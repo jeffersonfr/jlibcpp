@@ -421,38 +421,28 @@ void NativeApplication::InternalPaint()
   glEnable(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, texture);
 
-  // glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
-  // glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-  // glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  // glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
   gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, dw, dh, GL_RGBA, GL_UNSIGNED_BYTE, dst);
 
-  glViewport(0, 0, dw, dh);
+  glViewport(0, -dh, dw*2, dh*2);
   glClearColor(0, 0, 0, 0);
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  gluPerspective(70, 0.75, 0.2, 1000);
-
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  gluLookAt(0, 10, 0, 0, 0, 0, 1, 0, 0);
+  glMatrixMode(GL_TEXTURE);
 
   glActiveTexture(texture);
 
   glBegin(GL_QUADS);
 
-  glTexCoord2d(0,0); 
-  glVertex3f(-5.0f, 0, -5.0f);
-  glTexCoord2d(1,0); 
-  glVertex3f(-5.0f, 0, 5.0f);
-  glTexCoord2d(1,1); 
-  glVertex3f(5.0f, 0, 5.0f);
-  glTexCoord2d(0,1); 
-  glVertex3f(5.0f, 0, -5.0f);
+  glTexCoord2f(0.0f, 0.0f);
+  glVertex2f(-dw, 0.0f);
 
+  glTexCoord2f(0.0f, dh);
+  glVertex2f(-dw, dh);
+
+  glTexCoord2f(dw, dh);
+  glVertex2f(0, dh);
+
+  glTexCoord2f(dw, 0.0f);
+  glVertex2f(0, 0.0f);
+  
   glFlush();
   glEnd();
   glFinish();
