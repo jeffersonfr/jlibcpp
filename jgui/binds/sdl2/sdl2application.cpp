@@ -968,7 +968,39 @@ jwindow_rotation_t NativeWindow::GetRotation()
 
 void NativeWindow::SetIcon(jgui::Image *image)
 {
+  if (image == nullptr) {
+    return;
+  }
+
+  cairo_surface_t 
+    *cairo_surface = cairo_get_target(image->GetGraphics()->GetCairoContext());
+
   _icon = image;
+
+  if (cairo_surface == nullptr) {
+    return;
+  }
+
+  cairo_surface_flush(cairo_surface);
+
+  int dw = cairo_image_surface_get_width(cairo_surface);
+  int dh = cairo_image_surface_get_height(cairo_surface);
+  // int stride = cairo_image_surface_get_stride(cairo_surface);
+
+  uint8_t *data = cairo_image_surface_get_data(cairo_surface);
+
+  if (data == nullptr) {
+    return;
+  }
+
+  SDL_Surface *icon = SDL_CreateRGBSurfaceFrom(data, dw, dh, 32, dw*4, 0, 0, 0, 0);
+
+  if (nullptr == icon) {
+    return;
+  }
+
+  SDL_SetWindowIcon(_window, icon);
+  SDL_FreeSurface(icon);
 }
 
 jgui::Image * NativeWindow::GetIcon()

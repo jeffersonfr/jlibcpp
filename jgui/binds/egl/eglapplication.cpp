@@ -33,14 +33,17 @@
 #include <xcb/xcb_aux.h>
 #include <xcb/xcb_icccm.h>
 
+#include <GL/gl.h>
+#include <GL/glu.h>
+
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
 
 #include <GLES2/gl2.h>
 
 #include <xcb/xcb.h>
-#include <X11/Xlib-xcb.h>
 
+#include <X11/Xlib-xcb.h>
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <X11/cursorfont.h>
@@ -412,21 +415,51 @@ void NativeApplication::InternalPaint()
     }
 	}
 
-  GLint tex = 0;
+  GLuint texture;
 
+  glGenTextures(1, &texture);
   glEnable(GL_TEXTURE_2D);
-  glClear(GL_COLOR_BUFFER_BIT);
-  glGetIntegerv(GL_TEXTURE_BINDING_2D, &tex);
-  glBindTexture(GL_TEXTURE_2D, tex);
-  glPixelStorei(GL_UNPACK_ALIGNMENT, 8);
-  glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, dw, dh, GL_RGBA, GL_UNSIGNED_BYTE, dst);
-  glDisable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, texture);
+
+  // glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+  // glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+  // glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  // glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+  gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, dw, dh, GL_RGBA, GL_UNSIGNED_BYTE, dst);
+
+  glViewport(0, 0, dw, dh);
+  glClearColor(0, 0, 0, 0);
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  gluPerspective(70, 0.75, 0.2, 1000);
+
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  gluLookAt(0, 10, 0, 0, 0, 0, 1, 0, 0);
+
+  glActiveTexture(texture);
+
+  glBegin(GL_QUADS);
+
+  glTexCoord2d(0,0); 
+  glVertex3f(-5.0f, 0, -5.0f);
+  glTexCoord2d(1,0); 
+  glVertex3f(-5.0f, 0, 5.0f);
+  glTexCoord2d(1,1); 
+  glVertex3f(5.0f, 0, 5.0f);
+  glTexCoord2d(0,1); 
+  glVertex3f(5.0f, 0, -5.0f);
+
   glFlush();
+  glEnd();
+  glFinish();
 
   eglSwapBuffers(egl_display, egl_surface);
 
-  // glDeleteFramebuffers(1, &bin);
-  // glDeleteTextures(1, &tex2d);
+  glDeleteTextures(1, &texture);
 
   g_window->Flush();
 
@@ -744,7 +777,7 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
   */
 
   // TODO:: EGL_OPENGL_API, EGL_OPENGL_ES_API
-  if (!eglBindAPI(EGL_OPENGL_ES_API)) {
+  if (!eglBindAPI(EGL_OPENGL_API)) {
     throw jexception::RuntimeException("eglBindAPI failed");
   }
 
