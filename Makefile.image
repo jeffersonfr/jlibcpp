@@ -237,8 +237,10 @@ endif
 
 ifeq ($(findstring flif, $(ENABLE_IMAGE)), flif)
 	CCFLAGS		+= \
+		-I/home/jeff/Downloads/FLIF/src \
 
 	LDFLAGS		+= \
+		-lflif \
 
 	DEFINES		+= \
 		 -DFLIF_IMAGE \

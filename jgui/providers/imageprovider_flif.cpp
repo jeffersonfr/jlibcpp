@@ -19,58 +19,48 @@
  ***************************************************************************/
 #include "providers/include/imageprovider_flif.h"
 
-#include "jio/jfile.h"
-
-#include <fstream>
-
-// #include <flif.h>
+#include "config.h"
+#include "flif-enc.hpp"
+#include "flif-dec.hpp"
 
 namespace jgui {
 
 cairo_surface_t * create_flif_surface_from_data(uint8_t *data, int size)
 {
-  /*
-  FLIF_DECODER *d = flif_create_decoder();
-
-  if(d == nullptr) {
+  if (memcmp(data, "FLIF", 4) != 0) {
     return nullptr;
   }
 
-  flif_decoder_set_quality(d, 100);
-  flif_decoder_set_scale(d, 1);
-
-  if(flif_decoder_decode_memory(d, data, size) == 0)
-    flif_destroy_decoder(d);
-
+  BlobReader 
+    fio(data, size);
+  FLIF_INFO 
+    info;
+  Images 
+    images;
+  metadata_options 
+    md;
+  flif_options 
+    options = FLIF_DEFAULT_OPTIONS;
+  
+  md.icc = options.color_profile;
+  md.xmp = options.metadata;
+  md.exif = options.metadata;
+  
+  if (flif_decode(fio, images, nullptr, nullptr, 0, images, options, md, &info) == false) {
     return nullptr;
   }
 
-  FLIF_IMAGE *decoded = flif_decoder_get_image(d, 0);
+  int sw = info.width;
+  int sh = info.height;
+  int ch = info.channels;
+  int depth = info.bit_depth;
 
-  if(decoded == 0) {
-    flif_destroy_decoder(d);
-
+  if ((ch != 3 and ch != 4) or depth != 8) {
     return nullptr;
   }
 
-  FLIF_INFO *info = flif_read_info_from_memory(data, size);
-
-  if (info == 0) {
-    flif_destroy_decoder(d);
-
-    return nullptr;
-  }
-
-  int sw = flif_info_get_width(info);
-  int sh = flif_info_get_height(info);
-  int ch = flif_info_get_nb_channels(info);
-  int depth = flif_info_get_depth(info);
-
-  flif_destroy_info(info);
-
-  if (ch != 3 && ch != 4 && depth != 8) {
-    return nullptr;
-  }
+  const Image &image = images[0];
+  const GeneralPlane &plane = image.getPlane(0);
 
   cairo_surface_t 
     *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, sw, sh);
@@ -86,34 +76,35 @@ cairo_surface_t * create_flif_surface_from_data(uint8_t *data, int size)
 		return nullptr;
 	}
 
-  int 
-    length = sw*sh;
-
   if (ch == 3) {
-    for (int i=0; i<length; i++) {
-      dst[0] = src[2];
-      dst[1] = src[1];
-      dst[2] = src[0];
-      dst[3] = src[3];
+    for (int j=0; j<sh; j++) {
+      for (int i=0; i<sw; i++) {
+        ColorVal c = plane.get(j, i);
 
-      dst = dst + 4;
-      src = src + 4;
+        dst[0] = (c >> 0x10) & 0xff;
+        dst[1] = (c >> 0x08) & 0xff;
+        dst[2] = (c >> 0x00) & 0xff;
+        dst[3] = 0xff;
+
+        dst = dst + 4;
+      }
     }
   } else if (ch == 4) {
-    for (int i=0; i<length; i++) {
-      dst[0] = src[2];
-      dst[1] = src[1];
-      dst[2] = src[0];
-      dst[3] = src[3];
+    for (int j=0; j<sh; j++) {
+      for (int i=0; i<sw; i++) {
+        ColorVal c = plane.get(j, i);
 
-      dst = dst + 4;
-      src = src + 4;
+        dst[0] = (c >> 0x10) & 0xff;
+        dst[1] = (c >> 0x08) & 0xff;
+        dst[2] = (c >> 0x00) & 0xff;
+        dst[3] = (c >> 0x18) & 0xff;
+
+        dst = dst + 4;
+      }
     }
   }
 
 	cairo_surface_mark_dirty(surface);
-  flif_destroy_decoder(d);
-  */
 
   return nullptr;
 }

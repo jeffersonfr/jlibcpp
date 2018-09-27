@@ -401,27 +401,13 @@ void NativeApplication::InternalPaint()
     return;
   }
 
-  GLubyte dst[dh][dw][4];
-	uint8_t *src = data;
-
-  for (int i=dh-1; i>=0; i--) {
-    for (int j=0; j<dw; j++) {
-      dst[i][j][0] = (GLubyte)src[2];
-      dst[i][j][1] = (GLubyte)src[1];
-      dst[i][j][2] = (GLubyte)src[0];
-      dst[i][j][3] = (GLubyte)src[3];
-
-      src = src + 4;
-    }
-	}
-
   GLuint texture;
 
   glGenTextures(1, &texture);
   glEnable(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, texture);
 
-  gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, dw, dh, GL_RGBA, GL_UNSIGNED_BYTE, dst);
+  gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, dw, dh, GL_BGRA, GL_UNSIGNED_BYTE, data);
 
   glViewport(0, -dh, dw*2, dh*2);
   glClearColor(0, 0, 0, 0);
@@ -432,16 +418,16 @@ void NativeApplication::InternalPaint()
   glBegin(GL_QUADS);
 
   glTexCoord2f(0.0f, 0.0f);
-  glVertex2f(-dw, 0.0f);
-
-  glTexCoord2f(0.0f, dh);
   glVertex2f(-dw, dh);
 
+  glTexCoord2f(0.0f, dh);
+  glVertex2f(-dw, 0.0f);
+
   glTexCoord2f(dw, dh);
-  glVertex2f(0, dh);
+  glVertex2f(0, 0.0f);
 
   glTexCoord2f(dw, 0.0f);
-  glVertex2f(0, 0.0f);
+  glVertex2f(0, dh);
   
   glFlush();
   glEnd();

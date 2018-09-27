@@ -437,6 +437,8 @@ void NativeApplication::InternalPaint()
 		return;
 	}
 
+  // OPTIMIZE:: cairo_xlib_surface_create(Display, Drawable, Visual, width, height)
+  
   jregion_t 
     r = g_window->GetVisibleBounds();
   jgui::Image 
