@@ -17,6 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#define RASPBERRY_PI
+
 #include "binds/include/nativeapplication.h"
 #include "binds/include/nativewindow.h"
 
@@ -28,16 +30,29 @@
 
 #include <thread>
 
+#ifdef RASPBERRY_PI
+
+extern "C" {
+	#include "bcm_host.h"
+}
+
+#include "GLES/gl.h"
+#include "EGL/egl.h"
+
+#define SW 480*2
+#define SH 270*2
+
+#else
+
 #include <xcb/xcb.h>
 #include <xcb/xcb_image.h>
 #include <xcb/xcb_aux.h>
 #include <xcb/xcb_icccm.h>
 
-#include <GL/gl.h>
 #include <GL/glu.h>
 
 #include <EGL/egl.h>
-#include <EGL/eglext.h>
+// #include <EGL/eglext.h>
 
 #include <GLES2/gl2.h>
 
@@ -48,33 +63,31 @@
 #include <X11/Xatom.h>
 #include <X11/cursorfont.h>
 
+#endif
+
 #include <cairo.h>
 #include <cairo-xcb.h>
 
 namespace jgui {
 
-
 #ifdef RASPBERRY_PI
-static EGL_DISPMANX_WINDOW_T _xwindow;
 
-static DISPMANX_ELEMENT_HANDLE_T dispman_element;
 static DISPMANX_DISPLAY_HANDLE_T dispman_display;
+static DISPMANX_ELEMENT_HANDLE_T dispman_element;
 static DISPMANX_UPDATE_HANDLE_T dispman_update;
-static VC_RECT_T dst_rect;
-static VC_RECT_T src_rect;
+
+static EGL_DISPMANX_WINDOW_T window;
+
+#else
+
+static Display *_xdisplay;
+static xcb_connection_t *connection;
+static xcb_screen_t *_xscreen;
+static xcb_window_t window;
+static xcb_gcontext_t context;
+
 #endif
 
-
-/** \brief */
-Display *_xdisplay = nullptr;
-/** \brief */
-static xcb_connection_t *_xconnection = nullptr;
-/** \brief */
-static xcb_screen_t *_xscreen = nullptr;
-/** \brief */
-static xcb_window_t _xwindow = 0;
-/** \brief */
-static xcb_gcontext_t _xcontext;
 /** \brief */
 static EGLDisplay egl_display;
 /** \brief */
@@ -111,8 +124,6 @@ static bool _cursor_enabled = true;
 static jcursor_style_t _cursor;
 /** \brief */
 static bool _visible = true;
-/** \brief */
-static jgui::jregion_t _previous_bounds;
 
 static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(xcb_keycode_t symbol, bool capital)
 {
@@ -329,28 +340,94 @@ NativeApplication::~NativeApplication()
 
 void NativeApplication::InternalInit(int argc, char **argv)
 {
+  EGLint num_config;
+
 #ifdef RASPBERRY_PI
+  
   bcm_host_init();
-#endif
+
+  /*
+  if (!eglBindAPI(EGL_OPENGL_ES_API)) {
+    throw jexception::RuntimeException("Unable to bind opengl es api");
+  }
+  */
+
+  egl_display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+
+#else 
 
   _xdisplay = XOpenDisplay(nullptr);
 
   if (!_xdisplay) {
-    printf("XOpenDisplay() failed");
+    throw jexception::RuntimeException("Unable to open display");
   }
 
-  _xconnection = XGetXCBConnection(_xdisplay);
-  // _xconnection = xcb_connect(nullptr,nullptr);
+  connection = XGetXCBConnection(_xdisplay);
+  // connection = xcb_connect(nullptr,nullptr);
 
-  if (xcb_connection_has_error(_xconnection)) {
-		throw jexception::RuntimeException("Unable to open display");
+  if (xcb_connection_has_error(connection)) {
+		throw jexception::RuntimeException("Unable to connect to display");
   }
 
   // get the first screen
-  _xscreen = xcb_setup_roots_iterator(xcb_get_setup(_xconnection)).data;
+  _xscreen = xcb_setup_roots_iterator(xcb_get_setup(connection)).data;
+
+  if (!eglBindAPI(EGL_OPENGL_API)) {
+    throw jexception::RuntimeException("Unable to bind opengl api");
+  }
+
+  egl_display = eglGetDisplay(_xdisplay);
+
+#endif
+
+  const EGLint attribute_list[] = {
+    EGL_RED_SIZE, 8,
+    EGL_GREEN_SIZE, 8,
+    EGL_BLUE_SIZE, 8,
+    EGL_ALPHA_SIZE, 8,
+    EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
+    EGL_NONE
+  };
+
+  const EGLint egl_context_attribs[] = {
+    EGL_NONE,
+  };
+
+  if (egl_display == EGL_NO_DISPLAY) {
+    throw jexception::RuntimeException("Unable to get egl display");
+  }
+
+  if (eglInitialize(egl_display, nullptr, nullptr) == EGL_FALSE) {
+    throw jexception::RuntimeException("Unable to initialize egl");
+  }
+
+  if (eglChooseConfig(egl_display, attribute_list, &egl_config, 1, &num_config) == EGL_FALSE) {
+    throw jexception::RuntimeException("Unable to choose egl configuration");
+  }
+
+  egl_context = eglCreateContext(egl_display, egl_config, EGL_NO_CONTEXT, egl_context_attribs); 
+  
+  if (egl_context == EGL_NO_CONTEXT) {
+    throw jexception::RuntimeException("eglCreateContext() failed");
+  }
+
+#ifdef RASPBERRY_PI
+
+  uint32_t w, h;
+
+  if (graphics_get_display_size(0, &w, &h) < 0) {
+    throw jexception::RuntimeException("Unable to get screen size");
+  }
+
+  _screen.width = w;
+  _screen.height = h;
+
+#else
 
   _screen.width = _xscreen->width_in_pixels;
   _screen.height = _xscreen->height_in_pixels;
+
+#endif
 }
 
 void NativeApplication::InternalPaint()
@@ -404,9 +481,67 @@ void NativeApplication::InternalPaint()
   GLuint texture;
 
   glGenTextures(1, &texture);
+
+#ifdef RASPBERRY_PI
+
+  static const GLfloat coords[4 * 2] = {
+    0.0f,  1.0f,
+    0.0f,  0.0f,
+    1.0f,  1.0f,
+    1.0f,  0.0f
+  };
+
+  static const GLbyte verts[4*3] = {
+    -1, -1, 0,
+     1, -1, 0,
+    -1,  1, 0,
+     1,  1, 0
+  };
+
+  GLubyte dst[dh][dw][3];
+  uint8_t *src = data;
+
+  for (int i=dh-1; i>=0; i--) {
+	  for (int j=0; j<dw; j++) {
+		  dst[i][j][0] = (GLubyte)src[2];
+		  dst[i][j][1] = (GLubyte)src[1];
+		  dst[i][j][2] = (GLubyte)src[0];
+
+		  src = src + 4;
+	  }
+  }
+
+  glBindTexture(GL_TEXTURE_2D, texture);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SW, SH, 0, GL_RGB, GL_UNSIGNED_BYTE, dst);
+
+  glViewport(0, 0, dw*2, dh*2);
+  glClearColor(0, 0, 0, 0);
+  glMatrixMode(GL_TEXTURE);
+
+  glActiveTexture(texture);
+
+  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, (GLfloat)GL_NEAREST);
+  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, (GLfloat)GL_NEAREST);
+
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glVertexPointer(3, GL_BYTE, 0, verts);
+
+  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+  glTexCoordPointer(2, GL_FLOAT, 0, coords);
+
   glEnable(GL_TEXTURE_2D);
+
   glBindTexture(GL_TEXTURE_2D, texture);
 
+  glRotatef(90, 0.0f, 0.0f, 1.0f);
+
+  glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+  glRotatef(-90, 0.0f, 0.0f, 1.0f);
+
+#else
+
+  glBindTexture(GL_TEXTURE_2D, texture);
   gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, dw, dh, GL_BGRA, GL_UNSIGNED_BYTE, data);
 
   glViewport(0, -dh, dw*2, dh*2);
@@ -429,14 +564,17 @@ void NativeApplication::InternalPaint()
   glTexCoord2f(dw, 0.0f);
   glVertex2f(0, dh);
   
+  // glEnd();
+  
+#endif
+
   glFlush();
-  glEnd();
   glFinish();
 
   eglSwapBuffers(egl_display, egl_surface);
 
   glDeleteTextures(1, &texture);
-
+  
   g_window->Flush();
 
   delete buffer;
@@ -445,36 +583,29 @@ void NativeApplication::InternalPaint()
   g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_PAINTED));
 }
 
-struct my_event_queue_t {
-  xcb_generic_event_t *prev = nullptr;
-  xcb_generic_event_t *current = nullptr;
-  xcb_generic_event_t *next = nullptr;
-} event_queue;
-
-void update_event_queue(){
-  std::free(event_queue.prev);
-
-  event_queue.prev = event_queue.current;
-  event_queue.current = event_queue.next;
-  event_queue.next = xcb_poll_for_queued_event(_xconnection);
-}
-
 void NativeApplication::InternalLoop()
 {
-  xcb_generic_event_t *event;
   bool quitting = false;
 
+#ifdef RASPBERRY_PI
+
+#else
+
+  xcb_generic_event_t *event;
+
   xcb_intern_atom_cookie_t 
-    cookie = xcb_intern_atom(_xconnection, 1, 12, "WM_PROTOCOLS");
+    cookie = xcb_intern_atom(connection, 1, 12, "WM_PROTOCOLS");
   xcb_intern_atom_reply_t
-    *reply = xcb_intern_atom_reply(_xconnection, cookie, 0);
+    *reply = xcb_intern_atom_reply(connection, cookie, 0);
 
   xcb_intern_atom_cookie_t 
-    cookie2 = xcb_intern_atom(_xconnection, 0, 16, "WM_DELETE_WINDOW");
+    cookie2 = xcb_intern_atom(connection, 0, 16, "WM_DELETE_WINDOW");
   xcb_intern_atom_reply_t 
-    *reply2 = xcb_intern_atom_reply(_xconnection, cookie2, 0);
+    *reply2 = xcb_intern_atom_reply(connection, cookie2, 0);
 
-  xcb_change_property(_xconnection, XCB_PROP_MODE_REPLACE, _xwindow, (*reply).atom, 4, 32, 1, &(*reply2).atom);
+  xcb_change_property(connection, XCB_PROP_MODE_REPLACE, window, (*reply).atom, 4, 32, 1, &(*reply2).atom);
+
+#endif
 
 	while (quitting == false) {
     // INFO:: process api events
@@ -503,8 +634,12 @@ void NativeApplication::InternalLoop()
       }
     }
 
-    while ((event = xcb_poll_for_event(_xconnection))) {
-    // while (e = xcb_wait_for_event(_xconnection)) {
+#ifdef RASPBERRY_PI
+
+#else
+
+    while ((event = xcb_poll_for_event(connection))) {
+    // while (e = xcb_wait_for_event(connection)) {
       uint32_t id = event->response_type & ~0x80;
 
       if (id == XCB_EXPOSE) {
@@ -637,22 +772,28 @@ void NativeApplication::InternalLoop()
 
       free(event);
 
-      xcb_flush(_xconnection);
+      xcb_flush(connection);
     }
     
+#endif
+
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
 
-  xcb_disconnect(_xconnection);
-  
   g_window->SetVisible(false);
   g_window->GrabEvents();
 }
 
 void NativeApplication::InternalQuit()
 {
-  xcb_destroy_window(_xconnection, _xwindow);
-  xcb_disconnect(_xconnection);
+#ifdef RASPBERRY_PI
+
+#else
+
+  xcb_destroy_window(connection, window);
+  xcb_disconnect(connection);
+
+#endif
 }
 
 NativeWindow::NativeWindow(int x, int y, int width, int height):
@@ -660,23 +801,51 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 {
 	jcommon::Object::SetClassName("jgui::NativeWindow");
 
-	if (_xwindow != 0) {
-		throw jexception::RuntimeException("Cannot create more than one window");
-  }
-
   _icon = new BufferedImage(_DATA_PREFIX"/images/small-gnu.png");
 
-	_xwindow = 0;
 	_mouse_x = 0;
 	_mouse_y = 0;
 	_last_keypress = std::chrono::steady_clock::now();
 	_click_count = 1;
 
+#ifdef RASPBERRY_PI
+
+  VC_RECT_T dst_rect;
+  VC_RECT_T src_rect;
+
+  dst_rect.x = 0;
+  dst_rect.y = 0;
+  dst_rect.width = _screen.width;
+  dst_rect.height = _screen.height;
+
+  src_rect.x = 0;
+  src_rect.y = 0;
+  src_rect.width = _screen.width << 16;
+  src_rect.height = _screen.height << 16;
+
+  dispman_display = vc_dispmanx_display_open(0);
+  dispman_update = vc_dispmanx_update_start(0);
+
+  dispman_element = vc_dispmanx_element_add (
+		  dispman_update, dispman_display, 0, &dst_rect, 0, &src_rect, DISPMANX_PROTECTION_NONE, 0, 0, (DISPMANX_TRANSFORM_T)0);
+
+  window.element = dispman_element;
+  window.width = _screen.width;
+  window.height = _screen.height;
+
+  vc_dispmanx_update_submit_sync(dispman_update);
+
+#else
+
+  if (window != 0) {
+	  throw jexception::RuntimeException("Cannot create more than one window");
+  }
+
   uint32_t
     mask,
     values[2];
 
-  _xwindow = xcb_generate_id(_xconnection);
+  window = xcb_generate_id(connection);
 
   mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
   values[0] = _xscreen->black_pixel;
@@ -685,24 +854,26 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
     XCB_EVENT_MASK_ENTER_WINDOW | XCB_EVENT_MASK_LEAVE_WINDOW | XCB_EVENT_MASK_STRUCTURE_NOTIFY;
 
   xcb_create_window(
-      _xconnection, XCB_COPY_FROM_PARENT, _xwindow, _xscreen->root, x, y, width, height, 1, XCB_WINDOW_CLASS_INPUT_OUTPUT, _xscreen->root_visual, mask, values);
+      connection, XCB_COPY_FROM_PARENT, window, _xscreen->root, x, y, width, height, 1, XCB_WINDOW_CLASS_INPUT_OUTPUT, _xscreen->root_visual, mask, values);
 
   mask = XCB_GC_FOREGROUND | XCB_GC_GRAPHICS_EXPOSURES;
   values[0] = _xscreen->black_pixel;
   values[1] = 0;
 
-  _xcontext = xcb_generate_id(_xconnection);
+  context = xcb_generate_id(connection);
 
-  xcb_create_gc(_xconnection, _xcontext, _xwindow, mask, values);
+  xcb_create_gc(connection, context, window, mask, values);
 
   // INFO:: change parameters after the window creation
   // const static uint32_t values[] = { XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_BUTTON_PRESS };
   // xcb_change_window_attributes (connection, window, XCB_CW_EVENT_MASK, values);
 
-  xcb_map_window(_xconnection, _xwindow);
-  xcb_flush(_xconnection);
+  xcb_map_window(connection, window);
+  xcb_flush(connection);
 
-  // INFO:: initializing EGL
+#endif
+
+  /*
   const EGLint egl_config_attribs[] = {
     EGL_COLOR_BUFFER_TYPE,     EGL_RGB_BUFFER,
     EGL_BUFFER_SIZE,           32,
@@ -722,10 +893,7 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 
     EGL_NONE,
   };
-
-  const EGLint egl_context_attribs[] = {
-    EGL_NONE,
-  };
+  */
 
   const EGLint egl_surface_attribs[] = {
     EGL_RENDER_BUFFER, 
@@ -733,100 +901,25 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
     EGL_NONE,
   };
 
-  EGLint ignore;
-
-  /*
-  PFNEGLCREATEIMAGEKHRPROC eglCreateImageKHR;
-  PFNGLEGLIMAGETARGETTEXTURE2DOESPROC glEGLImageTargetTexture2DOES;
-
-  eglCreateImageKHR = (PFNEGLCREATEIMAGEKHRPROC)eglGetProcAddress("eglCreateImageKHR");
-
-  if (eglCreateImageKHR == nullptr) {
-    throw jexception::RuntimeException("eglCreateImageKHR not found");
-  }
-
-  glEGLImageTargetTexture2DOES = (PFNGLEGLIMAGETARGETTEXTURE2DOESPROC)eglGetProcAddress("glEGLImageTargetTexture2DOES");
-
-  if (glEGLImageTargetTexture2DOES == nullptr) {
-    throw jexception::RuntimeException("glEGLImageTargetTexture2DOES not found");
-  }
-  */
-
-  // TODO:: EGL_OPENGL_API, EGL_OPENGL_ES_API
-  if (!eglBindAPI(EGL_OPENGL_API)) {
-    throw jexception::RuntimeException("eglBindAPI failed");
-  }
-
-  egl_display = eglGetDisplay(_xdisplay);
-
-  if (egl_display == EGL_NO_DISPLAY) {
-    throw jexception::RuntimeException("eglGetDisplay() failed");
-  }
-
-  if (!eglInitialize(egl_display, &ignore, &ignore)) {
-    throw jexception::RuntimeException("eglInitialize() failed");
-  }
-
-  EGLint 
-    num_configs,
-    configs_size = 256;
-  EGLConfig
-    *configs = new EGLConfig[configs_size];
-
-  if (!eglChooseConfig(egl_display, egl_config_attribs, configs, configs_size, &num_configs)) {
-    throw jexception::RuntimeException("eglChooseConfig() failed");
-  }
-
-  if (num_configs == 0) {
-    throw jexception::RuntimeException("failed to find suitable EGLConfig");
-  }
-
-  egl_config = configs[0];
-
-  delete [] configs;
-
-  egl_context = eglCreateContext(egl_display, egl_config, EGL_NO_CONTEXT, egl_context_attribs); 
-  
-  if (!egl_context) {
-    throw jexception::RuntimeException("eglCreateContext() failed");
-  }
-
 #ifdef RASPBERRY_PI
-  graphics_get_display_size(0 /* LCD */, &egl->DisplayWidth, &egl->DisplayHeight);
 
-  dst_rect.x = 0;
-  dst_rect.y = 0;
-  dst_rect.width = egl->DisplayWidth;
-  dst_rect.height = egl->DisplayHeight;
+  egl_surface = eglCreateWindowSurface(egl_display, egl_config, &window, egl_surface_attribs);
 
-  src_rect.x = 0;
-  src_rect.y = 0;
-  src_rect.width  = dst_rect.width  << 16; // ANDI: fixed point 16.16?
-  src_rect.height = dst_rect.height << 16; 
+#else
 
-  dispman_display = vc_dispmanx_display_open( 0); 
-  dispman_update = vc_dispmanx_update_start( 0 );
+  egl_surface = eglCreateWindowSurface(egl_display, egl_config, window, egl_surface_attribs);
 
-  dispman_element = vc_dispmanx_element_add(dispman_update, dispman_display, 0, &dst_rect, 0, &src_rect, DISPMANX_PROTECTION_NONE, 0, 0, 0); 
-
-  nativewindow.element = dispman_element;
-  nativewindow.width   = egl->DisplayWidth;
-  nativewindow.height  = egl->DisplayHeight;
-
-  vc_dispmanx_update_submit_sync(dispman_update);
 #endif
-
-  egl_surface = eglCreateWindowSurface(egl_display, egl_config, _xwindow, egl_surface_attribs);
 
   if (!egl_surface) {
     throw jexception::RuntimeException("eglCreateWindowSurface() failed");
   }
 
-  if (!eglMakeCurrent(egl_display, egl_surface, egl_surface, egl_context)) {
+  if (eglMakeCurrent(egl_display, egl_surface, egl_surface, egl_context) == EGL_FALSE) {
     throw jexception::RuntimeException("eglMakeCurrent() failed");
   }
 
-  if (!eglSwapInterval(egl_display, 1)) {
+  if (eglSwapInterval(egl_display, 1) == EGL_FALSE) {
     throw jexception::RuntimeException("eglSwapInterval() failed");
   }
 }
@@ -837,27 +930,22 @@ NativeWindow::~NativeWindow()
   g_window = nullptr;
 }
 
-xcb_intern_atom_cookie_t getCookieForAtom(const char *state_name) 
-{
-  return xcb_intern_atom(_xconnection, 0, sizeof(state_name)/sizeof(char), state_name);
-}
-
-xcb_atom_t getReplyAtomFromCookie(xcb_intern_atom_cookie_t cookie) 
-{
-  xcb_generic_error_t 
-    *error;
-  xcb_intern_atom_reply_t 
-    *reply = xcb_intern_atom_reply(_xconnection, cookie, &error);
-
-  if (error) {
-    return 0;
-  }
-
-  return reply->atom;
-}
-
 void NativeWindow::ToggleFullScreen()
 {
+#ifdef RASPBERRY_PI
+  
+  if (_fullscreen == false) {
+    _fullscreen = true;
+  } else {
+    _fullscreen = false;
+  }
+
+#else
+
+  static jgui::jregion_t _previous_bounds = {
+	  0, 0, 0, 0
+  };
+
   if (_fullscreen == false) {
     _previous_bounds = GetVisibleBounds();
 
@@ -865,47 +953,16 @@ void NativeWindow::ToggleFullScreen()
 
     _fullscreen = true;
   } else {
-    xcb_unmap_window(_xconnection, _xwindow);
+    xcb_unmap_window(connection, window);
     SetBounds(_previous_bounds.x, _previous_bounds.y, _previous_bounds.width, _previous_bounds.height);
-    xcb_map_window(_xconnection, _xwindow);
+    xcb_map_window(connection, window);
 
     _fullscreen = false;
   }
   
-  xcb_flush(_xconnection);
+  xcb_flush(connection);
 
-  /*
-  xcb_intern_atom_cookie_t wm_state_ck = getCookieForAtom("_NET_WM_STATE");
-  xcb_intern_atom_cookie_t wm_state_fs_ck = getCookieForAtom("_NET_WM_STATE_FULLSCREEN");
-
-#define _NET_WM_STATE_REMOVE        0    // remove/unset property
-#define _NET_WM_STATE_ADD           1    // add/set property
-#define _NET_WM_STATE_TOGGLE        2    // toggle property
-
-  xcb_atom_t atom_from_cookie = getReplyAtomFromCookie(wm_state_ck); 
-
-  printf("::: 001\n");
-  if (atom_from_cookie == 0) {
-    return;
-  }
-  printf("::: 002\n");
-
-  xcb_client_message_event_t ev;
-  // memset (&ev, 0, sizeof (ev));
-  ev.response_type = XCB_CLIENT_MESSAGE;
-  ev.type = atom_from_cookie;
-  ev.format = 32;
-  ev.window = _xwindow;
-  // ev.data.data32[0] = _fullscreen ? _NET_WM_STATE_ADD : _NET_WM_STATE_REMOVE;
-  ev.data.data32[0] = _NET_WM_STATE_TOGGLE;
-  ev.data.data32[1] = getReplyAtomFromCookie(wm_state_fs_ck);
-  ev.data.data32[2] = XCB_ATOM_NONE;
-  ev.data.data32[3] = 0;
-  ev.data.data32[4] = 0;
-
-  xcb_send_event(
-      _xconnection, 1, _xwindow, XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT | XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY, (const char*)(&ev));
-      */
+#endif
 }
 
 void NativeWindow::SetParent(jgui::Container *c)
@@ -925,7 +982,13 @@ void NativeWindow::SetTitle(std::string title)
 {
 	_title = title;
 		
-  xcb_change_property(_xconnection, XCB_PROP_MODE_REPLACE, _xwindow, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, title.size(), title.c_str());
+#ifdef RASPBERRY_PI
+
+#else
+
+  xcb_change_property(connection, XCB_PROP_MODE_REPLACE, window, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, title.size(), title.c_str());
+
+#endif
 }
 
 std::string NativeWindow::GetTitle()
@@ -954,10 +1017,16 @@ bool NativeWindow::IsUndecorated()
 
 void NativeWindow::SetBounds(int x, int y, int width, int height)
 {
+#ifdef RASPBERRY_PI
+
+#else
+
   const uint32_t 
     values[] = {(uint32_t)x, (uint32_t)y, (uint32_t)width, (uint32_t)height};
 
-  xcb_configure_window(_xconnection, _xwindow, XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y | XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT, values);
+  xcb_configure_window(connection, window, XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y | XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT, values);
+
+#endif
 }
 
 jgui::jregion_t NativeWindow::GetVisibleBounds()
@@ -965,12 +1034,19 @@ jgui::jregion_t NativeWindow::GetVisibleBounds()
 	jgui::jregion_t 
     t = {0, 0, 0, 0};
 
+#ifdef RASPBERRY_PI
+
+	t.width = SW;
+	t.height = SH;
+
+#else
+
   xcb_get_geometry_cookie_t 
-    cookie = xcb_get_geometry(_xconnection, _xwindow);
+    cookie = xcb_get_geometry(connection, window);
   xcb_get_geometry_reply_t 
     *reply = nullptr;
 
-  if ((reply = xcb_get_geometry_reply(_xconnection, cookie, nullptr))) {
+  if ((reply = xcb_get_geometry_reply(connection, cookie, nullptr))) {
     t.x = reply->x;
     t.y = reply->y;
     t.width = reply->width;
@@ -978,6 +1054,8 @@ jgui::jregion_t NativeWindow::GetVisibleBounds()
   }
 
   free(reply);
+
+#endif
 
 	return t;
 }
@@ -1013,7 +1091,7 @@ void NativeWindow::SetCursorLocation(int x, int y)
 		y = _screen.height;
 	}
 
-	// XWarpPointer(_display, None, _xwindow, 0, 0, size.width, size.height, x, y);
+	// XWarpPointer(_display, None, window, 0, 0, size.width, size.height, x, y);
 }
 
 jpoint_t NativeWindow::GetCursorLocation()
@@ -1032,13 +1110,19 @@ void NativeWindow::SetVisible(bool visible)
 {
   _visible = visible;
 
+#ifdef RASPBERRY_PI
+
+#else
+
   if (visible == true) {
-    xcb_map_window(_xconnection, _xwindow);
+    xcb_map_window(connection, window);
   } else {
-    xcb_unmap_window(_xconnection, _xwindow);
+    xcb_unmap_window(connection, window);
   }
   
-  xcb_flush(_xconnection);
+  xcb_flush(connection);
+
+#endif
 }
 
 bool NativeWindow::IsVisible()
@@ -1066,6 +1150,12 @@ bool NativeWindow::IsCursorEnabled()
 
 void NativeWindow::SetCursor(jcursor_style_t style)
 {
+  _cursor = style;
+
+#ifdef RASPBERRY_PI
+
+#else
+
   int type = XC_arrow;
   
   if (style == JCS_DEFAULT) {
@@ -1102,19 +1192,17 @@ void NativeWindow::SetCursor(jcursor_style_t style)
     type = XC_watch;
   }
 
-  
-
-  xcb_font_t font = xcb_generate_id(_xconnection);
-  xcb_cursor_t cursor = xcb_generate_id(_xconnection);
-  xcb_create_glyph_cursor(_xconnection, cursor, font, font, type, type + 1, 0, 0, 0, 0, 0, 0 );
+  xcb_font_t font = xcb_generate_id(connection);
+  xcb_cursor_t cursor = xcb_generate_id(connection);
+  xcb_create_glyph_cursor(connection, cursor, font, font, type, type + 1, 0, 0, 0, 0, 0, 0 );
 
   uint32_t mask = XCB_CW_CURSOR;
   uint32_t values = cursor;
 
-  xcb_change_window_attributes(_xconnection, _xwindow, mask, &values);
-  xcb_free_cursor(_xconnection, cursor);
+  xcb_change_window_attributes(connection, window, mask, &values);
+  xcb_free_cursor(connection, cursor);
 
-  _cursor = style;
+#endif
 }
 
 void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)

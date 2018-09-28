@@ -19,14 +19,16 @@
  ***************************************************************************/
 #include "jgui/japplication.h"
 #include "jgui/jwindow.h"
+#include "jgui/jbufferedimage.h"
 
 class Fire : public jgui::Window {
 
   private:
+    jgui::BufferedImage
+      *image;
     uint32_t 
       palette[256], // this will contain the color palette
-      *fire,
-      *buffer; // this is the buffer to be drawn to the screen
+      *fire;
 
   public:
     Fire():
@@ -40,7 +42,9 @@ class Fire : public jgui::Window {
         b;
 
       fire = new uint32_t[size.width*size.height];
-      buffer = new uint32_t[size.width*size.height/2];
+      
+      image = 
+        new jgui::BufferedImage(jgui::JPF_ARGB, size.width, size.height/2);
 
       for (int i = 0; i < size.width*size.height; i++) {
         fire[i] = 0;
@@ -63,16 +67,28 @@ class Fire : public jgui::Window {
     {
       delete [] fire;
       fire = nullptr;
-
-      delete [] buffer;
-      buffer = nullptr;
     }
 
     virtual void Paint(jgui::Graphics *g) 
     {
       jgui::jsize_t size = GetSize();
 
-      // randomize the bottom row of the fire buffer
+      cairo_surface_t 
+        *cairo_surface = cairo_get_target(g->GetCairoContext());
+
+      if (cairo_surface == nullptr) {
+        return;
+      }
+
+      // cairo_surface_flush(cairo_surface);
+
+      uint8_t 
+        *data = cairo_image_surface_get_data(cairo_surface);
+
+      if (data == nullptr) {
+        return;
+      }
+
       for (int x = 0; x < size.width; x++) {
         fire[(size.height/2)*size.width + x] = abs(32768 + rand()) % 256;
       }
@@ -88,16 +104,16 @@ class Fire : public jgui::Window {
 
         for (int x = 0; x < size.width; x++) {
           *ptr++ = ((
-                fire[idx1 + (x - 1 + size.width) % size.width] + 
-                fire[idx1 + (x + 0) % size.width] + 
-                fire[idx1 + (x + 1) % size.width] + 
-                fire[idx2 + (x + 0) % size.width]
+                fire[idx1 + x + size.width - 1] + 
+                fire[idx1 + x] + 
+                fire[idx1 + x + 1] + 
+                fire[idx2 + x]
                 ) * 32) / 129;
         }
       }
 
       uint32_t 
-        *ptr2 = buffer;
+        *ptr2 = (uint32_t *)data + size.width*size.height/2;
 
       ptr = fire;
 
@@ -107,12 +123,10 @@ class Fire : public jgui::Window {
           if (*ptr > 255) {
             continue;
           }
+
           *ptr2++ = palette[*ptr++];
         }
       }
-
-      g->SetCompositeFlags(jgui::JCF_SRC);
-      g->SetRGBArray(buffer, 0, size.height/2, size.width, size.height/2);
     }
 
     virtual void ShowApp()
@@ -130,10 +144,11 @@ int main(int argc, char *argv[])
 
   Fire app;
 
-	app.SetTitle("Bitmask");
+	app.SetTitle("Fire");
   app.Exec();
 
 	jgui::Application::Loop();
 
 	return 0;
 }
+
