@@ -480,7 +480,10 @@ void NativeApplication::InternalPaint()
   g_window->Paint(g);
   g_window->PaintGlassPane(g);
 	g->Translate(t.x, t.y);
-  g->DrawImage(_current_cursor.cursor, _mouse_x, _mouse_y);
+    
+  if (_is_cursor_enabled == true) {
+    g->DrawImage(_current_cursor.cursor, _mouse_x, _mouse_y);
+  }
 
   cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
 

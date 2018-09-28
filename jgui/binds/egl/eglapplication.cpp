@@ -134,7 +134,7 @@ static bool _undecorated = false;
 /** \brief */
 static bool _resizable = true;
 /** \brief */
-static bool _cursor_enabled = true;
+static bool _is_cursor_enabled = true;
 /** \brief */
 static jcursor_style_t _cursor;
 /** \brief */
@@ -702,6 +702,10 @@ void NativeApplication::InternalPaint()
   g_window->PaintGlassPane(g);
 	g->Translate(t.x, t.y);
 
+  if (_is_cursor_enabled == true) {
+    g->DrawImage(_current_cursor.cursor, _mouse_x, _mouse_y);
+  }
+
   cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
 
   if (cairo_surface == nullptr) {
@@ -901,7 +905,7 @@ void NativeApplication::InternalLoop()
         delete event;
         event = nullptr;
       }
-    } else if (_cursor_enabled == true) {
+    } else if (_is_cursor_enabled == true) {
       if (mouse_x != _mouse_x or mouse_y != _mouse_y) {
         mouse_x = _mouse_x;
         mouse_y = _mouse_y;
@@ -1552,15 +1556,15 @@ jcursor_style_t NativeWindow::GetCursor()
 
 void NativeWindow::SetCursorEnabled(bool enabled)
 {
-  _cursor_enabled = enabled;
+  _is_cursor_enabled = enabled;
 
-	// XDefineCursor(_display, _window, _cursor_enabled);
+	// XDefineCursor(_display, _window, _is_cursor_enabled);
 	// XFlush(_display);
 }
 
 bool NativeWindow::IsCursorEnabled()
 {
-	return _cursor_enabled;
+	return _is_cursor_enabled;
 }
 
 void NativeWindow::SetCursor(jcursor_style_t style)
