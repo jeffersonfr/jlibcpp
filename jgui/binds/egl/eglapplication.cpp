@@ -39,6 +39,11 @@ extern "C" {
 #include "GLES/gl.h"
 #include "EGL/egl.h"
 
+#include <linux/input.h>
+
+#include <termio.h>
+#include <fcntl.h>
+
 #define SW 480*2
 #define SH 270*2
 
@@ -77,6 +82,16 @@ static DISPMANX_ELEMENT_HANDLE_T dispman_element;
 static DISPMANX_UPDATE_HANDLE_T dispman_update;
 
 static EGL_DISPMANX_WINDOW_T window;
+
+struct cursor_params_t {
+  jgui::Image *cursor;
+  int hot_x;
+  int hot_y;
+};
+
+static std::map<jcursor_style_t, struct cursor_params_t> _cursors;
+
+static struct cursor_params_t _current_cursor;
 
 #else
 
@@ -124,6 +139,201 @@ static bool _cursor_enabled = true;
 static jcursor_style_t _cursor;
 /** \brief */
 static bool _visible = true;
+
+#ifdef RASPBERRY_PI
+
+static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(int symbol, bool shift)
+{
+	switch (symbol) {
+		case 0x1c:
+			return jevent::JKS_ENTER; // jevent::JKS_RETURN;
+		case 0x0e:
+			return jevent::JKS_BACKSPACE;
+		case 0x0f:
+			return jevent::JKS_TAB;
+		// case SDLK_CANCEL:
+		//	return jevent::JKS_CANCEL;
+		case 0x01:
+			return jevent::JKS_ESCAPE;
+		case 0x39:
+			return jevent::JKS_SPACE;
+		case 0x29:
+			return (shift == false)?jevent::JKS_APOSTROPHE:jevent::JKS_QUOTATION;
+		case 0x33:
+			return (shift == false)?jevent::JKS_COMMA:jevent::JKS_LESS_THAN_SIGN;
+		case 0x0c:
+			return (shift == false)?jevent::JKS_MINUS_SIGN:jevent::JKS_UNDERSCORE;
+		case 0x34:  
+			return (shift == false)?jevent::JKS_PERIOD:jevent::JKS_GREATER_THAN_SIGN;
+		case 0x59:
+			return (shift == false)?jevent::JKS_SLASH:jevent::JKS_QUESTION_MARK;
+		case 0x0b:     
+			return (shift == false)?jevent::JKS_0:jevent::JKS_PARENTHESIS_RIGHT;
+		case 0x02:
+			return (shift == false)?jevent::JKS_1:jevent::JKS_EXCLAMATION_MARK;
+		case 0x03:
+			return (shift == false)?jevent::JKS_2:jevent::JKS_AT;
+		case 0x04:
+			return (shift == false)?jevent::JKS_3:jevent::JKS_NUMBER_SIGN;
+		case 0x05:
+			return (shift == false)?jevent::JKS_4:jevent::JKS_DOLLAR_SIGN;
+		case 0x06:
+			return (shift == false)?jevent::JKS_5:jevent::JKS_PERCENT_SIGN;
+		case 0x07:
+			return (shift == false)?jevent::JKS_6:jevent::JKS_CIRCUMFLEX_ACCENT;
+		case 0x08:
+			return (shift == false)?jevent::JKS_7:jevent::JKS_AMPERSAND;
+		case 0x09:
+			return (shift == false)?jevent::JKS_8:jevent::JKS_STAR;
+		case 0x0a:
+			return (shift == false)?jevent::JKS_9:jevent::JKS_PARENTHESIS_LEFT;
+		case 0x35:
+			return (shift == false)?jevent::JKS_SEMICOLON:jevent::JKS_COLON;
+		case 0x0d: 
+			return (shift == false)?jevent::JKS_EQUALS_SIGN:jevent::JKS_PLUS_SIGN;
+		case 0x1b:
+			return (shift == false)?jevent::JKS_SQUARE_BRACKET_LEFT:jevent::JKS_CURLY_BRACKET_LEFT;
+		case 0x56:   
+			return (shift == false)?jevent::JKS_BACKSLASH:jevent::JKS_VERTICAL_BAR;
+		case 0x2b:
+			return (shift == false)?jevent::JKS_SQUARE_BRACKET_RIGHT:jevent::JKS_CURLY_BRACKET_RIGHT;
+		case 0x1e:       
+			return (shift == false)?jevent::JKS_a:jevent::JKS_A;
+		case 0x30:
+			return (shift == false)?jevent::JKS_b:jevent::JKS_B;
+		case 0x2e:
+			return (shift == false)?jevent::JKS_c:jevent::JKS_C;
+		case 0x20:
+			return (shift == false)?jevent::JKS_d:jevent::JKS_D;
+		case 0x12:
+			return (shift == false)?jevent::JKS_e:jevent::JKS_E;
+		case 0x21:
+			return (shift == false)?jevent::JKS_f:jevent::JKS_F;
+		case 0x22:
+			return (shift == false)?jevent::JKS_g:jevent::JKS_G;
+		case 0x23:
+			return (shift == false)?jevent::JKS_h:jevent::JKS_H;
+		case 0x17:
+			return (shift == false)?jevent::JKS_i:jevent::JKS_I;
+		case 0x24:
+			return (shift == false)?jevent::JKS_j:jevent::JKS_J;
+		case 0x25:
+			return (shift == false)?jevent::JKS_k:jevent::JKS_K;
+		case 0x26:
+			return (shift == false)?jevent::JKS_l:jevent::JKS_L;
+		case 0x32:
+			return (shift == false)?jevent::JKS_m:jevent::JKS_M;
+		case 0x31:
+			return (shift == false)?jevent::JKS_n:jevent::JKS_N;
+		case 0x18:
+			return (shift == false)?jevent::JKS_o:jevent::JKS_O;
+		case 0x19:
+			return (shift == false)?jevent::JKS_p:jevent::JKS_P;
+		case 0x10:
+			return (shift == false)?jevent::JKS_q:jevent::JKS_Q;
+		case 0x13:
+			return (shift == false)?jevent::JKS_r:jevent::JKS_R;
+		case 0x1f:
+			return (shift == false)?jevent::JKS_s:jevent::JKS_S;
+		case 0x14:
+			return (shift == false)?jevent::JKS_t:jevent::JKS_T;
+		case 0x16:
+			return (shift == false)?jevent::JKS_u:jevent::JKS_U;
+		case 0x2f:
+			return (shift == false)?jevent::JKS_v:jevent::JKS_V;
+		case 0x11:
+			return (shift == false)?jevent::JKS_w:jevent::JKS_W;
+		case 0x2d:
+			return (shift == false)?jevent::JKS_x:jevent::JKS_X;
+		case 0x15:
+			return (shift == false)?jevent::JKS_y:jevent::JKS_Y;
+		case 0x2c:
+			return (shift == false)?jevent::JKS_z:jevent::JKS_Z;
+		// case SDLK_BACKQUOTE:
+		//	return jevent::JKS_GRAVE_ACCENT;
+		case 0x28:  
+			return (shift == false)?jevent::JKS_TILDE:jevent::JKS_CIRCUMFLEX_ACCENT;
+		case 0x6f:
+			return jevent::JKS_DELETE;
+		case 0x69:
+			return jevent::JKS_CURSOR_LEFT;
+		case 0x6a:
+			return jevent::JKS_CURSOR_RIGHT;
+		case 0x67:  
+			return jevent::JKS_CURSOR_UP;
+		case 0x6c:
+			return jevent::JKS_CURSOR_DOWN;
+		case 0x6e:  
+			return jevent::JKS_INSERT;
+		case 0x66:     
+			return jevent::JKS_HOME;
+		case 0x6b:
+			return jevent::JKS_END;
+		case 0x68:
+			return jevent::JKS_PAGE_UP;
+		case 0x6d:
+			return jevent::JKS_PAGE_DOWN;
+		case 0x63:   
+			return jevent::JKS_PRINT;
+		case 0x77:
+			return jevent::JKS_PAUSE;
+		// case SDLK_RED:
+		//	return jevent::JKS_RED;
+		// case SDLK_GREEN:
+		//	return jevent::JKS_GREEN;
+		// case SDLK_YELLOW:
+		//	return jevent::JKS_YELLOW;
+		// case SDLK_BLUE:
+		//	return jevent::JKS_BLUE;
+		case 0x3b:
+			return jevent::JKS_F1;
+		case 0x3c:
+			return jevent::JKS_F2;
+		case 0x3d:
+			return jevent::JKS_F3;
+		case 0x3e:
+			return jevent::JKS_F4;
+		case 0x3f:
+			return jevent::JKS_F5;
+		case 0x40:
+			return jevent::JKS_F6;
+		case 0x41:    
+			return jevent::JKS_F7;
+		case 0x42:
+			return jevent::JKS_F8;
+		case 0x43:  
+			return jevent::JKS_F9;
+		case 0x44: 
+			return jevent::JKS_F10;
+		case 0x57:
+			return jevent::JKS_F11;
+		case 0x58:
+			return jevent::JKS_F12;
+		case 0x2a: // left
+		case 0x36: // right
+			return jevent::JKS_SHIFT;
+		case 0x1d: // left
+		case 0x61: // right
+			return jevent::JKS_CONTROL;
+		case 0x38: // left
+			return jevent::JKS_ALT;
+		case 0x64: 
+		  return jevent::JKS_ALTGR;
+		// case SDLK_LMETA:
+		// case SDLK_RMETA:
+		//	return jevent::JKS_META;
+		case 0x7d:
+			return jevent::JKS_SUPER;
+		// case SDLK_HYPER:
+		//	return jevent::JKS_HYPER;
+		default: 
+			break;
+	}
+
+	return jevent::JKS_UNKNOWN;
+}
+
+#else 
 
 static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(xcb_keycode_t symbol, bool capital)
 {
@@ -326,6 +536,8 @@ static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(xcb_keycode_t symbo
 	return jevent::JKS_UNKNOWN;
 }
 
+#endif
+
 static jgui::jsize_t _screen = {0, 0};
 
 NativeApplication::NativeApplication():
@@ -354,6 +566,40 @@ void NativeApplication::InternalInit(int argc, char **argv)
 
   egl_display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
 
+#define CURSOR_INIT(type, ix, iy, hotx, hoty) 													\
+	t.cursor = new jgui::BufferedImage(JPF_ARGB, w, h);												\
+																																				\
+	t.hot_x = hotx;																												\
+	t.hot_y = hoty;																												\
+																																				\
+	t.cursor->GetGraphics()->DrawImage(cursors, ix*w, iy*h, w, h, 0, 0);	\
+																																				\
+	_cursors[type] = t;																										\
+
+	struct cursor_params_t t;
+	int w = 30,
+			h = 30;
+
+	Image *cursors = new jgui::BufferedImage(_DATA_PREFIX"/images/cursors.png");
+
+	CURSOR_INIT(JCS_DEFAULT, 0, 0, 8, 8);
+	CURSOR_INIT(JCS_CROSSHAIR, 4, 3, 15, 15);
+	CURSOR_INIT(JCS_EAST, 4, 4, 22, 15);
+	CURSOR_INIT(JCS_WEST, 5, 4, 9, 15);
+	CURSOR_INIT(JCS_NORTH, 6, 4, 15, 8);
+	CURSOR_INIT(JCS_SOUTH, 7, 4, 15, 22);
+	CURSOR_INIT(JCS_HAND, 1, 0, 15, 15);
+	CURSOR_INIT(JCS_MOVE, 8, 4, 15, 15);
+	CURSOR_INIT(JCS_NS, 2, 4, 15, 15);
+	CURSOR_INIT(JCS_WE, 3, 4, 15, 15);
+	CURSOR_INIT(JCS_NW_CORNER, 8, 1, 10, 10);
+	CURSOR_INIT(JCS_NE_CORNER, 9, 1, 20, 10);
+	CURSOR_INIT(JCS_SW_CORNER, 6, 1, 10, 20);
+	CURSOR_INIT(JCS_SE_CORNER, 7, 1, 20, 20);
+	CURSOR_INIT(JCS_TEXT, 7, 0, 15, 15);
+	CURSOR_INIT(JCS_WAIT, 8, 0, 15, 15);
+	
+	delete cursors;
 #else 
 
   _xdisplay = XOpenDisplay(nullptr);
@@ -413,14 +659,14 @@ void NativeApplication::InternalInit(int argc, char **argv)
 
 #ifdef RASPBERRY_PI
 
-  uint32_t w, h;
+  uint32_t sw, sh;
 
-  if (graphics_get_display_size(0, &w, &h) < 0) {
+  if (graphics_get_display_size(0, &sw, &sh) < 0) {
     throw jexception::RuntimeException("Unable to get screen size");
   }
 
-  _screen.width = w;
-  _screen.height = h;
+  _screen.width = sw;
+  _screen.height = sh;
 
 #else
 
@@ -439,7 +685,7 @@ void NativeApplication::InternalPaint()
   jregion_t 
     r = g_window->GetVisibleBounds();
   jgui::Image 
-    *buffer = new jgui::BufferedImage(jgui::JPF_ARGB, r.width, r.height);
+    *buffer = new jgui::BufferedImage(jgui::JPF_RGB32, r.width, r.height);
   jgui::Graphics 
     *g = buffer->GetGraphics();
 	jpoint_t 
@@ -507,8 +753,8 @@ void NativeApplication::InternalPaint()
 		  dst[i][j][1] = (GLubyte)src[1];
 		  dst[i][j][2] = (GLubyte)src[0];
 
-		  src = src + 4;
-	  }
+		  src = src + 4; 
+	  }    
   }
 
   glBindTexture(GL_TEXTURE_2D, texture);
@@ -589,6 +835,29 @@ void NativeApplication::InternalLoop()
 
 #ifdef RASPBERRY_PI
 
+  struct input_event ev;
+  bool shift = false;
+  int mouse_x = 0, mouse_y = 0;
+  uint32_t last_mouse_state = 0x00;
+
+  int 
+    fdk = open("/dev/input/by-path/platform-3f980000.usb-usb-0:1.4:1.0-event-kbd", O_RDONLY);
+
+  if (fdk == -1) {
+    printf("Cannot open the key device\n");
+  }
+
+  fcntl(fdk, F_SETFL, O_NONBLOCK);
+
+  int 
+    fdm = open("/dev/input/mice", O_RDONLY);
+
+  if(fdm == -1) {   
+    printf("Cannot open the mouse device\n");
+  }   
+
+  fcntl(fdm, F_SETFL, O_NONBLOCK);
+
 #else
 
   xcb_generic_event_t *event;
@@ -632,9 +901,157 @@ void NativeApplication::InternalLoop()
         delete event;
         event = nullptr;
       }
+    } else if (_cursor_enabled == true) {
+      if (mouse_x != _mouse_x or mouse_y != _mouse_y) {
+        mouse_x = _mouse_x;
+        mouse_y = _mouse_y;
+
+        InternalPaint();
+      }
     }
 
 #ifdef RASPBERRY_PI
+
+    if (read(fdk, &ev, sizeof ev) == sizeof(ev)) {
+      if (ev.type == EV_KEY) {
+        jevent::jkeyevent_type_t type;
+        jevent::jkeyevent_modifiers_t mod;
+
+        mod = (jevent::jkeyevent_modifiers_t)(0);
+
+        /*
+        if ((event.key.keysym.mod & KMOD_LSHIFT) != 0) {
+          mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_SHIFT);
+        } else if ((event.key.keysym.mod & KMOD_RSHIFT) != 0) {
+          mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_SHIFT);
+        } else if ((event.key.keysym.mod & KMOD_LCTRL) != 0) {
+          mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_CONTROL);
+        } else if ((event.key.keysym.mod & KMOD_RCTRL) != 0) {
+          mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_CONTROL);
+        } else if ((event.key.keysym.mod & KMOD_LALT) != 0) {
+          mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_ALT);
+        } else if ((event.key.keysym.mod & KMOD_RALT) != 0) {
+          mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_ALT);
+        // } else if ((event.key.keysym.mod & ) != 0) {
+        //	mod = (jevent::jkeyevent_modifiers_t)(mod | JKM_ALTGR);
+        // } else if ((event.key.keysym.mod & KMOD_LMETA) != 0) {
+        //	mod = (jevent::jkeyevent_modifiers_t)(mod | JKM_META);
+        // } else if ((event.key.keysym.mod & KMOD_RMETA) != 0) {
+        //	mod = (jevent::jkeyevent_modifiers_t)(mod | JKM_META);
+        // } else if ((event.key.keysym.mod & ) != 0) {
+        //	mod = (jevent::jkeyevent_modifiers_t)(mod | JKM_SUPER);
+        // } else if ((event.key.keysym.mod & ) != 0) {
+        //	mod = (jevent::jkeyevent_modifiers_t)(mod | JKM_HYPER);
+        }
+        */
+
+        type = jevent::JKT_UNKNOWN;
+
+        if (ev.value == 1 or ev.value == 2) {
+          type = jevent::JKT_PRESSED;
+
+          // TODO:: grab pointer events
+        } else if (ev.value == 0) {
+          type = jevent::JKT_RELEASED;
+
+          // TODO:: ungrab pointer events
+        }
+
+        if (ev.code == 0x2a or ev.code == 0x36) { // LSHIFT, RSHIFT
+          shift = (bool)ev.value;
+        }
+
+        jevent::jkeyevent_symbol_t symbol = TranslateToNativeKeySymbol(ev.code, shift);
+
+        g_window->GetEventManager()->PostEvent(new jevent::KeyEvent(g_window, type, mod, jevent::KeyEvent::GetCodeFromSymbol(symbol), symbol));
+
+        // continue;
+      }
+    }
+
+    signed char data[3];
+
+    if (read(fdm, data, sizeof(data)) == sizeof(data)) {
+      int 
+        buttonMask = data[0];
+      int 
+        x = _mouse_x + data[1],
+        y = _mouse_y - data[2];
+     
+      x = (x < 0)?0:(x > SW)?SW:x;
+      y = (y < 0)?0:(y > SH)?SH:y;
+
+      jevent::jmouseevent_button_t button = jevent::JMB_NONE;
+      jevent::jmouseevent_button_t buttons = jevent::JMB_NONE;
+      jevent::jmouseevent_type_t type = jevent::JMT_UNKNOWN;
+      int mouse_z = 0;
+
+      type = jevent::JMT_PRESSED;
+
+      if (_mouse_x != x || _mouse_y != y) {
+        type = jevent::JMT_MOVED;
+      }
+
+      _mouse_x = CLAMP(x, 0, _screen.width - 1);
+      _mouse_y = CLAMP(y, 0, _screen.height - 1);
+
+      if ((buttonMask & 0x01) == 0 && (last_mouse_state & 0x01)) {
+        type = jevent::JMT_RELEASED;
+      } else if ((buttonMask & 0x02) == 0 && (last_mouse_state & 0x02)) {
+        type = jevent::JMT_RELEASED;
+      } else if ((buttonMask & 0x04) == 0 && (last_mouse_state & 0x04)) {
+        type = jevent::JMT_RELEASED;
+      } 
+
+      if ((buttonMask & 0x01) != (last_mouse_state & 0x01)) {
+        button = jevent::JMB_BUTTON1;
+      } else if ((buttonMask & 0x02) != (last_mouse_state & 0x02)) {
+        button = jevent::JMB_BUTTON3;
+      } else if ((buttonMask & 0x04) != (last_mouse_state & 0x04)) {
+        button = jevent::JMB_BUTTON2;
+      }
+
+      last_mouse_state = buttonMask;
+
+      _click_count = 1;
+
+      if (type == jevent::JMT_PRESSED) {
+        auto current = std::chrono::steady_clock::now();
+
+        if ((std::chrono::duration_cast<std::chrono::milliseconds>(current - _last_keypress).count()) < 200L) {
+          _click_count = _click_count + 1;
+        }
+
+        _last_keypress = current;
+
+        mouse_z = _click_count;
+      }
+
+      /*
+      if ((buttonMask & 0x08) || (buttonMask & 0x10)) {
+        type = jevent::JMT_ROTATED;
+        mouse_z = 1;
+      }
+      */
+
+      if (buttonMask & 0x01) {
+        buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON1);
+      }
+
+      if (buttonMask & 0x02) {
+        buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON3);
+      }
+
+      if (buttonMask & 0x04) {
+        buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON2);
+      }
+
+      // SDL_GrabMode SDL_WM_GrabInput(SDL_GrabMode mode); // <SDL_GRAB_ON, SDL_GRAB_OFF>
+
+      g_window->GetEventManager()->PostEvent(new jevent::MouseEvent(g_window, type, button, buttons, mouse_z, _mouse_x + _current_cursor.hot_x, _mouse_y + _current_cursor.hot_y));
+
+      continue;
+    }
 
 #else
 
@@ -1072,36 +1489,34 @@ bool NativeWindow::IsResizable()
 
 void NativeWindow::SetCursorLocation(int x, int y)
 {
-  // jgui::jsize_t
-  //  size = GetSize();
+#ifdef RASPBERRY_PI
 
-	if (x < 0) {
-		x = 0;
-	}
+  _mouse_x = (x < 0)?0:(x > _screen.width)?_screen.width:x;
+  _mouse_y = (y < 0)?0:(y > _screen.height)?_screen.height:y;
 
-	if (y < 0) {
-		y = 0;
-	}
+#else
 
-	if (x > _screen.width) {
-		x = _screen.width;
-	}
-
-	if (y > _screen.height) {
-		y = _screen.height;
-	}
-
-	// XWarpPointer(_display, None, window, 0, 0, size.width, size.height, x, y);
+  // XWarpPointer(_display, None, window, 0, 0, size.width, size.height, x, y);
+  
+#endif
 }
 
 jpoint_t NativeWindow::GetCursorLocation()
 {
-	jpoint_t t;
+	jpoint_t t = {
+		.x = 0,
+		.y = 0
+	};
 
-	t.x = 0;
-	t.y = 0;
+#ifdef RASPBERRY_PI
+
+	t.x = _mouse_x;
+	t.y = _mouse_y;
+#else
 
 	// XTranslateCoordinates(_display, _window, XRootWindow(_display, DefaultScreen(_display)), 0, 0, &t.x, &t.y, &child_return);
+
+#endif
 
 	return t;
 }
@@ -1139,7 +1554,7 @@ void NativeWindow::SetCursorEnabled(bool enabled)
 {
   _cursor_enabled = enabled;
 
-	// XDefineCursor(_display, _window, _is_cursor_enabled);
+	// XDefineCursor(_display, _window, _cursor_enabled);
 	// XFlush(_display);
 }
 
@@ -1211,14 +1626,21 @@ void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 		return;
 	}
 
-	// XChangeWindowAttributes() this funciontion change attributes like cursor
-	//
-	
-	/*
-	if ((void *)shape == nullptr) {
-		return;
-	}
+#ifdef RASPBERRY_PI
 
+  if (_current_cursor.cursor != nullptr) {
+    delete _current_cursor.cursor;
+    _current_cursor.cursor = nullptr;
+  }
+
+  _current_cursor.cursor = dynamic_cast<jgui::Image *>(shape->Clone());
+
+  _current_cursor.hot_x = hotx;
+  _current_cursor.hot_y = hoty;
+
+#else
+
+	/*
 	uint32_t *data = nullptr;
 
 	jsize_t t = shape->GetSize();
@@ -1261,6 +1683,8 @@ void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 
 	delete [] data;
 	*/
+
+#endif
 }
 
 void NativeWindow::SetRotation(jwindow_rotation_t t)
