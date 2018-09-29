@@ -19,7 +19,7 @@
  ***************************************************************************/
 #include "jmedia/binds/mixer/include/mixerlightplayer.h"
 #include "jmedia/jaudiomixercontrol.h"
-#include "jio/jfileinputstream.h"
+#include "jio/jmemoryinputstream.h"
 #include "jexception/jmediaexception.h"
 #include "jexception/jcontrolexception.h"
 
@@ -37,42 +37,43 @@ class AudioImpl : public jmedia::Audio {
   
   public:
 		/** \brief */
+    jio::InputStream *_stream;
+		/** \brief */
     float _volume;
-		/** \brief */
-    uint32_t _buffer_index;
-		/** \brief */
-    uint32_t _buffer_size;
-		/** \brief */
-    uint8_t _fade;
 		/** \brief */
     uint8_t *_buffer;
 		/** \brief */
-    bool _is_loop_enabled;
+    uint8_t _fade;
 		/** \brief */
-    bool _is_reference;
+    bool _is_loop;
+		/** \brief */
+    bool _is_local;
 
   public:
     AudioImpl()
     {
-      _buffer_index = 0;
-      _buffer_size = 0;
+      _stream = nullptr;
       _buffer = nullptr;
       _fade = 0;
-      _is_loop_enabled = false;
+      _is_loop = false;
       _volume = 1.0f;
-      _is_reference = false;
+      _is_local = false;
     }
 
     virtual ~AudioImpl()
     {
-      if (_is_reference == false) {
+      if (_is_local == true) {
+        delete _stream;
+        _stream = nullptr;
+
         SDL_FreeWAV(_buffer);
+        _buffer = nullptr;
       }
     }
 
     virtual bool IsLoopEnabled()
     {
-      return _is_loop_enabled;
+      return _is_loop;
     }
 
     virtual float GetVolume()
@@ -82,7 +83,7 @@ class AudioImpl : public jmedia::Audio {
 
     virtual void SetLoopEnabled(bool enabled)
     {
-      _is_loop_enabled = enabled;
+      _is_loop = enabled;
     }
 
     virtual void SetVolume(float volume)
@@ -114,7 +115,6 @@ class AudioMixerControlImpl : public AudioMixerControl {
     static void AudioCallback(void *userdata, uint8_t *stream, int len)
     {
       AudioMixerControlImpl *mixer = reinterpret_cast<AudioMixerControlImpl *>(userdata);
-      int tempLength;
       bool music = false;
 
       memset(stream, 0, len);
@@ -122,7 +122,7 @@ class AudioMixerControlImpl : public AudioMixerControl {
       for (std::vector<Audio *>::iterator i=mixer->_audios.begin(); i!=mixer->_audios.end(); ) {
         AudioImpl *audio = static_cast<AudioImpl *>(*i);
 
-        if (audio->_buffer_index > 0) {
+        if (audio->_stream->Available() > 0) {
           int volume = (int)(audio->GetVolume()*SDL_MIX_MAXVOLUME);
 
           if (audio->_fade == 1 && audio->IsLoopEnabled() == true) {
@@ -131,23 +131,24 @@ class AudioMixerControlImpl : public AudioMixerControl {
             if (volume > 0) {
               volume--;
             } else {
-              audio->_buffer_index = 0;
+              audio->_stream->Skip(audio->_stream->Available());
             }
           }
 
-          if (music && audio->IsLoopEnabled() == true && audio->_fade == 0) {
-            tempLength = 0;
-          } else {
-            tempLength = ((uint32_t)len > audio->_buffer_index) ? audio->_buffer_index : (uint32_t)len;
+          if (music == false or audio->IsLoopEnabled() == false or audio->_fade != 0) {
+            char 
+              data[len];
+            int 
+              length = audio->_stream->Read(data, len);
+
+            if (length > 0) {
+              SDL_MixAudioFormat(stream, (uint8_t *)data, 32784, length, volume);
+            }
           }
-
-          SDL_MixAudioFormat(stream, audio->_buffer + audio->_buffer_size - audio->_buffer_index, 32784, tempLength, volume);
-
-          audio->_buffer_index -= tempLength;
 
           i++;
         } else if(audio->_fade == 0 && audio->IsLoopEnabled() == true) {
-          audio->_buffer_index = audio->_buffer_size;
+          audio->_stream->Reset();
 
           i++;
         } else {
@@ -192,7 +193,7 @@ class AudioMixerControlImpl : public AudioMixerControl {
         if (audio->IsLoopEnabled() == true) {
           if (audio->_fade == 0) {
             if (found == true) {
-              audio->_buffer_index = 0;
+              audio->_stream->Skip(audio->_stream->Available());
               audio->_volume = 0;
             }
 
@@ -213,8 +214,8 @@ class AudioMixerControlImpl : public AudioMixerControl {
       *tmp = *static_cast<AudioImpl *>(audio);
     
       tmp->_fade = 1;
-      tmp->_buffer_index = tmp->_buffer_size;
-      tmp->_is_reference = true;
+      tmp->_stream->Reset();
+      tmp->_is_local = false;
 
       _audios.push_back(tmp);
     }
@@ -254,21 +255,29 @@ class AudioMixerControlImpl : public AudioMixerControl {
 
     virtual Audio * CreateAudio(std::string filename)
     {
-      AudioImpl *audio = new AudioImpl;
-      SDL_AudioSpec spec;
+      AudioImpl 
+        *audio = new AudioImpl;
+      SDL_AudioSpec 
+        spec;
 
       SDL_memset(&spec, 0, sizeof(spec));
 
-      if (SDL_LoadWAV(filename.c_str(), &spec, &(audio->_buffer), &(audio->_buffer_size)) == nullptr) {
+      Uint8 
+        *buffer = nullptr;
+      Uint32
+        length = 0;
+
+      if (SDL_LoadWAV(filename.c_str(), &spec, &buffer, &length) == nullptr) {
         delete audio;
         audio = nullptr;
 
         return nullptr;
       }
 
+      audio->_buffer = buffer;
       audio->_fade = 0;
-
-      audio->_buffer_index = audio->_buffer_size;
+      audio->_stream = new jio::MemoryInputStream(buffer, length);
+      audio->_is_local = true;
 
       // INFO:: create the audio _device with the specification of the first audio file
       if (_device == 0) {
@@ -276,6 +285,78 @@ class AudioMixerControlImpl : public AudioMixerControl {
         spec.userdata = this;
 
         if ((_device = SDL_OpenAudioDevice(nullptr, 0, &spec, nullptr, SDL_AUDIO_ALLOW_ANY_CHANGE)) == 0) {
+		      throw jexception::MediaException("Unable to open the audio device");
+        }
+
+        SDL_PauseAudioDevice(_device, 0);
+      }
+
+      return audio;
+    }
+
+    virtual Audio * CreateAudio(jio::InputStream *stream, jaudio_format_t format, int frequency, int channels)
+    {
+      AudioImpl 
+        *audio = new AudioImpl;
+      SDL_AudioSpec 
+        spec;
+
+      SDL_memset(&spec, 0, sizeof(spec));
+
+      // TODO:: preencher o spec
+
+      audio->_fade = 0;
+      audio->_stream = stream;
+      audio->_is_local = false;
+
+      // INFO:: create the audio _device with the specification of the first audio file
+      if (_device == 0) {
+        SDL_AudioSpec wanted, spec;
+
+        if (format == JAF_AUDIO_S8) {
+          wanted.format = AUDIO_S8;
+        } else if (format == JAF_AUDIO_U8) {
+          wanted.format = JAF_AUDIO_U8;
+        } else if (format == JAF_AUDIO_S16LSB) {
+          wanted.format = JAF_AUDIO_S16LSB;
+        } else if (format == JAF_AUDIO_S16MSB) {
+          wanted.format = AUDIO_S16MSB;
+        } else if (format == JAF_AUDIO_S16SYS) {
+          wanted.format = AUDIO_S16SYS;
+        } else if (format == JAF_AUDIO_S16) {
+          wanted.format = AUDIO_S16;
+        } else if (format == JAF_AUDIO_U16LSB) {
+          wanted.format = AUDIO_U16LSB;
+        } else if (format == JAF_AUDIO_U16MSB) {
+          wanted.format = AUDIO_U16MSB;
+        } else if (format == JAF_AUDIO_U16) {
+          wanted.format = AUDIO_U16;
+        } else if (format == JAF_AUDIO_S32LSB) {
+          wanted.format = AUDIO_S32LSB;
+        } else if (format == JAF_AUDIO_S32MSB) {
+          wanted.format = AUDIO_S32MSB;
+        } else if (format == JAF_AUDIO_S32SYS) {
+          wanted.format = AUDIO_S32SYS;
+        } else if (format == JAF_AUDIO_S32) {
+          wanted.format = AUDIO_S32;
+        } else if (format == JAF_AUDIO_F32LSB) {
+          wanted.format = AUDIO_F32LSB;
+        } else if (format == JAF_AUDIO_F32MSB) {
+          wanted.format = AUDIO_F32MSB;
+        } else if (format == JAF_AUDIO_F32SYS) {
+          wanted.format = AUDIO_F32SYS;
+        } else if (format == JAF_AUDIO_F32) {
+          wanted.format = AUDIO_F32;
+        }
+            
+        wanted.freq = frequency; // is->sdl_sample_rate;
+        wanted.channels = channels; // is->sdl_channels;
+        wanted.silence = 0;
+        wanted.samples = 4096; // SDL_AUDIO_BUFFER_SIZE;
+        spec.callback = AudioCallback;
+        spec.userdata = this;
+
+        if ((_device = SDL_OpenAudioDevice(nullptr, 0, &wanted, &spec, SDL_AUDIO_ALLOW_ANY_CHANGE)) == 0) {
 		      throw jexception::MediaException("Unable to open the audio device");
         }
 

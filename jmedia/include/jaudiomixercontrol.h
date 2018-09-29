@@ -21,8 +21,37 @@
 #define J_AUDIOMIXERCONTROL_H
 
 #include "jmedia/jcontrol.h"
+#include "jio/jinputstream.h"
 
 namespace jmedia {
+
+enum jaudio_format_t {
+  // 8-bit support
+  JAF_AUDIO_S8, // signed 8-bit samples
+  JAF_AUDIO_U8, // unsigned 8-bit samples
+
+  // 16-bit support
+  JAF_AUDIO_S16LSB, // signed 16-bit samples in little-endian byte order
+  JAF_AUDIO_S16MSB, // signed 16-bit samples in big-endian byte order
+  JAF_AUDIO_S16SYS, // signed 16-bit samples in native byte order
+  JAF_AUDIO_S16, // JAF_AUDIO_S16LSB
+  JAF_AUDIO_U16LSB, // unsigned 16-bit samples in little-endian byte order
+  JAF_AUDIO_U16MSB, // unsigned 16-bit samples in big-endian byte order
+  JAF_AUDIO_U16SYS, // unsigned 16-bit samples in native byte order
+  JAF_AUDIO_U16, // JAF_AUDIO_U16LSB
+
+  // 32-bit support
+  JAF_AUDIO_S32LSB, // 32-bit integer samples in little-endian byte order
+  JAF_AUDIO_S32MSB, // 32-bit integer samples in big-endian byte order
+  JAF_AUDIO_S32SYS, // 32-bit integer samples in native byte order
+  JAF_AUDIO_S32, // JAF_AUDIO_S32LSB
+  
+  // float support
+  JAF_AUDIO_F32LSB, // 32-bit floating point samples in little-endian byte order
+  JAF_AUDIO_F32MSB, // 32-bit floating point samples in big-endian byte order
+  JAF_AUDIO_F32SYS, // 32-bit floating point samples in native byte order
+  JAF_AUDIO_F32 // JAF_AUDIO_F32LSB
+};
 
 class Audio : public virtual jcommon::Object {
   
@@ -92,6 +121,12 @@ class AudioMixerControl : public Control {
 		 *
 		 */
     virtual Audio * CreateAudio(std::string filename);
+
+		/**
+		 * \brief
+		 *
+		 */
+    virtual Audio * CreateAudio(jio::InputStream *stream, jaudio_format_t format, int frequency, int channels);
 
 		/**
 		 * \brief

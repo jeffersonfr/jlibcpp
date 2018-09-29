@@ -65,6 +65,11 @@ Audio * AudioMixerControl::CreateAudio(std::string filename)
   return nullptr;
 }
 
+Audio * AudioMixerControl::CreateAudio(jio::InputStream *stream, jaudio_format_t format, int frequency, int channels)
+{
+  return nullptr;
+}
+
 void AudioMixerControl::StartSound(Audio *audio)
 {
 }
