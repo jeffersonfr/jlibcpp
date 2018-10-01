@@ -450,9 +450,12 @@ void OnDraw()
 	}
 
   glClear(GL_COLOR_BUFFER_BIT);
-  glRasterPos2i(0, 0);
+
   glDrawPixels(dw, dh, GL_RGB, GL_UNSIGNED_BYTE, dst);
-  // glFlush();
+  
+  glFinish();
+  glFlush();
+  
   glutSwapBuffers();
 
   g_window->Flush();

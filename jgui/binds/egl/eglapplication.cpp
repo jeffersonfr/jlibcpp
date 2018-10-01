@@ -37,6 +37,7 @@ extern "C" {
 }
 
 #include "GLES/gl.h"
+#include "GLES/glext.h"
 #include "EGL/egl.h"
 
 #include <linux/input.h>
@@ -744,22 +745,8 @@ void NativeApplication::InternalPaint()
      1,  1, 0
   };
 
-  int size = dw*dh;
-  uint8_t *src = data;
-
-  for (int i=0; i<size; i++) {
-	  uint8_t p = src[2];
-
-	  // src[3] = src[3];
-	  src[2] = src[0];
-	  // src[1] = src[1];
-	  src[0] = p;
-
-	  src = src + 4;
-  }
-
   glBindTexture(GL_TEXTURE_2D, texture);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, SW, SH, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_BGRA_EXT, SW, SH, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, data);
 
   glViewport(0, 0, dw*2, dh*2);
   glClearColor(0, 0, 0, 0);
