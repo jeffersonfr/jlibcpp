@@ -446,6 +446,49 @@ Image * BufferedImage::Flip(jflip_flags_t mode)
 	return image;
 }
 
+Image * BufferedImage::Shear(float dx, float dy)
+{
+	cairo_surface_t *cairo_surface = cairo_get_target(dynamic_cast<Graphics *>(GetGraphics())->GetCairoContext());
+
+	if (cairo_surface == nullptr) {
+		return nullptr;
+	}
+
+  int 
+    tx = _size.width*fabs(dx),
+    ty = _size.height*fabs(dy);
+
+	Image *image = new BufferedImage(nullptr, _pixelformat, _size.width + tx, _size.height + ty);
+
+	cairo_t *cairo_context = dynamic_cast<Graphics *>(image->GetGraphics())->GetCairoContext();
+
+	cairo_surface_flush(cairo_surface);
+
+  cairo_matrix_t m;
+
+  cairo_matrix_init(&m,
+      1.0f, dy,
+      dx, 1.0f,
+      0.0f, 0.0f
+   );
+
+  cairo_transform(cairo_context, &m);
+	// cairo_set_matrix(cairo_context, &m);
+
+  if (dx < 0.0f) {
+    cairo_translate(cairo_context, tx, 0);
+  }
+
+  if (dy < 0.0f) {
+    cairo_translate(cairo_context, 0, ty);
+  }
+
+  cairo_set_source_surface(cairo_context, cairo_surface, 0, 0);
+	cairo_paint(cairo_context);
+
+  return image;
+}
+
 Image * BufferedImage::Rotate(double radians, bool resize)
 {
 	cairo_t *src_context = dynamic_cast<Graphics *>(GetGraphics())->GetCairoContext();

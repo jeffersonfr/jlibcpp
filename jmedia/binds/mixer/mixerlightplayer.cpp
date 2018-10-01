@@ -33,6 +33,81 @@
 
 namespace jmedia {
 
+struct jaudio_device_t {
+  SDL_AudioDeviceID device;
+  SDL_AudioSpec spec;
+  SDL_AudioSpec wanted;
+  int reference;
+};
+
+std::vector<jaudio_device_t> g_audio_devices;
+
+SDL_AudioDeviceID CreateAudioDevice(SDL_AudioSpec wanted)
+{
+  for (std::vector<struct jaudio_device_t>::const_iterator i=g_audio_devices.begin(); i!=g_audio_devices.end(); i++) {
+    struct jaudio_device_t t = *i;
+
+    if (t.spec.format == wanted.format and t.spec.channels == wanted.channels and t.spec.freq == wanted.freq) {
+      t.reference++;
+
+      return t.device;
+    }
+  }
+
+  for (std::vector<struct jaudio_device_t>::const_iterator i=g_audio_devices.begin(); i!=g_audio_devices.end(); i++) {
+    struct jaudio_device_t t = *i;
+
+    if (t.wanted.format == wanted.format and t.wanted.channels == wanted.channels and t.wanted.freq == wanted.freq) {
+      t.reference++;
+
+      return t.device;
+    }
+  }
+
+  SDL_AudioDeviceID
+    device;
+  SDL_AudioSpec 
+    spec;
+
+  device = SDL_OpenAudioDevice(nullptr, 0, &wanted, &spec, SDL_AUDIO_ALLOW_ANY_CHANGE);
+
+  if (device == 0) {
+    return 0;
+  }
+
+  SDL_PauseAudioDevice(device, 0);
+
+  struct jaudio_device_t t = {
+    .device = device,
+    .spec = spec,
+    .wanted = wanted,
+    .reference = 1
+  };
+
+  g_audio_devices.push_back(t);
+
+  return device;
+}
+
+void DestroyAudioDevice(SDL_AudioDeviceID id)
+{
+  for (std::vector<struct jaudio_device_t>::const_iterator i=g_audio_devices.begin(); i!=g_audio_devices.end(); i++) {
+    struct jaudio_device_t t = *i;
+
+    if (t.device == id) {
+      t.reference--;
+
+      if (t.reference == 0) {
+        SDL_CloseAudioDevice(t.device);
+      }
+
+      g_audio_devices.erase(i);
+
+      break;
+    }
+  }
+}
+
 class AudioImpl : public jmedia::Audio {
   
   public:
@@ -249,7 +324,7 @@ class AudioMixerControlImpl : public AudioMixerControl {
     virtual void CloseDevice()
     {
       if (_device > 0) {
-        SDL_CloseAudioDevice(_device);
+        DestroyAudioDevice(_device);
       }
     }
 
@@ -279,16 +354,13 @@ class AudioMixerControlImpl : public AudioMixerControl {
       audio->_stream = new jio::MemoryInputStream(buffer, length);
       audio->_is_local = true;
 
-      // INFO:: create the audio _device with the specification of the first audio file
+      spec.callback = AudioCallback;
+      spec.userdata = this;
+
+      _device = CreateAudioDevice(spec);
+
       if (_device == 0) {
-        spec.callback = AudioCallback;
-        spec.userdata = this;
-
-        if ((_device = SDL_OpenAudioDevice(nullptr, 0, &spec, nullptr, SDL_AUDIO_ALLOW_ANY_CHANGE)) == 0) {
-		      throw jexception::MediaException("Unable to open the audio device");
-        }
-
-        SDL_PauseAudioDevice(_device, 0);
+        throw jexception::MediaException("Unable to open the audio device");
       }
 
       return audio;
@@ -303,64 +375,58 @@ class AudioMixerControlImpl : public AudioMixerControl {
 
       SDL_memset(&spec, 0, sizeof(spec));
 
-      // TODO:: preencher o spec
-
       audio->_fade = 0;
       audio->_stream = stream;
       audio->_is_local = false;
 
-      // INFO:: create the audio _device with the specification of the first audio file
+      if (format == JAF_AUDIO_S8) {
+        spec.format = AUDIO_S8;
+      } else if (format == JAF_AUDIO_U8) {
+        spec.format = JAF_AUDIO_U8;
+      } else if (format == JAF_AUDIO_S16LSB) {
+        spec.format = JAF_AUDIO_S16LSB;
+      } else if (format == JAF_AUDIO_S16MSB) {
+        spec.format = AUDIO_S16MSB;
+      } else if (format == JAF_AUDIO_S16SYS) {
+        spec.format = AUDIO_S16SYS;
+      } else if (format == JAF_AUDIO_S16) {
+        spec.format = AUDIO_S16;
+      } else if (format == JAF_AUDIO_U16LSB) {
+        spec.format = AUDIO_U16LSB;
+      } else if (format == JAF_AUDIO_U16MSB) {
+        spec.format = AUDIO_U16MSB;
+      } else if (format == JAF_AUDIO_U16) {
+        spec.format = AUDIO_U16;
+      } else if (format == JAF_AUDIO_S32LSB) {
+        spec.format = AUDIO_S32LSB;
+      } else if (format == JAF_AUDIO_S32MSB) {
+        spec.format = AUDIO_S32MSB;
+      } else if (format == JAF_AUDIO_S32SYS) {
+        spec.format = AUDIO_S32SYS;
+      } else if (format == JAF_AUDIO_S32) {
+        spec.format = AUDIO_S32;
+      } else if (format == JAF_AUDIO_F32LSB) {
+        spec.format = AUDIO_F32LSB;
+      } else if (format == JAF_AUDIO_F32MSB) {
+        spec.format = AUDIO_F32MSB;
+      } else if (format == JAF_AUDIO_F32SYS) {
+        spec.format = AUDIO_F32SYS;
+      } else if (format == JAF_AUDIO_F32) {
+        spec.format = AUDIO_F32;
+      }
+
+      spec.freq = frequency; // is->sdl_sample_rate;
+      spec.channels = channels; // is->sdl_channels;
+      spec.silence = 0;
+      spec.samples = 4096; // SDL_AUDIO_BUFFER_SIZE;
+
+      spec.callback = AudioCallback;
+      spec.userdata = this;
+
+      _device = CreateAudioDevice(spec);
+
       if (_device == 0) {
-        SDL_AudioSpec wanted, spec;
-
-        if (format == JAF_AUDIO_S8) {
-          wanted.format = AUDIO_S8;
-        } else if (format == JAF_AUDIO_U8) {
-          wanted.format = JAF_AUDIO_U8;
-        } else if (format == JAF_AUDIO_S16LSB) {
-          wanted.format = JAF_AUDIO_S16LSB;
-        } else if (format == JAF_AUDIO_S16MSB) {
-          wanted.format = AUDIO_S16MSB;
-        } else if (format == JAF_AUDIO_S16SYS) {
-          wanted.format = AUDIO_S16SYS;
-        } else if (format == JAF_AUDIO_S16) {
-          wanted.format = AUDIO_S16;
-        } else if (format == JAF_AUDIO_U16LSB) {
-          wanted.format = AUDIO_U16LSB;
-        } else if (format == JAF_AUDIO_U16MSB) {
-          wanted.format = AUDIO_U16MSB;
-        } else if (format == JAF_AUDIO_U16) {
-          wanted.format = AUDIO_U16;
-        } else if (format == JAF_AUDIO_S32LSB) {
-          wanted.format = AUDIO_S32LSB;
-        } else if (format == JAF_AUDIO_S32MSB) {
-          wanted.format = AUDIO_S32MSB;
-        } else if (format == JAF_AUDIO_S32SYS) {
-          wanted.format = AUDIO_S32SYS;
-        } else if (format == JAF_AUDIO_S32) {
-          wanted.format = AUDIO_S32;
-        } else if (format == JAF_AUDIO_F32LSB) {
-          wanted.format = AUDIO_F32LSB;
-        } else if (format == JAF_AUDIO_F32MSB) {
-          wanted.format = AUDIO_F32MSB;
-        } else if (format == JAF_AUDIO_F32SYS) {
-          wanted.format = AUDIO_F32SYS;
-        } else if (format == JAF_AUDIO_F32) {
-          wanted.format = AUDIO_F32;
-        }
-            
-        wanted.freq = frequency; // is->sdl_sample_rate;
-        wanted.channels = channels; // is->sdl_channels;
-        wanted.silence = 0;
-        wanted.samples = 4096; // SDL_AUDIO_BUFFER_SIZE;
-        spec.callback = AudioCallback;
-        spec.userdata = this;
-
-        if ((_device = SDL_OpenAudioDevice(nullptr, 0, &wanted, &spec, SDL_AUDIO_ALLOW_ANY_CHANGE)) == 0) {
-		      throw jexception::MediaException("Unable to open the audio device");
-        }
-
-        SDL_PauseAudioDevice(_device, 0);
+        throw jexception::MediaException("Unable to open the audio device");
       }
 
       return audio;

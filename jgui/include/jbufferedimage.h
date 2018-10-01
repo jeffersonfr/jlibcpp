@@ -82,6 +82,12 @@ class BufferedImage : public virtual jgui::Image {
 		 * \brief
 		 *
 		 */
+    virtual Image * Shear(float dx, float dy);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual Image * Rotate(double radians, bool resize = true);
 		
 		/**

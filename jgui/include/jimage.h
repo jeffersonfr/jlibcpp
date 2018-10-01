@@ -88,6 +88,12 @@ class Image : public virtual jcommon::Object {
 		 * \brief
 		 *
 		 */
+    virtual Image * Shear(float dx, float dy);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual Image * Rotate(double radians, bool resize = true);
 		
 		/**

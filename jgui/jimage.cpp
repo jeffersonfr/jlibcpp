@@ -54,6 +54,11 @@ Image * Image::Flip(jflip_flags_t mode)
 {
   return nullptr;
 }
+    
+Image * Image::Shear(float dx, float dy)
+{
+  return nullptr;
+}
 
 Image * Image::Rotate(double radians, bool resize)
 {
