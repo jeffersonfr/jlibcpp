@@ -324,3 +324,26 @@ ifeq ($(ENABLE_GRAPHICS),egl)
 
 endif
 
+ifeq ($(ENABLE_GRAPHICS),openvg)
+	CCFLAGS 	+= \
+     -I/opt/vc/include \
+
+	LDFLAGS		+= \
+     -L/opt/vc/lib \
+		 -lbrcmGLESv2 \
+		 -lbrcmEGL \
+
+	DEFINES		+= \
+     -DJGUI_UI \
+		 -DOPENGV_UI \
+
+	REQUIRES	+= \
+
+	OBJS_gfx	+= \
+		 openvgapplication.o\
+
+  OBJS_jgui	+= \
+     $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+
+endif
+
