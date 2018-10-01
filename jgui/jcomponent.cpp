@@ -43,7 +43,6 @@ Component::Component(int x, int y, int width, int height):
 	_is_cyclic_focus = false;
 	_is_navigation_enabled = true;
 	_is_background_visible = true;
-	_is_valid = true;
 	_is_focusable = false;
 	_is_enabled = true;
 	_is_visible = true;
@@ -274,21 +273,6 @@ bool Component::IsOpaque()
   }
 
 	return (IsBackgroundVisible() == true) && ((theme->GetIntegerParam("component.bg") & 0xff000000) == 0xff000000);
-}
-
-void Component::Invalidate()
-{
-	_is_valid = false;
-}
-
-void Component::Revalidate()
-{
-	_is_valid = true;
-}
-
-bool Component::IsValid()
-{
-	return _is_valid;
 }
 
 int Component::GetBaseline(int width, int height)
@@ -887,8 +871,6 @@ bool Component::IsIgnoreRepaint()
 
 void Component::Repaint(Component *cmp)
 {
-	Invalidate();
-
 	if (_is_ignore_repaint == true) {
 		return;
 	}

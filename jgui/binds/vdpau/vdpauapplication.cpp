@@ -466,9 +466,9 @@ void NativeApplication::InternalPaint()
 	}
 
   jregion_t 
-    r = g_window->GetVisibleBounds();
+    bounds = g_window->GetVisibleBounds();
   jgui::Image 
-    *buffer = new jgui::BufferedImage(jgui::JPF_ARGB, r.width, r.height);
+    *buffer = new jgui::BufferedImage(jgui::JPF_ARGB, bounds.width, bounds.height);
   jgui::Graphics 
     *g = buffer->GetGraphics();
 	jpoint_t 
@@ -476,13 +476,9 @@ void NativeApplication::InternalPaint()
 
 	g->Reset();
 	g->Translate(-t.x, -t.y);
-	g->ReleaseClip();
+  g->SetClip(0, 0, bounds.width, bounds.height);
 	g_window->DoLayout();
-	g_window->InvalidateAll();
-  g->SetClip(0, 0, r.width, r.height);
-  g_window->PaintBackground(g);
   g_window->Paint(g);
-  g_window->PaintGlassPane(g);
 	g->Translate(t.x, t.y);
 
   cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
@@ -496,7 +492,7 @@ void NativeApplication::InternalPaint()
   cairo_surface_flush(cairo_surface);
 
   int dw = cairo_image_surface_get_width(cairo_surface);
-  int dh = cairo_image_surface_get_height(cairo_surface);
+  // int dh = cairo_image_surface_get_height(cairo_surface);
   // int stride = cairo_image_surface_get_stride(cairo_surface);
 
   uint8_t *data = cairo_image_surface_get_data(cairo_surface);

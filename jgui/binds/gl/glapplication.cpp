@@ -399,9 +399,9 @@ void OnDraw()
 	}
 
   jregion_t 
-    r = g_window->GetVisibleBounds();
+    bounds = g_window->GetVisibleBounds();
   jgui::Image 
-    *buffer = new jgui::BufferedImage(jgui::JPF_ARGB, r.width, r.height);
+    *buffer = new jgui::BufferedImage(jgui::JPF_ARGB, bounds.width, bounds.height);
   jgui::Graphics 
     *g = buffer->GetGraphics();
 	jpoint_t 
@@ -409,13 +409,9 @@ void OnDraw()
 
 	g->Reset();
 	g->Translate(-t.x, -t.y);
-	g->ReleaseClip();
+  g->SetClip(0, 0, bounds.width, bounds.height);
 	g_window->DoLayout();
-	g_window->InvalidateAll();
-  g->SetClip(0, 0, r.width, r.height);
-  g_window->PaintBackground(g);
   g_window->Paint(g);
-  g_window->PaintGlassPane(g);
 	g->Translate(t.x, t.y);
 
   cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());

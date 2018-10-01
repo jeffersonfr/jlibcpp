@@ -390,60 +390,6 @@ void Container::SetInsets(jinsets_t insets)
 	_insets = insets;
 }
 
-void Container::InvalidateAll()
-{
- 	std::vector<std::vector<jgui::Component *> *> containers;
-
-  std::lock_guard<std::mutex> guard(_container_mutex);
-
-	containers.push_back(&_components);
-
-	do {
-		std::vector<jgui::Component *> *c = (*containers.begin());
-
-		for (std::vector<jgui::Component *>::iterator i=c->begin(); i!=c->end(); i++) {
-			jgui::Component *component = (*i);
-
-			component->Invalidate();
-
-			Container *container = dynamic_cast<jgui::Container *>(component);
-
-			if (container != nullptr) {
-				containers.push_back(const_cast<std::vector<jgui::Component *> *>(&container->GetComponents()));
-			}
-		}
-
-		containers.erase(containers.begin());
-	} while (containers.size() > 0);
-}
-
-void Container::RevalidateAll()
-{
-	std::vector<std::vector<jgui::Component *> *> containers;
-
-  std::lock_guard<std::mutex> guard(_container_mutex);
-
-	containers.push_back(&_components);
-
-	do {
-		std::vector<jgui::Component *> *c = (*containers.begin());
-
-		for (std::vector<jgui::Component *>::iterator i=c->begin(); i!=c->end(); i++) {
-			jgui::Component *component = (*i);
-
-			component->Revalidate();
-
-			Container *container = dynamic_cast<jgui::Container *>(component);
-		
-			if (container != nullptr) {
-				containers.push_back(const_cast<std::vector<jgui::Component *> *>(&container->GetComponents()));
-			}
-		}
-
-		containers.erase(containers.begin());
-	} while (containers.size() > 0);
-}
-
 void Container::PaintGlassPane(Graphics *g)
 {
 }
@@ -469,7 +415,7 @@ void Container::Paint(Graphics *g)
 	for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
 		Component *c = (*i);
 
-		if (c->IsVisible() == true && c->IsValid() == false) {
+		if (c->IsVisible() == true) {
 			// TODO:: considera	r o scroll de um component
       jgui::jpoint_t 
         cl = c->GetLocation();
@@ -508,8 +454,6 @@ void Container::Paint(Graphics *g)
 				g->Translate(-cx, -cy);
 				g->SetClip(clip.x, clip.y, clip.width, clip.height);
 			}
-
-			c->Revalidate();
 		}
 	}
 				
@@ -525,8 +469,6 @@ void Container::Paint(Graphics *g)
 
 	g->Reset(); 
 	PaintGlassPane(g);
-
-	Revalidate();
 }
 
 void Container::Repaint(Component *cmp)
@@ -534,8 +476,6 @@ void Container::Repaint(Component *cmp)
 	if (IsIgnoreRepaint() == true || IsVisible() == false) {
 		return;
 	}
-
-	Invalidate();
 
 	if (_parent != nullptr) {
 		_parent->Repaint((cmp == nullptr)?this:cmp);
@@ -785,7 +725,6 @@ void Container::RequestComponentFocus(jgui::Component *c)
 
 		_focus = c;
 		
-		_focus->Invalidate();
 		_focus->Repaint();
 
 		SetIgnoreRepaint(false);

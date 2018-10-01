@@ -202,8 +202,6 @@ class Component : public jevent::KeyListener, public jevent::MouseListener {
 		/** \brief */
 		bool _is_focus_cycle_root;
 		/** \brief */
-		bool _is_valid;
-		/** \brief */
 		bool _is_scrollable_x;
 		/** \brief */
 		bool _is_scrollable_y;
@@ -497,24 +495,6 @@ class Component : public jevent::KeyListener, public jevent::MouseListener {
 		 */
 		virtual bool IsOpaque();
 		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Invalidate();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Revalidate();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsValid();
-
 		/**
 		 * \brief
 		 *

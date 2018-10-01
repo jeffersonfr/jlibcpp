@@ -228,18 +228,6 @@ class Container : public jgui::Component {
 		 * \brief
 		 *
 		 */
-		virtual void InvalidateAll();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RevalidateAll();
-
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void PaintGlassPane(Graphics *g);
 
 		/**

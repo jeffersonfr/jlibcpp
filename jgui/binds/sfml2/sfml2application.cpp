@@ -343,9 +343,9 @@ void NativeApplication::InternalPaint()
 	}
 
   jregion_t 
-    r = g_window->GetVisibleBounds();
+    bounds = g_window->GetVisibleBounds();
   jgui::Image 
-    *buffer = new jgui::BufferedImage(jgui::JPF_ARGB, r.width, r.height);
+    *buffer = new jgui::BufferedImage(jgui::JPF_ARGB, bounds.width, bounds.height);
   jgui::Graphics 
     *g = buffer->GetGraphics();
 	jpoint_t 
@@ -353,13 +353,9 @@ void NativeApplication::InternalPaint()
 
 	g->Reset();
 	g->Translate(-t.x, -t.y);
-	g->ReleaseClip();
+  g->SetClip(0, 0, bounds.width, bounds.height);
 	g_window->DoLayout();
-	g_window->InvalidateAll();
-  g->SetClip(0, 0, r.width, r.height);
-  g_window->PaintBackground(g);
   g_window->Paint(g);
-  g_window->PaintGlassPane(g);
 	g->Translate(t.x, t.y);
 
   cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
@@ -395,9 +391,7 @@ void NativeApplication::InternalPaint()
   sf::Vector2f targetSize(dw, dh);
 
 	int size = dw*dh;
-	// uint8_t argb[size*4];
 	uint8_t *src = data;
-	// uint8_t *dst = argb;
 
 	for (int i=0; i<size; i++) {
     uint8_t p = src[2];
@@ -407,18 +401,10 @@ void NativeApplication::InternalPaint()
 		// src[1] = src[1];
 		src[0] = p;
 
-    /*
-		dst[3] = src[3];
-		dst[2] = src[0];
-		dst[1] = src[1];
-		dst[0] = src[2];
-    */
-
 		src = src + 4;
-		// dst = dst + 4;
 	}
 
-	texture.update(argb);
+	texture.update(data);
 
 	// _window->setActive(true);
 	_window->clear();
