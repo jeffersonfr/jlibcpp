@@ -731,10 +731,10 @@ void NativeApplication::InternalPaint()
 #ifdef RASPBERRY_PI
 
   static const GLfloat coords[4 * 2] = {
+    1.0f,  1.0f,
+    1.0f,  0.0f,
     0.0f,  1.0f,
     0.0f,  0.0f,
-    1.0f,  1.0f,
-    1.0f,  0.0f
   };
 
   static const GLbyte verts[4*3] = {
@@ -744,21 +744,22 @@ void NativeApplication::InternalPaint()
      1,  1, 0
   };
 
-  GLubyte dst[dh][dw][3];
+  int size = dw*dh;
   uint8_t *src = data;
 
-  for (int i=dh-1; i>=0; i--) {
-	  for (int j=0; j<dw; j++) {
-		  dst[i][j][0] = (GLubyte)src[2];
-		  dst[i][j][1] = (GLubyte)src[1];
-		  dst[i][j][2] = (GLubyte)src[0];
+  for (int i=0; i<size; i++) {
+	  uint8_t p = src[2];
 
-		  src = src + 4; 
-	  }    
+	  // src[3] = src[3];
+	  src[2] = src[0];
+	  // src[1] = src[1];
+	  src[0] = p;
+
+	  src = src + 4;
   }
 
   glBindTexture(GL_TEXTURE_2D, texture);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SW, SH, 0, GL_RGB, GL_UNSIGNED_BYTE, dst);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, SW, SH, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
   glViewport(0, 0, dw*2, dh*2);
   glClearColor(0, 0, 0, 0);

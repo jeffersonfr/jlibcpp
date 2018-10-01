@@ -183,7 +183,7 @@ ifeq ($(ENABLE_GRAPHICS),gl)
 
 endif
 
-ifeq ($(ENABLE_GRAPHICS),rpi)
+ifeq ($(ENABLE_GRAPHICS),dispmanx)
 	CCFLAGS 	+= \
 		 -I/opt/vc/include -L/opt/vc/lib \
 
@@ -196,12 +196,12 @@ ifeq ($(ENABLE_GRAPHICS),rpi)
 
 	DEFINES		+= \
      -DJGUI_UI \
-		 -DRPI_UI \
+		 -DDISPMANX_UI \
 
 	REQUIRES	+= \
 
 	OBJS_gfx	+= \
-		 rpiapplication.o\
+		 dispmanxapplication.o\
 
   OBJS_jgui	+= \
      $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
