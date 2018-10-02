@@ -436,22 +436,27 @@ void OnDraw()
     return;
   }
 
-  GLubyte dst[dh][dw][3];
-	uint8_t *src = data;
+  // INFO:: invert the y-axis
+  uint32_t 
+    *r1 = (uint32_t *)data,
+    *r2 = (uint32_t *)data + (dh - 1)*dw;
 
-  for (int i=dh-1; i>=0; i--) {
+  for (int i=0; i<dh/2; i++) {
     for (int j=0; j<dw; j++) {
-      dst[i][j][0] = (GLubyte)src[2];
-      dst[i][j][1] = (GLubyte)src[1];
-      dst[i][j][2] = (GLubyte)src[0];
+      uint32_t p = r1[j];
 
-      src = src + 4;
+      r1[j] = r2[j];
+
+      r2[j] = p;
     }
+
+    r1 = r1 + dw;
+    r2 = r2 - dw;
 	}
 
-  glClear(GL_COLOR_BUFFER_BIT);
+  // glClear(GL_COLOR_BUFFER_BIT);
 
-  glDrawPixels(dw, dh, GL_RGB, GL_UNSIGNED_BYTE, dst);
+  glDrawPixels(dw, dh, GL_BGRA, GL_UNSIGNED_BYTE, data);
   
   glFinish();
   glFlush();

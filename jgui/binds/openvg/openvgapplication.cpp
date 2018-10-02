@@ -45,7 +45,6 @@ extern "C" {
 #define SH 270*2
 
 #include <cairo.h>
-#include <cairo-xcb.h>
 
 namespace jgui {
 
@@ -443,6 +442,11 @@ void NativeApplication::InternalPaint()
 
   vgWritePixels(data, stride, VG_sARGB_8888, 0, 0, dw, dh);
 
+  // VGImage img = vgCreateImage(VG_sRGBA_8888, dw, dh, VG_RENDERING_QUALITY);
+  // vgImageSubData(img, data, stride, VG_sRGBA_8888, 0, 0, dw, dh);
+  // vgSetPixels(0, 0, img, 0, 0, dw, dh);
+  // vgDestroyImage(img);
+
   vgFlush();
   vgFinish();
 
@@ -818,10 +822,6 @@ bool NativeWindow::IsUndecorated()
 
 void NativeWindow::SetBounds(int x, int y, int width, int height)
 {
-  const uint32_t 
-    values[] = {(uint32_t)x, (uint32_t)y, (uint32_t)width, (uint32_t)height};
-
-  xcb_configure_window(connection, window, XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y | XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT, values);
 }
 
 jgui::jregion_t NativeWindow::GetVisibleBounds()
@@ -867,14 +867,6 @@ jpoint_t NativeWindow::GetCursorLocation()
 void NativeWindow::SetVisible(bool visible)
 {
   _visible = visible;
-
-  if (visible == true) {
-    xcb_map_window(connection, window);
-  } else {
-    xcb_unmap_window(connection, window);
-  }
-  
-  xcb_flush(connection);
 }
 
 bool NativeWindow::IsVisible()
