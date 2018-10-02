@@ -41,10 +41,8 @@ extern "C" {
 #include <termio.h>
 #include <fcntl.h>
 
-#define SW 480*2
-#define SH 270*2
-
 #include <cairo.h>
+#include <cairo-xcb.h>
 
 namespace jgui {
 
@@ -310,10 +308,6 @@ void NativeApplication::InternalInit(int argc, char **argv)
 
   bcm_host_init();
 
-  if (!eglBindAPI(EGL_OPENVG_API)) {
-    throw jexception::RuntimeException("Unable to bind opengl es api");
-  }
-
   egl_display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
 
 #define CURSOR_INIT(type, ix, iy, hotx, hoty) 													\
@@ -352,6 +346,7 @@ void NativeApplication::InternalInit(int argc, char **argv)
 	delete cursors;
 
   const EGLint attribute_list[] = {
+    EGL_COLOR_BUFFER_TYPE, EGL_RGB_BUFFER,
     EGL_RED_SIZE, 8,
     EGL_GREEN_SIZE, 8,
     EGL_BLUE_SIZE, 8,
@@ -370,6 +365,10 @@ void NativeApplication::InternalInit(int argc, char **argv)
 
   if (eglInitialize(egl_display, nullptr, nullptr) == EGL_FALSE) {
     throw jexception::RuntimeException("Unable to initialize egl");
+  }
+
+  if (!eglBindAPI(EGL_OPENVG_API)) {
+    throw jexception::RuntimeException("Unable to bind opengl es api");
   }
 
   if (eglChooseConfig(egl_display, attribute_list, &egl_config, 1, &num_config) == EGL_FALSE) {
@@ -440,13 +439,32 @@ void NativeApplication::InternalPaint()
     return;
   }
 
-  vgWritePixels(data, stride, VG_sARGB_8888, 0, 0, dw, dh);
+  vgLoadIdentity();
+  vgSeti(VG_MATRIX_MODE, VG_MATRIX_IMAGE_USER_TO_SURFACE);
+  vgScale(1.0f, 1.0f);
 
-  // VGImage img = vgCreateImage(VG_sRGBA_8888, dw, dh, VG_RENDERING_QUALITY);
-  // vgImageSubData(img, data, stride, VG_sRGBA_8888, 0, 0, dw, dh);
-  // vgSetPixels(0, 0, img, 0, 0, dw, dh);
-  // vgDestroyImage(img);
+  // INFO:: invert the y-axis
+  uint32_t 
+	  *r1 = (uint32_t *)data,
+	  *r2 = (uint32_t *)data + (dh - 1)*dw;
 
+  for (int i=0; i<dh/2; i++) {
+	  for (int j=0; j<dw; j++) {
+		  uint32_t p = r1[j];
+
+		  r1[j] = r2[j];
+		  r2[j] = p; 
+	  }    
+
+	  r1 = r1 + dw;
+	  r2 = r2 - dw;
+  }
+
+  VGImage img = vgCreateImage(VG_sARGB_8888, dw, dh, VG_IMAGE_QUALITY_BETTER);
+  vgImageSubData(img, data, stride, VG_sARGB_8888, 0, 0, dw, dh);
+  vgDrawImage(img);
+  vgDestroyImage(img);
+  
   vgFlush();
   vgFinish();
 
@@ -587,8 +605,8 @@ void NativeApplication::InternalLoop()
         x = _mouse_x + data[1],
         y = _mouse_y - data[2];
      
-      x = (x < 0)?0:(x > SW)?SW:x;
-      y = (y < 0)?0:(y > SH)?SH:y;
+      x = (x < 0)?0:(x > _screen.width)?_screen.width:x;
+      y = (y < 0)?0:(y > _screen.height)?_screen.height:y;
 
       jevent::jmouseevent_button_t button = jevent::JMB_NONE;
       jevent::jmouseevent_button_t buttons = jevent::JMB_NONE;
@@ -671,7 +689,6 @@ void NativeApplication::InternalLoop()
 
 void NativeApplication::InternalQuit()
 {
-  glClear(GL_COLOR_BUFFER_BIT);
   eglSwapBuffers(egl_display, egl_surface);
   eglMakeCurrent(egl_display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
   eglDestroySurface(egl_display, egl_surface);
@@ -720,31 +737,9 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 
   vc_dispmanx_update_submit_sync(dispman_update);
 
-  /*
-  const EGLint egl_config_attribs[] = {
-    EGL_COLOR_BUFFER_TYPE,     EGL_RGB_BUFFER,
-    EGL_BUFFER_SIZE,           32,
-    EGL_RED_SIZE,              8,
-    EGL_GREEN_SIZE,            8,
-    EGL_BLUE_SIZE,             8,
-    EGL_ALPHA_SIZE,            8,
-
-    EGL_DEPTH_SIZE,            24,
-    EGL_STENCIL_SIZE,          8,
-
-    EGL_SAMPLE_BUFFERS,        0,
-    EGL_SAMPLES,               0,
-
-    EGL_SURFACE_TYPE,          EGL_WINDOW_BIT,
-    EGL_RENDERABLE_TYPE,       EGL_OPENGL_BIT,
-
-    EGL_NONE,
-  };
-  */
-
   const EGLint egl_surface_attribs[] = {
-    EGL_RENDER_BUFFER, 
-    EGL_BACK_BUFFER,
+    // EGL_RENDER_BUFFER, 
+    // EGL_BACK_BUFFER,
     EGL_NONE,
   };
 
@@ -829,8 +824,8 @@ jgui::jregion_t NativeWindow::GetVisibleBounds()
 	jgui::jregion_t 
     t = {0, 0, 0, 0};
 
-	t.width = SW;
-	t.height = SH;
+	t.width = _screen.width;
+	t.height = _screen.height;
 
 	return t;
 }

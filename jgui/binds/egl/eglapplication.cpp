@@ -45,9 +45,6 @@ extern "C" {
 #include <termio.h>
 #include <fcntl.h>
 
-#define SW 480*2
-#define SH 270*2
-
 #else
 
 #include <xcb/xcb.h>
@@ -746,9 +743,9 @@ void NativeApplication::InternalPaint()
   };
 
   glBindTexture(GL_TEXTURE_2D, texture);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_BGRA_EXT, SW, SH, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, data);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_BGRA_EXT, _screen.width, _screen.height, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, data);
 
-  glViewport(0, 0, dw*2, dh*2);
+  glViewport(0, 0, dw, dh);
   glClearColor(0, 0, 0, 0);
   glMatrixMode(GL_TEXTURE);
 
@@ -966,8 +963,8 @@ void NativeApplication::InternalLoop()
         x = _mouse_x + data[1],
         y = _mouse_y - data[2];
      
-      x = (x < 0)?0:(x > SW)?SW:x;
-      y = (y < 0)?0:(y > SH)?SH:y;
+      x = (x < 0)?0:(x > _screen.width)?_screen.width:x;
+      y = (y < 0)?0:(y > _screen.height)?_screen.height:y;
 
       jevent::jmouseevent_button_t button = jevent::JMB_NONE;
       jevent::jmouseevent_button_t buttons = jevent::JMB_NONE;
@@ -1452,8 +1449,8 @@ jgui::jregion_t NativeWindow::GetVisibleBounds()
 
 #ifdef RASPBERRY_PI
 
-	t.width = SW;
-	t.height = SH;
+	t.width = _screen.width;
+	t.height = _screen.height;
 
 #else
 
