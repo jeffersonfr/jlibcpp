@@ -27,6 +27,7 @@ Image::Image(jpixelformat_t pixelformat, int width, int height):
 	jcommon::Object::SetClassName("jgui::Image");
 
 	_pixelformat = pixelformat;
+  _interpolation_method = JIM_NEAREST;
 	_size.width = width;
 	_size.height = height;
 }
@@ -48,6 +49,16 @@ jpixelformat_t Image::GetPixelFormat()
 jsize_t Image::GetSize()
 {
 	return _size;
+}
+
+void Image::SetInterpolationMethod(jinterpolation_method_t method)
+{
+  _interpolation_method = method;
+}
+
+jinterpolation_method_t Image::GetInterpolationMethod()
+{
+  return _interpolation_method;
 }
 
 Image * Image::Flip(jflip_flags_t mode)

@@ -26,6 +26,12 @@
 
 namespace jgui{
 
+enum jinterpolation_method_t {
+  JIM_NEAREST,
+  JIM_BILINEAR,
+  JIM_BICUBIC
+};
+
 enum jflip_flags_t {
 	JFF_HORIZONTAL = 0x01,
 	JFF_VERTICAL = 0x02
@@ -43,6 +49,8 @@ class Image : public virtual jcommon::Object {
 	protected:
 		/** \brief */
 		struct jsize_t _size;
+		/** \brief */
+    jinterpolation_method_t _interpolation_method;
 		/** \brief */
 		jpixelformat_t _pixelformat;
 
@@ -78,6 +86,18 @@ class Image : public virtual jcommon::Object {
 		 */
 		virtual jsize_t GetSize();
 		
+    /**
+     * \brief
+     *
+     */
+    virtual void SetInterpolationMethod(jinterpolation_method_t method);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual jinterpolation_method_t GetInterpolationMethod();
+    
 		/**
 		 * \brief
 		 *

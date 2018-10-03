@@ -118,16 +118,17 @@ static void NearestNeighborScale(uint32_t *src, uint32_t *dst, int w, int h, int
 		}
 	}
 
-	// for (int i=0; i<sh; i++) {
-	//	for (int j=0; j<sw; j++) {
-	//		x2 = ((j*x_ratio) >> 16) ;
-	//		y2 = ((i*y_ratio) >> 16) ;
-	//		dst[(i*sw)+j] = src[(y2*w)+x2] ;
-	//	}                
-	// }
+  /*
+  for (int i=0; i<sh; i++) {
+    for (int j=0; j<sw; j++) {
+      x2 = ((j*x_ratio) >> 16) ;
+      y2 = ((i*y_ratio) >> 16) ;
+      dst[(i*sw)+j] = src[(y2*w)+x2] ;
+    }                
+  }
+  */
 }
 		
-/*
 static void BilinearScale(uint32_t *src, uint32_t *dst, int w, int h, int sw, int sh) 
 {
 	int a, b, c, d, x, y, index;
@@ -166,7 +167,135 @@ static void BilinearScale(uint32_t *src, uint32_t *dst, int w, int h, int sw, in
 		}
 	}
 }
-*/
+
+static float CubicHermite(float A, float B, float C, float D, float t) 
+{
+  float a = -A/2.0f + (3.0f*B)/2.0f - (3.0f*C)/2.0f + D/2.0f;
+  float b = A - (5.0f*B)/2.0f + 2.0f*C - D/2.0f;
+  float c = -A/2.0f + C/2.0f;
+  float d = B;
+
+  return a*t*t*t + b*t*t + c*t + d;
+}
+
+void GetPixelClamped(uint32_t *src, int x, int y, int w, int h, uint8_t temp[4])
+{
+  if (x < 0) {
+    x = 0;
+  }
+
+  if (x > (w - 1)) {
+    x = w - 1;
+  }
+  
+  if (y < 0) {
+    y = 0;
+  }
+
+  if (y > (h - 1)) {
+    y = h - 1;
+  }
+
+  uint32_t p = src[y*w + x];
+
+  temp[0] = (p >> 0x00) & 0xff;
+  temp[1] = (p >> 0x08) & 0xff;
+  temp[2] = (p >> 0x10) & 0xff;
+  temp[3] = (p >> 0x18) & 0xff;
+}
+
+static void SampleBicubic(uint32_t *src, int w, int h, float u, float v, uint8_t sample[4]) 
+{
+  float x = (u*w) - 0.5;
+  int xint = (int)x;
+  float xfract = x - floor(x);
+
+  float y = (v*h) - 0.5;
+  int yint = (int)y;
+  float yfract = y - floor(y);
+
+  uint8_t p00[4];
+  uint8_t p10[4];
+  uint8_t p20[4];
+  uint8_t p30[4];
+
+  uint8_t p01[4];
+  uint8_t p11[4];
+  uint8_t p21[4];
+  uint8_t p31[4];
+
+  uint8_t p02[4];
+  uint8_t p12[4];
+  uint8_t p22[4];
+  uint8_t p32[4];
+
+  uint8_t p03[4];
+  uint8_t p13[4];
+  uint8_t p23[4];
+  uint8_t p33[4];
+
+  // 1st row
+  GetPixelClamped(src, xint - 1, yint - 1, w, h, p00);
+  GetPixelClamped(src, xint + 0, yint - 1, w, h, p10);
+  GetPixelClamped(src, xint + 1, yint - 1, w, h, p20);
+  GetPixelClamped(src, xint + 2, yint - 1, w, h, p30);
+
+  // 2nd row
+  GetPixelClamped(src, xint - 1, yint + 0, w, h, p01);
+  GetPixelClamped(src, xint + 0, yint + 0, w, h, p11);
+  GetPixelClamped(src, xint + 1, yint + 0, w, h, p21);
+  GetPixelClamped(src, xint + 2, yint + 0, w, h, p31);
+
+  // 3rd row
+  GetPixelClamped(src, xint - 1, yint + 1, w, h, p02);
+  GetPixelClamped(src, xint + 0, yint + 1, w, h, p12);
+  GetPixelClamped(src, xint + 1, yint + 1, w, h, p22);
+  GetPixelClamped(src, xint + 2, yint + 1, w, h, p32);
+
+  // 4th row
+  GetPixelClamped(src, xint - 1, yint + 2, w, h, p03);
+  GetPixelClamped(src, xint + 0, yint + 2, w, h, p13);
+  GetPixelClamped(src, xint + 1, yint + 2, w, h, p23);
+  GetPixelClamped(src, xint + 2, yint + 2, w, h, p33);
+
+  // interpolate bi-cubically!
+  for (int i = 0; i < 4; i++) {
+    float col0 = CubicHermite(p00[i], p10[i], p20[i], p30[i], xfract);
+    float col1 = CubicHermite(p01[i], p11[i], p21[i], p31[i], xfract);
+    float col2 = CubicHermite(p02[i], p12[i], p22[i], p32[i], xfract);
+    float col3 = CubicHermite(p03[i], p13[i], p23[i], p33[i], xfract);
+
+    float value = CubicHermite(col0, col1, col2, col3, yfract);
+
+    if (value < 0.0f) {
+      value = 0.0f;
+    }
+
+    if (value > 255.0f) {
+      value = 255.0f;
+    }
+
+    sample[i] = (uint8_t)value;
+  }
+}
+
+static void BicubicScale(uint32_t *src, uint32_t *dst, int w, int h, int sw, int sh) 
+{
+  uint8_t sample[4];
+  int y, x;
+
+  for (y=0; y<sh; y++) {
+    float v = (float)y/(float)(sh - 1);
+
+    for (x=0; x<sw; x++) {
+      float u = (float)x/(float)(sw - 1);
+
+      SampleBicubic(src, w, h, u, v, sample);
+
+      dst[y*sw + x] = sample[3] << 0x18 | sample[2] << 0x10 | sample[1] << 0x08 | sample[0] << 0x00;
+    }
+  }
+}
 
 static void NearesNeighborRotate(uint32_t *src, int w, int h, uint32_t *dst, int dw, int dh, double radians, bool resize)
 {
@@ -593,13 +722,20 @@ Image * BufferedImage::Scale(int width, int height)
 #endif
 
 	if (GetGraphics()->GetAntialias() == JAM_NONE) {
+    jinterpolation_method_t method = GetInterpolationMethod();
+
 		uint32_t *src = new uint32_t[_size.width*_size.height];
 		uint32_t *dst = new uint32_t[width*height];
 
 		GetRGBArray(&src, 0, 0, _size.width, _size.height);
 
-		NearestNeighborScale(src, dst, _size.width, _size.height, width, height); 
-		// BilinearScale(src, dst, _size.width, _size.height, width, height); 
+    if (method == JIM_NEAREST) {
+		  NearestNeighborScale(src, dst, _size.width, _size.height, width, height); 
+    } else if (method == JIM_BILINEAR) {
+		  BilinearScale(src, dst, _size.width, _size.height, width, height); 
+    } else if (method == JIM_BICUBIC) {
+		  BicubicScale(src, dst, _size.width, _size.height, width, height); 
+    }
 
 		image->GetGraphics()->SetRGBArray(dst, 0, 0, width, height);
 
