@@ -358,7 +358,21 @@ void Graphics::SetAntialias(jantialias_mode_t mode)
 
 jantialias_mode_t Graphics::GetAntialias()
 {
-	return _antialias;
+  cairo_antialias_t antialias = cairo_get_antialias(_cairo_context);
+
+  if (antialias == CAIRO_ANTIALIAS_DEFAULT) {
+    return JAM_NORMAL;
+  } else if (antialias == CAIRO_ANTIALIAS_SUBPIXEL) {
+    return JAM_NORMAL;
+  } else if (antialias == CAIRO_ANTIALIAS_FAST) {
+    return JAM_FAST;
+  } else if (antialias == CAIRO_ANTIALIAS_GOOD) {
+    return JAM_GOOD;
+  } else if (antialias == CAIRO_ANTIALIAS_BEST) {
+    return JAM_GOOD;
+  }
+
+	return JAM_NONE;
 }
 
 void Graphics::SetPen(jpen_t t)

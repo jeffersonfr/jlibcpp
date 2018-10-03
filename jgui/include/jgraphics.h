@@ -290,8 +290,6 @@ class Graphics : public virtual jcommon::Object {
 		/** \brief */
 		struct jpoint_t _translate;
 		/** \brief */
-		jantialias_mode_t _antialias;
-		/** \brief */
 		jpen_t _pen;
 		/** \brief */
 		struct jregion_t _clip;
