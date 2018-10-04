@@ -910,8 +910,10 @@ void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 		return;
 	}
 
-	jsize_t t = shape->GetSize();
-	uint32_t *data = nullptr;
+	jsize_t 
+    t = shape->GetSize();
+	uint32_t 
+    *data = nullptr;
 
 	shape->GetGraphics()->GetRGBArray(&data, 0, 0, t.width, t.height);
 
@@ -919,20 +921,8 @@ void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 		return;
 	}
 
-	SDL_Surface *surface = nullptr;
-	uint32_t rmask = 0x000000ff;
-	uint32_t gmask = 0x0000ff00;
-	uint32_t bmask = 0x00ff0000;
-	uint32_t amask = 0xff000000;
-
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-	rmask = 0xff000000;
-	gmask = 0x00ff0000;
-	bmask = 0x0000ff00;
-	amask = 0x000000ff;
-#endif
-
-	surface = SDL_CreateRGBSurfaceFrom(data, t.width, t.height, 32, t.width*4, rmask, gmask, bmask, amask);
+	SDL_Surface 
+    *surface = SDL_CreateRGBSurfaceFrom(data, t.width, t.height, 32, t.width*4, 0, 0, 0, 0);
 
 	if (surface == nullptr) {
 		delete [] data;

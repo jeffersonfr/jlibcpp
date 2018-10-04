@@ -78,17 +78,27 @@ Player * PlayerManager::CreatePlayer(std::string url_)
 
 	jnetwork::URL url(url_);
 
-#if defined(MIXER_MEDIA)
+#if defined(V4L2_MEDIA)
 	try {
-		return new MixerLightPlayer(url_);
+		if (strncasecmp(url.GetProtocol().c_str(), "v4l", 3) == 0) {
+			return new V4L2LightPlayer(url.GetPath());
+		}
 	} catch (jexception::Exception &e) {
+    // INFO:: only this module usr v4l
+    return nullptr;
 	}
 #endif
 
-  // INFO:: only the MixerLightPlayer could do the mixer
-  if (strcasecmp(url.GetProtocol().c_str(), "mixer") == 0) {
+#if defined(MIXER_MEDIA)
+	try {
+    if (strcasecmp(url.GetProtocol().c_str(), "mixer") == 0) {
+		  return new MixerLightPlayer(url_);
+    }
+	} catch (jexception::Exception &e) {
+    // INFO:: only this module can mixer
     return nullptr;
-  }
+	}
+#endif
 
 #if defined(ALSA_MEDIA)
 	try {
@@ -100,15 +110,6 @@ Player * PlayerManager::CreatePlayer(std::string url_)
 #if defined(IMAGE_LIST_MEDIA)
 	try {
 		return new ImageListLightPlayer(url_);
-	} catch (jexception::Exception &e) {
-	}
-#endif
-
-#if defined(V4L2_MEDIA)
-	try {
-		if (strncasecmp(url.GetProtocol().c_str(), "v4l", 3) == 0) {
-			return new V4L2LightPlayer(url.GetPath());
-		}
 	} catch (jexception::Exception &e) {
 	}
 #endif

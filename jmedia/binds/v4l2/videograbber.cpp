@@ -1,6 +1,5 @@
 #include "jmedia/binds/v4l2/include/videograbber.h"
 #include "jmedia/binds/v4l2/include/videocontrol.h"
-#include "jmedia/binds/v4l2/include/videodev2.h"
 
 #include "jexception/jruntimeexception.h"
 
@@ -13,6 +12,8 @@
 #include <sys/types.h>
 #include <sys/mman.h>
 #include <sys/ioctl.h>
+
+#include <linux/videodev2.h>
 
 #define AUTO_EXPOSURE_ENABLED	1
 
@@ -446,7 +447,7 @@ void VideoGrabber::Open()
 {
 	struct stat st;
 
-	if (-1 == stat(_device.c_str(), &st)) {
+	if (stat(_device.c_str(), &st) != 0) {
 		ExceptionHandler("Cannot identify '" + _device + "': " + strerror(errno));
 	}
 
@@ -456,7 +457,7 @@ void VideoGrabber::Open()
 
 	_handler = open(_device.c_str(), O_RDWR | O_NONBLOCK, 0);
 
-	if (-1 == _handler) {
+	if (_handler == -1) {
 		ExceptionHandler("Cannot open '" + _device + "': " + strerror(errno));
 	}
 

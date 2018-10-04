@@ -426,6 +426,10 @@ V4L2LightPlayer::V4L2LightPlayer(jnetwork::URL url):
 	_frame_rate = 0.0;
 	_component = nullptr;
 	
+  if (_file.empty() == true) {
+    _file = "/dev/video0";
+  }
+
   _grabber = new VideoGrabber(this, _file);
 
 	jgui::jsize_t size;

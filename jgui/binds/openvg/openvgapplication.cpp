@@ -465,9 +465,9 @@ void NativeApplication::InternalPaint()
   vgDrawImage(img);
   vgDestroyImage(img);
   
-  // vgFlush();
-  
-  if (g->IsVerticalSyncEnabled() == true) {
+  if (g->IsVerticalSyncEnabled() == false) {
+    vgFlush();
+  } else {
     vgFinish();
   }
 

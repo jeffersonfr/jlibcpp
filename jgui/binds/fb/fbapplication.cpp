@@ -289,6 +289,26 @@ void NativeApplication::InternalInit(int argc, char **argv)
 		throw jexception::RuntimeException("Unable to reading variable information");
   }
 
+  /*
+  // INFO:: force resolution (fbset)
+  vinfo.xres = 320;
+  vinfo.yres = 240;
+  vinfo.xres_virtual = 320;
+  vinfo.yres_virtual = 480; // double the physical height (PAN)
+  vinfo.bits_per_pixel = 8;
+  
+  if (ioctl(fbfd, FBIOPUT_VSCREENINFO, &vinfo)) {
+    printf("Error setting variable information.\n");
+  }
+
+  // INFO:: after vsync ...  
+  vinfo.yoffset = vinfo.yres;
+
+  if (ioctl(fbfd, FBIOPAN_DISPLAY, &vinfo)) {
+    printf("Pan failed.\n");
+  }
+  */
+
   printf("FrameBuffer:: %dx%d, %dbpp\n", _fb_vinfo.xres, _fb_vinfo.yres, _fb_vinfo.bits_per_pixel);
 
 	_screen.width = _fb_vinfo.xres;
