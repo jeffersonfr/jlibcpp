@@ -527,7 +527,9 @@ void NativeApplication::InternalPaint()
     if (vc_dispmanx_resource_write_data(
           layer.resource, layer.image.type, layer.image.pitch, data, &dst_rect) == 0) {
       if (vc_dispmanx_element_change_source(layer.update, layer.element, layer.resource) == 0) {
-        vc_dispmanx_update_submit_sync(layer.update);
+        // if (g->IsVerticalSyncEnabled() == true) {
+          vc_dispmanx_update_submit_sync(layer.update);
+        // }
       }
     }
   }

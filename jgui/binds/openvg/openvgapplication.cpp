@@ -465,8 +465,11 @@ void NativeApplication::InternalPaint()
   vgDrawImage(img);
   vgDestroyImage(img);
   
-  vgFlush();
-  vgFinish();
+  // vgFlush();
+  
+  if (g->IsVerticalSyncEnabled() == true) {
+    vgFinish();
+  }
 
   eglSwapBuffers(egl_display, egl_surface);
 

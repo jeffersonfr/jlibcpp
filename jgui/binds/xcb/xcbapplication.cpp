@@ -380,8 +380,9 @@ void NativeApplication::InternalPaint()
   cairo_set_source_surface(cr, cairo_surface, 0, 0);
 	cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
   cairo_paint(cr);
-  xcb_flush(_xconnection);
   cairo_surface_finish(surface);
+
+  xcb_flush(_xconnection);
 
   g_window->Flush();
 

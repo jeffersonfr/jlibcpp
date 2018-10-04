@@ -506,12 +506,14 @@ void NativeApplication::InternalPaint()
 	// XDestroyImage(image);
 	XFreePixmap(_display, pixmap);
 
-	// XFlush(_display);
-
-	// INFO:: wait x11 process all events
-	// True:: discards all events remaing
-	// False:: not discards events remaing
-	// XSync(_display, True);
+  if (g->IsVerticalSyncEnabled() == false) {
+	  XFlush(_display);
+  } else {
+  	// INFO:: wait x11 process all events
+	  // True:: discards all events remaing
+  	// False:: not discards events remaing
+	  XSync(_display, False);
+  }
     
   g_window->Flush();
 

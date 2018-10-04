@@ -395,6 +395,13 @@ void NativeApplication::InternalPaint()
     }
 	}
 
+  if (g->IsVerticalSyncEnabled() == true) {
+    int 
+      dummy = 0;
+
+    ioctl(_fb_handle, FBIO_WAITFORVSYNC, &dummy);
+  }
+
   g_window->Flush();
 
   cairo_surface_destroy(cairo_surface);

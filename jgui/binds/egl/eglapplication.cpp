@@ -1,9 +1,9 @@
-  /***************************************************************************
-   *   Copyright (C) 2005 by Jeff Ferr                                       *
-   *   root@sat                                                              *
-   *                                                                         *
-   *   This program is free software; you can redistribute it and/or modify  *
-   *   it under the terms of the GNU General Public License as published by  *
+/***************************************************************************
+ *   Copyright (C) 2005 by Jeff Ferr                                       *
+ *   root@sat                                                              *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
  *   the Free Software Foundation; either version 2 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
@@ -556,48 +556,12 @@ void NativeApplication::InternalInit(int argc, char **argv)
   
   bcm_host_init();
 
-  /*
   if (!eglBindAPI(EGL_OPENGL_ES_API)) {
     throw jexception::RuntimeException("Unable to bind opengl es api");
   }
-  */
 
   egl_display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
 
-#define CURSOR_INIT(type, ix, iy, hotx, hoty) 													\
-	t.cursor = new jgui::BufferedImage(JPF_ARGB, w, h);												\
-																																				\
-	t.hot_x = hotx;																												\
-	t.hot_y = hoty;																												\
-																																				\
-	t.cursor->GetGraphics()->DrawImage(cursors, ix*w, iy*h, w, h, 0, 0);	\
-																																				\
-	_cursors[type] = t;																										\
-
-	struct cursor_params_t t;
-	int w = 30,
-			h = 30;
-
-	Image *cursors = new jgui::BufferedImage(_DATA_PREFIX"/images/cursors.png");
-
-	CURSOR_INIT(JCS_DEFAULT, 0, 0, 8, 8);
-	CURSOR_INIT(JCS_CROSSHAIR, 4, 3, 15, 15);
-	CURSOR_INIT(JCS_EAST, 4, 4, 22, 15);
-	CURSOR_INIT(JCS_WEST, 5, 4, 9, 15);
-	CURSOR_INIT(JCS_NORTH, 6, 4, 15, 8);
-	CURSOR_INIT(JCS_SOUTH, 7, 4, 15, 22);
-	CURSOR_INIT(JCS_HAND, 1, 0, 15, 15);
-	CURSOR_INIT(JCS_MOVE, 8, 4, 15, 15);
-	CURSOR_INIT(JCS_NS, 2, 4, 15, 15);
-	CURSOR_INIT(JCS_WE, 3, 4, 15, 15);
-	CURSOR_INIT(JCS_NW_CORNER, 8, 1, 10, 10);
-	CURSOR_INIT(JCS_NE_CORNER, 9, 1, 20, 10);
-	CURSOR_INIT(JCS_SW_CORNER, 6, 1, 10, 20);
-	CURSOR_INIT(JCS_SE_CORNER, 7, 1, 20, 20);
-	CURSOR_INIT(JCS_TEXT, 7, 0, 15, 15);
-	CURSOR_INIT(JCS_WAIT, 8, 0, 15, 15);
-	
-	delete cursors;
 #else 
 
   _xdisplay = XOpenDisplay(nullptr);
@@ -666,6 +630,41 @@ void NativeApplication::InternalInit(int argc, char **argv)
   _screen.width = sw;
   _screen.height = sh;
 
+#define CURSOR_INIT(type, ix, iy, hotx, hoty) 													\
+	t.cursor = new jgui::BufferedImage(JPF_ARGB, w, h);												\
+																																				\
+	t.hot_x = hotx;																												\
+	t.hot_y = hoty;																												\
+																																				\
+	t.cursor->GetGraphics()->DrawImage(cursors, ix*w, iy*h, w, h, 0, 0);	\
+																																				\
+	_cursors[type] = t;																										\
+
+	struct cursor_params_t t;
+	int w = 30,
+			h = 30;
+
+	Image *cursors = new jgui::BufferedImage(_DATA_PREFIX"/images/cursors.png");
+
+	CURSOR_INIT(JCS_DEFAULT, 0, 0, 8, 8);
+	CURSOR_INIT(JCS_CROSSHAIR, 4, 3, 15, 15);
+	CURSOR_INIT(JCS_EAST, 4, 4, 22, 15);
+	CURSOR_INIT(JCS_WEST, 5, 4, 9, 15);
+	CURSOR_INIT(JCS_NORTH, 6, 4, 15, 8);
+	CURSOR_INIT(JCS_SOUTH, 7, 4, 15, 22);
+	CURSOR_INIT(JCS_HAND, 1, 0, 15, 15);
+	CURSOR_INIT(JCS_MOVE, 8, 4, 15, 15);
+	CURSOR_INIT(JCS_NS, 2, 4, 15, 15);
+	CURSOR_INIT(JCS_WE, 3, 4, 15, 15);
+	CURSOR_INIT(JCS_NW_CORNER, 8, 1, 10, 10);
+	CURSOR_INIT(JCS_NE_CORNER, 9, 1, 20, 10);
+	CURSOR_INIT(JCS_SW_CORNER, 6, 1, 10, 20);
+	CURSOR_INIT(JCS_SE_CORNER, 7, 1, 20, 20);
+	CURSOR_INIT(JCS_TEXT, 7, 0, 15, 15);
+	CURSOR_INIT(JCS_WAIT, 8, 0, 15, 15);
+	
+	delete cursors;
+
 #else
 
   _screen.width = _xscreen->width_in_pixels;
@@ -696,9 +695,13 @@ void NativeApplication::InternalPaint()
   g_window->Paint(g);
 	g->Translate(t.x, t.y);
 
+#ifdef RASPBERRY_PI
+
   if (_is_cursor_enabled == true) {
     g->DrawImage(_current_cursor.cursor, _mouse_x, _mouse_y);
   }
+
+#endif
 
   cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
 
@@ -772,7 +775,9 @@ void NativeApplication::InternalPaint()
 
 #else
 
+  glEnable(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, texture);
+
   gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, dw, dh, GL_BGRA, GL_UNSIGNED_BYTE, data);
 
   glViewport(0, -dh, dw*2, dh*2);
@@ -795,12 +800,15 @@ void NativeApplication::InternalPaint()
   glTexCoord2f(dw, 0.0f);
   glVertex2f(0, dh);
   
-  // glEnd();
-  
+  glEnd();
+
 #endif
 
-  glFlush();
-  glFinish();
+  if (g->IsVerticalSyncEnabled() == false) {
+    glFlush();
+  } else {
+    glFinish();
+  }
 
   eglSwapBuffers(egl_display, egl_surface);
 
@@ -887,12 +895,14 @@ void NativeApplication::InternalLoop()
         event = nullptr;
       }
     } else if (_is_cursor_enabled == true) {
+#ifdef RASPBERRY_PI
       if (mouse_x != _mouse_x or mouse_y != _mouse_y) {
         mouse_x = _mouse_x;
         mouse_y = _mouse_y;
 
         InternalPaint();
       }
+#endif
     }
 
 #ifdef RASPBERRY_PI

@@ -412,7 +412,10 @@ void NativeApplication::InternalPaint()
 	al_clear_to_color(al_map_rgb(0, 0, 0));
 	al_draw_bitmap(_surface, 0, 0, 0);
 	al_flip_display();
-  // al_wait_for_vsync();
+  
+  if (g->IsVerticalSyncEnabled() == true) {
+    al_wait_for_vsync();
+  }
 
   g_window->Flush();
 

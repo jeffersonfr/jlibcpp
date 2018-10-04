@@ -56,6 +56,8 @@ static bool _fullscreen_enabled = false;
 static bool _cursor_enabled = true;
 /** \brief */
 static jcursor_style_t _cursor;
+/** \brief */
+static bool _visible = false;
 
 static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(guint symbol)
 {
@@ -657,7 +659,7 @@ void NativeApplication::InternalPaint()
 
 static bool quitting = false;
 
-static void main_thread(NativeApplication *app)
+static void PaintThread(NativeApplication *app)
 {
 	while (quitting == false) {
     std::vector<jevent::EventObject *> events = g_window->GrabEvents();
@@ -692,13 +694,13 @@ static void main_thread(NativeApplication *app)
 
 void NativeApplication::InternalLoop()
 {
-  std::thread _main_thread = std::thread(main_thread, this);
+  std::thread thread = std::thread(PaintThread, this);
 
  	g_application_run(G_APPLICATION(_handler), 0, nullptr);
 
   quitting = true;
 
-  _main_thread.join();
+  thread.join();
   
   g_window->SetVisible(false);
 }
@@ -730,6 +732,8 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
   _visible_bounds.height = height;
 
   g_signal_connect(_handler, "activate", G_CALLBACK(ConfigureApplication), nullptr);
+
+  _visible = true;
 }
 
 NativeWindow::~NativeWindow()
@@ -866,6 +870,8 @@ jpoint_t NativeWindow::GetCursorLocation()
 
 void NativeWindow::SetVisible(bool visible)
 {
+  _visible = visible;
+
   if (visible == true) {
     gtk_widget_show(_window);
     // gtk_widget_show_all(_window);
@@ -876,7 +882,10 @@ void NativeWindow::SetVisible(bool visible)
 
 bool NativeWindow::IsVisible()
 {
-  return (bool)gtk_widget_is_visible(_window);
+  return _visible; 
+
+  // INFO:: first calls return false ...
+  // return (bool)gtk_widget_is_visible(_window);
 }
 
 jcursor_style_t NativeWindow::GetCursor()

@@ -19,7 +19,7 @@
  ***************************************************************************/
 #include "providers/include/imageprovider_flif.h"
 
-#include "config.h"
+// #include "config.h"
 #include "flif-enc.hpp"
 #include "flif-dec.hpp"
 

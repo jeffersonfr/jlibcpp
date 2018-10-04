@@ -458,8 +458,11 @@ void OnDraw()
 
   glDrawPixels(dw, dh, GL_BGRA, GL_UNSIGNED_BYTE, data);
   
-  glFinish();
-  glFlush();
+  if (g->IsVerticalSyncEnabled() == false) {
+    glFlush();
+  } else {
+    glFinish();
+  }
   
   glutSwapBuffers();
 

@@ -406,11 +406,11 @@ void NativeApplication::InternalPaint()
 
 	texture.update(data);
 
-	// _window->setActive(true);
+  _window->setVerticalSyncEnabled(g->IsVerticalSyncEnabled());
+
 	_window->clear();
 	_window->draw(sprite);
 	_window->display();
-	// _window->setActive(false);
 	
   g_window->Flush();
 
