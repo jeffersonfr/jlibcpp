@@ -30,7 +30,7 @@
 
 namespace jmedia {
 
-class PlayerComponentImpl : public jgui::Component {
+class LibavPlayerComponentImpl : public jgui::Component {
 
 	public:
 		/** \brief */
@@ -47,7 +47,7 @@ class PlayerComponentImpl : public jgui::Component {
 		jgui::jsize_t _frame_size;
 
 	public:
-		PlayerComponentImpl(Player *player, int x, int y, int w, int h):
+		LibavPlayerComponentImpl(Player *player, int x, int y, int w, int h):
 			jgui::Component(x, y, w, h)
 		{
 			_image = nullptr;
@@ -69,7 +69,7 @@ class PlayerComponentImpl : public jgui::Component {
 			SetVisible(true);
 		}
 
-		virtual ~PlayerComponentImpl()
+		virtual ~LibavPlayerComponentImpl()
 		{
 			if (_image != nullptr) {
 				delete _image;
@@ -142,7 +142,7 @@ class PlayerComponentImpl : public jgui::Component {
 
 };
 
-class VolumeControlImpl : public VolumeControl {
+class LibavVolumeControlImpl : public VolumeControl {
 	
 	private:
 		/** \brief */
@@ -153,7 +153,7 @@ class VolumeControlImpl : public VolumeControl {
 		bool _is_muted;
 
 	public:
-		VolumeControlImpl(LibAVLightPlayer *player):
+		LibavVolumeControlImpl(LibAVLightPlayer *player):
 			VolumeControl()
 		{
 			_player = player;
@@ -163,7 +163,7 @@ class VolumeControlImpl : public VolumeControl {
 			SetLevel(100);
 		}
 
-		virtual ~VolumeControlImpl()
+		virtual ~LibavVolumeControlImpl()
 		{
 		}
 
@@ -216,25 +216,25 @@ class VolumeControlImpl : public VolumeControl {
 
 };
 
-class VideoSizeControlImpl : public VideoSizeControl {
+class LibavVideoSizeControlImpl : public VideoSizeControl {
 	
 	private:
 		LibAVLightPlayer *_player;
 
 	public:
-		VideoSizeControlImpl(LibAVLightPlayer *player):
+		LibavVideoSizeControlImpl(LibAVLightPlayer *player):
 			VideoSizeControl()
 		{
 			_player = player;
 		}
 
-		virtual ~VideoSizeControlImpl()
+		virtual ~LibavVideoSizeControlImpl()
 		{
 		}
 
 		virtual void SetSource(int x, int y, int w, int h)
 		{
-			PlayerComponentImpl *impl = dynamic_cast<PlayerComponentImpl *>(_player->_component);
+			LibavPlayerComponentImpl *impl = dynamic_cast<LibavPlayerComponentImpl *>(_player->_component);
 
       std::unique_lock<std::mutex> lock(impl->_mutex);
 			
@@ -246,7 +246,7 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual void SetDestination(int x, int y, int w, int h)
 		{
-			PlayerComponentImpl *impl = dynamic_cast<PlayerComponentImpl *>(_player->_component);
+			LibavPlayerComponentImpl *impl = dynamic_cast<LibavPlayerComponentImpl *>(_player->_component);
 
       std::unique_lock<std::mutex> lock(impl->_mutex);
 
@@ -255,17 +255,17 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual jgui::jregion_t GetSource()
 		{
-			return dynamic_cast<PlayerComponentImpl *>(_player->_component)->_src;
+			return dynamic_cast<LibavPlayerComponentImpl *>(_player->_component)->_src;
 		}
 
 		virtual jgui::jregion_t GetDestination()
 		{
-			return dynamic_cast<PlayerComponentImpl *>(_player->_component)->GetVisibleBounds();
+			return dynamic_cast<LibavPlayerComponentImpl *>(_player->_component)->GetVisibleBounds();
 		}
 
 };
 
-class VideoFormatControlImpl : public VideoFormatControl {
+class LibavVideoFormatControlImpl : public VideoFormatControl {
 	
 	private:
 		LibAVLightPlayer *_player;
@@ -274,7 +274,7 @@ class VideoFormatControlImpl : public VideoFormatControl {
 		jsd_video_format_t _sd_video_format;
 
 	public:
-		VideoFormatControlImpl(LibAVLightPlayer *player):
+		LibavVideoFormatControlImpl(LibAVLightPlayer *player):
 			VideoFormatControl()
 		{
 			_player = player;
@@ -284,7 +284,7 @@ class VideoFormatControlImpl : public VideoFormatControl {
 			_sd_video_format = LSVF_PAL_M;
 		}
 
-		virtual ~VideoFormatControlImpl()
+		virtual ~LibavVideoFormatControlImpl()
 		{
 		}
 
@@ -348,7 +348,7 @@ class VideoFormatControlImpl : public VideoFormatControl {
 
 static void render_callback(void *data, uint8_t *buffer, int width, int height)
 {
-	reinterpret_cast<PlayerComponentImpl *>(data)->UpdateComponent(buffer, width, height);
+	reinterpret_cast<LibavPlayerComponentImpl *>(data)->UpdateComponent(buffer, width, height);
 }
 
 static void endofmedia_callback(void *data)
@@ -378,18 +378,18 @@ LibAVLightPlayer::LibAVLightPlayer(jnetwork::URL url):
 		throw jexception::MediaException("Cannot recognize the media file");
 	}
 
-	_component = new PlayerComponentImpl(this, 0, 0, -1, -1);//iw, ih);
+	_component = new LibavPlayerComponentImpl(this, 0, 0, -1, -1);//iw, ih);
 
 	avplay_set_rendercallback(_provider, render_callback, (void *)_component);
 	avplay_set_endofmediacallback(_provider, endofmedia_callback, (void *)this);
 		
 	if (_provider->wanted_stream[AVMEDIA_TYPE_AUDIO] != -1) {
-		_controls.push_back(new VolumeControlImpl(this));
+		_controls.push_back(new LibavVolumeControlImpl(this));
 	}
 	
 	if (_provider->wanted_stream[AVMEDIA_TYPE_VIDEO] != -1) {
-		_controls.push_back(new VideoSizeControlImpl(this));
-		_controls.push_back(new VideoFormatControlImpl(this));
+		_controls.push_back(new LibavVideoSizeControlImpl(this));
+		_controls.push_back(new LibavVideoFormatControlImpl(this));
 	}
 }
 

@@ -33,7 +33,7 @@
 
 namespace jmedia {
 
-class PlayerComponentImpl : public jgui::Component {
+class XinePlayerComponentImpl : public jgui::Component {
 
 	public:
 		/** \brief */
@@ -52,7 +52,7 @@ class PlayerComponentImpl : public jgui::Component {
 		jgui::jsize_t _frame_size;
 
 	public:
-		PlayerComponentImpl(Player *player, int x, int y, int w, int h):
+		XinePlayerComponentImpl(Player *player, int x, int y, int w, int h):
 			jgui::Component(x, y, w, h)
 		{
 			_buffer = nullptr;
@@ -73,7 +73,7 @@ class PlayerComponentImpl : public jgui::Component {
 			SetVisible(true);
 		}
 
-		virtual ~PlayerComponentImpl()
+		virtual ~XinePlayerComponentImpl()
 		{
 			if (_image != nullptr) {
 				delete _image;
@@ -169,7 +169,7 @@ class PlayerComponentImpl : public jgui::Component {
 
 };
 
-class VolumeControlImpl : public VolumeControl {
+class XineVolumeControlImpl : public VolumeControl {
 	
 	private:
 		/** \brief */
@@ -180,7 +180,7 @@ class VolumeControlImpl : public VolumeControl {
 		bool _is_muted;
 
 	public:
-		VolumeControlImpl(LibXineLightPlayer *player):
+		XineVolumeControlImpl(LibXineLightPlayer *player):
 			VolumeControl()
 		{
 			_player = player;
@@ -190,7 +190,7 @@ class VolumeControlImpl : public VolumeControl {
 			SetLevel(100);
 		}
 
-		virtual ~VolumeControlImpl()
+		virtual ~XineVolumeControlImpl()
 		{
 		}
 
@@ -264,25 +264,25 @@ class VolumeControlImpl : public VolumeControl {
 
 };
 
-class VideoSizeControlImpl : public VideoSizeControl {
+class XineVideoSizeControlImpl : public VideoSizeControl {
 	
 	private:
 		LibXineLightPlayer *_player;
 
 	public:
-		VideoSizeControlImpl(LibXineLightPlayer *player):
+		XineVideoSizeControlImpl(LibXineLightPlayer *player):
 			VideoSizeControl()
 		{
 			_player = player;
 		}
 
-		virtual ~VideoSizeControlImpl()
+		virtual ~XineVideoSizeControlImpl()
 		{
 		}
 
 		virtual void SetSource(int x, int y, int w, int h)
 		{
-			PlayerComponentImpl *impl = dynamic_cast<PlayerComponentImpl *>(_player->_component);
+			XinePlayerComponentImpl *impl = dynamic_cast<XinePlayerComponentImpl *>(_player->_component);
 
       std::unique_lock<std::mutex> lock(impl->_mutex);
 			
@@ -294,7 +294,7 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual void SetDestination(int x, int y, int w, int h)
 		{
-			PlayerComponentImpl *impl = dynamic_cast<PlayerComponentImpl *>(_player->_component);
+			XinePlayerComponentImpl *impl = dynamic_cast<XinePlayerComponentImpl *>(_player->_component);
 
       std::unique_lock<std::mutex> lock(impl->_mutex);
 
@@ -303,17 +303,17 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual jgui::jregion_t GetSource()
 		{
-			return dynamic_cast<PlayerComponentImpl *>(_player->_component)->_src;
+			return dynamic_cast<XinePlayerComponentImpl *>(_player->_component)->_src;
 		}
 
 		virtual jgui::jregion_t GetDestination()
 		{
-			return dynamic_cast<PlayerComponentImpl *>(_player->_component)->GetVisibleBounds();
+			return dynamic_cast<XinePlayerComponentImpl *>(_player->_component)->GetVisibleBounds();
 		}
 
 };
 
-class VideoFormatControlImpl : public VideoFormatControl {
+class XineVideoFormatControlImpl : public VideoFormatControl {
 	
 	private:
 		LibXineLightPlayer *_player;
@@ -322,7 +322,7 @@ class VideoFormatControlImpl : public VideoFormatControl {
 		jsd_video_format_t _sd_video_format;
 
 	public:
-		VideoFormatControlImpl(LibXineLightPlayer *player):
+		XineVideoFormatControlImpl(LibXineLightPlayer *player):
 			VideoFormatControl()
 		{
 			_player = player;
@@ -332,7 +332,7 @@ class VideoFormatControlImpl : public VideoFormatControl {
 			_sd_video_format = LSVF_PAL_M;
 		}
 
-		virtual ~VideoFormatControlImpl()
+		virtual ~XineVideoFormatControlImpl()
 		{
 		}
 
@@ -394,14 +394,14 @@ class VideoFormatControlImpl : public VideoFormatControl {
 
 };
 
-class VideoDeviceControlImpl : public VideoDeviceControl {
+class XineVideoDeviceControlImpl : public VideoDeviceControl {
 	
 	private:
 		LibXineLightPlayer *_player;
 		std::map<jvideo_control_t, int> _default_values;
 
 	public:
-		VideoDeviceControlImpl(LibXineLightPlayer *player):
+		XineVideoDeviceControlImpl(LibXineLightPlayer *player):
 			VideoDeviceControl()
 		{
 			_player = player;
@@ -417,7 +417,7 @@ class VideoDeviceControlImpl : public VideoDeviceControl {
 			}
 		}
 
-		virtual ~VideoDeviceControlImpl()
+		virtual ~XineVideoDeviceControlImpl()
 		{
 		}
 
@@ -486,7 +486,7 @@ class VideoDeviceControlImpl : public VideoDeviceControl {
 
 static void render_callback(void *data, int format, int width, int height, double aspect, void *data0, void *data1, void *data2)
 {
-	reinterpret_cast<PlayerComponentImpl *>(data)->UpdateComponent(format, width, height, aspect, data0, data1, data2);
+	reinterpret_cast<XinePlayerComponentImpl *>(data)->UpdateComponent(format, width, height, aspect, data0, data1, data2);
 }
 
 static void overlay_callback(void *user_data, int num_ovl, raw_overlay_t *overlays_array)
@@ -522,7 +522,7 @@ LibXineLightPlayer::LibXineLightPlayer(jnetwork::URL url):
 	_decode_rate = 1.0;
 	_frames_per_second = 0.0;
 	
-	_component = new PlayerComponentImpl(this, 0, 0, -1, -1);
+	_component = new XinePlayerComponentImpl(this, 0, 0, -1, -1);
 
 	raw_visual_t t;
 
@@ -574,7 +574,7 @@ LibXineLightPlayer::LibXineLightPlayer(jnetwork::URL url):
 	if (xine_get_stream_info(_stream, XINE_STREAM_INFO_HAS_AUDIO)) {
 		_has_audio = true;
 
-		_controls.push_back(new VolumeControlImpl(this));
+		_controls.push_back(new XineVolumeControlImpl(this));
 	}
 
 	if (xine_get_stream_info(_stream, XINE_STREAM_INFO_HAS_VIDEO)) {
@@ -586,9 +586,9 @@ LibXineLightPlayer::LibXineLightPlayer(jnetwork::URL url):
 			_frames_per_second = 90000.0/_frames_per_second;
 		}
 
-		_controls.push_back(new VideoSizeControlImpl(this));
-		_controls.push_back(new VideoFormatControlImpl(this));
-		_controls.push_back(new VideoDeviceControlImpl(this));
+		_controls.push_back(new XineVideoSizeControlImpl(this));
+		_controls.push_back(new XineVideoFormatControlImpl(this));
+		_controls.push_back(new XineVideoDeviceControlImpl(this));
 	}
 
 	if (_has_video == false && _has_audio == true) {

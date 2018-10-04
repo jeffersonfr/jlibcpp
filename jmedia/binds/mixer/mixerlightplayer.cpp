@@ -108,7 +108,7 @@ void DestroyAudioDevice(SDL_AudioDeviceID id)
   }
 }
 
-class AudioImpl : public jmedia::Audio {
+class MixerAudioImpl : public jmedia::Audio {
   
   public:
 		/** \brief */
@@ -125,7 +125,7 @@ class AudioImpl : public jmedia::Audio {
     bool _is_local;
 
   public:
-    AudioImpl()
+    MixerAudioImpl()
     {
       _stream = nullptr;
       _buffer = nullptr;
@@ -135,7 +135,7 @@ class AudioImpl : public jmedia::Audio {
       _is_local = false;
     }
 
-    virtual ~AudioImpl()
+    virtual ~MixerAudioImpl()
     {
       if (_is_local == true) {
         delete _stream;
@@ -176,7 +176,7 @@ class AudioImpl : public jmedia::Audio {
 
 };
 
-class AudioMixerControlImpl : public AudioMixerControl {
+class MixerAudioMixerControlImpl : public AudioMixerControl {
 	
 	private:
 		/** \brief */
@@ -189,13 +189,13 @@ class AudioMixerControlImpl : public AudioMixerControl {
 	private:
     static void AudioCallback(void *userdata, uint8_t *stream, int len)
     {
-      AudioMixerControlImpl *mixer = reinterpret_cast<AudioMixerControlImpl *>(userdata);
+      MixerAudioMixerControlImpl *mixer = reinterpret_cast<MixerAudioMixerControlImpl *>(userdata);
       bool music = false;
 
       memset(stream, 0, len);
 
       for (std::vector<Audio *>::iterator i=mixer->_audios.begin(); i!=mixer->_audios.end(); ) {
-        AudioImpl *audio = static_cast<AudioImpl *>(*i);
+        MixerAudioImpl *audio = static_cast<MixerAudioImpl *>(*i);
 
         if (audio->_stream->Available() > 0) {
           int volume = (int)(audio->GetVolume()*SDL_MIX_MAXVOLUME);
@@ -263,7 +263,7 @@ class AudioMixerControlImpl : public AudioMixerControl {
       bool found = false;
 
       for (std::vector<Audio *>::iterator i=_audios.begin(); i!=_audios.end(); i++) {
-        AudioImpl *audio = static_cast<AudioImpl *>(*i);
+        MixerAudioImpl *audio = static_cast<MixerAudioImpl *>(*i);
 
         if (audio->IsLoopEnabled() == true) {
           if (audio->_fade == 0) {
@@ -284,9 +284,9 @@ class AudioMixerControlImpl : public AudioMixerControl {
 
     void AddAudio(Audio *audio)
     {
-      AudioImpl *tmp = new AudioImpl;
+      MixerAudioImpl *tmp = new MixerAudioImpl;
 
-      *tmp = *static_cast<AudioImpl *>(audio);
+      *tmp = *static_cast<MixerAudioImpl *>(audio);
     
       tmp->_fade = 1;
       tmp->_stream->Reset();
@@ -296,14 +296,14 @@ class AudioMixerControlImpl : public AudioMixerControl {
     }
 
 	public:
-		AudioMixerControlImpl(MixerLightPlayer *player):
+		MixerAudioMixerControlImpl(MixerLightPlayer *player):
 			AudioMixerControl()
 		{
 			_player = player;
       _device = 0;
 		}
 
-		virtual ~AudioMixerControlImpl()
+		virtual ~MixerAudioMixerControlImpl()
 		{
 		}
 
@@ -330,8 +330,8 @@ class AudioMixerControlImpl : public AudioMixerControl {
 
     virtual Audio * CreateAudio(std::string filename)
     {
-      AudioImpl 
-        *audio = new AudioImpl;
+      MixerAudioImpl 
+        *audio = new MixerAudioImpl;
       SDL_AudioSpec 
         spec;
 
@@ -368,8 +368,8 @@ class AudioMixerControlImpl : public AudioMixerControl {
 
     virtual Audio * CreateAudio(jio::InputStream *stream, jaudio_format_t format, int frequency, int channels)
     {
-      AudioImpl 
-        *audio = new AudioImpl;
+      MixerAudioImpl 
+        *audio = new MixerAudioImpl;
       SDL_AudioSpec 
         spec;
 
@@ -459,7 +459,7 @@ MixerLightPlayer::MixerLightPlayer(jnetwork::URL url):
 		throw jexception::MediaException("Unable to initialize the audio system");
   }
 
-	_controls.push_back(new AudioMixerControlImpl(this));
+	_controls.push_back(new MixerAudioMixerControlImpl(this));
 }
 
 MixerLightPlayer::~MixerLightPlayer()
@@ -484,14 +484,14 @@ void MixerLightPlayer::Play()
 
 void MixerLightPlayer::Pause()
 {
-  AudioMixerControlImpl *impl = static_cast<AudioMixerControlImpl *>(_controls[0]);
+  MixerAudioMixerControlImpl *impl = static_cast<MixerAudioMixerControlImpl *>(_controls[0]);
 
   impl->PauseDevice();
 }
 
 void MixerLightPlayer::Resume()
 {
-  AudioMixerControlImpl *impl = static_cast<AudioMixerControlImpl *>(_controls[0]);
+  MixerAudioMixerControlImpl *impl = static_cast<MixerAudioMixerControlImpl *>(_controls[0]);
 
   impl->ResumeDevice();
 }
@@ -502,7 +502,7 @@ void MixerLightPlayer::Stop()
 
 void MixerLightPlayer::Close()
 {
-  AudioMixerControlImpl *impl = static_cast<AudioMixerControlImpl *>(_controls[0]);
+  MixerAudioMixerControlImpl *impl = static_cast<MixerAudioMixerControlImpl *>(_controls[0]);
 
   impl->CloseDevice();
   // SDL_Quit();

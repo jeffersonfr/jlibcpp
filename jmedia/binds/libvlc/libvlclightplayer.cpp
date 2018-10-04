@@ -98,7 +98,7 @@ static libvlc_event_type_t mi_events[] = {
 	
 static int mi_events_len = sizeof(mi_events)/sizeof(*mi_events);
 
-class PlayerComponentImpl : public jgui::Component {
+class LibvlcPlayerComponentImpl : public jgui::Component {
 
 	public:
 		/** \brief */
@@ -119,7 +119,7 @@ class PlayerComponentImpl : public jgui::Component {
 		jgui::jsize_t _frame_size;
 
 	public:
-		PlayerComponentImpl(Player *player, int x, int y, int w, int h):
+		LibvlcPlayerComponentImpl(Player *player, int x, int y, int w, int h):
 			jgui::Component(x, y, w, h)
 		{
 			_buffer = new uint32_t*[2];
@@ -148,7 +148,7 @@ class PlayerComponentImpl : public jgui::Component {
 			SetVisible(true);
 		}
 
-		virtual ~PlayerComponentImpl()
+		virtual ~LibvlcPlayerComponentImpl()
 		{
 			if (_image != nullptr) {
 				delete _image;
@@ -220,7 +220,7 @@ class PlayerComponentImpl : public jgui::Component {
 
 static void * LockMediaSurface(void *data, void **p_pixels)
 {
-	PlayerComponentImpl *cmp = reinterpret_cast<PlayerComponentImpl *>(data);
+	LibvlcPlayerComponentImpl *cmp = reinterpret_cast<LibvlcPlayerComponentImpl *>(data);
 	
 	(*p_pixels) = cmp->_buffer[cmp->_buffer_index];
 
@@ -235,7 +235,7 @@ static void UnlockMediaSurface(void *data, void *id, void *const *p_pixels)
 
 static void DisplayMediaSurface(void *data, void *id)
 {
-	reinterpret_cast<PlayerComponentImpl *>(data)->UpdateComponent();
+	reinterpret_cast<LibvlcPlayerComponentImpl *>(data)->UpdateComponent();
 }
 
 static void MediaEventsCallback(const libvlc_event_t *event, void *data)
@@ -309,7 +309,7 @@ static void MediaEventsCallback(const libvlc_event_t *event, void *data)
 	}
 }
 
-class VolumeControlImpl : public VolumeControl {
+class LibvlcVolumeControlImpl : public VolumeControl {
 	
 	private:
 		/** \brief */
@@ -320,7 +320,7 @@ class VolumeControlImpl : public VolumeControl {
 		bool _is_muted;
 
 	public:
-		VolumeControlImpl(LibVLCLightPlayer *player):
+		LibvlcVolumeControlImpl(LibVLCLightPlayer *player):
 			VolumeControl()
 		{
 			_player = player;
@@ -330,7 +330,7 @@ class VolumeControlImpl : public VolumeControl {
 			SetLevel(100);
 		}
 
-		virtual ~VolumeControlImpl()
+		virtual ~LibvlcVolumeControlImpl()
 		{
 		}
 
@@ -382,20 +382,20 @@ class VolumeControlImpl : public VolumeControl {
 
 };
 
-class AudioConfigurationControlImpl : public AudioConfigurationControl {
+class LibvlcAudioConfigurationControlImpl : public AudioConfigurationControl {
 	
 	private:
 		/** \brief */
 		LibVLCLightPlayer *_player;
 
 	public:
-		AudioConfigurationControlImpl(LibVLCLightPlayer *player):
+		LibvlcAudioConfigurationControlImpl(LibVLCLightPlayer *player):
 			AudioConfigurationControl()
 		{
 			_player = player;
 		}
 
-		virtual ~AudioConfigurationControlImpl()
+		virtual ~LibvlcAudioConfigurationControlImpl()
 		{
 		}
 
@@ -419,25 +419,25 @@ class AudioConfigurationControlImpl : public AudioConfigurationControl {
 
 };
 
-class VideoSizeControlImpl : public VideoSizeControl {
+class LibvlcVideoSizeControlImpl : public VideoSizeControl {
 	
 	private:
 		LibVLCLightPlayer *_player;
 
 	public:
-		VideoSizeControlImpl(LibVLCLightPlayer *player):
+		LibvlcVideoSizeControlImpl(LibVLCLightPlayer *player):
 			VideoSizeControl()
 		{
 			_player = player;
 		}
 
-		virtual ~VideoSizeControlImpl()
+		virtual ~LibvlcVideoSizeControlImpl()
 		{
 		}
 
 		virtual void SetSource(int x, int y, int w, int h)
 		{
-			PlayerComponentImpl *impl = dynamic_cast<PlayerComponentImpl *>(_player->_component);
+			LibvlcPlayerComponentImpl *impl = dynamic_cast<LibvlcPlayerComponentImpl *>(_player->_component);
 
       std::unique_lock<std::mutex> lock(impl->_mutex);
 			
@@ -449,7 +449,7 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual void SetDestination(int x, int y, int w, int h)
 		{
-			PlayerComponentImpl *impl = dynamic_cast<PlayerComponentImpl *>(_player->_component);
+			LibvlcPlayerComponentImpl *impl = dynamic_cast<LibvlcPlayerComponentImpl *>(_player->_component);
 
       std::unique_lock<std::mutex> lock(impl->_mutex);
 
@@ -458,17 +458,17 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual jgui::jregion_t GetSource()
 		{
-			return dynamic_cast<PlayerComponentImpl *>(_player->_component)->_src;
+			return dynamic_cast<LibvlcPlayerComponentImpl *>(_player->_component)->_src;
 		}
 
 		virtual jgui::jregion_t GetDestination()
 		{
-			return dynamic_cast<PlayerComponentImpl *>(_player->_component)->GetVisibleBounds();
+			return dynamic_cast<LibvlcPlayerComponentImpl *>(_player->_component)->GetVisibleBounds();
 		}
 
 };
 
-class VideoFormatControlImpl : public VideoFormatControl {
+class LibvlcVideoFormatControlImpl : public VideoFormatControl {
 	
 	private:
 		LibVLCLightPlayer *_player;
@@ -477,7 +477,7 @@ class VideoFormatControlImpl : public VideoFormatControl {
 		jsd_video_format_t _sd_video_format;
 
 	public:
-		VideoFormatControlImpl(LibVLCLightPlayer *player):
+		LibvlcVideoFormatControlImpl(LibVLCLightPlayer *player):
 			VideoFormatControl()
 		{
 			_player = player;
@@ -487,7 +487,7 @@ class VideoFormatControlImpl : public VideoFormatControl {
 			_sd_video_format = LSVF_PAL_M;
 		}
 
-		virtual ~VideoFormatControlImpl()
+		virtual ~LibvlcVideoFormatControlImpl()
 		{
 		}
 
@@ -615,8 +615,8 @@ LibVLCLightPlayer::LibVLCLightPlayer(jnetwork::URL url):
 
       _aspect = static_cast<float>(iw)/ih;
 
-      _controls.push_back(new VideoSizeControlImpl(this));
-      _controls.push_back(new VideoFormatControlImpl(this));
+      _controls.push_back(new LibvlcVideoSizeControlImpl(this));
+      _controls.push_back(new LibvlcVideoFormatControlImpl(this));
     }
   } else {
     for (int i=0; i<count; i++) {
@@ -626,15 +626,15 @@ LibVLCLightPlayer::LibVLCLightPlayer(jnetwork::URL url):
         if (_has_audio == false) {
           _has_audio = true;
 
-          _controls.push_back(new VolumeControlImpl(this));
-          _controls.push_back(new AudioConfigurationControlImpl(this));
+          _controls.push_back(new LibvlcVolumeControlImpl(this));
+          _controls.push_back(new LibvlcAudioConfigurationControlImpl(this));
         }
       } else if (t->i_type == libvlc_track_video) {
         if (_has_video == false) {
           _has_video = true;
 
-          _controls.push_back(new VideoSizeControlImpl(this));
-          _controls.push_back(new VideoFormatControlImpl(this));
+          _controls.push_back(new LibvlcVideoSizeControlImpl(this));
+          _controls.push_back(new LibvlcVideoFormatControlImpl(this));
         }
 
         iw = t->video->i_width;
@@ -650,7 +650,7 @@ LibVLCLightPlayer::LibVLCLightPlayer(jnetwork::URL url):
 
 	_media_time = (uint64_t)libvlc_media_get_duration(media);
 
-	_component = new PlayerComponentImpl(this, 0, 0, iw, ih);
+	_component = new LibvlcPlayerComponentImpl(this, 0, 0, iw, ih);
 
 	libvlc_video_set_format(_provider, "RV32", iw, ih, iw*4);
 	libvlc_video_set_callbacks(_provider, LockMediaSurface, UnlockMediaSurface, DisplayMediaSurface, _component);

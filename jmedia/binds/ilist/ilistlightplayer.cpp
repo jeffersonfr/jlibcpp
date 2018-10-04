@@ -37,7 +37,7 @@
 
 namespace jmedia {
 
-class PlayerComponentImpl : public jgui::Component {
+class IlistPlayerComponentImpl : public jgui::Component {
 
 	public:
 		/** \brief */
@@ -54,7 +54,7 @@ class PlayerComponentImpl : public jgui::Component {
 		jgui::jsize_t _frame_size;
 
 	public:
-		PlayerComponentImpl(Player *player, int x, int y, int w, int h):
+		IlistPlayerComponentImpl(Player *player, int x, int y, int w, int h):
 			jgui::Component(x, y, w, h)
 		{
 			_image = nullptr;
@@ -76,7 +76,7 @@ class PlayerComponentImpl : public jgui::Component {
 			SetVisible(true);
 		}
 
-		virtual ~PlayerComponentImpl()
+		virtual ~IlistPlayerComponentImpl()
 		{
 			if (_image != nullptr) {
 				delete _image;
@@ -139,25 +139,25 @@ class PlayerComponentImpl : public jgui::Component {
 
 };
 
-class VideoSizeControlImpl : public VideoSizeControl {
+class IlistVideoSizeControlImpl : public VideoSizeControl {
 	
 	private:
 		ImageListLightPlayer *_player;
 
 	public:
-		VideoSizeControlImpl(ImageListLightPlayer *player):
+		IlistVideoSizeControlImpl(ImageListLightPlayer *player):
 			VideoSizeControl()
 		{
 			_player = player;
 		}
 
-		virtual ~VideoSizeControlImpl()
+		virtual ~IlistVideoSizeControlImpl()
 		{
 		}
 
 		virtual void SetSource(int x, int y, int w, int h)
 		{
-			PlayerComponentImpl *impl = dynamic_cast<PlayerComponentImpl *>(_player->_component);
+			IlistPlayerComponentImpl *impl = dynamic_cast<IlistPlayerComponentImpl *>(_player->_component);
 
       impl->_mutex.lock();
 
@@ -171,7 +171,7 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual void SetDestination(int x, int y, int w, int h)
 		{
-			PlayerComponentImpl *impl = dynamic_cast<PlayerComponentImpl *>(_player->_component);
+			IlistPlayerComponentImpl *impl = dynamic_cast<IlistPlayerComponentImpl *>(_player->_component);
 
       impl->_mutex.lock();
 
@@ -182,12 +182,12 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual jgui::jregion_t GetSource()
 		{
-			return dynamic_cast<PlayerComponentImpl *>(_player->_component)->_src;
+			return dynamic_cast<IlistPlayerComponentImpl *>(_player->_component)->_src;
 		}
 
 		virtual jgui::jregion_t GetDestination()
 		{
-			return dynamic_cast<PlayerComponentImpl *>(_player->_component)->GetVisibleBounds();
+			return dynamic_cast<IlistPlayerComponentImpl *>(_player->_component)->GetVisibleBounds();
 		}
 
 };
@@ -251,9 +251,9 @@ ImageListLightPlayer::ImageListLightPlayer(jnetwork::URL url):
     return false;
   });
 
-	_controls.push_back(new VideoSizeControlImpl(this));
+	_controls.push_back(new IlistVideoSizeControlImpl(this));
 
-	_component = new PlayerComponentImpl(this, 0, 0, -1, -1);
+	_component = new IlistPlayerComponentImpl(this, 0, 0, -1, -1);
 }
 
 ImageListLightPlayer::~ImageListLightPlayer()
@@ -309,7 +309,7 @@ void ImageListLightPlayer::Run()
 			}
 		}
 
-		dynamic_cast<PlayerComponentImpl *>(_component)->UpdateComponent(frame);
+		dynamic_cast<IlistPlayerComponentImpl *>(_component)->UpdateComponent(frame);
 
 		try {
 			if (_decode_rate == 0) {

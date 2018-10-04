@@ -36,7 +36,7 @@
 
 namespace jmedia {
 
-class PlayerComponentImpl : public jgui::Component {
+class V4l2PlayerComponentImpl : public jgui::Component {
 
 	public:
 		/** \brief */
@@ -53,7 +53,7 @@ class PlayerComponentImpl : public jgui::Component {
 		jgui::jsize_t _frame_size;
 
 	public:
-		PlayerComponentImpl(Player *player, int x, int y, int w, int h):
+		V4l2PlayerComponentImpl(Player *player, int x, int y, int w, int h):
 			jgui::Component(x, y, w, h)
 		{
 			_buffer = nullptr;
@@ -71,7 +71,7 @@ class PlayerComponentImpl : public jgui::Component {
 			SetVisible(true);
 		}
 
-		virtual ~PlayerComponentImpl()
+		virtual ~V4l2PlayerComponentImpl()
 		{
 			if (_image != nullptr) {
 				delete _image;
@@ -166,26 +166,26 @@ class PlayerComponentImpl : public jgui::Component {
 
 };
 
-class VideoSizeControlImpl : public VideoSizeControl {
+class V4l2VideoSizeControlImpl : public VideoSizeControl {
 	
 	private:
 		V4L2LightPlayer *_player;
 
 	public:
-		VideoSizeControlImpl(V4L2LightPlayer *player):
+		V4l2VideoSizeControlImpl(V4L2LightPlayer *player):
 			VideoSizeControl()
 		{
 			_player = player;
 		}
 
-		virtual ~VideoSizeControlImpl()
+		virtual ~V4l2VideoSizeControlImpl()
 		{
 		}
 
 		virtual void SetSize(int w, int h)
 		{
-			PlayerComponentImpl 
-        *impl = dynamic_cast<PlayerComponentImpl *>(_player->_component);
+			V4l2PlayerComponentImpl 
+        *impl = dynamic_cast<V4l2PlayerComponentImpl *>(_player->_component);
 			VideoGrabber 
         *grabber = _player->_grabber;
 
@@ -202,7 +202,7 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual void SetSource(int x, int y, int w, int h)
 		{
-			PlayerComponentImpl *impl = dynamic_cast<PlayerComponentImpl *>(_player->_component);
+			V4l2PlayerComponentImpl *impl = dynamic_cast<V4l2PlayerComponentImpl *>(_player->_component);
 
       impl->_mutex.lock();
 			
@@ -228,7 +228,7 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual void SetDestination(int x, int y, int w, int h)
 		{
-			PlayerComponentImpl *impl = dynamic_cast<PlayerComponentImpl *>(_player->_component);
+			V4l2PlayerComponentImpl *impl = dynamic_cast<V4l2PlayerComponentImpl *>(_player->_component);
 
       impl->_mutex.lock();
 
@@ -239,22 +239,22 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual jgui::jsize_t GetSize()
 		{
-			return dynamic_cast<PlayerComponentImpl *>(_player->_component)->GetPreferredSize();
+			return dynamic_cast<V4l2PlayerComponentImpl *>(_player->_component)->GetPreferredSize();
 		}
 
 		virtual jgui::jregion_t GetSource()
 		{
-			return dynamic_cast<PlayerComponentImpl *>(_player->_component)->_src;
+			return dynamic_cast<V4l2PlayerComponentImpl *>(_player->_component)->_src;
 		}
 
 		virtual jgui::jregion_t GetDestination()
 		{
-			return dynamic_cast<PlayerComponentImpl *>(_player->_component)->GetVisibleBounds();
+			return dynamic_cast<V4l2PlayerComponentImpl *>(_player->_component)->GetVisibleBounds();
 		}
 
 };
 
-class VideoFormatControlImpl : public VideoFormatControl {
+class V4l2VideoFormatControlImpl : public VideoFormatControl {
 	
 	private:
 		V4L2LightPlayer *_player;
@@ -263,7 +263,7 @@ class VideoFormatControlImpl : public VideoFormatControl {
 		jsd_video_format_t _sd_video_format;
 
 	public:
-		VideoFormatControlImpl(V4L2LightPlayer *player):
+		V4l2VideoFormatControlImpl(V4L2LightPlayer *player):
 			VideoFormatControl()
 		{
 			_player = player;
@@ -273,7 +273,7 @@ class VideoFormatControlImpl : public VideoFormatControl {
 			_sd_video_format = LSVF_PAL_M;
 		}
 
-		virtual ~VideoFormatControlImpl()
+		virtual ~V4l2VideoFormatControlImpl()
 		{
 		}
 
@@ -339,13 +339,13 @@ class VideoFormatControlImpl : public VideoFormatControl {
 
 };
 
-class VideoDeviceControlImpl : public VideoDeviceControl {
+class V4l2VideoDeviceControlImpl : public VideoDeviceControl {
 	
 	private:
 		V4L2LightPlayer *_player;
 
 	public:
-		VideoDeviceControlImpl(V4L2LightPlayer *player):
+		V4l2VideoDeviceControlImpl(V4L2LightPlayer *player):
 			VideoDeviceControl()
 		{
 			_player = player;
@@ -360,7 +360,7 @@ class VideoDeviceControlImpl : public VideoDeviceControl {
 			}
 		}
 
-		virtual ~VideoDeviceControlImpl()
+		virtual ~V4l2VideoDeviceControlImpl()
 		{
 		}
 
@@ -441,11 +441,11 @@ V4L2LightPlayer::V4L2LightPlayer(jnetwork::URL url):
 	_grabber->Configure(size.width, size.height);
 	_grabber->GetVideoControl()->Reset();
 
-	_controls.push_back(new VideoSizeControlImpl(this));
-	_controls.push_back(new VideoFormatControlImpl(this));
-	_controls.push_back(new VideoDeviceControlImpl(this));
+	_controls.push_back(new V4l2VideoSizeControlImpl(this));
+	_controls.push_back(new V4l2VideoFormatControlImpl(this));
+	_controls.push_back(new V4l2VideoDeviceControlImpl(this));
 	
-	_component = new PlayerComponentImpl(this, 0, 0, -1, -1);
+	_component = new V4l2PlayerComponentImpl(this, 0, 0, -1, -1);
 }
 
 V4L2LightPlayer::~V4L2LightPlayer()
@@ -466,7 +466,7 @@ V4L2LightPlayer::~V4L2LightPlayer()
 
 void V4L2LightPlayer::ProcessFrame(const uint8_t *buffer, int width, int height, jgui::jpixelformat_t format)
 {
-	dynamic_cast<PlayerComponentImpl *>(_component)->UpdateComponent(buffer, width, height, format);
+	dynamic_cast<V4l2PlayerComponentImpl *>(_component)->UpdateComponent(buffer, width, height, format);
 }
 
 void V4L2LightPlayer::Play()

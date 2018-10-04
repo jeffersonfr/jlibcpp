@@ -630,7 +630,7 @@ static int GIFReadFrame(AnimatedGIFData *data)
 	return 0;
 }
 
-class PlayerComponentImpl : public jgui::Component {
+class GifPlayerComponentImpl : public jgui::Component {
 
 	public:
 		/** \brief */
@@ -647,7 +647,7 @@ class PlayerComponentImpl : public jgui::Component {
 		jgui::jsize_t _frame_size;
 
 	public:
-		PlayerComponentImpl(Player *player, int x, int y, int w, int h):
+		GifPlayerComponentImpl(Player *player, int x, int y, int w, int h):
 			jgui::Component(x, y, w, h)
 		{
 			_image = nullptr;
@@ -669,7 +669,7 @@ class PlayerComponentImpl : public jgui::Component {
 			SetVisible(true);
 		}
 
-		virtual ~PlayerComponentImpl()
+		virtual ~GifPlayerComponentImpl()
 		{
 			_mutex.lock();
 
@@ -742,25 +742,25 @@ class PlayerComponentImpl : public jgui::Component {
 
 };
 
-class VideoSizeControlImpl : public VideoSizeControl {
+class GifVideoSizeControlImpl : public VideoSizeControl {
 	
 	private:
 		GIFLightPlayer *_player;
 
 	public:
-		VideoSizeControlImpl(GIFLightPlayer *player):
+		GifVideoSizeControlImpl(GIFLightPlayer *player):
 			VideoSizeControl()
 		{
 			_player = player;
 		}
 
-		virtual ~VideoSizeControlImpl()
+		virtual ~GifVideoSizeControlImpl()
 		{
 		}
 
 		virtual void SetSource(int x, int y, int w, int h)
 		{
-			PlayerComponentImpl *impl = dynamic_cast<PlayerComponentImpl *>(_player->_component);
+			GifPlayerComponentImpl *impl = dynamic_cast<GifPlayerComponentImpl *>(_player->_component);
 
       impl->_mutex.lock();
 			
@@ -774,7 +774,7 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual void SetDestination(int x, int y, int w, int h)
 		{
-			PlayerComponentImpl *impl = dynamic_cast<PlayerComponentImpl *>(_player->_component);
+			GifPlayerComponentImpl *impl = dynamic_cast<GifPlayerComponentImpl *>(_player->_component);
 
       impl->_mutex.lock();
 
@@ -785,12 +785,12 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual jgui::jregion_t GetSource()
 		{
-			return dynamic_cast<PlayerComponentImpl *>(_player->_component)->_src;
+			return dynamic_cast<GifPlayerComponentImpl *>(_player->_component)->_src;
 		}
 
 		virtual jgui::jregion_t GetDestination()
 		{
-			return dynamic_cast<PlayerComponentImpl *>(_player->_component)->GetVisibleBounds();
+			return dynamic_cast<GifPlayerComponentImpl *>(_player->_component)->GetVisibleBounds();
 		}
 
 };
@@ -856,9 +856,9 @@ GIFLightPlayer::GIFLightPlayer(jnetwork::URL url):
 
 	data->image = new uint32_t[data->Width*data->Height];
 
-	_controls.push_back(new VideoSizeControlImpl(this));
+	_controls.push_back(new GifVideoSizeControlImpl(this));
 
-	_component = new PlayerComponentImpl(this, 0, 0, data->Width, data->Height);
+	_component = new GifPlayerComponentImpl(this, 0, 0, data->Width, data->Height);
 	
 	_provider = data;
 }
@@ -913,7 +913,7 @@ void GIFLightPlayer::Run()
 		}
 
 		if (skip == false) {
-			dynamic_cast<PlayerComponentImpl *>(_component)->UpdateComponent(data->image);
+			dynamic_cast<GifPlayerComponentImpl *>(_component)->UpdateComponent(data->image);
 
 			try {
 				if (_decode_rate == 0) {

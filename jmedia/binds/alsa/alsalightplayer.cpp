@@ -30,7 +30,7 @@
 
 namespace jmedia {
 
-class VolumeControlImpl : public VolumeControl {
+class AlsaVolumeControlImpl : public VolumeControl {
 	
 	private:
 		/** \brief */
@@ -47,7 +47,7 @@ class VolumeControlImpl : public VolumeControl {
 		snd_mixer_selem_id_t *_sid;
 
 	public:
-		VolumeControlImpl(AlsaLightPlayer *player):
+		AlsaVolumeControlImpl(AlsaLightPlayer *player):
 			VolumeControl()
 		{
 			_player = player;
@@ -98,7 +98,7 @@ class VolumeControlImpl : public VolumeControl {
 			SetLevel(100);
 		}
 
-		virtual ~VolumeControlImpl()
+		virtual ~AlsaVolumeControlImpl()
 		{
 			snd_mixer_close(_mixer);
 		}
@@ -323,7 +323,7 @@ AlsaLightPlayer::AlsaLightPlayer(jnetwork::URL url):
 
 	_component = new jgui::Component();
 
-	_controls.push_back(new VolumeControlImpl(this));
+	_controls.push_back(new AlsaVolumeControlImpl(this));
 }
 
 AlsaLightPlayer::~AlsaLightPlayer()
