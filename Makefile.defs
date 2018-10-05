@@ -57,8 +57,8 @@ ENABLE_DEBUG ?= yes
 # {allegro5, gl, gtk3, dispmanx, sdl2, sfml2, vdpau, vnc, xcb, xlib, directfb, fb, egl, openvg}
 ENABLE_GRAPHICS ?= sdl2
 
-# {bmp, gif, ico, jpg, pcx, png, ppm, tga, xbm, xpm, heif, webp, jp2000, svg, tif, bpg, flif}
-ENABLE_IMAGE ?= bmp, gif, ico, jpg, pcx, png, ppm, tga, xbm, xpm, heif, webp, jp2000, svg, tif, bpg, flif
+# {bmp, gif, ico, jpg, pcx, png, ppm, tga, xbm, xpm, heif, webp, jp2000, svg, tif, bpg, mjpeg, flif}
+ENABLE_IMAGE ?= bmp, gif, ico, jpg, pcx, png, ppm, tga, xbm, xpm, heif, webp, jp2000, svg, tif, bpg, mjpeg, flif
 
 # {gif, ilist, v4l2, libvlc, libav, libxine, alsa, mixer}
 ENABLE_VIDEO ?= gif, ilist, v4l2, libvlc, libav, libxine, alsa, mixer

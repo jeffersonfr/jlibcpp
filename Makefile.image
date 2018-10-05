@@ -250,3 +250,16 @@ ifeq ($(findstring flif, $(ENABLE_IMAGE)), flif)
 
 endif
 
+ifeq ($(findstring mjpeg, $(ENABLE_IMAGE)), mjpeg)
+	CCFLAGS		+= \
+
+	LDFLAGS		+= \
+
+	DEFINES		+= \
+		 -DMJPEG_IMAGE \
+
+	OBJS_jgui	+= \
+		 providers/imageprovider_mjpeg.o \
+
+endif
+

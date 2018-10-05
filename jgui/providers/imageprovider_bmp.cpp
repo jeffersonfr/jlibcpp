@@ -66,12 +66,15 @@ cairo_surface_t * create_bmp_surface_from_stream(jio::InputStream *stream)
 		}
 	}
 
+  /*
 	for (int i=0; i<(int)sz; i++) {
 		int alpha = data[i*4+3];
+
 		data[i*4+2] = ALPHA_PREMULTIPLY(data[i*4+2], alpha);
 		data[i*4+1] = ALPHA_PREMULTIPLY(data[i*4+1], alpha);
 		data[i*4+0] = ALPHA_PREMULTIPLY(data[i*4+0], alpha);
 	}
+  */
 
 	cairo_surface_mark_dirty(surface);
 
