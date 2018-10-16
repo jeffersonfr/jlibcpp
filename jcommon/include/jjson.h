@@ -20,7 +20,9 @@
 #ifndef JSON_H
 #define JSON_H
 
-#include "jcommon/jobject.h"
+#include "jio/jinputstream.h"
+
+#include <sstream>
 
 namespace jcommon {
 
@@ -60,13 +62,9 @@ class JSONValue : public jcommon::Object{
 		/** \brief */
 		JSONValue *_last_child;
 		/** \brief */
-		char *_name;
+    std::string _name;
 		/** \brief */
-		char *_string_value;
-		/** \brief */
-		int _int_value;
-		/** \brief */
-		double _double_value;
+    std::string _value;
 		/** \brief */
 		json_type_t _type;
 
@@ -100,31 +98,19 @@ class JSONValue : public jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual char * GetName();
+		virtual std::string GetName();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual char * GetString();
+		virtual std::string GetValue();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool GetBoolean();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetInteger();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual double GetFloat();
+		virtual void SetValue(std::string value);
 
 		/**
 		 * \brief
@@ -152,12 +138,25 @@ class JSONValue : public jcommon::Object{
 
 };
 
-class JSON : public virtual jcommon::Object{
+class JSON : public virtual jcommon::Object {
 
 	private:
+    JSON()
+    {
+    }
 
 	public:
-		static JSONValue * Parse(const char *source);
+    /**
+     * \brief
+     *
+     */
+		static JSONValue * Parse(jio::InputStream *stream);
+
+    /**
+     * \brief
+     *
+     */
+    static std::string Dump(jcommon::JSONValue *value);
 
 };
 

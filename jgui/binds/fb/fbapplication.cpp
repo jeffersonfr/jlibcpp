@@ -407,6 +407,13 @@ void NativeApplication::InternalPaint()
 
       src = src + 4;
       dst = dst + 4;
+    } else if (_fb_vinfo.bits_per_pixel == 24) { // BGR24
+      dst[2] = src[2];
+      dst[1] = src[1];
+      dst[0] = src[0];
+
+      src = src + 4;
+      dst = dst + 3;
     } else if (_fb_vinfo.bits_per_pixel == 16) { // BGR565
       *((uint16_t *)dst) = ((src[0] & 0x1f) << 11) | ((src[1] & 0x3f) << 5) | (src[2] & 0x1f);
 
