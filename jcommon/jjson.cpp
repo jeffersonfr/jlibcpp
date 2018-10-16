@@ -563,10 +563,17 @@ void InternalDump(jcommon::JSONValue *value, std::ostringstream &out)
 
       break;
     case jcommon::JSON_STRING:
+      out << "\"" << value->GetValue() << "\"";
+      
+      if (value->NextSibling() != nullptr) {
+        out << ",";
+      }
+
+      break;
     case jcommon::JSON_INT:
     case jcommon::JSON_FLOAT:
     case jcommon::JSON_BOOL:
-      out << "\"" << value->GetValue() << "\"";
+      out << value->GetValue();
 
       if (value->NextSibling() != nullptr) {
         out << ",";
