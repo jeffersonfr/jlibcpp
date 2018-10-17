@@ -587,11 +587,11 @@ std::string JSON::Dump(jcommon::JSONValue *value)
 {
   std::ostringstream out;
 
-  out << "[";
+  // out << "[";
 
   InternalDump(value, out);
 
-  out << "]";
+  // out << "]";
 
   return out.str();
 }
