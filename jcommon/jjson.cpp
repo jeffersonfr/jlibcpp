@@ -255,7 +255,7 @@ JSONValue * JSON::Parse(jio::InputStream *stream)
     return nullptr;
   }
 
-  char source[stream->Available()];
+  char source[stream->Available() + 1];
   char *ptr = source;
 
   while (stream->Available() > 0) {
