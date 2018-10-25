@@ -334,18 +334,7 @@ bool File::Exists(std::string path)
 
 File * File::OpenFile(std::string path, jfile_flags_t flags)
 {
-	// mode_t mode = GetPermissions(perms);
-	int o = GetFlags(flags);
-
-	int fd = open(path.c_str(), o | O_DIRECTORY);
-
-	if (fd > 0) {
-		close(fd);
-
-		return nullptr;
-	}
-
-	fd = open(path.c_str(), o);
+	int fd = open(path.c_str(), GetFlags(flags));
 
 	if (fd < 0) {
 		return nullptr;
@@ -356,8 +345,7 @@ File * File::OpenFile(std::string path, jfile_flags_t flags)
 
 File * File::OpenDirectory(std::string path, jfile_flags_t flags)
 {
-	// int fd = open(path.c_str(), O_DIRECTORY);
-	int fd = open(path.c_str(), O_DIRECTORY, S_IREAD | S_IWRITE); // S_IRWXU
+	int fd = open(path.c_str(), GetFlags(flags) | O_DIRECTORY, S_IREAD | S_IWRITE); // S_IRWXU
 
 	if (fd < 0) {
 		return nullptr;

@@ -144,13 +144,13 @@ class File : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		static File * OpenFile(std::string path, jfile_flags_t flags = (jfile_flags_t)(JFF_READ_WRITE | JFF_LARGEFILE));
+		static File * OpenFile(std::string path, jfile_flags_t flags = (jfile_flags_t)(JFF_READ_ONLY | JFF_LARGEFILE));
 
 		/**
 		 * \brief
 		 *
 		 */
-		static File * OpenDirectory(std::string path, jfile_flags_t flags = (jfile_flags_t)(JFF_READ_WRITE | JFF_LARGEFILE));
+		static File * OpenDirectory(std::string path, jfile_flags_t flags = (jfile_flags_t)(JFF_READ_ONLY | JFF_LARGEFILE));
 
 		/**
 		 * \brief
