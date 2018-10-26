@@ -21,19 +21,16 @@ OBJS_msg_teste = \
 OBJS_process = \
 	   process.o\
 
-OBJS_ipcmap = \
-	   ipcmap.o\
-
-OBJS_ipcshared = \
-	   ipcshared.o\
-
 OBJS_semaphore = \
 	   semaphore.o\
 
 OBJS_namedsem = \
 	   namedsem.o\
 
-all: fifo_teste msg_teste process ipcmap ipcshared semaphore namedsem
+OBJS_memmap = \
+	   memmap.o\
+
+all: fifo_teste msg_teste process semaphore namedsem memmap
 	
 fifo_teste: $(OBJS_fifo_teste)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
@@ -45,16 +42,13 @@ process: $(OBJS_process)
 	@$(CC) $(CCFLAGS) multiply.cpp -o multiply $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
 
-ipcmap: $(OBJS_ipcmap)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
-
-ipcshared: $(OBJS_ipcshared)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
-
 semaphore: $(OBJS_semaphore)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
 
 namedsem: $(OBJS_namedsem)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
+
+memmap: $(OBJS_memmap)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
 
 .cpp.o: $<  
@@ -63,4 +57,4 @@ namedsem: $(OBJS_namedsem)
 install:
 
 clean:
-	@rm -rvf *.o *~ fifo_teste msg_teste process ipcmap ipcshared multiply semaphore namedsem
+	@rm -rvf *.o *~ fifo_teste msg_teste process multiply semaphore namedsem memmap

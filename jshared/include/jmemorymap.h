@@ -20,28 +20,9 @@
 #ifndef J_MEMORYMAP_H
 #define J_MEMORYMAP_H
 
-#include "jcommon/jobject.h"
-
-#include <iostream>
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
+#include "jio/jfile.h"
 
 namespace jshared {
-
-enum jmemory_permission_t {
-	JMP_NONE 	= 0x00,
-	JMP_EXEC 	= 0x01,
-	JMP_READ 	= 0x02,
-	JMP_WRITE	= 0x04,
-	JMP_READ_WRITE	= 0x08,
-};
-	
-enum jmemory_flags_t {
-	JMF_OPEN	= 0x01,
-	JMF_CREAT	= 0x02
-};
 
 /**
  * \brief Socket.
@@ -52,32 +33,19 @@ class MemoryMap : public virtual jcommon::Object {
 
     private:
 			/** \brief Socket handler. */
-			int _fd;
+      jio::File *_file;
 			/** \brief */
-			struct stat _stats;
+			uint8_t *_address;
 			/** \brief */
-			void *_start;
-			/** \brief */
-			std::string _filename;
-			/** \brief */
-			int _timeout;
-			/** \brief */
-			jmemory_permission_t _permission;
-			/** \brief */
-			bool _is_open;
+      int64_t _length;
 
 		public:
 			/**
 			 * \brief Constructor.
 			 *
 			 */
-			MemoryMap(std::string sharedfile_, jmemory_flags_t flags_ = JMF_OPEN, jmemory_permission_t perms_ = JMP_READ_WRITE, bool private_ = true);
-
-			/**
-			 * \brief Constructor.
-			 *
-			 */
-			MemoryMap(std::string sharedfile_);
+			MemoryMap(jio::File *file, int length, bool shared = true, 
+          jio::jfile_permissions_t perms = (jio::jfile_permissions_t)(jio::JFP_USR_READ | jio::JFP_USR_WRITE));
 
 			/**
 			 * \brief Destrutor virtual.
@@ -89,37 +57,19 @@ class MemoryMap : public virtual jcommon::Object {
 			 * \brief
 			 *
 			 */
-			virtual int64_t Get(char *data_, int64_t size_, int64_t offset_);
+			virtual uint8_t * GetAddress();
 
 			/**
 			 * \brief
 			 *
 			 */
-			virtual int64_t Put(const char *data_, int64_t size_, int64_t offset_);
+			virtual int64_t GetLength();
 
 			/**
 			 * \brief
 			 *
 			 */
-			virtual jmemory_permission_t GetPermission();
-
-			/**
-			 * \brief
-			 *
-			 */
-			virtual void SetPermission(jmemory_permission_t perms_);
-
-			/**
-			 * \brief
-			 *
-			 */
-			virtual int64_t GetSize();
-
-			/**
-			 * \brief 
-			 *
-			 */
-			virtual void Release();
+      virtual void SetPermission(jio::jfile_permissions_t perms);
 
 };
 

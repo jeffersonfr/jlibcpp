@@ -53,10 +53,8 @@ SharedSemaphore::SharedSemaphore(key_t key_):
 	_id = semget(key_, 0, 0);
 
 	if (_id < 0) {
-		throw jexception::SemaphoreException("Open shared semaphore error");
+		throw jexception::SemaphoreException("Unable to open shared semaphore");
 	}
-
-	// TODO:: initialize _nsem
 }
 
 SharedSemaphore::SharedSemaphore(key_t key_, int nsem_, int value_, jshared_permissions_t perms_):
@@ -127,28 +125,6 @@ SharedSemaphore::SharedSemaphore(key_t key_, int nsem_, int value_, jshared_perm
 
 		throw jexception::SemaphoreException("Shared semaphore create failed");
 	}
-
-	/*
-	// INFO:: initialize semaphore
-	uint16_t *initv = new uint16_t[_nsem];
-	int r;
-
-	for (int i=0; i<_nsem; i++) {
-		initv[i] = value_;
-	}
-	
-	union semun arg;
-
-	arg.array = initv;
-
-	r = semctl(_id, _nsem, SETALL, arg);
-
-	delete [] initv;
-	
-	if (r < 0) {
-		throw jexception::SemaphoreException(strerror(errno));
-	}
-	*/
 }
 
 SharedSemaphore::~SharedSemaphore()

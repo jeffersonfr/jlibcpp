@@ -18,41 +18,45 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "jshared/jmemorymap.h"
+#include "jio/jfile.h"
+#include "jexception/jexception.h"
 
 #include <iostream>
 #include <thread>
 
+#include <string.h>
+
+const std::string MEM_FILE("/tmp/mem.ui");
+
 int main(int argc, char **argv)
 {
-	if (argc < 2) {
-		std::cout << "use:: ./ipcmap <id>" << std::endl;
-
-		return -1;
-	}
-
-  jshared::MemoryMap *m = nullptr;
-
-	std::string key;
-
-	if (argc == 1) {
-		key = "server";
-	} else if (argc > 1) {
-		key = argv[1];
-	}
-
 	try {
-		m = new jshared::MemoryMap(key, jshared::JMF_CREAT, jshared::JMP_WRITE, true);
-	} catch (...) {
-		try {
-			m = new jshared::MemoryMap(key, jshared::JMF_OPEN, jshared::JMP_WRITE, true);
-		} catch (...) {
-			std::cout << "Cannot create the memory map" << std::endl;
+    jio::File 
+      *file = jio::File::CreateFile(MEM_FILE);
 
-			return -1;
-		}
+    if (file == nullptr) {
+      std::cout << "File [" << MEM_FILE << "] already created !" << std::endl;
+    }
+
+    file = jio::File::OpenFile(MEM_FILE, (jio::jfile_flags_t)(jio::JFF_READ_WRITE | jio::JFF_LARGEFILE));
+
+    if (file == nullptr) {
+      std::cout << "Unable to open the file [" << MEM_FILE << "]" << std::endl;
+
+      return -1;
+    }
+
+    jshared::MemoryMap 
+      mem(file, 1024, true);
+
+    uint8_t *address = mem.GetAddress();
+
+    memset(address, '1', 10);
+	} catch (jexception::Exception &e) {
+		std::cout << e.GetMessage() << std::endl;
+
+    return -1;
 	}
-
-  std::this_thread::sleep_for(std::chrono::seconds((60)));
 
 	return 0;
 }

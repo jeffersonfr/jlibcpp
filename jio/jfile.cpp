@@ -358,10 +358,10 @@ File * File::OpenDirectory(std::string path, jfile_flags_t flags)
 
 File * File::CreateFile(std::string path, jfile_flags_t flags, jfile_permissions_t perms)
 {
-	mode_t mode = GetPermissions(perms);
-	int o = GetFlags(flags);
-
-	int fd = open(path.c_str(), o | O_CREAT | O_EXCL, mode);
+	mode_t 
+    mode = GetPermissions(perms);
+	int 
+    fd = open(path.c_str(), GetFlags(flags) | O_CREAT | O_EXCL, mode);
 
 	if (fd < 0) {
 		return nullptr;
@@ -372,13 +372,15 @@ File * File::CreateFile(std::string path, jfile_flags_t flags, jfile_permissions
 
 File * File::CreateDirectory(std::string path, jfile_permissions_t perms)
 {
-	mode_t mode = GetPermissions(perms);
+	mode_t 
+    mode = GetPermissions(perms);
 
 	if (mkdir(path.c_str(), mode) != 0) {
 		return nullptr;
 	}
 
-	DIR *dir = opendir(path.c_str());
+	DIR 
+    *dir = opendir(path.c_str());
 
 	if (dir == nullptr) {
 		return nullptr;
@@ -447,6 +449,11 @@ File * File::CreateTemporaryDirectory(std::string path, std::string prefix)
 	}
 	
 	return new File(-1, dir, path, JFT_DIRECTORY);
+}
+
+int File::GetDescriptor()
+{
+  return _fd;
 }
 
 jfile_type_t File::GetType()

@@ -88,8 +88,6 @@ int main()
 	s.At(0).NotifyAll();
 
 	for (int i=0; i<N; i++) {
-    Test *t = test[i];
-
 		delete test[i];
 	}
 

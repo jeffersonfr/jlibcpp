@@ -21,8 +21,7 @@
 #define J_SHAREDMUTEX_H
 
 #include "jshared/jsharedsemaphore.h"
-
-#include <iostream>
+#include "jshared/jmemorymap.h"
 
 #include <sys/stat.h>
 #include <sys/ipc.h>
@@ -30,11 +29,6 @@
 #include <stdint.h>
 
 namespace jshared {
-
-enum jsharedmutex_flags_t {
-	JSF_CURRENT	= 1,
-	JSF_FUTURE	= 2
-};
 
 /**
  * \brief SharedMutex.
@@ -44,29 +38,15 @@ enum jsharedmutex_flags_t {
 class SharedMutex : public virtual jcommon::Object {
 
     private:
-			/** \brief . */
-			key_t _id;
 			/** \brief */
-			int64_t _size;
-			/** \brief */
-			char *_shmp;
-			/** \brief */
-			bool _is_open;
-			/** \brief */
-			jsharedmutex_flags_t _flags;
+      MemoryMap *_mmap;
 
 		public:
 			/**
 			 * \brief Constructor.
 			 *
 			 */
-			SharedMutex(jsharedmutex_flags_t flags_ = jsharedmutex_flags_t(JSF_CURRENT | JSF_FUTURE));
-
-			/**
-			 * \brief Constructor.
-			 *
-			 */
-			SharedMutex(void *data_, int64_t size_);
+			SharedMutex(MemoryMap *mem);
 
 			/**
 			 * \brief Destrutor virtual.
@@ -97,12 +77,6 @@ class SharedMutex : public virtual jcommon::Object {
 			 *
 			 */
 			virtual void UnlockAll();
-
-			/**
-			 * \brief 
-			 *
-			 */
-			virtual void Release();
 
 };
 

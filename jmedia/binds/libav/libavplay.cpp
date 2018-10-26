@@ -1712,7 +1712,8 @@ static void * decode_thread(void *arg)
 
             ret = avformat_seek_file(is->ic, -1, seek_min, seek_target, seek_max, is->seek_flags);
             if (ret < 0) {
-                fprintf(stderr, "%s: error while seeking\n", is->ic->filename);
+                fprintf(stderr, "error while seeking\n");
+                // fprintf(stderr, "%s: error while seeking\n", is->ic->filename);
             } else {
                 if (is->audio_stream >= 0) {
                     packet_queue_flush(&is->audioq);
@@ -1846,10 +1847,10 @@ void avplay_init()
 
   av_log_set_flags(AV_LOG_SKIP_REPEATED);
 
-  avcodec_register_all();
+  // avcodec_register_all(); // CHANGE:: dont need anymore !
   avdevice_register_all();
-  avfilter_register_all();
-  av_register_all();
+  // avfilter_register_all(); // CHANGE:: dont need anymore !
+  // av_register_all(); // CHANGE:: dont need anymore !
   avformat_network_init();
 
   if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER)) {

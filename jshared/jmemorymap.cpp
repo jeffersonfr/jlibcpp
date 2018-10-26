@@ -18,7 +18,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "jshared/jmemorymap.h"
+#include "jio/jfile.h"
 #include "jexception/jmemoryexception.h"
+#include "jexception/jnullpointerexception.h"
 
 #include <sys/mman.h>
 
@@ -27,171 +29,76 @@
 
 namespace jshared {
 
-MemoryMap::MemoryMap(std::string filename_, jmemory_flags_t flags_, jmemory_permission_t perms_, bool private_):
+MemoryMap::MemoryMap(jio::File *file, int length, bool shared, jio::jfile_permissions_t perms):
 	jcommon::Object()
 {
+  if (file == nullptr) {
+		throw jexception::NullPointerException("File pointer must be valid");
+  }
+
 	jcommon::Object::SetClassName("jshared::MemoryMap");
 
-	_permission = perms_;
+  _file = file;
+	_length = length;
 
-	_is_open = false;
-	
-	uint32_t f = 0;
+	int flags = PROT_NONE;
 
-	if ((flags_ & JMF_OPEN) != 0) {
-		f = (jmemory_flags_t)(f | 0);
+	if ((perms & jio::JFP_USR_READ) != 0) {
+		flags = flags | PROT_READ;
 	}
 
-	if ((flags_ & JMF_CREAT) != 0) {
-		f = (jmemory_flags_t)(f | O_CREAT | O_EXCL | O_TRUNC);
+	if ((perms & jio::JFP_USR_WRITE) != 0) {
+		flags = flags | PROT_WRITE;
 	}
 
-	_fd = open(filename_.c_str(), f | O_RDWR | O_LARGEFILE, (mode_t)0600); 
-	
-	if (_fd < 0) {
-		if ((f | JMF_CREAT) != 0) {
-			throw jexception::MemoryException("Error creating a shared file");
-		} else {
-			throw jexception::MemoryException("Error opening a shared file");
-		}
-	}
-	
-	if ((flags_ & JMF_CREAT) != 0) {
-		if (write(_fd, "", 1) < 0) {
-			throw jexception::MemoryException("Error creating shared memory");
-		}
+	if ((perms & jio::JFP_USR_EXEC) != 0) {
+		flags = flags | PROT_EXEC;
 	}
 
-	if (fstat(_fd, &_stats) < 0) {
-		throw jexception::MemoryException("Error getting stats of shared file");
-	}
-
-	uint32_t t = 0;
-
-	if ((perms_ & JMP_EXEC) != 0) {
-		t = (jmemory_permission_t)(t | PROT_EXEC);
-	}
-
-	if ((perms_ & JMP_READ) != 0) {
-		t = (jmemory_permission_t)(t | PROT_READ);
-	}
-
-	if ((perms_ & JMP_WRITE) != 0) {
-		t = (jmemory_permission_t)(t | PROT_WRITE);
-	}
-
-	if ((perms_ & JMP_READ_WRITE) != 0) {
-		t = (jmemory_permission_t)(t | PROT_READ | PROT_WRITE);
-	}
-
-	if (private_ == true) {
-		_start = mmap((caddr_t)0, _stats.st_size, t, MAP_PRIVATE, _fd, 0);
+	if (shared == false) {
+		_address = (uint8_t *)mmap(nullptr, length, flags, MAP_PRIVATE, _file->GetDescriptor(), 0);
 	} else {
-		_start = mmap((caddr_t)0, _stats.st_size, t, MAP_SHARED, _fd, 0);
+		_address = (uint8_t *)mmap(nullptr, length, flags, MAP_SHARED, _file->GetDescriptor(), 0);
 	}
 
-	if (_start == MAP_FAILED) {
+	if (_address == MAP_FAILED) {
 		throw jexception::MemoryException("Creating memory map failed");
 	}
-	
-	_is_open = true;
 }
 
 MemoryMap::~MemoryMap()
 {
-	Release();
+	munmap(_address, _length);
 }
 
-int64_t MemoryMap::Get(char *data_, int64_t size_, int64_t offset_)
+uint8_t * MemoryMap::GetAddress()
 {
-	// TODO:: tratar mmap2 com offset
-	if (size_ > _stats.st_size) {
-		// throw jexception::MemoryException("Size cause overflow in memory");
-		
-		size_ = _stats.st_size;
-	}
-
-	memcpy(data_, _start, size_);
-	
-  return size_;
+  return _address;
 }
 
-int64_t MemoryMap::Put(const char *data_, int64_t size_, int64_t offset_)
+int64_t MemoryMap::GetLength()
 {
-	// TODO:: tratar mmap2 com offset
-	if (size_ > _stats.st_size) {
-		throw jexception::MemoryException("Size cause overflow in memory");
-	}
-
-	memcpy(_start, data_, size_);
-	
-	return size_;
+	return _length;
 }
 
-jmemory_permission_t MemoryMap::GetPermission()
+void MemoryMap::SetPermission(jio::jfile_permissions_t perms)
 {
-	return _permission;
-}
-	
-void MemoryMap::SetPermission(jmemory_permission_t perms_)
-{
-	_permission = perms_;
+	int flags = PROT_NONE;
 
-	unsigned int t = 0;
-
-	if ((_permission & JMP_EXEC) != 0) {
-		t = (jmemory_permission_t)(t | PROT_EXEC);
+	if ((perms & jio::JFP_USR_READ) != 0) {
+		flags = flags | PROT_READ;
 	}
 
-	if ((_permission & JMP_READ) != 0) {
-		t = (jmemory_permission_t)(t | PROT_READ);
+	if ((perms & jio::JFP_USR_WRITE) != 0) {
+		flags = flags | PROT_WRITE;
 	}
 
-	if ((_permission & JMP_WRITE) != 0) {
-		t = (jmemory_permission_t)(t | PROT_WRITE);
+	if ((perms & jio::JFP_USR_EXEC) != 0) {
+		flags = flags | PROT_EXEC;
 	}
 
-	if ((_permission & JMP_READ_WRITE) != 0) {
-		t = (jmemory_permission_t)(t | PROT_READ | PROT_WRITE);
-	}
-
-	if ((_permission & JMP_NONE) != 0) {
-		t = (jmemory_permission_t)(t | PROT_NONE);
-	}
-
-	if (mprotect(_start, _stats.st_size, t) < 0) {
+	if (mprotect(_address, _length, flags) < 0) {
 		throw jexception::MemoryException("Set permission failed");
-	}
-}
-
-int64_t MemoryMap::GetSize()
-{
-	return (int64_t)_stats.st_size;
-}
-
-void MemoryMap::Release()
-{
-	if (_is_open == false) {
-		return;
-	}
-	
-	int r = munmap(_start, _stats.st_size);
-	
-	if (r < 0) {
-		if (errno == EINVAL) {
-			throw jexception::MemoryException("We don't like start or length or offset");
-		} else if (errno == EAGAIN) {
-			throw jexception::MemoryException("The file has been locked, or too much memory has been locked");
-		} else if (errno == ENOMEM) {
-			throw jexception::MemoryException("No memory is available, or the process's maximum number of mappings would have been exceeded");
-		// } else if (errno == SIGSEGV) {
-		// 	throw jexception::MemoryException("Attempted write into a region specified to mmap as read-only");
-		} else {
-			throw jexception::MemoryException("Release failed");
-		}
-	}
-
-	if (close(_fd) < 0) {
 	}
 }
 

@@ -86,7 +86,7 @@ enum jfile_permissions_t {
  * 
  * \author Jeff Ferr
  */
-class File : public virtual jcommon::Object{
+class File : public virtual jcommon::Object {
 
 	private:
 		/** \brief */
@@ -181,6 +181,12 @@ class File : public virtual jcommon::Object{
 		 *
 		 */
 		virtual bool ListFiles(std::vector<std::string> *files, std::string extension = std::string(""));
+		
+		/**
+		 * \brief Retorna o descritor do arquivo.
+		 *
+		 */
+		virtual int GetDescriptor();
 		
 		/**
 		 * \brief Retorna o tipo do arquivo.
