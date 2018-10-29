@@ -132,6 +132,7 @@ OBJS_jmath += \
 		 jmatrix.o\
 		 jrandom.o\
 		 juuid.o\
+		 jvector.o\
 
 OBJS_jio += \
 		 jbitinputstream.o\
