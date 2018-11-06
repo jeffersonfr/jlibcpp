@@ -162,10 +162,7 @@ OBJS_function = \
 OBJS_graph = \
 		graph.o\
 
-OBJS_opentube = \
-		opentube.o\
-
-all: primitives border ball breakout skull raycaster1 raycaster2 raycaster3 clip custom calc mines ants swarm cube mouse watch tank pacman tetris signal layouts stress mhp drawimage drawtypes rotateimage sort noise kmeans som events colorchooser scroll hough 2048 newvox mandelbrot porter fire minecraft fullscreen coloralpha bitmask widgets tree terrain surface function graph opentube
+all: primitives border ball breakout skull raycaster1 raycaster2 raycaster3 clip custom calc mines ants swarm cube mouse watch tank pacman tetris signal layouts stress mhp drawimage drawtypes rotateimage sort noise kmeans som events colorchooser scroll hough 2048 newvox mandelbrot porter fire minecraft fullscreen coloralpha bitmask widgets tree terrain surface function graph 
 	
 primitives: $(OBJS_primitives)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 

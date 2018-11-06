@@ -109,7 +109,7 @@ class LibavPlayerComponentImpl : public jgui::Component {
 				_image = nullptr;
 			}
 
-			_image = new jgui::BufferedImage(cairo_context, jgui::JPF_ARGB, sw, sh);
+			_image = new jgui::BufferedImage(cairo_context);
 
 			_player->DispatchFrameGrabberEvent(new jevent::FrameGrabberEvent(_image, jevent::JFE_GRABBED));
 

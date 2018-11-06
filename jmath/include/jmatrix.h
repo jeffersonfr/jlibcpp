@@ -20,7 +20,7 @@
 #ifndef J_MATRIX_H
 #define J_MATRIX_H
 
-#include "jmath/jmath.h"
+#include "jmath/jvector.h"
 #include "jexception/joutofboundsexception.h"
 #include "jexception/jnullpointerexception.h"
 #include "jexception/jinvalidargumentexception.h"

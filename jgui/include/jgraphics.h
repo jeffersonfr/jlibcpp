@@ -309,7 +309,7 @@ class Graphics : public virtual jcommon::Object {
 		 * \brief
 		 *
 		 */
-		Graphics(cairo_t *cairo_context, jpixelformat_t pixelformat, int wp, int hp);
+		Graphics(cairo_t *cairo_context);
 
 		/**
 		 * \brief

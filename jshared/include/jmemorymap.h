@@ -57,6 +57,12 @@ class MemoryMap : public virtual jcommon::Object {
 			 * \brief
 			 *
 			 */
+      virtual jio::File * GetFile();
+
+			/**
+			 * \brief
+			 *
+			 */
 			virtual uint8_t * GetAddress();
 
 			/**

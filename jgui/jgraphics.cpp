@@ -29,19 +29,23 @@
 #include "jexception/joutofboundsexception.h"
 #include "jexception/jnullpointerexception.h"
 
+#include <math.h>
+
 #define M_2PI	(2*M_PI)
 	
-#define IMAGE_SIZE_LIMIT 32768
-#include <math.h>
+#define IMAGE_LIMIT 32768
 
 namespace jgui {
 
-Graphics::Graphics(cairo_t *cairo_context, jpixelformat_t pixelformat, int wp, int hp):
+Graphics::Graphics(cairo_t *cairo_context):
 	jcommon::Object()
 {
+	if (cairo_context == nullptr) {
+    throw jexception::NullPointerException("Invalid null pointer to cairo context");
+  }
+
 	jcommon::Object::SetClassName("jgui::Graphics");
 
-	_pixelformat = pixelformat;
 	_translate.x = 0;
 	_translate.y = 0;
 	_is_vertical_sync_enabled = false;
@@ -53,33 +57,32 @@ Graphics::Graphics(cairo_t *cairo_context, jpixelformat_t pixelformat, int wp, i
 	_pen.join = JLJ_MITER;
 	_pen.style = JLS_BUTT;
 
+	_cairo_context = cairo_context;
+
+  cairo_surface_t 
+    *surface = cairo_get_target(cairo_context);
+
+  if (surface == nullptr) {
+		throw jexception::RuntimeException("Unable to get target surface from cairo context");
+  }
+
+  cairo_format_t
+    format = cairo_image_surface_get_format(surface);
+
+  if (format == CAIRO_FORMAT_ARGB32) {
+	  _pixelformat = jgui::JPF_ARGB;
+  } else if (format == CAIRO_FORMAT_RGB24) {
+	  _pixelformat = jgui::JPF_RGB24;
+  } else if (format == CAIRO_FORMAT_RGB16_565) {
+	  _pixelformat = jgui::JPF_RGB16;
+  } else {
+		throw jexception::RuntimeException("Invalid pixel format");
+  }
+  
 	_clip.x = 0;
 	_clip.y = 0;
-	_clip.width = wp;
-	_clip.height = hp;
-
-	if (cairo_context != nullptr) {
-		_cairo_context = cairo_context;
-	} else {
-		cairo_surface_t *cairo_surface = nullptr;
-		cairo_format_t format = CAIRO_FORMAT_INVALID;
-
-		if (_pixelformat == JPF_ARGB) {
-			format = CAIRO_FORMAT_ARGB32;
-		} else if (_pixelformat == JPF_RGB32) {
-			format = CAIRO_FORMAT_ARGB32;
-		} else if (_pixelformat == JPF_RGB24) {
-			format = CAIRO_FORMAT_RGB24;
-		} else if (_pixelformat == JPF_RGB16) {
-			format = CAIRO_FORMAT_RGB16_565;
-		}
-
-		cairo_surface = cairo_image_surface_create(format, wp, hp);
-
-		_cairo_context = cairo_create(cairo_surface);
-
-		// cairo_surface_destroy(cairo_surface);
-	}
+	_clip.width = cairo_image_surface_get_width(surface);
+	_clip.height = cairo_image_surface_get_height(surface);
 
 	SetAntialias(JAM_NORMAL);
 	SetPen(_pen);
@@ -258,14 +261,15 @@ void Graphics::Clear()
 	int sw = cairo_image_surface_get_width(cairo_surface);
 	int sh = cairo_image_surface_get_height(cairo_surface);
 
-	cairo_save(_cairo_context);
-	// cairo_reset_clip(_cairo_context);
-	cairo_set_operator(_cairo_context, CAIRO_OPERATOR_CLEAR);
+  cairo_save(_cairo_context);
+  cairo_set_source_rgba(_cairo_context, 0, 0, 0, 0);
+  cairo_set_operator(_cairo_context, CAIRO_OPERATOR_SOURCE);
+  
 	cairo_rectangle(_cairo_context, 0, 0, sw, sh);
 	cairo_fill(_cairo_context);
-	cairo_restore(_cairo_context);
-
-	SetCompositeFlags(_composite_flags);
+  // cairo_paint(_cairo_context);
+  
+  cairo_restore(_cairo_context);
 }
 
 void Graphics::Clear(int xp, int yp, int wp, int hp)
@@ -283,14 +287,14 @@ void Graphics::Clear(int xp, int yp, int wp, int hp)
 		y = 0;
 	}
 
-	cairo_save(_cairo_context);
-	// cairo_reset_clip(_cairo_context);
-	cairo_set_operator(_cairo_context, CAIRO_OPERATOR_CLEAR);
+  cairo_save(_cairo_context);
+  cairo_set_source_rgba(_cairo_context, 0, 0, 0, 0);
+  cairo_set_operator(_cairo_context, CAIRO_OPERATOR_SOURCE);
+  
 	cairo_rectangle(_cairo_context, x, y, w, h);
 	cairo_fill(_cairo_context);
-	cairo_restore(_cairo_context);
-
-	SetCompositeFlags(_composite_flags);
+  
+  cairo_restore(_cairo_context);
 }
 
 Color & Graphics::GetColor()
@@ -1992,7 +1996,7 @@ bool Graphics::DrawImage(Image *img, int xp, int yp, int wp, int hp)
 		return false;
 	}
 
-	if (wp > IMAGE_SIZE_LIMIT || hp > IMAGE_SIZE_LIMIT) {
+	if (wp > IMAGE_LIMIT || hp > IMAGE_LIMIT) {
 		return false;
 	}
 
@@ -2061,7 +2065,7 @@ bool Graphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp,
 		return false;
 	}
 
-	if (swp > IMAGE_SIZE_LIMIT || shp > IMAGE_SIZE_LIMIT || wp > IMAGE_SIZE_LIMIT || hp > IMAGE_SIZE_LIMIT) {
+	if (swp > IMAGE_LIMIT || shp > IMAGE_LIMIT || wp > IMAGE_LIMIT || hp > IMAGE_LIMIT) {
 		return false;
 	}
 

@@ -69,6 +69,16 @@ MemoryMap::MemoryMap(jio::File *file, int length, bool shared, jio::jfile_permis
 MemoryMap::~MemoryMap()
 {
 	munmap(_address, _length);
+
+  _file->Close();
+
+  delete _file;
+  _file = nullptr;
+}
+
+jio::File * MemoryMap::GetFile()
+{
+  return _file;
 }
 
 uint8_t * MemoryMap::GetAddress()

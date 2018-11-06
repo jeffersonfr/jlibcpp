@@ -229,10 +229,7 @@ class GraphicLayer : public ScreenLayer {
 
 		virtual void Paint(jgui::Graphics *g)
 		{
-			_user_container->InvalidateAll();
 			_user_container->Paint(g);
-
-			_system_container->InvalidateAll();
 			_system_container->Paint(g);
 		}
 

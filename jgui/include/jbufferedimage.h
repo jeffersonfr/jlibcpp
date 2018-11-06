@@ -46,7 +46,7 @@ class BufferedImage : public virtual jgui::Image {
 		 * \brief
 		 *
 		 */
-		BufferedImage(cairo_t *cairo_context, jpixelformat_t pixelformat, int width, int height);
+		BufferedImage(cairo_t *cairo_context);
 
 		/**
 		 * \brief
