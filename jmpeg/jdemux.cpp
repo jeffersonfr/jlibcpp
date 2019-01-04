@@ -33,9 +33,8 @@ Demux::Demux(jmpeg_data_type_t type):
 
 	_type = type;
 	_last_index = -1;
-	_timeout = -1;
+	_timeout = 2000; // 2ms
 	_is_crc_enabled = true;
-	_is_update_if_modified = true;
 }
 		
 Demux::~Demux()
@@ -102,16 +101,6 @@ bool Demux::IsCRCCheckEnabled()
 	return _is_crc_enabled;
 }
 
-void Demux::SetUpdateIfModified(bool b)
-{
-	_is_update_if_modified = b;
-}
-
-bool Demux::IsUpdateIfModified()
-{
-	return _is_update_if_modified;
-}
-
 bool Demux::Append(const char *data, int data_length)
 {
 	if (_type == JMDT_RAW) {
@@ -124,12 +113,12 @@ bool Demux::Append(const char *data, int data_length)
 		return false;
 	}
 
-	uint32_t crc = *(uint32_t *)(data+(data_length-4));
-	
 	if (_is_crc_enabled == true) {
-		uint32_t sum = jmath::CRC::Calculate32((const uint8_t *)_buffer.data(), _buffer.size()-4);
+		uint32_t 
+	    // crc = *(uint32_t *)(data+(data_length-4)),
+      sum = jmath::CRC::Calculate32((const uint8_t *)data, data_length);
 
-		if (sum != 0) {
+		if (sum != 0xffffffff) {
 			_buffer.clear();
 
 			_last_index = -1;
@@ -138,13 +127,7 @@ bool Demux::Append(const char *data, int data_length)
 		}
 	}
 
-	if (_is_update_if_modified == false || _last_crcs.find(crc) == _last_crcs.end()) {
-		_last_crcs.insert(crc);
-
-		return true;
-	}
-
-	return false;
+	return true;
 }
 
 void Demux::RegisterDemuxListener(jevent::DemuxListener *listener)

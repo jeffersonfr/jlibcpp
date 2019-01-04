@@ -40,11 +40,7 @@ class Demux : public jcommon::Object {
 		/** \brief */
 		std::vector<jevent::DemuxListener *> _demux_listeners;
 		/** \brief */
-		std::set<int> _last_crcs;
-		/** \brief */
 		std::string _buffer;
-		/** \brief */
-		std::string _data;
 		/** \brief */
 		jmpeg_data_type_t _type;
 		/** \brief */
@@ -57,8 +53,6 @@ class Demux : public jcommon::Object {
 		int _last_index;
 		/** \brief */
 		bool _is_crc_enabled;
-		/** \brief */
-		bool _is_update_if_modified;
 
 	public:
 		/**
@@ -144,18 +138,6 @@ class Demux : public jcommon::Object {
 		 *
 		 */
 		virtual bool IsCRCCheckEnabled();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetUpdateIfModified(bool b);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsUpdateIfModified();
 
 		/**
 		 * \brief

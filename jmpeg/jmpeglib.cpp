@@ -19,31 +19,77 @@
  ***************************************************************************/
 #include "jmpeg/jmpeglib.h"
 
-std::string GetTableDescription(int table_id)
+std::string GetTableDescription(int pid, int tid)
 {
-	if (table_id >= 0x4e && table_id <= 0x6f) {
-		return "Event Information Table";
-	} else {
-		switch (table_id) {
-			case 0x00: return "Program Association Table";
-			case 0x01: return "Condicional Access Table";
-			case 0x02: return "Program Map Table";
-			case 0x03: return "Transport Stream Description";
-			case 0x04: return "Metadata Table";
-			case 0x40: return "Networkd Informatio Table";
-			case 0x42: return "Service Description Table";
-			case 0x70: return "Time Description Table";
-			case 0x73: return "Time Offset Table";
-			case 0x3a: return "DSM-CC Sections containing multi-protocol encapsulated data";
-			case 0x3b: return "DSM-CC Sections containing U-N Messages, except Download Data Messages";
-			case 0x3c: return "DSM-CC Sections containing Download Data Messages";
-			case 0x3d: return "DSM-CC Sections containing Stream Descriptors";
-			case 0x3e: return "DSM-CC Sections containing private data";
-			case 0x3f: return "DSM-CC Addressable Sections";
-			default: 
-								 break;
+  if (pid == TS_PAT_PID && tid == TS_PAT_TABLE_ID) {
+    return "Program Association Table";
+  } else if (pid == TS_CAT_PID && tid == TS_CAT_TABLE_ID) {
+    return "Condition Access Table";
+  } else if (pid == TS_NIT_PID && tid == TS_NIT_TABLE_ID) {
+    return "Network Information Table";
+  } else if (pid == TS_BAT_PID && tid == TS_BAT_TABLE_ID) {
+    return "Bouquet Association Table";
+  } else if (pid == TS_TSDT_PID && tid == TS_TSDT_TABLE_ID) {
+    return "Transport Stream Descriptor Table";
+  } else if (pid == TS_SDT_PID && tid == TS_SDT_TABLE_ID) {
+    return "Service Descriptor Table";
+  } else if (pid == TS_TDT_PID && tid == TS_TDT_TABLE_ID) {
+    return "Time Descriptor Table";
+  } else if (pid == TS_TDT_PID && tid == TS_TOT_TABLE_ID) {
+    return "Time Offset Table";
+  } else if (pid == TS_EIT_PID) {
+	  if (tid == 0x4e) {
+		  return "Event Information Table [present & following]";
+    } else if (tid == 0x4f) {
+		  return "Event Information Table [present & following - other service]";
+    } else if (tid >= 0x50 && tid <= 0x5f) {
+		  return "Event Information Table [schedule]";
+    } else if (tid >= 0x60 && tid <= 0x6f) {
+		  return "Event Information Table [schedule - other service]";
+    }
+  } else { // INFO:: considering only table id information
+    if (tid == TS_PAT_TABLE_ID) {
+			return "Program Association Table";
+    } else if (tid == TS_CAT_TABLE_ID) {
+			return "Condicional Access Table";
+    } else if (tid == TS_PMT_TABLE_ID) {
+			return "Program Map Table";
+    } else if (tid == TS_TSDT_TABLE_ID) {
+			return "Transport Stream Description";
+    } else if (tid == TS_METADATA_TABLE_ID) {
+			return "Metadata Table";
+    } else if (tid == TS_NIT_TABLE_ID) {
+			return "Network Information Table";
+    } else if (tid == TS_SDT_TABLE_ID) {
+			return "Service Description Table";
+    } else if (tid == TS_BAT_TABLE_ID) {
+			return "Bouquet Association Table";
+    } else if (tid == TS_TDT_TABLE_ID) {
+			return "Time Description Table";
+    } else if (tid == TS_TOT_TABLE_ID) {
+			return "Time Offset Table";
+    } else if (tid == 0x4e) {
+		  return "Event Information Table [present & following]";
+    } else if (tid == 0x4f) {
+		  return "Event Information Table [present & following - other service]";
+    } else if (tid >= 0x50 && tid <= 0x5f) {
+		  return "Event Information Table [schedule]";
+    } else if (tid >= 0x60 && tid <= 0x6f) {
+		  return "Event Information Table [schedule - other service]";
+    } else if (tid == 0x3a) {
+			return "DSM-CC Sections containing multi-protocol encapsulated data";
+    } else if (tid == 0x3b) {
+			return "DSM-CC Sections containing U-N Messages, except Download Data Messages";
+    } else if (tid == 0x3c) {
+			return "DSM-CC Sections containing Download Data Messages";
+    } else if (tid == 0x3d) {
+			return "DSM-CC Sections containing Stream Descriptors";
+    } else if (tid == 0x3e) {
+			return "DSM-CC Sections containing private data";
+    } else if (tid == 0x3f) {
+			return "DSM-CC Addressable Sections";
 		}
-	}
+  }
 
 	return "Unknown Table";
 }

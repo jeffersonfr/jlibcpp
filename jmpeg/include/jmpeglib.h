@@ -73,9 +73,11 @@
 #define TS_CAT_PID 0x01
 #define TS_TSDT_PID 0x02
 #define TS_NIT_PID 0x10
+#define TS_BAT_PID 0x11
 #define TS_SDT_PID 0x11
 #define TS_EIT_PID 0x12
 #define TS_TDT_PID 0x14
+#define TS_TOT_PID 0x14
 
 #define TS_PSI_HEADER_LENGTH 8
 
@@ -86,6 +88,7 @@
 #define TS_METADATA_TABLE_ID 0x04
 #define TS_NIT_TABLE_ID 0x40
 #define TS_SDT_TABLE_ID 0x42
+#define TS_BAT_TABLE_ID 0x4A
 #define TS_TDT_TABLE_ID 0x70
 #define TS_TOT_TABLE_ID 0x73
 #define TS_EIT_TABLE_ID 0x78
@@ -98,7 +101,7 @@
 #define TS_PSI_G_LAST_SECTION_NUMBER(data) TS_G8(data+7)
 
 std::string GetStreamTypeDescription(int stream_type);
-std::string GetTableDescription(int table_id);
+std::string GetTableDescription(int pid, int tid);
 std::string GetDescriptorName(int descriptor_tag);
 
 void DumpBytes(std::string id, const char *data, int length, int columns = 16);

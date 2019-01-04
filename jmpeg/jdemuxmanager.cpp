@@ -34,7 +34,6 @@ DemuxManager::DemuxManager():
 
 	_source = nullptr;
 	_is_running = false;
-	_thread = nullptr;
 }
 		
 DemuxManager::~DemuxManager()
@@ -99,24 +98,24 @@ void DemuxManager::SetInputStream(jio::InputStream *is)
 
 void DemuxManager::Start()
 {
-	if (_thread != nullptr) {
+	if (_is_running == true) {
 		return;
 	}
 
 	_is_running = true;
 	
-	_thread = new std::thread(&DemuxManager::Run, this);
+	_thread = std::thread(&DemuxManager::Run, this);
+
+  // INFO:: grant some time to starts the thread
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
 
 void DemuxManager::Stop()
 {
-	if (_thread != nullptr) {
+	if (_is_running == true) {
 		_is_running = false;
 
-		_thread->join();
-
-		delete _thread;
-		_thread = nullptr;
+		_thread.join();
 	}
 }
 
@@ -127,6 +126,8 @@ void DemuxManager::WaitSync()
 
 void DemuxManager::Run()
 {
+ 	std::lock_guard<std::mutex> guard(_demux_sync_mutex);
+
 	if (_source == nullptr) {
 		return;
 	}
@@ -134,8 +135,6 @@ void DemuxManager::Run()
 	std::map<int, std::string> timeline;
 
 	while (_is_running) {
-  	std::lock_guard<std::mutex> guard(_demux_sync_mutex);
-
 		char packet[TS_PACKET_LENGTH];
 		int length = TS_PACKET_LENGTH;
 
@@ -241,16 +240,12 @@ void DemuxManager::Run()
 
 			std::map<Demux *, struct jdemux_status_t>::iterator 
         j=_demux_status.find(demux);
-			struct jdemux_status_t 
-        t;
       uint64_t 
         current_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
 
 			if (j == _demux_status.end()) {
-				t.start_time = current_time;
-				t.found = false;
-
-				_demux_status[demux] = t;
+				_demux_status[demux].start_time = current_time;
+				_demux_status[demux].found = false;
 			}
 
 			if (demux->GetPID() < 0 || demux->GetPID() == pid) {
@@ -262,7 +257,7 @@ void DemuxManager::Run()
 					}
 				} else if (demux->GetType() == JMDT_PSI) {
 					if (section_length == (int)current.size()) {
-						if (demux->Append(current.c_str(), current.size()) == true) {
+						if (demux->Append(current.data(), current.size()) == true) {
 							int tid = TS_G8(current.data());
 
 							_demux_status[demux].found = true;
@@ -288,13 +283,14 @@ void DemuxManager::Run()
 				}
 			}
 
-			t = _demux_status[demux];
-
-			if (t.found == false && demux->GetTimeout() < (int)(current_time-t.start_time)) {
+			if (_demux_status[demux].found == false && demux->GetTimeout() < (int)(current_time-_demux_status[demux].start_time)) {
 				_demux_status[demux].start_time = current_time;
 
 				demux->DispatchDemuxEvent(new jevent::DemuxEvent(demux, jevent::JDET_DATA_NOT_FOUND, nullptr, 0, demux->GetPID(), demux->GetTID()));
 			}
+		
+      // INFO:: reset state
+      _demux_status[demux].found = false;
 		}
 
 		_demux_mutex.lock();

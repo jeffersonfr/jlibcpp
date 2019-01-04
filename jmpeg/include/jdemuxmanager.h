@@ -50,7 +50,7 @@ class DemuxManager : public jcommon::Object {
 		/** \brief */
 		std::vector<Demux *> _sync_demuxes;
 		/** \brief */
-		std::thread *_thread;
+		std::thread _thread;
 		/** \brief */
 		std::mutex _demux_mutex;
 		/** \brief */

@@ -130,6 +130,12 @@ class DemuxTest : public jevent::DemuxListener {
 	private:
 		void InitDemux(std::string id, int pid, int tid, int timeout)
 		{
+      if (_demuxes.find(id) != _demuxes.end()) {
+        printf("Demux [%s] already created\n", id.c_str());
+
+        return;
+      }
+
 			jmpeg::Demux *demux = new jmpeg::Demux(jmpeg::JMDT_PSI);
 
 			demux->RegisterDemuxListener(this);
@@ -179,7 +185,6 @@ class DemuxTest : public jevent::DemuxListener {
 			_stream_types[234] = "video";
 
 			InitDemux("pat", TS_PAT_PID, TS_PAT_TABLE_ID, TS_PAT_TIMEOUT);
-			InitDemux("tsdt", TS_TSDT_PID, TS_TSDT_TABLE_ID, TS_PAT_TIMEOUT);
 		}
 
 		virtual ~DemuxTest()
@@ -196,8 +201,6 @@ class DemuxTest : public jevent::DemuxListener {
 				demux->Stop();
 			}
 
-			jmpeg::DemuxManager::GetInstance()->WaitSync();
-			
 			for (std::map<std::string, jmpeg::Demux *>::iterator i=_demuxes.begin(); i!=_demuxes.end(); i++) {
 				jmpeg::Demux *demux = i->second;
 
@@ -851,6 +854,21 @@ class DemuxTest : public jevent::DemuxListener {
 						DumpBytes("Additional Info", ptr, private_length);
 					}
 				}
+			} else if (descriptor_tag == 0xc4) { // audio component descriptor
+				// int reserved = TS_GM8(ptr+0, 0, 4);
+				int stream_content = TS_GM8(ptr+0, 4, 4);
+				int content_type = TS_G8(ptr+1);
+				int component_tag = TS_G8(ptr+2);
+				int stream_type = TS_G8(ptr+3);
+				int group_tag = TS_G8(ptr+4);
+				int multilanguage_flag = TS_GM8(ptr+5, 0, 1);
+				int component_flag = TS_GM8(ptr+5, 1, 1);
+				int quality_indicator = TS_GM8(ptr+5, 2, 2);
+				int sampling_rate = TS_GM8(ptr+5, 4, 3);
+				// int reserved = TS_GM8(ptr+5, 7, 1);
+        std::string language = std::string(ptr+6, 3);
+
+				printf(":: stream content:[0x%01x], content type:[0x%01x], compoennt tag::[0x%01x], stream type::[0x%01x], group tag::[0x%01x], multilanguage::[0x%01x], component flag::[0x%01x], quality flag::[0x%01x], sampling rate::[0x%01x], language::[%s]\n", stream_content, content_type, component_tag, stream_type, group_tag, multilanguage_flag, component_flag, quality_indicator, sampling_rate, language.c_str());
 			} else if (descriptor_tag == 0xcd) { // ts information descriptor 
 				const char *end = ptr + descriptor_length;
 
@@ -962,71 +980,40 @@ class DemuxTest : public jevent::DemuxListener {
 			}
 		}
 
-		virtual std::string GetTableDescription(int pid, int tid)
-		{
-			if (pid == TS_PAT_PID && tid == TS_PAT_TABLE_ID) {
-				return "Program Association Table";
-			} else if (pid == TS_CAT_PID && tid == TS_CAT_TABLE_ID) {
-				return "Condition Access Table";
-			} else if (pid == TS_NIT_PID && tid == TS_NIT_TABLE_ID) {
-				return "Network Information Table";
-			} else if (pid == TS_TSDT_PID && tid == TS_TSDT_TABLE_ID) {
-				return "Transport Stream Descriptor Table";
-			} else if (pid == TS_SDT_PID && tid == TS_SDT_TABLE_ID) {
-				return "Service Descriptor Table";
-			} else if (pid == TS_TDT_PID && tid == TS_TDT_TABLE_ID) {
-				return "Time Descriptor Table";
-			} else if (pid == TS_EIT_PID) {
-				return "Event Information Table";
-			} else if (tid == TS_PMT_TABLE_ID) {
-				return "Program Map Table ?";
-			}
-
-			return "...";
-		}
-
 		virtual void DataArrived(jevent::DemuxEvent *event)
 		{
 			int pid = event->GetPID();
 			int tid = event->GetTID();
 			int len = event->GetDataLength();
 
-			printf("PSI Section:[%s]: pid:[0x%04x], tid:[0x%04x], length:[%d]\n", 
-					GetTableDescription(pid, tid).c_str(), 
-					pid, 
-					tid, 
-					len
-					);
+			printf("PSI Section:[%s]: pid:[0x%04x], tid:[0x%04x], length:[%d]\n", GetTableDescription(pid, tid).c_str(), pid, tid, len);
 
 			_pids.insert(pid);
 
 			if (pid == TS_PAT_PID && tid == TS_PAT_TABLE_ID) {
 				ProcessPAT(event);
-			} else if (tid == TS_CAT_TABLE_ID) {
+			} else if (pid == TS_CAT_PID && tid == TS_CAT_TABLE_ID) {
 				ProcessCAT(event);
-			} else if (tid == TS_TSDT_TABLE_ID) {
+			} else if (pid == TS_TSDT_PID && tid == TS_TSDT_TABLE_ID) {
 				ProcessTSDT(event);
-			} else if (tid == TS_PMT_TABLE_ID) {
-				ProcessPMT(event);
-			} else if (tid == TS_NIT_TABLE_ID) {
+			} else if (pid == TS_NIT_PID && tid == TS_NIT_TABLE_ID) {
 				ProcessNIT(event);
-			} else if (tid == (TS_SDT_TABLE_ID)) {
+			} else if (pid == TS_SDT_PID && tid == (TS_SDT_TABLE_ID)) {
 				ProcessSDT(event);
-			} else if (tid == TS_TOT_TABLE_ID) {
+			} else if (pid == TS_BAT_PID && tid == (TS_BAT_TABLE_ID)) {
+				ProcessBAT(event);
+			} else if (pid == TS_TDT_PID && tid == TS_TDT_TABLE_ID) {
+				ProcessTDT(event);
+			} else if (pid == TS_TOT_PID && tid == TS_TOT_TABLE_ID) {
 				ProcessTOT(event);
 			} else if (tid == TS_AIT_TABLE_ID) {
 				ProcessPrivate(event);
+			} else if (pid == TS_EIT_PID && (tid >= 0x4e && tid <= 0x6f)) {
+				ProcessEIT(event);
+			} else if (tid == TS_PMT_TABLE_ID) { // TODO:: gravar uma lista de pids em ProcessPAT e verificar usando (pid, tid)
+				ProcessPMT(event);
 			} else {
-				if (pid == TS_EIT_PID || (tid >= 0x4e && tid <= 0x6f)) {
-					// INFO:: 
-					// 	switch (tid) {
-					// 		0x4e: present and following (present ts)
-					// 		0x4f: present and following (other ts)
-					// 		0x50-0x5f: schedule (present ts)
-					// 		0x60-0x6f: schedule (other ts)
-					// 	}
-					ProcessEIT(event);
-				} else if (pid == _pcr_pid) {
+				if (pid == _pcr_pid) {
 					ProcessPCR(event);
 				} else if (pid == _dsmcc_data_pid) {
 					ProcessDSMCCData(event);
@@ -1051,7 +1038,7 @@ class DemuxTest : public jevent::DemuxListener {
 			InitDemux("sdt", TS_SDT_PID, TS_SDT_TABLE_ID, TS_SDT_TIMEOUT);
 			InitDemux("tdt", TS_TDT_PID, TS_TDT_TABLE_ID, TS_TDT_TIMEOUT);
 			InitDemux("eit", TS_EIT_PID, -1, TS_EIT_TIMEOUT);
-			InitDemux("eit-now&next", -1, 0x4e, TS_EIT_TIMEOUT);
+			// InitDemux("eit-now&next", -1, 0x4e, TS_EIT_TIMEOUT);
 
 			int nit_pid = TS_NIT_PID;
 			int count = ((section_length-5)/4-1); // last 4 bytes are CRC	
@@ -1317,6 +1304,70 @@ class DemuxTest : public jevent::DemuxListener {
 			}
 		}
 
+		virtual void ProcessBAT(jevent::DemuxEvent *event)
+		{
+			const char *ptr = event->GetData();
+
+			int section_length = TS_GM16(ptr+1, 4, 12);
+			int bouquet_id = TS_G16(ptr+3);
+
+			printf("BAT:: bouquet id:[0x%04x]\n", bouquet_id);
+
+			int descriptors_length = TS_GM16(ptr+9, 4, 12);
+      int descriptors_count = 0;
+
+      ptr = ptr + 11;
+
+      while (descriptors_count < descriptors_length) {
+        // int descriptor_tag = TS_G8(ptr);
+        int descriptor_length = TS_G8(ptr+1);
+
+        DescriptorDump(ptr, descriptor_length+2);
+
+        ptr = ptr + descriptor_length + 2;
+
+        descriptors_count = descriptors_count + descriptor_length + 2;	
+      }
+
+			int events_length = section_length-7-descriptors_length-4;
+			int events_count = 0;
+
+			while (events_count < events_length) {
+				int transport_stream_id = TS_G16(ptr);
+				int original_network_id = TS_G16(ptr+2);
+
+				printf(":: transport stream id:[%04x], original network id:[%04x]\n", transport_stream_id, original_network_id);
+
+				int descriptors_length = TS_GM16(ptr+4, 4, 12);
+				int descriptors_count = 0;
+
+				ptr = ptr + 4;
+
+				while (descriptors_count < descriptors_length) {
+					// int descriptor_tag = TS_G8(ptr);
+					int descriptor_length = TS_G8(ptr+1);
+
+					DescriptorDump(ptr, descriptor_length+2);
+
+					ptr = ptr + descriptor_length + 2;
+
+					descriptors_count = descriptors_count + descriptor_length + 2;	
+				}
+
+				events_count = events_count + 6 + descriptors_length;
+			}
+		}
+
+		virtual void ProcessTDT(jevent::DemuxEvent *event)
+		{
+			const char *ptr = event->GetData();
+
+			uint16_t mjd = TS_G16(ptr+3);
+			uint32_t utc = TS_GM32(ptr+5, 0, 24);
+
+			printf("TDT:: data :[0x%02x], utc:[%03x]\n", mjd, utc);
+		}
+
 		virtual void ProcessTOT(jevent::DemuxEvent *event)
 		{
 			const char *ptr = event->GetData();
@@ -1325,7 +1376,23 @@ class DemuxTest : public jevent::DemuxListener {
 			uint32_t utc = TS_GM32(ptr+5, 0, 24);
 
 			printf("TOT:: data :[0x%02x], utc:[%03x]\n", mjd, utc);
-		}
+				
+      int descriptors_length = TS_GM16(ptr+9, 4, 12);
+      int descriptors_count = 0;
+
+      ptr = ptr + 11;
+
+      while (descriptors_count < descriptors_length) {
+        // int descriptor_tag = TS_G8(ptr);
+        int descriptor_length = TS_G8(ptr+1);
+
+        DescriptorDump(ptr, descriptor_length+2);
+
+        ptr = ptr + descriptor_length + 2;
+
+        descriptors_count = descriptors_count + descriptor_length + 2;	
+      }
+    }
 
 		virtual void ProcessEIT(jevent::DemuxEvent *event)
 		{
@@ -1816,16 +1883,20 @@ int main(int argc, char **argv)
 		return -1;
 	}
 
-	jmpeg::DemuxManager *manager = jmpeg::DemuxManager::GetInstance();
-	ISDBTInputStream is(argv[1], atoi(argv[2]), atoi(argv[3]));
+	jmpeg::DemuxManager 
+    *manager = jmpeg::DemuxManager::GetInstance();
+	ISDBTInputStream 
+    is(argv[1], atoi(argv[2]), atoi(argv[3]));
 
 	manager->SetInputStream(&is);
+	
+  DemuxTest 
+    test;
+
 	manager->Start();
-
-	DemuxTest test;
-
-	// manager->WaitThread();
-
+  manager->WaitSync();
+  manager->Stop();
+  
 	return 0;
 }
 
