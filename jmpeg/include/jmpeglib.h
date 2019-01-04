@@ -76,6 +76,7 @@
 #define TS_BAT_PID 0x11
 #define TS_SDT_PID 0x11
 #define TS_EIT_PID 0x12
+#define TS_RST_PID 0x13
 #define TS_TDT_PID 0x14
 #define TS_TOT_PID 0x14
 
@@ -90,6 +91,7 @@
 #define TS_SDT_TABLE_ID 0x42
 #define TS_BAT_TABLE_ID 0x4A
 #define TS_TDT_TABLE_ID 0x70
+#define TS_RST_TABLE_ID 0x71
 #define TS_TOT_TABLE_ID 0x73
 #define TS_EIT_TABLE_ID 0x78
 

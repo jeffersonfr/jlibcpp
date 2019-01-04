@@ -39,6 +39,7 @@
 #define TS_NIT_TIMEOUT	4000
 #define TS_SDT_TIMEOUT	2000
 #define TS_TDT_TIMEOUT	6000
+#define TS_RST_TIMEOUT	4000
 #define TS_EIT_TIMEOUT	4000
 #define TS_PRIVATE_TIMEOUT	10000
 #define TS_PCR_TIMEOUT	1000
@@ -128,7 +129,7 @@ class DemuxTest : public jevent::DemuxListener {
 		int _dsmcc_descriptors_pid;
 
 	private:
-		void InitDemux(std::string id, int pid, int tid, int timeout)
+		void StartDemux(std::string id, int pid, int tid, int timeout)
 		{
       if (_demuxes.find(id) != _demuxes.end()) {
         printf("Demux [%s] already created\n", id.c_str());
@@ -147,6 +148,21 @@ class DemuxTest : public jevent::DemuxListener {
 			demux->Start();
 
 			_demuxes[id] = demux;
+		}
+
+		void StopDemux(std::string id)
+		{
+		  std::map<std::string, jmpeg::Demux *>::iterator i = _demuxes.find(id);
+
+      if (i == _demuxes.end()) {
+        printf("Demux [%s] no exists\n", id.c_str());
+
+        return;
+      }
+
+      i->second->Stop();
+
+      _demuxes.erase(i);
 		}
 
 	public:
@@ -184,7 +200,7 @@ class DemuxTest : public jevent::DemuxListener {
 			_stream_types[209] = "video";
 			_stream_types[234] = "video";
 
-			InitDemux("pat", TS_PAT_PID, TS_PAT_TABLE_ID, TS_PAT_TIMEOUT);
+			StartDemux("pat", TS_PAT_PID, TS_PAT_TABLE_ID, TS_PAT_TIMEOUT);
 		}
 
 		virtual ~DemuxTest()
@@ -1006,12 +1022,14 @@ class DemuxTest : public jevent::DemuxListener {
 				ProcessTDT(event);
 			} else if (pid == TS_TOT_PID && tid == TS_TOT_TABLE_ID) {
 				ProcessTOT(event);
-			} else if (tid == TS_AIT_TABLE_ID) {
-				ProcessPrivate(event);
+			} else if (pid == TS_RST_PID && tid == TS_RST_TABLE_ID) {
+				ProcessRST(event);
 			} else if (pid == TS_EIT_PID && (tid >= 0x4e && tid <= 0x6f)) {
 				ProcessEIT(event);
 			} else if (tid == TS_PMT_TABLE_ID) { // TODO:: gravar uma lista de pids em ProcessPAT e verificar usando (pid, tid)
 				ProcessPMT(event);
+			} else if (tid == TS_AIT_TABLE_ID) {
+				ProcessPrivate(event);
 			} else {
 				if (pid == _pcr_pid) {
 					ProcessPCR(event);
@@ -1030,15 +1048,18 @@ class DemuxTest : public jevent::DemuxListener {
 			const char *ptr = event->GetData();
 			int section_length = TS_PSI_G_SECTION_LENGTH(ptr);
 
+      StopDemux("pat");
+
 			// INFO::
 			// 	start SDT to get the service name
 			// 	start TDT/TOT to get the current time
-			InitDemux("cat", TS_CAT_PID, TS_CAT_TABLE_ID, TS_CAT_TIMEOUT);
-			InitDemux("tsdt", TS_TSDT_PID, TS_TSDT_TABLE_ID, TS_TSDT_TIMEOUT);
-			InitDemux("sdt", TS_SDT_PID, TS_SDT_TABLE_ID, TS_SDT_TIMEOUT);
-			InitDemux("tdt", TS_TDT_PID, TS_TDT_TABLE_ID, TS_TDT_TIMEOUT);
-			InitDemux("eit", TS_EIT_PID, -1, TS_EIT_TIMEOUT);
-			// InitDemux("eit-now&next", -1, 0x4e, TS_EIT_TIMEOUT);
+			StartDemux("cat", TS_CAT_PID, TS_CAT_TABLE_ID, TS_CAT_TIMEOUT);
+			StartDemux("tsdt", TS_TSDT_PID, TS_TSDT_TABLE_ID, TS_TSDT_TIMEOUT);
+			StartDemux("sdt", TS_SDT_PID, TS_SDT_TABLE_ID, TS_SDT_TIMEOUT);
+			StartDemux("tdt", TS_TDT_PID, TS_TDT_TABLE_ID, TS_TDT_TIMEOUT);
+			StartDemux("rst", TS_RST_PID, TS_RST_TABLE_ID, TS_RST_TIMEOUT);
+			StartDemux("eit", TS_EIT_PID, -1, TS_EIT_TIMEOUT);
+			// StartDemux("eit-now&next", -1, 0x4e, TS_EIT_TIMEOUT);
 
 			int nit_pid = TS_NIT_PID;
 			int count = ((section_length-5)/4-1); // last 4 bytes are CRC	
@@ -1058,13 +1079,13 @@ class DemuxTest : public jevent::DemuxListener {
 
 					sprintf(tmp, "pmt-0x%04x", program_number);
 
-					InitDemux(tmp, map_pid, TS_PMT_TABLE_ID, TS_PMT_TIMEOUT);
+					StartDemux(tmp, map_pid, TS_PMT_TABLE_ID, TS_PMT_TIMEOUT);
 				}
 
 				ptr = ptr + 4;
 			}
 
-			InitDemux("nit", nit_pid, TS_NIT_TABLE_ID, TS_NIT_TIMEOUT);
+			StartDemux("nit", nit_pid, TS_NIT_TABLE_ID, TS_NIT_TIMEOUT);
 		}
 
 		virtual void ProcessCAT(jevent::DemuxEvent *event)
@@ -1162,17 +1183,17 @@ class DemuxTest : public jevent::DemuxListener {
 					}
 				} else if (_stream_types[stream_type] == "private") {
 					// INFO:: ProcessPrivate(tid:[0x74]::[Application Information Table])
-					InitDemux("private", elementary_pid, TS_AIT_TABLE_ID, TS_PRIVATE_TIMEOUT);
+					StartDemux("private", elementary_pid, TS_AIT_TABLE_ID, TS_PRIVATE_TIMEOUT);
 				} else if (_stream_types[stream_type] == "dsmcc-data") {
 					_dsmcc_data_pid = elementary_pid;
 
 					// INFO:: ProcessDSMCCData()
-					InitDemux("dsmcc-data", elementary_pid, -1, TS_PRIVATE_TIMEOUT);
+					StartDemux("dsmcc-data", elementary_pid, -1, TS_PRIVATE_TIMEOUT);
 				} else if (_stream_types[stream_type] == "dsmcc-descriptors") {
 					_dsmcc_descriptors_pid = elementary_pid;
 
 					// INFO:: ProcessDSMCCDescriptors()
-					InitDemux("dsmcc-descriptors", elementary_pid, -1, TS_PRIVATE_TIMEOUT);
+					StartDemux("dsmcc-descriptors", elementary_pid, -1, TS_PRIVATE_TIMEOUT);
 				}
 
 				ptr = ptr + 5;
@@ -1198,7 +1219,7 @@ class DemuxTest : public jevent::DemuxListener {
 				pcr_pid = vpid; // first video pid
 			}
 			
-			InitDemux("pcr", pcr_pid, -1, TS_PCR_TIMEOUT);
+			StartDemux("pcr", pcr_pid, -1, TS_PCR_TIMEOUT);
 		}
 
 		virtual void ProcessNIT(jevent::DemuxEvent *event)
@@ -1394,9 +1415,55 @@ class DemuxTest : public jevent::DemuxListener {
       }
     }
 
+		virtual void ProcessRST(jevent::DemuxEvent *event)
+		{
+			const char *ptr = event->GetData();
+
+			int section_length = TS_PSI_G_SECTION_LENGTH(ptr);
+
+			printf("RST:: length:[%d]\n", section_length/9);
+				
+			int events_length = section_length;
+			int events_count = 0;
+
+			ptr = ptr + 3;
+
+			while (events_count < events_length) {
+				int transport_stream_id = TS_G16(ptr+0);
+				int original_network_id = TS_G16(ptr+2);
+				int service_id = TS_G16(ptr+4);
+				int event_id = TS_G16(ptr+6);
+				int running_status = TS_GM8(ptr+8, 5, 3);
+        std::string status;
+
+        if (running_status == 0x00) {
+          status = "undefined";
+        } else if (running_status == 0x01) {
+          status = "not running";
+        } else if (running_status == 0x02) {
+          status = "starts in a few seconds";
+        } else if (running_status == 0x03) {
+          status = "pausing";
+        } else if (running_status == 0x04) {
+          status = "running";
+        } else if (running_status == 0x05) {
+          status = "reserved";
+        } else if (running_status == 0x06) {
+          status = "reserved";
+        } else if (running_status == 0x07) {
+          status = "reserved";
+        }
+
+				printf(":: transport stream id:[%04x], original network id:[%04x], service id:[0x%04x], event id:[0x%04x], running status:[%s]\n", transport_stream_id, original_network_id, service_id, event_id, status.c_str());
+
+				events_count = events_count + 9;
+			}
+    }
+
 		virtual void ProcessEIT(jevent::DemuxEvent *event)
 		{
 			const char *ptr = event->GetData();
+
 			int tid = event->GetTID();
 			int section_length = TS_PSI_G_SECTION_LENGTH(ptr);
 			int service_id = TS_G16(ptr+3);

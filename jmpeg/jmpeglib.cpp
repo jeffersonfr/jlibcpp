@@ -47,6 +47,8 @@ std::string GetTableDescription(int pid, int tid)
     } else if (tid >= 0x60 && tid <= 0x6f) {
 		  return "Event Information Table [schedule - other service]";
     }
+  } else if (pid == TS_RST_PID && tid == TS_RST_TABLE_ID) {
+    return "Running Status Table";
   } else { // INFO:: considering only table id information
     if (tid == TS_PAT_TABLE_ID) {
 			return "Program Association Table";
