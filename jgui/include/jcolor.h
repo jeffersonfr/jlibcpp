@@ -32,155 +32,157 @@ namespace jgui {
 class Color : public virtual jcommon::Object {
 	
 	public:
-		const static uint32_t AliceBlue;
-		const static uint32_t AntiqueWhite;
-		const static uint32_t Aqua;
-		const static uint32_t Aquamarine;
-		const static uint32_t Azure;
-		const static uint32_t Beige;
-		const static uint32_t Bisque;
-		const static uint32_t Black;
-		const static uint32_t BlanchedAlmond;
-		const static uint32_t Blue;
-		const static uint32_t BlueViolet;
-		const static uint32_t Brown;
-		const static uint32_t BurlyWood;
-		const static uint32_t CadetBlue;
-		const static uint32_t Chartreuse;
-		const static uint32_t Chocolate;
-		const static uint32_t Coral;
-		const static uint32_t CornflowerBlue;
-		const static uint32_t Cornsilk;
-		const static uint32_t Crimson;
-		const static uint32_t Cyan;
-		const static uint32_t DarkBlue;
-		const static uint32_t DarkCyan;
-		const static uint32_t DarkGoldenRod;
-		const static uint32_t DarkGray;
-		const static uint32_t DarkGrey;
-		const static uint32_t DarkGreen;
-		const static uint32_t DarkKhaki;
-		const static uint32_t DarkMagenta;
-		const static uint32_t DarkOliveGreen;
-		const static uint32_t DarkOrange;
-		const static uint32_t DarkOrchid;
-		const static uint32_t DarkRed;
-		const static uint32_t DarkSalmon;
-		const static uint32_t DarkSeaGreen;
-		const static uint32_t DarkSlateBlue;
-		const static uint32_t DarkSlateGray;
-		const static uint32_t DarkSlateGrey;
-		const static uint32_t DarkTurquoise;
-		const static uint32_t DarkViolet;
-		const static uint32_t DeepPink;
-		const static uint32_t Deepskyblue;
-		const static uint32_t DimGray;
-		const static uint32_t DimGrey;
-		const static uint32_t DodgerBlue;
-		const static uint32_t FireBrick;
-		const static uint32_t FloralWhite;
-		const static uint32_t ForestGreen;
-		const static uint32_t Fuchsia;
-		const static uint32_t Gainsboro;
-		const static uint32_t GhostWhite;
-		const static uint32_t Gold;
-		const static uint32_t GoldenRod;
-		const static uint32_t Gray;
-		const static uint32_t Grey;
-		const static uint32_t Green;
-		const static uint32_t GreenYellow;
-		const static uint32_t HoneyDew;
-		const static uint32_t HotPink;
-		const static uint32_t IndianRed;
-		const static uint32_t Indigo;
-		const static uint32_t Ivory;
-		const static uint32_t Khaki;
-		const static uint32_t Lavender;
-		const static uint32_t kavenderBlush;
-		const static uint32_t LawnGreen;
-		const static uint32_t LemonChiffon;
-		const static uint32_t LightBlue;
-		const static uint32_t LightCoral;
-		const static uint32_t LightCyan;
-		const static uint32_t LightGoldenRodYellow;
-		const static uint32_t LightGray;
-		const static uint32_t LightGrey;
-		const static uint32_t LightGreen;
-		const static uint32_t LightPink;
-		const static uint32_t LightSalmon;
-		const static uint32_t LightSeaGreen;
-		const static uint32_t LightSkyBlue;
-		const static uint32_t LightSlateGray;
-		const static uint32_t LightSlateGrey;
-		const static uint32_t LightSteelBlue;
-		const static uint32_t LightYellow;
-		const static uint32_t Lime;
-		const static uint32_t LimeGreen;
-		const static uint32_t Linen;
-		const static uint32_t Magenta;
-		const static uint32_t Maroon;
-		const static uint32_t MediumAquaMarine;
-		const static uint32_t MediumBlue;
-		const static uint32_t MediumOrchid;
-		const static uint32_t MediumPurple;
-		const static uint32_t MediumSeaGreen;
-		const static uint32_t MediumSlateBlue;
-		const static uint32_t MediumSpringGreen;
-		const static uint32_t MediumTurquoise;
-		const static uint32_t MediumVioletRed;
-		const static uint32_t MidnightBlue;
-		const static uint32_t MintCream;
-		const static uint32_t MistyRose;
-		const static uint32_t Moccasin;
-		const static uint32_t NavajoWhite;
-		const static uint32_t Navy;
-		const static uint32_t OldLace;
-		const static uint32_t Olive;
-		const static uint32_t OliveDrab;
-		const static uint32_t Orange;
-		const static uint32_t OrangeRed;
-		const static uint32_t Orchid;
-		const static uint32_t PaleGoldenRod;
-		const static uint32_t PaleGreen;
-		const static uint32_t PaleTurquoise;
-		const static uint32_t PaleVioletRed;
-		const static uint32_t PapayaWhip;
-		const static uint32_t PeachPuff;
-		const static uint32_t Peru;
-		const static uint32_t Pink;
-		const static uint32_t PowderBlue;
-		const static uint32_t Plum;
-		const static uint32_t Purple;
-		const static uint32_t Red;
-		const static uint32_t RosyBrown;
-		const static uint32_t RoyalBlue;
-		const static uint32_t SaddlebBown;
-		const static uint32_t Salmon;
-		const static uint32_t SandyBrown;
-		const static uint32_t SeaGreen;
-		const static uint32_t SeaShell;
-		const static uint32_t Sienna;
-		const static uint32_t Silver;
-		const static uint32_t Skyblue;
-		const static uint32_t StateBlue;
-		const static uint32_t StateGray;
-		const static uint32_t StateGrey;
-		const static uint32_t Snow;
-		const static uint32_t SpringGreen;
-		const static uint32_t SteelBlue;
-		const static uint32_t Tan;
-		const static uint32_t Teal;
-		const static uint32_t Thistle;
-		const static uint32_t Tomato;
-		const static uint32_t Turquoise;
-		const static uint32_t Violet;
-		const static uint32_t Wheat;
-		const static uint32_t White;
-		const static uint32_t WhiteSmoke;
-		const static uint32_t Yellow;
-		const static uint32_t Yellowgreen;
-		const static uint32_t Transparent;
-	
+    enum {
+      AliceBlue = 0xfff0f8ff,
+      AntiqueWhite = 0xfffaebd7,
+      Aqua = 0xff00ffff,
+      Aquamarine = 0xff7fffd4,
+      Azure = 0xfff0ffff,
+      Beige = 0xfff5f5dc,
+      Bisque = 0xffffe4c4,
+      Black = 0xff000000,
+      BlanchedAlmond = 0xffffebcd,
+      Blue = 0xff0000ff,
+      BlueViolet = 0xff8a2be2,
+      Brown = 0xffa52a2a,
+      BurlyWood = 0xffdeb887,
+      CadetBlue = 0xff5f9ea0,
+      Chartreuse = 0xff7fff00,
+      Chocolate = 0xffd2691e,
+      Coral = 0xffff7f50,
+      CornflowerBlue = 0xff6495ed,
+      Cornsilk = 0xfffff8dc,
+      Crimson = 0xffdc143c,
+      Cyan = 0xff00ffff,
+      DarkBlue = 0xff00008b,
+      DarkCyan = 0xff008b8b,
+      DarkGoldenRod = 0xffb8860b,
+      DarkGray = 0xffa9a9a9,
+      DarkGrey = 0xffa9a9a9,
+      DarkGreen = 0xff006400,
+      DarkKhaki = 0xffbdb76b,
+      DarkMagenta = 0xff8b008b,
+      DarkOliveGreen = 0xff556b2f,
+      DarkOrange = 0xffff8c00,
+      DarkOrchid = 0xff9932cc,
+      DarkRed = 0xff8b0000,
+      DarkSalmon = 0xffe9967a,
+      DarkSeaGreen = 0xff8fbc8f,
+      DarkSlateBlue = 0xff483d8b,
+      DarkSlateGray = 0xff2f4f4f,
+      DarkSlateGrey = 0xff3f4f4f,
+      DarkTurquoise = 0xff00ced1,
+      DarkViolet = 0xff9400d3,
+      DeepPink = 0xffff1493,
+      Deepskyblue = 0xff00bf00,
+      DimGray = 0xff696969,
+      DimGrey = 0xff696969,
+      DodgerBlue = 0xff1e90ff,
+      FireBrick = 0xffb22222,
+      FloralWhite = 0xfffffaf0,
+      ForestGreen = 0xff228b22,
+      Fuchsia = 0xffff00ff,
+      Gainsboro = 0xffdcdcdc,
+      GhostWhite = 0xfff8f8ff,
+      Gold = 0xffffd700,
+      GoldenRod = 0xffdaa520,
+      Gray = 0xff808080,
+      Grey = 0xff808080,
+      Green = 0xff008000,
+      GreenYellow = 0xffadff2f,
+      HoneyDew = 0xfff0fff0,
+      HotPink = 0xffff69b4,
+      IndianRed = 0xffcd5c5c,
+      Indigo = 0xff4b0082,
+      Ivory = 0xfffffff0,
+      Khaki = 0xfff0e68c,
+      Lavender = 0xffe6e6fa,
+      kavenderBlush = 0xfffff0f5,
+      LawnGreen = 0xff7cfc00,
+      LemonChiffon = 0xfffffacd,
+      LightBlue = 0xffadd8e6,
+      LightCoral = 0xfff08080,
+      LightCyan = 0xffe0ffff,
+      LightGoldenRodYellow = 0xfffafad2,
+      LightGray = 0xffd3d3d3,
+      LightGrey = 0xffd3d3d3,
+      LightGreen = 0xff90ee90,
+      LightPink = 0xffffb6c1,
+      LightSalmon = 0xffffa07a,
+      LightSeaGreen = 0xff20b2aa,
+      LightSkyBlue = 0xff87cefa,
+      LightSlateGray = 0xff778899,
+      LightSlateGrey = 0xff778899,
+      LightSteelBlue = 0xffb0c4de,
+      LightYellow = 0xffffffe0,
+      Lime = 0xff00ff00,
+      LimeGreen = 0xff32cd32,
+      Linen = 0xfffaf0e6,
+      Magenta = 0xffff00ff,
+      Maroon = 0xff800000,
+      MediumAquaMarine = 0xff6ccdaa,
+      MediumBlue = 0xff0000cd,
+      MediumOrchid = 0xffba55d3,
+      MediumPurple = 0xff9370d6,
+      MediumSeaGreen = 0xff3cb371,
+      MediumSlateBlue = 0xff7b68ee,
+      MediumSpringGreen = 0xff00fa9a,
+      MediumTurquoise = 0xff48d1cc,
+      MediumVioletRed = 0xffc71585,
+      MidnightBlue = 0xff191970,
+      MintCream = 0xfff5fffa,
+      MistyRose = 0xffffe4e1,
+      Moccasin = 0xffffe4b5,
+      NavajoWhite = 0xffffdead,
+      Navy = 0xff000080,
+      OldLace = 0xfffdf5e6,
+      Olive = 0xff808000,
+      OliveDrab = 0xff6b8e23,
+      Orange = 0xffffa500,
+      OrangeRed = 0xffff4500,
+      Orchid = 0xffda70d6,
+      PaleGoldenRod = 0xffeee8aa,
+      PaleGreen = 0xff98fb98,
+      PaleTurquoise = 0xffafeeee,
+      PaleVioletRed = 0xffd87093,
+      PapayaWhip = 0xffffefd5,
+      PeachPuff = 0xffffdab9,
+      Peru = 0xffcd853f,
+      Pink = 0xffffc0cb,
+      PowderBlue = 0xffb0e0e6,
+      Plum = 0xffdda0dd,
+      Purple = 0xff800080,
+      Red = 0xffff0000,
+      RosyBrown = 0xffbc8f8f,
+      RoyalBlue = 0xff4169e1,
+      SaddlebBown = 0xff8b4513,
+      Salmon = 0xfffa8072,
+      SandyBrown = 0xfff4a460,
+      SeaGreen = 0xff2e8b57,
+      SeaShell = 0xfffff5ee,
+      Sienna = 0xffa0522d,
+      Silver = 0xffc0c0c0,
+      Skyblue = 0xff87ceeb,
+      StateBlue = 0xff6a5acd,
+      StateGray = 0xff708090,
+      StateGrey = 0xff708090,
+      Snow = 0xfffffafa,
+      SpringGreen = 0xff00ff7f,
+      SteelBlue = 0xff4682b4,
+      Tan = 0xffd2b48c,
+      Teal = 0xff008080,
+      Thistle = 0xffd8bfd8,
+      Tomato = 0xffff6347,
+      Turquoise = 0xff40e0d0,
+      Violet = 0xffee82ee,
+      Wheat = 0xfff5deb3,
+      White = 0xffffffff,
+      WhiteSmoke = 0xfff5f5f5,
+      Yellow = 0xffffff00,
+      Yellowgreen = 0xff9acd32,
+      Transparent = 0x00000000
+    };
+
 	private:
 		/** \brief */
 		int _red;

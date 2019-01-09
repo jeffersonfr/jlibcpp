@@ -51,9 +51,9 @@ std::string GetTableDescription(int pid, int tid)
     return "Running Status Table";
   } else { // INFO:: considering only table id information
     if (tid == TS_PAT_TABLE_ID) {
-			return "Program Association Table";
+			return "Program Association Table ?";
     } else if (tid == TS_CAT_TABLE_ID) {
-			return "Condicional Access Table";
+			return "Condicional Access Table ?";
     } else if (tid == TS_PMT_TABLE_ID) {
 			return "Program Map Table";
     } else if (tid == TS_TSDT_TABLE_ID) {
@@ -61,7 +61,7 @@ std::string GetTableDescription(int pid, int tid)
     } else if (tid == TS_METADATA_TABLE_ID) {
 			return "Metadata Table";
     } else if (tid == TS_NIT_TABLE_ID) {
-			return "Network Information Table";
+			return "Network Information Table ?";
     } else if (tid == TS_SDT_TABLE_ID) {
 			return "Service Description Table";
     } else if (tid == TS_BAT_TABLE_ID) {
@@ -213,7 +213,9 @@ std::string GetDescriptorName(int descriptor_tag)
 	switch (descriptor_tag) {
 		// INFO:: ABNTNBR15606-3_2007Vc_2008.pdf
 		// INFO:: ABNTNBR15603-1_2007Vc_2008.pdf
+		case 0x06: return "location_descriptor";
 		case 0x09: return "conditional_access_descriptor";
+		case 0x0a: return "iso_639_language_descriptor";
 		case 0x0d: return "copyright_descriptor";
 		case 0x11: return "ip_signalling_descriptor";
 		case 0x13: return "carousel_identifier_descriptor";
@@ -338,6 +340,10 @@ std::string GetDescriptorName(int descriptor_tag)
 	if (descriptor_tag >= 0x37 && descriptor_tag <= 0x3f) {
 		return "reserved";
 	} else if (descriptor_tag >= 0x80 && descriptor_tag <= 0xcf) {
+    if (descriptor_tag == 0xa3) {
+			return "component name descriptor - ATSC A/65A, ATSC Working Draft";
+    }
+
 		return "atsc descriptor";
 	} else if (descriptor_tag >= 0xd0 && descriptor_tag <= 0xdf) {
 		return "isdb descriptor";

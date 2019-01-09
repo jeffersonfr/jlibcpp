@@ -17,6 +17,12 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+
+// TODO:: 
+// - verificar o parse da EIT, mas especificamente a parte dos descritores, pois o short_event_descriptor, em varios casos, nao considera o tamanho total do texto, apenas uma parte e considera o resto como um descritor (ainda sobre a parte do texto).
+//  ** aparentemente estah ocorrendo apenas no fluxo da globo de 2014, o problema ocorre no short event descriptor que nao contempla o tamanho total do descriptor .. isso pode ser observado tanto no descriptor_length quanto no text_length, correspondente
+//
+
 #include "jmpeg/jdemuxmanager.h"
 #include "jmpeg/jdemux.h"
 #include "jmpeg/jmpeglib.h"
@@ -439,6 +445,14 @@ class DemuxTest : public jevent::DemuxListener {
 				if (private_length > 0) {
 					DumpBytes("Private Data", ptr, private_length);
 				}
+			} else if (descriptor_tag == 0x06) { // location descriptor
+				int location_tag = TS_G8(ptr+0);
+
+				printf(":: location tag:[0x%02x]\n", location_tag);
+			} else if (descriptor_tag == 0x0a) { // iso 639 language descriptor
+        std::string language = std::string(ptr+0, 3);
+
+				printf(":: language:[%s]\n", language.c_str());
 			} else if (descriptor_tag == 0x14) { // association tag descriptor
 				const char *end = ptr + descriptor_length;
 
@@ -507,7 +521,7 @@ class DemuxTest : public jevent::DemuxListener {
 				if (private_length > 0) {
 					DumpBytes("Private Data", ptr, private_length);
 				}
-			} else if (descriptor_tag == 0x40) { // network descriptor
+			} else if (descriptor_tag == 0x40) { // network name descriptor
 				std::string name(ptr, descriptor_length);
 
 				name = Utils::ISO8859_1_TO_UTF8(name);
@@ -590,7 +604,7 @@ class DemuxTest : public jevent::DemuxListener {
 
 					services_loop_count = services_loop_count + 3;
 				}
-			} else if (descriptor_tag == 0x48) { // service descriptor
+			} else if (descriptor_tag == 0x48) { // service descriptor [ABNTNBR 15603-2 2007]
 				int service_type = TS_G8(ptr); // 0x01: HD, 0xXX: LD
 				int service_provider_name_length = TS_G8(ptr+1);
 				std::string service_provider_name(ptr+2, service_provider_name_length);
@@ -600,7 +614,91 @@ class DemuxTest : public jevent::DemuxListener {
 				service_provider_name = Utils::ISO8859_1_TO_UTF8(service_provider_name);
 				service_name = Utils::ISO8859_1_TO_UTF8(service_name);
 
-				printf(":: service type:[0x%02x], service provider name:[%s], service name:[%s]\n", service_type, service_provider_name.c_str(), service_name.c_str());
+        std::string service;
+
+        if (service_type == 0x00) {
+          service = "Reservado para uso futuro";
+        } else if (service_type == 0x01) {
+          service = "Serviço de televisão digital";
+        } else if (service_type == 0x02) {
+          service = "Serviço de áudio digital";
+        } else if (service_type == 0x03) {
+          service = "Serviço de teletexto";
+        } else if (service_type == 0x04) {
+          service = "Serviço de referência NVOD";
+        } else if (service_type == 0x05) {
+          service = "Serviço time-shifted NVOD";
+        } else if (service_type == 0x06) {
+          service = "Serviço de mosaico";
+        } else if (service_type >= 0x07 and service_type <= 0x09) {
+          service = "Reservado para uso futuro";
+        } else if (service_type == 0x0a) {
+          service = "Codificação avançada para serviço de rádio digital";
+        } else if (service_type == 0x0b) {
+          service = "Codificação avançada para serviço de mosaico";
+        } else if (service_type == 0x0c) {
+          service = "Serviço de transmissão de dados";
+        } else if (service_type == 0x0d) {
+          service = "Reservado para interface de uso comum (ver EN 50221)";
+        } else if (service_type == 0x0e) {
+          service = "RCS Map (ver EN 301 790)";
+        } else if (service_type == 0x0f) {
+          service = "RCS FLS (ver EN 301 790)";
+        } else if (service_type == 0x10) {
+          service = "Serviço DVB MHP";
+        } else if (service_type == 0x11) {
+          service = "Serviço de televisão digital MPEG-2 HD";
+        } else if (service_type >= 0x12 and service_type <= 0x15) {
+          service = "Reservado para uso futuro";
+        } else if (service_type == 0x16) {
+          service = "Codificação avançada de serviço de televisão digital SD";
+        } else if (service_type == 0x17) {
+          service = "Codificação avançada de serviço de NVOD SD time-shifted";
+        } else if (service_type == 0x18) {
+          service = "Codificação avançada de serviço de referência NVOD SD";
+        } else if (service_type == 0x19) {
+          service = "Codificação avançada de serviço de televisão digital HD";
+        } else if (service_type == 0x1a) {
+          service = "Codificação avançada de serviço de NVOD HD time-shifted";
+        } else if (service_type == 0x1b) {
+          service = "Codificação avançada de serviço de referência NVOD HD";
+        } else if (service_type >= 0x1c and service_type < 0x7f) {
+          service = "Reservado para uso futuro";
+        } else if (service_type >= 0x80 and service_type <= 0xa0) {
+          service = "Definido pelo provedor de serviço";
+        } else if (service_type == 0xa1) {
+          service = "Serviço especial de vídeo";
+        } else if (service_type == 0xa2) {
+          service = "Serviço especial de áudio";
+        } else if (service_type == 0xa3) {
+          service = "Serviço especial de dados";
+        } else if (service_type == 0xa4) {
+          service = "Serviço de engenharia";
+        } else if (service_type == 0xa5) {
+          service = "Serviço promocional de vídeo";
+        } else if (service_type == 0xa6) {
+          service = "Serviço promocional de áudio";
+        } else if (service_type == 0xa7) {
+          service = "Serviço promocional de dados";
+        } else if (service_type == 0xa8) {
+          service = "Serviço de dados para armazenamento antecipado";
+        } else if (service_type == 0xa9) {
+          service = "Serviço de dados exclusivo para armazenamento";
+        } else if (service_type == 0xaa) {
+          service = "Lista de serviços de bookmark";
+        } else if (service_type == 0xab) {
+          service = "Serviço simultâneo do tipo servidor";
+        } else if (service_type == 0xac) {
+          service = "Serviço independente de arquivos";
+        } else if (service_type >= 0xad and service_type <= 0xbf) {
+          service = "Não definido (área definida pela organização de regulamentação)";
+        } else if (service_type == 0xc0) {
+          service = "Serviço de dados";
+        } else if (service_type >= 0xc1 and service_type <= 0xff) {
+          service = "Não definido";
+        }
+
+				printf(":: service type:[0x%02x/%s], service provider name:[%s], service name:[%s]\n", service_type, service.c_str(), service_provider_name.c_str(), service_name.c_str());
 			} else if (descriptor_tag == 0x49) { // country availability descriptor
 				int country_availability_flag = TS_G8(ptr);
 				std::string country(ptr+1, 3);
@@ -608,10 +706,16 @@ class DemuxTest : public jevent::DemuxListener {
 				printf(":: country availability flag:[%d], country:[%s]\n", country_availability_flag, country.c_str());
 			} else if (descriptor_tag == 0x4d) { // short event descriptor
 				std::string language = std::string(ptr, 3);
-				int event_name_length = TS_G8(ptr+3);
-				std::string event_name(ptr+3+1, event_name_length);
-				int text_length = TS_G8(ptr+4+event_name_length);
-				std::string text(ptr+4+1+event_name_length, text_length);
+
+        ptr = ptr + 3;
+
+				int event_name_length = TS_G8(ptr);
+				std::string event_name(ptr+1, event_name_length);
+
+        ptr = ptr + 1 + event_name_length;
+
+				int text_length = TS_G8(ptr);
+				std::string text(ptr+1, text_length);
 
 				printf(":: language:[%s], event name:[%s], text:[%s]\n", language.c_str(), event_name.c_str(), text.c_str());
 			} else if (descriptor_tag == 0x4e) { // extended event descriptor
@@ -776,7 +880,7 @@ class DemuxTest : public jevent::DemuxListener {
 					} else if (genre_description == 0x02) {
 						description = "Premiação";
 					} else {
-						description = "Sorteio, Vendas  e Premiação";
+						description = "Sorteio, Vendas e Premiação";
 					}
 				} else if (genre == 0x0e) {
 					if (genre_description == 0x00) {
@@ -843,33 +947,179 @@ class DemuxTest : public jevent::DemuxListener {
 				}
 
 				printf(":: country:[%s], age:[%d]::[%s], content:[%02x]::[%s]\n", country.c_str(), rate_age, age.c_str(), rate_content,  content.c_str());
-			} else if (descriptor_tag == 0x7d) { // aac descriptor
+			} else if (descriptor_tag == 0x7c) { // aac descriptor
 				const char *end = ptr + descriptor_length;
 
-				int profile_and_level = TS_G8(ptr);
+				int profile_and_level = TS_G8(ptr+0);
+				int aac_type_flag = TS_GM8(ptr+1, 0, 1);
+				int aac_type = -1;
 
-				printf(":: profile and level:[%d]\n", profile_and_level);
+        ptr = ptr + 2;
 
-				if (descriptor_length > 1) {
-					int aac_type_flag = TS_GM8(ptr+1, 0, 1);
-					int aac_type = -1;
+				if (aac_type_flag == 1) {
+				  aac_type = TS_G8(ptr);
 
-					ptr = ptr + 2;
-
-					if (aac_type_flag == 0x01) {
-						aac_type = TS_G8(ptr);
-
-						ptr = ptr + 1;
-					}
+					ptr = ptr + 1;
+        }
 	
-					printf(":: aac type flag:[%d], aac type:[%d]\n", aac_type_flag, aac_type);
+        std::string profile;
 
-					int private_length = end-ptr;
+        if (profile_and_level >= 0x00 and profile_and_level <= 0x27) {
+          profile = "reserved";
+        } else if (profile_and_level == 0x28) {
+          profile = "AAC Profile";
+        } else if (profile_and_level == 0x29) {
+          profile = "AAC Profile";
+        } else if (profile_and_level == 0x2a) {
+          profile = "AAC Profile";
+        } else if (profile_and_level == 0x2b) {
+          profile = "AAC Profile";
+        } else if (profile_and_level == 0x2c) {
+          profile = "High Efficiency AAC Profile";
+        } else if (profile_and_level == 0x2d) {
+          profile = "High Efficiency AAC Profile";
+        } else if (profile_and_level == 0x2e) {
+          profile = "High Efficiency AAC Profile";
+        } else if (profile_and_level == 0x2f) {
+          profile = "High Efficiency AAC Profile";
+        } else if (profile_and_level >= 0x30 and profile_and_level <= 0x7f) {
+          profile = "Reservado para uso da ISO";
+        } else if (profile_and_level >= 0x80 and profile_and_level <= 0xfd) {
+          profile = "Private";
+        } else if (profile_and_level == 0xfe) {
+          profile = "No specified";
+        } else if (profile_and_level == 0xff) {
+          profile = "None information about audio";
+        }
 
-					if (private_length > 0) {
-						DumpBytes("Additional Info", ptr, private_length);
-					}
+				printf(":: profile and level:[0x%02x/%s], aac type flag:[%d], aac type:[%d]\n", profile_and_level, profile.c_str(), aac_type_flag, aac_type);
+
+				int private_length = end-ptr;
+
+				if (private_length > 0) {
+					DumpBytes("Additional Info", ptr, private_length);
 				}
+			} else if (descriptor_tag == 0xa3) { // component name descriptor [ATSC A/65A, ATSC Working Draft]
+				// int reserved = TS_GM8(ptr+0, 0, 4);
+				int number_strings = TS_G8(ptr+0);
+
+				printf(":: number strings :[%d]\n", number_strings);
+
+        for (int i=0; i<number_strings; i++) {
+          std::string ISO_639_language_code(ptr+1, 3);
+          int number_segments = TS_G8(ptr+4);
+
+          ptr = ptr + 5;
+
+				  printf(":: language:[%s], number segments:[%d]\n", ISO_639_language_code.c_str(), number_segments);
+
+          for (int j=0; j<number_segments; j++) {
+            int compression_type = TS_G8(ptr+0);
+            int mode = TS_G8(ptr+1);
+            int number_bytes = TS_G8(ptr+2);
+
+            std::string compression;
+            std::string mode_info;
+
+            if (compression_type == 0x00) {
+              compression = "no compression";
+            } else if (compression_type == 0x01) {
+              compression = "huffman coding";
+            } else if (compression_type == 0x02) {
+              compression = "huffman coding";
+            } else if (compression_type >= 0x03 and compression_type <= 0xaf) {
+              compression = "reserved";
+            } else if (compression_type >= 0xb0 and compression_type <= 0xff) {
+              compression = "used in other systems";
+            }
+
+            if (mode == 0x00) {
+              mode_info = "select Unicode Code Range 0x0000 - 0x00FF";
+            } else if (mode == 0x01) {
+              mode_info = "select Unicode Code Range 0x0100 - 0x01FF";
+            } else if (mode == 0x02) {
+              mode_info = "select Unicode Code Range 0x0200 - 0x02FF";
+            } else if (mode == 0x03) {
+              mode_info = "select Unicode Code Range 0x0300 - 0x03FF";
+            } else if (mode == 0x04) {
+              mode_info = "select Unicode Code Range 0x0400 - 0x04FF";
+            } else if (mode == 0x05) {
+              mode_info = "select Unicode Code Range 0x0500 - 0x05FF";
+            } else if (mode == 0x06) {
+              mode_info = "select Unicode Code Range 0x0600 - 0x06FF";
+            } else if (mode >= 0x07 and mode <= 0x08) {
+              mode_info = "reserved";
+            } else if (mode == 0x09) {
+              mode_info = "select Unicode Code Range 0x0900 - 0x09FF";
+            } else if (mode == 0x0a) {
+              mode_info = "select Unicode Code Range 0x0A00 - 0x0AFF";
+            } else if (mode == 0x0b) {
+              mode_info = "select Unicode Code Range 0x0B00 - 0x0BFF";
+            } else if (mode == 0x0c) {
+              mode_info = "select Unicode Code Range 0x0C00 - 0x0CFF";
+            } else if (mode == 0x0d) {
+              mode_info = "select Unicode Code Range 0x0D00 - 0x0DFF";
+            } else if (mode == 0x0e) {
+              mode_info = "select Unicode Code Range 0x0E00 - 0x0EFF";
+            } else if (mode == 0x0f) {
+              mode_info = "select Unicode Code Range 0x0F00 - 0x0FFF";
+            } else if (mode == 0x10) {
+              mode_info = "select Unicode Code Range 0x1000 - 0x10FF";
+            } else if (mode >= 0x11 and mode <= 0x1f) {
+              mode_info = "reserved";
+            } else if (mode == 0x20) {
+              mode_info = "select Unicode Code Range 0x2000 - 0x20FF";
+            } else if (mode == 0x21) {
+              mode_info = "select Unicode Code Range 0x2100 - 0x21FF";
+            } else if (mode == 0x22) {
+              mode_info = "select Unicode Code Range 0x2200 - 0x22FF";
+            } else if (mode == 0x23) {
+              mode_info = "select Unicode Code Range 0x2300 - 0x23FF";
+            } else if (mode == 0x24) {
+              mode_info = "select Unicode Code Range 0x2400 - 0x24FF";
+            } else if (mode == 0x25) {
+              mode_info = "select Unicode Code Range 0x2500 - 0x25FF";
+            } else if (mode == 0x26) {
+              mode_info = "select Unicode Code Range 0x2600 - 0x26FF";
+            } else if (mode == 0x27) {
+              mode_info = "select Unicode Code Range 0x2700 - 0x27FF";
+            } else if (mode >= 0x28 and mode <= 0x2f) {
+              mode_info = "reserved";
+            } else if (mode == 0x30) {
+              mode_info = "select Unicode Code Range 0x3000 - 0x30FF";
+            } else if (mode == 0x31) {
+              mode_info = "select Unicode Code Range 0x3100 - 0x31FF";
+            } else if (mode == 0x32) {
+              mode_info = "select Unicode Code Range 0x3200 - 0x32FF";
+            } else if (mode == 0x33) {
+              mode_info = "select Unicode Code Range 0x3300 - 0x33FF";
+            } else if (mode >= 0x34 and mode <= 0x3d) {
+              mode_info = "reserved";
+            } else if (mode == 0x3e) {
+              mode_info = "select Standard Compression Scheme for Unicode (SCSU)";
+            } else if (mode == 0x3f) {
+              mode_info = "select Unicode, UTF-16 form";
+            } else if (mode >= 0x40 and mode <= 0x41) {
+              mode_info = "assigned to ATSC standard for Taiwan";
+            } else if (mode >= 0x42 and mode <= 0x47) {
+              mode_info = "reserved for future ATSC use";
+            } else if (mode == 0x48) {
+              mode_info = "assigned to ATSC standard for South Korea";
+            } else if (mode >= 0x49 and mode <= 0xdf) {
+              mode_info = "reserved for future ATSC use";
+            } else if (mode >= 0xe0 and mode <= 0xfe) {
+              mode_info = "used in other systems";
+            } else if (mode == 0xff) {
+              mode_info = "not applicable";
+            }
+
+            ptr = ptr + 3;
+
+				    printf(":: compression type:[%s], mode:[%s]\n", compression.c_str(), mode_info.c_str());
+					    
+            DumpBytes("Compressed String Bytes", ptr, number_bytes);
+          }
+        }
 			} else if (descriptor_tag == 0xc4) { // audio component descriptor
 				// int reserved = TS_GM8(ptr+0, 0, 4);
 				int stream_content = TS_GM8(ptr+0, 4, 4);
@@ -884,8 +1134,51 @@ class DemuxTest : public jevent::DemuxListener {
 				// int reserved = TS_GM8(ptr+5, 7, 1);
         std::string language = std::string(ptr+6, 3);
 
-				printf(":: stream content:[0x%01x], content type:[0x%01x], compoennt tag::[0x%01x], stream type::[0x%01x], group tag::[0x%01x], multilanguage::[0x%01x], component flag::[0x%01x], quality flag::[0x%01x], sampling rate::[0x%01x], language::[%s]\n", stream_content, content_type, component_tag, stream_type, group_tag, multilanguage_flag, component_flag, quality_indicator, sampling_rate, language.c_str());
-			} else if (descriptor_tag == 0xcd) { // ts information descriptor 
+				printf(":: stream content:[0x%01x], content type:[0x%01x], component tag::[0x%01x], stream type::[0x%01x], group tag::[0x%01x], multilanguage::[0x%01x], component flag::[0x%01x], quality flag::[0x%01x], sampling rate::[0x%01x], language::[%s]\n", stream_content, content_type, component_tag, stream_type, group_tag, multilanguage_flag, component_flag, quality_indicator, sampling_rate, language.c_str());
+			} else if (descriptor_tag == 0xc7) { // data contents descriptor [ABNTNBR 15608-3-2008]
+				int data_component_id = TS_G16(ptr+0);
+				int entry_component = TS_G8(ptr+2);
+				int selector_length = TS_G8(ptr+3);
+				int num_languages = TS_G8(ptr+4);
+
+				printf(":: data component id:[0x%04x], entry component:[0x%02x], selector length::[0x%02x], number of languages::[0x%02x]\n", data_component_id, entry_component, selector_length, num_languages);
+
+        ptr = ptr + 5;
+
+        for (int i=0; i<num_languages; i++) {
+				  int language_tag = TS_GM8(ptr+0, 0, 3);
+				  // int reserved = TS_GM8(ptr+0, 3, 1);
+				  int dmf = TS_GM8(ptr+0, 4, 4);
+          std::string language(ptr+1, 3);
+
+				  printf(":: language tag:[0x%01x], dmf:[0x%01x], language::[%s]\n", language_tag, dmf, language.c_str());
+          
+          ptr = ptr + 4;
+        }
+
+        int num_of_component_ref = TS_G8(ptr+0);
+
+        ptr = ptr + 1;
+
+        for (int i=0; i<num_of_component_ref; i++) {
+				  int component_ref = TS_GM8(ptr+0, 0, 3);
+
+				  printf(":: component ref:[0x%02x]\n", component_ref);
+          
+          ptr = ptr + 1;
+        }
+
+        std::string language_code(ptr+0, 3);
+				int text_length = TS_G8(ptr+3);
+
+        if (text_length > 16) { // INFO:: restricted in specification
+          text_length = 16;
+        }
+
+        std::string text(ptr+4, text_length);
+
+				printf(":: language code:[%s], text:[%s]\n", language_code.c_str(), text.c_str());
+			} else if (descriptor_tag == 0xcd) { // ts information descriptor [ABNTNBR 15603-2 2007]
 				const char *end = ptr + descriptor_length;
 
 				int remote_control_key_identification = TS_G8(ptr);
@@ -920,6 +1213,62 @@ class DemuxTest : public jevent::DemuxListener {
 				if (private_length > 0) {
 					DumpBytes("Private Data", ptr, private_length);
 				}
+
+        /*
+				const char *end = ptr + descriptor_length;
+
+				int remote_control_key_identification = TS_G8(ptr);
+				int ts_name_length = TS_GM8(ptr+1, 0, 6);
+				int transmission_type_count = TS_GM8(ptr+1, 6, 2);
+				std::string ts_name(ptr+2, ts_name_length);
+
+				printf(":: remote control key identification:[0x%02x], ts name:[%s]\n", remote_control_key_identification, ts_name.c_str());
+
+				ptr = ptr + 2 + ts_name_length;
+
+				if (transmission_type_count > 0) {
+					for (int i=0; i<transmission_type_count; i++) {
+						// CHANGE:: service_number should come after transmission_type_count2
+						int service_number = TS_G8(ptr);
+						int transmission_type_count2 = TS_G8(ptr+1);
+					
+						for (int j=0; j<transmission_type_count2; j++) {
+							int service_identification = TS_G16(ptr+2+j);
+
+							printf(":: service number:[0x%02x], service identification:[0x%04x]\n", service_number, service_identification);
+
+							ptr = ptr + 2;
+						}
+
+						ptr = ptr + 2;
+					}
+				}
+				
+				int private_length = end-ptr;
+
+				if (private_length > 0) {
+					DumpBytes("Private Data", ptr, private_length);
+				}
+        */
+			} else if (descriptor_tag == 0xcf) { // logo transmission descriptor [ABNTNBR 15603-2D1 2007]
+				int logo_transmission_type = TS_G8(ptr+0);
+
+        printf(":: logo transmission type:[0x%02x]\n", logo_transmission_type);
+
+        if (logo_transmission_type == 0x01) {
+				  // int reserved = TS_GM16(ptr+1, 0, 7);
+				  // int logo_identified = TS_GM16(ptr+1, 7, 9);
+				  // int reserved = TS_GM16(ptr+3, 0, 4);
+				  // int logo_version = TS_GM16(ptr+3, 4, 12);
+				  // int download_data_identified = TS_G16(ptr+5);
+        } else if (logo_transmission_type == 0x02) {
+				  // int reserved = TS_GM16(ptr+1, 0, 7);
+				  // int logo_identified = TS_GM16(ptr+1, 7, 9);
+        } else if (logo_transmission_type == 0x03) {
+          // std::string logo_character_string(ptr+1, descriptor_length-1);
+        } else {
+					DumpBytes("Reserved", ptr+1, descriptor_length-1);
+        }
 			} else if (descriptor_tag == 0xfa) { // terrestrial delivery system descriptor
 				int area_code = TS_GM16(ptr, 0, 12);
 				int guard_interval = TS_GM16(ptr, 12, 2);
@@ -972,17 +1321,45 @@ class DemuxTest : public jevent::DemuxListener {
 					ptr = ptr + 2;
 				}
 			} else if (descriptor_tag == 0xfd) { // data component descriptor
-				int data_coding_method_id = TS_G16(ptr);
+				int data_component_id = TS_G16(ptr+0);
+				int dmf = TS_GM8(ptr+1, 0, 4);
+				// int reserved = TS_GM8(ptr+1, 4, 2);
+				int timing = TS_GM8(ptr+1, 6, 2);
 
-				printf(":: data coding method id:[0x%04x]\n", data_coding_method_id);
-
-				if (descriptor_length > 2) {
-					DumpBytes("Additional Identifier Info", ptr+2, descriptor_length-2);
-				}
-			} else if (descriptor_tag == 0xfe) { // system management descriptor
+				printf(":: data component id:[0x%04x], dmf:[0x%02x], timing:[0x%02x]\n", data_component_id, dmf, timing);
+			} else if (descriptor_tag == 0xfe) { // system management descriptor [ABNTNBR 15608-3-2008]
 				int system_management_id = TS_G16(ptr);
+        int broadcasting_flag = TS_GM8(ptr, 0, 2);
+        int broadcasting_identifier = TS_GM8(ptr, 2, 6);
 
-				printf(":: system management id:[0x%04x]\n", system_management_id);
+        std::string flag;
+        std::string identifier;
+
+        if (broadcasting_flag == 0x00) {
+          flag = "Open television";
+        } else if (broadcasting_flag == 0x01) {
+          flag = "Not open television";
+        } else if (broadcasting_flag == 0x02) {
+          flag = "Not open television";
+        } else if (broadcasting_flag == 0x03) {
+          flag = "Not specified";
+        }
+
+        if (broadcasting_identifier == 0x00) {
+          identifier = "Not specified";
+        } else if (broadcasting_identifier == 0x01) {
+          identifier = "Not used";
+        } else if (broadcasting_identifier == 0x02) {
+          identifier = "Not used";
+        } else if (broadcasting_identifier == 0x03) {
+          identifier = "ISDB system";
+        } else if (broadcasting_identifier >= 0x04 and broadcasting_identifier <= 0x06) {
+          identifier = "Not used";
+        } else if (broadcasting_identifier >= 0x07 and broadcasting_identifier <= 0x015) {
+          identifier = "Not specified";
+        }
+
+				printf(":: system management id:[0x%04x] {broadcasting_id:[%s], broadcasting identified:[%s]}\n", system_management_id, flag.c_str(), identifier.c_str());
 
 				int count = (descriptor_length - 2);
 
@@ -1567,7 +1944,7 @@ class DemuxTest : public jevent::DemuxListener {
 				if (application_type == 0x01) {
 					type = "Ginga-J";
 				} else if (application_type == 0x02) {
-					type = "DVB-HHTML";
+					type = "DVB-HTML";
 				} else if (application_type == 0x06) {
 					type = "ACAP-J";
 				} else if (application_type == 0x07) {
