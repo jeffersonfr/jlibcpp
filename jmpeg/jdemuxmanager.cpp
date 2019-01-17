@@ -260,9 +260,11 @@ void DemuxManager::Run()
 						if (demux->Append(current.data(), current.size()) == true) {
 							int tid = TS_G8(current.data());
 
-							_demux_status[demux].found = true;
+			        if (demux->GetTID() < 0 || demux->GetTID() == tid) {
+	  						_demux_status[demux].found = true;
 
-							demux->DispatchDemuxEvent(new jevent::DemuxEvent(this, jevent::JDET_DATA_ARRIVED, current.data(), current.size(), pid, tid));
+		  					demux->DispatchDemuxEvent(new jevent::DemuxEvent(this, jevent::JDET_DATA_ARRIVED, current.data(), current.size(), pid, tid));
+              }
 						}
 					}
 					

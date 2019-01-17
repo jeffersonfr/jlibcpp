@@ -92,7 +92,9 @@
 #define TS_BAT_TABLE_ID 0x4A
 #define TS_TDT_TABLE_ID 0x70
 #define TS_RST_TABLE_ID 0x71
+#define TS_ST_TABLE_ID 0x72
 #define TS_TOT_TABLE_ID 0x73
+#define TS_AIT_TABLE_ID 0x74
 #define TS_EIT_TABLE_ID 0x78
 
 #define TS_DESCRIPTOR_HEADER_LENGTH 2
@@ -103,6 +105,8 @@
 #define TS_PSI_G_LAST_SECTION_NUMBER(data) TS_G8(data+7)
 
 std::string GetStreamTypeDescription(int stream_type);
+std::string GetComponentDescription(int stream_content, int component_type);
+std::string GetServiceDescription(int service_type);
 std::string GetTableDescription(int pid, int tid);
 std::string GetDescriptorName(int descriptor_tag);
 

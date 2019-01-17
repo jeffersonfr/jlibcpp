@@ -28,9 +28,13 @@
 #include "jmpeg/jmpeglib.h"
 #include "jio/jfileinputstream.h"
 #include "jevent/jdemuxlistener.h"
+#include "jlogger/jloggerlib.h"
 
 #include <iostream>
 #include <algorithm>
+#include <unordered_map>
+#include <tuple>
+#include <utility>
 
 #include <string.h>
 
@@ -71,7 +75,9 @@ class Utils {
 					utf8[k++] = 0xc3;
 					utf8[k++] = c-0x40;
 				} else {
-					utf8[k++] = c;
+          if (c >= 0x20) { // INFO:: accept only valid characters
+					  utf8[k++] = c;
+          }
 				}
 			}
 
@@ -122,16 +128,651 @@ class Utils {
 		}
 };
 
-class DemuxTest : public jevent::DemuxListener {
+class SI {
+
+  private:
+
+  protected:
+    SI()
+    {
+    }
+
+  public:
+    virtual ~SI()
+    {
+    }
+
+};
+
+class ElementaryStream {
+
+  public:
+    enum class stream_type_t {
+      UNKNOWN,
+      AUDIO,
+      VIDEO,
+      SUBTITLE,
+      PRIVATE,
+      DSMCC_SECTION,
+      DSMCC_MESSAGE,
+      DSMCC_DESCRIPTOR,
+      RESERVED,
+    };
+
+  private:
+    int 
+      _program_id,
+      _component_tag;
+    stream_type_t
+      _stream_type;
+
+  public:
+    ElementaryStream()
+    {
+      _component_tag = -1;
+    }
+
+    virtual ~ElementaryStream()
+    {
+    }
+
+    void StreamType(stream_type_t param)
+    {
+      _stream_type = param;
+    }
+
+    void ProgramID(int param)
+    {
+      _program_id = param;
+    }
+
+    void ComponentTag(int param)
+    {
+      _component_tag = param;
+    }
+
+    stream_type_t StreamType()
+    {
+      return _stream_type;
+    }
+
+    int ProgramID()
+    {
+      return _program_id;
+    }
+    
+    int ComponentTag()
+    {
+      return _component_tag;
+    }
+
+};
+
+class SIService : public SI {
+
+  public:
+    enum class service_type_t {
+      LD,
+      SD,
+      HD
+    };
+
+  private:
+    std::vector<std::shared_ptr<ElementaryStream>>
+      _elementary_streams;
+    std::string
+      _service_provider, 
+      _service_name;
+    int
+      _original_network_id, 
+      _transport_stream_id, 
+      _service_id,
+      _program_id;
+    service_type_t
+      _service_type;
+
+  public:
+    bool operator==(const std::shared_ptr<SIService> &param)
+    {
+      return (ServiceProvider() == param->ServiceProvider() and ServiceName() == param->ServiceName() and OriginalNetworkID() == param->OriginalNetworkID() and TransportStreamID() == param->TransportStreamID() and ServiceID() == param->ServiceID() and ServiceType() == param->ServiceType());
+    }
+
+  public:
+    SIService():
+      SI()
+    {
+    }
+
+    virtual ~SIService()
+    {
+    }
+
+    void ServiceProvider(std::string param)
+    {
+      _service_provider = param;
+    }
+
+    void ServiceName(std::string param)
+    {
+      _service_name = param;
+    }
+
+    void OriginalNetworkID(int param)
+    {
+      _original_network_id = param;
+    }
+
+    void TransportStreamID(int param)
+    {
+      _transport_stream_id = param;
+    }
+
+    void ServiceID(int param)
+    {
+      _service_id = param;
+    }
+
+    void ProgramID(int param)
+    {
+      _program_id = param;
+    }
+
+    void ServiceType(service_type_t param)
+    {
+      _service_type = param;
+    }
+
+    std::string ServiceProvider()
+    {
+      return _service_provider;
+    }
+
+    std::string ServiceName()
+    {
+      return _service_name;
+    }
+
+    int OriginalNetworkID()
+    {
+      return _original_network_id;
+    }
+
+    int TransportStreamID()
+    {
+      return _transport_stream_id;
+    }
+
+    int ServiceID()
+    {
+      return _service_id;
+    }
+
+    int ProgramID()
+    {
+      return _program_id;
+    }
+
+    service_type_t ServiceType()
+    {
+      return _service_type;
+    }
+
+    void Print()
+    {
+      std::string service_type;
+
+      if (_service_type == service_type_t::HD) {
+        service_type = "HD";
+      } else if (_service_type == service_type_t::LD) {
+        service_type = "LD";
+      } else {
+        service_type = "SD";
+      }
+
+      printf("Service:: provider:[%s], name:[%s], original network id:[0x%04x], transport stream id:[0x%04x], service id:[0x%04x], service type:[%s]\n",
+          _service_provider.c_str(), _service_name.c_str(), _original_network_id, _transport_stream_id, _service_id, service_type.c_str()); 
+    }
+
+};
+
+class SITime : public SI {
+
+  public:
+    enum class week_day_t {
+      SUNDAY,
+      MONDAY,
+      TUESDAY,
+      WEDNESDAY,
+      THRUSDAY,
+      FRIDAY,
+      SATURDAY
+    };
+
+  private:
+    std::string
+      _country;
+    int
+      _year,
+      _month,
+      _day,
+      _hour,
+      _minute,
+      _second;
+    week_day_t
+      _week_day;
+
+  public:
+    bool operator==(SITime param)
+    {
+      return (Year() == param.Year() and Month() == param.Month() and Day() == param.Day() and Hour() == param.Hour() and Minute() == param.Minute() and Second() == param.Second());
+    }
+
+  public:
+    SITime():
+      SI()
+    {
+      _country = "BRA";
+    }
+
+    virtual ~SITime()
+    {
+    }
+
+    void Country(std::string param)
+    {
+      _country = param;
+    }
+
+    void Year(int param)
+    {
+      _year = param;
+    }
+
+    void Month(int param)
+    {
+      _month = param;
+    }
+
+    void Day(int param)
+    {
+      _day = param;
+    }
+
+    void Hour(int param)
+    {
+      _hour = param;
+    }
+
+    void Minute(int param)
+    {
+      _minute = param;
+    }
+
+    void Second(int param)
+    {
+      _second = param;
+    }
+
+    void WeekDay(week_day_t param)
+    {
+      _week_day = param;
+    }
+
+    std::string Country()
+    {
+      return _country;
+    }
+
+    int Year()
+    {
+      return _year;
+    }
+
+    int Month()
+    {
+      return _month;
+    }
+
+    int Day()
+    {
+      return _day;
+    }
+
+    int Hour()
+    {
+      return _hour;
+    }
+
+    int Minute()
+    {
+      return _minute;
+    }
+
+    int Second()
+    {
+      return _second;
+    }
+
+    week_day_t WeekDay()
+    {
+      return _week_day;
+    }
+
+    void Print()
+    {
+      printf("Time:: country:[%s], year:[%02d], month:[%02d], day:[%02d], hour:[%02d], minute:[%02d], second:[%02d]\n",
+          _country.c_str(), _year, _month, _day, _hour, _minute, _second); 
+    }
+
+};
+
+class SINetwork : public SI {
+
+  private:
+    std::string
+      _transport_stream_name;
+    int
+      _network_id, 
+      _original_network_id, 
+      _transport_stream_id;
+
+  public:
+    bool operator==(std::shared_ptr<SINetwork> param)
+    {
+      return (TransportStreamName() == param->TransportStreamName() and NetworkID() == param->NetworkID() and OriginalNetworkID() == param->OriginalNetworkID() and TransportStreamID() == param->TransportStreamID());
+    }
+
+  public:
+    SINetwork():
+      SI()
+    {
+    }
+
+    virtual ~SINetwork()
+    {
+    }
+
+    void TransportStreamName(std::string param)
+    {
+      _transport_stream_name = param;
+    }
+
+    void NetworkID(int param)
+    {
+      _network_id = param;
+    }
+
+    void OriginalNetworkID(int param)
+    {
+      _original_network_id = param;
+    }
+
+    void TransportStreamID(int param)
+    {
+      _transport_stream_id = param;
+    }
+
+    std::string TransportStreamName()
+    {
+      return _transport_stream_name;
+    }
+
+    int NetworkID()
+    {
+      return _network_id;
+    }
+
+    int OriginalNetworkID()
+    {
+      return _original_network_id;
+    }
+
+    int TransportStreamID()
+    {
+      return _transport_stream_id;
+    }
+
+    void Print()
+    {
+      printf("Network:: transport stream name:[%s], network id:[0x%04x], original network id:[0x%04x], transport stream id:[0x%04x]\n",
+          _transport_stream_name.c_str(), _network_id, _original_network_id, _transport_stream_id); 
+    }
+
+};
+
+class SIEvent : public SI {
+
+  private:
+    std::string
+      _event_name,
+      _description;
+    int
+      _original_network_id, 
+      _transport_stream_id,
+      _service_id,
+      _event_id;
+
+  public:
+    bool operator==(std::shared_ptr<SIEvent> &param)
+    {
+      return (EventName() == param->EventName() and Description() == param->Description() and OriginalNetworkID() == param->OriginalNetworkID() and TransportStreamID() == param->TransportStreamID() and ServiceID() == param->ServiceID() and EventID() == param->EventID());
+    }
+
+  public:
+    SIEvent():
+      SI()
+    {
+    }
+
+    virtual ~SIEvent()
+    {
+    }
+
+    void EventName(std::string param)
+    {
+      _event_name = param;
+    }
+
+    void Description(std::string param)
+    {
+      _description = param;
+    }
+
+    void OriginalNetworkID(int param)
+    {
+      _original_network_id = param;
+    }
+
+    void TransportStreamID(int param)
+    {
+      _transport_stream_id = param;
+    }
+
+    void ServiceID(int param)
+    {
+      _service_id = param;
+    }
+
+    void EventID(int param)
+    {
+      _event_id = param;
+    }
+
+    std::string EventName()
+    {
+      return _event_name;
+    }
+
+    std::string Description()
+    {
+      return _description;
+    }
+
+    int OriginalNetworkID()
+    {
+      return _original_network_id;
+    }
+
+    int TransportStreamID()
+    {
+      return _transport_stream_id;
+    }
+
+    int ServiceID()
+    {
+      return _service_id;
+    }
+
+    int EventID()
+    {
+      return _event_id;
+    }
+
+    void Print()
+    {
+      printf("Event:: event name:[%s], original network id:[0x%04x], transport stream id:[0x%04x], service id:[0x%04x], event id:[0x%04x]\n",
+          _event_name.c_str(), _original_network_id, _transport_stream_id, _service_id, _event_id); 
+    }
+
+};
+
+class SIFacade {
+
+  private:
+    std::vector<std::shared_ptr<SIService>>
+      _services;
+    std::mutex
+      _services_mutex;
+    std::vector<std::shared_ptr<SINetwork>>
+      _networks;
+    std::mutex
+      _networks_mutex;
+    std::vector<std::shared_ptr<SIEvent>> 
+      _events;
+    std::mutex
+      _events_mutex;
+    SITime
+      _time;
+    std::mutex
+      _time_mutex;
+
+  private:
+    SIFacade()
+    {
+    }
+
+  public:
+    virtual ~SIFacade()
+    {
+    }
+
+    static SIFacade * GetInstance()
+    {
+      static SIFacade 
+        *instance = new SIFacade();
+
+      return instance;
+    }
+
+    void Service(std::shared_ptr<SIService> &param)
+    {
+      std::lock_guard<std::mutex> 
+        lock(_services_mutex);
+
+      for (auto service : _services) {
+        if (service->ServiceID() == param->ServiceID()) {
+          return;
+        }
+      }
+       
+      _services.push_back(param);
+    }
+
+    std::vector<std::shared_ptr<SIService>> & Services()
+    {
+      std::lock_guard<std::mutex> 
+        lock(_services_mutex);
+
+      return _services;
+    }
+
+    void Network(std::shared_ptr<SINetwork> &param)
+    {
+      std::lock_guard<std::mutex> 
+        lock(_networks_mutex);
+
+      for (auto network : _networks) {
+        if (network->TransportStreamName() == param->TransportStreamName()) {
+          return;
+        }
+      }
+
+      _networks.push_back(param);
+    }
+
+    std::vector<std::shared_ptr<SINetwork>> & Networks()
+    {
+      std::lock_guard<std::mutex> 
+        lock(_networks_mutex);
+
+      return _networks;
+    }
+    
+    void Event(std::shared_ptr<SIEvent> &param)
+    {
+      std::lock_guard<std::mutex> 
+        lock(_events_mutex);
+
+      for (auto event : _events) {
+        if (event->ServiceID() == param->ServiceID() and event->EventID() == param->EventID()) {
+          return;
+        }
+      }
+
+      _events.push_back(param);
+    }
+
+    std::vector<std::shared_ptr<SIEvent>> & Events()
+    {
+      std::lock_guard<std::mutex> 
+        lock(_events_mutex);
+
+      std::sort(_events.begin(), _events.end(), 
+          [](const std::shared_ptr<SIEvent> &a, const std::shared_ptr<SIEvent> &b) {
+            return (a->EventID() < b->EventID());
+          });
+
+      return _events;
+    }
+    
+    void Time(SITime &param)
+    {
+      std::lock_guard<std::mutex> 
+        lock(_time_mutex);
+
+      _time = param;
+    }
+
+    SITime & Time()
+    {
+      std::lock_guard<std::mutex> 
+        lock(_time_mutex);
+
+      return _time;
+    }
+    
+};
+
+class PSIParser : public jevent::DemuxListener {
 
 	private:
 		std::map<std::string, jmpeg::Demux *> _demuxes;
-		std::map<int, std::string> _stream_types;
+		std::map<int, ElementaryStream::stream_type_t> _stream_types;
 		std::set<int> _pids;
 		std::string _dsmcc_private_payload;
 		int _pcr_pid;
 		int _dsmcc_sequence_number;
-		int _dsmcc_data_pid;
+		int _dsmcc_message_pid;
 		int _dsmcc_descriptors_pid;
 
 	private:
@@ -172,44 +813,45 @@ class DemuxTest : public jevent::DemuxListener {
 		}
 
 	public:
-		DemuxTest()
+		PSIParser()
 		{
 			_pcr_pid = -1;
-			_dsmcc_data_pid = -1;
+			_dsmcc_message_pid = -1;
 			_dsmcc_descriptors_pid = -1;
 			_dsmcc_sequence_number = 0;
 
-			_stream_types[0] = "reserved";
-			_stream_types[1] = "video";
-			_stream_types[2] = "video";
-			_stream_types[3] = "audio";
-			_stream_types[4] = "audio";
-			_stream_types[5] = "private";
-			_stream_types[6] = "subtitle";
-			_stream_types[11] = "dsmcc-data";
-			_stream_types[12] = "dsmcc-descriptors";
-			_stream_types[15] = "audio";
-			_stream_types[16] = "video";
-			_stream_types[17] = "audio";
-			_stream_types[27] = "video";
-			_stream_types[36] = "video";
-			_stream_types[66] = "video";
-			_stream_types[128] = "audio";
-			_stream_types[129] = "audio";
-			_stream_types[130] = "audio";
-			_stream_types[131] = "audio";
-			_stream_types[132] = "audio";
-			_stream_types[133] = "audio";
-			_stream_types[134] = "audio";
-			_stream_types[135] = "audio";
-			_stream_types[144] = "subtitle";
-			_stream_types[209] = "video";
-			_stream_types[234] = "video";
+			_stream_types[0x00] = ElementaryStream::stream_type_t::RESERVED;
+			_stream_types[0x01] = ElementaryStream::stream_type_t::VIDEO;
+			_stream_types[0x02] = ElementaryStream::stream_type_t::VIDEO;
+			_stream_types[0x03] = ElementaryStream::stream_type_t::AUDIO;
+			_stream_types[0x04] = ElementaryStream::stream_type_t::AUDIO;
+			_stream_types[0x05] = ElementaryStream::stream_type_t::PRIVATE;
+			_stream_types[0x06] = ElementaryStream::stream_type_t::SUBTITLE;
+			_stream_types[0x0b] = ElementaryStream::stream_type_t::DSMCC_MESSAGE;
+			_stream_types[0x0c] = ElementaryStream::stream_type_t::DSMCC_DESCRIPTOR;
+			_stream_types[0x0d] = ElementaryStream::stream_type_t::DSMCC_SECTION;
+			_stream_types[0x0f] = ElementaryStream::stream_type_t::AUDIO;
+			_stream_types[0x10] = ElementaryStream::stream_type_t::VIDEO;
+			_stream_types[0x11] = ElementaryStream::stream_type_t::AUDIO;
+			_stream_types[0x1b] = ElementaryStream::stream_type_t::VIDEO;
+			_stream_types[0x24] = ElementaryStream::stream_type_t::VIDEO;
+			_stream_types[0x42] = ElementaryStream::stream_type_t::VIDEO;
+			_stream_types[0x80] = ElementaryStream::stream_type_t::AUDIO;
+			_stream_types[0x81] = ElementaryStream::stream_type_t::AUDIO;
+			_stream_types[0x82] = ElementaryStream::stream_type_t::AUDIO;
+			_stream_types[0x83] = ElementaryStream::stream_type_t::AUDIO;
+			_stream_types[0x84] = ElementaryStream::stream_type_t::AUDIO;
+			_stream_types[0x85] = ElementaryStream::stream_type_t::AUDIO;
+			_stream_types[0x86] = ElementaryStream::stream_type_t::AUDIO;
+			_stream_types[0x87] = ElementaryStream::stream_type_t::AUDIO;
+			_stream_types[0x90] = ElementaryStream::stream_type_t::SUBTITLE;
+			_stream_types[0xd1] = ElementaryStream::stream_type_t::VIDEO;
+			_stream_types[0xea] = ElementaryStream::stream_type_t::VIDEO;
 
 			StartDemux("pat", TS_PAT_PID, TS_PAT_TABLE_ID, TS_PAT_TIMEOUT);
 		}
 
-		virtual ~DemuxTest()
+		virtual ~PSIParser()
 		{
 			printf("\nList of PID's::\n");
 
@@ -394,7 +1036,7 @@ class DemuxTest : public jevent::DemuxListener {
 			}
 		}
 
-		virtual void DescriptorDump(const char *data, int length)
+    virtual void DescriptorDump(SI *si, const char *data, int length)
 		{
 			int descriptor_tag = TS_G8(data);
 			int descriptor_length = length-2; // TS_G8(data+1);
@@ -604,7 +1246,7 @@ class DemuxTest : public jevent::DemuxListener {
 
 					services_loop_count = services_loop_count + 3;
 				}
-			} else if (descriptor_tag == 0x48) { // service descriptor [ABNTNBR 15603-2 2007]
+			} else if (descriptor_tag == 0x48) { // service descriptor [ABNTNBR 15603-2 2009]
 				int service_type = TS_G8(ptr); // 0x01: HD, 0xXX: LD
 				int service_provider_name_length = TS_G8(ptr+1);
 				std::string service_provider_name(ptr+2, service_provider_name_length);
@@ -614,98 +1256,27 @@ class DemuxTest : public jevent::DemuxListener {
 				service_provider_name = Utils::ISO8859_1_TO_UTF8(service_provider_name);
 				service_name = Utils::ISO8859_1_TO_UTF8(service_name);
 
-        std::string service;
-
-        if (service_type == 0x00) {
-          service = "Reservado para uso futuro";
-        } else if (service_type == 0x01) {
-          service = "Serviço de televisão digital";
-        } else if (service_type == 0x02) {
-          service = "Serviço de áudio digital";
-        } else if (service_type == 0x03) {
-          service = "Serviço de teletexto";
-        } else if (service_type == 0x04) {
-          service = "Serviço de referência NVOD";
-        } else if (service_type == 0x05) {
-          service = "Serviço time-shifted NVOD";
-        } else if (service_type == 0x06) {
-          service = "Serviço de mosaico";
-        } else if (service_type >= 0x07 and service_type <= 0x09) {
-          service = "Reservado para uso futuro";
-        } else if (service_type == 0x0a) {
-          service = "Codificação avançada para serviço de rádio digital";
-        } else if (service_type == 0x0b) {
-          service = "Codificação avançada para serviço de mosaico";
+        SIService *param = dynamic_cast<SIService *>(si);
+        
+        if (service_type == 0x01) {
+          param->ServiceType(SIService::service_type_t::HD);
         } else if (service_type == 0x0c) {
-          service = "Serviço de transmissão de dados";
-        } else if (service_type == 0x0d) {
-          service = "Reservado para interface de uso comum (ver EN 50221)";
-        } else if (service_type == 0x0e) {
-          service = "RCS Map (ver EN 301 790)";
-        } else if (service_type == 0x0f) {
-          service = "RCS FLS (ver EN 301 790)";
-        } else if (service_type == 0x10) {
-          service = "Serviço DVB MHP";
-        } else if (service_type == 0x11) {
-          service = "Serviço de televisão digital MPEG-2 HD";
-        } else if (service_type >= 0x12 and service_type <= 0x15) {
-          service = "Reservado para uso futuro";
-        } else if (service_type == 0x16) {
-          service = "Codificação avançada de serviço de televisão digital SD";
-        } else if (service_type == 0x17) {
-          service = "Codificação avançada de serviço de NVOD SD time-shifted";
-        } else if (service_type == 0x18) {
-          service = "Codificação avançada de serviço de referência NVOD SD";
-        } else if (service_type == 0x19) {
-          service = "Codificação avançada de serviço de televisão digital HD";
-        } else if (service_type == 0x1a) {
-          service = "Codificação avançada de serviço de NVOD HD time-shifted";
-        } else if (service_type == 0x1b) {
-          service = "Codificação avançada de serviço de referência NVOD HD";
-        } else if (service_type >= 0x1c and service_type < 0x7f) {
-          service = "Reservado para uso futuro";
-        } else if (service_type >= 0x80 and service_type <= 0xa0) {
-          service = "Definido pelo provedor de serviço";
-        } else if (service_type == 0xa1) {
-          service = "Serviço especial de vídeo";
-        } else if (service_type == 0xa2) {
-          service = "Serviço especial de áudio";
-        } else if (service_type == 0xa3) {
-          service = "Serviço especial de dados";
-        } else if (service_type == 0xa4) {
-          service = "Serviço de engenharia";
-        } else if (service_type == 0xa5) {
-          service = "Serviço promocional de vídeo";
-        } else if (service_type == 0xa6) {
-          service = "Serviço promocional de áudio";
-        } else if (service_type == 0xa7) {
-          service = "Serviço promocional de dados";
-        } else if (service_type == 0xa8) {
-          service = "Serviço de dados para armazenamento antecipado";
-        } else if (service_type == 0xa9) {
-          service = "Serviço de dados exclusivo para armazenamento";
-        } else if (service_type == 0xaa) {
-          service = "Lista de serviços de bookmark";
-        } else if (service_type == 0xab) {
-          service = "Serviço simultâneo do tipo servidor";
-        } else if (service_type == 0xac) {
-          service = "Serviço independente de arquivos";
-        } else if (service_type >= 0xad and service_type <= 0xbf) {
-          service = "Não definido (área definida pela organização de regulamentação)";
-        } else if (service_type == 0xc0) {
-          service = "Serviço de dados";
-        } else if (service_type >= 0xc1 and service_type <= 0xff) {
-          service = "Não definido";
+          param->ServiceType(SIService::service_type_t::LD);
+        } else {
+          param->ServiceType(SIService::service_type_t::SD);
         }
 
-				printf(":: service type:[0x%02x/%s], service provider name:[%s], service name:[%s]\n", service_type, service.c_str(), service_provider_name.c_str(), service_name.c_str());
+        param->ServiceProvider(service_provider_name);
+        param->ServiceName(service_name);
+
+				printf(":: service type:[0x%02x/%s], service provider name:[%s], service name:[%s]\n", service_type, GetServiceDescription(service_type).c_str(), service_provider_name.c_str(), service_name.c_str());
 			} else if (descriptor_tag == 0x49) { // country availability descriptor
 				int country_availability_flag = TS_G8(ptr);
 				std::string country(ptr+1, 3);
 				
 				printf(":: country availability flag:[%d], country:[%s]\n", country_availability_flag, country.c_str());
-			} else if (descriptor_tag == 0x4d) { // short event descriptor
-				std::string language = std::string(ptr, 3);
+      } else if (descriptor_tag == 0x4d) { // short event descriptor
+        std::string language = std::string(ptr, 3);
 
         ptr = ptr + 3;
 
@@ -716,6 +1287,11 @@ class DemuxTest : public jevent::DemuxListener {
 
 				int text_length = TS_G8(ptr);
 				std::string text(ptr+1, text_length);
+
+        SIEvent *param = dynamic_cast<SIEvent *>(si);
+
+        param->EventName(event_name);
+        param->Description(text);
 
 				printf(":: language:[%s], event name:[%s], text:[%s]\n", language.c_str(), event_name.c_str(), text.c_str());
 			} else if (descriptor_tag == 0x4e) { // extended event descriptor
@@ -751,7 +1327,7 @@ class DemuxTest : public jevent::DemuxListener {
 				int component_tag = TS_G8(ptr+2);
 				std::string language(ptr+3, 3);
 
-				printf(":: stream content:[0x%02x], component type:[0x%02x], component tag:[0x%02x], language:[%s]\n", stream_content, component_type, component_tag, language.c_str());
+				printf(":: stream content:[0x%02x], component type:[0x%02x]:[%s], component tag:[0x%02x], language:[%s]\n", stream_content, component_type, GetComponentDescription(stream_content, component_type).c_str(), component_tag, language.c_str());
 
 				ptr = ptr + 6;
 
@@ -947,6 +1523,31 @@ class DemuxTest : public jevent::DemuxListener {
 				}
 
 				printf(":: country:[%s], age:[%d]::[%s], content:[%02x]::[%s]\n", country.c_str(), rate_age, age.c_str(), rate_content,  content.c_str());
+			} else if (descriptor_tag == 0x58) { // local time offset descriptor
+				std::string country = std::string(ptr, 3);
+				int country_region_id = TS_GM8(ptr+3, 0, 6);
+        int local_time_offset_polarity = TS_GM8(ptr+3, 7, 1);
+        int local_time_offset = TS_G16(ptr+4);
+        // uint64_t time_of_change = TS_GM64(ptr+6, 0, 40);
+        int next_time_offset = TS_G16(ptr+11);
+
+        // UTC-3
+        int julian_date = TS_G16(ptr+6);
+
+        int Y, M, D, WD, h, m, s;
+
+        Utils::ParseJulianDate(julian_date, Y, M, D, WD);
+
+        h = DHEX2DEC(ptr[8]);
+        m = DHEX2DEC(ptr[9]);
+        s = DHEX2DEC(ptr[10]);
+
+        SITime *param = dynamic_cast<SITime *>(si);
+        
+        param->Country(country);
+
+				printf(":: country:[%s], country id:[%d], local time offset polarity:[%d], local time offset:[%d], time of change:[%02d%02d%02d-%02d%02d%02d], next time offset:[%04x]\n", country.c_str(), country_region_id, local_time_offset_polarity, local_time_offset, Y, M, D, h, m, s, next_time_offset);
+				// printf(":: country:[%s], country id:[%d], local time offset polarity:[%d], local time offset:[%d], time of change:[%lu], next time offset:[0x%04x]\n", country.c_str(), country_region_id, local_time_offset_polarity, local_time_offset, time_of_change, next_time_offset);
 			} else if (descriptor_tag == 0x7c) { // aac descriptor
 				const char *end = ptr + descriptor_length;
 
@@ -1186,6 +1787,10 @@ class DemuxTest : public jevent::DemuxListener {
 				int transmission_type_count = TS_GM8(ptr+1, 6, 2);
 				std::string ts_name(ptr+2, ts_name_length);
 
+        SINetwork *param = dynamic_cast<SINetwork *>(si);
+
+        param->TransportStreamName(ts_name);
+
 				printf(":: remote control key identification:[0x%02x], ts name:[%s]\n", remote_control_key_identification, ts_name.c_str());
 
 				ptr = ptr + 2 + ts_name_length;
@@ -1410,10 +2015,10 @@ class DemuxTest : public jevent::DemuxListener {
 			} else {
 				if (pid == _pcr_pid) {
 					ProcessPCR(event);
-				} else if (pid == _dsmcc_data_pid) {
-					ProcessDSMCCData(event);
+				} else if (pid == _dsmcc_message_pid) {
+					ProcessDSMCC(event);
 				} else if (pid == _dsmcc_descriptors_pid) {
-					ProcessDSMCCDescriptors(event);
+					ProcessDSMCC(event);
 				} 
 			}
 
@@ -1434,6 +2039,7 @@ class DemuxTest : public jevent::DemuxListener {
 			StartDemux("tsdt", TS_TSDT_PID, TS_TSDT_TABLE_ID, TS_TSDT_TIMEOUT);
 			StartDemux("sdt", TS_SDT_PID, TS_SDT_TABLE_ID, TS_SDT_TIMEOUT);
 			StartDemux("tdt", TS_TDT_PID, TS_TDT_TABLE_ID, TS_TDT_TIMEOUT);
+			StartDemux("tot", TS_TOT_PID, TS_TOT_TABLE_ID, TS_TDT_TIMEOUT);
 			StartDemux("rst", TS_RST_PID, TS_RST_TABLE_ID, TS_RST_TIMEOUT);
 			StartDemux("eit", TS_EIT_PID, -1, TS_EIT_TIMEOUT);
 			// StartDemux("eit-now&next", -1, 0x4e, TS_EIT_TIMEOUT);
@@ -1443,9 +2049,30 @@ class DemuxTest : public jevent::DemuxListener {
 
 			ptr = ptr + 8;
 
+      std::vector<std::shared_ptr<SIService>> &services = SIFacade::GetInstance()->Services();
+
 			for (int i=0; i<count; i++) {
 				int program_number = TS_G16(ptr);
 				int map_pid = TS_GM16(ptr+2, 3, 13);
+
+        std::shared_ptr<SIService> param;
+
+        for (auto service : services) {
+          if (service->ServiceID() == program_number) {
+            param = service;
+
+            break;
+          }
+        }
+
+        if (param == nullptr and program_number > 0x00) {
+          std::shared_ptr<SIService> param = std::make_shared<SIService>();
+
+          param->ServiceID(program_number);
+          param->ProgramID(map_pid);
+
+          SIFacade::GetInstance()->Service(param);
+        }
 
 				printf("PAT:: program number:[0x%04x], map pid:[0x%04x]\n", program_number, map_pid);
 
@@ -1481,7 +2108,7 @@ class DemuxTest : public jevent::DemuxListener {
 				// int descriptor_tag = TS_G8(ptr);
 				int descriptor_length = TS_G8(ptr+1);
 
-				DescriptorDump(ptr, descriptor_length+2);
+				DescriptorDump(nullptr, ptr, descriptor_length+2);
 
 				ptr = ptr + descriptor_length + 2;
 
@@ -1505,7 +2132,7 @@ class DemuxTest : public jevent::DemuxListener {
 				// int descriptor_tag = TS_G8(ptr);
 				int descriptor_length = TS_G8(ptr+1);
 
-				DescriptorDump(ptr, descriptor_length+2);
+				DescriptorDump(nullptr, ptr, descriptor_length+2);
 
 				ptr = ptr + descriptor_length + 2;
 
@@ -1534,7 +2161,7 @@ class DemuxTest : public jevent::DemuxListener {
 				// int descriptor_tag = TS_G8(ptr);
 				int descriptor_length = TS_G8(ptr+1);
 
-				DescriptorDump(ptr, descriptor_length+2);
+				DescriptorDump(nullptr, ptr, descriptor_length+2);
 
 				ptr = ptr + descriptor_length + 2;
 
@@ -1554,23 +2181,21 @@ class DemuxTest : public jevent::DemuxListener {
 
 				printf("PMT:: elementary stream:[0x%04x], type:[0x%02x]::[%s]\n", elementary_pid, stream_type, GetStreamTypeDescription(stream_type).c_str());
 
-				if (_stream_types[stream_type] == "video") {
+				if (_stream_types[stream_type] == ElementaryStream::stream_type_t::VIDEO) {
 					if (vpid < 0) {
 						vpid = elementary_pid;
 					}
-				} else if (_stream_types[stream_type] == "private") {
+				} else if (_stream_types[stream_type] == ElementaryStream::stream_type_t::PRIVATE) {
 					// INFO:: ProcessPrivate(tid:[0x74]::[Application Information Table])
 					StartDemux("private", elementary_pid, TS_AIT_TABLE_ID, TS_PRIVATE_TIMEOUT);
-				} else if (_stream_types[stream_type] == "dsmcc-data") {
-					_dsmcc_data_pid = elementary_pid;
-
-					// INFO:: ProcessDSMCCData()
-					StartDemux("dsmcc-data", elementary_pid, -1, TS_PRIVATE_TIMEOUT);
-				} else if (_stream_types[stream_type] == "dsmcc-descriptors") {
+				} else if (_stream_types[stream_type] == ElementaryStream::stream_type_t::DSMCC_MESSAGE) {
+					_dsmcc_message_pid = elementary_pid;
+					
+          StartDemux("dsmcc-data", elementary_pid, -1, TS_PRIVATE_TIMEOUT);
+				} else if (_stream_types[stream_type] == ElementaryStream::stream_type_t::DSMCC_DESCRIPTOR) {
 					_dsmcc_descriptors_pid = elementary_pid;
-
-					// INFO:: ProcessDSMCCDescriptors()
-					StartDemux("dsmcc-descriptors", elementary_pid, -1, TS_PRIVATE_TIMEOUT);
+					
+          StartDemux("dsmcc-descriptors", elementary_pid, -1, TS_PRIVATE_TIMEOUT);
 				}
 
 				ptr = ptr + 5;
@@ -1582,7 +2207,7 @@ class DemuxTest : public jevent::DemuxListener {
 					// int descriptor_tag = TS_G8(ptr);
 					int descriptor_length = TS_G8(ptr+1);
 
-					DescriptorDump(ptr, descriptor_length+2);
+					DescriptorDump(nullptr, ptr, descriptor_length+2);
 
 					ptr = ptr + descriptor_length + 2;
 
@@ -1617,7 +2242,7 @@ class DemuxTest : public jevent::DemuxListener {
 				// int descriptor_tag = TS_G8(ptr);
 				int descriptor_length = TS_G8(ptr+1);
 
-				DescriptorDump(ptr, descriptor_length+2);
+				DescriptorDump(nullptr, ptr, descriptor_length+2);
 
 				ptr = ptr + descriptor_length + 2;
 
@@ -1642,16 +2267,24 @@ class DemuxTest : public jevent::DemuxListener {
 
 				ptr = ptr + 6;
 
+        std::shared_ptr<SINetwork> param = std::make_shared<SINetwork>();
+
+        param->NetworkID(network_id);
+        param->OriginalNetworkID(original_network_id);
+        param->TransportStreamID(transport_stream_id);
+
 				while (descriptors_count < descriptors_length) {
 					// int descriptor_tag = TS_G8(ptr);
 					int descriptor_length = TS_G8(ptr+1);
 
-					DescriptorDump(ptr, descriptor_length+2);
+					DescriptorDump(param.get(), ptr, descriptor_length+2);
 
 					ptr = ptr + descriptor_length + 2;
 
 					descriptors_count = descriptors_count + descriptor_length + 2;	
 				}
+
+        SIFacade::GetInstance()->Network(param);
 
 				transport_stream_loop_count = transport_stream_loop_count + 6 + descriptors_length;
 			}
@@ -1687,16 +2320,34 @@ class DemuxTest : public jevent::DemuxListener {
 
 				ptr = ptr + 5;
 
+        std::vector<std::shared_ptr<SIService>> &services = SIFacade::GetInstance()->Services();
+        std::shared_ptr<SIService> param;
+
+        for (auto service : services) {
+          if (service->ServiceID() == service_id) {
+            param = service;
+
+            param->OriginalNetworkID(original_network_id);
+            param->TransportStreamID(transport_stream_id);
+
+            break;
+          }
+        }
+
 				while (descriptors_count < descriptors_length) {
 					// int descriptor_tag = TS_G8(ptr);
 					int descriptor_length = TS_G8(ptr+1);
 
-					DescriptorDump(ptr, descriptor_length+2);
+					DescriptorDump(param.get(), ptr, descriptor_length+2);
 
 					ptr = ptr + descriptor_length + 2;
 
 					descriptors_count = descriptors_count + descriptor_length + 2;	
 				}
+
+        if (param != nullptr) {
+          SIFacade::GetInstance()->Service(param);
+        }
 
 				services_count = services_count + 6 + descriptors_length;
 			}
@@ -1720,7 +2371,7 @@ class DemuxTest : public jevent::DemuxListener {
         // int descriptor_tag = TS_G8(ptr);
         int descriptor_length = TS_G8(ptr+1);
 
-        DescriptorDump(ptr, descriptor_length+2);
+        DescriptorDump(nullptr, ptr, descriptor_length+2);
 
         ptr = ptr + descriptor_length + 2;
 
@@ -1745,7 +2396,7 @@ class DemuxTest : public jevent::DemuxListener {
 					// int descriptor_tag = TS_G8(ptr);
 					int descriptor_length = TS_G8(ptr+1);
 
-					DescriptorDump(ptr, descriptor_length+2);
+					DescriptorDump(nullptr, ptr, descriptor_length+2);
 
 					ptr = ptr + descriptor_length + 2;
 
@@ -1760,36 +2411,98 @@ class DemuxTest : public jevent::DemuxListener {
 		{
 			const char *ptr = event->GetData();
 
-			uint16_t mjd = TS_G16(ptr+3);
-			uint32_t utc = TS_GM32(ptr+5, 0, 24);
+      int julian_date = TS_G16(ptr+3);
 
-			printf("TDT:: data :[0x%02x], utc:[%03x]\n", mjd, utc);
+      int Y, M, D, WD, h, m, s;
+
+      Utils::ParseJulianDate(julian_date, Y, M, D, WD);
+
+      h = DHEX2DEC(ptr[5]);
+      m = DHEX2DEC(ptr[6]);
+      s = DHEX2DEC(ptr[7]);
+
+      std::string day = "Seg";
+
+      if (WD == 1) {
+        day = "Seg";
+      } else if (WD == 2) {
+        day = "Ter";
+      } else if (WD == 3) {
+        day = "Qua";
+      } else if (WD == 4) {
+        day = "Qui";
+      } else if (WD == 5) {
+        day = "Sex";
+      } else if (WD == 6) {
+        day = "Sab";
+      } else if (WD == 7) {
+        day = "Dom";
+      }
+
+      printf("TDT:: utc:[%02d%02d%02d-%02d%02d%02d]\n", Y, M, D, h, m, s);
 		}
 
 		virtual void ProcessTOT(jevent::DemuxEvent *event)
 		{
 			const char *ptr = event->GetData();
 
-			uint16_t mjd = TS_G16(ptr+3);
-			uint32_t utc = TS_GM32(ptr+5, 0, 24);
+      int julian_date = TS_G16(ptr+3);
 
-			printf("TOT:: data :[0x%02x], utc:[%03x]\n", mjd, utc);
+      int Y, M, D, WD, h, m, s;
+
+      Utils::ParseJulianDate(julian_date, Y, M, D, WD);
+
+      h = DHEX2DEC(ptr[5]);
+      m = DHEX2DEC(ptr[6]);
+      s = DHEX2DEC(ptr[7]);
+
+      SITime::week_day_t week_day = SITime::week_day_t::MONDAY;
+
+      if (WD == 1) {
+        week_day = SITime::week_day_t::MONDAY;
+      } else if (WD == 2) {
+        week_day = SITime::week_day_t::TUESDAY;
+      } else if (WD == 3) {
+        week_day = SITime::week_day_t::WEDNESDAY;
+      } else if (WD == 4) {
+        week_day = SITime::week_day_t::THRUSDAY;
+      } else if (WD == 5) {
+        week_day = SITime::week_day_t::FRIDAY;
+      } else if (WD == 6) {
+        week_day = SITime::week_day_t::SATURDAY;
+      } else if (WD == 7) {
+        week_day = SITime::week_day_t::SUNDAY;
+      }
+
+      SITime param;
+
+      param.Year(Y);
+      param.Month(M);
+      param.Day(D);
+      param.Hour(h);
+      param.Minute(m);
+      param.Second(s);
+      param.WeekDay(week_day);
+
+      printf("TOT:: utc:[%02d%02d%02d-%02d%02d%02d]\n", Y, M, D, h, m, s);
 				
-      int descriptors_length = TS_GM16(ptr+9, 4, 12);
+      int descriptors_length = TS_GM16(ptr+8, 4, 12);
       int descriptors_count = 0;
 
-      ptr = ptr + 11;
+      ptr = ptr + 10;
 
       while (descriptors_count < descriptors_length) {
         // int descriptor_tag = TS_G8(ptr);
         int descriptor_length = TS_G8(ptr+1);
 
-        DescriptorDump(ptr, descriptor_length+2);
+        DescriptorDump(&param, ptr, descriptor_length+2);
 
         ptr = ptr + descriptor_length + 2;
 
         descriptors_count = descriptors_count + descriptor_length + 2;	
       }
+      
+      SIFacade::GetInstance()->Time(param);
     }
 
 		virtual void ProcessRST(jevent::DemuxEvent *event)
@@ -1900,23 +2613,41 @@ class DemuxTest : public jevent::DemuxListener {
 				int running_status = TS_GM8(ptr+10, 0, 3);
 				// int free_ca_mode = TS_GM8(ptr+10, 3, 1);
 
-				printf("EIT:: transport stream id:[%04x], original network id:[%04x], service id:[0x%04x], event id:[0x%04x], date:[%s], running status:[0x%02x]\n", transport_stream_id, original_network_id, service_id,  event_id, tmp, running_status);
+				printf("EIT:: transport stream id:[%04x], original network id:[%04x], service id:[0x%04x], event id:[0x%04x], date:[%s], running status:[0x%02x]\n", transport_stream_id, original_network_id, service_id, event_id, tmp, running_status);
 
 				int descriptors_length = TS_GM16(ptr+10, 4, 12);
 				int descriptors_count = 0;
 
 				ptr = ptr + 12;
 
+        std::shared_ptr<SIEvent> param = std::make_shared<SIEvent>();
+
+        param->OriginalNetworkID(original_network_id);
+        param->TransportStreamID(transport_stream_id);
+        param->ServiceID(service_id);
+        param->EventID(event_id);
+
 				while (descriptors_count < descriptors_length) {
 					// int descriptor_tag = TS_G8(ptr);
 					int descriptor_length = TS_G8(ptr+1);
 
-					DescriptorDump(ptr, descriptor_length+2);
+					descriptors_count = descriptors_count + descriptor_length + 2;	
+        
+          // INFO:: invalidate and abort the read process if the sizes not maths
+          if (descriptors_count > descriptors_length) {
+            printf("EIT:: <abort parser>:[descriptors_count > descriptors_length]\n");
+
+						DumpBytes("Invalid bytes", ptr, descriptors_length - (descriptors_count - descriptor_length - 2));
+
+            return;
+          }
+
+					DescriptorDump(param.get(), ptr, descriptor_length+2);
 
 					ptr = ptr + descriptor_length + 2;
-
-					descriptors_count = descriptors_count + descriptor_length + 2;	
 				}
+
+        SIFacade::GetInstance()->Event(param);
 
 				events_count = events_count + 12 + descriptors_length;
 			}
@@ -2038,151 +2769,183 @@ class DemuxTest : public jevent::DemuxListener {
 			printf("PCR:: base:[%lu], extension:[%lu]\n", program_clock_reference_base, program_clock_reference_extension);
 		}
 
-		virtual void ProcessDSMCCData(jevent::DemuxEvent *event)
+		virtual void ProcessDSMCC(jevent::DemuxEvent *event)
+    {
+			// INFO:: ISO IEC 13818-6 - MPEG2 DSMCC - Digital Storage Media Command & Control.pdf
+			const char *ptr = event->GetData();
+
+			int section_length = TS_GM16(ptr+1, 4, 12);
+      std::string type;
+
+			if (event->GetTID() == 0x3a) {
+			  type = "MPE reserved";
+      } else if (event->GetTID() == 0x3b) {
+			  type = "DII message";
+      } else if (event->GetTID() == 0x3c) {
+			  type = "DDB message";
+      } else if (event->GetTID() == 0x3d) {
+			  type = "Stream descriptor";
+      } else if (event->GetTID() == 0x3e) {
+			  type = "Private data";
+      } else if (event->GetTID() == 0x3f) {
+			  type = "reserved";
+      }
+
+			printf("DSMCC:: table id:[0x%02x], type:[%s], section length:[0x%04x]\n", event->GetTID(), type.c_str(), section_length);
+
+			if (event->GetTID() == 0x3a) {
+      } else if (event->GetTID() == 0x3b) {
+      } else if (event->GetTID() == 0x3c) {
+        ProcessDSMCCMessage(event);
+      } else if (event->GetTID() == 0x3d) {
+		    ProcessDSMCCDescriptors(event);
+      } else if (event->GetTID() == 0x3e) {
+      } else if (event->GetTID() == 0x3f) {
+      }
+    }
+
+		virtual void ProcessDSMCCMessage(jevent::DemuxEvent *event)
 		{
 			const char *ptr = event->GetData();
 
-			// INFO:: ISO IEC 13818-6 - MPEG2 DSMCC - Digital Storage Media Command & Control.pdf
-			if (event->GetTID() == 0x3c) {
-				ptr = ptr + 8;
+      ptr = ptr + 8;
 
-				int protocol_discriminator = TS_G8(ptr);
-				int dsmcc_type = TS_G8(ptr + 1);
-				int message_id = TS_G16(ptr + 2);
-				int download_id = TS_G32(ptr + 4);
-				int reserved = TS_G8(ptr + 8);
-				int adaptation_length = TS_G8(ptr + 9);
-				int message_length = TS_G16(ptr + 10);
+      int protocol_discriminator = TS_G8(ptr);
+      int dsmcc_type = TS_G8(ptr + 1);
+      int message_id = TS_G16(ptr + 2);
+      int download_id = TS_G32(ptr + 4);
+      int reserved = TS_G8(ptr + 8);
+      int adaptation_length = TS_G8(ptr + 9);
+      int message_length = TS_G16(ptr + 10);
 
-				if (protocol_discriminator != 0x11 || // MPEG-2 DSM -CC message
-						dsmcc_type != 0x03 || // Download message
-						reserved != 0xff ||
-						message_id != 0x1003) { // DownloadDataBlock
-					return;
-				}
+      if (protocol_discriminator != 0x11 || // MPEG-2 DSM -CC message
+          dsmcc_type != 0x03 || // Download message
+          reserved != 0xff ||
+          message_id != 0x1003) { // DownloadDataBlock
+        return;
+      }
 
-				ptr = ptr + 12 + adaptation_length;
+      ptr = ptr + 12 + adaptation_length;
 
-				int module_id = TS_G16(ptr);
-				// int module_version = TS_G8(ptr+2);
-				// int reserved = TS_G8(ptr+3);
-				int block_number = TS_G16(ptr+4);
+      int module_id = TS_G16(ptr);
+      // int module_version = TS_G8(ptr+2);
+      // int reserved = TS_G8(ptr+3);
+      int block_number = TS_G16(ptr+4);
 
-				int magic = TS_G32(ptr+6);
+      std::string magic = std::string(ptr+6, 4);
 
-				if (magic != 0x42494F50) {
-					return;
-				}
+      if (magic != "BIOP") {
+        return;
+      }
 
-				ptr = ptr + 6;
+      ptr = ptr + 6;
 
-				int biop_version_major = TS_G8(ptr+4);
-				int biop_version_minor = TS_G8(ptr+5);
-				int byte_order = TS_G8(ptr+6);
-				int message_type = TS_G8(ptr+7);
-				// int message_size = TS_G32(ptr+8);
-				int objectKey_length = TS_G8(ptr+12); 
-				// int objectKind_length = TS_G32(ptr+13+objectKey_length);
-				int objectKind = TS_G32(ptr+17+objectKey_length);
+      int biop_version_major = TS_G8(ptr+4);
+      int biop_version_minor = TS_G8(ptr+5);
+      int byte_order = TS_G8(ptr+6);
+      int message_type = TS_G8(ptr+7);
+      // int message_size = TS_G32(ptr+8);
+      int objectKey_length = TS_G8(ptr+12); 
+      // int objectKind_length = TS_G32(ptr+13+objectKey_length);
+      int objectKind = TS_G32(ptr+17+objectKey_length);
 
-				if (biop_version_major != 0x01 || 
-						biop_version_minor != 0x00 || 
-						byte_order != 0x00 || 
-						message_type != 0x00) { // 0x00: Indicates that the message is being sent from the User to the Network to begin a scenario
-					return;
-				}
+      if (biop_version_major != 0x01 || 
+          biop_version_minor != 0x00 || 
+          byte_order != 0x00 || 
+          message_type != 0x00) { // 0x00: Indicates that the message is being sent from the User to the Network to begin a scenario
+        return;
+      }
 
-				printf("DSMCC Data:: biop:[%s], dsmcc type:[%d], message id:[%04x], module id:[%04x], block number:[%04x], download id:[%08x], message length:[%d]\n", ptr+17+objectKey_length, dsmcc_type, message_id, module_id, block_number, download_id, message_length);
+      printf(":: biop:[%s], dsmcc type:[%d], message id:[%04x], module id:[%04x], block number:[%04x], download id:[%08x], message length:[%d]\n", ptr+17+objectKey_length, dsmcc_type, message_id, module_id, block_number, download_id, message_length);
 
-				ptr = ptr + 21 + objectKey_length;
+      ptr = ptr + 21 + objectKey_length;
 
-				// "ste" (Stream Event messages)
-				if (objectKind == 0x66696c00) { // 'f', 'i', 'l', '\0'
-				} else if (objectKind == 0x73747200) { // 's', 't', 'r', '\0'
-				} else if (objectKind == 0x73746500) { // 's', 't', 'e', '\0'
-					int objectInfo_length = TS_G16(ptr); 
-					int aDescription_length = TS_G8(ptr+2); 
-					// int duration_aSeconds = TS_G32(ptr+3+aDescription_length); 
-					// int duration_aMicroseconds = TS_G32(ptr+3+aDescription_length+4); 
-					// int audio = TS_G8(ptr+3+aDescription_length+8); 
-					// int video = TS_G8(ptr+3+aDescription_length+9); 
-					// int data = TS_G8(ptr+3+aDescription_length+10); 
+      // "ste" (Stream Event messages)
+      if (objectKind == 0x66696c00) { // 'f', 'i', 'l', '\0'
+      } else if (objectKind == 0x73747200) { // 's', 't', 'r', '\0'
+      } else if (objectKind == 0x73746500) { // 's', 't', 'e', '\0'
+        int objectInfo_length = TS_G16(ptr); 
+        int aDescription_length = TS_G8(ptr+2); 
+        // int duration_aSeconds = TS_G32(ptr+3+aDescription_length); 
+        // int duration_aMicroseconds = TS_G32(ptr+3+aDescription_length+4); 
+        // int audio = TS_G8(ptr+3+aDescription_length+8); 
+        // int video = TS_G8(ptr+3+aDescription_length+9); 
+        // int data = TS_G8(ptr+3+aDescription_length+10); 
 
-					// DSM::Event::EventList_T
-					ptr = ptr + 3 + aDescription_length + 11;
+        // DSM::Event::EventList_T
+        ptr = ptr + 3 + aDescription_length + 11;
 
-					int eventNames_count = TS_G16(ptr);
-					int count = 0;
+        int eventNames_count = TS_G16(ptr);
+        int count = 0;
 
-					ptr = ptr + 2;
+        ptr = ptr + 2;
 
-					for (int i=0; i<eventNames_count; i++) {
-						int eventName_length = TS_G8(ptr);
-						std::string name(ptr+1, eventName_length);
+        for (int i=0; i<eventNames_count; i++) {
+          int eventName_length = TS_G8(ptr);
+          std::string name(ptr+1, eventName_length);
 
-						printf(":: event name:[%s]\n", name.c_str());
+          printf(":: event name:[%s]\n", name.c_str());
 
-						count = count + eventName_length;
+          count = count + eventName_length;
 
-						ptr = ptr + eventName_length + 1;
-					}
+          ptr = ptr + eventName_length + 1;
+        }
 
-					int objectInfo_byte_length = objectInfo_length-(aDescription_length+10)-(2+eventNames_count+count)-2;
+        int objectInfo_byte_length = objectInfo_length-(aDescription_length+10)-(2+eventNames_count+count)-2;
 
-					ptr = ptr + objectInfo_byte_length;
+        ptr = ptr + objectInfo_byte_length;
 
-					int serviceContextList_count = TS_G8(ptr);
+        int serviceContextList_count = TS_G8(ptr);
 
-					if (serviceContextList_count != 0x00) {
-						return;
-					}
+        if (serviceContextList_count != 0x00) {
+          return;
+        }
 
-					ptr = ptr + 1; // + eventNames_count;
+        ptr = ptr + 1; // + eventNames_count;
 
-					// int messageBody_length = TS_G32(ptr);
-					int taps_count = TS_G8(ptr+4);
+        // int messageBody_length = TS_G32(ptr);
+        int taps_count = TS_G8(ptr+4);
 
-					ptr = ptr + 4 + 1;
+        ptr = ptr + 4 + 1;
 
-					for (int i=0; i<taps_count; i++) {
-						int id = TS_G16(ptr);
-						int use = TS_G16(ptr+2);
-						std::string use_str;
-						int association_tag = TS_G16(ptr+4);
-						// int selector_length = TS_G8(ptr+6);
+        for (int i=0; i<taps_count; i++) {
+          int id = TS_G16(ptr);
+          int use = TS_G16(ptr+2);
+          std::string use_str;
+          int association_tag = TS_G16(ptr+4);
+          // int selector_length = TS_G8(ptr+6);
 
-						if (use == 0x0b) {
-							use_str = "STREAM_NPT_USE";
-						} else if (use == 0x0c) {
-							use_str = "STREAM_STATUS_AND_EVENT_USE";
-						} else if (use == 0x0d) {
-							use_str = "STREAM_EVENT_USE";
-						} else if (use == 0x0e) {
-							use_str = "STREAM_STATUS_USE";
-						} else if (use == 0x18) {
-							use_str = "BIOP_ES_USE";
-						} else if (use == 0x19) {
-							use_str = "BIOP_PROGRAM_USE";
-						}
+          if (use == 0x0b) {
+            use_str = "STREAM_NPT_USE";
+          } else if (use == 0x0c) {
+            use_str = "STREAM_STATUS_AND_EVENT_USE";
+          } else if (use == 0x0d) {
+            use_str = "STREAM_EVENT_USE";
+          } else if (use == 0x0e) {
+            use_str = "STREAM_STATUS_USE";
+          } else if (use == 0x18) {
+            use_str = "BIOP_ES_USE";
+          } else if (use == 0x19) {
+            use_str = "BIOP_PROGRAM_USE";
+          }
 
-						printf(":: id:[%04x], use:[%s], association tag:[%04x]\n", id, use_str.c_str(), association_tag);
+          printf(":: id:[%04x], use:[%s], association tag:[%04x]\n", id, use_str.c_str(), association_tag);
 
-						ptr = ptr + 7;
-					}
+          ptr = ptr + 7;
+        }
 
-					int eventIds_count = eventNames_count; // TS_G8(ptr);
+        int eventIds_count = eventNames_count; // TS_G8(ptr);
 
-					ptr = ptr + 1;
+        ptr = ptr + 1;
 
-					for (int i=0; i<eventIds_count; i++) {
-						int event_id = TS_G16(ptr);
+        for (int i=0; i<eventIds_count; i++) {
+          int event_id = TS_G16(ptr);
 
-						printf(":: event id:[%04x]\n", event_id);
+          printf(":: event id:[%04x]\n", event_id);
 
-						ptr = ptr + 2;
-					}
-				}
-			}
+          ptr = ptr + 2;
+        }
+      }
 		}
 
 		virtual void ProcessDSMCCDescriptors(jevent::DemuxEvent *event)
@@ -2191,79 +2954,75 @@ class DemuxTest : public jevent::DemuxListener {
 
 			int section_length = TS_GM16(ptr+1, 4, 12);
 
-			printf("DSMCC Descriptors:: section length:[0x%04x]\n", section_length);
+      int descriptors_length = section_length-3;
+      int descriptors_count = 0;
 
-			if (event->GetTID() == 0x3d) {
-				int descriptors_length = section_length-3;
-				int descriptors_count = 0;
+      ptr = ptr + 8;
 
-				ptr = ptr + 8;
+      // INFO:: ISO IEC 13818-6 - MPEG2 DSMCC - Digital Storage Media Command & Control.pdf; pg.326
+      while (descriptors_count < descriptors_length) {
+        int descriptor_tag = TS_G8(ptr);
+        int descriptor_length = TS_G8(ptr+1);
 
-				// INFO:: ISO IEC 13818-6 - MPEG2 DSMCC - Digital Storage Media Command & Control.pdf; pg.326
-				while (descriptors_count < descriptors_length) {
-					int descriptor_tag = TS_G8(ptr);
-					int descriptor_length = TS_G8(ptr+1);
+        if (descriptor_tag == 0x01) { // npt reference descriptor
+          // int post_discontinuity_indicator = TS_GM8(ptr+2, 0, 1);
+          int content_id = TS_GM8(ptr+2, 1, 7);
+          uint64_t STC_reference = (uint64_t)TS_GM8(ptr+3, 7, 1) << 32 | TS_G32(ptr+4);
+          uint64_t NPT_reference = (uint64_t)TS_GM8(ptr+11, 7, 1) << 32 | TS_G32(ptr+12);
+          int scale_numerator = TS_G16(ptr+16);
+          int scale_denominator = TS_G16(ptr+18);
 
-					if (descriptor_tag == 0x01) { // npt reference descriptor
-						// int post_discontinuity_indicator = TS_GM8(ptr+2, 0, 1);
-						int content_id = TS_GM8(ptr+2, 1, 7);
-						uint64_t STC_reference = (uint64_t)TS_GM8(ptr+3, 7, 1) << 32 | TS_G32(ptr+4);
-						uint64_t NPT_reference = (uint64_t)TS_GM8(ptr+11, 7, 1) << 32 | TS_G32(ptr+12);
-						int scale_numerator = TS_G16(ptr+16);
-						int scale_denominator = TS_G16(ptr+18);
+          printf(":: npt reference descriptor:: content id:[%04x], STC reference:[%lu], NPT reference:[%lu], scale numerator:[%d], scale denominator:[%d]\n", content_id, STC_reference, NPT_reference, scale_numerator, scale_denominator);
+        } else if (descriptor_tag == 0x02) { // npt endpoint descriptor
+          uint64_t start_NPT = (uint64_t)TS_GM8(ptr+3, 7, 1) << 32 | TS_G32(ptr+4);
+          uint64_t stop_NPT = (uint64_t)TS_GM8(ptr+11, 7, 1) << 32 | TS_G32(ptr+12);
 
-						printf(":: npt reference descriptor:: content id:[%04x], STC reference:[%lu], NPT reference:[%lu], scale numerator:[%d], scale denominator:[%d]\n", content_id, STC_reference, NPT_reference, scale_numerator, scale_denominator);
-					} else if (descriptor_tag == 0x02) { // npt endpoint descriptor
-						uint64_t start_NPT = (uint64_t)TS_GM8(ptr+3, 7, 1) << 32 | TS_G32(ptr+4);
-						uint64_t stop_NPT = (uint64_t)TS_GM8(ptr+11, 7, 1) << 32 | TS_G32(ptr+12);
+          printf(":: npt endpoint descriptor:: start NPT:[%lu], stop NPT:[%lu]\n", start_NPT, stop_NPT);
+        } else if (descriptor_tag == 0x03) { // stream mode descriptor
+          int stream_mode = TS_G8(ptr+2);
+          std::string mode = "ISO/IEC 13818-6 reserved";
 
-						printf(":: npt endpoint descriptor:: start NPT:[%lu], stop NPT:[%lu]\n", start_NPT, stop_NPT);
-					} else if (descriptor_tag == 0x03) { // stream mode descriptor
-						int stream_mode = TS_G8(ptr+2);
-						std::string mode = "ISO/IEC 13818-6 reserved";
+          if (stream_mode == 0x00) {
+            mode = "Open";
+          } else if (stream_mode == 0x01) {
+            mode = "Pause";
+          } else if (stream_mode == 0x02) {
+            mode = "Transport";
+          } else if (stream_mode == 0x03) {
+            mode = "Transport Pause";
+          } else if (stream_mode == 0x04) {
+            mode = "Search Transport";
+          } else if (stream_mode == 0x05) {
+            mode = "Search Transport Pause";
+          } else if (stream_mode == 0x06) {
+            mode = "Pause Search Transport";
+          } else if (stream_mode == 0x07) {
+            mode = "End of Stream";
+          } else if (stream_mode == 0x08) {
+            mode = "Pre Search Transport";
+          } else if (stream_mode == 0x09) {
+            mode = "Pre Search Transport Pause";
+          }
 
-						if (stream_mode == 0x00) {
-							mode = "Open";
-						} else if (stream_mode == 0x01) {
-							mode = "Pause";
-						} else if (stream_mode == 0x02) {
-							mode = "Transport";
-						} else if (stream_mode == 0x03) {
-							mode = "Transport Pause";
-						} else if (stream_mode == 0x04) {
-							mode = "Search Transport";
-						} else if (stream_mode == 0x05) {
-							mode = "Search Transport Pause";
-						} else if (stream_mode == 0x06) {
-							mode = "Pause Search Transport";
-						} else if (stream_mode == 0x07) {
-							mode = "End of Stream";
-						} else if (stream_mode == 0x08) {
-							mode = "Pre Search Transport";
-						} else if (stream_mode == 0x09) {
-							mode = "Pre Search Transport Pause";
-						}
+          printf(":: stream mode descriptor:: mode:[%s]\n", mode.c_str());
+        } else if (descriptor_tag == 0x04) { // stream event descriptor
+          // ABNTNBR15606_2D2_2007Vc3_2008.pdf
+          int event_id = TS_G16(ptr+2);
+          uint64_t event_NPT = (uint64_t)TS_GM8(ptr+7, 7, 1) << 32 | TS_G32(ptr+8);
 
-						printf(":: stream mode descriptor:: mode:[%s]\n", mode.c_str());
-					} else if (descriptor_tag == 0x04) { // stream event descriptor
-						// ABNTNBR15606_2D2_2007Vc3_2008.pdf
-						int event_id = TS_G16(ptr+2);
-						uint64_t event_NPT = (uint64_t)TS_GM8(ptr+7, 7, 1) << 32 | TS_G32(ptr+8);
+          int private_data_length = descriptor_length-10;
+          std::string private_data_byte(ptr+12, private_data_length);
 
-						int private_data_length = descriptor_length-10;
-						std::string private_data_byte(ptr+12, private_data_length);
+          printf(":: stream event descriptor:: event id:[%04x], event npt:[%lu]\n", event_id, event_NPT);
 
-						printf(":: stream event descriptor:: event id:[%04x], event npt:[%lu]\n", event_id, event_NPT);
+          DumpBytes("private data", private_data_byte.c_str(), private_data_byte.size());
+        }
 
-						DumpBytes("private data", private_data_byte.c_str(), private_data_byte.size());
-					}
+        ptr = ptr + descriptor_length + 2;
 
-					ptr = ptr + descriptor_length + 2;
-
-					descriptors_count = descriptors_count + descriptor_length + 2;	
-				}
-			}
-		}
+        descriptors_count = descriptors_count + descriptor_length + 2;	
+      }
+    }
 
 		virtual void DataNotFound(jevent::DemuxEvent *event)
 		{
@@ -2334,13 +3093,40 @@ int main(int argc, char **argv)
 
 	manager->SetInputStream(&is);
 	
-  DemuxTest 
+  PSIParser 
     test;
 
 	manager->Start();
   manager->WaitSync();
   manager->Stop();
-  
+ 
+  // INFO:: dumping methods
+  auto 
+    services = SIFacade::GetInstance()->Services();
+
+  for (auto i : services) {
+    i->Print();
+  }
+
+  auto 
+    networks = SIFacade::GetInstance()->Networks();
+
+  for (auto i : networks) {
+    i->Print();
+  }
+
+  auto 
+    events = SIFacade::GetInstance()->Events();
+
+  for (auto i : events) {
+    i->Print();
+  }
+
+  auto 
+    time = SIFacade::GetInstance()->Time();
+
+  time.Print();
+
 	return 0;
 }
 

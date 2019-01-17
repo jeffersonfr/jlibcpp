@@ -155,6 +155,360 @@ std::string GetStreamTypeDescription(int stream_type)
 	return "Unrecognised";
 }
 
+std::string GetComponentDescription(int stream_content, int component_type)
+{
+  std::string description = "undefined";
+
+  if (stream_content == 0x00 and component_type >= 0x00 and component_type <= 0xff) {
+    description = "reserved";
+  } else if (stream_content == 0x01 and component_type == 0x00) {
+    description = "reserved";
+  } else if (stream_content == 0x01 and component_type == 0x01) {
+    description = "MPEG2 vídeo 480i(525i), relação de aspecto 4:3";
+  } else if (stream_content == 0x01 and component_type == 0x02) {
+    description = "MPEG2 vídeo 480i(525i), relação de aspecto 16:9 com vetor de pan";
+  } else if (stream_content == 0x01 and component_type == 0x03) {
+    description = "MPEG2 vídeo 480i(525i), relação de aspecto 16:9 sem vetor de pan";
+  } else if (stream_content == 0x01 and component_type == 0x04) {
+    description = "MPEG2 vídeo 480i(525i), > relação de aspecto 16:9";
+  } else if (stream_content == 0x01 and component_type >= 0x05 and component_type <= 0xa0) {
+    description = "reserved";
+  } else if (stream_content == 0x01 and component_type == 0xa1) {
+    description = "MPEG2 vídeo 480p(525p), relação de aspecto 4:3";
+  } else if (stream_content == 0x01 and component_type == 0xa2) {
+    description = "MPEG2 vídeo 480p(525p), relação de aspecto 16:9 com vetor de pan";
+  } else if (stream_content == 0x01 and component_type == 0xa3) {
+    description = "MPEG2 vídeo 480p(525p), relação de aspecto 16:9 sem vetor de pan";
+  } else if (stream_content == 0x01 and component_type == 0xa4) {
+    description = "MPEG2 vídeo 480p(525p), > relação de aspecto 16:9";
+  } else if (stream_content == 0x01 and component_type >= 0xa5 and component_type <= 0xb0) {
+    description = "reserved";
+  } else if (stream_content == 0x01 and component_type == 0xb1) {
+    description = "MPEG2 vídeo 1080i(1125i), relação de aspecto 4:3";
+  } else if (stream_content == 0x01 and component_type == 0xb2) {
+    description = "MPEG2 vídeo 1080i(1125i), relação de aspecto 16:9 com vetor de pan";
+  } else if (stream_content == 0x01 and component_type == 0xb3) {
+    description = "MPEG2 vídeo 1080i(1125i), relação de aspecto 16:9 sem vetor de pan";
+  } else if (stream_content == 0x01 and component_type == 0xb4) {
+    description = "MPEG2 vídeo 1080i(1125i), > relação de aspecto 16:9";
+  } else if (stream_content == 0x01 and component_type >= 0xb5 and component_type <= 0xc0) {
+    description = "reserved";
+  } else if (stream_content == 0x01 and component_type == 0xc1) {
+    description = "MPEG2 vídeo 720p(750p), relação de aspecto 4:3";
+  } else if (stream_content == 0x01 and component_type == 0xc2) {
+    description = "MPEG2 vídeo 720p(750p), relação de aspecto 16:9 com vetor de pan";
+  } else if (stream_content == 0x01 and component_type == 0xc3) {
+    description = "MPEG2 vídeo 720p(750p), relação de aspecto 16:9 sem vetor de pan";
+  } else if (stream_content == 0x01 and component_type == 0xc4) {
+    description = "MPEG2 vídeo 720p(750p), > relação de aspecto 16:9";
+  } else if (stream_content == 0x01 and component_type >= 0xc5 and component_type <= 0xd0) {
+    description = "reserved";
+  } else if (stream_content == 0x01 and component_type == 0xd1) {
+    description = "MPEG2 vídeo 240p, relação de aspecto 4:3";
+  } else if (stream_content == 0x01 and component_type == 0xd2) {
+    description = "MPEG2 vídeo 240p, relação de aspecto 4:3 com vetor de pan";
+  } else if (stream_content == 0x01 and component_type == 0xd3) {
+    description = "MPEG2 vídeo 240p, relação de aspecto 4:3, sem vetor de pan";
+  } else if (stream_content == 0x01 and component_type == 0xd4) {
+    description = "MPEG2 vídeo 240p, > relação de aspecto 16:9";
+  } else if (stream_content == 0x01 and component_type >= 0xd5 and component_type <= 0xe0) {
+    description = "reserved";
+  } else if (stream_content == 0x01 and component_type == 0xe1) {
+    description = "MPEG2 vídeo 1080p(1125p), relação de aspecto 4:3";
+  } else if (stream_content == 0x01 and component_type == 0xe2) {
+    description = "MPEG2 vídeo 1080p(1125p), relação de aspecto 16:9 com vetor de pan";
+  } else if (stream_content == 0x01 and component_type == 0xe3) {
+    description = "MPEG2 vídeo 1080p(1125p), relação de aspecto 16:9 sem vetor de pan";
+  } else if (stream_content == 0x01 and component_type == 0xe4) {
+    description = "MPEG2 vídeo 1080p(1125p), > relação de aspecto 16:9";
+  } else if (stream_content == 0x01 and component_type >= 0xe5 and component_type <= 0xff) {
+    description = "reserved";
+  } else if (stream_content == 0x02 and component_type == 0x00) {
+    description = "reserved";
+  } else if (stream_content == 0x02 and component_type == 0x01) {
+    description = "AAC MPEG2 áudio, modo 1/0 (single mono)";
+  } else if (stream_content == 0x02 and component_type == 0x02) {
+    description = "AAC MPEG2 áudio, modo 1/0 + 1/0 (dual mono)";
+  } else if (stream_content == 0x02 and component_type == 0x03) {
+    description = "AAC MPEG2 áudio, modo 2/0 (estéreo)";
+  } else if (stream_content == 0x02 and component_type == 0x04) {
+    description = "AAC MPEG2 áudio, modo 2/1";
+  } else if (stream_content == 0x02 and component_type == 0x05) {
+    description = "AAC MPEG2 áudio, modo 3/0";
+  } else if (stream_content == 0x02 and component_type == 0x06) {
+    description = "AAC MPEG2 áudio, modo 2/2";
+  } else if (stream_content == 0x02 and component_type == 0x07) {
+    description = "AAC MPEG2 áudio, modo 3/1";
+  } else if (stream_content == 0x02 and component_type == 0x08) {
+    description = "AAC MPEG2 áudio, modo 3/2";
+  } else if (stream_content == 0x02 and component_type == 0x09) {
+    description = "AAC MPEG2 áudio, modo 3/2 + LFE";
+  } else if (stream_content == 0x02 and component_type >= 0x0a and component_type <= 0x3f) {
+    description = "reserved";
+  } else if (stream_content == 0x02 and component_type == 0x40) {
+    description = "AAC MPEG2 descrição de áudio para deficientes visuais";
+  } else if (stream_content == 0x02 and component_type == 0x41) {
+    description = "AAC MPEG2 áudio com áudio elevado para deficientes auditivos";
+  } else if (stream_content == 0x02 and component_type >= 0x42 and component_type <= 0xaf) {
+    description = "reserved";
+  } else if (stream_content == 0x02 and component_type >= 0xb0 and component_type <= 0xfe) {
+    description = "user defined";
+  } else if (stream_content == 0x02 and component_type == 0xff) {
+    description = "reserved";
+  } else if (stream_content == 0x03 and component_type >= 0x00 and component_type <= 0xff) {
+    description = "reserved";
+  } else if (stream_content == 0x04 and component_type >= 0x00 and component_type <= 0xff) {
+    description = "reserved";
+  } else if (stream_content == 0x05 and component_type == 0x00) {
+    description = "reserved";
+  } else if (stream_content == 0x05 and component_type == 0x01) {
+    description = "H264/AVC vídeo 480i(525i), relação de aspecto 4:3";
+  } else if (stream_content == 0x05 and component_type == 0x02) {
+    description = "H264/AVC vídeo 480i(525i), relação de aspecto 16:9 com vetor de pan";
+  } else if (stream_content == 0x05 and component_type == 0x03) {
+    description = "H264/AVC vídeo 480i(525i), relação de aspecto 16:9 sem vetor de pan";
+  } else if (stream_content == 0x05 and component_type == 0x04) {
+    description = "H264/AVC vídeo 480i(525i), > relação de aspecto 16:9";
+  } else if (stream_content == 0x05 and component_type >= 0x05 and component_type <= 0xa0) {
+    description = "reserved";
+  } else if (stream_content == 0x05 and component_type == 0xa1) {
+    description = "H264/AVC vídeo 480p(525p), relação de aspecto 4:3";
+  } else if (stream_content == 0x05 and component_type == 0xa2) {
+    description = "H264/AVC vídeo 480p(525p), relação de aspecto 16:9, com vetor de pan";
+  } else if (stream_content == 0x05 and component_type == 0xa3) {
+    description = "H264/AVC vídeo 480p(525p), relação de aspecto 16:9, sem vetor de pan";
+  } else if (stream_content == 0x05 and component_type == 0xa4) {
+    description = "H264/AVC vídeo 480p(525p), > relação de aspecto 16:9";
+  } else if (stream_content == 0x05 and component_type >= 0xa5 and component_type <= 0xb0) {
+    description = "reserved";
+  } else if (stream_content == 0x05 and component_type == 0xb1) {
+    description = "H264/AVC vídeo 1080i(1125i), relação de aspecto 4:3";
+  } else if (stream_content == 0x05 and component_type == 0xb2) {
+    description = "H264/AVC vídeo 1080i(1125i), relação de aspecto 16:9, com vetor de pan";
+  } else if (stream_content == 0x05 and component_type == 0xb3) {
+    description = "H264/AVC vídeo 1080i(1125i), relação de aspecto 16:9, sem vetor de pan";
+  } else if (stream_content == 0x05 and component_type == 0xb4) {
+    description = "H264/AVC vídeo 1080i(1125i), > relação de aspecto 16:9";
+  } else if (stream_content == 0x05 and component_type >= 0xb5 and component_type <= 0xc0) {
+    description = "reserved";
+  } else if (stream_content == 0x05 and component_type == 0xc1) {
+    description = "H264/AVC vídeo 720p(750p), relação de aspecto 4:3";
+  } else if (stream_content == 0x05 and component_type == 0xc2) {
+    description = "H264/AVC vídeo 720p(750p), relação de aspecto 16:9, com vetor de pan";
+  } else if (stream_content == 0x05 and component_type == 0xc3) {
+    description = "H264/AVC vídeo 720p(750p), relação de aspecto 16:9, sem vetor de pan";
+  } else if (stream_content == 0x05 and component_type == 0xc4) {
+    description = "H264/AVC vídeo 720p(750p), > relação de aspecto 16:9";
+  } else if (stream_content == 0x05 and component_type >= 0xc5 and component_type <= 0xd0) {
+    description = "reserved";
+  } else if (stream_content == 0x05 and component_type == 0xd1) {
+    description = "H264/AVC vídeo 240p, relação de aspecto 4:3";
+  } else if (stream_content == 0x05 and component_type == 0xd2) {
+    description = "H264/AVC vídeo 240p, relação de aspecto 16:9 com vetor de pan";
+  } else if (stream_content == 0x05 and component_type == 0xd3) {
+    description = "H264/AVC vídeo 240p, relação de aspecto 16:9 sem vetor de pan";
+  } else if (stream_content == 0x05 and component_type == 0xd4) {
+    description = "H264/AVC vídeo 240p, > relação de aspecto 16:9";
+  } else if (stream_content == 0x05 and component_type >= 0xd5 and component_type <= 0xe0) {
+    description = "reserved";
+  } else if (stream_content == 0x05 and component_type == 0xe1) {
+    description = "H264/AVC vídeo 1080p(1125p), relação de aspecto 4:3";
+  } else if (stream_content == 0x05 and component_type == 0xe2) {
+    description = "H264/AVC vídeo 1080p(1125p), relação de aspecto 16:9 com vetor de pan";
+  } else if (stream_content == 0x05 and component_type == 0xe3) {
+    description = "H264/AVC vídeo 1080p(1125p), relação de aspecto 16:9 sem vetor de pan";
+  } else if (stream_content == 0x05 and component_type == 0xe4) {
+    description = "H264/AVC vídeo 1080p(1125p), > relação de aspecto 16:9";
+  } else if (stream_content == 0x05 and component_type >= 0xe5 and component_type <= 0xff) {
+    description = "reserved";
+  } else if (stream_content == 0x06 and component_type == 0x00) {
+    description = "reserved";
+  } else if (stream_content == 0x06 and component_type == 0x01) {
+    description = "HE-AAC MPEG4 áudio, modo 1/0 (single mono)";
+  } else if (stream_content == 0x06 and component_type == 0x02) {
+    description = "HE-AAC MPEG4 áudio, modo 1/0 + 1/0 (dual mono)";
+  } else if (stream_content == 0x06 and component_type == 0x03) {
+    description = "HE-AAC MPEG4 áudio, modo 2/0 (estéreo)";
+  } else if (stream_content == 0x06 and component_type == 0x04) {
+    description = "HE-AAC MPEG4 áudio, modo 2/1";
+  } else if (stream_content == 0x06 and component_type == 0x05) {
+    description = "HE-AAC MPEG4 áudio, modo 3/0";
+  } else if (stream_content == 0x06 and component_type == 0x06) {
+    description = "HE-AAC MPEG4 áudio, modo 2/2";
+  } else if (stream_content == 0x06 and component_type == 0x07) {
+    description = "HE-AAC MPEG4 áudio, modo 3/1";
+  } else if (stream_content == 0x06 and component_type == 0x08) {
+    description = "HE-AAC MPEG4 áudio, modo 3/2";
+  } else if (stream_content == 0x06 and component_type == 0x09) {
+    description = "HE-AAC MPEG4 áudio, modo 3/2 + LFE";
+  } else if (stream_content == 0x06 and component_type >= 0x0a and component_type <= 0x3f) {
+    description = "reserved";
+  } else if (stream_content == 0x06 and component_type == 0x40) {
+    description = "HE-AAC MPEG4 descrição de pure audio para deficientes visuais";
+  } else if (stream_content == 0x06 and component_type == 0x41) {
+    description = "HE-AAC MPEG4 áudio com áudio elevado para deficientes auditivos";
+  } else if (stream_content == 0x06 and component_type == 0x42) {
+    description = "HE-AAC MPEG4 descrição de mixed audio para deficientes visuais";
+  } else if (stream_content == 0x06 and component_type == 0x43) {
+    description = "HE-AAC v2 MPEG4 áudio, modo 1/0 (mono)";
+  } else if (stream_content == 0x06 and component_type == 0x44) {
+    description = "HE-AAC v2 MPEG4 áudio, modo 2/0 (estéreo)";
+  } else if (stream_content == 0x06 and component_type == 0x45) {
+    description = "HE-AAC v2 MPEG4 descrição de pure audio para deficientes visuais";
+  } else if (stream_content == 0x06 and component_type == 0x46) {
+    description = "HE-AAC MPEG4 v2 áudio com áudio elevado para deficientes auditivos";
+  } else if (stream_content == 0x06 and component_type == 0x47) {
+    description = "HE-AAC MPEG4 v2 descrição de mixed audio para deficientes visuais";
+  } else if (stream_content == 0x06 and component_type >= 0x48 and component_type <= 0x50) {
+    description = "reserved";
+  } else if (stream_content == 0x06 and component_type == 0x51) {
+    description = "AAC MPEG4 áudio, modo 1/0 (single mono)";
+  } else if (stream_content == 0x06 and component_type == 0x52) {
+    description = "AAC MPEG4 áudio, modo 1/0 + 1/0 (dual mono)";
+  } else if (stream_content == 0x06 and component_type == 0x53) {
+    description = "AAC MPEG4 áudio, modo 2/0 (estéreo)";
+  } else if (stream_content == 0x06 and component_type == 0x54) {
+    description = "AAC MPEG4 áudio, modo 2/1";
+  } else if (stream_content == 0x06 and component_type == 0x55) {
+    description = "AAC MPEG4 áudio, modo 3/0";
+  } else if (stream_content == 0x06 and component_type == 0x56) {
+    description = "AAC MPEG4 áudio, modo 2/2";
+  } else if (stream_content == 0x06 and component_type == 0x57) {
+    description = "AAC MPEG4 áudio, modo 3/1";
+  } else if (stream_content == 0x06 and component_type == 0x58) {
+    description = "AAC MPEG4 áudio, modo 3/2";
+  } else if (stream_content == 0x06 and component_type == 0x59) {
+    description = "AAC MPEG4 áudio, modo 3/2 + LFE";
+  } else if (stream_content == 0x06 and component_type >= 0x60 and component_type <= 0x9e) {
+    description = "reserved";
+  } else if (stream_content == 0x06 and component_type == 0x9f) {
+    description = "AAC MPEG4 descrição de pure audio para deficientes visuais";
+  } else if (stream_content == 0x06 and component_type == 0xa0) {
+    description = "AAC MPEG4 áudio com áudio elevado para deficientes auditivos";
+  } else if (stream_content == 0x06 and component_type == 0xa1) {
+    description = "AAC MPEG4 descrição de mixed audio para deficientes visuais";
+  } else if (stream_content == 0x06 and component_type >= 0xa2 and component_type <= 0xaf) {
+    description = "reserved";
+  } else if (stream_content == 0x06 and component_type >= 0xb0 and component_type <= 0xfe) {
+    description = "user defined";
+  } else if (stream_content == 0x06 and component_type == 0xff) {
+    description = "reserved";
+  } else if (stream_content == 0x06 and component_type >= 0x00 and component_type <= 0xff) {
+    description = "reserved";
+  } else if (stream_content == 0x07 and component_type >= 0x00 and component_type <= 0xff) {
+    description = "reserved";
+  } else if (stream_content == 0x08 and component_type >= 0x00 and component_type <= 0xff) {
+    description = "reserved";
+  } else if (stream_content == 0x09 and component_type >= 0x00 and component_type <= 0xff) {
+    description = "reserved";
+  } else if (stream_content == 0x0a and component_type >= 0x00 and component_type <= 0xff) {
+    description = "reserved";
+  } else if (stream_content == 0x0b and component_type >= 0x00 and component_type <= 0xff) {
+    description = "reserved";
+  } else if (stream_content == 0x0c and component_type >= 0x00 and component_type <= 0xff) {
+    description = "reserved";
+  } else if (stream_content == 0x0d and component_type >= 0x00 and component_type <= 0xff) {
+    description = "reserved";
+  } else if (stream_content == 0x0e and component_type >= 0x00 and component_type <= 0xff) {
+    description = "reserved";
+  } else if (stream_content == 0x0f and component_type >= 0x00 and component_type <= 0xff) {
+    description = "reserved";
+  }
+
+  return description;
+}
+
+std::string GetServiceDescription(int service_type)
+{
+  std::string description;
+
+  if (service_type == 0x00) {
+    description = "Reservado para uso futuro";
+  } else if (service_type == 0x01) {
+    description = "Serviço de televisão digital HD";
+    // description = "Serviço de televisão digital";
+  } else if (service_type == 0x02) {
+    description = "Serviço de áudio digital";
+  } else if (service_type == 0x03) {
+    description = "Serviço de teletexto";
+  } else if (service_type == 0x04) {
+    description = "Serviço de referência NVOD";
+  } else if (service_type == 0x05) {
+    description = "Serviço time-shifted NVOD";
+  } else if (service_type == 0x06) {
+    description = "Serviço de mosaico";
+  } else if (service_type >= 0x07 and service_type <= 0x09) {
+    description = "Reservado para uso futuro";
+  } else if (service_type == 0x0a) {
+    description = "Codificação avançada para serviço de rádio digital";
+  } else if (service_type == 0x0b) {
+    description = "Codificação avançada para serviço de mosaico";
+  } else if (service_type == 0x0c) {
+    description = "Serviço de transmissão de dados";
+  } else if (service_type == 0x0d) {
+    description = "Reservado para interface de uso comum (ver EN 50221)";
+  } else if (service_type == 0x0e) {
+    description = "RCS Map (ver EN 301 790)";
+  } else if (service_type == 0x0f) {
+    description = "RCS FLS (ver EN 301 790)";
+  } else if (service_type == 0x10) {
+    description = "Serviço DVB MHP";
+  } else if (service_type == 0x11) {
+    description = "Serviço de televisão digital MPEG-2 HD";
+  } else if (service_type >= 0x12 and service_type <= 0x15) {
+    description = "Reservado para uso futuro";
+  } else if (service_type == 0x16) {
+    description = "Codificação avançada de serviço de televisão digital SD";
+  } else if (service_type == 0x17) {
+    description = "Codificação avançada de serviço de NVOD SD time-shifted";
+  } else if (service_type == 0x18) {
+    description = "Codificação avançada de serviço de referência NVOD SD";
+  } else if (service_type == 0x19) {
+    description = "Codificação avançada de serviço de televisão digital HD";
+  } else if (service_type == 0x1a) {
+    description = "Codificação avançada de serviço de NVOD HD time-shifted";
+  } else if (service_type == 0x1b) {
+    description = "Codificação avançada de serviço de referência NVOD HD";
+  } else if (service_type >= 0x1c and service_type < 0x7f) {
+    description = "Reservado para uso futuro";
+  } else if (service_type >= 0x80 and service_type <= 0xa0) {
+    description = "Definido pelo provedor de serviço";
+  } else if (service_type == 0xa1) {
+    description = "Serviço especial de vídeo";
+  } else if (service_type == 0xa2) {
+    description = "Serviço especial de áudio";
+  } else if (service_type == 0xa3) {
+    description = "Serviço especial de dados";
+  } else if (service_type == 0xa4) {
+    description = "Serviço de engenharia";
+  } else if (service_type == 0xa5) {
+    description = "Serviço promocional de vídeo";
+  } else if (service_type == 0xa6) {
+    description = "Serviço promocional de áudio";
+  } else if (service_type == 0xa7) {
+    description = "Serviço promocional de dados";
+  } else if (service_type == 0xa8) {
+    description = "Serviço de dados para armazenamento antecipado";
+  } else if (service_type == 0xa9) {
+    description = "Serviço de dados exclusivo para armazenamento";
+  } else if (service_type == 0xaa) {
+    description = "Lista de serviços de bookmark";
+  } else if (service_type == 0xab) {
+    description = "Serviço simultâneo do tipo servidor";
+  } else if (service_type == 0xac) {
+    description = "Serviço independente de arquivos";
+  } else if (service_type >= 0xad and service_type <= 0xbf) {
+    description = "Não definido (área definida pela organização de regulamentação)";
+  } else if (service_type == 0xc0) {
+    description = "Serviço de televisão digital LD";
+    // description = "Serviço de dados";
+  } else if (service_type >= 0xc1 and service_type <= 0xff) {
+    description = "Não definido";
+  }
+
+  return description;
+}
+
 std::string GetDescriptorName(int descriptor_tag)
 {
 	/*
