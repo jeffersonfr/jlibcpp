@@ -26,15 +26,14 @@
 
 namespace jmpeg {
 
-Demux::Demux(jmpeg_data_type_t type):
+Demux::Demux(jdemux_type_t type):
 	jcommon::Object()
 {
 	jcommon::Object::SetClassName("jmpeg::Demux");
 
-	_type = type;
+  _type = type;
 	_last_index = -1;
 	_timeout = 2000; // 2ms
-	_is_crc_enabled = true;
 }
 		
 Demux::~Demux()
@@ -51,12 +50,7 @@ void Demux::Stop()
 	DemuxManager::GetInstance()->RemoveDemux(this);
 }
 
-void Demux::SetType(jmpeg_data_type_t type)
-{
-	_type = type;
-}
-
-jmpeg_data_type_t Demux::GetType()
+jdemux_type_t Demux::GetType()
 {
 	return _type;
 }
@@ -76,58 +70,14 @@ void Demux::SetPID(int pid)
 	_pid = pid;
 }
 
-void Demux::SetTID(int tid)
-{
-	_tid = tid;
-}
-
 int Demux::GetPID()
 {
 	return _pid;
 }
 
-int Demux::GetTID()
+jdemux_status_t Demux::Append(const char *data, int data_length)
 {
-	return _tid;
-}
-
-void Demux::SetCRCCheckEnabled(bool b)
-{
-	_is_crc_enabled = b;
-}
-
-bool Demux::IsCRCCheckEnabled()
-{
-	return _is_crc_enabled;
-}
-
-bool Demux::Append(const char *data, int data_length)
-{
-	if (_type == JMDT_RAW) {
-		return true;
-	}
-
-	int tid = TS_G8(data);
-
-	if (_tid >= 0 && _tid != tid) {
-		return false;
-	}
-
-	if (_is_crc_enabled == true) {
-		uint32_t 
-	    // crc = *(uint32_t *)(data+(data_length-4)),
-      sum = jmath::CRC::Calculate32((const uint8_t *)data, data_length);
-
-		if (sum != 0xffffffff) {
-			_buffer.clear();
-
-			_last_index = -1;
-
-			return false;
-		}
-	}
-
-	return true;
+  return JDS_COMPLETE;
 }
 
 void Demux::RegisterDemuxListener(jevent::DemuxListener *listener)

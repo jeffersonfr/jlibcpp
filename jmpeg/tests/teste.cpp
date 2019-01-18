@@ -24,7 +24,7 @@
 //
 
 #include "jmpeg/jdemuxmanager.h"
-#include "jmpeg/jdemux.h"
+#include "jmpeg/jpsidemux.h"
 #include "jmpeg/jmpeglib.h"
 #include "jio/jfileinputstream.h"
 #include "jevent/jdemuxlistener.h"
@@ -784,7 +784,7 @@ class PSIParser : public jevent::DemuxListener {
         return;
       }
 
-			jmpeg::Demux *demux = new jmpeg::Demux(jmpeg::JMDT_PSI);
+			jmpeg::PSIDemux *demux = new jmpeg::PSIDemux();
 
 			demux->RegisterDemuxListener(this);
 			demux->SetPID(pid);
@@ -1787,6 +1787,8 @@ class PSIParser : public jevent::DemuxListener {
 				int transmission_type_count = TS_GM8(ptr+1, 6, 2);
 				std::string ts_name(ptr+2, ts_name_length);
 
+				ts_name = Utils::ISO8859_1_TO_UTF8(ts_name);
+
         SINetwork *param = dynamic_cast<SINetwork *>(si);
 
         param->TransportStreamName(ts_name);
@@ -1981,8 +1983,10 @@ class PSIParser : public jevent::DemuxListener {
 		virtual void DataArrived(jevent::DemuxEvent *event)
 		{
 			int pid = event->GetPID();
-			int tid = event->GetTID();
-			int len = event->GetDataLength();
+			int len = event->GetLength();
+
+			const char *ptr = event->GetData();
+			int tid = TS_G8(ptr+0);
 
 			printf("PSI Section:[%s]: pid:[0x%04x], tid:[0x%04x], length:[%d]\n", GetTableDescription(pid, tid).c_str(), pid, tid, len);
 
@@ -2143,7 +2147,7 @@ class PSIParser : public jevent::DemuxListener {
 		virtual void ProcessPMT(jevent::DemuxEvent *event)
 		{
 			const char *ptr = event->GetData();
-			int tid = event->GetTID();
+			int tid = TS_G8(ptr+0);
 			int section_length = TS_PSI_G_SECTION_LENGTH(ptr);
 
 			int pcr_pid = TS_GM16(ptr+8, 3, 13);
@@ -2554,7 +2558,7 @@ class PSIParser : public jevent::DemuxListener {
 		{
 			const char *ptr = event->GetData();
 
-			int tid = event->GetTID();
+			int tid = TS_G8(ptr+0);
 			int section_length = TS_PSI_G_SECTION_LENGTH(ptr);
 			int service_id = TS_G16(ptr+3);
 			int transport_stream_id = TS_G16(ptr+8);
@@ -2657,11 +2661,12 @@ class PSIParser : public jevent::DemuxListener {
 		{
 			const char *ptr = event->GetData();
 
+			int tid = TS_G8(ptr+0);
 			int section_length = TS_GM16(ptr+1, 4, 12);
 
 			printf("AIT:: section length:[0x%04x]\n", section_length);
 
-			if (event->GetTID() == 0x74) {
+			if (tid == 0x74) {
 				// int test_application_flag = TS_GM8(ptr+3, 0, 1);
 				int application_type = TS_GM16(ptr+3, 1, 15);
 				// int reserved = TS_GM8(ptr+5, 0, 2);
@@ -2774,33 +2779,34 @@ class PSIParser : public jevent::DemuxListener {
 			// INFO:: ISO IEC 13818-6 - MPEG2 DSMCC - Digital Storage Media Command & Control.pdf
 			const char *ptr = event->GetData();
 
+			int tid = TS_G8(ptr+0);
 			int section_length = TS_GM16(ptr+1, 4, 12);
       std::string type;
 
-			if (event->GetTID() == 0x3a) {
+			if (tid == 0x3a) {
 			  type = "MPE reserved";
-      } else if (event->GetTID() == 0x3b) {
+      } else if (tid == 0x3b) {
 			  type = "DII message";
-      } else if (event->GetTID() == 0x3c) {
+      } else if (tid == 0x3c) {
 			  type = "DDB message";
-      } else if (event->GetTID() == 0x3d) {
+      } else if (tid == 0x3d) {
 			  type = "Stream descriptor";
-      } else if (event->GetTID() == 0x3e) {
+      } else if (tid == 0x3e) {
 			  type = "Private data";
-      } else if (event->GetTID() == 0x3f) {
+      } else if (tid == 0x3f) {
 			  type = "reserved";
       }
 
-			printf("DSMCC:: table id:[0x%02x], type:[%s], section length:[0x%04x]\n", event->GetTID(), type.c_str(), section_length);
+			printf("DSMCC:: table id:[0x%02x], type:[%s], section length:[0x%04x]\n", tid, type.c_str(), section_length);
 
-			if (event->GetTID() == 0x3a) {
-      } else if (event->GetTID() == 0x3b) {
-      } else if (event->GetTID() == 0x3c) {
+			if (tid == 0x3a) {
+      } else if (tid == 0x3b) {
+      } else if (tid == 0x3c) {
         ProcessDSMCCMessage(event);
-      } else if (event->GetTID() == 0x3d) {
+      } else if (tid == 0x3d) {
 		    ProcessDSMCCDescriptors(event);
-      } else if (event->GetTID() == 0x3e) {
-      } else if (event->GetTID() == 0x3f) {
+      } else if (tid == 0x3e) {
+      } else if (tid == 0x3f) {
       }
     }
 
@@ -3026,7 +3032,7 @@ class PSIParser : public jevent::DemuxListener {
 
 		virtual void DataNotFound(jevent::DemuxEvent *event)
 		{
-			printf("Data Not Found:: pid:[0x%04x], tid:[0x%04x], length:[%d]\n", event->GetPID(), event->GetTID(), event->GetDataLength());
+			printf("Data Not Found:: pid:[0x%04x], length:[%d]\n", event->GetPID(), event->GetLength());
 		}
 
 		// INFO:: si methods

@@ -25,6 +25,13 @@
 
 namespace jmpeg {
 
+struct  jpacket_status_t {
+	uint64_t start_time;
+	bool found;
+};
+
+std::map<Demux *, struct jpacket_status_t> _packet_status;
+
 DemuxManager * DemuxManager::_instance = nullptr;
 
 DemuxManager::DemuxManager():
@@ -78,10 +85,10 @@ void DemuxManager::RemoveDemux(Demux *demux)
 		_sync_demuxes.erase(i);
 	}
 	
-	std::map<Demux *, struct jdemux_status_t>::iterator j=_demux_status.find(demux);
+	std::map<Demux *, struct jpacket_status_t>::iterator j=_packet_status.find(demux);
 
-	if (j != _demux_status.end()) {
-		_demux_status.erase(j);
+	if (j != _packet_status.end()) {
+		_packet_status.erase(j);
 	}
 
 	_demux_mutex.unlock();
@@ -238,61 +245,48 @@ void DemuxManager::Run()
 		for (std::vector<Demux *>::iterator i=_demuxes.begin(); i!=_demuxes.end(); i++) {
 			Demux *demux = (*i);
 
-			std::map<Demux *, struct jdemux_status_t>::iterator 
-        j=_demux_status.find(demux);
+			std::map<Demux *, struct jpacket_status_t>::iterator 
+        j=_packet_status.find(demux);
       uint64_t 
         current_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
 
-			if (j == _demux_status.end()) {
-				_demux_status[demux].start_time = current_time;
-				_demux_status[demux].found = false;
+			if (j == _packet_status.end()) {
+				_packet_status[demux].start_time = current_time;
+				_packet_status[demux].found = false;
 			}
 
 			if (demux->GetPID() < 0 || demux->GetPID() == pid) {
-				if (demux->GetType() == JMDT_RAW) {
-					if (demux->Append(packet, TS_PACKET_LENGTH) == true) {
-						_demux_status[demux].found = true;
+        if (demux->GetType() == JDT_RAW) {
+          if (demux->Append(packet, TS_PACKET_LENGTH) == JDS_COMPLETE) {
+            _packet_status[demux].found = true;
 
-						demux->DispatchDemuxEvent(new jevent::DemuxEvent(this, jevent::JDET_DATA_ARRIVED, packet, TS_PACKET_LENGTH, pid, -1));
-					}
-				} else if (demux->GetType() == JMDT_PSI) {
-					if (section_length == (int)current.size()) {
-						if (demux->Append(current.data(), current.size()) == true) {
-							int tid = TS_G8(current.data());
+            demux->DispatchDemuxEvent(new jevent::DemuxEvent(this, jevent::JDET_DATA_ARRIVED, packet, TS_PACKET_LENGTH, pid));
+          }
+        } else {
+          if (demux->Append(current.c_str(), current.size()) == JDS_COMPLETE) {
+            _packet_status[demux].found = true;
 
-			        if (demux->GetTID() < 0 || demux->GetTID() == tid) {
-	  						_demux_status[demux].found = true;
+            demux->DispatchDemuxEvent(new jevent::DemuxEvent(this, jevent::JDET_DATA_ARRIVED, current.data(), current.size(), pid));
+          }
 
-		  					demux->DispatchDemuxEvent(new jevent::DemuxEvent(this, jevent::JDET_DATA_ARRIVED, current.data(), current.size(), pid, tid));
-              }
-						}
-					}
-					
-					// INFO:: previous section
-					if (previous.size() > 0) {
-						int section_length = TS_PSI_G_SECTION_LENGTH(previous.data()) + 3;
+          if (previous.size() > 0) {
+            if (demux->Append(previous.c_str(), previous.size()) == JDS_COMPLETE) {
+              _packet_status[demux].found = true;
 
-						if (section_length == (int)previous.size()) {
-							if (demux->Append(previous.c_str(), previous.size()) == true) {
-								int tid = TS_G8(previous.data());
+              demux->DispatchDemuxEvent(new jevent::DemuxEvent(this, jevent::JDET_DATA_ARRIVED, previous.data(), previous.size(), pid));
+            }
+          }
+        }
+      }
 
-								_demux_status[demux].found = true;
+			if (_packet_status[demux].found == false && demux->GetTimeout() < (int)(current_time-_packet_status[demux].start_time)) {
+				_packet_status[demux].start_time = current_time;
 
-								demux->DispatchDemuxEvent(new jevent::DemuxEvent(this, jevent::JDET_DATA_ARRIVED, previous.data(), previous.size(), pid, tid));
-							}
-						}
-					}
-				}
-			}
-
-			if (_demux_status[demux].found == false && demux->GetTimeout() < (int)(current_time-_demux_status[demux].start_time)) {
-				_demux_status[demux].start_time = current_time;
-
-				demux->DispatchDemuxEvent(new jevent::DemuxEvent(demux, jevent::JDET_DATA_NOT_FOUND, nullptr, 0, demux->GetPID(), demux->GetTID()));
+				demux->DispatchDemuxEvent(new jevent::DemuxEvent(demux, jevent::JDET_DATA_NOT_FOUND, nullptr, 0, demux->GetPID()));
 			}
 		
       // INFO:: reset state
-      _demux_status[demux].found = false;
+      _packet_status[demux].found = false;
 		}
 
 		_demux_mutex.lock();

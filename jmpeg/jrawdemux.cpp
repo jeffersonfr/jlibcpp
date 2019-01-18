@@ -17,107 +17,39 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_DEMUXMANAGER_H
-#define J_DEMUXMANAGER_H
-
-#include "jio/jinputstream.h"
-
-#include <map>
-#include <thread>
-#include <mutex>
+#include "jmpeg/jrawdemux.h"
 
 namespace jmpeg {
 
-class Demux;
+RawDemux::RawDemux():
+	Demux(JDT_RAW)
+{
+	jcommon::Object::SetClassName("jmpeg::RawDemux");
 
-class DemuxManager : public jcommon::Object {
-
-	friend class Demux;
-
-	protected:
-		/** \brief */
-		static DemuxManager *_instance;
-
-		/** \brief */
-		std::vector<Demux *> _demuxes;
-		/** \brief */
-		std::vector<Demux *> _sync_demuxes;
-		/** \brief */
-		std::thread _thread;
-		/** \brief */
-		std::mutex _demux_mutex;
-		/** \brief */
-		std::mutex _demux_sync_mutex;
-		/** \brief */
-		jio::InputStream *_source;
-		/** \brief */
-		bool _is_running;
-
-	protected:
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void AddDemux(Demux *demux);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveDemux(Demux *demux);
-
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		DemuxManager();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~DemuxManager();
-
-		/**
-		 * \brief
-		 *
-		 */
-		static DemuxManager * GetInstance();
+  _packet_size = 188; // INFO:: DVB standard
+}
 		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetInputStream(jio::InputStream *is);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Start();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Stop();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void WaitSync();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Run();
-		
-};
-
+RawDemux::~RawDemux()
+{
 }
 
-#endif
+void RawDemux::SetPacketSize(int packet_size)
+{
+  _packet_size = packet_size;
+}
 
+int RawDemux::GetPacketSize()
+{
+  return _packet_size;
+}
+
+jdemux_status_t RawDemux::Append(const char *data, int data_length)
+{
+  if (_packet_size != data_length) {
+    return JDS_FAILED;
+  }
+
+	return JDS_COMPLETE;
+}
+
+}

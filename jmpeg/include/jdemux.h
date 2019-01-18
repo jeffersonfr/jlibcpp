@@ -29,9 +29,16 @@
 
 namespace jmpeg {
 
-enum jmpeg_data_type_t {
-	JMDT_RAW,
-	JMDT_PSI
+enum jdemux_type_t {
+  JDT_RAW,
+  JDT_PSI,
+  JDT_PRIVATE
+};
+
+enum jdemux_status_t {
+  JDS_COMPLETE,
+  JDS_INCOMPLETE,
+  JDS_FAILED
 };
 
 class Demux : public jcommon::Object {
@@ -40,27 +47,22 @@ class Demux : public jcommon::Object {
 		/** \brief */
 		std::vector<jevent::DemuxListener *> _demux_listeners;
 		/** \brief */
-		std::string _buffer;
-		/** \brief */
-		jmpeg_data_type_t _type;
+		int _timeout;
 		/** \brief */
 		int _pid;
 		/** \brief */
-		int _tid;
-		/** \brief */
-		int _timeout;
-		/** \brief */
 		int _last_index;
 		/** \brief */
-		bool _is_crc_enabled;
+    jdemux_type_t _type;
 
-	public:
+  protected:
 		/**
 		 * \brief
 		 *
 		 */
-		Demux(jmpeg_data_type_t _type);
+		Demux(jdemux_type_t type);
 
+	public:
 		/**
 		 * \brief
 		 *
@@ -83,12 +85,6 @@ class Demux : public jcommon::Object {
 		 * \brief
 		 *
 		 */
-		virtual void SetType(jmpeg_data_type_t type);
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void SetTimeout(int timeout);
 
 		/**
@@ -101,7 +97,7 @@ class Demux : public jcommon::Object {
 		 * \brief
 		 *
 		 */
-		virtual jmpeg_data_type_t GetType();
+		virtual jdemux_type_t GetType();
 
 		/**
 		 * \brief
@@ -113,37 +109,13 @@ class Demux : public jcommon::Object {
 		 * \brief
 		 *
 		 */
-		virtual void SetTID(int tid);
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual int GetPID();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual int GetTID();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetCRCCheckEnabled(bool b);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsCRCCheckEnabled();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool Append(const char *data, int data_length);
+		virtual jdemux_status_t Append(const char *data, int data_length);
 		
 		/**
 		 * \brief

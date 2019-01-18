@@ -17,107 +17,75 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_DEMUXMANAGER_H
-#define J_DEMUXMANAGER_H
+#include "jmpeg/jpsidemux.h"
+#include "jmpeg/jdemuxmanager.h"
+#include "jmpeg/jmpeglib.h"
+#include "jmath/jcrc.h"
 
-#include "jio/jinputstream.h"
-
-#include <map>
-#include <thread>
-#include <mutex>
+#include <algorithm>
 
 namespace jmpeg {
 
-class Demux;
+PSIDemux::PSIDemux():
+	Demux(JDT_PSI)
+{
+	jcommon::Object::SetClassName("jmpeg::PSIDemux");
 
-class DemuxManager : public jcommon::Object {
-
-	friend class Demux;
-
-	protected:
-		/** \brief */
-		static DemuxManager *_instance;
-
-		/** \brief */
-		std::vector<Demux *> _demuxes;
-		/** \brief */
-		std::vector<Demux *> _sync_demuxes;
-		/** \brief */
-		std::thread _thread;
-		/** \brief */
-		std::mutex _demux_mutex;
-		/** \brief */
-		std::mutex _demux_sync_mutex;
-		/** \brief */
-		jio::InputStream *_source;
-		/** \brief */
-		bool _is_running;
-
-	protected:
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void AddDemux(Demux *demux);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveDemux(Demux *demux);
-
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		DemuxManager();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~DemuxManager();
-
-		/**
-		 * \brief
-		 *
-		 */
-		static DemuxManager * GetInstance();
+  _tid = -1;
+	_is_crc_enabled = true;
+}
 		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetInputStream(jio::InputStream *is);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Start();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Stop();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void WaitSync();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Run();
-		
-};
-
+PSIDemux::~PSIDemux()
+{
 }
 
-#endif
+void PSIDemux::SetTID(int tid)
+{
+	_tid = tid;
+}
 
+int PSIDemux::GetTID()
+{
+	return _tid;
+}
+
+void PSIDemux::SetCRCCheckEnabled(bool b)
+{
+	_is_crc_enabled = b;
+}
+
+bool PSIDemux::IsCRCCheckEnabled()
+{
+	return _is_crc_enabled;
+}
+
+jdemux_status_t PSIDemux::Append(const char *data, int data_length)
+{
+	int table_id = TS_G8(data);
+
+	if (_tid >= 0 && _tid != table_id) {
+		return JDS_FAILED;
+	}
+
+  int section_length = TS_PSI_G_SECTION_LENGTH(data) + 3;
+
+  if (section_length > data_length) {
+    return JDS_INCOMPLETE;
+  }
+
+	if (_is_crc_enabled == true) {
+		uint32_t 
+	    // crc = *(uint32_t *)(data+(data_length-4)),
+      sum = jmath::CRC::Calculate32((const uint8_t *)data, data_length);
+
+		if (sum != 0xffffffff) {
+			_last_index = -1;
+
+			return JDS_FAILED;
+		}
+	}
+
+	return JDS_COMPLETE;
+}
+
+}

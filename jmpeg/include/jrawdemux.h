@@ -17,103 +17,49 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_DEMUXMANAGER_H
-#define J_DEMUXMANAGER_H
+#ifndef J_RAWDEMUX_H
+#define J_RAWDEMUX_H
 
-#include "jio/jinputstream.h"
-
-#include <map>
-#include <thread>
-#include <mutex>
+#include "jmpeg/jdemux.h"
 
 namespace jmpeg {
 
-class Demux;
+class RawDemux : public jmpeg::Demux {
 
-class DemuxManager : public jcommon::Object {
-
-	friend class Demux;
-
-	protected:
-		/** \brief */
-		static DemuxManager *_instance;
-
-		/** \brief */
-		std::vector<Demux *> _demuxes;
-		/** \brief */
-		std::vector<Demux *> _sync_demuxes;
-		/** \brief */
-		std::thread _thread;
-		/** \brief */
-		std::mutex _demux_mutex;
-		/** \brief */
-		std::mutex _demux_sync_mutex;
-		/** \brief */
-		jio::InputStream *_source;
-		/** \brief */
-		bool _is_running;
-
-	protected:
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void AddDemux(Demux *demux);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveDemux(Demux *demux);
+  private:
+    /** \bried */
+    int _packet_size;
 
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		DemuxManager();
+		RawDemux();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~DemuxManager();
+		virtual ~RawDemux();
 
 		/**
 		 * \brief
 		 *
 		 */
-		static DemuxManager * GetInstance();
-		
+    virtual void SetPacketSize(int packet_size);
+
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetInputStream(jio::InputStream *is);
-		
+    virtual int GetPacketSize();
+
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void Start();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Stop();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void WaitSync();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Run();
+		virtual jdemux_status_t Append(const char *data, int data_length);
 		
 };
 

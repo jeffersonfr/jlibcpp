@@ -17,103 +17,63 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_DEMUXMANAGER_H
-#define J_DEMUXMANAGER_H
+#ifndef J_PSIDEMUX_H
+#define J_PSIDEMUX_H
 
-#include "jio/jinputstream.h"
-
-#include <map>
-#include <thread>
-#include <mutex>
+#include "jmpeg/jdemux.h"
 
 namespace jmpeg {
 
-class Demux;
-
-class DemuxManager : public jcommon::Object {
-
-	friend class Demux;
+class PSIDemux : public jmpeg::Demux {
 
 	protected:
 		/** \brief */
-		static DemuxManager *_instance;
-
+		int _tid;
 		/** \brief */
-		std::vector<Demux *> _demuxes;
-		/** \brief */
-		std::vector<Demux *> _sync_demuxes;
-		/** \brief */
-		std::thread _thread;
-		/** \brief */
-		std::mutex _demux_mutex;
-		/** \brief */
-		std::mutex _demux_sync_mutex;
-		/** \brief */
-		jio::InputStream *_source;
-		/** \brief */
-		bool _is_running;
-
-	protected:
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void AddDemux(Demux *demux);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveDemux(Demux *demux);
+		bool _is_crc_enabled;
 
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		DemuxManager();
+		PSIDemux();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~DemuxManager();
+		virtual ~PSIDemux();
 
 		/**
 		 * \brief
 		 *
 		 */
-		static DemuxManager * GetInstance();
+		virtual void SetTID(int tid);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetInputStream(jio::InputStream *is);
-		
+		virtual int GetTID();
+
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void Start();
-		
+		virtual void SetCRCCheckEnabled(bool b);
+
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void Stop();
-		
+		virtual bool IsCRCCheckEnabled();
+
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void WaitSync();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Run();
+		virtual jdemux_status_t Append(const char *data, int data_length);
 		
 };
 
