@@ -25,6 +25,7 @@
 
 #include "jmpeg/jdemuxmanager.h"
 #include "jmpeg/jpsidemux.h"
+#include "jmpeg/jrawdemux.h"
 #include "jmpeg/jmpeglib.h"
 #include "jio/jfileinputstream.h"
 #include "jevent/jdemuxlistener.h"
@@ -43,6 +44,7 @@
 #define TS_DSMCC_DESCRIPTORS_TABLE_ID 0x3d
 
 #define TS_PAT_TIMEOUT	2000
+#define TS_BAT_TIMEOUT	4000
 #define TS_CAT_TIMEOUT	4000
 #define TS_TSDT_TIMEOUT	4000
 #define TS_PMT_TIMEOUT	4000
@@ -768,7 +770,7 @@ class PSIParser : public jevent::DemuxListener {
 	private:
 		std::map<std::string, jmpeg::Demux *> _demuxes;
 		std::map<int, ElementaryStream::stream_type_t> _stream_types;
-		std::set<int> _pids;
+		std::map<int, int> _pids;
 		std::string _dsmcc_private_payload;
 		int _pcr_pid;
 		int _dsmcc_sequence_number;
@@ -849,14 +851,25 @@ class PSIParser : public jevent::DemuxListener {
 			_stream_types[0xea] = ElementaryStream::stream_type_t::VIDEO;
 
 			StartDemux("pat", TS_PAT_PID, TS_PAT_TABLE_ID, TS_PAT_TIMEOUT);
+			
+      // INFO:: see all pids from stream
+      /*
+      jmpeg::RawDemux *demux = new jmpeg::RawDemux();
+
+			demux->RegisterDemuxListener(this);
+			demux->SetPID(-1);
+			demux->Start();
+
+			_demuxes["raw"] = demux;
+      */
 		}
 
 		virtual ~PSIParser()
 		{
 			printf("\nList of PID's::\n");
 
-			for (std::set<int, int>::iterator i=_pids.begin(); i!=_pids.end(); i++) {
-				printf("PID:[0x%02x]\n", *i);
+			for (std::map<int, int>::iterator i=_pids.begin(); i!=_pids.end(); i++) {
+				printf("pid:[0x%04x], count:[%d]\n", i->first, i->second);
 			}
 
 			for (std::map<std::string, jmpeg::Demux *>::iterator i=_demuxes.begin(); i!=_demuxes.end(); i++) {
@@ -1984,13 +1997,20 @@ class PSIParser : public jevent::DemuxListener {
 		{
 			int pid = event->GetPID();
 			int len = event->GetLength();
-
 			const char *ptr = event->GetData();
+
+      // INFO:: save the pid counter
+      auto i = _pids.find(pid);
+
+      if (i == _pids.end()) {
+        _pids[pid] = 0;
+      } else {
+        i->second++;
+      }
+
 			int tid = TS_G8(ptr+0);
 
 			printf("PSI Section:[%s]: pid:[0x%04x], tid:[0x%04x], length:[%d]\n", GetTableDescription(pid, tid).c_str(), pid, tid, len);
-
-			_pids.insert(pid);
 
 			if (pid == TS_PAT_PID && tid == TS_PAT_TABLE_ID) {
 				ProcessPAT(event);
@@ -2039,6 +2059,7 @@ class PSIParser : public jevent::DemuxListener {
 			// INFO::
 			// 	start SDT to get the service name
 			// 	start TDT/TOT to get the current time
+			StartDemux("bat", TS_BAT_PID, TS_BAT_TABLE_ID, TS_BAT_TIMEOUT);
 			StartDemux("cat", TS_CAT_PID, TS_CAT_TABLE_ID, TS_CAT_TIMEOUT);
 			StartDemux("tsdt", TS_TSDT_PID, TS_TSDT_TABLE_ID, TS_TSDT_TIMEOUT);
 			StartDemux("sdt", TS_SDT_PID, TS_SDT_TABLE_ID, TS_SDT_TIMEOUT);
@@ -3035,11 +3056,62 @@ class PSIParser : public jevent::DemuxListener {
 			printf("Data Not Found:: pid:[0x%04x], length:[%d]\n", event->GetPID(), event->GetLength());
 		}
 
-		// INFO:: si methods
-		void GetPrograms(std::vector<int> *programs)
+};
+
+class PIDList : public jevent::DemuxListener {
+
+	private:
+		std::map<int, int> _pids;
+    jmpeg::RawDemux *_demux;
+
+	public:
+		PIDList(int pid)
 		{
+      _demux = new jmpeg::RawDemux();
+
+			_demux->RegisterDemuxListener(this);
+			_demux->SetPID(pid);
+			_demux->Start();
 		}
 
+		virtual ~PIDList()
+		{
+      _demux->Stop();
+			_demux->RemoveDemuxListener(this);
+
+      delete _demux;
+      _demux = nullptr;
+
+			printf("\nList of PID's::\n");
+
+      int count = 0;
+
+			for (std::map<int, int>::iterator i=_pids.begin(); i!=_pids.end(); i++) {
+        count = count + i->second;
+
+				printf("pid:[0x%04x], count:[%d]\n", i->first, i->second);
+			}
+
+      printf("\n:: total:[%d]\n", count);
+		}
+
+		virtual void DataArrived(jevent::DemuxEvent *event)
+		{
+			int pid = event->GetPID();
+
+      // INFO:: save the pid counter
+      auto i = _pids.find(pid);
+
+      if (i == _pids.end()) {
+        _pids[pid] = 0;
+      } else {
+        i->second++;
+      }
+		}
+		
+    virtual void DataNotFound(jevent::DemuxEvent *event)
+		{
+		}
 };
 
 class ISDBTInputStream : public jio::FileInputStream {
@@ -3077,11 +3149,12 @@ class ISDBTInputStream : public jio::FileInputStream {
 
 int main(int argc, char **argv)
 {
-	if (argc != 4) {
-		std::cout << "usage:: " << argv[0] << " <file.ts> <lgap> <rgap>" << std::endl;
+	if (argc != 4 and argc != 5) {
+		std::cout << "usage:: " << argv[0] << " <file.ts> <lgap> <rgap> [pid]" << std::endl;
 		std::cout << std::endl;
 		std::cout << "  lgap: bytes before ts packet (lgap+188 bytes)" << std::endl;
 		std::cout << "  rgap: bytes after ts packet (188+rgap bytes)" << std::endl;
+		std::cout << "   pid: count the occurrencies of specific pid or -1 to consider all pids in stream" << std::endl;
 		std::cout << std::endl;
 		std::cout << "  examples ..." << std::endl;
 		std::cout << "    DVB Packet Size (0+188+0 = 188 bytes) -> (lgap, rgap) = (0, 0)" << std::endl;
@@ -3099,39 +3172,48 @@ int main(int argc, char **argv)
 
 	manager->SetInputStream(&is);
 	
-  PSIParser 
-    test;
+  if (argc == 4) {
+    PSIParser 
+      test;
 
-	manager->Start();
-  manager->WaitSync();
-  manager->Stop();
- 
-  // INFO:: dumping methods
-  auto 
-    services = SIFacade::GetInstance()->Services();
+    manager->Start();
+    manager->WaitSync();
+    manager->Stop();
 
-  for (auto i : services) {
-    i->Print();
+    // INFO:: dumping methods
+    auto 
+      services = SIFacade::GetInstance()->Services();
+
+    for (auto i : services) {
+      i->Print();
+    }
+
+    auto 
+      networks = SIFacade::GetInstance()->Networks();
+
+    for (auto i : networks) {
+      i->Print();
+    }
+
+    auto 
+      events = SIFacade::GetInstance()->Events();
+
+    for (auto i : events) {
+      i->Print();
+    }
+
+    auto 
+      time = SIFacade::GetInstance()->Time();
+
+    time.Print();
+  } else if (argc == 5) {
+    PIDList 
+      test(atoi(argv[4]));
+    
+    manager->Start();
+    manager->WaitSync();
+    manager->Stop();
   }
-
-  auto 
-    networks = SIFacade::GetInstance()->Networks();
-
-  for (auto i : networks) {
-    i->Print();
-  }
-
-  auto 
-    events = SIFacade::GetInstance()->Events();
-
-  for (auto i : events) {
-    i->Print();
-  }
-
-  auto 
-    time = SIFacade::GetInstance()->Time();
-
-  time.Print();
 
 	return 0;
 }

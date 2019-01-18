@@ -167,6 +167,44 @@ void DemuxManager::Run()
 		int contains_payload = TS_GM8(data+3, 3, 1);
 		// int continuity_counter = TS_GM8(data+3, 4, 4);
 
+    uint64_t 
+      current_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
+
+    // OPTIMIZE:: process only if necessary
+    for (std::vector<Demux *>::iterator i=_demuxes.begin(); i!=_demuxes.end(); i++) {
+      Demux *demux = (*i);
+
+      if (_packet_status.find(demux) == _packet_status.end()) {
+        _packet_status[demux] = {
+          .start_time = current_time,
+          .found = false
+        };
+      }
+    }
+
+    // INFO:: process only raw packets
+		for (std::vector<Demux *>::iterator i=_demuxes.begin(); i!=_demuxes.end(); i++) {
+			Demux *demux = (*i);
+
+      if (demux->GetType() == JDT_RAW) {
+			  if (demux->GetPID() < 0 || demux->GetPID() == pid) {
+          if (demux->Append(packet, TS_PACKET_LENGTH) == JDS_COMPLETE) {
+            _packet_status[demux].found = true;
+
+            demux->DispatchDemuxEvent(new jevent::DemuxEvent(this, jevent::JDET_DATA_ARRIVED, packet, TS_PACKET_LENGTH, pid));
+          }
+        }
+      }
+
+			if (_packet_status[demux].found == false && demux->GetTimeout() < (int)(current_time-_packet_status[demux].start_time)) {
+				_packet_status[demux].start_time = current_time;
+
+				demux->DispatchDemuxEvent(new jevent::DemuxEvent(demux, jevent::JDET_DATA_NOT_FOUND, nullptr, 0, demux->GetPID()));
+			}
+		
+      _packet_status[demux].found = false;
+		}
+
 		if (transport_error_indicator == 1) {
 			continue;
 		}
@@ -242,27 +280,12 @@ void DemuxManager::Run()
 
 		timeline[pid] = current;
 
+    // INFO:: process psi, private packets
 		for (std::vector<Demux *>::iterator i=_demuxes.begin(); i!=_demuxes.end(); i++) {
 			Demux *demux = (*i);
 
-			std::map<Demux *, struct jpacket_status_t>::iterator 
-        j=_packet_status.find(demux);
-      uint64_t 
-        current_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
-
-			if (j == _packet_status.end()) {
-				_packet_status[demux].start_time = current_time;
-				_packet_status[demux].found = false;
-			}
-
-			if (demux->GetPID() < 0 || demux->GetPID() == pid) {
-        if (demux->GetType() == JDT_RAW) {
-          if (demux->Append(packet, TS_PACKET_LENGTH) == JDS_COMPLETE) {
-            _packet_status[demux].found = true;
-
-            demux->DispatchDemuxEvent(new jevent::DemuxEvent(this, jevent::JDET_DATA_ARRIVED, packet, TS_PACKET_LENGTH, pid));
-          }
-        } else {
+      if (demux->GetType() != JDT_RAW) {
+			  if (demux->GetPID() < 0 || demux->GetPID() == pid) {
           if (demux->Append(current.c_str(), current.size()) == JDS_COMPLETE) {
             _packet_status[demux].found = true;
 
