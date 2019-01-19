@@ -58,10 +58,10 @@ ENABLE_DEBUG ?= yes
 ENABLE_GRAPHICS ?= sdl2
 
 # {bmp, gif, ico, jpg, pcx, png, ppm, tga, xbm, xpm, heif, webp, jp2000, svg, tif, bpg, mjpeg, flif}
-ENABLE_IMAGE ?= bmp, gif, ico, jpg, pcx, png, ppm, tga, xbm, xpm, heif, webp, jp2000, svg, tif, bpg, mjpeg, flif
+ENABLE_IMAGE ?= bmp, gif, ico, jpg, pcx, png, ppm, tga, xbm, xpm
 
 # {gif, ilist, v4l2, libvlc, libav, libxine, alsa, mixer}
-ENABLE_VIDEO ?= gif, ilist, v4l2, libvlc, libav, libxine, alsa, mixer
+ENABLE_VIDEO ?= 
 
 # -ansi: problemas com va_copy()
 CCFLAGS		= \
