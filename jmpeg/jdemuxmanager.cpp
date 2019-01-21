@@ -25,13 +25,6 @@
 
 namespace jmpeg {
 
-struct  jpacket_status_t {
-	uint64_t start_time;
-	bool found;
-};
-
-std::map<Demux *, struct jpacket_status_t> _packet_status;
-
 DemuxManager * DemuxManager::_instance = nullptr;
 
 DemuxManager::DemuxManager():
@@ -85,12 +78,6 @@ void DemuxManager::RemoveDemux(Demux *demux)
 		_sync_demuxes.erase(i);
 	}
 	
-	std::map<Demux *, struct jpacket_status_t>::iterator j=_packet_status.find(demux);
-
-	if (j != _packet_status.end()) {
-		_packet_status.erase(j);
-	}
-
 	_demux_mutex.unlock();
 }
 
@@ -131,6 +118,161 @@ void DemuxManager::WaitSync()
   std::lock_guard<std::mutex> guard(_demux_sync_mutex);
 }
 
+void DemuxManager::ProcessRaw(const char *data, const int length)
+{
+  std::chrono::steady_clock::time_point
+    timepoint = std::chrono::steady_clock::now();
+  int 
+    pid = TS_GM16(data+1, 3, 13);
+
+  // INFO:: process only raw packets
+  for (std::vector<Demux *>::iterator i=_demuxes.begin(); i!=_demuxes.end(); i++) {
+    Demux *demux = (*i);
+
+    if (demux->GetType() != JDT_RAW) {
+      continue;
+    }
+
+    if ((timepoint - demux->GetTimePoint()) > demux->GetTimeout()) {
+      demux->UpdateTimePoint();
+
+      demux->DispatchDemuxEvent(new jevent::DemuxEvent(this, jevent::JDET_DATA_NOT_FOUND, nullptr, 0, demux->GetPID()));
+    } else {
+      if (demux->GetPID() < 0 || demux->GetPID() == pid) {
+        if (demux->Append(data, length) == true) {
+          demux->UpdateTimePoint();
+
+          demux->DispatchDemuxEvent(new jevent::DemuxEvent(this, jevent::JDET_DATA_ARRIVED, data, length, pid));
+        }
+      }
+    }
+  }
+}
+
+void DemuxManager::ProcessPSI(const char *data, const int length)
+{
+  static std::map<int, std::string> timeline;
+
+  int transport_error_indicator = TS_GM8(data+1, 0, 1);
+  int payload_unit_start_indicator = TS_GM8(data+1, 1, 1);
+  // int transport_priority = TS_GM8(data+1, 2, 1);
+  int pid = TS_GM16(data+1, 3, 13);
+  // int scrambling_control = TS_GM8(data+3, 0, 2);
+  int adaptation_field_exist = TS_GM8(data+3, 2, 1);
+  int contains_payload = TS_GM8(data+3, 3, 1);
+  // int continuity_counter = TS_GM8(data+3, 4, 4);
+
+  if (transport_error_indicator == 1) {
+    return;
+  }
+
+  if (contains_payload == 0) {
+    return;
+  }
+
+  const char *ptr = data+TS_HEADER_LENGTH;
+  const char *end = data+TS_PACKET_LENGTH;
+
+  // INFO:: discards adaptation field
+  if (adaptation_field_exist == 1) {
+    int adaptation_field_length = TS_G8(ptr);
+
+    ptr = ptr + adaptation_field_length + 1;
+  }
+
+  std::string current;
+  std::string previous;
+  int section_length = -1;
+
+  if (payload_unit_start_indicator == 1) {
+    int pointer_field = TS_G8(ptr);
+
+    if (pointer_field > 0) {
+      previous = timeline[pid];
+
+      if (previous.size() > 0) {
+        previous.append(ptr+1, pointer_field);
+      }
+    }
+
+    ptr = ptr + pointer_field + 1;
+
+    if (ptr < end) {
+      section_length = TS_PSI_G_SECTION_LENGTH(ptr) + 3;
+
+      if (section_length > 3) {
+        int length = end - ptr;
+        int chunk = section_length;
+
+        if (chunk > length) {
+          chunk = length;
+        }
+
+        current = std::string(ptr, chunk);
+      }
+    }
+  } else {
+    current = timeline[pid];
+
+    if (current.size() == 0) {
+      return;
+    }
+
+    section_length = TS_PSI_G_SECTION_LENGTH(current.data()) + 3;
+
+    int length = end - ptr;
+
+    if (length < 0) {
+      return;
+    }
+
+    int chunk = section_length - current.size();
+
+    if (chunk > length) {
+      chunk = length;
+    }
+
+    current.append(ptr, chunk);
+  }
+
+  timeline[pid] = current;
+
+  std::chrono::steady_clock::time_point
+    timepoint = std::chrono::steady_clock::now();
+
+  // INFO:: process psi, private packets
+  for (std::vector<Demux *>::iterator i=_demuxes.begin(); i!=_demuxes.end(); i++) {
+    Demux *demux = (*i);
+
+    if (demux->GetType() != JDT_PSI and demux->GetType() != JDT_PRIVATE) {
+      continue;
+    }
+
+    if ((timepoint - demux->GetTimePoint()) > demux->GetTimeout()) {
+      demux->UpdateTimePoint();
+      demux->DispatchDemuxEvent(new jevent::DemuxEvent(this, jevent::JDET_DATA_NOT_FOUND, nullptr, 0, demux->GetPID()));
+    } else {
+      if (demux->GetPID() < 0 || demux->GetPID() == pid) {
+        if (demux->Append(current.c_str(), current.size()) == true) {
+          demux->UpdateTimePoint();
+          demux->DispatchDemuxEvent(new jevent::DemuxEvent(this, jevent::JDET_DATA_ARRIVED, current.data(), current.size(), pid));
+        }
+        
+        if (previous.size() > 0) {
+          if (demux->Append(previous.c_str(), previous.size()) == true) {
+            demux->UpdateTimePoint();
+            demux->DispatchDemuxEvent(new jevent::DemuxEvent(this, jevent::JDET_DATA_ARRIVED, previous.data(), previous.size(), pid));
+          }
+        }
+      }
+    }
+  }
+}
+
+void DemuxManager::ProcessPES(const char *data, const int length)
+{
+}
+
 void DemuxManager::Run()
 {
  	std::lock_guard<std::mutex> guard(_demux_sync_mutex);
@@ -138,8 +280,6 @@ void DemuxManager::Run()
 	if (_source == nullptr) {
 		return;
 	}
-
-	std::map<int, std::string> timeline;
 
 	while (_is_running) {
 		char packet[TS_PACKET_LENGTH];
@@ -158,159 +298,9 @@ void DemuxManager::Run()
 			continue;
 		}
 
-		int transport_error_indicator = TS_GM8(data+1, 0, 1);
-		int payload_unit_start_indicator = TS_GM8(data+1, 1, 1);
-		// int transport_priority = TS_GM8(data+1, 2, 1);
-		int pid = TS_GM16(data+1, 3, 13);
-		// int scrambling_control = TS_GM8(data+3, 0, 2);
-		int adaptation_field_exist = TS_GM8(data+3, 2, 1);
-		int contains_payload = TS_GM8(data+3, 3, 1);
-		// int continuity_counter = TS_GM8(data+3, 4, 4);
-
-    uint64_t 
-      current_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
-
-    // OPTIMIZE:: process only if necessary
-    for (std::vector<Demux *>::iterator i=_demuxes.begin(); i!=_demuxes.end(); i++) {
-      Demux *demux = (*i);
-
-      if (_packet_status.find(demux) == _packet_status.end()) {
-        _packet_status[demux] = {
-          .start_time = current_time,
-          .found = false
-        };
-      }
-    }
-
-    // INFO:: process only raw packets
-		for (std::vector<Demux *>::iterator i=_demuxes.begin(); i!=_demuxes.end(); i++) {
-			Demux *demux = (*i);
-
-      if (demux->GetType() == JDT_RAW) {
-			  if (demux->GetPID() < 0 || demux->GetPID() == pid) {
-          if (demux->Append(packet, TS_PACKET_LENGTH) == JDS_COMPLETE) {
-            _packet_status[demux].found = true;
-
-            demux->DispatchDemuxEvent(new jevent::DemuxEvent(this, jevent::JDET_DATA_ARRIVED, packet, TS_PACKET_LENGTH, pid));
-          }
-        }
-      }
-
-			if (_packet_status[demux].found == false && demux->GetTimeout() < (int)(current_time-_packet_status[demux].start_time)) {
-				_packet_status[demux].start_time = current_time;
-
-				demux->DispatchDemuxEvent(new jevent::DemuxEvent(demux, jevent::JDET_DATA_NOT_FOUND, nullptr, 0, demux->GetPID()));
-			}
-		
-      _packet_status[demux].found = false;
-		}
-
-		if (transport_error_indicator == 1) {
-			continue;
-		}
-
-		if (contains_payload == 0) {
-			continue;
-		}
-
-		const char *ptr = data+TS_HEADER_LENGTH;
-		const char *end = data+TS_PACKET_LENGTH;
-
-		// INFO:: discards adaptation field
-		if (adaptation_field_exist == 1) {
-			int adaptation_field_length = TS_G8(ptr);
-
-			ptr = ptr + adaptation_field_length + 1;
-		}
-
-		std::string current;
-		std::string previous;
-		int section_length = -1;
-
-		if (payload_unit_start_indicator == 1) {
-			int pointer_field = TS_G8(ptr);
-
-			if (pointer_field > 0) {
-				previous = timeline[pid];
-
-				if (previous.size() > 0) {
-					previous.append(ptr+1, pointer_field);
-				}
-			}
-
-			ptr = ptr + pointer_field + 1;
-
-			if (ptr < end) {
-				section_length = TS_PSI_G_SECTION_LENGTH(ptr) + 3;
-
-				if (section_length > 3) {
-					int length = end - ptr;
-					int chunk = section_length;
-
-					if (chunk > length) {
-						chunk = length;
-					}
-
-					current = std::string(ptr, chunk);
-				}
-			}
-		} else {
-			current = timeline[pid];
-
-			if (current.size() == 0) {
-				continue;
-			}
-
-			section_length = TS_PSI_G_SECTION_LENGTH(current.data()) + 3;
-
-			int length = end - ptr;
-
-			if (length < 0) {
-				continue;
-			}
-
-			int chunk = section_length - current.size();
-
-			if (chunk > length) {
-				chunk = length;
-			}
-
-			current.append(ptr, chunk);
-		}
-
-		timeline[pid] = current;
-
-    // INFO:: process psi, private packets
-		for (std::vector<Demux *>::iterator i=_demuxes.begin(); i!=_demuxes.end(); i++) {
-			Demux *demux = (*i);
-
-      if (demux->GetType() != JDT_RAW) {
-			  if (demux->GetPID() < 0 || demux->GetPID() == pid) {
-          if (demux->Append(current.c_str(), current.size()) == JDS_COMPLETE) {
-            _packet_status[demux].found = true;
-
-            demux->DispatchDemuxEvent(new jevent::DemuxEvent(this, jevent::JDET_DATA_ARRIVED, current.data(), current.size(), pid));
-          }
-
-          if (previous.size() > 0) {
-            if (demux->Append(previous.c_str(), previous.size()) == JDS_COMPLETE) {
-              _packet_status[demux].found = true;
-
-              demux->DispatchDemuxEvent(new jevent::DemuxEvent(this, jevent::JDET_DATA_ARRIVED, previous.data(), previous.size(), pid));
-            }
-          }
-        }
-      }
-
-			if (_packet_status[demux].found == false && demux->GetTimeout() < (int)(current_time-_packet_status[demux].start_time)) {
-				_packet_status[demux].start_time = current_time;
-
-				demux->DispatchDemuxEvent(new jevent::DemuxEvent(demux, jevent::JDET_DATA_NOT_FOUND, nullptr, 0, demux->GetPID()));
-			}
-		
-      // INFO:: reset state
-      _packet_status[demux].found = false;
-		}
+    ProcessRaw(data, TS_PACKET_LENGTH);
+    ProcessPSI(data, TS_PACKET_LENGTH);
+    ProcessPES(data, TS_PACKET_LENGTH);
 
 		_demux_mutex.lock();
 

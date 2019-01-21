@@ -221,6 +221,10 @@ OBJS_jnetwork += \
 
 OBJS_jmpeg += \
 		 jdemux.o\
+		 jrawdemux.o\
+		 jpsidemux.o\
+		 jpesdemux.o\
+		 jprivatedemux.o\
 		 jdemuxmanager.o\
 	   jmpeglib.o\
 

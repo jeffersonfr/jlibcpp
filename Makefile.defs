@@ -58,15 +58,15 @@ ENABLE_DEBUG ?= yes
 ENABLE_GRAPHICS ?= sdl2
 
 # {bmp, gif, ico, jpg, pcx, png, ppm, tga, xbm, xpm, heif, webp, jp2000, svg, tif, bpg, mjpeg, flif}
-ENABLE_IMAGE ?= bmp, gif, ico, jpg, pcx, png, ppm, tga, xbm, xpm
+ENABLE_IMAGE ?= bmp, gif, ico, jpg, pcx, png, ppm, tga, xbm, xpm, heif, webp, jp2000, svg, tif, bpg, mjpeg, flif
 
 # {gif, ilist, v4l2, libvlc, libav, libxine, alsa, mixer}
-ENABLE_VIDEO ?= 
+ENABLE_VIDEO ?= gif, ilist, v4l2, libvlc, libav, libxine, alsa, mixer
 
 # -ansi: problemas com va_copy()
 CCFLAGS		= \
 		 -Wall -shared -rdynamic -fPIC -funroll-loops \
-		 -std=c++11 -O2 -D_GNU_SOURCE -D_REENTRANT -fopenmp \
+		 -std=c++14 -O2 -D_GNU_SOURCE -D_REENTRANT -fopenmp \
 		 -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE \
 		 -D_DATA_PREFIX=\"$(PREFIX)/$(MODULE)\" -I. -I$(INCDIR) \
 	 	 `pkg-config --cflags libssl` \

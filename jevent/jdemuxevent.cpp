@@ -21,7 +21,7 @@
 
 namespace jevent {
 
-DemuxEvent::DemuxEvent(void *source, jdemuxevent_type_t type, const char *data, int data_length, int pid, int tid):
+DemuxEvent::DemuxEvent(void *source, jdemuxevent_type_t type, const char *data, int data_length, int pid):
 	jevent::EventObject(source)
 {
 	jcommon::Object::SetClassName("jevent::DemuxEvent");
@@ -30,7 +30,6 @@ DemuxEvent::DemuxEvent(void *source, jdemuxevent_type_t type, const char *data, 
 	_data = data;
 	_data_length = data_length;
 	_pid = pid;
-	_tid = tid;
 }
 		
 DemuxEvent::~DemuxEvent()
@@ -47,7 +46,7 @@ const char * DemuxEvent::GetData()
 	return _data;
 }
 
-int DemuxEvent::GetDataLength()
+int DemuxEvent::GetLength()
 {
 	return _data_length;
 }
@@ -55,11 +54,6 @@ int DemuxEvent::GetDataLength()
 int DemuxEvent::GetPID()
 {
 	return _pid;
-}
-
-int DemuxEvent::GetTID()
-{
-	return _tid;
 }
 
 }

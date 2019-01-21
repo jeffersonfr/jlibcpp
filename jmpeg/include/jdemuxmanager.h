@@ -58,6 +58,24 @@ class DemuxManager : public jcommon::Object {
 		 * \brief
 		 *
 		 */
+    virtual void ProcessRaw(const char *data, const int length);
+
+		/**
+		 * \brief
+		 *
+		 */
+    virtual void ProcessPSI(const char *data, const int length);
+
+		/**
+		 * \brief
+		 *
+		 */
+    virtual void ProcessPES(const char *data, const int length);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void AddDemux(Demux *demux);
 
 		/**

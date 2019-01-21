@@ -43,13 +43,13 @@ int RawDemux::GetPacketSize()
   return _packet_size;
 }
 
-jdemux_status_t RawDemux::Append(const char *data, int data_length)
+bool RawDemux::Append(const char *data, int data_length)
 {
   if (_packet_size != data_length) {
-    return JDS_FAILED;
+    return false;
   }
 
-	return JDS_COMPLETE;
+	return true;
 }
 
 }

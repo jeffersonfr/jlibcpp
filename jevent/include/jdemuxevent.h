@@ -43,8 +43,6 @@ class DemuxEvent : public jevent::EventObject {
 	private:
 		/** \brief Program Identify */
 		int _pid;
-		/** \brief Table Identify */
-		int _tid;
 		/** \brief */
 		const char *_data;
 		/** \brief */
@@ -57,7 +55,7 @@ class DemuxEvent : public jevent::EventObject {
 		 * \brief 
 		 *
 		 */
-		DemuxEvent(void *source, jdemuxevent_type_t type, const char *data, int data_length, int pid, int tid);
+		DemuxEvent(void *source, jdemuxevent_type_t type, const char *data, int data_length, int pid);
 
 		/**
 		 * \brief
@@ -81,19 +79,13 @@ class DemuxEvent : public jevent::EventObject {
 		 * \brief
 		 *
 		 */
-		virtual int GetDataLength();
+		virtual int GetLength();
 
 		/**
 		 * \brief
 		 *
 		 */
 		virtual int GetPID();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetTID();
 
 };
 

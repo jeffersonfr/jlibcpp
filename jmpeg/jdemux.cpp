@@ -33,7 +33,9 @@ Demux::Demux(jdemux_type_t type):
 
   _type = type;
 	_last_index = -1;
-	_timeout = 2000; // 2ms
+	_timeout = std::chrono::milliseconds(2000);
+
+  UpdateTimePoint();
 }
 		
 Demux::~Demux()
@@ -55,14 +57,24 @@ jdemux_type_t Demux::GetType()
 	return _type;
 }
 
-void Demux::SetTimeout(int timeout)
+void Demux::SetTimeout(std::chrono::milliseconds ms)
 {
-	_timeout = timeout;
+  _timeout = ms;
 }
 
-int Demux::GetTimeout()
+std::chrono::milliseconds Demux::GetTimeout()
 {
-	return _timeout;
+  return _timeout;
+}
+
+std::chrono::steady_clock::time_point Demux::GetTimePoint()
+{
+  return _timepoint;
+}
+
+void Demux::UpdateTimePoint()
+{
+  _timepoint = std::chrono::steady_clock::now();
 }
 
 void Demux::SetPID(int pid)
@@ -75,9 +87,9 @@ int Demux::GetPID()
 	return _pid;
 }
 
-jdemux_status_t Demux::Append(const char *data, int data_length)
+bool Demux::Append(const char *data, int data_length)
 {
-  return JDS_COMPLETE;
+  return false;
 }
 
 void Demux::RegisterDemuxListener(jevent::DemuxListener *listener)

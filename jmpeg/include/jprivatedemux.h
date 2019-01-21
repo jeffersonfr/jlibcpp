@@ -73,7 +73,7 @@ class PrivateDemux : public jmpeg::Demux {
 		 * \brief
 		 *
 		 */
-		virtual jdemux_status_t Append(const char *data, int data_length);
+		virtual bool Append(const char *data, int data_length);
 		
 };
 

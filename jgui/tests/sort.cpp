@@ -1649,6 +1649,11 @@ class SortComponent : public jgui::Component, public jcommon::Observer {
 
 			if (event->GetButton() == jevent::JMB_BUTTON1) {
 				if (_algorithm->IsLocked() == false) {
+          try {
+            _thread.join();
+          } catch (...) {
+          }
+
           _thread = std::thread(&SortComponent::Run, this);
 				} else {
 					Stop();

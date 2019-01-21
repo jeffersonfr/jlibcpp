@@ -59,18 +59,18 @@ bool PSIDemux::IsCRCCheckEnabled()
 	return _is_crc_enabled;
 }
 
-jdemux_status_t PSIDemux::Append(const char *data, int data_length)
+bool PSIDemux::Append(const char *data, int data_length)
 {
 	int table_id = TS_G8(data);
 
 	if (_tid >= 0 && _tid != table_id) {
-		return JDS_FAILED;
+		return false;
 	}
 
   int section_length = TS_PSI_G_SECTION_LENGTH(data) + 3;
 
   if (section_length > data_length) {
-    return JDS_INCOMPLETE;
+    return false;
   }
 
 	if (_is_crc_enabled == true) {
@@ -81,11 +81,11 @@ jdemux_status_t PSIDemux::Append(const char *data, int data_length)
 		if (sum != 0xffffffff) {
 			_last_index = -1;
 
-			return JDS_FAILED;
+			return false;
 		}
 	}
 
-	return JDS_COMPLETE;
+	return true;
 }
 
 }

@@ -770,7 +770,6 @@ class PSIParser : public jevent::DemuxListener {
 	private:
 		std::map<std::string, jmpeg::Demux *> _demuxes;
 		std::map<int, ElementaryStream::stream_type_t> _stream_types;
-		std::map<int, int> _pids;
 		std::string _dsmcc_private_payload;
 		int _pcr_pid;
 		int _dsmcc_sequence_number;
@@ -791,7 +790,7 @@ class PSIParser : public jevent::DemuxListener {
 			demux->RegisterDemuxListener(this);
 			demux->SetPID(pid);
 			demux->SetTID(tid);
-			demux->SetTimeout(timeout);
+			demux->SetTimeout(std::chrono::milliseconds(timeout));
 			// demux->SetUpdateIfModified(false);
 			demux->SetCRCCheckEnabled(false);
 			demux->Start();
@@ -866,12 +865,6 @@ class PSIParser : public jevent::DemuxListener {
 
 		virtual ~PSIParser()
 		{
-			printf("\nList of PID's::\n");
-
-			for (std::map<int, int>::iterator i=_pids.begin(); i!=_pids.end(); i++) {
-				printf("pid:[0x%04x], count:[%d]\n", i->first, i->second);
-			}
-
 			for (std::map<std::string, jmpeg::Demux *>::iterator i=_demuxes.begin(); i!=_demuxes.end(); i++) {
 				jmpeg::Demux *demux = i->second;
 
@@ -1995,20 +1988,10 @@ class PSIParser : public jevent::DemuxListener {
 
 		virtual void DataArrived(jevent::DemuxEvent *event)
 		{
-			int pid = event->GetPID();
-			int len = event->GetLength();
 			const char *ptr = event->GetData();
-
-      // INFO:: save the pid counter
-      auto i = _pids.find(pid);
-
-      if (i == _pids.end()) {
-        _pids[pid] = 0;
-      } else {
-        i->second++;
-      }
-
+			int pid = event->GetPID();
 			int tid = TS_G8(ptr+0);
+			int len = event->GetLength();
 
 			printf("PSI Section:[%s]: pid:[0x%04x], tid:[0x%04x], length:[%d]\n", GetTableDescription(pid, tid).c_str(), pid, tid, len);
 

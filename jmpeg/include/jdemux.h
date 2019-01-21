@@ -24,6 +24,7 @@
 
 #include <vector>
 #include <set>
+#include <chrono>
 
 #include <stdint.h>
 
@@ -32,13 +33,8 @@ namespace jmpeg {
 enum jdemux_type_t {
   JDT_RAW,
   JDT_PSI,
+  JDT_PES,
   JDT_PRIVATE
-};
-
-enum jdemux_status_t {
-  JDS_COMPLETE,
-  JDS_INCOMPLETE,
-  JDS_FAILED
 };
 
 class Demux : public jcommon::Object {
@@ -47,7 +43,9 @@ class Demux : public jcommon::Object {
 		/** \brief */
 		std::vector<jevent::DemuxListener *> _demux_listeners;
 		/** \brief */
-		int _timeout;
+    std::chrono::steady_clock::time_point _timepoint;
+		/** \brief */
+    std::chrono::milliseconds _timeout;
 		/** \brief */
 		int _pid;
 		/** \brief */
@@ -85,13 +83,25 @@ class Demux : public jcommon::Object {
 		 * \brief
 		 *
 		 */
-		virtual void SetTimeout(int timeout);
+		virtual void SetTimeout(std::chrono::milliseconds ms);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual int GetTimeout();
+		virtual std::chrono::milliseconds GetTimeout();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual std::chrono::steady_clock::time_point GetTimePoint();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void UpdateTimePoint();
 
 		/**
 		 * \brief
@@ -115,7 +125,7 @@ class Demux : public jcommon::Object {
 		 * \brief
 		 *
 		 */
-		virtual jdemux_status_t Append(const char *data, int data_length);
+		virtual bool Append(const char *data, int data_length);
 		
 		/**
 		 * \brief
