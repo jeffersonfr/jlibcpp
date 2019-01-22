@@ -1574,6 +1574,17 @@ class PSIParser : public jevent::DemuxListener {
 
 				printf(":: country:[%s], country id:[%d], local time offset polarity:[%d], local time offset:[%d], time of change:[%02d%02d%02d-%02d%02d%02d], next time offset:[%04x]\n", country.c_str(), country_region_id, local_time_offset_polarity, local_time_offset, Y, M, D, h, m, s, next_time_offset);
 				// printf(":: country:[%s], country id:[%d], local time offset polarity:[%d], local time offset:[%d], time of change:[%lu], next time offset:[0x%04x]\n", country.c_str(), country_region_id, local_time_offset_polarity, local_time_offset, time_of_change, next_time_offset);
+			} else if (descriptor_tag == 0x59) { // subtitling descriptor
+        int count = descriptor_length/8;
+
+        for (int i=0; i<count; i++) {
+				  std::string country = std::string(ptr, 3);
+          int subtitling_type = TS_G8(ptr+3);
+          int composition_page_id = TS_G8(ptr+4);
+          int ancillary_page_id = TS_G8(ptr+6);
+
+          printf(":: country:[%s], subtitle type:[0x%02x/%s], composition page id:[%d], ancillary page id:[%d]\n", country.c_str(), subtitling_type, GetComponentDescription(0x03, subtitling_type).c_str(), composition_page_id, ancillary_page_id);
+        }
 			} else if (descriptor_tag == 0x7c) { // aac descriptor
 				const char *end = ptr + descriptor_length;
 

@@ -255,10 +255,63 @@ std::string GetComponentDescription(int stream_content, int component_type)
     description = "user defined";
   } else if (stream_content == 0x02 and component_type == 0xff) {
     description = "reserved";
-  } else if (stream_content == 0x03 and component_type >= 0x00 and component_type <= 0xff) {
-    description = "reserved";
-  } else if (stream_content == 0x04 and component_type >= 0x00 and component_type <= 0xff) {
-    description = "reserved";
+  
+  
+  
+  
+  
+  } else if (stream_content == 0x03 and component_type == 0x00) {
+    description = "reserved for future use";
+  } else if (stream_content == 0x03 and component_type == 0x01) {
+    description = "EBU Teletext subtitles";
+  } else if (stream_content == 0x03 and component_type == 0x02) {
+    description = "associated EBU Teletext";
+  } else if (stream_content == 0x03 and component_type == 0x03) {
+    description = "VBI data";
+  } else if (stream_content == 0x03 and component_type >= 0x04 and component_type <= 0x0f) {
+    description = "reserved for future use";
+  } else if (stream_content == 0x03 and component_type >= 0x10) {
+    description = "DVB subtitles (normal) with no monitor aspect ratio criticality";
+  } else if (stream_content == 0x03 and component_type >= 0x11) {
+    description = "DVB subtitles (normal) for display on 4:3 aspect ratio monitor";
+  } else if (stream_content == 0x03 and component_type >= 0x12) {
+    description = "DVB subtitles (normal) for display on 16:9 aspect ratio monitor";
+  } else if (stream_content == 0x03 and component_type >= 0x13) {
+    description = "DVB subtitles (normal) for display on 2.21:1 aspect ratio monitor";
+  } else if (stream_content == 0x03 and component_type >= 0x14) {
+    description = "DVB subtitles (normal) for display on a high definition monitor";
+  } else if (stream_content == 0x03 and component_type >= 0x15 and component_type <= 0x1f) {
+    description = "reserved for future use";
+  } else if (stream_content == 0x03 and component_type >= 0x20) {
+    description = "DVB subtitles (for the hard of hearing) with no monitor aspect ratio criticality ";
+  } else if (stream_content == 0x03 and component_type >= 0x21) {
+    description = "DVB subtitles (for the hard of hearing) for display on 4:3 aspect ratio monitor";
+  } else if (stream_content == 0x03 and component_type >= 0x22) {
+    description = "DVB subtitles (for the hard of hearing) for display on 16:9 aspect ratio monitor";
+  } else if (stream_content == 0x03 and component_type >= 0x23) {
+    description = "DVB subtitles (for the hard of hearing) for display on 2.21:1 aspect ratio monitor";
+  } else if (stream_content == 0x03 and component_type >= 0x24) {
+    description = "DVB subtitles (for the hard of hearing) for display on a high definition monitor";
+  } else if (stream_content == 0x03 and component_type >= 0x25 and component_type <= 0x2f) {
+    description = "reserved for future use";
+  } else if (stream_content == 0x03 and component_type >= 0x30) {
+    description = "Open (in-vision) sign language interpretation for the deaf";
+  } else if (stream_content == 0x03 and component_type >= 0x31) {
+    description = "Closed sign language interpretation for the deaf";
+  } else if (stream_content == 0x03 and component_type >= 0x32 and component_type <= 0x3f) {
+    description = "reserved for future use";
+  } else if (stream_content == 0x03 and component_type >= 0x40) {
+    description = "video up-sampled from standard definition source material";
+  } else if (stream_content == 0x03 and component_type >= 0x41 and component_type <= 0xaf) {
+    description = "reserved for future use";
+  } else if (stream_content == 0x03 and component_type >= 0xb0 and component_type <= 0xfe) {
+    description = "user defined";
+  } else if (stream_content == 0x03 and component_type >= 0xff) {
+    description = "reserved for future use";
+  } else if (stream_content == 0x04 and component_type >= 0x00 and component_type <= 0x7f) {
+    description = "reserved for AC-3 audio modes (refer to table D.1)";
+  } else if (stream_content == 0x04 and component_type >= 0x80 and component_type <= 0xff) {
+    description = "reserved for enhanced AC-3 audio modes (refer to table D.1)";
   } else if (stream_content == 0x05 and component_type == 0x00) {
     description = "reserved";
   } else if (stream_content == 0x05 and component_type == 0x01) {
