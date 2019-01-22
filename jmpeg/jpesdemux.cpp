@@ -27,7 +27,7 @@
 namespace jmpeg {
 
 PESDemux::PESDemux():
-	jmpeg::Demux(JDT_PRIVATE)
+	jmpeg::Demux(JDT_PES)
 {
 	jcommon::Object::SetClassName("jmpeg::PESDemux");
 }

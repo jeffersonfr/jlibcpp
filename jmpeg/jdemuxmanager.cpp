@@ -271,6 +271,120 @@ void DemuxManager::ProcessPSI(const char *data, const int length)
 
 void DemuxManager::ProcessPES(const char *data, const int length)
 {
+  static std::string current;
+  static int section_length = 0;
+
+  int transport_error_indicator = TS_GM8(data+1, 0, 1);
+  int payload_unit_start_indicator = TS_GM8(data+1, 1, 1);
+  // int transport_priority = TS_GM8(data+1, 2, 1);
+  int pid = TS_GM16(data+1, 3, 13);
+  // int scrambling_control = TS_GM8(data+3, 0, 2);
+  int adaptation_field_exist = TS_GM8(data+3, 2, 1);
+  int contains_payload = TS_GM8(data+3, 3, 1);
+  // int continuity_counter = TS_GM8(data+3, 4, 4);
+
+  if (transport_error_indicator == 1) {
+    return;
+  }
+
+  if (contains_payload == 0) {
+    return;
+  }
+
+  const char *ptr = data+TS_HEADER_LENGTH;
+  const char *end = data+TS_PACKET_LENGTH;
+
+  // INFO:: discards adaptation field
+  if (adaptation_field_exist == 1) {
+    int adaptation_field_length = TS_G8(ptr);
+
+    ptr = ptr + adaptation_field_length + 1;
+  }
+
+  if (payload_unit_start_indicator == 1) {
+    if (ptr[0] != 0x00 or ptr[1] != 0x00 or ptr[2] != 0x01) {
+      current.clear();
+
+      return;
+    }
+
+    int stream_id = TS_G8(ptr+3);
+    int pes_packet_length = TS_G16(ptr+4);
+    
+    section_length = 0;
+
+    if (stream_id != 0b10111100 and // program_stream_map
+        stream_id != 0b10111110 and // padding_stream
+        stream_id != 0b10111111 and // private_stream_2
+        stream_id != 0b11110000 and // ECM
+        stream_id != 0b11110001 and // EMM
+        stream_id != 0b11111111 and // program_stream_directory
+        stream_id != 0b11110010 and // DSMCC_stream
+        stream_id != 0b11111000) { // ITU-T Rec. H.222.1 type E stream
+      int pes_header_data_length = TS_G8(ptr+8);
+
+      section_length = section_length + pes_header_data_length + pes_packet_length;
+    } else if (stream_id != 0b10111100 or // program_stream_map
+        stream_id != 0b10111111 or // private_stream_2
+        stream_id != 0b11110000 or // ECM
+        stream_id != 0b11110001 or // EMM
+        stream_id != 0b11111111 or // program_stream_directory
+        stream_id != 0b11110010 or // DSMCC_stream
+        stream_id != 0b11111000) { // ITU-T Rec. H.222.1 type E stream
+      section_length = section_length + pes_packet_length;
+    } else if (stream_id == 0b10111110) { // padding_stream
+      // section_length = section_length + padding bytes;
+    }
+
+    if (section_length > 0) {
+      int length = end - ptr;
+      int chunk = section_length;
+
+      if (chunk > length) {
+        chunk = length;
+      }
+
+      current = std::string(ptr, chunk);
+    }
+  } else {
+    if (current.size() == 0) {
+      return;
+    }
+
+    int 
+      length = end - ptr,
+      chunk = section_length - current.size();
+
+    if (chunk > length) {
+      chunk = length;
+    }
+
+    current.append(ptr, chunk);
+  }
+
+  std::chrono::steady_clock::time_point
+    timepoint = std::chrono::steady_clock::now();
+
+  // INFO:: process pes packets
+  for (std::vector<Demux *>::iterator i=_demuxes.begin(); i!=_demuxes.end(); i++) {
+    Demux *demux = (*i);
+
+    if (demux->GetType() != JDT_PES) {
+      continue;
+    }
+
+    if ((timepoint - demux->GetTimePoint()) > demux->GetTimeout()) {
+      demux->UpdateTimePoint();
+      demux->DispatchDemuxEvent(new jevent::DemuxEvent(this, jevent::JDET_DATA_NOT_FOUND, nullptr, 0, demux->GetPID()));
+    } else {
+      if (demux->GetPID() < 0 || demux->GetPID() == pid) {
+        if (demux->Append(current.c_str(), current.size()) == true) {
+          demux->UpdateTimePoint();
+          demux->DispatchDemuxEvent(new jevent::DemuxEvent(this, jevent::JDET_DATA_ARRIVED, current.data(), current.size(), pid));
+        }
+      }
+    }
+  }
 }
 
 void DemuxManager::Run()

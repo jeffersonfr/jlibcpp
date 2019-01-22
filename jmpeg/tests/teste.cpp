@@ -25,6 +25,7 @@
 
 #include "jmpeg/jdemuxmanager.h"
 #include "jmpeg/jpsidemux.h"
+#include "jmpeg/jpesdemux.h"
 #include "jmpeg/jrawdemux.h"
 #include "jmpeg/jmpeglib.h"
 #include "jio/jfileinputstream.h"
@@ -772,6 +773,7 @@ class PSIParser : public jevent::DemuxListener {
 		std::map<int, ElementaryStream::stream_type_t> _stream_types;
 		std::string _dsmcc_private_payload;
 		int _pcr_pid;
+		int _closed_caption_pid;
 		int _dsmcc_sequence_number;
 		int _dsmcc_message_pid;
 		int _dsmcc_descriptors_pid;
@@ -791,8 +793,25 @@ class PSIParser : public jevent::DemuxListener {
 			demux->SetPID(pid);
 			demux->SetTID(tid);
 			demux->SetTimeout(std::chrono::milliseconds(timeout));
-			// demux->SetUpdateIfModified(false);
 			demux->SetCRCCheckEnabled(false);
+			demux->Start();
+
+			_demuxes[id] = demux;
+		}
+
+		void StartPESDemux(std::string id, int pid, int timeout)
+		{
+      if (_demuxes.find(id) != _demuxes.end()) {
+        printf("Demux [%s] already created\n", id.c_str());
+
+        return;
+      }
+
+			jmpeg::PESDemux *demux = new jmpeg::PESDemux();
+
+			demux->RegisterDemuxListener(this);
+			demux->SetPID(pid);
+			demux->SetTimeout(std::chrono::milliseconds(timeout));
 			demux->Start();
 
 			_demuxes[id] = demux;
@@ -817,6 +836,7 @@ class PSIParser : public jevent::DemuxListener {
 		PSIParser()
 		{
 			_pcr_pid = -1;
+			_closed_caption_pid = -1;
 			_dsmcc_message_pid = -1;
 			_dsmcc_descriptors_pid = -1;
 			_dsmcc_sequence_number = 0;
@@ -2022,6 +2042,8 @@ class PSIParser : public jevent::DemuxListener {
 			} else {
 				if (pid == _pcr_pid) {
 					ProcessPCR(event);
+				} else if (pid == _closed_caption_pid) {
+          ProcessClosedCaption(event);
 				} else if (pid == _dsmcc_message_pid) {
 					ProcessDSMCC(event);
 				} else if (pid == _dsmcc_descriptors_pid) {
@@ -2194,8 +2216,11 @@ class PSIParser : public jevent::DemuxListener {
 						vpid = elementary_pid;
 					}
 				} else if (_stream_types[stream_type] == ElementaryStream::stream_type_t::PRIVATE) {
-					// INFO:: ProcessPrivate(tid:[0x74]::[Application Information Table])
 					StartDemux("private", elementary_pid, TS_AIT_TABLE_ID, TS_PRIVATE_TIMEOUT);
+				} else if (_stream_types[stream_type] == ElementaryStream::stream_type_t::SUBTITLE) {
+          _closed_caption_pid = elementary_pid;
+
+					StartPESDemux("closed-caption", elementary_pid, 3600000);
 				} else if (_stream_types[stream_type] == ElementaryStream::stream_type_t::DSMCC_MESSAGE) {
 					_dsmcc_message_pid = elementary_pid;
 					
@@ -2777,6 +2802,14 @@ class PSIParser : public jevent::DemuxListener {
 					
 			printf("PCR:: base:[%lu], extension:[%lu]\n", program_clock_reference_base, program_clock_reference_extension);
 		}
+
+		virtual void ProcessClosedCaption(jevent::DemuxEvent *event)
+		{
+      // PES private data
+			const char *ptr = event->GetData();
+
+      DumpBytes("Closed Caption", ptr, event->GetLength());
+    }
 
 		virtual void ProcessDSMCC(jevent::DemuxEvent *event)
     {
