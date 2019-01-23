@@ -498,7 +498,7 @@ void NativeApplication::InternalPaint()
 	_surface->Write(_surface, &rect, data, stride);
 		
   if (g->IsVerticalSyncEnabled() == false) {
-  	surface->Flip(surface, nullptr, (DFBSurfaceFlipFlags)(DSFLIP_NONE));
+  	_surface->Flip(_surface, nullptr, (DFBSurfaceFlipFlags)(DSFLIP_NONE));
   } else {
   	_surface->Flip(_surface, nullptr, (DFBSurfaceFlipFlags)(DSFLIP_BLIT | DSFLIP_WAITFORSYNC));
   }
