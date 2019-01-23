@@ -184,11 +184,6 @@ class ElementaryStream {
       _stream_type = param;
     }
 
-    void ProgramID(int param)
-    {
-      _program_id = param;
-    }
-
     void ComponentTag(int param)
     {
       _component_tag = param;
@@ -199,11 +194,6 @@ class ElementaryStream {
       return _stream_type;
     }
 
-    int ProgramID()
-    {
-      return _program_id;
-    }
-    
     int ComponentTag()
     {
       return _component_tag;
@@ -229,8 +219,7 @@ class SIService : public SI {
     int
       _original_network_id, 
       _transport_stream_id, 
-      _service_id,
-      _program_id;
+      _service_id;
     service_type_t
       _service_type;
 
@@ -275,11 +264,6 @@ class SIService : public SI {
       _service_id = param;
     }
 
-    void ProgramID(int param)
-    {
-      _program_id = param;
-    }
-
     void ServiceType(service_type_t param)
     {
       _service_type = param;
@@ -308,11 +292,6 @@ class SIService : public SI {
     int ServiceID()
     {
       return _service_id;
-    }
-
-    int ProgramID()
-    {
-      return _program_id;
     }
 
     service_type_t ServiceType()
@@ -898,6 +877,29 @@ class PSIParser : public jevent::DemuxListener {
 			}
 		}
 
+    std::string GetRunningStatusDescription(int status) 
+    {
+      if (status == 0x00) {
+        return "undefined";
+      } else if (status == 0x01) {
+        return "not running";
+      } else if (status == 0x02) {
+        return "starts in a few seconds";
+      } else if (status == 0x03) {
+        return "pausing";
+      } else if (status == 0x04) {
+        return "running";
+      } else if (status == 0x05) {
+        return "reserved";
+      } else if (status == 0x06) {
+        return "reserved";
+      } else if (status == 0x07) {
+        return "reserved";
+      }
+
+      return "undefined";
+    }
+
 		std::string GetAITDescriptorName(int descriptor_tag)
 		{
 			switch (descriptor_tag) {
@@ -1286,7 +1288,7 @@ class PSIParser : public jevent::DemuxListener {
         
         if (service_type == 0x01) {
           param->ServiceType(SIService::service_type_t::HD);
-        } else if (service_type == 0x0c) {
+        } else if (service_type == 0xc0) {
           param->ServiceType(SIService::service_type_t::LD);
         } else {
           param->ServiceType(SIService::service_type_t::SD);
@@ -1964,6 +1966,23 @@ class PSIParser : public jevent::DemuxListener {
 
 					ptr = ptr + 2;
 				}
+			} else if (descriptor_tag == 0xfc) { // emergency information descriptor (EWBS)
+				int service_id = TS_G16(ptr+0);
+				int start_end_flag = TS_GM8(ptr+2, 0, 1);
+				int signal_type = TS_GM8(ptr+2, 1, 1);
+				// int reserved = TS_GM8(ptr+2, 2, 6);
+				int area_code_length = TS_G8(ptr+3);
+
+        ptr = ptr + 4;
+
+        for (int i=0; i<area_code_length/2; i++) {
+				  int area_code = TS_GM16(ptr+0, 0, 12);
+				  // int reserved = TS_GM16(ptr+0, 12, 4);
+
+				  printf(":: service id:[0x%04x], start end flag:[%01x], signal type:[%01x], area code:[0x%04x]\n", service_id, start_end_flag, signal_type, area_code);
+
+          ptr = ptr + 2;
+        }
 			} else if (descriptor_tag == 0xfd) { // data component descriptor
 				int data_component_id = TS_G16(ptr+0);
 				int dmf = TS_GM8(ptr+1, 0, 4);
@@ -2090,30 +2109,9 @@ class PSIParser : public jevent::DemuxListener {
 
 			ptr = ptr + 8;
 
-      std::vector<std::shared_ptr<SIService>> &services = SIFacade::GetInstance()->Services();
-
 			for (int i=0; i<count; i++) {
 				int program_number = TS_G16(ptr);
 				int map_pid = TS_GM16(ptr+2, 3, 13);
-
-        std::shared_ptr<SIService> param;
-
-        for (auto service : services) {
-          if (service->ServiceID() == program_number) {
-            param = service;
-
-            break;
-          }
-        }
-
-        if (param == nullptr and program_number > 0x00) {
-          std::shared_ptr<SIService> param = std::make_shared<SIService>();
-
-          param->ServiceID(program_number);
-          param->ProgramID(map_pid);
-
-          SIFacade::GetInstance()->Service(param);
-        }
 
 				printf("PAT:: program number:[0x%04x], map pid:[0x%04x]\n", program_number, map_pid);
 
@@ -2187,11 +2185,29 @@ class PSIParser : public jevent::DemuxListener {
 			int tid = TS_G8(ptr+0);
 			int section_length = TS_PSI_G_SECTION_LENGTH(ptr);
 
+			int program_number = TS_G16(ptr+3);
 			int pcr_pid = TS_GM16(ptr+8, 3, 13);
 			int vpid = -1;
 			int program_info_length = TS_GM16(ptr+10, 4, 12);
 
-			printf("PMT:: service number:[0x%04x], pcr pid:[0x%04x]\n", tid, pcr_pid);
+      std::vector<std::shared_ptr<SIService>> &services = SIFacade::GetInstance()->Services();
+      std::shared_ptr<SIService> param;
+
+      for (auto service : services) {
+        if (service->ServiceID() == program_number) {
+          param = service;
+
+          break;
+        }
+      }
+      
+      if (param == nullptr) {
+        param = std::make_shared<SIService>();
+
+        param->ServiceID(program_number);
+      }
+
+			printf("PMT:: service number:[0x%04x], program number:[0x%04x], pcr pid:[0x%04x]\n", tid, program_number, pcr_pid);
 
 			ptr = ptr + 12;
 
@@ -2219,6 +2235,8 @@ class PSIParser : public jevent::DemuxListener {
 				// int reserved_bits_2 = TS_GM8(ptr+3, 0, 4); // 0x0f
 				// int es_info_length_unsed = TS_GM8(ptr+4, 4, 2); // 0x00
 				int es_info_length = TS_GM16(ptr+3, 6, 10);
+
+        // TODO:: add elementary stream to param
 
 				printf("PMT:: elementary stream:[0x%04x], type:[0x%02x]::[%s]\n", elementary_pid, stream_type, GetStreamTypeDescription(stream_type).c_str());
 
@@ -2260,6 +2278,8 @@ class PSIParser : public jevent::DemuxListener {
 
 				services_count = services_count + 5 + descriptors_length;
 			}
+
+      SIFacade::GetInstance()->Service(param);
 
 			if (pcr_pid == 0x1fff) { // pmt pcr unsed
 				pcr_pid = vpid; // first video pid
@@ -2357,7 +2377,7 @@ class PSIParser : public jevent::DemuxListener {
 				int running_status = TS_GM8(ptr+3, 0, 3);
 				// int free_CA_mode = TS_GM8(ptr+3, 3, 1);
 
-				printf("SDT:: service id:[0x%04x], running status:[0x%02x]\n", service_id, running_status);
+				printf("SDT:: service id:[0x%04x], running status:[0x%02x/%s]\n", service_id, running_status, GetRunningStatusDescription(running_status).c_str());
 
 				int descriptors_length = TS_GM16(ptr+3, 4, 12);
 				int descriptors_count = 0;
@@ -2568,27 +2588,8 @@ class PSIParser : public jevent::DemuxListener {
 				int service_id = TS_G16(ptr+4);
 				int event_id = TS_G16(ptr+6);
 				int running_status = TS_GM8(ptr+8, 5, 3);
-        std::string status;
 
-        if (running_status == 0x00) {
-          status = "undefined";
-        } else if (running_status == 0x01) {
-          status = "not running";
-        } else if (running_status == 0x02) {
-          status = "starts in a few seconds";
-        } else if (running_status == 0x03) {
-          status = "pausing";
-        } else if (running_status == 0x04) {
-          status = "running";
-        } else if (running_status == 0x05) {
-          status = "reserved";
-        } else if (running_status == 0x06) {
-          status = "reserved";
-        } else if (running_status == 0x07) {
-          status = "reserved";
-        }
-
-				printf(":: transport stream id:[%04x], original network id:[%04x], service id:[0x%04x], event id:[0x%04x], running status:[%s]\n", transport_stream_id, original_network_id, service_id, event_id, status.c_str());
+				printf(":: transport stream id:[%04x], original network id:[%04x], service id:[0x%04x], event id:[0x%04x], running status:[0x%02x/%s]\n", transport_stream_id, original_network_id, service_id, event_id, running_status, GetRunningStatusDescription(running_status).c_str());
 
 				events_count = events_count + 9;
 			}
@@ -2657,7 +2658,7 @@ class PSIParser : public jevent::DemuxListener {
 				int running_status = TS_GM8(ptr+10, 0, 3);
 				// int free_ca_mode = TS_GM8(ptr+10, 3, 1);
 
-				printf("EIT:: transport stream id:[%04x], original network id:[%04x], service id:[0x%04x], event id:[0x%04x], date:[%s], running status:[0x%02x]\n", transport_stream_id, original_network_id, service_id, event_id, tmp, running_status);
+				printf("EIT:: transport stream id:[%04x], original network id:[%04x], service id:[0x%04x], event id:[0x%04x], date:[%s], running status:[0x%02x/%s]\n", transport_stream_id, original_network_id, service_id, event_id, tmp, running_status, GetRunningStatusDescription(running_status).c_str());
 
 				int descriptors_length = TS_GM16(ptr+10, 4, 12);
 				int descriptors_count = 0;
