@@ -32,7 +32,6 @@ Demux::Demux(jdemux_type_t type):
 	jcommon::Object::SetClassName("jmpeg::Demux");
 
   _type = type;
-	_last_index = -1;
 	_timeout = std::chrono::milliseconds(2000);
 
   UpdateTimePoint();

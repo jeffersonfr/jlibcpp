@@ -82,8 +82,6 @@ bool PrivateDemux::Append(const char *data, int data_length)
         sum = jmath::CRC::Calculate32((const uint8_t *)data, data_length);
 
       if (sum != 0xffffffff) {
-        _last_index = -1;
-
         return false;
       }
     }

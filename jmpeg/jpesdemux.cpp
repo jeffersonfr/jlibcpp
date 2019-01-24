@@ -38,10 +38,7 @@ PESDemux::~PESDemux()
 
 bool PESDemux::Append(const char *data, int data_length)
 {
-  if (
-      TS_G8(data+0) != 0x00 ||
-      TS_G8(data+1) != 0x00 ||
-      TS_G8(data+2) != 0x01) {
+  if (data[0] != 0x00 or data[1] != 0x00 or data[2] != 0x01) {
     return false;
   }
 

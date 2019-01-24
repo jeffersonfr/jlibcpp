@@ -136,13 +136,13 @@ void DemuxManager::ProcessRaw(const char *data, const int length)
     if ((timepoint - demux->GetTimePoint()) > demux->GetTimeout()) {
       demux->UpdateTimePoint();
 
-      demux->DispatchDemuxEvent(new jevent::DemuxEvent(this, jevent::JDET_DATA_NOT_FOUND, nullptr, 0, demux->GetPID()));
+      demux->DispatchDemuxEvent(new jevent::DemuxEvent(demux, jevent::JDET_DATA_NOT_FOUND, nullptr, 0, demux->GetPID()));
     } else {
       if (demux->GetPID() < 0 || demux->GetPID() == pid) {
         if (demux->Append(data, length) == true) {
           demux->UpdateTimePoint();
 
-          demux->DispatchDemuxEvent(new jevent::DemuxEvent(this, jevent::JDET_DATA_ARRIVED, data, length, pid));
+          demux->DispatchDemuxEvent(new jevent::DemuxEvent(demux, jevent::JDET_DATA_ARRIVED, data, length, pid));
         }
       }
     }
@@ -250,18 +250,18 @@ void DemuxManager::ProcessPSI(const char *data, const int length)
 
     if ((timepoint - demux->GetTimePoint()) > demux->GetTimeout()) {
       demux->UpdateTimePoint();
-      demux->DispatchDemuxEvent(new jevent::DemuxEvent(this, jevent::JDET_DATA_NOT_FOUND, nullptr, 0, demux->GetPID()));
+      demux->DispatchDemuxEvent(new jevent::DemuxEvent(demux, jevent::JDET_DATA_NOT_FOUND, nullptr, 0, demux->GetPID()));
     } else {
       if (demux->GetPID() < 0 || demux->GetPID() == pid) {
         if (demux->Append(current.c_str(), current.size()) == true) {
           demux->UpdateTimePoint();
-          demux->DispatchDemuxEvent(new jevent::DemuxEvent(this, jevent::JDET_DATA_ARRIVED, current.data(), current.size(), pid));
+          demux->DispatchDemuxEvent(new jevent::DemuxEvent(demux, jevent::JDET_DATA_ARRIVED, current.data(), current.size(), pid));
         }
         
         if (previous.size() > 0) {
           if (demux->Append(previous.c_str(), previous.size()) == true) {
             demux->UpdateTimePoint();
-            demux->DispatchDemuxEvent(new jevent::DemuxEvent(this, jevent::JDET_DATA_ARRIVED, previous.data(), previous.size(), pid));
+            demux->DispatchDemuxEvent(new jevent::DemuxEvent(demux, jevent::JDET_DATA_ARRIVED, previous.data(), previous.size(), pid));
           }
         }
       }
@@ -321,7 +321,7 @@ void DemuxManager::ProcessPES(const char *data, const int length)
         stream_id != 0b11111111 and // program_stream_directory
         stream_id != 0b11110010 and // DSMCC_stream
         stream_id != 0b11111000) { // ITU-T Rec. H.222.1 type E stream
-      int pes_header_data_length = TS_G8(ptr+8);
+      int pes_header_data_length = TS_G8(ptr+8) + 3;
 
       section_length = section_length + pes_header_data_length + pes_packet_length;
     } else if (stream_id != 0b10111100 or // program_stream_map
@@ -375,12 +375,12 @@ void DemuxManager::ProcessPES(const char *data, const int length)
 
     if ((timepoint - demux->GetTimePoint()) > demux->GetTimeout()) {
       demux->UpdateTimePoint();
-      demux->DispatchDemuxEvent(new jevent::DemuxEvent(this, jevent::JDET_DATA_NOT_FOUND, nullptr, 0, demux->GetPID()));
+      demux->DispatchDemuxEvent(new jevent::DemuxEvent(demux, jevent::JDET_DATA_NOT_FOUND, nullptr, 0, demux->GetPID()));
     } else {
       if (demux->GetPID() < 0 || demux->GetPID() == pid) {
         if (demux->Append(current.c_str(), current.size()) == true) {
           demux->UpdateTimePoint();
-          demux->DispatchDemuxEvent(new jevent::DemuxEvent(this, jevent::JDET_DATA_ARRIVED, current.data(), current.size(), pid));
+          demux->DispatchDemuxEvent(new jevent::DemuxEvent(demux, jevent::JDET_DATA_ARRIVED, current.data(), current.size(), pid));
         }
       }
     }

@@ -49,8 +49,6 @@ class Demux : public jcommon::Object {
 		/** \brief */
 		int _pid;
 		/** \brief */
-		int _last_index;
-		/** \brief */
     jdemux_type_t _type;
 
   protected:

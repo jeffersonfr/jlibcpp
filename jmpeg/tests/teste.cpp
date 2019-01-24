@@ -31,6 +31,7 @@
 #include "jio/jfileinputstream.h"
 #include "jevent/jdemuxlistener.h"
 #include "jlogger/jloggerlib.h"
+#include "jmath/jcrc.h"
 
 #include <iostream>
 #include <algorithm>
@@ -849,17 +850,6 @@ class PSIParser : public jevent::DemuxListener {
 			_stream_types[0xea] = ElementaryStream::stream_type_t::VIDEO;
 
 			StartDemux("pat", TS_PAT_PID, TS_PAT_TABLE_ID, TS_PAT_TIMEOUT);
-			
-      // INFO:: see all pids from stream
-      /*
-      jmpeg::RawDemux *demux = new jmpeg::RawDemux();
-
-			demux->RegisterDemuxListener(this);
-			demux->SetPID(-1);
-			demux->Start();
-
-			_demuxes["raw"] = demux;
-      */
 		}
 
 		virtual ~PSIParser()
@@ -2038,12 +2028,20 @@ class PSIParser : public jevent::DemuxListener {
 
 		virtual void DataArrived(jevent::DemuxEvent *event)
 		{
+      jmpeg::Demux *demux = reinterpret_cast<jmpeg::Demux *>(event->GetSource());
+
 			const char *ptr = event->GetData();
 			int pid = event->GetPID();
 			int tid = TS_G8(ptr+0);
 			int len = event->GetLength();
 
-			printf("PSI Section:[%s]: pid:[0x%04x], tid:[0x%04x], length:[%d]\n", GetTableDescription(pid, tid).c_str(), pid, tid, len);
+      if (demux->GetType() == jmpeg::JDT_RAW) {
+			  printf("Raw Packet:: pid:[0x%04x], length:[%d]\n", pid, len);
+      } else if (demux->GetType() == jmpeg::JDT_PES) {
+			  printf("PES Section:: pid:[0x%04x], length:[%d]\n", pid, len);
+      } else {
+			  printf("PSI Section:[%s]: pid:[0x%04x], tid:[0x%04x], length:[%d]\n", GetTableDescription(pid, tid).c_str(), pid, tid, len);
+      }
 
 			if (pid == TS_PAT_PID && tid == TS_PAT_TABLE_ID) {
 				ProcessPAT(event);
@@ -2820,7 +2818,174 @@ class PSIParser : public jevent::DemuxListener {
       // PES private data
 			const char *ptr = event->GetData();
 
-      DumpBytes("Closed Caption", ptr, event->GetLength());
+      int stream_id = TS_G8(ptr+3);
+
+      int pes_packet_length = TS_G16(ptr+4);
+
+      ptr = ptr + 6;
+
+      if (stream_id != 0b10111100 and // program_stream_map
+          stream_id != 0b10111110 and // padding_stream
+          stream_id != 0b10111111 and // private_stream_2
+          stream_id != 0b11110000 and // ECM
+          stream_id != 0b11110001 and // EMM
+          stream_id != 0b11111111 and // program_stream_directory
+          stream_id != 0b11110010 and // DSMCC_stream
+          stream_id != 0b11111000) { // ITU-T Rec. H.222.1 type E
+        // PES data field (Arib 6-STD B37 v2.4)
+        if (stream_id != 0b10111101) { // private_stream_1 [W3]
+          return;
+        }
+
+        int data_alignment_indicator  = TS_GM8(ptr+0, 4, 1);
+        int pes_header_data_length = TS_G8(ptr+2);
+        int ccis_code = TS_G32(ptr+8);
+        int caption_conversion_type = TS_G8(ptr+12);
+        int drcs_conversion_type = TS_GM8(ptr+13, 0, 2);
+
+        ptr = ptr + pes_header_data_length + 3;
+
+        int data_identifier = TS_G8(ptr+0);
+
+        if (data_identifier != 0x80) { // closed caption identifier
+          return;
+        }
+
+        int private_stream_id = TS_G8(ptr+1);
+
+        if (private_stream_id != 0xff) { // magic number
+          return;
+        }
+
+        int pes_data_packet_header_length = TS_GM8(ptr+2, 4, 4); // (W34)
+
+        std::string caption_conversion_info = "undefined";
+        std::string drcs_conversion_info = "undefined";
+
+        if (caption_conversion_type == 0x01) {
+          caption_conversion_info = "HD side panel";
+        } else if (caption_conversion_type == 0x02) {
+          caption_conversion_info = "SD (4:3)";
+        } else if (caption_conversion_type == 0x03) {
+          caption_conversion_info = "SD wide side panel";
+        } else if (caption_conversion_type == 0x04) {
+          caption_conversion_info = "Mobile closed caption";
+        }
+
+        if (drcs_conversion_type == 0x00) {
+          drcs_conversion_info = "DRCS conversion mode A";
+        } else if (drcs_conversion_type == 0x01) {
+          drcs_conversion_info = "DRCS conversion mode B";
+        } else if (drcs_conversion_type == 0x02) {
+          drcs_conversion_info = "Moblie DRCS";
+        } else if (drcs_conversion_type == 0x03) {
+          drcs_conversion_info = "DRCS conversion not possible";
+        }
+
+        ptr = ptr + pes_data_packet_header_length + 3;
+
+        // 6-STD B24 (data group)
+        int data_group_id = TS_GM8(ptr+0, 0, 6);
+        int data_group_link_number = TS_G8(ptr+1);
+        int last_data_group_link_number = TS_G8(ptr+2);
+        int data_group_size = TS_G16(ptr+3);
+        
+        std::string data_group_info;
+        int caption_data_type_nibble = (data_group_id & 0x0f) >> 0;
+        int data_group_id_nibble = (data_group_id & 0xf0) >> 4;
+
+        if (caption_data_type_nibble == 0x00) {
+          data_group_info = "Caption management";
+        } else if (caption_data_type_nibble == 0x01) {
+          data_group_info = "Caption statement (1st language) ";
+        } else if (caption_data_type_nibble == 0x02) {
+          data_group_info = "Caption statement (2nd language) ";
+        } else if (caption_data_type_nibble == 0x03) {
+          data_group_info = "Caption statement (3rd language) ";
+        } else if (caption_data_type_nibble == 0x04) {
+          data_group_info = "Caption statement (4th language) ";
+        } else if (caption_data_type_nibble == 0x05) {
+          data_group_info = "Caption statement (5th language) ";
+        } else if (caption_data_type_nibble == 0x06) {
+          data_group_info = "Caption statement (6th language) ";
+        } else if (caption_data_type_nibble == 0x07) {
+          data_group_info = "Caption statement (7th language) ";
+        } else if (caption_data_type_nibble == 0x08) {
+          data_group_info = "Caption statement (8th language) ";
+        } else {
+          // INFO:: invalid type
+          return;
+        }
+
+        if (data_group_id_nibble == 0x00) {
+          data_group_info = "[Group A] " + data_group_info;
+        } else if (data_group_id_nibble == 0x02) {
+          data_group_info = "[Group B] " + data_group_info;
+        } else {
+          // INFO:: invalid type
+          return;
+        }
+        
+		    uint16_t 
+          sum = jmath::CRC::Calculate16((const uint8_t *)ptr, data_group_size + 7);
+
+        if (sum != 0xffff) {
+          return;
+        }
+
+        ptr = ptr + 5;
+
+        printf("Closed Caption:: data alignment indicator:[0x%01x], pes header data length:[%d], data identifier:[0x%02x], subtitle stream id:[0x%02x], ccis code:[0x%08x], caption conversion type:[%s], drcs conversion type:[%s], data group id:[0x%02x/%s], data group link number:[0x%02x], data group size:[%d]\n", data_alignment_indicator, pes_header_data_length, data_identifier, private_stream_id, ccis_code, caption_conversion_info.c_str(), drcs_conversion_info.c_str(), data_group_id, data_group_info.c_str(), data_group_link_number, data_group_size);
+
+        if (caption_data_type_nibble == 0x00) { // INFO:: caption management data
+          int time_control_mode = TS_GM8(ptr+0, 0, 2);
+          int offset_time = 0;
+
+          if (time_control_mode == 0x02) {
+            offset_time = TS_GM64(ptr+1, 0, 36);
+
+            ptr = ptr + 5;
+          }
+
+          int num_languages = TS_G8(ptr+1);
+
+          ptr = ptr + 2;
+
+          printf(":: time control mode:[0x%01x], offset time:[0x%08x], number of languages:[%d]\n", time_control_mode, offset_time, num_languages);
+
+          for (int i=0; i<num_languages; i++) {
+            int language_tag = TS_GM8(ptr+0, 0, 3);
+            int display_mode = TS_GM8(ptr+0, 4, 4);
+            int display_condition_designation = 0;
+
+            if (display_mode == 0xc0 or display_mode == 0x0d or display_mode == 0x0e) {
+              display_condition_designation = TS_G8(ptr+1);
+
+              ptr = ptr + 1;
+            }
+
+            std::string language_code = std::string(ptr+1, 3);
+            int format = TS_GM8(ptr+4, 0, 4);
+            int character_code = TS_GM8(ptr+4, 4, 2);
+            int rollup_mode = TS_GM8(ptr+4, 6, 2);
+
+            // INFO:: 6-STD B24 v5.2.1 (Data group data/Caption management data)
+            printf(":: language tag:[0x%01x], display mode:[0x%01x], display condition designation:[0x%02x], language code:[%s], format:[0x%01x], character code:[0x%01x], rollup mode:[0x%01x]\n", language_tag, display_mode, display_condition_designation, language_code.c_str(), format, character_code, rollup_mode);
+          }
+        }
+
+        DumpBytes("data group data byte", ptr, data_group_size);
+      } else if (stream_id == 0b10111100 or // program_stream_map
+          stream_id == 0b10111111 or // private_stream_2
+          stream_id == 0b11110000 or // ECM
+          stream_id == 0b11110001 or // EMM
+          stream_id == 0b11111111 or // program_stream_directory
+          stream_id == 0b11110010 or // DSMCC_stream
+          stream_id == 0b11111000) { // ITU-T Rec. H.222.1 type E stream
+        // data
+      } else if (stream_id == 0b10111110) { // padding_stream
+        // do nothing
+      }
     }
 
 		virtual void ProcessDSMCC(jevent::DemuxEvent *event)
