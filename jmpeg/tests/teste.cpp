@@ -2820,7 +2820,7 @@ class PSIParser : public jevent::DemuxListener {
 
       int stream_id = TS_G8(ptr+3);
 
-      int pes_packet_length = TS_G16(ptr+4);
+      // int pes_packet_length = TS_G16(ptr+4);
 
       ptr = ptr + 6;
 
@@ -2887,7 +2887,7 @@ class PSIParser : public jevent::DemuxListener {
         // 6-STD B24 (data group)
         int data_group_id = TS_GM8(ptr+0, 0, 6);
         int data_group_link_number = TS_G8(ptr+1);
-        int last_data_group_link_number = TS_G8(ptr+2);
+        // int last_data_group_link_number = TS_G8(ptr+2);
         int data_group_size = TS_G16(ptr+3);
         
         std::string data_group_info;
@@ -2939,7 +2939,7 @@ class PSIParser : public jevent::DemuxListener {
 
         if (caption_data_type_nibble == 0x00) { // INFO:: caption management data
           int time_control_mode = TS_GM8(ptr+0, 0, 2);
-          int offset_time = 0;
+          uint64_t offset_time = 0;
 
           if (time_control_mode == 0x02) {
             offset_time = TS_GM64(ptr+1, 0, 36);
@@ -2951,7 +2951,19 @@ class PSIParser : public jevent::DemuxListener {
 
           ptr = ptr + 2;
 
-          printf(":: time control mode:[0x%01x], offset time:[0x%08x], number of languages:[%d]\n", time_control_mode, offset_time, num_languages);
+          std::string time_control_info;
+
+          if (time_control_mode == 0x00) {
+            time_control_info = "free";
+          } else if (time_control_mode == 0x01) {
+            time_control_info = "real time";
+          } else if (time_control_mode == 0x02) {
+            time_control_info = "offset time";
+          } else if (time_control_mode == 0x03) {
+            time_control_info = "reserved";
+          }
+          
+          printf(":caption managment: time control mode:[0x%01x/%s], offset time:[0x%01x%08x]\n", time_control_mode, time_control_info.c_str(), uint32_t((offset_time >> 32) & 0x0f), uint32_t(offset_time & 0xffffffff));
 
           for (int i=0; i<num_languages; i++) {
             int language_tag = TS_GM8(ptr+0, 0, 3);
@@ -2969,12 +2981,182 @@ class PSIParser : public jevent::DemuxListener {
             int character_code = TS_GM8(ptr+4, 4, 2);
             int rollup_mode = TS_GM8(ptr+4, 6, 2);
 
+            std::string display_condition_info;
+            std::string format_info;
+            std::string character_info;
+            std::string rollup_info;
+
+            if (display_condition_designation == 0x00) {
+              display_condition_info = "message display of attenuation due to rain";
+            } else {
+              display_condition_info = "specified otherwise";
+            }
+
+            if (format == 0x00) {
+              format_info = "horizontal writing in standard density";
+            } else if (format == 0x01) {
+              format_info = "vertical writing in standard density";
+            } else if (format == 0x02) {
+              format_info = "horizontal writing in high density";
+            } else if (format == 0x03) {
+              format_info = "vertical writing in high density";
+            } else if (format == 0x04) {
+              format_info = "horizontal of western language";
+            } else if (format == 0x05) {
+              format_info = "reserved";
+            } else if (format == 0x06) {
+              format_info = "horizontal writing in 1920 x 1080";
+            } else if (format == 0x07) {
+              format_info = "vertical writing in 1920 x 1080";
+            } else if (format == 0x08) {
+              format_info = "horizontal writing in 960 x 540";
+            } else if (format == 0x09) {
+              format_info = "vertical writing in 960 x 540";
+            } else if (format == 0x0a) {
+              format_info = "horizontal writing in 1280 x 720";
+            } else if (format == 0x0b) {
+              format_info = "vertical writing in 1280 x 720";
+            } else if (format == 0x0b) {
+              format_info = "horizontal writing in 720 x 480";
+            } else if (format == 0x0b) {
+              format_info = "vertical writing in 720 x 480";
+            } else {
+              format_info = "reserved";
+            }
+
+            if (character_code == 0x00) {
+              character_info = "8bit code";
+            } else if (character_code == 0x01) {
+              character_info = "reserved for UCS";
+            } else if (character_code == 0x02) {
+              character_info = "reserved";
+            } else if (character_code == 0x03) {
+              character_info = "reserved";
+            }
+
+            if (rollup_mode == 0x00) {
+              rollup_info = "non roll-up";
+            } else if (rollup_mode == 0x01) {
+              rollup_info = "roll-up";
+            } else if (rollup_mode == 0x02) {
+              rollup_info = "reserved";
+            } else if (rollup_mode == 0x03) {
+              rollup_info = "reserved";
+            }
+
             // INFO:: 6-STD B24 v5.2.1 (Data group data/Caption management data)
-            printf(":: language tag:[0x%01x], display mode:[0x%01x], display condition designation:[0x%02x], language code:[%s], format:[0x%01x], character code:[0x%01x], rollup mode:[0x%01x]\n", language_tag, display_mode, display_condition_designation, language_code.c_str(), format, character_code, rollup_mode);
+            printf(":caption managment: language tag:[0x%01x], display mode:[0x%01x], display condition designation:[0x%02x/%s], language code:[%s], format:[0x%01x/%s], character code:[0x%01x/%s], rollup mode:[0x%01x/%s]\n", language_tag, display_mode, display_condition_designation, display_condition_info.c_str(), language_code.c_str(), format, format_info.c_str(), character_code, character_info.c_str(), rollup_mode, rollup_info.c_str());
+
+            int data_unit_loop_length = TS_GM32(ptr+5, 0, 24);
+
+            ptr = ptr + 8;
+
+            int count_data_unit = 0;
+
+            while (count_data_unit < data_unit_loop_length) {
+              int unit_separator = TS_G8(ptr+0);
+
+              if (unit_separator != 0x1f) {
+                break;
+              }
+            
+              int data_unit_parameter = TS_G8(ptr+1);
+              int data_unit_size = TS_GM32(ptr+2, 0, 24);
+
+              std::string data_unit_info = "undefined";
+
+              if (data_unit_parameter == 0x20) {
+                data_unit_info = "statement body";
+              } else if (data_unit_parameter == 0x28) {
+                data_unit_info = "geometric";
+              } else if (data_unit_parameter == 0x2c) {
+                data_unit_info = "synthesized sound";
+              } else if (data_unit_parameter == 0x30) {
+                data_unit_info = "1-byte DRCS";
+              } else if (data_unit_parameter == 0x31) {
+                data_unit_info = "2-byte DRCS";
+              } else if (data_unit_parameter == 0x34) {
+                data_unit_info = "color map";
+              } else if (data_unit_parameter == 0x35) {
+                data_unit_info = "bit map";
+              }
+
+              printf(":caption managment: data unit parameter:[0x%02x/%s]\n", data_unit_parameter, data_unit_info.c_str());
+
+              DumpBytes("data unit byte", ptr, data_unit_loop_length);
+
+              count_data_unit = count_data_unit + data_unit_size + 5;
+
+              ptr = ptr + data_unit_size + 5;
+            }
+          }
+        } else if (caption_data_type_nibble == 0x01) { // INFO:: caption statment data
+          int time_control_mode = TS_GM8(ptr+0, 0, 2);
+          uint64_t offset_time = 0;
+
+          if (time_control_mode == 0x01 or time_control_mode == 0x02) {
+            offset_time = TS_GM64(ptr+1, 0, 36);
+
+            ptr = ptr + 5;
+          }
+
+          std::string time_control_info;
+
+          if (time_control_mode == 0x00) {
+            time_control_info = "free";
+          } else if (time_control_mode == 0x01) {
+            time_control_info = "real time";
+          } else if (time_control_mode == 0x02) {
+            time_control_info = "offset time";
+          } else if (time_control_mode == 0x03) {
+            time_control_info = "reserved";
+          }
+
+          printf(":caption statement: time control mode:[0x%01x/%s], offset time:[0x%01x%08x]\n", time_control_mode, time_control_info.c_str(), uint32_t((offset_time >> 32) & 0x0f), uint32_t(offset_time & 0xffffffff));
+
+          int data_unit_loop_length = TS_GM32(ptr+1, 0, 24);
+
+          ptr = ptr + 4;
+
+          int count_data_unit = 0;
+
+          while (count_data_unit < data_unit_loop_length) {
+            int unit_separator = TS_G8(ptr+0);
+
+            if (unit_separator != 0x1f) {
+              break;
+            }
+
+            int data_unit_parameter = TS_G8(ptr+1);
+            int data_unit_size = TS_GM32(ptr+2, 0, 24);
+
+            std::string data_unit_info = "undefined";
+
+            if (data_unit_parameter == 0x20) {
+              data_unit_info = "statement body";
+            } else if (data_unit_parameter == 0x28) {
+              data_unit_info = "geometric";
+            } else if (data_unit_parameter == 0x2c) {
+              data_unit_info = "synthesized sound";
+            } else if (data_unit_parameter == 0x30) {
+              data_unit_info = "1-byte DRCS";
+            } else if (data_unit_parameter == 0x31) {
+              data_unit_info = "2-byte DRCS";
+            } else if (data_unit_parameter == 0x34) {
+              data_unit_info = "color map";
+            } else if (data_unit_parameter == 0x35) {
+              data_unit_info = "bit map";
+            }
+
+            printf(":caption managment: data unit parameter:[0x%02x/%s]\n", data_unit_parameter, data_unit_info.c_str());
+
+            DumpBytes("data unit byte", ptr, data_unit_loop_length);
+
+            count_data_unit = count_data_unit + data_unit_size + 5;
+
+            ptr = ptr + data_unit_size + 5;
           }
         }
-
-        DumpBytes("data group data byte", ptr, data_group_size);
       } else if (stream_id == 0b10111100 or // program_stream_map
           stream_id == 0b10111111 or // private_stream_2
           stream_id == 0b11110000 or // ECM
