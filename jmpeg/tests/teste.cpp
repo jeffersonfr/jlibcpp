@@ -1765,7 +1765,7 @@ class PSIParser : public jevent::DemuxListener {
         std::string language = std::string(ptr+6, 3);
 
 				printf(":: stream content:[0x%01x], content type:[0x%01x], component tag::[0x%01x], stream type::[0x%01x], group tag::[0x%01x], multilanguage::[0x%01x], component flag::[0x%01x], quality flag::[0x%01x], sampling rate::[0x%01x], language::[%s]\n", stream_content, content_type, component_tag, stream_type, group_tag, multilanguage_flag, component_flag, quality_indicator, sampling_rate, language.c_str());
-			} else if (descriptor_tag == 0xc7) { // data contents descriptor [ABNTNBR 15608-3-2008]
+			} else if (descriptor_tag == 0xc7) { // data content descriptor [ABNTNBR 15608-3/15610-1]
 				int data_component_id = TS_G16(ptr+0);
 				int entry_component = TS_G8(ptr+2);
 				int selector_length = TS_G8(ptr+3);
@@ -1975,6 +1975,8 @@ class PSIParser : public jevent::DemuxListener {
         }
 			} else if (descriptor_tag == 0xfd) { // data component descriptor
 				int data_component_id = TS_G16(ptr+0);
+
+        // INFO:: STD-B24:2008, volume 1, parte 3, 9.6.1 (additional_arib_caption_info)
 				int dmf = TS_GM8(ptr+1, 0, 4);
 				// int reserved = TS_GM8(ptr+1, 4, 2);
 				int timing = TS_GM8(ptr+1, 6, 2);
@@ -3083,6 +3085,7 @@ class PSIParser : public jevent::DemuxListener {
 
               printf(":caption managment: data unit parameter:[0x%02x/%s]\n", data_unit_parameter, data_unit_info.c_str());
 
+              // 6-STD-B24v5_1-1p3-E1:: pg. 113
               DumpBytes("data unit byte", ptr, data_unit_loop_length);
 
               count_data_unit = count_data_unit + data_unit_size + 5;
@@ -3150,6 +3153,7 @@ class PSIParser : public jevent::DemuxListener {
 
             printf(":caption managment: data unit parameter:[0x%02x/%s]\n", data_unit_parameter, data_unit_info.c_str());
 
+            // 6-STD-B24v5_1-1p3-E1:: pg. 113
             DumpBytes("data unit byte", ptr, data_unit_loop_length);
 
             count_data_unit = count_data_unit + data_unit_size + 5;

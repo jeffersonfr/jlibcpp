@@ -637,7 +637,7 @@ std::string GetDescriptorName(int descriptor_tag)
 		case 0xc4: return "audio_component_descriptor";
 		case 0xc5: return "hyperlink_descriptor";
 		case 0xc6: return "target_area_descriptor";
-		case 0xc7: return "data_contents_descriptor";
+		case 0xc7: return "data_content_descriptor";
 		case 0xc8: return "video_decode_control_descriptor";
 		case 0xc9: return "download_content_descriptor";
 		case 0xca: return "ca_emm_ts_descriptor";
