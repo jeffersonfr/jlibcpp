@@ -30,39 +30,39 @@
 
 // INFO:: bit get
 #define TS_G8(data) ((uint8_t)(((uint8_t *)(data))[0]))
-#define TS_G16(data) ((uint16_t)(htobe16(((uint16_t *)(data))[0]))) 
+#define TS_G16(data) ((uint16_t)(htobe16(((uint16_t *)(data))[0])))
 #define TS_G32(data) ((uint32_t)(htobe32(((uint32_t *)(data))[0])))
 #define TS_G64(data) ((uint64_t)(htobe64(((uint64_t *)(data))[0])))
 
 // INFO:: bit get with mask
-#define TS_GM8(data, offset, count) (uint8_t)((((uint8_t *)(data))[0] & TS_M8(offset, count)) >> (8-offset-count)) 
-#define TS_GM16(data, offset, count) ((uint16_t)((htobe16(((uint16_t *)(data))[0]) & TS_M16(offset, count)) >> (16-offset-count)))
-#define TS_GM32(data, offset, count) ((uint32_t)((htobe32(((uint32_t *)(data))[0]) & TS_M32(offset, count)) >> (32-offset-count)))
-#define TS_GM64(data, offset, count) ((uint64_t)((htobe64(((uint64_t *)(data))[0]) & TS_M64(offset, count)) >> (64-offset-count)))
+#define TS_GM8(data, offset, count) (uint8_t)((((uint8_t *)(data))[0] & TS_M8(offset, count)) >> (8 - offset - count))
+#define TS_GM16(data, offset, count) ((uint16_t)((htobe16(((uint16_t *)(data))[0]) & TS_M16(offset, count)) >> (16 - offset - count)))
+#define TS_GM32(data, offset, count) ((uint32_t)((htobe32(((uint32_t *)(data))[0]) & TS_M32(offset, count)) >> (32 - offset - count)))
+#define TS_GM64(data, offset, count) ((uint64_t)((htobe64(((uint64_t *)(data))[0]) & TS_M64(offset, count)) >> (64 - offset - count)))
 
 // INFO:: set bits
-#define TS_S8(data, offset, count) (uint8_t)(((uint8_t *)(data))[0] | (TS_M8(offset, count) & 0xff)) 
-#define TS_S16(data, offset, count) (uint16_t)(((uint16_t *)(data))[0] | (TS_M16(offset, count) & 0xffff)) 
-#define TS_S32(data, offset, count) (uint32_t)(((uint32_t *)(data))[0] | (TS_M32(offset, count) & 0xffffffff)) 
-#define TS_S64(data, offset, count) (uint64_t)(((uint64_t *)(data))[0] | (TS_M64(offset, count) & 0xffffffffffffffff)) 
+#define TS_S8(data, offset, count) (uint8_t)(((uint8_t *)(data))[0] | (TS_M8(offset, count) & 0xff))
+#define TS_S16(data, offset, count) (uint16_t)(((uint16_t *)(data))[0] | (TS_M16(offset, count) & 0xffff))
+#define TS_S32(data, offset, count) (uint32_t)(((uint32_t *)(data))[0] | (TS_M32(offset, count) & 0xffffffff))
+#define TS_S64(data, offset, count) (uint64_t)(((uint64_t *)(data))[0] | (TS_M64(offset, count) & 0xffffffffffffffff))
 
 // INFO:: set bits with mask
-#define TS_SM8(data, mask) (uint8_t)(((uint8_t *)(data))[0] | (mask & 0xff)) 
-#define TS_SM16(data, mask) (uint16_t)(((uint16_t *)(data))[0] | (mask & 0xffff)) 
-#define TS_SM32(data, mask) (uint32_t)(((uint32_t *)(data))[0] | (mask & 0xffffffff)) 
-#define TS_SM64(data, mask) (uint64_t)(((uint64_t *)(data))[0] | (mask & 0xffffffffffffffff)) 
+#define TS_SM8(data, mask) (uint8_t)(((uint8_t *)(data))[0] | (mask & 0xff))
+#define TS_SM16(data, mask) (uint16_t)(((uint16_t *)(data))[0] | (mask & 0xffff))
+#define TS_SM32(data, mask) (uint32_t)(((uint32_t *)(data))[0] | (mask & 0xffffffff))
+#define TS_SM64(data, mask) (uint64_t)(((uint64_t *)(data))[0] | (mask & 0xffffffffffffffff))
 
 // INFO:: clear bits
-#define TS_C8(data, offset, count) (uint8_t)(((uint8_t *)(data))[0] & (~TS_M8(offset, count) & 0xff)) 
-#define TS_C16(data, offset, count) (uint16_t)(((uint16_t *)(data))[0] & (~TS_M16(offset, count) & 0xffff)) 
-#define TS_C32(data, offset, count) (uint32_t)(((uint32_t *)(data))[0] & (~TS_M32(offset, count) & 0xffffffff)) 
-#define TS_C64(data, offset, count) (uint64_t)(((uint64_t *)(data))[0] & (~TS_M64(offset, count) & 0xffffffffffffffff)) 
+#define TS_C8(data, offset, count) (uint8_t)(((uint8_t *)(data))[0] & (~TS_M8(offset, count) & 0xff))
+#define TS_C16(data, offset, count) (uint16_t)(((uint16_t *)(data))[0] & (~TS_M16(offset, count) & 0xffff))
+#define TS_C32(data, offset, count) (uint32_t)(((uint32_t *)(data))[0] & (~TS_M32(offset, count) & 0xffffffff))
+#define TS_C64(data, offset, count) (uint64_t)(((uint64_t *)(data))[0] & (~TS_M64(offset, count) & 0xffffffffffffffff))
 
 // INFO:: clear bits with mask
-#define TS_CM8(data, mask) (uint8_t)(((uint8_t *)(data))[0] & (~mask & 0xff)) 
-#define TS_CM16(data, mask) (uint16_t)(((uint16_t *)(data))[0] & (~mask & 0xffff)) 
-#define TS_CM32(data, mask) (uint32_t)(((uint32_t *)(data))[0] & (~mask & 0xffffffff)) 
-#define TS_CM64(data, mask) (uint64_t)(((uint64_t *)(data))[0] & (~mask & 0xffffffffffffffff)) 
+#define TS_CM8(data, mask) (uint8_t)(((uint8_t *)(data))[0] & (~mask & 0xff))
+#define TS_CM16(data, mask) (uint16_t)(((uint16_t *)(data))[0] & (~mask & 0xffff))
+#define TS_CM32(data, mask) (uint32_t)(((uint32_t *)(data))[0] & (~mask & 0xffffffff))
+#define TS_CM64(data, mask) (uint64_t)(((uint64_t *)(data))[0] & (~mask & 0xffffffffffffffff))
 
 // INFO:: mpeg masks
 #define TS_PACKET_LENGTH 188
@@ -100,9 +100,9 @@
 #define TS_DESCRIPTOR_HEADER_LENGTH 2
 
 #define TS_PSI_G_TABLE_ID(data) TS_G8(data)
-#define TS_PSI_G_SECTION_LENGTH(data) (TS_G16(data+1) & 0x0fff)
-#define TS_PSI_G_SECTION_NUMBER(data) TS_G8(data+6)
-#define TS_PSI_G_LAST_SECTION_NUMBER(data) TS_G8(data+7)
+#define TS_PSI_G_SECTION_LENGTH(data) (TS_G16(data + 1) & 0x0fff)
+#define TS_PSI_G_SECTION_NUMBER(data) TS_G8(data + 6)
+#define TS_PSI_G_LAST_SECTION_NUMBER(data) TS_G8(data + 7)
 
 std::string GetStreamTypeDescription(int stream_type);
 std::string GetComponentDescription(int stream_content, int component_type);

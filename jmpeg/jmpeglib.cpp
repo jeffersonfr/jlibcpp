@@ -734,11 +734,11 @@ std::string GetDescriptorName(int descriptor_tag)
 		case 0x78: return "ECM_repetition_rate_descriptor";
 		case 0x79: return "S2_satellite_delivery_system_descriptor";
 		case 0x7a: return "enhanced_AC-3_descriptor";
-		case 0x7b: return "DTS descriptor";
-		case 0x7c: return "AAC descriptor";
-		case 0x7d: return "XAIT location descriptor";
+		case 0x7b: return "DTS_descriptor";
+		case 0x7c: return "AAC)descriptor";
+		case 0x7d: return "XAIT)location_descriptor";
 		case 0x7e: return "FTA_content_management_descriptor";
-		case 0x7f: return "extension descriptor";
+		case 0x7f: return "extension_descriptor";
 		case 0xff: return "forbidden";
 		default: 
 							 break;
@@ -763,7 +763,11 @@ std::string GetDescriptorName(int descriptor_tag)
 
 void DumpBytes(std::string id, const char *data, int length, int columns)
 {
-	printf("----:: Dump (%s) :: BEGIN ::----\n", id.c_str());
+  if (length == 0) {
+    return;
+  }
+
+	printf("----:: Dump (%s) <%d bytes> :: BEGIN ::----\n", id.c_str(), length);
 
 	const char *ptr = data;
 
