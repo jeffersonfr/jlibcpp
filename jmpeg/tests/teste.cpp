@@ -2524,7 +2524,12 @@ class PSIParser : public jevent::DemuxListener {
 				pcr_pid = vpid; // first video pid
 			}
 			
-			StartDemux("pcr", pcr_pid, -1, TS_PCR_TIMEOUT);
+      // INFO:: no overwrite
+      if (_pcr_pid < 0) {
+        _pcr_pid = pcr_pid;
+      }
+
+			StartPESDemux("pcr", _pcr_pid, TS_PCR_TIMEOUT);
 		}
 
 		virtual void ProcessNIT(jevent::DemuxEvent *event)
@@ -2624,6 +2629,10 @@ class PSIParser : public jevent::DemuxListener {
 				ptr = ptr + 5;
 
         std::shared_ptr<SIService> param = SIFacade::GetInstance()->Service(service_id);
+
+        if (param == nullptr) {
+          return;
+        }
 
         param->OriginalNetworkID(original_network_id);
         param->TransportStreamID(transport_stream_id);

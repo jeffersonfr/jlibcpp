@@ -359,6 +359,10 @@ void DemuxManager::ProcessPES(const char *data, const int length)
       chunk = length;
     }
 
+    if (chunk < 0) { // TODO:: whats is wrong ?
+      chunk = 0;
+    }
+
     current.append(ptr, chunk);
   }
 
