@@ -739,7 +739,7 @@ void File::Remove()
 
 void File::Reset() 
 {
-	Seek(0);
+	lseek(_fd, (off_t)0, SEEK_SET);
 }
 
 int64_t File::Tell() 
@@ -755,7 +755,7 @@ int64_t File::Tell()
 
 int64_t File::Seek(int64_t n) 
 {
-	return lseek(_fd, (off_t)n, SEEK_SET);
+	return lseek(_fd, (off_t)n, SEEK_CUR);
 }
 
 void File::Truncate(int64_t n) 
