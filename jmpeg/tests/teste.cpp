@@ -4129,6 +4129,17 @@ class ISDBTInputStream : public jio::FileInputStream {
 		{
 			_lgap = lgap;
 			_rgap = rgap;
+
+      // INFO:: try to search the sync byte of transport stream
+      int count = 0;
+      int64_t c;
+
+      while ((c = jio::FileInputStream::Read()) != 0x47) { // sync byte
+        count = count + 1;
+      }
+
+      jio::FileInputStream::Reset();
+      jio::FileInputStream::Skip(count);
 		}
 		
 		virtual ~ISDBTInputStream() 
@@ -4137,14 +4148,16 @@ class ISDBTInputStream : public jio::FileInputStream {
 		
 		virtual int64_t Read(char *data, int64_t size)
 		{
-			char tmp[_lgap+size+_rgap];
-			int64_t r = jio::FileInputStream::Read(tmp, _lgap+size+_rgap);
+      jio::FileInputStream::Skip(_lgap);
+			
+      int64_t 
+        r = jio::FileInputStream::Read(data, size);
+
+      jio::FileInputStream::Skip(_rgap);
 
 			if (r <= 0) {
 				return -1LL;
 			}
-
-			memcpy(data, tmp+_lgap, size);
 
 			return size;
 		}
