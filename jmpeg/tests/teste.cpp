@@ -554,6 +554,13 @@ class SITime : public SI {
       SI()
     {
       _country = "BRA";
+      _year = 0;
+      _month = 0;
+      _day = 0;
+      _hour = 0;
+      _minute = 0;
+      _second = 0;
+      _week_day = week_day_t::SUNDAY;
     }
 
     virtual ~SITime()

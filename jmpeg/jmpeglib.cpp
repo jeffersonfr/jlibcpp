@@ -123,7 +123,7 @@ std::string GetStreamTypeDescription(int stream_type)
 			case 0x02: return "H.262/13818-2 video (MPEG-2) or 11172-2 constrained video";
 			case 0x03: return "11172-3 audio (MPEG-1)";
 			case 0x04: return "13818-3 audio (MPEG-2)";
-			case 0x05: return "H.222.0/13818-1  private sections";
+			case 0x05: return "H.222.0/13818-1 private sections";
 			case 0x06: return "H.222.0/13818-1 PES private data (maybe Dolby/AC-3 in DVB)";
 			case 0x07: return "13522 MHEG";
 			case 0x08: return "H.222.0/13818-1 Annex A - DSM CC";
