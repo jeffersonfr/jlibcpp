@@ -110,6 +110,7 @@ OBJS_jexception += \
 		jnullpointerexception.o\
 		joutofboundsexception.o\
 		joutofmemoryexception.o\
+		joverflowexception.o\
 		jparserexception.o\
 		jpipeexception.o\
 		jprocessexception.o\
@@ -220,6 +221,7 @@ OBJS_jnetwork += \
 	   jurl.o\
 
 OBJS_jmpeg += \
+     jdatastream.o\
 		 jdemux.o\
 		 jrawdemux.o\
 		 jpsidemux.o\

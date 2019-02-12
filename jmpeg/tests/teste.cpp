@@ -17,12 +17,6 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-
-// TODO:: 
-// - verificar o parse da EIT, mas especificamente a parte dos descritores, pois o short_event_descriptor, em varios casos, nao considera o tamanho total do texto, apenas uma parte e considera o resto como um descritor (ainda sobre a parte do texto).
-//  ** aparentemente estah ocorrendo apenas no fluxo da globo de 2014, o problema ocorre no short event descriptor que nao contempla o tamanho total do descriptor .. isso pode ser observado tanto no descriptor_length quanto no text_length, correspondente
-//
-
 #include "jmpeg/jdemuxmanager.h"
 #include "jmpeg/jpsidemux.h"
 #include "jmpeg/jpesdemux.h"
@@ -32,6 +26,8 @@
 #include "jevent/jdemuxlistener.h"
 #include "jlogger/jloggerlib.h"
 #include "jmath/jcrc.h"
+#include "jexception/joverflowexception.h"
+#include "jexception/joutofboundsexception.h"
 
 #include <iostream>
 #include <algorithm>
@@ -130,138 +126,6 @@ class Utils {
 
 			WD = ((MJD + 2) % 7) + 1;
 		}
-};
-
-class DataStream {
-
-  private:
-    std::string 
-      _data;
-    size_t 
-      _data_index;
-
-  public:
-    DataStream(std::string data)
-    {
-      _data = data;
-    }
-
-    DataStream(const char *data, size_t length):
-      DataStream(std::string(data, length))
-    {
-      _data_index = 0;
-    }
-
-    virtual ~DataStream()
-    {
-    }
-
-    uint64_t GetBits(size_t n)
-    {
-      if ((_data_index + n) > (_data.size() << 3)) {
-        throw std::overflow_error("Skip overflow");
-      }
-
-      if (n > 64L) {
-        throw std::range_error("Range is limited to [0, 64]");
-      }
-
-      if (n == 0) {
-        return 0LL;
-      }
-
-      uint8_t 
-        *ptr = (uint8_t *)_data.c_str();
-      uint64_t 
-        bits = 0LL;
-      size_t 
-        start = 0,
-        end = 0;
-
-      do {
-        start = _data_index >> 3;
-        end = (_data_index + n - 1) >> 3;
-
-        if (start == end) {
-          bits = (bits << n) | TS_GM8(ptr + start, _data_index%8, n);
-
-          _data_index = _data_index + n;
-
-          n = 0;
-        } else {
-          size_t 
-            d = 8 - (_data_index%8);
-
-          bits = (bits << d) | TS_GM8(ptr + start, _data_index%8, d);
-          
-          _data_index = _data_index + d;
-
-          n = n - d;
-        }
-      } while (n > 0);
-
-      return bits;
-    }
-
-    std::string GetBitsAsString(size_t n)
-    {
-      std::string bits;
-
-      if (n == 0) {
-        return bits;
-      }
-
-      bits.reserve(n);
-
-      for (size_t i=0; i<n; i++) {
-        bits = bits + ((GetBits(1) == 0)?'0':'1');
-      }
-
-      return bits;
-    }
-
-    std::string GetBytes(size_t n)
-    {
-      std::string bytes;
-
-      if (n == 0) {
-        return bytes;
-      }
-
-      bytes.reserve(n);
-
-      for (size_t i=0; i<n; i++) {
-        uint8_t byte = GetBits(8);
-
-        bytes.append((const char *)&byte, 1);
-      }
-
-      return bytes;
-    }
-
-    void Skip(size_t n)
-    {
-      if ((_data_index + n) > (_data.size() << 3)) {
-        throw std::overflow_error("Skip overflow");
-      }
-
-      _data_index = _data_index + n;
-    }
-
-    void Reset()
-    {
-      _data_index = 0;
-    }
-
-    size_t GetAvaiableBits()
-    {
-      return (_data.size() << 8) - _data_index;
-    }
-    
-    size_t GetAvaiableBytes()
-    {
-      return GetAvaiableBits() >> 8;
-    }
 };
 
 class SI {
