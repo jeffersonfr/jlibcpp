@@ -3571,11 +3571,63 @@ class PSIParser : public jevent::DemuxListener {
 
 		virtual void ProcessDSMCCInformation(jevent::DemuxEvent *event)
     {
-      /*
 			const char *ptr = event->GetData();
 
-			int section_length = TS_GM16(ptr+1, 4, 12);
-      */
+      ptr = ptr + 8;
+
+      int protocol_discriminator = TS_G8(ptr);
+      int dsmcc_type = TS_G8(ptr + 1);
+      int message_id = TS_G16(ptr + 2);
+      uint32_t transaction_id = TS_G32(ptr + 4);
+      int reserved = TS_G8(ptr + 8);
+      int adaptation_length = TS_G8(ptr + 9);
+      // int message_length = TS_G16(ptr + 10);
+
+      if (protocol_discriminator != 0x11 || // MPEG-2 DSM-CC message
+          dsmcc_type != 0x03 || // Download message
+          reserved != 0xff ||
+          message_id != 0x1002) { // DownloadInfoIndication (DII)
+        return;
+      }
+
+      ptr = ptr + 12 + adaptation_length;
+
+      uint32_t download_id = TS_G32(ptr + 0);
+      int block_size = TS_G16(ptr + 4);
+      int window_size = TS_G8(ptr + 6);
+      // int ack_period = TS_G8(ptr + 7);
+      // uint32_t tcdownload_window = TS_G32(ptr + 8);
+      // uint32_t tcdownload_scenario = TS_G32(ptr + 12);
+
+      ptr = ptr + 16;
+
+      // INFO:: compatibilitydescriptor()
+      int compatibility_descriptor_length = TS_G8(ptr + 0);
+
+      ptr = ptr + compatibility_descriptor_length + 2;
+
+      int number_of_modules = TS_G16(ptr + 0);
+
+      ptr = ptr + 2;
+
+      printf("DSMCCInformation:: protocol discriminator:[0x%02x], dsmcc type:[0x%02x], message id:[0x%04x], transaction id:[0x%08x], download id:[0x%08x], block size:[%d], window size:[%d], number of modules:[%d]\n", protocol_discriminator, dsmcc_type, message_id, transaction_id, download_id, block_size, window_size, number_of_modules);
+
+      for (int i=0; i<number_of_modules; i++) {
+        int module_id = TS_G16(ptr + 0);
+        uint32_t module_size = TS_G32(ptr + 2);
+        int module_version = TS_G8(ptr + 6);
+        int module_info_length = TS_G8(ptr + 7);
+
+        printf("DSMCCInformation:: module id:[0x%04x], module size:[%d], module version:[0x%02x]\n", module_id, module_size, module_version);
+
+        DumpBytes("DSMCCInformation:: module info bytes", ptr + 8, module_info_length);
+
+        ptr = ptr + 8 + module_info_length;
+      }
+        
+      int private_data_length = TS_G16(ptr + 0);
+        
+      DumpBytes("DSMCCInformation:: private data byte", ptr + 2, private_data_length);
     }
 
 		virtual void ProcessDSMCCMessage(jevent::DemuxEvent *event)
@@ -3595,7 +3647,7 @@ class PSIParser : public jevent::DemuxListener {
       if (protocol_discriminator != 0x11 || // MPEG-2 DSM-CC message
           dsmcc_type != 0x03 || // Download message
           reserved != 0xff ||
-          message_id != 0x1003) { // DownloadDataBlock
+          message_id != 0x1003) { // DownloadDataBlock (DDB)
         return;
       }
 
