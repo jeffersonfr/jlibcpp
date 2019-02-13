@@ -527,7 +527,8 @@ class SINetwork : public SI {
     int
       _network_id, 
       _original_network_id, 
-      _transport_stream_id;
+      _transport_stream_id,
+      _channel_number;
 
   public:
     bool operator==(std::shared_ptr<SINetwork> param)
@@ -565,6 +566,11 @@ class SINetwork : public SI {
       _transport_stream_id = param;
     }
 
+    void ChannelNumber(int param)
+    {
+      _channel_number = param;
+    }
+
     std::string TransportStreamName()
     {
       return _transport_stream_name;
@@ -585,10 +591,15 @@ class SINetwork : public SI {
       return _transport_stream_id;
     }
 
+    int ChannelNumber()
+    {
+      return _channel_number;
+    }
+
     void Print()
     {
-      printf("Network:: transport stream name:[%s], network id:[0x%04x], original network id:[0x%04x], transport stream id:[0x%04x]\n",
-          _transport_stream_name.c_str(), _network_id, _original_network_id, _transport_stream_id); 
+      printf("Network:: transport stream name:[%s], network id:[0x%04x], original network id:[0x%04x], transport stream id:[0x%04x], channel number:[%02d]\n",
+          _transport_stream_name.c_str(), _network_id, _original_network_id, _transport_stream_id, _channel_number); 
     }
 
 };
@@ -1931,6 +1942,7 @@ class PSIParser : public jevent::DemuxListener {
         SINetwork *param = dynamic_cast<SINetwork *>(si);
 
         param->TransportStreamName(ts_name);
+        param->ChannelNumber(remote_control_key_identification);
 
 				printf(":: remote control key identification:[0x%02x], ts name:[%s]\n", remote_control_key_identification, ts_name.c_str());
 
@@ -3263,12 +3275,209 @@ class PSIParser : public jevent::DemuxListener {
 
             printf("Closed Caption:caption managment: data unit parameter:[0x%02x/%s]\n", data_unit_parameter, data_unit_info.c_str());
 
+            ptr = ptr + 5;
+
             // 6-STD-B24v5_1-1p3-E1:: pg. 113
-            DumpBytes("data unit byte", ptr, data_unit_loop_length);
+            DumpBytes("data unit byte", ptr, data_unit_size);
+
+            uint8_t 
+              *code = (uint8_t *)ptr,
+              *end = code + data_unit_size;
+
+            while (code != end) {
+              uint8_t byte = *code++;
+
+              // Table 7-15 C0 Control Set
+              if (byte == 0x00) { // null (do nothing)
+                printf("Closed Caption::data unit: <NULL>\n");
+              } else if (byte == 0x01) { // 
+              } else if (byte == 0x02) { // 
+              } else if (byte == 0x03) { // 
+              } else if (byte == 0x04) { // 
+              } else if (byte == 0x05) { // 
+              } else if (byte == 0x06) { // 
+              } else if (byte == 0x07) { // BEL (bell)::(used to call attention with alarm or signal)
+                printf("Closed Caption::data unit: <BEL>\n");
+              } else if (byte == 0x08) { // APB (active position backward)::(move cursor backward)
+                printf("Closed Caption::data unit: <APB>\n");
+              } else if (byte == 0x09) { // APF (active position forward)::(move cursor forward)
+                printf("Closed Caption::data unit: <APF>\n");
+              } else if (byte == 0x0a) { // APD (active position control)::(move cursor down)
+                printf("Closed Caption::data unit: <APD>\n");
+              } else if (byte == 0x0b) { // APU (active position control)::(move cursor up)
+                printf("Closed Caption::data unit: <APU>\n");
+              } else if (byte == 0x0c) { // CS (clear screen)::(clear the screen)
+                printf("Closed Caption::data unit: <CS>\n");
+              } else if (byte == 0x0d) { // APR (active position return)::(move to first position of the line)
+                printf("Closed Caption::data unit: <APR>\n");
+              } else if (byte == 0x0e) { // LS1
+                printf("Closed Caption::data unit: <LS1>\n");
+              } else if (byte == 0x0f) { // LS0
+                printf("Closed Caption::data unit: <LS0>\n");
+              } else if (byte == 0x10) { // 
+              } else if (byte == 0x11) { // 
+              } else if (byte == 0x12) { // 
+              } else if (byte == 0x13) { // 
+              } else if (byte == 0x14) { // 
+              } else if (byte == 0x15) { // 
+              } else if (byte == 0x16) { // PAPF (parameterized active position forward::[length])::(set the cursor forward a number of times)
+                printf("Closed Caption::data unit: <PAPF>::[0x%02x]\n", *code++);
+              } else if (byte == 0x17) { // 
+              } else if (byte == 0x18) { // CAN (cancel)::(cover from the current position to the end of line with background color)
+                printf("Closed Caption::data unit: <CAN>\n");
+              } else if (byte == 0x19) { // SS2 (single shift 2)::(invoke character code set)
+                printf("Closed Caption::data unit: <SS2>\n");
+              } else if (byte == 0x1a) { // 
+              } else if (byte == 0x1b) { // ESC
+                printf("Closed Caption::data unit: <ESC>\n");
+              } else if (byte == 0x1c) { // APS (active position set::[row, column])::(set the current position of cursor)
+                uint8_t
+                  param1 = *code++,
+                  param2 = *code++;
+
+                printf("Closed Caption::data unit: <APS>::[0x%02x, 0x%02x]\n", param1, param2);
+              } else if (byte == 0x1d) { // SS3 (single shift 3)::(special characters escape [G3])
+                printf("Closed Caption::data unit: <SS3>::[0x%02x]\n", *code++);
+              } else if (byte == 0x1e) { // RS (record separator)::(information division code)
+                printf("Closed Caption::data unit: <RS>\n");
+              } else if (byte == 0x1f) { // US (unit separator)::(information division code)
+                printf("Closed Caption::data unit: <US>\n");
+              } else if (byte == 0x20) { // SP (space)
+                printf("Closed Caption::data unit: <CHAR>::[%c]\n", (char)'\x20');
+              } else if (byte == 0x7f) { // DEL (delete)
+                printf("Closed Caption::data unit: <DEL>\n");
+              } else if (byte == 0x80) { // BKF (black foreground)::(set foreground color to black)
+                printf("Closed Caption::data unit: <BKF>\n");
+              } else if (byte == 0x81) { // RDF (red foreground)::(set foreground color to red)
+                printf("Closed Caption::data unit: <RDF>\n");
+              } else if (byte == 0x82) { // GRF (green foreground)::(set foreground color to green)
+                printf("Closed Caption::data unit: <GRF>\n");
+              } else if (byte == 0x83) { // YLF (yellow foreground)::(set foreground color to yellow)
+                printf("Closed Caption::data unit: <YLF>\n");
+              } else if (byte == 0x84) { // BLF (blue foreground)::(set foreground to blue)
+                printf("Closed Caption::data unit: <BLF>\n");
+              } else if (byte == 0x85) { // MGF (magenta foreground)::(set foreground to magenta)
+                printf("Closed Caption::data unit: <MGF>\n");
+              } else if (byte == 0x86) { // CNF (cyan foreground)::(set foreground to cyan)
+                printf("Closed Caption::data unit: <CNF>\n");
+              } else if (byte == 0x87) { // WHF (white foreground)::(set foreground to white)
+                printf("Closed Caption::data unit: <WHF>\n");
+              } else if (byte == 0x88) { // SSZ (small size)::(set character size to small)
+                printf("Closed Caption::data unit: <SSZ>\n");
+              } else if (byte == 0x89) { // MSZ (middle size)::(set character size to middle)
+                printf("Closed Caption::data unit: <MSZ>\n");
+              } else if (byte == 0x8a) { // NSZ (normal size)::(set character size to normal)
+                printf("Closed Caption::data unit: <NSZ>\n");
+              } else if (byte == 0x8b) { // SZX (character size controls::[size])::(set size of character)
+                printf("Closed Caption::data unit: <SZX>::[0x%02x]\n", *code++);
+              } else if (byte == 0x8c) { // 
+              } else if (byte == 0x8d) { // 
+              } else if (byte == 0x8e) { // 
+              } else if (byte == 0x8f) { // 
+              } else if (byte == 0x90) { // COL (color controls::[color])::(set foreground, background, half foreground, half background and CMLA colors)
+                printf("Closed Caption::data unit: <COL>::[0x%02x]\n", *code++);
+              } else if (byte == 0x91) { // FLC (flashing control::[param])::(set beginning and end of flashing)
+                printf("Closed Caption::data unit: <FLC>::[0x%02x]\n", *code++);
+              } else if (byte == 0x92) { // CDC (conceal display controls::[param1[, param2]])::(set beginning and end of concealing)
+                uint8_t 
+                  param1 = *code++,
+                  param2 = 0;
+
+                if (param1 == 0x20) {
+                  param2 = *code++;
+                }
+
+                printf("Closed Caption::data unit: <CDC>::[0x%02x, 0x%02x]\n", param1, param2);
+              } else if (byte == 0x93) { // POL (pattern polarity controls)::(set pattern and polarity of the character and the mosaic)
+                printf("Closed Caption::data unit: <POL>::[0x%02x]\n", *code++);
+              } else if (byte == 0x94) { // WMM (writing mode modification)::(change the writing mode to the memory of display)
+                printf("Closed Caption::data unit: <WMM>::[0x%02x]\n", *code++);
+              } else if (byte == 0x95) { // MACRO (macro definition)::(???)
+                printf("Closed Caption::data unit: <MACRO>::[TODO]\n");
+              } else if (byte == 0x96) { // 
+              } else if (byte == 0x97) { // HLC (highlighting control)::(set start and ending of enclosure)
+                printf("Closed Caption::data unit: <HLC>::[0x%02x]\n", *code++);
+              } else if (byte == 0x98) { // RPC (repeat character)::(cause a displayable character or mosaic the immediately follows the code)
+                printf("Closed Caption::data unit: <RPC>::[0x%02x]\n", *code++);
+              } else if (byte == 0x99) { // SPL (stop lining)::(underlining and mosaic division process is terminated)
+                printf("Closed Caption::data unit: <SPL>\n");
+              } else if (byte == 0x9a) { // STL (start lining)::(starts the lining process)
+                printf("Closed Caption::data unit: <STL>\n");
+              } else if (byte == 0x9b) { // CSI
+                std::string params;
+
+                do {
+                  params.append((char *)code++, 1);
+                } while (*code != 0x20);
+                  
+                code++; // 0x20
+
+                uint8_t control = *code++;
+
+                std::string info = "unknown";
+
+                if (control == 0x42) {
+                  info = "character deformation";
+                } else if (control == 0x53) {
+                  info = "set writing form";
+                } else if (control == 0x54) {
+                  info = "composite character composition";
+                } else if (control == 0x56) {
+                  info = "set display format";
+                } else if (control == 0x57) {
+                  info = "character composite data designation";
+                } else if (control == 0x58) {
+                  info = "set horizontal spacing";
+                } else if (control == 0x59) {
+                  info = "set vertical spacing";
+                } else if (control == 0x5d) {
+                  info = "colouring block";
+                } else if (control == 0x5e) {
+                  info = "raster colour designation";
+                } else if (control == 0x5f) {
+                  info = "set display position";
+                } else if (control == 0x61) {
+                  info = "active coordinate position set";
+                } else if (control == 0x62) {
+                  info = "witch control";
+                } else if (control == 0x63) {
+                  info = "ornament control";
+                } else if (control == 0x64) {
+                  info = "font";
+                } else if (control == 0x65) {
+                  info = "character font set";
+                } else if (control == 0x66) {
+                  info = "external character set";
+                } else if (control == 0x68) {
+                  info = "build-in sound replay";
+                } else if (control == 0x69) {
+                  info = "alternative character set";
+                } else if (control == 0x6e) {
+                  info = "raster colour command";
+                } else if (control == 0x6f) {
+                  info = "skip character set";
+                }
+                  
+                printf("Closed Caption::data unit: <CSI>::[0x%02x]:[%s]\n", control, info.c_str());
+              } else if (byte == 0x9c) { // 
+              } else if (byte == 0x9d) { // TIME (time control)
+                uint8_t
+                  param1 = *code++,
+                  param2 = *code++;
+
+                printf("Closed Caption::data unit: <TIME>::[0x%02x, 0x%02x]\n", param1, param2);
+              } else if (byte == 0x9e) { // 
+              } else if (byte == 0x9f) { // 
+              } else if (byte == 0xa0) { // 10/0
+              } else if (byte == 0xff) { // 15/15
+              } else {
+                printf("Closed Caption::data unit: <CHAR>::[%c]\n", (char)byte);
+              }
+            }
 
             count_data_unit = count_data_unit + data_unit_size + 5;
 
-            ptr = ptr + data_unit_size + 5;
+            ptr = ptr + data_unit_size;
           }
         }
       } else if (stream_id == 0b10111100 or // program_stream_map
@@ -3393,7 +3602,7 @@ class PSIParser : public jevent::DemuxListener {
       ptr = ptr + 12 + adaptation_length;
 
       int module_id = TS_G16(ptr);
-      // int module_version = TS_G8(ptr+2);
+      int module_version = TS_G8(ptr+2);
       // int reserved = TS_G8(ptr+3);
       int block_number = TS_G16(ptr+4);
       uint32_t magic = TS_G32(ptr+6);
@@ -3440,7 +3649,7 @@ class PSIParser : public jevent::DemuxListener {
 
       std::string biop(ptr+17+object_key_length);
 
-      printf("DSMCC:biop: biop:[%s], dsmcc type:[%d], message id:[0x%04x], module id:[0x%04x], block number:[0x%04x], download id:[%08x], message length:[%d]\n", biop_type_info(biop).c_str(), dsmcc_type, message_id, module_id, block_number, download_id, message_length);
+      printf("DSMCC:biop: biop:[%s], module version:[%02x], dsmcc type:[%d], message id:[0x%04x], module id:[0x%04x], block number:[0x%04x], download id:[%08x], message length:[%d]\n", biop_type_info(biop).c_str(), module_version, dsmcc_type, message_id, module_id, block_number, download_id, message_length);
 
       ptr = ptr + 21 + object_key_length;
 
@@ -3576,12 +3785,14 @@ class PSIParser : public jevent::DemuxListener {
               }
 
               // int component_data_length = TS_G8(ptr+6);
-              // uint32_t carousel_id = TS_G32(ptr+7);
-              // int module_id = TS_G16(ptr+11);
-              // int version_major = TS_G8(ptr+13); // BIOP protocol major version 1
-              // int version_minor = TS_G8(ptr+14); // BIOP protocol minor version 0
+              uint32_t carousel_id = TS_G32(ptr+7);
+              int module_id = TS_G16(ptr+11);
+              int version_major = TS_G8(ptr+13); // BIOP protocol major version 1
+              int version_minor = TS_G8(ptr+14); // BIOP protocol minor version 0
               int object_key_length = TS_G8(ptr+15);
           
+              printf("DSMCC::biop[dir]/TAG_BIOP/BIOP:: carousel id:[0x%08x], module id:[0x%04x], version:[%02d.%02d]\n", carousel_id, module_id, version_major, version_minor);
+
               DumpBytes("DSMCC:biop[dir]/TAG_BIOP: object key data byte", ptr+16, object_key_length);
 
               ptr = ptr + 16 + object_key_length;
@@ -3605,11 +3816,11 @@ class PSIParser : public jevent::DemuxListener {
               int use = TS_G16(ptr+2); // 0x0016
               int association_tag = TS_G16(ptr+4);
               // int selector_length = TS_G8(ptr+6); // 0x0A
-              // int selector_type = TS_G16(ptr+7); // 0x01
-              // uint32_t transaction_id = TS_G32(ptr+9);
+              int selector_type = TS_G16(ptr+7); // 0x01
+              uint32_t transaction_id = TS_G32(ptr+9);
               // uint32_t timeout = TS_G32(ptr+13);
 
-              printf("DSMCC::biop[dir]/TAG_BIOP/BIOP::Tap1: id:[0x%04x], use:[0x%04x], association tag:[0x%04x]\n", id, use, association_tag);
+              printf("DSMCC::biop[dir]/TAG_BIOP/BIOP::Tap1: id:[0x%04x], use:[0x%04x], association tag:[0x%04x], selector type:[%04x], transaction id:[%08x]\n", id, use, association_tag, selector_type, transaction_id);
 
               ptr = ptr + 17;
 
@@ -4069,16 +4280,16 @@ int main(int argc, char **argv)
 
     // INFO:: dumping methods
     auto 
-      services = SIFacade::GetInstance()->Services();
+      networks = SIFacade::GetInstance()->Networks();
 
-    for (auto i : services) {
+    for (auto i : networks) {
       i->Print();
     }
 
     auto 
-      networks = SIFacade::GetInstance()->Networks();
+      services = SIFacade::GetInstance()->Services();
 
-    for (auto i : networks) {
+    for (auto i : services) {
       i->Print();
     }
 

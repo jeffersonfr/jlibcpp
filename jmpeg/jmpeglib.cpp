@@ -164,63 +164,63 @@ std::string GetComponentDescription(int stream_content, int component_type)
   } else if (stream_content == 0x01 and component_type == 0x00) {
     description = "reserved";
   } else if (stream_content == 0x01 and component_type == 0x01) {
-    description = "MPEG2 vídeo 480i(525i), relação de aspecto 4:3";
+    description = "MPEG2 vídeo 480i(525i), apect ratio 4:3";
   } else if (stream_content == 0x01 and component_type == 0x02) {
-    description = "MPEG2 vídeo 480i(525i), relação de aspecto 16:9 com vetor de pan";
+    description = "MPEG2 vídeo 480i(525i), apect ratio 16:9 with pan vector";
   } else if (stream_content == 0x01 and component_type == 0x03) {
-    description = "MPEG2 vídeo 480i(525i), relação de aspecto 16:9 sem vetor de pan";
+    description = "MPEG2 vídeo 480i(525i), apect ratio 16:9 without pan vector";
   } else if (stream_content == 0x01 and component_type == 0x04) {
-    description = "MPEG2 vídeo 480i(525i), > relação de aspecto 16:9";
+    description = "MPEG2 vídeo 480i(525i), > apect ratio 16:9";
   } else if (stream_content == 0x01 and component_type >= 0x05 and component_type <= 0xa0) {
     description = "reserved";
   } else if (stream_content == 0x01 and component_type == 0xa1) {
-    description = "MPEG2 vídeo 480p(525p), relação de aspecto 4:3";
+    description = "MPEG2 vídeo 480p(525p), apect ratio 4:3";
   } else if (stream_content == 0x01 and component_type == 0xa2) {
-    description = "MPEG2 vídeo 480p(525p), relação de aspecto 16:9 com vetor de pan";
+    description = "MPEG2 vídeo 480p(525p), apect ratio 16:9 with pan vector";
   } else if (stream_content == 0x01 and component_type == 0xa3) {
-    description = "MPEG2 vídeo 480p(525p), relação de aspecto 16:9 sem vetor de pan";
+    description = "MPEG2 vídeo 480p(525p), apect ratio 16:9 without pan vector";
   } else if (stream_content == 0x01 and component_type == 0xa4) {
-    description = "MPEG2 vídeo 480p(525p), > relação de aspecto 16:9";
+    description = "MPEG2 vídeo 480p(525p), > apect ratio 16:9";
   } else if (stream_content == 0x01 and component_type >= 0xa5 and component_type <= 0xb0) {
     description = "reserved";
   } else if (stream_content == 0x01 and component_type == 0xb1) {
-    description = "MPEG2 vídeo 1080i(1125i), relação de aspecto 4:3";
+    description = "MPEG2 vídeo 1080i(1125i), apect ratio 4:3";
   } else if (stream_content == 0x01 and component_type == 0xb2) {
-    description = "MPEG2 vídeo 1080i(1125i), relação de aspecto 16:9 com vetor de pan";
+    description = "MPEG2 vídeo 1080i(1125i), apect ratio 16:9 with pan vector";
   } else if (stream_content == 0x01 and component_type == 0xb3) {
-    description = "MPEG2 vídeo 1080i(1125i), relação de aspecto 16:9 sem vetor de pan";
+    description = "MPEG2 vídeo 1080i(1125i), apect ratio 16:9 without pan vector";
   } else if (stream_content == 0x01 and component_type == 0xb4) {
-    description = "MPEG2 vídeo 1080i(1125i), > relação de aspecto 16:9";
+    description = "MPEG2 vídeo 1080i(1125i), > apect ratio 16:9";
   } else if (stream_content == 0x01 and component_type >= 0xb5 and component_type <= 0xc0) {
     description = "reserved";
   } else if (stream_content == 0x01 and component_type == 0xc1) {
-    description = "MPEG2 vídeo 720p(750p), relação de aspecto 4:3";
+    description = "MPEG2 vídeo 720p(750p), apect ratio 4:3";
   } else if (stream_content == 0x01 and component_type == 0xc2) {
-    description = "MPEG2 vídeo 720p(750p), relação de aspecto 16:9 com vetor de pan";
+    description = "MPEG2 vídeo 720p(750p), apect ratio 16:9 with pan vector";
   } else if (stream_content == 0x01 and component_type == 0xc3) {
-    description = "MPEG2 vídeo 720p(750p), relação de aspecto 16:9 sem vetor de pan";
+    description = "MPEG2 vídeo 720p(750p), apect ratio 16:9 without pan vector";
   } else if (stream_content == 0x01 and component_type == 0xc4) {
-    description = "MPEG2 vídeo 720p(750p), > relação de aspecto 16:9";
+    description = "MPEG2 vídeo 720p(750p), > apect ratio 16:9";
   } else if (stream_content == 0x01 and component_type >= 0xc5 and component_type <= 0xd0) {
     description = "reserved";
   } else if (stream_content == 0x01 and component_type == 0xd1) {
-    description = "MPEG2 vídeo 240p, relação de aspecto 4:3";
+    description = "MPEG2 vídeo 240p, apect ratio 4:3";
   } else if (stream_content == 0x01 and component_type == 0xd2) {
-    description = "MPEG2 vídeo 240p, relação de aspecto 4:3 com vetor de pan";
+    description = "MPEG2 vídeo 240p, apect ratio 4:3 with pan vector";
   } else if (stream_content == 0x01 and component_type == 0xd3) {
-    description = "MPEG2 vídeo 240p, relação de aspecto 4:3, sem vetor de pan";
+    description = "MPEG2 vídeo 240p, apect ratio 4:3, without pan vector";
   } else if (stream_content == 0x01 and component_type == 0xd4) {
-    description = "MPEG2 vídeo 240p, > relação de aspecto 16:9";
+    description = "MPEG2 vídeo 240p, > apect ratio 16:9";
   } else if (stream_content == 0x01 and component_type >= 0xd5 and component_type <= 0xe0) {
     description = "reserved";
   } else if (stream_content == 0x01 and component_type == 0xe1) {
-    description = "MPEG2 vídeo 1080p(1125p), relação de aspecto 4:3";
+    description = "MPEG2 vídeo 1080p(1125p), apect ratio 4:3";
   } else if (stream_content == 0x01 and component_type == 0xe2) {
-    description = "MPEG2 vídeo 1080p(1125p), relação de aspecto 16:9 com vetor de pan";
+    description = "MPEG2 vídeo 1080p(1125p), apect ratio 16:9 with pan vector";
   } else if (stream_content == 0x01 and component_type == 0xe3) {
-    description = "MPEG2 vídeo 1080p(1125p), relação de aspecto 16:9 sem vetor de pan";
+    description = "MPEG2 vídeo 1080p(1125p), apect ratio 16:9 without pan vector";
   } else if (stream_content == 0x01 and component_type == 0xe4) {
-    description = "MPEG2 vídeo 1080p(1125p), > relação de aspecto 16:9";
+    description = "MPEG2 vídeo 1080p(1125p), > apect ratio 16:9";
   } else if (stream_content == 0x01 and component_type >= 0xe5 and component_type <= 0xff) {
     description = "reserved";
   } else if (stream_content == 0x02 and component_type == 0x00) {
@@ -315,63 +315,63 @@ std::string GetComponentDescription(int stream_content, int component_type)
   } else if (stream_content == 0x05 and component_type == 0x00) {
     description = "reserved";
   } else if (stream_content == 0x05 and component_type == 0x01) {
-    description = "H264/AVC vídeo 480i(525i), relação de aspecto 4:3";
+    description = "H264/AVC vídeo 480i(525i), apect ratio 4:3";
   } else if (stream_content == 0x05 and component_type == 0x02) {
-    description = "H264/AVC vídeo 480i(525i), relação de aspecto 16:9 com vetor de pan";
+    description = "H264/AVC vídeo 480i(525i), apect ratio 16:9 with pan vector";
   } else if (stream_content == 0x05 and component_type == 0x03) {
-    description = "H264/AVC vídeo 480i(525i), relação de aspecto 16:9 sem vetor de pan";
+    description = "H264/AVC vídeo 480i(525i), apect ratio 16:9 without pan vector";
   } else if (stream_content == 0x05 and component_type == 0x04) {
-    description = "H264/AVC vídeo 480i(525i), > relação de aspecto 16:9";
+    description = "H264/AVC vídeo 480i(525i), > apect ratio 16:9";
   } else if (stream_content == 0x05 and component_type >= 0x05 and component_type <= 0xa0) {
     description = "reserved";
   } else if (stream_content == 0x05 and component_type == 0xa1) {
-    description = "H264/AVC vídeo 480p(525p), relação de aspecto 4:3";
+    description = "H264/AVC vídeo 480p(525p), apect ratio 4:3";
   } else if (stream_content == 0x05 and component_type == 0xa2) {
-    description = "H264/AVC vídeo 480p(525p), relação de aspecto 16:9, com vetor de pan";
+    description = "H264/AVC vídeo 480p(525p), apect ratio 16:9, with pan vector";
   } else if (stream_content == 0x05 and component_type == 0xa3) {
-    description = "H264/AVC vídeo 480p(525p), relação de aspecto 16:9, sem vetor de pan";
+    description = "H264/AVC vídeo 480p(525p), apect ratio 16:9, without pan vector";
   } else if (stream_content == 0x05 and component_type == 0xa4) {
-    description = "H264/AVC vídeo 480p(525p), > relação de aspecto 16:9";
+    description = "H264/AVC vídeo 480p(525p), > apect ratio 16:9";
   } else if (stream_content == 0x05 and component_type >= 0xa5 and component_type <= 0xb0) {
     description = "reserved";
   } else if (stream_content == 0x05 and component_type == 0xb1) {
-    description = "H264/AVC vídeo 1080i(1125i), relação de aspecto 4:3";
+    description = "H264/AVC vídeo 1080i(1125i), apect ratio 4:3";
   } else if (stream_content == 0x05 and component_type == 0xb2) {
-    description = "H264/AVC vídeo 1080i(1125i), relação de aspecto 16:9, com vetor de pan";
+    description = "H264/AVC vídeo 1080i(1125i), apect ratio 16:9, with pan vector";
   } else if (stream_content == 0x05 and component_type == 0xb3) {
-    description = "H264/AVC vídeo 1080i(1125i), relação de aspecto 16:9, sem vetor de pan";
+    description = "H264/AVC vídeo 1080i(1125i), apect ratio 16:9, without pan vector";
   } else if (stream_content == 0x05 and component_type == 0xb4) {
-    description = "H264/AVC vídeo 1080i(1125i), > relação de aspecto 16:9";
+    description = "H264/AVC vídeo 1080i(1125i), > apect ratio 16:9";
   } else if (stream_content == 0x05 and component_type >= 0xb5 and component_type <= 0xc0) {
     description = "reserved";
   } else if (stream_content == 0x05 and component_type == 0xc1) {
-    description = "H264/AVC vídeo 720p(750p), relação de aspecto 4:3";
+    description = "H264/AVC vídeo 720p(750p), apect ratio 4:3";
   } else if (stream_content == 0x05 and component_type == 0xc2) {
-    description = "H264/AVC vídeo 720p(750p), relação de aspecto 16:9, com vetor de pan";
+    description = "H264/AVC vídeo 720p(750p), apect ratio 16:9, with pan vector";
   } else if (stream_content == 0x05 and component_type == 0xc3) {
-    description = "H264/AVC vídeo 720p(750p), relação de aspecto 16:9, sem vetor de pan";
+    description = "H264/AVC vídeo 720p(750p), apect ratio 16:9, without pan vector";
   } else if (stream_content == 0x05 and component_type == 0xc4) {
-    description = "H264/AVC vídeo 720p(750p), > relação de aspecto 16:9";
+    description = "H264/AVC vídeo 720p(750p), > apect ratio 16:9";
   } else if (stream_content == 0x05 and component_type >= 0xc5 and component_type <= 0xd0) {
     description = "reserved";
   } else if (stream_content == 0x05 and component_type == 0xd1) {
-    description = "H264/AVC vídeo 240p, relação de aspecto 4:3";
+    description = "H264/AVC vídeo 240p, apect ratio 4:3";
   } else if (stream_content == 0x05 and component_type == 0xd2) {
-    description = "H264/AVC vídeo 240p, relação de aspecto 16:9 com vetor de pan";
+    description = "H264/AVC vídeo 240p, apect ratio 16:9 with pan vector";
   } else if (stream_content == 0x05 and component_type == 0xd3) {
-    description = "H264/AVC vídeo 240p, relação de aspecto 16:9 sem vetor de pan";
+    description = "H264/AVC vídeo 240p, apect ratio 16:9 without pan vector";
   } else if (stream_content == 0x05 and component_type == 0xd4) {
-    description = "H264/AVC vídeo 240p, > relação de aspecto 16:9";
+    description = "H264/AVC vídeo 240p, > apect ratio 16:9";
   } else if (stream_content == 0x05 and component_type >= 0xd5 and component_type <= 0xe0) {
     description = "reserved";
   } else if (stream_content == 0x05 and component_type == 0xe1) {
-    description = "H264/AVC vídeo 1080p(1125p), relação de aspecto 4:3";
+    description = "H264/AVC vídeo 1080p(1125p), apect ratio 4:3";
   } else if (stream_content == 0x05 and component_type == 0xe2) {
-    description = "H264/AVC vídeo 1080p(1125p), relação de aspecto 16:9 com vetor de pan";
+    description = "H264/AVC vídeo 1080p(1125p), apect ratio 16:9 with pan vector";
   } else if (stream_content == 0x05 and component_type == 0xe3) {
-    description = "H264/AVC vídeo 1080p(1125p), relação de aspecto 16:9 sem vetor de pan";
+    description = "H264/AVC vídeo 1080p(1125p), apect ratio 16:9 without pan vector";
   } else if (stream_content == 0x05 and component_type == 0xe4) {
-    description = "H264/AVC vídeo 1080p(1125p), > relação de aspecto 16:9";
+    description = "H264/AVC vídeo 1080p(1125p), > apect ratio 16:9";
   } else if (stream_content == 0x05 and component_type >= 0xe5 and component_type <= 0xff) {
     description = "reserved";
   } else if (stream_content == 0x06 and component_type == 0x00) {
