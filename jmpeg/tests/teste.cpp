@@ -74,7 +74,7 @@ class Utils {
 					utf8[k++] = c;
 				} else if (c >= 0xc0 && c <= 0xff) {
 					utf8[k++] = 0xc3;
-					utf8[k++] = c-0x40;
+					utf8[k++] = c - 0x40;
 				} else {
           if (c >= 0x20) { // INFO:: accept only valid characters
 					  utf8[k++] = c;
@@ -1050,8 +1050,8 @@ class PSIParser : public jevent::DemuxListener {
 		virtual void AITDescriptorDump(const char *data, int length)
 		{
 			int descriptor_tag = TS_G8(data);
-			int descriptor_length = length-2; // TS_G8(data+1);
-			const char *ptr = data+2;
+			int descriptor_length = length - 2; // TS_G8(data + 1);
+			const char *ptr = data + 2;
 
 			printf("Descriptor:: tag:[0x%02x], length:[%d]::[%s]\n", descriptor_tag, descriptor_length, GetAITDescriptorName(descriptor_tag).c_str());
 
@@ -1063,27 +1063,27 @@ class PSIParser : public jevent::DemuxListener {
 				int profile_current_byte = 0;
 
 				while (profile_current_byte < application_profile_length) {
-					int application_profile = TS_G16(ptr+profile_current_byte+1);
-					int version_major = TS_G8(ptr+profile_current_byte+3);
-					int version_minor = TS_G8(ptr+profile_current_byte+4);
-					int version_micro = TS_G8(ptr+profile_current_byte+5);
+					int application_profile = TS_G16(ptr + profile_current_byte + 1);
+					int version_major = TS_G8(ptr + profile_current_byte + 3);
+					int version_minor = TS_G8(ptr + profile_current_byte + 4);
+					int version_micro = TS_G8(ptr + profile_current_byte + 5);
 
 					printf(":: application profile:[0x%04x], version:[%d.%d.%d]\n", application_profile, version_major, version_minor, version_micro);
 
-					profile_current_byte += 5;	
+					profile_current_byte = profile_current_byte + 5;	
 				}
 
-				// int bound_visibility = TS_G8(ptr+profile_current_byte+1);
+				// int bound_visibility = TS_G8(ptr + profile_current_byte + 1);
 				// int bound_flag = (bound_visibility & 0x80) >> 7;
 				// int visibility = (bound_visibility & 0x60) >> 5;
-				// int application_priotiry = TS_G8(ptr+profile_current_byte+2);
+				// int application_priotiry = TS_G8(ptr + profile_current_byte + 2);
 			} else if (descriptor_tag == 0x01) { // application name descriptor
 				int count = 0;
 
 				while (count < descriptor_length) {
-					std::string language_code = std::string((ptr+count), 3);
-					int name_length = TS_G8(ptr+3+count);
-					std::string name = std::string(ptr+4+count, name_length);
+					std::string language_code = std::string((ptr + count), 3);
+					int name_length = TS_G8(ptr + 3 + count);
+					std::string name = std::string(ptr + 4 + count, name_length);
 
 					printf(":: application language:[%s], name:[%s]\n", language_code.c_str(), name.c_str());
 
@@ -1093,7 +1093,7 @@ class PSIParser : public jevent::DemuxListener {
 				}	
 			} else if (descriptor_tag == 0x02) { // transport protocol
 				int protocol_id = TS_G16(ptr);
-				int transpor_protocol_label = TS_G8(ptr+2);
+				int transpor_protocol_label = TS_G8(ptr + 2);
         std::string protocol = "UNKNOWN";
 
         if (protocol_id == 0x01) {
@@ -1111,17 +1111,17 @@ class PSIParser : public jevent::DemuxListener {
 				printf(":: transport protocol tag:[0x%04x/%s], transport_protocol_label:[0x%02x]\n", protocol_id, protocol.c_str(), transpor_protocol_label);
 
 				if (protocol_id == 0x01) {
-					int remote_connection = TS_GM8(ptr+3, 0, 1);
+					int remote_connection = TS_GM8(ptr + 3, 0, 1);
 
 					if (remote_connection == 0x01) {
-						int original_network_id = TS_G16(ptr+4);
-						int transport_stream_id = TS_G16(ptr+6);
-						int service_id = TS_G16(ptr+8);
-						int component_tag = TS_G8(ptr+9);
+						int original_network_id = TS_G16(ptr + 4);
+						int transport_stream_id = TS_G16(ptr + 6);
+						int service_id = TS_G16(ptr + 8);
+						int component_tag = TS_G8(ptr + 9);
 
 						printf(":: original network id:[0x%04x], transport_stream_id:[0x%04x], service id:[0x%04x], component tag:[0x%04x]\n", original_network_id, transport_stream_id, service_id, component_tag);
 					} else {
-						int component_tag = TS_G8(ptr+4);
+						int component_tag = TS_G8(ptr + 4);
 
 						printf(":: component tag:[0x%04x]\n", component_tag);
 					}
@@ -1130,8 +1130,8 @@ class PSIParser : public jevent::DemuxListener {
 				int count = 0;
 
 				while (count < descriptor_length) {
-					int param_length = TS_G8(ptr+count);
-					std::string param(ptr+count+1, param_length);
+					int param_length = TS_G8(ptr + count);
+					std::string param(ptr + count + 1, param_length);
 
 					printf(":: param:[%s]\n", param.c_str());
 
@@ -1139,11 +1139,11 @@ class PSIParser : public jevent::DemuxListener {
 				}
 			} else if (descriptor_tag == 0x04 || descriptor_tag == 0x07) {  // gingaj location descriptor, gingancl location descriptor
 				int base_directory_length = TS_G8(ptr);
-				std::string base_directory(ptr+1, base_directory_length);
-				int class_extension_length = TS_G8(ptr+1+base_directory_length);
-				std::string class_extension = std::string(ptr+2+base_directory_length, class_extension_length);
-				int main_file_length = descriptor_length-base_directory_length-class_extension_length-2;
-				std::string main_file = std::string(ptr+2+base_directory_length+class_extension_length, main_file_length);
+				std::string base_directory(ptr + 1, base_directory_length);
+				int class_extension_length = TS_G8(ptr + 1 + base_directory_length);
+				std::string class_extension = std::string(ptr + 2 + base_directory_length, class_extension_length);
+				int main_file_length = descriptor_length - base_directory_length - class_extension_length - 2;
+				std::string main_file = std::string(ptr + 2 + base_directory_length + class_extension_length, main_file_length);
 
 				printf(":: base_directory:[%s], class extension:[%s], main_file:[%s]\n", base_directory.c_str(), class_extension.c_str(), main_file.c_str());
 			} else if (descriptor_tag == 0x05) { // external application authorrisation descriptor
@@ -1151,8 +1151,8 @@ class PSIParser : public jevent::DemuxListener {
 
 				while (count < descriptor_length) {
 					uint32_t oid = TS_G32(ptr);	
-					int aid = TS_G16(ptr+4);
-					int application_priority = TS_G8(ptr+6);
+					int aid = TS_G16(ptr + 4);
+					int application_priority = TS_G8(ptr + 6);
 
 					printf(":: oid:[0x%08x], aid:[0x%04x], application priority:[%d]\n", oid, aid, application_priority);
 
@@ -1161,8 +1161,8 @@ class PSIParser : public jevent::DemuxListener {
 				}
 			} else if (descriptor_tag == 0x0b) { // application icons descriptor
 				int icon_locator_length = TS_G8(ptr);
-				std::string icon_locator(ptr+1, icon_locator_length);
-				int icon_flags = TS_G8(ptr+1+icon_locator_length);
+				std::string icon_locator(ptr + 1, icon_locator_length);
+				int icon_flags = TS_G8(ptr + 1 + icon_locator_length);
 				
 				printf(":: icon locator:[%s], icon flags:[0x%02x]\n", icon_locator.c_str(), icon_flags);
 			} else if (descriptor_tag == 0x0c) { // prefetch descriptor
@@ -1170,15 +1170,15 @@ class PSIParser : public jevent::DemuxListener {
 
 				printf(":: transport protocol label:[%d]\n", transport_protocol_label);
 
-				int loop_length = descriptor_length-1;
+				int loop_length = descriptor_length - 1;
 				int count = 0;
 
 				ptr = ptr + 1;
 
 				while (count < loop_length) {
 					int label_length = TS_G8(ptr);
-					std::string label(ptr+1+label_length);
-					int prefetch_priority = TS_G8(ptr+1+label_length);
+					std::string label(ptr + 1 + label_length);
+					int prefetch_priority = TS_G8(ptr + 1 + label_length);
 
 					printf(":: label:[%s], prefetch priority:[0x%02x]\n", label.c_str(), prefetch_priority);
 
@@ -1199,8 +1199,8 @@ class PSIParser : public jevent::DemuxListener {
     virtual void DescriptorDump(SI *si, const char *data, int length)
 		{
 			int descriptor_tag = TS_G8(data);
-			int descriptor_length = length-2; // TS_G8(data+1);
-			const char *ptr = data+2;
+			int descriptor_length = length - 2; // TS_G8(data + 1);
+			const char *ptr = data + 2;
 
 			printf("Descriptor:: tag:[0x%02x], length:[%d]::[%s]\n", descriptor_tag, descriptor_length, GetDescriptorName(descriptor_tag).c_str());
 
@@ -1208,7 +1208,7 @@ class PSIParser : public jevent::DemuxListener {
 				const char *end = ptr + descriptor_length;
 
 				uint32_t carousel_id = TS_G32(ptr);
-				int format_id = TS_G8(ptr+4);
+				int format_id = TS_G8(ptr + 4);
 				std::string format = "No FormatterSpecifier";
 
 				if (format_id == 0x01) {
@@ -1225,41 +1225,41 @@ class PSIParser : public jevent::DemuxListener {
 
 				if (format_id == 0x01) {
 					int module_version = TS_G8(ptr);
-					int module_id = TS_G16(ptr+1);
-					// int block_size = TS_G16(ptr+3);
-					// uint32_t module_size = TS_G32(ptr+5);
-					// int compression_method = TS_G8(ptr+9);
-					// uint32_t original_size = TS_G32(ptr+10);
-					int timeout = TS_G8(ptr+14);
-					int object_key_length = TS_G8(ptr+15);
+					int module_id = TS_G16(ptr + 1);
+					// int block_size = TS_G16(ptr + 3);
+					// uint32_t module_size = TS_G32(ptr + 5);
+					// int compression_method = TS_G8(ptr + 9);
+					// uint32_t original_size = TS_G32(ptr + 10);
+					int timeout = TS_G8(ptr + 14);
+					int object_key_length = TS_G8(ptr + 15);
 
 					printf(":: module version:[0x%02x], module id:[0x%04x], timeout:[%d]\n", module_version, module_id, timeout);
 				
 					if (object_key_length > 0) {
-						DumpBytes("ObjectKey Data", ptr+16, object_key_length);
+						DumpBytes("ObjectKey Data", ptr + 16, object_key_length);
 					}
 
 					ptr = ptr + 16 + object_key_length;
 				}
 				
-				int private_length = end-ptr;
+				int private_length = end - ptr;
 
 				if (private_length > 0) {
 					DumpBytes("Private Data", ptr, private_length);
 				}
 			} else if (descriptor_tag == 0x06) { // location descriptor
-				int location_tag = TS_G8(ptr+0);
+				int location_tag = TS_G8(ptr + 0);
 
 				printf(":: location tag:[0x%02x]\n", location_tag);
 			} else if (descriptor_tag == 0x0a) { // iso 639 language descriptor
-        std::string language = std::string(ptr+0, 3);
+        std::string language = std::string(ptr + 0, 3);
 
 				printf(":: language:[%s]\n", language.c_str());
 			} else if (descriptor_tag == 0x14) { // association tag descriptor
 				const char *end = ptr + descriptor_length;
 
 				int association_tag = TS_G16(ptr);
-				int use_id = TS_G16(ptr+2);
+				int use_id = TS_G16(ptr + 2);
 				std::string use = "Unknown";
 
 				if (use_id == 0x0000) {
@@ -1272,27 +1272,27 @@ class PSIParser : public jevent::DemuxListener {
 
 				printf(":: association tag:[0x%04x], use id:[0x%04x]::[%s]\n", association_tag, use_id, use.c_str());
 
-				int selector_length = TS_G8(ptr+4);
+				int selector_length = TS_G8(ptr + 4);
 
 				/*
 				if (use_id == 0x0000) {
 					// selection_length == 0x08
-					uint32_t transation_id = TS_G32(ptr+5);
-					int timeout = TS_G16(ptr+9);
+					uint32_t transation_id = TS_G32(ptr + 5);
+					int timeout = TS_G16(ptr + 9);
 				} else if (use_id == 0x0001) {
 					// selection_length == 0x00
 				} else {
-					DumpBytes("Private Data", ptr+5, selector_length);
+					DumpBytes("Private Data", ptr + 5, selector_length);
 				}
 				*/
 					
 				if (selector_length > 0) {
-					DumpBytes("Selector Bytes", ptr+5, selector_length);
+					DumpBytes("Selector Bytes", ptr + 5, selector_length);
 				}
 
 				ptr = ptr + 5 + selector_length;
 
-				int private_length = end-ptr;
+				int private_length = end - ptr;
 
 				if (private_length > 0) {
 					DumpBytes("Private Data", ptr, private_length);
@@ -1303,7 +1303,7 @@ class PSIParser : public jevent::DemuxListener {
 				int association_tags_loop_length = TS_G8(ptr);
 
 				for (int i=0; i<association_tags_loop_length; i+=2) {
-					int association_tag = TS_G16(ptr+1+i);
+					int association_tag = TS_G16(ptr + 1 + i);
 
 					printf(":: association tag:[%d] = 0x%04x\n", i, association_tag);
 				}
@@ -1311,14 +1311,14 @@ class PSIParser : public jevent::DemuxListener {
 				ptr = ptr + association_tags_loop_length;
 
 				int transport_stream_id = TS_G16(ptr);
-				int program_number = TS_G16(ptr+2);
-				int original_network_id = TS_G16(ptr+4);
+				int program_number = TS_G16(ptr + 2);
+				int original_network_id = TS_G16(ptr + 4);
 
 				printf(":: transport stream id:[0x%04x], program number:[0x%04x], original network id::[0x%04x]\n", transport_stream_id, program_number, original_network_id);
 
 				ptr = ptr + 6;
 
-				int private_length = end-ptr;
+				int private_length = end - ptr;
 
 				if (private_length > 0) {
 					DumpBytes("Private Data", ptr, private_length);
@@ -1335,7 +1335,7 @@ class PSIParser : public jevent::DemuxListener {
 
 				while (services_loop_count < services_loop_length) {
 					int service_id = TS_G16(ptr);
-					int service_type = TS_G8(ptr+2);
+					int service_type = TS_G8(ptr + 2);
 					std::string service = "Reserved for future use";
 
 					if (service_type == 0x01) {
@@ -1408,10 +1408,10 @@ class PSIParser : public jevent::DemuxListener {
 				}
 			} else if (descriptor_tag == 0x48) { // service descriptor [ABNTNBR 15603-2 2009]
 				int service_type = TS_G8(ptr); // 0x01: HD, 0xXX: LD
-				int service_provider_name_length = TS_G8(ptr+1);
-				std::string service_provider_name(ptr+2, service_provider_name_length);
-				int service_name_length = TS_G8(ptr+2+service_provider_name_length);
-				std::string service_name(ptr+3+service_provider_name_length, service_name_length);
+				int service_provider_name_length = TS_G8(ptr + 1);
+				std::string service_provider_name(ptr + 2, service_provider_name_length);
+				int service_name_length = TS_G8(ptr + 2 + service_provider_name_length);
+				std::string service_name(ptr + 3 + service_provider_name_length, service_name_length);
 
 				service_provider_name = Utils::ISO8859_1_TO_UTF8(service_provider_name);
 				service_name = Utils::ISO8859_1_TO_UTF8(service_name);
@@ -1432,7 +1432,7 @@ class PSIParser : public jevent::DemuxListener {
 				printf(":: service type:[0x%02x/%s], service provider name:[%s], service name:[%s]\n", service_type, GetServiceDescription(service_type).c_str(), service_provider_name.c_str(), service_name.c_str());
 			} else if (descriptor_tag == 0x49) { // country availability descriptor
 				int country_availability_flag = TS_G8(ptr);
-				std::string country(ptr+1, 3);
+				std::string country(ptr + 1, 3);
 				
 				printf(":: country availability flag:[%d], country:[%s]\n", country_availability_flag, country.c_str());
       } else if (descriptor_tag == 0x4d) { // short event descriptor
@@ -1441,12 +1441,12 @@ class PSIParser : public jevent::DemuxListener {
         ptr = ptr + 3;
 
 				int event_name_length = TS_G8(ptr);
-				std::string event_name(ptr+1, event_name_length);
+				std::string event_name(ptr + 1, event_name_length);
 
         ptr = ptr + 1 + event_name_length;
 
 				int text_length = TS_G8(ptr);
-				std::string text(ptr+1, text_length);
+				std::string text(ptr + 1, text_length);
 
         SIEvent *param = dynamic_cast<SIEvent *>(si);
 
@@ -1455,22 +1455,22 @@ class PSIParser : public jevent::DemuxListener {
 
 				printf(":: language:[%s], event name:[%s], text:[%s]\n", language.c_str(), event_name.c_str(), text.c_str());
 			} else if (descriptor_tag == 0x4e) { // extended event descriptor
-				int descriptor_number = TS_GM8(ptr+0, 0, 4);
-				int last_descriptor_number = TS_GM8(ptr+0, 4, 4);
-				std::string language(ptr+1, 3);
+				int descriptor_number = TS_GM8(ptr + 0, 0, 4);
+				int last_descriptor_number = TS_GM8(ptr + 0, 4, 4);
+				std::string language(ptr + 1, 3);
 				
 				printf(":: descriptor number:[0x%02x], last descriptor number:[0x%02x], language:[%s]\n", descriptor_number, last_descriptor_number, language.c_str());
 
-				int length_of_items = TS_G8(ptr+4);
+				int length_of_items = TS_G8(ptr + 4);
 				int count = 0;
 
 				ptr = ptr + 5;
 
 				while (count < length_of_items) {
 					int item_description_length = TS_G8(ptr);
-					std::string item_description(ptr+1, item_description_length);
-					int item_length = TS_G8(ptr+1+item_description_length);
-					std::string item(ptr+1+item_description_length+1, item_length);
+					std::string item_description(ptr + 1, item_description_length);
+					int item_length = TS_G8(ptr + 1 + item_description_length);
+					std::string item(ptr + 1 + item_description_length + 1, item_length);
 
 					ptr = ptr + item_description_length + item_length + 2;
 
@@ -1483,15 +1483,15 @@ class PSIParser : public jevent::DemuxListener {
 
 				// int reserved = TS_GM8(ptr, 0, 4);
 				int stream_content = TS_GM8(ptr, 4, 4);
-				int component_type = TS_G8(ptr+1);
-				int component_tag = TS_G8(ptr+2);
-				std::string language(ptr+3, 3);
+				int component_type = TS_G8(ptr + 1);
+				int component_tag = TS_G8(ptr + 2);
+				std::string language(ptr + 3, 3);
 
 				printf(":: stream content:[0x%02x], component type:[0x%02x]:[%s], component tag:[0x%02x], language:[%s]\n", stream_content, component_type, GetComponentDescription(stream_content, component_type).c_str(), component_tag, language.c_str());
 
 				ptr = ptr + 6;
 
-				int private_length = end-ptr;
+				int private_length = end - ptr;
 
 				if (private_length > 0) {
 					DumpBytes("Text Char", ptr, private_length);
@@ -1643,7 +1643,7 @@ class PSIParser : public jevent::DemuxListener {
 				printf("Description:: %s\n", description.c_str());
 			} else if (descriptor_tag == 0x55) { // parental rating descriptor
 				std::string country = std::string(ptr, 3);
-				int rate = TS_G8(ptr+3);
+				int rate = TS_G8(ptr + 3);
 
 				int rate_age = (rate >> 0) & 0xff; 
 				int rate_content = (rate >> 4) & 0x0f;
@@ -1685,14 +1685,14 @@ class PSIParser : public jevent::DemuxListener {
 				printf(":: country:[%s], age:[%d]::[%s], content:[0x%02x]::[%s]\n", country.c_str(), rate_age, age.c_str(), rate_content,  content.c_str());
 			} else if (descriptor_tag == 0x58) { // local time offset descriptor
 				std::string country = std::string(ptr, 3);
-				int country_region_id = TS_GM8(ptr+3, 0, 6);
-        int local_time_offset_polarity = TS_GM8(ptr+3, 7, 1);
-        int local_time_offset = TS_G16(ptr+4);
-        // uint64_t time_of_change = TS_GM64(ptr+6, 0, 40);
-        int next_time_offset = TS_G16(ptr+11);
+				int country_region_id = TS_GM8(ptr + 3, 0, 6);
+        int local_time_offset_polarity = TS_GM8(ptr + 3, 7, 1);
+        int local_time_offset = TS_G16(ptr + 4);
+        // uint64_t time_of_change = TS_GM64(ptr + 6, 0, 40);
+        int next_time_offset = TS_G16(ptr + 11);
 
         // UTC-3
-        int julian_date = TS_G16(ptr+6);
+        int julian_date = TS_G16(ptr + 6);
 
         int Y, M, D, WD, h, m, s;
 
@@ -1713,17 +1713,17 @@ class PSIParser : public jevent::DemuxListener {
 
         for (int i=0; i<count; i++) {
 				  std::string country = std::string(ptr, 3);
-          int subtitling_type = TS_G8(ptr+3);
-          int composition_page_id = TS_G8(ptr+4);
-          int ancillary_page_id = TS_G8(ptr+6);
+          int subtitling_type = TS_G8(ptr + 3);
+          int composition_page_id = TS_G8(ptr + 4);
+          int ancillary_page_id = TS_G8(ptr + 6);
 
           printf(":: country:[%s], subtitle type:[0x%02x/%s], composition page id:[%d], ancillary page id:[%d]\n", country.c_str(), subtitling_type, GetComponentDescription(0x03, subtitling_type).c_str(), composition_page_id, ancillary_page_id);
         }
 			} else if (descriptor_tag == 0x7c) { // aac descriptor
 				const char *end = ptr + descriptor_length;
 
-				int profile_and_level = TS_G8(ptr+0);
-				int aac_type_flag = TS_GM8(ptr+1, 0, 1);
+				int profile_and_level = TS_G8(ptr + 0);
+				int aac_type_flag = TS_GM8(ptr + 1, 0, 1);
 				int aac_type = -1;
 
         ptr = ptr + 2;
@@ -1766,29 +1766,29 @@ class PSIParser : public jevent::DemuxListener {
 
 				printf(":: profile and level:[0x%02x/%s], aac type flag:[%d], aac type:[%d]\n", profile_and_level, profile.c_str(), aac_type_flag, aac_type);
 
-				int private_length = end-ptr;
+				int private_length = end - ptr;
 
 				if (private_length > 0) {
 					DumpBytes("Additional Info", ptr, private_length);
 				}
 			} else if (descriptor_tag == 0xa3) { // component name descriptor [ATSC A/65A, ATSC Working Draft]
-				// int reserved = TS_GM8(ptr+0, 0, 4);
-				int number_strings = TS_G8(ptr+0);
+				// int reserved = TS_GM8(ptr + 0, 0, 4);
+				int number_strings = TS_G8(ptr + 0);
 
 				printf(":: number strings :[%d]\n", number_strings);
 
         for (int i=0; i<number_strings; i++) {
-          std::string ISO_639_language_code(ptr+1, 3);
-          int number_segments = TS_G8(ptr+4);
+          std::string ISO_639_language_code(ptr + 1, 3);
+          int number_segments = TS_G8(ptr + 4);
 
           ptr = ptr + 5;
 
 				  printf(":: language:[%s], number segments:[%d]\n", ISO_639_language_code.c_str(), number_segments);
 
           for (int j=0; j<number_segments; j++) {
-            int compression_type = TS_G8(ptr+0);
-            int mode = TS_G8(ptr+1);
-            int number_bytes = TS_G8(ptr+2);
+            int compression_type = TS_G8(ptr + 0);
+            int mode = TS_G8(ptr + 1);
+            int number_bytes = TS_G8(ptr + 2);
 
             std::string compression;
             std::string mode_info;
@@ -1893,70 +1893,70 @@ class PSIParser : public jevent::DemuxListener {
           }
         }
 			} else if (descriptor_tag == 0xc4) { // audio component descriptor
-				// int reserved = TS_GM8(ptr+0, 0, 4);
-				int stream_content = TS_GM8(ptr+0, 4, 4);
-				int content_type = TS_G8(ptr+1);
-				int component_tag = TS_G8(ptr+2);
-				int stream_type = TS_G8(ptr+3);
-				int group_tag = TS_G8(ptr+4);
-				int multilanguage_flag = TS_GM8(ptr+5, 0, 1);
-				int component_flag = TS_GM8(ptr+5, 1, 1);
-				int quality_indicator = TS_GM8(ptr+5, 2, 2);
-				int sampling_rate = TS_GM8(ptr+5, 4, 3);
-				// int reserved = TS_GM8(ptr+5, 7, 1);
-        std::string language = std::string(ptr+6, 3);
+				// int reserved = TS_GM8(ptr + 0, 0, 4);
+				int stream_content = TS_GM8(ptr + 0, 4, 4);
+				int content_type = TS_G8(ptr + 1);
+				int component_tag = TS_G8(ptr + 2);
+				int stream_type = TS_G8(ptr + 3);
+				int group_tag = TS_G8(ptr + 4);
+				int multilanguage_flag = TS_GM8(ptr + 5, 0, 1);
+				int component_flag = TS_GM8(ptr + 5, 1, 1);
+				int quality_indicator = TS_GM8(ptr + 5, 2, 2);
+				int sampling_rate = TS_GM8(ptr + 5, 4, 3);
+				// int reserved = TS_GM8(ptr + 5, 7, 1);
+        std::string language = std::string(ptr + 6, 3);
 
 				printf(":: stream content:[0x%01x], content type:[0x%01x], component tag::[0x%01x], stream type::[0x%01x], group tag::[0x%01x], multilanguage::[0x%01x], component flag::[0x%01x], quality flag::[0x%01x], sampling rate::[0x%01x], language::[%s]\n", stream_content, content_type, component_tag, stream_type, group_tag, multilanguage_flag, component_flag, quality_indicator, sampling_rate, language.c_str());
 			} else if (descriptor_tag == 0xc7) { // data content descriptor [ABNTNBR 15608-3/15610-1]
-				int data_component_id = TS_G16(ptr+0);
-				int entry_component = TS_G8(ptr+2);
-				int selector_length = TS_G8(ptr+3);
-				int num_languages = TS_G8(ptr+4);
+				int data_component_id = TS_G16(ptr + 0);
+				int entry_component = TS_G8(ptr + 2);
+				int selector_length = TS_G8(ptr + 3);
+				int num_languages = TS_G8(ptr + 4);
 
 				printf(":: data component id:[0x%04x], entry component:[0x%02x], selector length::[0x%02x], number of languages::[0x%02x]\n", data_component_id, entry_component, selector_length, num_languages);
 
         ptr = ptr + 5;
 
         for (int i=0; i<num_languages; i++) {
-				  int language_tag = TS_GM8(ptr+0, 0, 3);
-				  // int reserved = TS_GM8(ptr+0, 3, 1);
-				  int dmf = TS_GM8(ptr+0, 4, 4);
-          std::string language(ptr+1, 3);
+				  int language_tag = TS_GM8(ptr + 0, 0, 3);
+				  // int reserved = TS_GM8(ptr + 0, 3, 1);
+				  int dmf = TS_GM8(ptr + 0, 4, 4);
+          std::string language(ptr + 1, 3);
 
 				  printf(":: language tag:[0x%01x], dmf:[0x%01x], language::[%s]\n", language_tag, dmf, language.c_str());
           
           ptr = ptr + 4;
         }
 
-        int num_of_component_ref = TS_G8(ptr+0);
+        int num_of_component_ref = TS_G8(ptr + 0);
 
         ptr = ptr + 1;
 
         for (int i=0; i<num_of_component_ref; i++) {
-				  int component_ref = TS_GM8(ptr+0, 0, 3);
+				  int component_ref = TS_GM8(ptr + 0, 0, 3);
 
 				  printf(":: component ref:[0x%02x]\n", component_ref);
           
           ptr = ptr + 1;
         }
 
-        std::string language_code(ptr+0, 3);
-				int text_length = TS_G8(ptr+3);
+        std::string language_code(ptr + 0, 3);
+				int text_length = TS_G8(ptr + 3);
 
         if (text_length > 16) { // INFO:: restricted in specification
           text_length = 16;
         }
 
-        std::string text(ptr+4, text_length);
+        std::string text(ptr + 4, text_length);
 
 				printf(":: language code:[%s], text:[%s]\n", language_code.c_str(), text.c_str());
 			} else if (descriptor_tag == 0xcd) { // ts information descriptor [ABNTNBR 15603-2 2007]
 				const char *end = ptr + descriptor_length;
 
 				int remote_control_key_identification = TS_G8(ptr);
-				int ts_name_length = TS_GM8(ptr+1, 0, 6);
-				int transmission_type_count = TS_GM8(ptr+1, 6, 2);
-				std::string ts_name(ptr+2, ts_name_length);
+				int ts_name_length = TS_GM8(ptr + 1, 0, 6);
+				int transmission_type_count = TS_GM8(ptr + 1, 6, 2);
+				std::string ts_name(ptr + 2, ts_name_length);
 
 				ts_name = Utils::ISO8859_1_TO_UTF8(ts_name);
 
@@ -1973,10 +1973,10 @@ class PSIParser : public jevent::DemuxListener {
 					for (int i=0; i<transmission_type_count; i++) {
 						// CHANGE:: service_number should come after transmission_type_count2
 						int service_number = TS_G8(ptr);
-						int transmission_type_count2 = TS_G8(ptr+1);
+						int transmission_type_count2 = TS_G8(ptr + 1);
 					
 						for (int j=0; j<transmission_type_count2; j++) {
-							int service_identification = TS_G16(ptr+2+j);
+							int service_identification = TS_G16(ptr + 2+j);
 
 							printf(":: service number:[0x%02x], service identification:[0x%04x]\n", service_number, service_identification);
 
@@ -1987,7 +1987,7 @@ class PSIParser : public jevent::DemuxListener {
 					}
 				}
 				
-				int private_length = end-ptr;
+				int private_length = end - ptr;
 
 				if (private_length > 0) {
 					DumpBytes("Private Data", ptr, private_length);
@@ -1997,9 +1997,9 @@ class PSIParser : public jevent::DemuxListener {
 				const char *end = ptr + descriptor_length;
 
 				int remote_control_key_identification = TS_G8(ptr);
-				int ts_name_length = TS_GM8(ptr+1, 0, 6);
-				int transmission_type_count = TS_GM8(ptr+1, 6, 2);
-				std::string ts_name(ptr+2, ts_name_length);
+				int ts_name_length = TS_GM8(ptr + 1, 0, 6);
+				int transmission_type_count = TS_GM8(ptr + 1, 6, 2);
+				std::string ts_name(ptr + 2, ts_name_length);
 
 				printf(":: remote control key identification:[0x%02x], ts name:[%s]\n", remote_control_key_identification, ts_name.c_str());
 
@@ -2009,10 +2009,10 @@ class PSIParser : public jevent::DemuxListener {
 					for (int i=0; i<transmission_type_count; i++) {
 						// CHANGE:: service_number should come after transmission_type_count2
 						int service_number = TS_G8(ptr);
-						int transmission_type_count2 = TS_G8(ptr+1);
+						int transmission_type_count2 = TS_G8(ptr + 1);
 					
 						for (int j=0; j<transmission_type_count2; j++) {
-							int service_identification = TS_G16(ptr+2+j);
+							int service_identification = TS_G16(ptr + 2 + j);
 
 							printf(":: service number:[0x%02x], service identification:[0x%04x]\n", service_number, service_identification);
 
@@ -2023,30 +2023,30 @@ class PSIParser : public jevent::DemuxListener {
 					}
 				}
 				
-				int private_length = end-ptr;
+				int private_length = end - ptr;
 
 				if (private_length > 0) {
 					DumpBytes("Private Data", ptr, private_length);
 				}
         */
 			} else if (descriptor_tag == 0xcf) { // logo transmission descriptor [ABNTNBR 15603-2D1 2007]
-				int logo_transmission_type = TS_G8(ptr+0);
+				int logo_transmission_type = TS_G8(ptr + 0);
 
         printf(":: logo transmission type:[0x%02x]\n", logo_transmission_type);
 
         if (logo_transmission_type == 0x01) {
-				  // int reserved = TS_GM16(ptr+1, 0, 7);
-				  // int logo_identified = TS_GM16(ptr+1, 7, 9);
-				  // int reserved = TS_GM16(ptr+3, 0, 4);
-				  // int logo_version = TS_GM16(ptr+3, 4, 12);
-				  // int download_data_identified = TS_G16(ptr+5);
+				  // int reserved = TS_GM16(ptr + 1, 0, 7);
+				  // int logo_identified = TS_GM16(ptr + 1, 7, 9);
+				  // int reserved = TS_GM16(ptr + 3, 0, 4);
+				  // int logo_version = TS_GM16(ptr + 3, 4, 12);
+				  // int download_data_identified = TS_G16(ptr + 5);
         } else if (logo_transmission_type == 0x02) {
-				  // int reserved = TS_GM16(ptr+1, 0, 7);
-				  // int logo_identified = TS_GM16(ptr+1, 7, 9);
+				  // int reserved = TS_GM16(ptr + 1, 0, 7);
+				  // int logo_identified = TS_GM16(ptr + 1, 7, 9);
         } else if (logo_transmission_type == 0x03) {
-          // std::string logo_character_string(ptr+1, descriptor_length-1);
+          // std::string logo_character_string(ptr + 1, descriptor_length - 1);
         } else {
-					DumpBytes("Reserved", ptr+1, descriptor_length-1);
+					DumpBytes("Reserved", ptr + 1, descriptor_length - 1);
         }
 			} else if (descriptor_tag == 0xfa) { // terrestrial delivery system descriptor
 				int area_code = TS_GM16(ptr, 0, 12);
@@ -2100,29 +2100,29 @@ class PSIParser : public jevent::DemuxListener {
 					ptr = ptr + 2;
 				}
 			} else if (descriptor_tag == 0xfc) { // emergency information descriptor (EWBS)
-				int service_id = TS_G16(ptr+0);
-				int start_end_flag = TS_GM8(ptr+2, 0, 1);
-				int signal_type = TS_GM8(ptr+2, 1, 1);
-				// int reserved = TS_GM8(ptr+2, 2, 6);
-				int area_code_length = TS_G8(ptr+3);
+				int service_id = TS_G16(ptr + 0);
+				int start_end_flag = TS_GM8(ptr + 2, 0, 1);
+				int signal_type = TS_GM8(ptr + 2, 1, 1);
+				// int reserved = TS_GM8(ptr + 2, 2, 6);
+				int area_code_length = TS_G8(ptr + 3);
 
         ptr = ptr + 4;
 
         for (int i=0; i<area_code_length/2; i++) {
-				  int area_code = TS_GM16(ptr+0, 0, 12);
-				  // int reserved = TS_GM16(ptr+0, 12, 4);
+				  int area_code = TS_GM16(ptr + 0, 0, 12);
+				  // int reserved = TS_GM16(ptr + 0, 12, 4);
 
 				  printf(":: service id:[0x%04x], start end flag:[%01x], signal type:[%01x], area code:[0x%04x]\n", service_id, start_end_flag, signal_type, area_code);
 
           ptr = ptr + 2;
         }
 			} else if (descriptor_tag == 0xfd) { // data component descriptor
-				int data_component_id = TS_G16(ptr+0);
+				int data_component_id = TS_G16(ptr + 0);
 
         // INFO:: STD-B24:2008, volume 1, parte 3, 9.6.1 (additional_arib_caption_info)
-				int dmf = TS_GM8(ptr+1, 0, 4);
-				// int reserved = TS_GM8(ptr+1, 4, 2);
-				int timing = TS_GM8(ptr+1, 6, 2);
+				int dmf = TS_GM8(ptr + 1, 0, 4);
+				// int reserved = TS_GM8(ptr + 1, 4, 2);
+				int timing = TS_GM8(ptr + 1, 6, 2);
 
 				printf(":: data component id:[0x%04x], dmf:[0x%02x], timing:[0x%02x]\n", data_component_id, dmf, timing);
 			} else if (descriptor_tag == 0xfe) { // system management descriptor [ABNTNBR 15608-3-2008]
@@ -2177,7 +2177,7 @@ class PSIParser : public jevent::DemuxListener {
 
 			const char *ptr = event->GetData();
 			int pid = event->GetPID();
-			int tid = TS_G8(ptr+0);
+			int tid = TS_G8(ptr + 0);
 			int len = event->GetLength();
 
       if (demux->GetType() == jmpeg::JDT_RAW) {
@@ -2266,13 +2266,13 @@ class PSIParser : public jevent::DemuxListener {
 			// StartPSIDemux("eit-now&next", -1, 0x4e, TS_EIT_TIMEOUT);
 
 			int nit_pid = TS_NIT_PID;
-			int count = ((section_length-5)/4-1); // last 4 bytes are CRC	
+			int count = ((section_length - 5)/4 - 1); // last 4 bytes are CRC	
 
 			ptr = ptr + 8;
 
 			for (int i=0; i<count; i++) {
 				int program_number = TS_G16(ptr);
-				int map_pid = TS_GM16(ptr+2, 3, 13);
+				int map_pid = TS_GM16(ptr + 2, 3, 13);
 
 				printf("PAT:: program number:[0x%04x], map pid:[0x%04x]\n", program_number, map_pid);
 
@@ -2306,9 +2306,9 @@ class PSIParser : public jevent::DemuxListener {
 
 			while (descriptors_count < descriptors_length) {
 				// int descriptor_tag = TS_G8(ptr);
-				int descriptor_length = TS_G8(ptr+1);
+				int descriptor_length = TS_G8(ptr + 1);
 
-				DescriptorDump(nullptr, ptr, descriptor_length+2);
+				DescriptorDump(nullptr, ptr, descriptor_length + 2);
 
 				ptr = ptr + descriptor_length + 2;
 
@@ -2330,9 +2330,9 @@ class PSIParser : public jevent::DemuxListener {
 
 			while (descriptors_count < descriptors_length) {
 				// int descriptor_tag = TS_G8(ptr);
-				int descriptor_length = TS_G8(ptr+1);
+				int descriptor_length = TS_G8(ptr + 1);
 
-				DescriptorDump(nullptr, ptr, descriptor_length+2);
+				DescriptorDump(nullptr, ptr, descriptor_length + 2);
 
 				ptr = ptr + descriptor_length + 2;
 
@@ -2343,13 +2343,13 @@ class PSIParser : public jevent::DemuxListener {
 		virtual void ProcessPMT(jevent::DemuxEvent *event)
 		{
 			const char *ptr = event->GetData();
-			int tid = TS_G8(ptr+0);
+			int tid = TS_G8(ptr + 0);
 			int section_length = TS_PSI_G_SECTION_LENGTH(ptr);
 
-			int program_number = TS_G16(ptr+3);
-			int pcr_pid = TS_GM16(ptr+8, 3, 13);
+			int program_number = TS_G16(ptr + 3);
+			int pcr_pid = TS_GM16(ptr + 8, 3, 13);
 			int vpid = -1;
-			int program_info_length = TS_GM16(ptr+10, 4, 12);
+			int program_info_length = TS_GM16(ptr + 10, 4, 12);
 
       std::shared_ptr<SIService> param = SIFacade::GetInstance()->Service(program_number);
 
@@ -2368,9 +2368,9 @@ class PSIParser : public jevent::DemuxListener {
 
 			while (descriptors_count < descriptors_length) {
 				// int descriptor_tag = TS_G8(ptr);
-				int descriptor_length = TS_G8(ptr+1);
+				int descriptor_length = TS_G8(ptr + 1);
 
-				DescriptorDump(nullptr, ptr, descriptor_length+2);
+				DescriptorDump(nullptr, ptr, descriptor_length + 2);
 
 				ptr = ptr + descriptor_length + 2;
 
@@ -2383,10 +2383,10 @@ class PSIParser : public jevent::DemuxListener {
 			while (services_count < services_length) {
 				int stream_type = TS_G8(ptr);
 				// int reserved_bits_1 = TS_GM8(1, 0, 3); // 0x07
-				int elementary_pid = TS_GM16(ptr+1, 3, 13);
-				// int reserved_bits_2 = TS_GM8(ptr+3, 0, 4); // 0x0f
-				// int es_info_length_unsed = TS_GM8(ptr+4, 4, 2); // 0x00
-				int es_info_length = TS_GM16(ptr+3, 6, 10);
+				int elementary_pid = TS_GM16(ptr + 1, 3, 13);
+				// int reserved_bits_2 = TS_GM8(ptr + 3, 0, 4); // 0x0f
+				// int es_info_length_unsed = TS_GM8(ptr + 4, 4, 2); // 0x00
+				int es_info_length = TS_GM16(ptr + 3, 6, 10);
 
         // TODO:: add elementary stream to param
 
@@ -2424,11 +2424,11 @@ class PSIParser : public jevent::DemuxListener {
 
 				while (descriptors_count < descriptors_length) {
 					int descriptor_tag = TS_G8(ptr);
-					int descriptor_length = TS_G8(ptr+1);
+					int descriptor_length = TS_G8(ptr + 1);
 
-          es->Descriptor(descriptor_tag, std::string(ptr+2, descriptor_length));
+          es->Descriptor(descriptor_tag, std::string(ptr + 2, descriptor_length));
 
-					DescriptorDump(nullptr, ptr, descriptor_length+2);
+					DescriptorDump(nullptr, ptr, descriptor_length + 2);
 
 					ptr = ptr + descriptor_length + 2;
 
@@ -2457,7 +2457,7 @@ class PSIParser : public jevent::DemuxListener {
 		virtual void ProcessNIT(jevent::DemuxEvent *event)
 		{
 			const char *ptr = event->GetData();
-			int network_id = TS_G16(ptr+3);
+			int network_id = TS_G16(ptr + 3);
 
 			printf("NIT:: network_id:[0x%04x]\n", network_id);
 
@@ -2470,9 +2470,9 @@ class PSIParser : public jevent::DemuxListener {
 
 			while (descriptors_count < descriptors_length) {
 				// int descriptor_tag = TS_G8(ptr);
-				int descriptor_length = TS_G8(ptr+1);
+				int descriptor_length = TS_G8(ptr + 1);
 
-				DescriptorDump(nullptr, ptr, descriptor_length+2);
+				DescriptorDump(nullptr, ptr, descriptor_length + 2);
 
 				ptr = ptr + descriptor_length + 2;
 
@@ -2487,12 +2487,12 @@ class PSIParser : public jevent::DemuxListener {
 
 			while (transport_stream_loop_count < transport_stream_loop_length) {
 				int transport_stream_id = TS_G16(ptr);
-				int original_network_id = TS_G16(ptr+2);
-				// int reserved_future_use = TS_GM8(ptr+4, 0, 4);
+				int original_network_id = TS_G16(ptr + 2);
+				// int reserved_future_use = TS_GM8(ptr + 4, 0, 4);
 
 				printf("NIT:transport stream: transport stream id:[0x%04x], original network id:[0x%04x]\n", transport_stream_id, original_network_id);
 
-				descriptors_length = TS_GM16(ptr+4, 4, 12);
+				descriptors_length = TS_GM16(ptr + 4, 4, 12);
 				descriptors_count = 0;
 
 				ptr = ptr + 6;
@@ -2505,9 +2505,9 @@ class PSIParser : public jevent::DemuxListener {
 
 				while (descriptors_count < descriptors_length) {
 					// int descriptor_tag = TS_G8(ptr);
-					int descriptor_length = TS_G8(ptr+1);
+					int descriptor_length = TS_G8(ptr + 1);
 
-					DescriptorDump(param.get(), ptr, descriptor_length+2);
+					DescriptorDump(param.get(), ptr, descriptor_length + 2);
 
 					ptr = ptr + descriptor_length + 2;
 
@@ -2524,28 +2524,28 @@ class PSIParser : public jevent::DemuxListener {
 		{
 			const char *ptr = event->GetData();
 
-			int section_length = TS_GM16(ptr+1, 4, 12);
-			int transport_stream_id = TS_G16(ptr+3);
-			int original_network_id = TS_G16(ptr+8);
+			int section_length = TS_GM16(ptr + 1, 4, 12);
+			int transport_stream_id = TS_G16(ptr + 3);
+			int original_network_id = TS_G16(ptr + 8);
 
 			printf("SDT:: transport stream id:[0x%04x], original_network_id:[0x%04x]\n", transport_stream_id, original_network_id);
 
-			int services_length = section_length-8-4;
+			int services_length = section_length - 8 - 4;
 			int services_count = 0;
 
 			ptr = ptr + 11;
 
 			while (services_count < services_length) {
 				int service_id = TS_G16(ptr);
-				// int reserved_future_use = TS_GM8(ptr+2, 0, 6);
-				// int EIT_schedule_flag = TS_GM8(ptr+2, 6, 1);
-				// int EIT_present_following_flag = TS_GM8(ptr+2, 7, 1);
-				int running_status = TS_GM8(ptr+3, 0, 3);
-				// int free_CA_mode = TS_GM8(ptr+3, 3, 1);
+				// int reserved_future_use = TS_GM8(ptr + 2, 0, 6);
+				// int EIT_schedule_flag = TS_GM8(ptr + 2, 6, 1);
+				// int EIT_present_following_flag = TS_GM8(ptr + 2, 7, 1);
+				int running_status = TS_GM8(ptr + 3, 0, 3);
+				// int free_CA_mode = TS_GM8(ptr + 3, 3, 1);
 
 				printf("SDT:service: service id:[0x%04x], running status:[0x%02x/%s]\n", service_id, running_status, GetRunningStatusDescription(running_status).c_str());
 
-				int descriptors_length = TS_GM16(ptr+3, 4, 12);
+				int descriptors_length = TS_GM16(ptr + 3, 4, 12);
 				int descriptors_count = 0;
 
 				ptr = ptr + 5;
@@ -2561,9 +2561,9 @@ class PSIParser : public jevent::DemuxListener {
 
 				while (descriptors_count < descriptors_length) {
 					// int descriptor_tag = TS_G8(ptr);
-					int descriptor_length = TS_G8(ptr+1);
+					int descriptor_length = TS_G8(ptr + 1);
 
-					DescriptorDump(param.get(), ptr, descriptor_length+2);
+					DescriptorDump(param.get(), ptr, descriptor_length + 2);
 
 					ptr = ptr + descriptor_length + 2;
 
@@ -2582,46 +2582,46 @@ class PSIParser : public jevent::DemuxListener {
 		{
 			const char *ptr = event->GetData();
 
-			int section_length = TS_GM16(ptr+1, 4, 12);
-			int bouquet_id = TS_G16(ptr+3);
+			int section_length = TS_GM16(ptr + 1, 4, 12);
+			int bouquet_id = TS_G16(ptr + 3);
 
 			printf("BAT:: bouquet id:[0x%04x]\n", bouquet_id);
 
-			int descriptors_length = TS_GM16(ptr+9, 4, 12);
+			int descriptors_length = TS_GM16(ptr + 9, 4, 12);
       int descriptors_count = 0;
 
       ptr = ptr + 11;
 
       while (descriptors_count < descriptors_length) {
         // int descriptor_tag = TS_G8(ptr);
-        int descriptor_length = TS_G8(ptr+1);
+        int descriptor_length = TS_G8(ptr + 1);
 
-        DescriptorDump(nullptr, ptr, descriptor_length+2);
+        DescriptorDump(nullptr, ptr, descriptor_length + 2);
 
         ptr = ptr + descriptor_length + 2;
 
         descriptors_count = descriptors_count + descriptor_length + 2;	
       }
 
-			int events_length = section_length-7-descriptors_length-4;
+			int events_length = section_length - 7 - descriptors_length - 4;
 			int events_count = 0;
 
 			while (events_count < events_length) {
 				int transport_stream_id = TS_G16(ptr);
-				int original_network_id = TS_G16(ptr+2);
+				int original_network_id = TS_G16(ptr + 2);
 
 				printf("BAT:event: transport stream id:[0x%04x], original network id:[0x%04x]\n", transport_stream_id, original_network_id);
 
-				int descriptors_length = TS_GM16(ptr+4, 4, 12);
+				int descriptors_length = TS_GM16(ptr + 4, 4, 12);
 				int descriptors_count = 0;
 
 				ptr = ptr + 4;
 
 				while (descriptors_count < descriptors_length) {
 					// int descriptor_tag = TS_G8(ptr);
-					int descriptor_length = TS_G8(ptr+1);
+					int descriptor_length = TS_G8(ptr + 1);
 
-					DescriptorDump(nullptr, ptr, descriptor_length+2);
+					DescriptorDump(nullptr, ptr, descriptor_length + 2);
 
 					ptr = ptr + descriptor_length + 2;
 
@@ -2636,7 +2636,7 @@ class PSIParser : public jevent::DemuxListener {
 		{
 			const char *ptr = event->GetData();
 
-      int julian_date = TS_G16(ptr+3);
+      int julian_date = TS_G16(ptr + 3);
 
       int Y, M, D, WD, h, m, s;
 
@@ -2671,7 +2671,7 @@ class PSIParser : public jevent::DemuxListener {
 		{
 			const char *ptr = event->GetData();
 
-      int julian_date = TS_G16(ptr+3);
+      int julian_date = TS_G16(ptr + 3);
 
       int Y, M, D, WD, h, m, s;
 
@@ -2711,16 +2711,16 @@ class PSIParser : public jevent::DemuxListener {
 
       printf("TOT:: utc:[%02d%02d%02d-%02d%02d%02d]\n", Y, M, D, h, m, s);
 				
-      int descriptors_length = TS_GM16(ptr+8, 4, 12);
+      int descriptors_length = TS_GM16(ptr + 8, 4, 12);
       int descriptors_count = 0;
 
       ptr = ptr + 10;
 
       while (descriptors_count < descriptors_length) {
         // int descriptor_tag = TS_G8(ptr);
-        int descriptor_length = TS_G8(ptr+1);
+        int descriptor_length = TS_G8(ptr + 1);
 
-        DescriptorDump(&param, ptr, descriptor_length+2);
+        DescriptorDump(&param, ptr, descriptor_length + 2);
 
         ptr = ptr + descriptor_length + 2;
 
@@ -2744,11 +2744,11 @@ class PSIParser : public jevent::DemuxListener {
 			ptr = ptr + 3;
 
 			while (events_count < events_length) {
-				int transport_stream_id = TS_G16(ptr+0);
-				int original_network_id = TS_G16(ptr+2);
-				int service_id = TS_G16(ptr+4);
-				int event_id = TS_G16(ptr+6);
-				int running_status = TS_GM8(ptr+8, 5, 3);
+				int transport_stream_id = TS_G16(ptr + 0);
+				int original_network_id = TS_G16(ptr + 2);
+				int service_id = TS_G16(ptr + 4);
+				int event_id = TS_G16(ptr + 6);
+				int running_status = TS_GM8(ptr + 8, 5, 3);
 
 				printf("RST:event: transport stream id:[0x%04x], original network id:[0x%04x], service id:[0x%04x], event id:[0x%04x], running status:[0x%02x/%s]\n", transport_stream_id, original_network_id, service_id, event_id, running_status, GetRunningStatusDescription(running_status).c_str());
 
@@ -2760,11 +2760,11 @@ class PSIParser : public jevent::DemuxListener {
 		{
 			const char *ptr = event->GetData();
 
-			int tid = TS_G8(ptr+0);
+			int tid = TS_G8(ptr + 0);
 			int section_length = TS_PSI_G_SECTION_LENGTH(ptr);
-			int service_id = TS_G16(ptr+3);
-			int transport_stream_id = TS_G16(ptr+8);
-			int original_network_id = TS_G16(ptr+10);
+			int service_id = TS_G16(ptr + 3);
+			int transport_stream_id = TS_G16(ptr + 8);
+			int original_network_id = TS_G16(ptr + 10);
 
 			if (tid == 0x4e) { // present and following (present ts)
 			} else if (tid == 0x4f) { // present and following (other ts)
@@ -2774,14 +2774,14 @@ class PSIParser : public jevent::DemuxListener {
 				return;
 			}
 
-			int events_length = section_length-15;
+			int events_length = section_length - 15;
 			int events_count = 0;
 
 			ptr = ptr + 14;
 
 			while (events_count < events_length) {
 				int event_id = TS_G16(ptr);
-				int julian_date = TS_G16(ptr+2);
+				int julian_date = TS_G16(ptr + 2);
 
 				int Y, M, D, WD, h, m, s, dh, dm, ds;
 
@@ -2816,12 +2816,12 @@ class PSIParser : public jevent::DemuxListener {
 				
 				sprintf(tmp, "%02d%02d%02d-%02d%02d%02d (%02d%02d%02d)", Y, M, D, h, m, s, dh, dm, ds);
 
-				int running_status = TS_GM8(ptr+10, 0, 3);
-				// int free_ca_mode = TS_GM8(ptr+10, 3, 1);
+				int running_status = TS_GM8(ptr + 10, 0, 3);
+				// int free_ca_mode = TS_GM8(ptr + 10, 3, 1);
 
 				printf("EIT:: transport stream id:[0x%04x], original network id:[0x%04x], service id:[0x%04x], event id:[0x%04x], date:[%s], running status:[0x%02x/%s]\n", transport_stream_id, original_network_id, service_id, event_id, tmp, running_status, GetRunningStatusDescription(running_status).c_str());
 
-				int descriptors_length = TS_GM16(ptr+10, 4, 12);
+				int descriptors_length = TS_GM16(ptr + 10, 4, 12);
 				int descriptors_count = 0;
 
 				ptr = ptr + 12;
@@ -2835,7 +2835,7 @@ class PSIParser : public jevent::DemuxListener {
 
 				while (descriptors_count < descriptors_length) {
 					// int descriptor_tag = TS_G8(ptr);
-					int descriptor_length = TS_G8(ptr+1);
+					int descriptor_length = TS_G8(ptr + 1);
 
 					descriptors_count = descriptors_count + descriptor_length + 2;	
         
@@ -2848,7 +2848,7 @@ class PSIParser : public jevent::DemuxListener {
             return;
           }
 
-					DescriptorDump(param.get(), ptr, descriptor_length+2);
+					DescriptorDump(param.get(), ptr, descriptor_length + 2);
 
 					ptr = ptr + descriptor_length + 2;
 				}
@@ -2863,20 +2863,20 @@ class PSIParser : public jevent::DemuxListener {
 		{
 			const char *ptr = event->GetData();
 
-			int tid = TS_G8(ptr+0);
-			int section_length = TS_GM16(ptr+1, 4, 12);
+			int tid = TS_G8(ptr + 0);
+			int section_length = TS_GM16(ptr + 1, 4, 12);
 
 			printf("AIT:: section length:[0x%04x]\n", section_length);
 
 			if (tid == 0x74) {
-				// int test_application_flag = TS_GM8(ptr+3, 0, 1);
-				int application_type = TS_GM16(ptr+3, 1, 15);
-				// int reserved = TS_GM8(ptr+5, 0, 2);
-				int version_number = TS_GM8(ptr+5, 2, 5);
-				// int current_next_indicator = TS_GM8(ptr+5, 7, 1);
-				// int section_number = TS_G8(ptr+6);
-				// int last_section_number = TS_G8(ptr+7);
-				// int reserved_future_use = TS_GM8(ptr+8, 0, 4);
+				// int test_application_flag = TS_GM8(ptr + 3, 0, 1);
+				int application_type = TS_GM16(ptr + 3, 1, 15);
+				// int reserved = TS_GM8(ptr + 5, 0, 2);
+				int version_number = TS_GM8(ptr + 5, 2, 5);
+				// int current_next_indicator = TS_GM8(ptr + 5, 7, 1);
+				// int section_number = TS_G8(ptr + 6);
+				// int last_section_number = TS_G8(ptr + 7);
+				// int reserved_future_use = TS_GM8(ptr + 8, 0, 4);
 				std::string type = "Unknown";
 
 				if (application_type == 0x01) {
@@ -2904,9 +2904,9 @@ class PSIParser : public jevent::DemuxListener {
 	
 				while (descriptors_count < descriptors_length) {
 					// int descriptor_tag = TS_G8(ptr);
-					int descriptor_length = TS_G8(ptr+1);
+					int descriptor_length = TS_G8(ptr + 1);
 	
-					AITDescriptorDump(ptr, descriptor_length+2);
+					AITDescriptorDump(ptr, descriptor_length + 2);
 	
 					ptr = ptr + descriptor_length + 2;
 	
@@ -2920,8 +2920,8 @@ class PSIParser : public jevent::DemuxListener {
 
 				while (application_loop_count < application_loop_length) {
 					uint32_t oid = TS_G32(ptr);	
-					int aid = TS_G16(ptr+4);
-					int application_control_code = TS_G8(ptr+6);
+					int aid = TS_G16(ptr + 4);
+					int application_control_code = TS_G8(ptr + 6);
 					std::string control_code = "Reserved to the future";
 
 					if (application_control_code == 0x01) {
@@ -2944,16 +2944,16 @@ class PSIParser : public jevent::DemuxListener {
 
 					printf("AIT:application: aid:[0x%04x], oid:[0x%04x], application control code:[0x%02x]::[%s]\n", aid, oid, application_control_code, control_code.c_str());
 
-					int descriptors_length = TS_GM16(ptr+7, 4, 12);
+					int descriptors_length = TS_GM16(ptr + 7, 4, 12);
 					int descriptors_count = 0;
 
 					ptr = ptr + 9;
 
 					while (descriptors_count < descriptors_length) {
 						// int descriptor_tag = TS_G8(ptr);
-						int descriptor_length = TS_G8(ptr+1);
+						int descriptor_length = TS_G8(ptr + 1);
 
-						AITDescriptorDump(ptr, descriptor_length+2);
+						AITDescriptorDump(ptr, descriptor_length + 2);
 
 						ptr = ptr + descriptor_length + 2;
 
@@ -2969,9 +2969,9 @@ class PSIParser : public jevent::DemuxListener {
 		{
 			const char *ptr = event->GetData();
 
-			uint64_t program_clock_reference_base = (uint64_t)TS_GM32(ptr, 0, 32) << 1 | TS_GM8(ptr+4, 0, 1);
-			// int reserved = TS_GM8(ptr+4, 1, 6);
-			uint64_t program_clock_reference_extension = (uint64_t)TS_GM16(ptr+4, 7, 9);
+			uint64_t program_clock_reference_base = (uint64_t)TS_GM32(ptr, 0, 32) << 1 | TS_GM8(ptr + 4, 0, 1);
+			// int reserved = TS_GM8(ptr + 4, 1, 6);
+			uint64_t program_clock_reference_extension = (uint64_t)TS_GM16(ptr + 4, 7, 9);
 					
 			printf("PCR:: base:[%lu], extension:[%lu]\n", program_clock_reference_base, program_clock_reference_extension);
 		}
@@ -2981,9 +2981,9 @@ class PSIParser : public jevent::DemuxListener {
       // PES private data
 			const char *ptr = event->GetData();
 
-      int stream_id = TS_G8(ptr+3);
+      int stream_id = TS_G8(ptr + 3);
 
-      // int pes_packet_length = TS_G16(ptr+4);
+      // int pes_packet_length = TS_G16(ptr + 4);
 
       ptr = ptr + 6;
 
@@ -3000,27 +3000,27 @@ class PSIParser : public jevent::DemuxListener {
           return;
         }
 
-        int data_alignment_indicator  = TS_GM8(ptr+0, 4, 1);
-        int pes_header_data_length = TS_G8(ptr+2);
-        uint32_t ccis_code = TS_G32(ptr+8);
-        int caption_conversion_type = TS_G8(ptr+12);
-        int drcs_conversion_type = TS_GM8(ptr+13, 0, 2);
+        int data_alignment_indicator  = TS_GM8(ptr + 0, 4, 1);
+        int pes_header_data_length = TS_G8(ptr + 2);
+        uint32_t ccis_code = TS_G32(ptr + 8);
+        int caption_conversion_type = TS_G8(ptr + 12);
+        int drcs_conversion_type = TS_GM8(ptr + 13, 0, 2);
 
         ptr = ptr + pes_header_data_length + 3;
 
-        int data_identifier = TS_G8(ptr+0);
+        int data_identifier = TS_G8(ptr + 0);
 
         if (data_identifier != 0x80) { // closed caption identifier
           return;
         }
 
-        int private_stream_id = TS_G8(ptr+1);
+        int private_stream_id = TS_G8(ptr + 1);
 
         if (private_stream_id != 0xff) { // magic number
           return;
         }
 
-        int pes_data_packet_header_length = TS_GM8(ptr+2, 4, 4); // (W34)
+        int pes_data_packet_header_length = TS_GM8(ptr + 2, 4, 4); // (W34)
 
         std::string caption_conversion_info = "undefined";
         std::string drcs_conversion_info = "undefined";
@@ -3048,10 +3048,10 @@ class PSIParser : public jevent::DemuxListener {
         ptr = ptr + pes_data_packet_header_length + 3;
 
         // 6-STD B24 (data group)
-        int data_group_id = TS_GM8(ptr+0, 0, 6);
-        int data_group_link_number = TS_G8(ptr+1);
-        // int last_data_group_link_number = TS_G8(ptr+2);
-        int data_group_size = TS_G16(ptr+3);
+        int data_group_id = TS_GM8(ptr + 0, 0, 6);
+        int data_group_link_number = TS_G8(ptr + 1);
+        // int last_data_group_link_number = TS_G8(ptr + 2);
+        int data_group_size = TS_G16(ptr + 3);
         
         std::string data_group_info;
         int caption_data_type_nibble = (data_group_id & 0x0f) >> 0;
@@ -3101,16 +3101,16 @@ class PSIParser : public jevent::DemuxListener {
         printf("Closed Caption:: data alignment indicator:[0x%01x], pes header data length:[%d], data identifier:[0x%02x], subtitle stream id:[0x%02x], ccis code:[0x%08x], caption conversion type:[%s], drcs conversion type:[%s], data group id:[0x%02x/%s], data group link number:[0x%02x], data group size:[%d]\n", data_alignment_indicator, pes_header_data_length, data_identifier, private_stream_id, ccis_code, caption_conversion_info.c_str(), drcs_conversion_info.c_str(), data_group_id, data_group_info.c_str(), data_group_link_number, data_group_size);
 
         if (caption_data_type_nibble == 0x00) { // INFO:: caption management data
-          int time_control_mode = TS_GM8(ptr+0, 0, 2);
+          int time_control_mode = TS_GM8(ptr + 0, 0, 2);
           uint64_t offset_time = 0;
 
           if (time_control_mode == 0x02) {
-            offset_time = TS_GM64(ptr+1, 0, 36);
+            offset_time = TS_GM64(ptr + 1, 0, 36);
 
             ptr = ptr + 5;
           }
 
-          int num_languages = TS_G8(ptr+1);
+          int num_languages = TS_G8(ptr + 1);
 
           ptr = ptr + 2;
 
@@ -3129,20 +3129,20 @@ class PSIParser : public jevent::DemuxListener {
           printf("Closed Caption:caption managment: time control mode:[0x%01x/%s], offset time:[0x%01x%08x]\n", time_control_mode, time_control_info.c_str(), uint32_t((offset_time >> 32) & 0x0f), uint32_t(offset_time & 0xffffffff));
 
           for (int i=0; i<num_languages; i++) {
-            int language_tag = TS_GM8(ptr+0, 0, 3);
-            int display_mode = TS_GM8(ptr+0, 4, 4);
+            int language_tag = TS_GM8(ptr + 0, 0, 3);
+            int display_mode = TS_GM8(ptr + 0, 4, 4);
             int display_condition_designation = 0;
 
             if (display_mode == 0xc0 or display_mode == 0x0d or display_mode == 0x0e) {
-              display_condition_designation = TS_G8(ptr+1);
+              display_condition_designation = TS_G8(ptr + 1);
 
               ptr = ptr + 1;
             }
 
-            std::string language_code = std::string(ptr+1, 3);
-            int format = TS_GM8(ptr+4, 0, 4);
-            int character_code = TS_GM8(ptr+4, 4, 2);
-            int rollup_mode = TS_GM8(ptr+4, 6, 2);
+            std::string language_code = std::string(ptr + 1, 3);
+            int format = TS_GM8(ptr + 4, 0, 4);
+            int character_code = TS_GM8(ptr + 4, 4, 2);
+            int rollup_mode = TS_GM8(ptr + 4, 6, 2);
 
             std::string display_condition_info;
             std::string format_info;
@@ -3210,21 +3210,21 @@ class PSIParser : public jevent::DemuxListener {
             // INFO:: 6-STD B24 v5.2.1 (Data group data/Caption management data)
             printf("Closed Caption:caption managment: language tag:[0x%01x], display mode:[0x%01x], display condition designation:[0x%02x/%s], language code:[%s], format:[0x%01x/%s], character code:[0x%01x/%s], rollup mode:[0x%01x/%s]\n", language_tag, display_mode, display_condition_designation, display_condition_info.c_str(), language_code.c_str(), format, format_info.c_str(), character_code, character_info.c_str(), rollup_mode, rollup_info.c_str());
 
-            int data_unit_loop_length = TS_GM32(ptr+5, 0, 24);
+            int data_unit_loop_length = TS_GM32(ptr + 5, 0, 24);
 
             ptr = ptr + 8;
 
             int count_data_unit = 0;
 
             while (count_data_unit < data_unit_loop_length) {
-              int unit_separator = TS_G8(ptr+0);
+              int unit_separator = TS_G8(ptr + 0);
 
               if (unit_separator != 0x1f) {
                 break;
               }
             
-              int data_unit_parameter = TS_G8(ptr+1);
-              int data_unit_size = TS_GM32(ptr+2, 0, 24);
+              int data_unit_parameter = TS_G8(ptr + 1);
+              int data_unit_size = TS_GM32(ptr + 2, 0, 24);
 
               std::string data_unit_info = "undefined";
 
@@ -3255,11 +3255,11 @@ class PSIParser : public jevent::DemuxListener {
             }
           }
         } else if (caption_data_type_nibble == 0x01) { // INFO:: caption statment data
-          int time_control_mode = TS_GM8(ptr+0, 0, 2);
+          int time_control_mode = TS_GM8(ptr + 0, 0, 2);
           uint64_t offset_time = 0;
 
           if (time_control_mode == 0x01 or time_control_mode == 0x02) {
-            offset_time = TS_GM64(ptr+1, 0, 36);
+            offset_time = TS_GM64(ptr + 1, 0, 36);
 
             ptr = ptr + 5;
           }
@@ -3278,21 +3278,21 @@ class PSIParser : public jevent::DemuxListener {
 
           printf("Closed Caption:caption statement: time control mode:[0x%01x/%s], offset time:[0x%01x%08x]\n", time_control_mode, time_control_info.c_str(), uint32_t((offset_time >> 32) & 0x0f), uint32_t(offset_time & 0xffffffff));
 
-          int data_unit_loop_length = TS_GM32(ptr+1, 0, 24);
+          int data_unit_loop_length = TS_GM32(ptr + 1, 0, 24);
 
           ptr = ptr + 4;
 
           int count_data_unit = 0;
 
           while (count_data_unit < data_unit_loop_length) {
-            int unit_separator = TS_G8(ptr+0);
+            int unit_separator = TS_G8(ptr + 0);
 
             if (unit_separator != 0x1f) {
               break;
             }
 
-            int data_unit_parameter = TS_G8(ptr+1);
-            int data_unit_size = TS_GM32(ptr+2, 0, 24);
+            int data_unit_parameter = TS_G8(ptr + 1);
+            int data_unit_size = TS_GM32(ptr + 2, 0, 24);
 
             std::string data_unit_info = "undefined";
 
@@ -3537,8 +3537,8 @@ class PSIParser : public jevent::DemuxListener {
 			// INFO:: ISO IEC 13818-6 - MPEG2 DSMCC - Digital Storage Media Command & Control.pdf
 			const char *ptr = event->GetData();
 
-			int tid = TS_G8(ptr+0);
-			int section_length = TS_GM16(ptr+1, 4, 12);
+			int tid = TS_G8(ptr + 0);
+			int section_length = TS_GM16(ptr + 1, 4, 12);
       std::string type;
 
 			if (tid == 0x3a) {
@@ -3592,8 +3592,8 @@ class PSIParser : public jevent::DemuxListener {
 
     virtual const char * ProcessIOR(const char *ptr)
     {
-      uint32_t type_id_length = TS_G32(ptr+0);
-      std::string type_id = std::string(ptr+4, type_id_length);
+      uint32_t type_id_length = TS_G32(ptr + 0);
+      std::string type_id = std::string(ptr + 4, type_id_length);
 
       ptr = ptr + 4 + type_id_length;
 
@@ -3604,13 +3604,13 @@ class PSIParser : public jevent::DemuxListener {
         ptr = ptr + (4 - (type_id_length%4));
       }
 
-      uint32_t tagged_profiles_count = TS_G32(ptr+0);
+      uint32_t tagged_profiles_count = TS_G32(ptr + 0);
 
       ptr = ptr + 4;
 
       for (uint32_t i=0; i<tagged_profiles_count; i++) {
-        uint32_t profile_id_tag = TS_G32(ptr+0);
-        // uint32_t profile_data_length = TS_G32(ptr+4);
+        uint32_t profile_id_tag = TS_G32(ptr + 0);
+        // uint32_t profile_data_length = TS_G32(ptr + 4);
         std::string profile_info;
 
         if (profile_id_tag == 0x49534f06) {
@@ -3624,11 +3624,11 @@ class PSIParser : public jevent::DemuxListener {
         ptr = ptr + 8;
 
         if (profile_info == "TAG_BIOP") { // TR 101 202: Table 4.5
-          // int profile_data_byte_order = TS_G8(ptr+0);
-          int lite_components_count = TS_G8(ptr+1);
+          // int profile_data_byte_order = TS_G8(ptr + 0);
+          int lite_components_count = TS_G8(ptr + 1);
 
           // INFO:: BIOP::ObjectLocation
-          uint32_t component_id_tag = TS_G32(ptr+2);
+          uint32_t component_id_tag = TS_G32(ptr + 2);
 
           if (component_id_tag != 0x49534F50) {
             printf("DSMCC:DownloadDataMessage::biop[dir]/TAG_BIOP/BIOP::ObjectLocation: invalid component id tag");
@@ -3636,21 +3636,21 @@ class PSIParser : public jevent::DemuxListener {
             return nullptr;
           }
 
-          // int component_data_length = TS_G8(ptr+6);
-          uint32_t carousel_id = TS_G32(ptr+7);
-          int module_id = TS_G16(ptr+11);
-          int version_major = TS_G8(ptr+13); // BIOP protocol major version 1
-          int version_minor = TS_G8(ptr+14); // BIOP protocol minor version 0
-          int object_key_length = TS_G8(ptr+15);
+          // int component_data_length = TS_G8(ptr + 6);
+          uint32_t carousel_id = TS_G32(ptr + 7);
+          int module_id = TS_G16(ptr + 11);
+          int version_major = TS_G8(ptr + 13); // BIOP protocol major version 1
+          int version_minor = TS_G8(ptr + 14); // BIOP protocol minor version 0
+          int object_key_length = TS_G8(ptr + 15);
 
           printf("DSMCC:DownloadDataMessage::biop[dir]/TAG_BIOP/BIOP:: carousel id:[0x%08x], module id:[0x%04x], version:[%02d.%02d]\n", carousel_id, module_id, version_major, version_minor);
 
-          DumpBytes("DSMCC:DownloadDataMessage:biop[dir]/TAG_BIOP: object key data byte", ptr+16, object_key_length);
+          DumpBytes("DSMCC:DownloadDataMessage:biop[dir]/TAG_BIOP: object key data byte", ptr + 16, object_key_length);
 
           ptr = ptr + 16 + object_key_length;
 
           // INFO:: DSM::ConnBinder
-          uint32_t component_id_tag2 = TS_G32(ptr+0);
+          uint32_t component_id_tag2 = TS_G32(ptr + 0);
 
           if (component_id_tag2 != 0x49534F40) {
             printf("DSMCC:DownloadDataMessage::biop[dir]/TAG_BIOP/DSM::ConnBinder: invalid component id tag\n");
@@ -3658,54 +3658,54 @@ class PSIParser : public jevent::DemuxListener {
             return nullptr;
           }
 
-          // int component_data_length2 = TS_G8(ptr+4);
-          int taps_count = TS_G8(ptr+5);
+          // int component_data_length2 = TS_G8(ptr + 4);
+          int taps_count = TS_G8(ptr + 5);
 
           ptr = ptr + 6;
 
           // INFO:: BIOP::Tap
-          int id = TS_G16(ptr+0); // 0x0000
-          int use = TS_G16(ptr+2); // 0x0016
-          int association_tag = TS_G16(ptr+4);
-          // int selector_length = TS_G8(ptr+6); // 0x0A
-          int selector_type = TS_G16(ptr+7); // 0x01
-          uint32_t transaction_id = TS_G32(ptr+9);
-          // uint32_t timeout = TS_G32(ptr+13);
+          int id = TS_G16(ptr + 0); // 0x0000
+          int use = TS_G16(ptr + 2); // 0x0016
+          int association_tag = TS_G16(ptr + 4);
+          // int selector_length = TS_G8(ptr + 6); // 0x0A
+          int selector_type = TS_G16(ptr + 7); // 0x01
+          uint32_t transaction_id = TS_G32(ptr + 9);
+          // uint32_t timeout = TS_G32(ptr + 13);
 
           printf("DSMCC:DownloadDataMessage::biop[dir]/TAG_BIOP/BIOP::Tap1: id:[0x%04x], use:[0x%04x], association tag:[0x%04x], selector type:[%04x], transaction id:[%08x]\n", id, use, association_tag, selector_type, transaction_id);
 
           ptr = ptr + 17;
 
-          for (int i=0; i<taps_count-1; i++) {
-            int id = TS_G16(ptr+0); // 0x0000
-            int use = TS_G16(ptr+2); // 0x0016 (BIOP_DELIVERY_PARA_USE<0x16>, BIOP_OBJECT_USE<0x17>)
-            int association_tag = TS_G16(ptr+4);
-            int selector_length = TS_G8(ptr+6);
+          for (int i=0; i<taps_count - 1; i++) {
+            int id = TS_G16(ptr + 0); // 0x0000
+            int use = TS_G16(ptr + 2); // 0x0016 (BIOP_DELIVERY_PARA_USE<0x16>, BIOP_OBJECT_USE<0x17>)
+            int association_tag = TS_G16(ptr + 4);
+            int selector_length = TS_G8(ptr + 6);
 
             printf("DSMCC:DownloadDataMessage::biop[dir]/TAG_BIOP/BIOP::Tap2: id:[0x%04x], use:[0x%04x], association tag:[0x%04x]\n", id, use, association_tag);
 
-            DumpBytes("DSMCC:DownloadDataMessage:biop[dir]/TAG_BIOP/BIOP::Tap2: selector data byte", ptr+7, selector_length);
+            DumpBytes("DSMCC:DownloadDataMessage:biop[dir]/TAG_BIOP/BIOP::Tap2: selector data byte", ptr + 7, selector_length);
 
             ptr = ptr + 7 + selector_length;
           }
 
-          for (int i=0; i<lite_components_count-2; i++) {
+          for (int i=0; i<lite_components_count - 2; i++) {
             // INFO:: BIOP::LiteComponent
-            uint32_t component_id_tag = TS_G32(ptr+0);
-            int component_data_length = TS_G8(ptr+4);
+            uint32_t component_id_tag = TS_G32(ptr + 0);
+            int component_data_length = TS_G8(ptr + 4);
 
             printf("DSMCC:DownloadDataMessage::biop[dir]/TAG_BIOP/BIOP::LiteComponent: component id tag:[0x%08x]\n", component_id_tag);
 
-            DumpBytes("DSMCC:DownloadDataMessage:biop[dir]/TAG_BIOP/BIOP::LiteComponent: component data byte", ptr+5, component_data_length);
+            DumpBytes("DSMCC:DownloadDataMessage:biop[dir]/TAG_BIOP/BIOP::LiteComponent: component data byte", ptr + 5, component_data_length);
 
             ptr = ptr + 5 + component_data_length;
           }
         } else if (profile_info == "TAG_LITE_OPTIONS") { // TR 101 202: Table 4.7
-          // int profile_data_byte_order = TS_G8(ptr+0);
-          int component_count = TS_G8(ptr+1);
+          // int profile_data_byte_order = TS_G8(ptr + 0);
+          int component_count = TS_G8(ptr + 1);
 
           // INFO:: DSM::ServiceLocation
-          uint32_t component_id_tag = TS_G32(ptr+2);
+          uint32_t component_id_tag = TS_G32(ptr + 2);
 
           if (component_id_tag != 0x49534F46) {
             printf("DSMCC:DownloadDataMessage::biop[dir]/TAG_LITE_OPTIONS/DSM::ServiceLocation: invalid component id tag\n");
@@ -3713,54 +3713,54 @@ class PSIParser : public jevent::DemuxListener {
             return nullptr;
           }
 
-          // uint32_t component_data_length = TS_G32(ptr+6);
-          // int service_domain_length = TS_G8(ptr+10);
+          // uint32_t component_data_length = TS_G32(ptr + 6);
+          // int service_domain_length = TS_G8(ptr + 10);
 
           ptr = ptr + 11;
 
           // INFO:: serviceDomain_Data() -> DVBcarouselNSAPaddress()
-          // int afi = TS_G8(ptr+0); // 0x00
-          // int type = TS_G8(ptr+1); // 0x00
-          // uint32_t carousel_id = TS_G32(ptr+2);
-          // int specifier_type = TS_G8(ptr+6); // 0x01
-          // uint32_t specifier_data = TS_GM32(ptr+7, 0, 24);
-          // int transport_stream_id = TS_G16(ptr+10);
-          // int original_network_id = TS_G16(ptr+12);
-          // int service_id = TS_G16(ptr+14);
-          // uint32_t reserved = TS_G32(ptr+16);
+          // int afi = TS_G8(ptr + 0); // 0x00
+          // int type = TS_G8(ptr + 1); // 0x00
+          // uint32_t carousel_id = TS_G32(ptr + 2);
+          // int specifier_type = TS_G8(ptr + 6); // 0x01
+          // uint32_t specifier_data = TS_GM32(ptr + 7, 0, 24);
+          // int transport_stream_id = TS_G16(ptr + 10);
+          // int original_network_id = TS_G16(ptr + 12);
+          // int service_id = TS_G16(ptr + 14);
+          // uint32_t reserved = TS_G32(ptr + 16);
 
           ptr = ptr + 20;
 
           // INFO:: CosNaming::Name
-          uint32_t names_component_count = TS_G32(ptr+0);
+          uint32_t names_component_count = TS_G32(ptr + 0);
 
           ptr = ptr + 4;
 
           for (uint32_t i=0; i<names_component_count; i++) {
-            uint32_t id_length = TS_G32(ptr+0);
-            std::string id(ptr+4, id_length);
+            uint32_t id_length = TS_G32(ptr + 0);
+            std::string id(ptr + 4, id_length);
 
             ptr = ptr + 4 + id_length;
 
-            uint32_t kind_length = TS_G32(ptr+0);
-            std::string kind(ptr+4, kind_length);
+            uint32_t kind_length = TS_G32(ptr + 0);
+            std::string kind(ptr + 4, kind_length);
 
             ptr = ptr + 4 + kind_length;
 
             printf("DSMCC:DownloadDataMessage:biop[dir]/TAG_LITE_OPTIONS/CosNaming::Name: id:[%s], kind:[%s]", id.c_str(), GetBIOPTypeInfo(kind).c_str());
           }
 
-          uint32_t initial_context_length = TS_G32(ptr+0);
+          uint32_t initial_context_length = TS_G32(ptr + 0);
 
-          DumpBytes("DSMCC:DownloadDataMessage:biop[dir]/TAG_LITE_OPTIONS/CosNaming::Name: initial context data byte", ptr+4, initial_context_length);
+          DumpBytes("DSMCC:DownloadDataMessage:biop[dir]/TAG_LITE_OPTIONS/CosNaming::Name: initial context data byte", ptr + 4, initial_context_length);
 
           ptr = ptr + 4 + initial_context_length;
 
-          for (int i=0; i<component_count-1; i++) {
-            // uint32_t component_id_tag = TS_G32(ptr+0);
-            int component_data_length = TS_G8(ptr+4);
+          for (int i=0; i<component_count - 1; i++) {
+            // uint32_t component_id_tag = TS_G32(ptr + 0);
+            int component_data_length = TS_G8(ptr + 4);
 
-            DumpBytes("DSMCC:DownloadDataMessage:biop[dir]/TAG_LITE_OPTIONS: component data byte", ptr+5, component_data_length);
+            DumpBytes("DSMCC:DownloadDataMessage:biop[dir]/TAG_LITE_OPTIONS: component data byte", ptr + 5, component_data_length);
 
             ptr = ptr + 5 + component_data_length;
           }
@@ -3779,18 +3779,18 @@ class PSIParser : public jevent::DemuxListener {
       // INFO:: EN 301 192 (compliant with dsmcc private sections)
 			const char *ptr = event->GetData();
 
-			int section_length = TS_GM16(ptr+1, 4, 12);
-      int mac_address_6 = TS_G8(ptr+3);
-      int mac_address_5 = TS_G8(ptr+4);
-      // int payload_scrambling_control = TS_GM8(ptr+5, 2, 2);
-      // int address_scrambling_control = TS_GM8(ptr+5, 4, 2);
-      int llc_snap_flag = TS_GM8(ptr+5, 6, 1);
-      int section_number = TS_G8(ptr+6);
-      int last_section_number = TS_G8(ptr+7);
-      int mac_address_4 = TS_G8(ptr+8);
-      int mac_address_3 = TS_G8(ptr+9);
-      int mac_address_2 = TS_G8(ptr+10);
-      int mac_address_1 = TS_G8(ptr+11);
+			int section_length = TS_GM16(ptr + 1, 4, 12);
+      int mac_address_6 = TS_G8(ptr + 3);
+      int mac_address_5 = TS_G8(ptr + 4);
+      // int payload_scrambling_control = TS_GM8(ptr + 5, 2, 2);
+      // int address_scrambling_control = TS_GM8(ptr + 5, 4, 2);
+      int llc_snap_flag = TS_GM8(ptr + 5, 6, 1);
+      int section_number = TS_G8(ptr + 6);
+      int last_section_number = TS_G8(ptr + 7);
+      int mac_address_4 = TS_G8(ptr + 8);
+      int mac_address_3 = TS_G8(ptr + 9);
+      int mac_address_2 = TS_G8(ptr + 10);
+      int mac_address_1 = TS_G8(ptr + 11);
 
       ptr = ptr + 12;
 
@@ -3801,13 +3801,13 @@ class PSIParser : public jevent::DemuxListener {
       if (llc_snap_flag == 0x01) {
         // INFO:: LLC_SNAP() ISO/IEC 8802.2 Logical Link Control
       } else {
-        DumpBytes("ip datagram data byte", ptr+0, N);
+        DumpBytes("ip datagram data byte", ptr + 0, N);
       }
 
       ptr = ptr + N;
 
       if (section_number == last_section_number) {
-        DumpBytes("stuffing byte", ptr+0, section_length-9-N-4);
+        DumpBytes("stuffing byte", ptr + 0, section_length - 9 - N - 4);
       }
     }
 
@@ -3825,11 +3825,11 @@ class PSIParser : public jevent::DemuxListener {
       int adaptation_length = TS_G8(ptr + 9);
       // int message_length = TS_G16(ptr + 10);
 
+      printf("DSMCCInformation:: protocol discriminator:[%02x], dsmcc type:[%d], message id:[0x%04x], transaction id:[0x%04x]\n", protocol_discriminator, dsmcc_type, message_id, transaction_id);
+
       if (protocol_discriminator != 0x11 || // MPEG-2 DSM-CC message
           dsmcc_type != 0x03 || // Download message
           reserved != 0xff) {
-        printf("DSMCCInformation:<return>: protocol discriminator:[%02x], dsmcc type:[%d], message id:[0x%04x], transaction id:[0x%04x]\n", protocol_discriminator, dsmcc_type, message_id, transaction_id);
-
         return;
       }
 
@@ -3918,11 +3918,12 @@ class PSIParser : public jevent::DemuxListener {
       int adaptation_length = TS_G8(ptr + 9);
       int message_length = TS_G16(ptr + 10);
 
+      printf("DSMCC:DownloadDataMessage: protocol discriminator:[%02x], dsmcc type:[%d], message id:[0x%04x], download id:[0x%04x]\n", protocol_discriminator, dsmcc_type, message_id, download_id);
+
       if (protocol_discriminator != 0x11 || // MPEG-2 DSM-CC message
           dsmcc_type != 0x03 || // Download message
           reserved != 0xff ||
           message_id != 0x1003) { // DownloadDataBlock (DDB)
-        printf("DSMCC:DownloadDataMessage:<return>: protocol discriminator:[%02x], dsmcc type:[%d], message id:[0x%04x], download id:[0x%04x]\n", protocol_discriminator, dsmcc_type, message_id, download_id);
 
         return;
       }
@@ -3930,29 +3931,27 @@ class PSIParser : public jevent::DemuxListener {
       ptr = ptr + 12 + adaptation_length;
 
       int module_id = TS_G16(ptr);
-      int module_version = TS_G8(ptr+2);
-      // int reserved = TS_G8(ptr+3);
-      int block_number = TS_G16(ptr+4);
-      uint32_t magic = TS_G32(ptr+6);
+      int module_version = TS_G8(ptr + 2);
+      // int reserved = TS_G8(ptr + 3);
+      int block_number = TS_G16(ptr + 4);
+      uint32_t magic = TS_G32(ptr + 6);
+
+      printf("DSMCC:DownloadDataMessage: magic number:[0x%08x/%c%c%c%c]\n", magic, ptr[6], ptr[7], ptr[8], ptr[9]);
 
       if (magic != 0x42494f50) { // 'B','I','O','P'
-        // DumpBytes("DSMCC:DownloadDataMessage::<invalid ?>", event->GetData(), event->GetLength());
-
-        printf("DSMCC:DownloadDataMessage:<return>: magic number:[0x%08x/%c%c%c%c]\n", magic, ptr[6], ptr[7], ptr[8], ptr[9]);
-
         return;
       }
 
       ptr = ptr + 6;
 
-      int biop_version_major = TS_G8(ptr+4);
-      int biop_version_minor = TS_G8(ptr+5);
-      int byte_order = TS_G8(ptr+6);
-      int message_type = TS_G8(ptr+7);
-      // uint32_t message_size = TS_G32(ptr+8);
-      int object_key_length = TS_G8(ptr+12); 
-      // uint32_t object_kind_length = TS_G32(ptr+13+object_key_length);
-      uint32_t object_kind = TS_G32(ptr+17+object_key_length);
+      int biop_version_major = TS_G8(ptr + 4);
+      int biop_version_minor = TS_G8(ptr + 5);
+      int byte_order = TS_G8(ptr + 6);
+      int message_type = TS_G8(ptr + 7);
+      // uint32_t message_size = TS_G32(ptr + 8);
+      int object_key_length = TS_G8(ptr + 12); 
+      // uint32_t object_kind_length = TS_G32(ptr + 13 + object_key_length);
+      uint32_t object_kind = TS_G32(ptr + 17 + object_key_length);
 
       if (biop_version_major != 0x01 || 
           biop_version_minor != 0x00 || 
@@ -3961,7 +3960,7 @@ class PSIParser : public jevent::DemuxListener {
         return;
       }
 
-      std::string biop(ptr+17+object_key_length);
+      std::string biop(ptr + 17 + object_key_length);
 
       printf("DSMCC:DownloadDataMessage:biop: biop:[%s], module version:[%02x], dsmcc type:[%d], message id:[0x%04x], module id:[0x%04x], block number:[0x%04x], download id:[%08x], message length:[%d]\n", GetBIOPTypeInfo(biop).c_str(), module_version, dsmcc_type, message_id, module_id, block_number, download_id, message_length);
 
@@ -3969,79 +3968,79 @@ class PSIParser : public jevent::DemuxListener {
 
       if (object_kind == 0x66696c00) { // 'f', 'i', 'l', '\0' (file)
         // TODO:: gerando valores muito grandes !!
-        int object_info_length = TS_G16(ptr+0); 
-        uint64_t dsm_file_content_size = TS_G64(ptr+2); 
+        int object_info_length = TS_G16(ptr + 0); 
+        uint64_t dsm_file_content_size = TS_G64(ptr + 2); 
 
-        DumpBytes("object info data byte", ptr+10, object_info_length-8);
+        DumpBytes("object info data byte", ptr + 10, object_info_length - 8);
 
         ptr = ptr + 10 + object_info_length - 8;
 
-        int service_context_list_count = TS_G8(ptr+0); 
+        int service_context_list_count = TS_G8(ptr + 0); 
 
         ptr = ptr + 1;
 
         for (int i=0; i<service_context_list_count; i++) {
-          // uint32_t context_id = TS_G32(ptr+0); 
-          int context_data_length = TS_G16(ptr+4); 
+          // uint32_t context_id = TS_G32(ptr + 0); 
+          int context_data_length = TS_G16(ptr + 4); 
         
-          DumpBytes("context data byte", ptr+6, context_data_length);
+          DumpBytes("context data byte", ptr + 6, context_data_length);
 
           ptr = ptr + 6 + context_data_length;
         }
 
-        uint32_t message_body_length = TS_G32(ptr+0);
-        uint32_t content_length = TS_G32(ptr+4);
+        uint32_t message_body_length = TS_G32(ptr + 0);
+        uint32_t content_length = TS_G32(ptr + 4);
         
         printf("DSMCC:DownloadDataMessage:biop[fil]: object info length:[%d], dsm file content size:[%lu], service context list count:[%d], message body length:[%u], content length:[%u]\n", object_info_length, dsm_file_content_size, service_context_list_count, message_body_length, content_length);
 
-        // DumpBytes("content data byte", ptr+8, content_length);
+        // DumpBytes("content data byte", ptr + 8, content_length);
       } else if (
           object_kind == 0x73726700 or // 's', 'r', 'g', '\0' (gateway)
           object_kind == 0x64697200) { // 'd', 'i', 'r', '\0' (directory)
-        int object_info_length = TS_G16(ptr+0); 
+        int object_info_length = TS_G16(ptr + 0); 
         
-        DumpBytes("object info data byte", ptr+2, object_info_length);
+        DumpBytes("object info data byte", ptr + 2, object_info_length);
 
         ptr = ptr + 2 + object_info_length;
 
-        int service_context_list_count = TS_G8(ptr+0); 
+        int service_context_list_count = TS_G8(ptr + 0); 
 
         ptr = ptr + 1;
 
         for (int i=0; i<service_context_list_count; i++) {
-          // uint32_t context_id = TS_G32(ptr+0); 
-          int context_data_length = TS_G16(ptr+4); 
+          // uint32_t context_id = TS_G32(ptr + 0); 
+          int context_data_length = TS_G16(ptr + 4); 
 
-          DumpBytes("service context data byte", ptr+6, context_data_length);
+          DumpBytes("service context data byte", ptr + 6, context_data_length);
 
           ptr = ptr + 6 + context_data_length;
         }
 
-        // uint32_t message_body_length = TS_G32(ptr+0);
-        int binds_count = TS_G16(ptr+4);
+        // uint32_t message_body_length = TS_G32(ptr + 0);
+        int binds_count = TS_G16(ptr + 4);
 
         ptr = ptr + 6;
 
         for (int i=0; i<binds_count; i++) {
-          int name_component_count = TS_G8(ptr+0);
+          int name_component_count = TS_G8(ptr + 0);
 
           ptr = ptr + 1;
 
           for (int j=0; j<name_component_count; j++) {
-            int id_length = TS_G8(ptr+0);
-            std::string id(ptr+1, id_length);
+            int id_length = TS_G8(ptr + 0);
+            std::string id(ptr + 1, id_length);
 
             ptr = ptr + 1 + id_length;
 
-            int kind_length = TS_G8(ptr+0);
-            std::string kind(ptr+1, kind_length);
+            int kind_length = TS_G8(ptr + 0);
+            std::string kind(ptr + 1, kind_length);
             
             ptr = ptr + 1 + kind_length;
 
             printf("DSMCC:DownloadDataMessage:biop[dir]/binds: id:[%s], kind:[%s]\n", id.c_str(), GetBIOPTypeInfo(kind).c_str());
           }
 
-          int binding_type = TS_G8(ptr+0);
+          int binding_type = TS_G8(ptr + 0);
 
           std::string binding_info;
 
@@ -4061,59 +4060,59 @@ class PSIParser : public jevent::DemuxListener {
             return;
           }
 
-          int object_info_length2 = TS_G16(ptr+0);
+          int object_info_length2 = TS_G16(ptr + 0);
 
           ptr = ptr + 2 + object_info_length2;
         }
       } else if (object_kind == 0x73747200) { // 's', 't', 'r', '\0' (stream event)
-        int object_info_length = TS_G16(ptr+0);
-        int aDescription_length = TS_G8(ptr+2); 
+        int object_info_length = TS_G16(ptr + 0);
+        int aDescription_length = TS_G8(ptr + 2); 
 
-        DumpBytes("DSMCC:DownloadDataMessage:Stream: aDescription bytes", ptr+3, aDescription_length);
+        DumpBytes("DSMCC:DownloadDataMessage:Stream: aDescription bytes", ptr + 3, aDescription_length);
 
         ptr = ptr + 3 + aDescription_length;
 
         // AppNPT
-        uint32_t aSeconds = TS_G32(ptr+0); 
-        uint32_t aMicroseconds = TS_G32(ptr+4);
-        int audio = TS_G8(ptr+8);
-        int video = TS_G8(ptr+9);
-        int data = TS_G8(ptr+10);
+        uint32_t aSeconds = TS_G32(ptr + 0); 
+        uint32_t aMicroseconds = TS_G32(ptr + 4);
+        int audio = TS_G8(ptr + 8);
+        int video = TS_G8(ptr + 9);
+        int data = TS_G8(ptr + 10);
 
         printf("DSMCC:DownloadDataMessage:biop[str]: seconds:[%u], microseconds:[%u], audio:[0x%02x], video:[0x%02x], data:[0x%02x]\n", aSeconds, aMicroseconds, audio, video, data);
 
-        DumpBytes("DSMCC:DownloadDataMessage:: object info byte", ptr+11, object_info_length - (aDescription_length + 10));
+        DumpBytes("DSMCC:DownloadDataMessage:: object info byte", ptr + 11, object_info_length - (aDescription_length + 10));
 
         ptr = ptr + 11 + object_info_length - (aDescription_length + 10);
 
-        int service_context_list_count = TS_G8(ptr+0);
+        int service_context_list_count = TS_G8(ptr + 0);
 
-        DumpBytes("DSMCC:DownloadDataMessage:: service context list bytes", ptr+1, service_context_list_count);
+        DumpBytes("DSMCC:DownloadDataMessage:: service context list bytes", ptr + 1, service_context_list_count);
 
         ptr = ptr + 1 + service_context_list_count;
 
-        // uint32_t message_body_length = TS_G32(ptr+0);
-        int taps_count = TS_G8(ptr+4);
+        // uint32_t message_body_length = TS_G32(ptr + 0);
+        int taps_count = TS_G8(ptr + 4);
 
         ptr = ptr + 5;
 
         for (int i=0; i<taps_count; i++) {
-          int id = TS_G16(ptr+0);
-          int use = TS_G16(ptr+2);
-          int association_tag = TS_G16(ptr+4);
-          int selector_length = TS_G8(ptr+6);
+          int id = TS_G16(ptr + 0);
+          int use = TS_G16(ptr + 2);
+          int association_tag = TS_G16(ptr + 4);
+          int selector_length = TS_G8(ptr + 6);
 
           printf("DSMCC:DownloadDataMessage:taps: id:[0x%04x], use:[0x%04x], association tag:[0x%04x], selector length:[0x%02x]\n", id, use, association_tag, selector_length);
         }
 
       } else if (object_kind == 0x73746500) { // 's', 't', 'e', '\0' (stream event message)
-        int object_info_length = TS_G16(ptr+0); 
-        int aDescription_length = TS_G8(ptr+2); 
-        // uint32_t duration_aSeconds = TS_G32(ptr+3+aDescription_length); 
-        // uint32_t duration_aMicroseconds = TS_G32(ptr+3+aDescription_length+4); 
-        // int audio = TS_G8(ptr+3+aDescription_length+8); 
-        // int video = TS_G8(ptr+3+aDescription_length+9); 
-        // int data = TS_G8(ptr+3+aDescription_length+10); 
+        int object_info_length = TS_G16(ptr + 0); 
+        int aDescription_length = TS_G8(ptr + 2); 
+        // uint32_t duration_aSeconds = TS_G32(ptr + 3 + aDescription_length); 
+        // uint32_t duration_aMicroseconds = TS_G32(ptr + 3 + aDescription_length + 4); 
+        // int audio = TS_G8(ptr + 3 + aDescription_length + 8); 
+        // int video = TS_G8(ptr + 3 + aDescription_length + 9); 
+        // int data = TS_G8(ptr + 3 + aDescription_length + 10); 
 
         // DSM::Event::EventList_T
         ptr = ptr + 3 + aDescription_length + 11;
@@ -4125,7 +4124,7 @@ class PSIParser : public jevent::DemuxListener {
 
         for (int i=0; i<eventNames_count; i++) {
           int eventName_length = TS_G8(ptr);
-          std::string name(ptr+1, eventName_length);
+          std::string name(ptr + 1, eventName_length);
 
           printf("DSMCC:DownloadDataMessage:biop[ste]: event name:[%s]\n", name.c_str());
 
@@ -4134,7 +4133,7 @@ class PSIParser : public jevent::DemuxListener {
           ptr = ptr + eventName_length + 1;
         }
 
-        int object_info_byte_length = object_info_length-(aDescription_length+10)-(2+eventNames_count+count)-2;
+        int object_info_byte_length = object_info_length - (aDescription_length + 10) - (2 + eventNames_count + count) - 2;
 
         ptr = ptr + object_info_byte_length;
 
@@ -4147,16 +4146,16 @@ class PSIParser : public jevent::DemuxListener {
         ptr = ptr + 1; // + eventNames_count;
 
         // uint32_t messageBody_length = TS_G32(ptr);
-        int taps_count = TS_G8(ptr+4);
+        int taps_count = TS_G8(ptr + 4);
 
         ptr = ptr + 4 + 1;
 
         for (int i=0; i<taps_count; i++) {
           int id = TS_G16(ptr);
-          int use = TS_G16(ptr+2);
+          int use = TS_G16(ptr + 2);
           std::string use_str;
-          int association_tag = TS_G16(ptr+4);
-          // int selector_length = TS_G8(ptr+6);
+          int association_tag = TS_G16(ptr + 4);
+          // int selector_length = TS_G8(ptr + 6);
 
           if (use == 0x0b) {
             use_str = "STREAM_NPT_USE";
@@ -4195,9 +4194,9 @@ class PSIParser : public jevent::DemuxListener {
 		{
 			const char *ptr = event->GetData();
 
-			int section_length = TS_GM16(ptr+1, 4, 12);
+			int section_length = TS_GM16(ptr + 1, 4, 12);
 
-      int descriptors_length = section_length-3;
+      int descriptors_length = section_length - 5 - 4;
       int descriptors_count = 0;
 
       ptr = ptr + 8;
@@ -4205,24 +4204,24 @@ class PSIParser : public jevent::DemuxListener {
       // INFO:: ISO IEC 13818-6 - MPEG2 DSMCC - Digital Storage Media Command & Control.pdf; pg.326
       while (descriptors_count < descriptors_length) {
         int descriptor_tag = TS_G8(ptr);
-        int descriptor_length = TS_G8(ptr+1);
+        int descriptor_length = TS_G8(ptr + 1);
 
         if (descriptor_tag == 0x01) { // npt reference descriptor
-          // int post_discontinuity_indicator = TS_GM8(ptr+2, 0, 1);
-          int content_id = TS_GM8(ptr+2, 1, 7);
-          uint64_t STC_reference = (uint64_t)TS_GM8(ptr+3, 7, 1) << 32 | TS_G32(ptr+4);
-          uint64_t NPT_reference = (uint64_t)TS_GM8(ptr+11, 7, 1) << 32 | TS_G32(ptr+12);
-          int scale_numerator = TS_G16(ptr+16);
-          int scale_denominator = TS_G16(ptr+18);
+          // int post_discontinuity_indicator = TS_GM8(ptr + 2, 0, 1);
+          int content_id = TS_GM8(ptr + 2, 1, 7);
+          uint64_t STC_reference = (uint64_t)TS_GM8(ptr + 3, 7, 1) << 32 | TS_G32(ptr + 4);
+          uint64_t NPT_reference = (uint64_t)TS_GM8(ptr + 11, 7, 1) << 32 | TS_G32(ptr + 12);
+          int scale_numerator = TS_G16(ptr + 16);
+          int scale_denominator = TS_G16(ptr + 18);
 
-          printf("DSMCCDescriptor:: npt reference descriptor:: content id:[0x%04x], STC reference:[%lu], NPT reference:[%lu], scale numerator:[%d], scale denominator:[%d]\n", content_id, STC_reference, NPT_reference, scale_numerator, scale_denominator);
+          printf("DSMCCDescriptor:NPT reference descriptor: content id:[0x%04x], STC reference:[%lu], NPT reference:[%lu], scale numerator:[%d], scale denominator:[%d]\n", content_id, STC_reference, NPT_reference, scale_numerator, scale_denominator);
         } else if (descriptor_tag == 0x02) { // npt endpoint descriptor
-          uint64_t start_NPT = (uint64_t)TS_GM8(ptr+3, 7, 1) << 32 | TS_G32(ptr+4);
-          uint64_t stop_NPT = (uint64_t)TS_GM8(ptr+11, 7, 1) << 32 | TS_G32(ptr+12);
+          uint64_t start_NPT = (uint64_t)TS_GM8(ptr + 3, 7, 1) << 32 | TS_G32(ptr + 4);
+          uint64_t stop_NPT = (uint64_t)TS_GM8(ptr + 11, 7, 1) << 32 | TS_G32(ptr + 12);
 
-          printf("DSMCCDescriptor:: npt endpoint descriptor:: start NPT:[%lu], stop NPT:[%lu]\n", start_NPT, stop_NPT);
+          printf("DSMCCDescriptor:NPT endpoint descriptor: start NPT:[%lu], stop NPT:[%lu]\n", start_NPT, stop_NPT);
         } else if (descriptor_tag == 0x03) { // stream mode descriptor
-          int stream_mode = TS_G8(ptr+2);
+          int stream_mode = TS_G8(ptr + 2);
           std::string mode = "ISO/IEC 13818-6 reserved";
 
           if (stream_mode == 0x00) {
@@ -4247,16 +4246,16 @@ class PSIParser : public jevent::DemuxListener {
             mode = "Pre Search Transport Pause";
           }
 
-          printf("DSMCCDescriptor:: stream mode descriptor:: mode:[%s]\n", mode.c_str());
+          printf("DSMCCDescriptor:stream mode descriptor: mode:[%s]\n", mode.c_str());
         } else if (descriptor_tag == 0x04) { // stream event descriptor
           // ABNTNBR15606_2D2_2007Vc3_2008.pdf
-          int event_id = TS_G16(ptr+2);
-          uint64_t event_NPT = (uint64_t)TS_GM8(ptr+7, 7, 1) << 32 | TS_G32(ptr+8);
+          int event_id = TS_G16(ptr + 2);
+          uint64_t event_NPT = (uint64_t)TS_GM8(ptr + 7, 7, 1) << 32 | TS_G32(ptr + 8);
 
           int private_data_length = descriptor_length - 10;
-          std::string private_data_byte(ptr+12, private_data_length);
+          std::string private_data_byte(ptr + 12, private_data_length);
 
-          printf("DSMCCDescriptor:: stream event descriptor:: event id:[0x%04x], event npt:[%lu]\n", event_id, event_NPT);
+          printf("DSMCCDescriptor:stream event descriptor: event id:[0x%04x], event npt:[%lu]\n", event_id, event_NPT);
 
           DumpBytes("private data", private_data_byte.c_str(), private_data_byte.size());
         }
@@ -4271,9 +4270,9 @@ class PSIParser : public jevent::DemuxListener {
     {
 			const char *ptr = event->GetData();
 
-			int section_length = TS_GM16(ptr+1, 4, 12);
+			int section_length = TS_GM16(ptr + 1, 4, 12);
 
-      DumpBytes("DSMCC Private Section", ptr+8, section_length-9);
+      DumpBytes("DSMCC Private Section", ptr + 8, section_length - 9);
     }
 
 		virtual void DataNotFound(jevent::DemuxEvent *event)
@@ -4390,14 +4389,14 @@ int main(int argc, char **argv)
 	if (argc != 4 and argc != 5) {
 		std::cout << "usage:: " << argv[0] << " <file.ts> <lgap> <rgap> [pid]" << std::endl;
 		std::cout << std::endl;
-		std::cout << "  lgap: bytes before ts packet (lgap+188 bytes)" << std::endl;
-		std::cout << "  rgap: bytes after ts packet (188+rgap bytes)" << std::endl;
+		std::cout << "  lgap: bytes before ts packet (lgap + 188 bytes)" << std::endl;
+		std::cout << "  rgap: bytes after ts packet (188 + rgap bytes)" << std::endl;
 		std::cout << "   pid: count the occurrencies of specific pid or -1 to consider all pids in stream" << std::endl;
 		std::cout << std::endl;
 		std::cout << "  examples ..." << std::endl;
-		std::cout << "    DVB Packet Size (0+188+0 = 188 bytes) -> (lgap, rgap) = (0, 0)" << std::endl;
-		std::cout << "    ISDBT Packet Size (0+188+16 = 204 bytes) -> (lgap, rgap) = (0, 16)" << std::endl;
-		std::cout << "    MTS Packet Size (4+188+0 = 192 bytes) -> (lgap, rgap) = (4, 0)" << std::endl;
+		std::cout << "    DVB Packet Size (0 + 188 + 0 = 188 bytes) -> (lgap, rgap) = (0, 0)" << std::endl;
+		std::cout << "    ISDBT Packet Size (0 + 188 + 16 = 204 bytes) -> (lgap, rgap) = (0, 16)" << std::endl;
+		std::cout << "    MTS Packet Size (4 + 188 + 0 = 192 bytes) -> (lgap, rgap) = (4, 0)" << std::endl;
 		std::cout << std::endl;
 
 		return -1;
