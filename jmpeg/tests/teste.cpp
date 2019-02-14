@@ -38,10 +38,6 @@
 
 #include <string.h>
 
-// INFO:: extra table ids 
-#define TS_AIT_TABLE_ID 0x74
-#define TS_DSMCC_DESCRIPTORS_TABLE_ID 0x3d
-
 #define TS_PAT_TIMEOUT	2000
 #define TS_BAT_TIMEOUT	4000
 #define TS_CAT_TIMEOUT	4000
@@ -2228,7 +2224,7 @@ class PSIParser : public jevent::DemuxListener {
 				ProcessEIT(event);
 			} else if (tid == TS_PMT_TABLE_ID) { // TODO:: gravar uma lista de pids em ProcessPAT e verificar usando (pid, tid)
 				ProcessPMT(event);
-			} else if (tid == TS_AIT_TABLE_ID) {
+			} else if (tid == 0x74) { // AIT
 				ProcessPrivate(event);
 			} else {
 				if (pid == _pcr_pid) {
@@ -2402,7 +2398,7 @@ class PSIParser : public jevent::DemuxListener {
 						vpid = elementary_pid;
 					}
 				} else if (_stream_types[stream_type] == ElementaryStream::stream_type_t::PRIVATE) {
-					StartPrivateDemux("private", elementary_pid, TS_AIT_TABLE_ID, TS_PRIVATE_TIMEOUT);
+					StartPrivateDemux("private", elementary_pid, 0x74, TS_PRIVATE_TIMEOUT); // AIT
 				} else if (_stream_types[stream_type] == ElementaryStream::stream_type_t::SUBTITLE) {
           _closed_caption_pid = elementary_pid;
 
@@ -2864,11 +2860,9 @@ class PSIParser : public jevent::DemuxListener {
 			const char *ptr = event->GetData();
 
 			int tid = TS_G8(ptr + 0);
-			int section_length = TS_GM16(ptr + 1, 4, 12);
+			// int section_length = TS_GM16(ptr + 1, 4, 12);
 
-			printf("AIT:: section length:[0x%04x]\n", section_length);
-
-			if (tid == 0x74) {
+			if (tid == 0x74) { // AIT private section
 				// int test_application_flag = TS_GM8(ptr + 3, 0, 1);
 				int application_type = TS_GM16(ptr + 3, 1, 15);
 				// int reserved = TS_GM8(ptr + 5, 0, 2);
