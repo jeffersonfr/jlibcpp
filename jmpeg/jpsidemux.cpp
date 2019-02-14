@@ -33,6 +33,7 @@ PSIDemux::PSIDemux():
 
   _tid = -1;
 	_is_crc_enabled = true;
+  _is_crc_failed = false;
 }
 		
 PSIDemux::~PSIDemux()
@@ -59,6 +60,11 @@ bool PSIDemux::IsCRCCheckEnabled()
 	return _is_crc_enabled;
 }
 
+bool PSIDemux::IsCRCFailed()
+{
+	return _is_crc_failed;
+}
+
 bool PSIDemux::Append(const char *data, int data_length)
 {
 	int table_id = TS_G8(data);
@@ -73,15 +79,19 @@ bool PSIDemux::Append(const char *data, int data_length)
     return false;
   }
 
-	if (_is_crc_enabled == true) {
-		uint32_t 
-	    // crc = *(uint32_t *)(data+(data_length-4)),
-      sum = jmath::CRC::Calculate32((const uint8_t *)data, data_length);
+  uint32_t 
+    // crc = *(uint32_t *)(data+(data_length-4)),
+    sum = jmath::CRC::Calculate32((const uint8_t *)data, data_length);
 
-		if (sum != 0xffffffff) {
-			return false;
-		}
-	}
+  _is_crc_failed = false;
+
+  if (sum != 0xffffffff) {
+    _is_crc_failed = true;
+
+    if (_is_crc_enabled == true) {
+      return false;
+    }
+  }
 
 	return true;
 }

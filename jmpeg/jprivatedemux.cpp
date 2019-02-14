@@ -33,6 +33,7 @@ PrivateDemux::PrivateDemux():
 
   _tid = -1;
 	_is_crc_enabled = true;
+  _is_crc_failed = false;
 }
 		
 PrivateDemux::~PrivateDemux()
@@ -59,6 +60,11 @@ bool PrivateDemux::IsCRCCheckEnabled()
 	return _is_crc_enabled;
 }
 
+bool PrivateDemux::IsCRCFailed()
+{
+	return _is_crc_failed;
+}
+
 bool PrivateDemux::Append(const char *data, int data_length)
 {
 	int table_id = TS_G8(data);
@@ -76,12 +82,16 @@ bool PrivateDemux::Append(const char *data, int data_length)
 	int section_syntax_indicator = TS_GM8(data+1, 1, 1);
 
   if (section_syntax_indicator != 0) {
-    if (_is_crc_enabled == true) {
-      uint32_t 
-        // crc = *(uint32_t *)(data+(data_length-4)),
-        sum = jmath::CRC::Calculate32((const uint8_t *)data, data_length);
+    uint32_t 
+      // crc = *(uint32_t *)(data+(data_length-4)),
+      sum = jmath::CRC::Calculate32((const uint8_t *)data, data_length);
 
-      if (sum != 0xffffffff) {
+    _is_crc_failed = false;
+
+    if (sum != 0xffffffff) {
+      _is_crc_failed = true;
+
+      if (_is_crc_enabled == true) {
         return false;
       }
     }

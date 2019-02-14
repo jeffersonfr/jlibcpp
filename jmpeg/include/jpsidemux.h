@@ -31,6 +31,8 @@ class PSIDemux : public jmpeg::Demux {
 		int _tid;
 		/** \brief */
 		bool _is_crc_enabled;
+    /** \brief */
+    bool _is_crc_failed;
 
 	public:
 		/**
@@ -68,6 +70,12 @@ class PSIDemux : public jmpeg::Demux {
 		 *
 		 */
 		virtual bool IsCRCCheckEnabled();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsCRCFailed();
 
 		/**
 		 * \brief
