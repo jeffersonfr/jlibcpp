@@ -2181,7 +2181,7 @@ class PSIParser : public jevent::DemuxListener {
       } else if (demux->GetType() == jmpeg::JDT_PES) {
 			  printf("PES Section:: pid:[0x%04x], length:[%d]\n", pid, len);
       } else {
-			  printf("PSI Section:[%s]: pid:[0x%04x], tid:[0x%04x], length:[%d]\n", GetTableDescription(pid, tid).c_str(), pid, tid, len);
+			  printf("PSI Section:[%s]: pid:[0x%04x], table id:[0x%04x], length:[%d]\n", GetTableDescription(pid, tid).c_str(), pid, tid, len);
       
         if (demux->GetType() == jmpeg::JDT_PSI) {
           jmpeg::PSIDemux *d = dynamic_cast<jmpeg::PSIDemux *>(demux);
