@@ -767,46 +767,46 @@ void DumpBytes(std::string id, const char *data, int length, int columns)
     return;
   }
 
-	printf("----:: Dump (%s) <%d bytes> :: BEGIN ::----\n", id.c_str(), length);
+  printf("----:: Dump (%s) <%d bytes> :: BEGIN ::----\n", id.c_str(), length);
 
-	const char *ptr = data;
+  const char *ptr = data;
 
-	if (columns < 8) {
-		columns = 8;
-	}
+  if (columns < 8) {
+    columns = 8;
+  }
 
-	while (length > 0) {
-		for (int i=0; i<columns && i<length; i++) {
-			printf("%02x ", (uint8_t)ptr[i]);
-		}
+  while (length > 0) {
+    for (int i=0; i<columns && i<length; i++) {
+      printf("%02x ", (uint8_t)ptr[i]);
+    }
 
-		if (length < columns) {
-			for (int i=0; i<(columns-length); i++) {
-				printf("   ");
-			}
-		}
+    if (length < columns) {
+      for (int i=0; i<(columns-length); i++) {
+        printf("   ");
+      }
+    }
 
-		for (int i=0; i<columns && i<length; i++) {
-			if (isprint(ptr[i])) {
-				printf("%c", ptr[i]);
-			} else {
-				printf(".");
-			}
-		}
-		
-		length = length - columns;
-		ptr = ptr + columns;
-		
-		if (length > 0) {
-			printf("\n");
-		}
-	}
-	
-	printf("\n----:: Dump (%s) :: END ::----\n", id.c_str());
+    for (int i=0; i<columns && i<length; i++) {
+      if (isprint(ptr[i])) {
+        printf("%c", ptr[i]);
+      } else {
+        printf(".");
+      }
+    }
+
+    length = length - columns;
+    ptr = ptr + columns;
+
+    if (length > 0) {
+      printf("\n");
+    }
+  }
+
+  printf("\n----:: Dump (%s) :: END ::----\n", id.c_str());
 }
 
 int main_mpeg(int argc, char *argv[])
 {
-	return EXIT_SUCCESS;
+  return EXIT_SUCCESS;
 }
 
