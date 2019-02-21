@@ -584,9 +584,15 @@ class SI {
 
 };
 
-class ElementaryStream {
+class SIService : public SI {
 
   public:
+    enum class service_type_t {
+      LD,
+      SD,
+      HD
+    };
+
     enum class stream_type_t {
       UNKNOWN,
       AUDIO,
@@ -599,103 +605,14 @@ class ElementaryStream {
       RESERVED,
     };
 
-  private:
-    std::map<int, std::string>
-      _descriptor;
-    int 
-      _program_identifier;
-    stream_type_t
-      _stream_type;
-
-  public:
-    ElementaryStream()
-    {
-    }
-
-    virtual ~ElementaryStream()
-    {
-    }
-
-    void StreamType(stream_type_t param)
-    {
-      _stream_type = param;
-    }
-
-    void ProgramIdentifier(int param)
-    {
-      _program_identifier = param;
-    }
-
-    void Descriptor(int tag, std::string param)
-    {
-      _descriptor[tag] = param;
-    }
-
-    stream_type_t StreamType()
-    {
-      return _stream_type;
-    }
-
-    int ProgramIdentifier()
-    {
-      return _program_identifier;
-    }
-
-    std::string Descriptor(int tag)
-    {
-      if (_descriptor.find(tag) == _descriptor.end()) {
-        return "";
-      }
-
-      return _descriptor[tag];
-    }
-
-    void Print()
-    {
-      std::string 
-        stream_type = "unknown";
-
-      if (_stream_type == stream_type_t::AUDIO) {
-        stream_type = "audio";
-      } else if (_stream_type == stream_type_t::VIDEO) {
-        stream_type = "video";
-      } else if (_stream_type == stream_type_t::SUBTITLE) {
-        stream_type = "subtitle";
-      } else if (_stream_type == stream_type_t::PRIVATE) {
-        stream_type = "private";
-      } else if (_stream_type == stream_type_t::DSMCC_SECTION) {
-        stream_type = "dsmcc section";
-      } else if (_stream_type == stream_type_t::DSMCC_MESSAGE) {
-        stream_type = "dsmcc message";
-      } else if (_stream_type == stream_type_t::DSMCC_DESCRIPTOR) {
-        stream_type = "dsmcc descriptor";
-      } else if (_stream_type == stream_type_t::RESERVED) {
-        stream_type = "reserved";
-      }
-
-      std::string 
-        component_tag = Descriptor(0x52); // INFO:: stream identifier descriptor
-
-      if (component_tag.empty() == true) {
-        component_tag = "\xff";
-      }
-
-      printf("\tElementary Stream<%s>: program identifer:[0x%04x], component tag:[0x%02x]\n", stream_type.c_str(), _program_identifier, (uint8_t)component_tag[0]);
-    }
-
-};
-
-class SIService : public SI {
-
-  public:
-    enum class service_type_t {
-      LD,
-      SD,
-      HD
+    struct elementary_stream_t {
+      std::map<int, std::shared_ptr<std::string>> descriptors;
+      int program_identifier;
+      stream_type_t type;
     };
 
   private:
-    std::vector<std::shared_ptr<ElementaryStream>>
+    std::vector<std::shared_ptr<struct elementary_stream_t>>
       _elementary_streams;
     std::string
       _service_provider, 
@@ -753,10 +670,10 @@ class SIService : public SI {
       _service_type = param;
     }
 
-    void AddElementaryStream(std::shared_ptr<ElementaryStream> param)
+    void AddElementaryStream(std::shared_ptr<struct elementary_stream_t> param)
     {
-      for (std::vector<std::shared_ptr<ElementaryStream>>::iterator i=_elementary_streams.begin(); i!=_elementary_streams.end(); i++) {
-        if (param->ProgramIdentifier() == (*i)->ProgramIdentifier()) {
+      for (std::vector<std::shared_ptr<struct elementary_stream_t>>::iterator i=_elementary_streams.begin(); i!=_elementary_streams.end(); i++) {
+        if (param->program_identifier == (*i)->program_identifier) {
           return;
         }
       }
@@ -794,7 +711,7 @@ class SIService : public SI {
       return _service_type;
     }
 
-    const std::vector<std::shared_ptr<ElementaryStream>> ElementaryStreams()
+    const std::vector<std::shared_ptr<struct elementary_stream_t>> ElementaryStreams()
     {
       return _elementary_streams;
     }
@@ -814,8 +731,38 @@ class SIService : public SI {
       printf("Service:: provider:[%s], name:[%s], original network id:[0x%04x], transport stream id:[0x%04x], service id:[0x%04x], service type:[%s]\n",
           _service_provider.c_str(), _service_name.c_str(), _original_network_id, _transport_stream_id, _service_id, service_type.c_str()); 
     
-      for (std::vector<std::shared_ptr<ElementaryStream>>::iterator i=_elementary_streams.begin(); i!=_elementary_streams.end(); i++) {
-        (*i)->Print();
+      for (std::vector<std::shared_ptr<struct elementary_stream_t>>::iterator i=_elementary_streams.begin(); i!=_elementary_streams.end(); i++) {
+        std::shared_ptr<struct elementary_stream_t> stream = (*i);
+
+        std::string 
+          stream_type = "unknown";
+
+        if (stream->type == stream_type_t::AUDIO) {
+          stream_type = "audio";
+        } else if (stream->type == stream_type_t::VIDEO) {
+          stream_type = "video";
+        } else if (stream->type == stream_type_t::SUBTITLE) {
+          stream_type = "subtitle";
+        } else if (stream->type == stream_type_t::PRIVATE) {
+          stream_type = "private";
+        } else if (stream->type == stream_type_t::DSMCC_SECTION) {
+          stream_type = "dsmcc section";
+        } else if (stream->type == stream_type_t::DSMCC_MESSAGE) {
+          stream_type = "dsmcc message";
+        } else if (stream->type == stream_type_t::DSMCC_DESCRIPTOR) {
+          stream_type = "dsmcc descriptor";
+        } else if (stream->type == stream_type_t::RESERVED) {
+          stream_type = "reserved";
+        }
+
+        std::shared_ptr<std::string> 
+          component_tag = std::make_shared<std::string>("\xff");
+        
+        if (stream->descriptors.find(0x52) != stream->descriptors.end()) { // INFO:: stream identifier descriptor
+          component_tag = stream->descriptors[0x52];
+        }
+
+        printf("\telementary Stream<%s>: program identifer:[0x%04x], component tag:[0x%02x]\n", stream_type.c_str(), stream->program_identifier, (uint8_t)component_tag->data()[0]);
       }
     }
 
@@ -2445,7 +2392,7 @@ class PSIParser : public jevent::DemuxListener {
 
 	private:
 		std::map<std::string, jmpeg::Demux *> _demuxes;
-		std::map<int, ElementaryStream::stream_type_t> _stream_types;
+		std::map<int, SIService::stream_type_t> _stream_types;
 		std::string _dsmcc_private_payload;
 		int _pcr_pid;
 		int _closed_caption_pid;
@@ -2536,33 +2483,33 @@ class PSIParser : public jevent::DemuxListener {
 			_dsmcc_descriptors_pid = -1;
 			_dsmcc_sequence_number = 0;
 
-			_stream_types[0x00] = ElementaryStream::stream_type_t::RESERVED;
-			_stream_types[0x01] = ElementaryStream::stream_type_t::VIDEO;
-			_stream_types[0x02] = ElementaryStream::stream_type_t::VIDEO;
-			_stream_types[0x03] = ElementaryStream::stream_type_t::AUDIO;
-			_stream_types[0x04] = ElementaryStream::stream_type_t::AUDIO;
-			_stream_types[0x05] = ElementaryStream::stream_type_t::PRIVATE;
-			_stream_types[0x06] = ElementaryStream::stream_type_t::SUBTITLE;
-			_stream_types[0x0b] = ElementaryStream::stream_type_t::DSMCC_MESSAGE;
-			_stream_types[0x0c] = ElementaryStream::stream_type_t::DSMCC_DESCRIPTOR;
-			_stream_types[0x0d] = ElementaryStream::stream_type_t::DSMCC_SECTION;
-			_stream_types[0x0f] = ElementaryStream::stream_type_t::AUDIO;
-			_stream_types[0x10] = ElementaryStream::stream_type_t::VIDEO;
-			_stream_types[0x11] = ElementaryStream::stream_type_t::AUDIO;
-			_stream_types[0x1b] = ElementaryStream::stream_type_t::VIDEO;
-			_stream_types[0x24] = ElementaryStream::stream_type_t::VIDEO;
-			_stream_types[0x42] = ElementaryStream::stream_type_t::VIDEO;
-			_stream_types[0x80] = ElementaryStream::stream_type_t::AUDIO;
-			_stream_types[0x81] = ElementaryStream::stream_type_t::AUDIO;
-			_stream_types[0x82] = ElementaryStream::stream_type_t::AUDIO;
-			_stream_types[0x83] = ElementaryStream::stream_type_t::AUDIO;
-			_stream_types[0x84] = ElementaryStream::stream_type_t::AUDIO;
-			_stream_types[0x85] = ElementaryStream::stream_type_t::AUDIO;
-			_stream_types[0x86] = ElementaryStream::stream_type_t::AUDIO;
-			_stream_types[0x87] = ElementaryStream::stream_type_t::AUDIO;
-			_stream_types[0x90] = ElementaryStream::stream_type_t::SUBTITLE;
-			_stream_types[0xd1] = ElementaryStream::stream_type_t::VIDEO;
-			_stream_types[0xea] = ElementaryStream::stream_type_t::VIDEO;
+			_stream_types[0x00] = SIService::stream_type_t::RESERVED;
+			_stream_types[0x01] = SIService::stream_type_t::VIDEO;
+			_stream_types[0x02] = SIService::stream_type_t::VIDEO;
+			_stream_types[0x03] = SIService::stream_type_t::AUDIO;
+			_stream_types[0x04] = SIService::stream_type_t::AUDIO;
+			_stream_types[0x05] = SIService::stream_type_t::PRIVATE;
+			_stream_types[0x06] = SIService::stream_type_t::SUBTITLE;
+			_stream_types[0x0b] = SIService::stream_type_t::DSMCC_MESSAGE;
+			_stream_types[0x0c] = SIService::stream_type_t::DSMCC_DESCRIPTOR;
+			_stream_types[0x0d] = SIService::stream_type_t::DSMCC_SECTION;
+			_stream_types[0x0f] = SIService::stream_type_t::AUDIO;
+			_stream_types[0x10] = SIService::stream_type_t::VIDEO;
+			_stream_types[0x11] = SIService::stream_type_t::AUDIO;
+			_stream_types[0x1b] = SIService::stream_type_t::VIDEO;
+			_stream_types[0x24] = SIService::stream_type_t::VIDEO;
+			_stream_types[0x42] = SIService::stream_type_t::VIDEO;
+			_stream_types[0x80] = SIService::stream_type_t::AUDIO;
+			_stream_types[0x81] = SIService::stream_type_t::AUDIO;
+			_stream_types[0x82] = SIService::stream_type_t::AUDIO;
+			_stream_types[0x83] = SIService::stream_type_t::AUDIO;
+			_stream_types[0x84] = SIService::stream_type_t::AUDIO;
+			_stream_types[0x85] = SIService::stream_type_t::AUDIO;
+			_stream_types[0x86] = SIService::stream_type_t::AUDIO;
+			_stream_types[0x87] = SIService::stream_type_t::AUDIO;
+			_stream_types[0x90] = SIService::stream_type_t::SUBTITLE;
+			_stream_types[0xd1] = SIService::stream_type_t::VIDEO;
+			_stream_types[0xea] = SIService::stream_type_t::VIDEO;
 
 			StartPSIDemux("pat", TS_PAT_PID, TS_PAT_TABLE_ID, TS_PAT_TIMEOUT);
 		}
@@ -2626,7 +2573,7 @@ class PSIParser : public jevent::DemuxListener {
 
 					break; // we can get more than one app name ='[
 				}	
-			} else if (descriptor_tag == 0x02) { // transport protocol
+			} else if (descriptor_tag == 0x02) { // transport protocol descriptor
 				int protocol_id = TS_G16(ptr + 0);
 				int transpor_protocol_label = TS_G8(ptr + 2);
 
@@ -2646,6 +2593,8 @@ class PSIParser : public jevent::DemuxListener {
 						int component_tag = TS_G8(ptr + 4);
 
 						printf(":: component tag:[0x%04x]\n", component_tag);
+
+            // TODO:: initialize dsmcc here
 					}
 				}	
 			} else if (descriptor_tag == 0x03 || descriptor_tag == 0x06) {  // gingaj application descriptor, gingancl application descriptor
@@ -3558,26 +3507,26 @@ class PSIParser : public jevent::DemuxListener {
 
 				printf("PMT:service: elementary stream:[0x%04x], type:[0x%02x]::[%s]\n", elementary_pid, stream_type, GetStreamTypeDescription(stream_type).c_str());
 
-        std::shared_ptr<ElementaryStream> es = std::make_shared<ElementaryStream>();
+        std::shared_ptr<struct SIService::elementary_stream_t> es = std::make_shared<struct SIService::elementary_stream_t>();
 
-        es->StreamType(_stream_types[stream_type]);
-        es->ProgramIdentifier(elementary_pid);
+        es->type = _stream_types[stream_type];
+        es->program_identifier = elementary_pid;
 
-				if (_stream_types[stream_type] == ElementaryStream::stream_type_t::VIDEO) {
+				if (_stream_types[stream_type] == SIService::stream_type_t::VIDEO) {
 					if (vpid < 0) {
 						vpid = elementary_pid;
 					}
-				} else if (_stream_types[stream_type] == ElementaryStream::stream_type_t::PRIVATE) {
+				} else if (_stream_types[stream_type] == SIService::stream_type_t::PRIVATE) {
 					StartPrivateDemux("private", elementary_pid, 0x74, TS_PRIVATE_TIMEOUT); // AIT
-				} else if (_stream_types[stream_type] == ElementaryStream::stream_type_t::SUBTITLE) {
+				} else if (_stream_types[stream_type] == SIService::stream_type_t::SUBTITLE) {
           _closed_caption_pid = elementary_pid;
 
 					StartPESDemux("closed-caption", elementary_pid, 3600000);
-				} else if (_stream_types[stream_type] == ElementaryStream::stream_type_t::DSMCC_MESSAGE) {
+				} else if (_stream_types[stream_type] == SIService::stream_type_t::DSMCC_MESSAGE) {
 					_dsmcc_message_pid = elementary_pid;
 					
           StartPrivateDemux("dsmcc-data", elementary_pid, -1, TS_PRIVATE_TIMEOUT);
-				} else if (_stream_types[stream_type] == ElementaryStream::stream_type_t::DSMCC_DESCRIPTOR) {
+				} else if (_stream_types[stream_type] == SIService::stream_type_t::DSMCC_DESCRIPTOR) {
 					_dsmcc_descriptors_pid = elementary_pid;
 					
           StartPrivateDemux("dsmcc-descriptors", elementary_pid, -1, TS_PRIVATE_TIMEOUT);
@@ -3592,7 +3541,7 @@ class PSIParser : public jevent::DemuxListener {
 					int descriptor_tag = TS_G8(ptr + 0);
 					int descriptor_length = TS_G8(ptr + 1);
 
-          es->Descriptor(descriptor_tag, std::string(ptr + 2, descriptor_length));
+          es->descriptors[descriptor_tag] = std::make_shared<std::string>(std::string(ptr + 2, descriptor_length));
 
 					DescriptorDump(nullptr, ptr, descriptor_length + 2);
 
