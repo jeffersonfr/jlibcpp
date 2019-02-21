@@ -559,6 +559,98 @@ std::string GetServiceDescription(int service_type)
     description = "Não definido";
   }
 
+  /*
+  if (service_type == 0x01) {
+    description = "Digital television service";
+  } else if (service_type == 0x02) {
+    description = "Digital radio sound service";
+  } else if (service_type == 0x03) {
+    description = "Teletext ser";
+  } else if (service_type == 0x04) {
+    description = "NVOD reference service ";
+  } else if (service_type == 0x05) {
+    description = "NVOD time-shifted service";
+  } else if (service_type == 0x06) {
+    description = "Mosaic ser";
+  } else if (service_type == 0x07) {
+    description = "FM radio service";
+  } else if (service_type == 0x08) {
+    description = "DVB SRM service ";
+  } else if (service_type == 0x09) {
+    description = "Reserved for future use";
+  } else if (service_type == 0x0a) {
+    description = "Advanced codec digital radio sound service";
+  } else if (service_type == 0x0b) {
+    description = "Advanced codec mosaic service";
+  } else if (service_type == 0x0c) {
+    description = "Data broadcast service";
+  } else if (service_type == 0x0d) {
+    description = "Reserved for Common Interface Usage (EN 50221 [37])";
+  } else if (service_type == 0x0e) {
+    description = "RCS Map (see EN 301 790 [7])";
+  } else if (service_type == 0x0f) {
+    description = "RCS FLS (see EN 301 790 [7])";
+  } else if (service_type == 0x10) {
+    description = "DB MHP service";
+  } else if (service_type == 0x11) {
+    description = "MPEG-2 HD digital television service";
+  } else if (service_type == 0x12) {
+    description = "Reserved for future use";
+  } else if (service_type == 0x13) {
+    description = "Reserved for future use";
+  } else if (service_type == 0x14) {
+    description = "Reserved for future use";
+  } else if (service_type == 0x15) {
+    description = "Reserved for future use";
+  } else if (service_type == 0x16) {
+    description = "Advanced codec SD digital television service";
+  } else if (service_type == 0x17) {
+    description = "Advanced codec SD NVOD time-shifted service";
+  } else if (service_type == 0x18) {
+    description = "Advanced codec SD NVOD reference service";
+  } else if (service_type == 0x19) {
+    description = "Advanced codec HD digital television service";
+  } else if (service_type == 0x1a) {
+    description = "Advanced codec HD NVOD time-shifted service";
+  } else if (service_type == 0x1b) {
+    description = "Advanced codec HD NVOD reference service";
+  } else if (service_type >= 0x1c && service_type <= 0x7f) {
+    description = "Reserved for future use";
+  } else if (service_type >= 0x80 and service_type <= 0xa0) {
+    description = "Defined by the service provider";
+  } else if (service_type == 0xa1) {
+    description = "Special video service";
+  } else if (service_type == 0xa2) {
+    description = "Special audio service";
+  } else if (service_type == 0xa3) {
+    description = "Special data service";
+  } else if (service_type == 0xa4) {
+    description = "Engineering service (software download)";
+  } else if (service_type == 0xa5) {
+    description = "Promotional video service";
+  } else if (service_type == 0xa6) {
+    description = "Promotional audio service";
+  } else if (service_type == 0xa7) {
+    description = "Promotional data service";
+  } else if (service_type == 0xa8) {
+    description = "Data service for anticipated storage";
+  } else if (service_type == 0xa9) {
+    description = "Exclusive data service for storage";
+  } else if (service_type == 0xaa) {
+    description = "Bookmark service list";
+  } else if (service_type == 0xab) {
+    description = "Simultaneous server type service";
+  } else if (service_type == 0xac) {
+    description = "Independent file service";
+  } else if (service_type >= 0xad and service_type <= 0xbf) {
+    description = "Not defined (range defined by the standardization organization)";
+  } else if (service_type == 0xc0) {
+    description = "Data service";
+  } else if (service_type >= 0xc1 and service_type <= 0xff) {
+    description = "Not defined";
+  }
+  */
+
   return description;
 }
 

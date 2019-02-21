@@ -128,6 +128,175 @@ class Utils {
 			WD = ((MJD + 2) % 7) + 1;
 		}
     
+    static std::string GetParentalAgeDescription(int age)
+    {
+      std::string info = "not defined";
+
+      if (age == 0x01) {
+        info = "L";
+      } else if (age == 0x02) {
+        info = "10";
+      } else if (age == 0x03) {
+        info = "12";
+      } else if (age == 0x04) {
+        info = "14";
+      } else if (age == 0x05) {
+        info = "16";
+      } else if (age == 0x06) {
+        info = "18";
+      }
+
+      return info;
+    }
+
+    static std::string GetParentalContentDescription(int content)
+    {
+      std::string info;
+
+      if (content == 0x01) {
+        info = "drugs";
+      } else if (content == 0x02) {
+        info = "violence";
+      } else if (content == 0x03) {
+        info = "violence and drugs";
+      } else if (content == 0x04) {
+        info = "sex";
+      } else if (content == 0x05) {
+        info = "sex and drugs";
+      } else if (content == 0x06) {
+        info = "violence and sex";
+      } else if (content == 0x07) {
+        info = "violence, sex and drugs";
+      }
+
+      return info;
+    }
+
+    static std::string GetLanguageCompressionDescription(int compression)
+    {
+      std::string info = "no compression";
+
+      if (compression == 0x00) {
+        info = "no compression";
+      } else if (compression == 0x01) {
+        info = "huffman coding";
+      } else if (compression == 0x02) {
+        info = "huffman coding";
+      } else if (compression >= 0x03 and compression <= 0xaf) {
+        info = "reserved";
+      } else if (compression >= 0xb0 and compression <= 0xff) {
+        info = "used in other systems";
+      }
+
+      return info;
+    }
+
+    static std::string GetLanguageUnicodeModeDescription(int mode)
+    {
+      std::string info = "Undefined";
+
+      if (mode == 0x00) {
+        info = "select unicode code range 0x0000 - 0x00FF";
+      } else if (mode == 0x01) {
+        info = "select unicode code range 0x0100 - 0x01FF";
+      } else if (mode == 0x02) {
+        info = "select unicode code range 0x0200 - 0x02FF";
+      } else if (mode == 0x03) {
+        info = "select unicode code range 0x0300 - 0x03FF";
+      } else if (mode == 0x04) {
+        info = "select unicode code range 0x0400 - 0x04FF";
+      } else if (mode == 0x05) {
+        info = "select unicode code range 0x0500 - 0x05FF";
+      } else if (mode == 0x06) {
+        info = "select unicode code range 0x0600 - 0x06FF";
+      } else if (mode >= 0x07 and mode <= 0x08) {
+        info = "reserved";
+      } else if (mode == 0x09) {
+        info = "select unicode code range 0x0900 - 0x09FF";
+      } else if (mode == 0x0a) {
+        info = "select unicode code range 0x0A00 - 0x0AFF";
+      } else if (mode == 0x0b) {
+        info = "select unicode code range 0x0B00 - 0x0BFF";
+      } else if (mode == 0x0c) {
+        info = "select unicode code range 0x0C00 - 0x0CFF";
+      } else if (mode == 0x0d) {
+        info = "select unicode code range 0x0D00 - 0x0DFF";
+      } else if (mode == 0x0e) {
+        info = "select unicode code range 0x0E00 - 0x0EFF";
+      } else if (mode == 0x0f) {
+        info = "select unicode code range 0x0F00 - 0x0FFF";
+      } else if (mode == 0x10) {
+        info = "select unicode code range 0x1000 - 0x10FF";
+      } else if (mode >= 0x11 and mode <= 0x1f) {
+        info = "reserved";
+      } else if (mode == 0x20) {
+        info = "select unicode code range 0x2000 - 0x20FF";
+      } else if (mode == 0x21) {
+        info = "select unicode code range 0x2100 - 0x21FF";
+      } else if (mode == 0x22) {
+        info = "select unicode code range 0x2200 - 0x22FF";
+      } else if (mode == 0x23) {
+        info = "select unicode code range 0x2300 - 0x23FF";
+      } else if (mode == 0x24) {
+        info = "select unicode code range 0x2400 - 0x24FF";
+      } else if (mode == 0x25) {
+        info = "select unicode code range 0x2500 - 0x25FF";
+      } else if (mode == 0x26) {
+        info = "select unicode code range 0x2600 - 0x26FF";
+      } else if (mode == 0x27) {
+        info = "select unicode code range 0x2700 - 0x27FF";
+      } else if (mode >= 0x28 and mode <= 0x2f) {
+        info = "reserved";
+      } else if (mode == 0x30) {
+        info = "select unicode code range 0x3000 - 0x30FF";
+      } else if (mode == 0x31) {
+        info = "select unicode code range 0x3100 - 0x31FF";
+      } else if (mode == 0x32) {
+        info = "select unicode code range 0x3200 - 0x32FF";
+      } else if (mode == 0x33) {
+        info = "select unicode code range 0x3300 - 0x33FF";
+      } else if (mode >= 0x34 and mode <= 0x3d) {
+        info = "reserved";
+      } else if (mode == 0x3e) {
+        info = "select Standard Compression Scheme for Unicode (SCSU)";
+      } else if (mode == 0x3f) {
+        info = "select Unicode, UTF-16 form";
+      } else if (mode >= 0x40 and mode <= 0x41) {
+        info = "assigned to ATSC standard for Taiwan";
+      } else if (mode >= 0x42 and mode <= 0x47) {
+        info = "reserved for future ATSC use";
+      } else if (mode == 0x48) {
+        info = "assigned to ATSC standard for South Korea";
+      } else if (mode >= 0x49 and mode <= 0xdf) {
+        info = "reserved for future ATSC use";
+      } else if (mode >= 0xe0 and mode <= 0xfe) {
+        info = "used in other systems";
+      } else if (mode == 0xff) {
+        info = "not applicable";
+      }
+
+      return info;
+    }
+
+    static std::string GetTransportProtocolDescription(int protocol)
+    {
+      std::string info = "UNKNOWN";
+
+      if (protocol == 0x01) {
+        info = "Object Carousel";
+      } else if (protocol == 0x02) {
+        info = "IP";
+      } else if (protocol == 0x03) {
+        info = "IChannel";
+      } else if (protocol == 0x04) {
+        info = "Data Carousel";
+      } else if (protocol == 0x05) {
+        info = "Persistence Carousel";
+      }
+
+      return info;
+    }
+
     static std::string GetBIOPTypeInfo(std::string type) 
     {
       std::string info("unknown");
@@ -151,10 +320,22 @@ class Utils {
     {
       std::string info = "UNKNOWN";
 
-      if (use == 0x16) {
+      if (use == 0x0b) {
+        info = "STREAM_NPT_USE";
+      } else if (use == 0x0c) {
+        info = "STREAM_STATUS_AND_EVENT_USE";
+      } else if (use == 0x0d) {
+        info = "STREAM_EVENT_USE";
+      } else if (use == 0x0e) {
+        info = "STREAM_STATUS_USE";
+      } else if (use == 0x10) {
         info = "BIOP_DELIVERY_PARA_USE";
-      } else if (use == 0x17) {
+      } else if (use == 0x11) {
         info = "BIOP_OBJECT_USE";
+      } else if (use == 0x18) {
+        info = "BIOP_ES_USE";
+      } else if (use == 0x19) {
+        info = "BIOP_PROGRAM_USE";
       }
 
       return info;
@@ -209,6 +390,180 @@ class Utils {
       }
 
       return "unknown descriptor";
+    }
+
+    static std::string GetAACProfileAndLevelDescription(int profile_and_level)
+    {
+      std::string info;
+
+      if (profile_and_level >= 0x00 and profile_and_level <= 0x27) {
+        info = "reserved";
+      } else if (profile_and_level == 0x28) {
+        info = "AAC Profile";
+      } else if (profile_and_level == 0x29) {
+        info = "AAC Profile";
+      } else if (profile_and_level == 0x2a) {
+        info = "AAC Profile";
+      } else if (profile_and_level == 0x2b) {
+        info = "AAC Profile";
+      } else if (profile_and_level == 0x2c) {
+        info = "High Efficiency AAC Profile";
+      } else if (profile_and_level == 0x2d) {
+        info = "High Efficiency AAC Profile";
+      } else if (profile_and_level == 0x2e) {
+        info = "High Efficiency AAC Profile";
+      } else if (profile_and_level == 0x2f) {
+        info = "High Efficiency AAC Profile";
+      } else if (profile_and_level >= 0x30 and profile_and_level <= 0x7f) {
+        info = "Reservado para uso da ISO";
+      } else if (profile_and_level >= 0x80 and profile_and_level <= 0xfd) {
+        info = "Private";
+      } else if (profile_and_level == 0xfe) {
+        info = "No specified";
+      } else if (profile_and_level == 0xff) {
+        info = "None information about audio";
+      }
+
+      return info;
+    }
+
+    static std::string GetGenreDescription(int genre, int description)
+    {
+      std::string info = "Geral";
+
+      if (genre == 0x00) {
+        if (description == 0x00) {
+          info = "Notícias";
+        } else if (description == 0x01) {
+          info = "Reportagem";
+        } else if (description == 0x02) {
+          info = "Documentário";
+        } else if (description == 0x03) {
+          info = "Biografia";
+        }
+      } else if (genre == 0x01) {
+        if (description == 0x01) {
+          info = "Esportes";
+        } else {
+          info = "Esportes";
+        }
+      } else if (genre == 0x02) {
+        if (description == 0x00) {
+          info = "Educativo";
+        } else {
+          info = "Educativo";
+        }
+      } else if (genre == 0x03) {
+        if (description == 0x00) {
+          info = "Novela";
+        } else {
+          info = "Novela";
+        }
+      } else if (genre == 0x04) {
+        if (description == 0x00) {
+          info = "Mini Serie";
+        } else {
+          info = "Mini Serie";
+        }
+      } else if (genre == 0x05) {
+        if (description == 0x00) {
+          info = "Series";
+        } else {
+          info = "Series";
+        }
+      } else if (genre == 0x06) {
+        if (description == 0x00) {
+          info = "Auditório";
+        } else if (description == 0x01) {
+          info = "Show";
+        } else if (description == 0x02) {
+          info = "Musical";
+        } else if (description == 0x03) {
+          info = "Making Of";
+        } else if (description == 0x04) {
+          info = "Feminino";
+        } else if (description == 0x05) {
+          info = "Entreterimento";
+        } else {
+          info = "Variedades";
+        }
+      } else if (genre == 0x07) {
+        if (description == 0x00) {
+          info = "Reality Show";
+        } else {
+          info = "Reality Show";
+        }
+      } else if (genre == 0x08) {
+        if (description == 0x00) {
+          info = "Cozinha";
+        } else if (description == 0x01) {
+          info = "Fashion";
+        } else if (description == 0x02) {
+          info = "Regional";
+        } else if (description == 0x03) {
+          info = "Saúde";
+        } else if (description == 0x04) {
+          info = "Viagem";
+        } else {
+          info = "Informação";
+        }
+      } else if (genre == 0x09) {
+        if (description == 0x00) {
+          info = "Comédia";
+        } else {
+          info = "Comédia";
+        }
+      } else if (genre == 0x0a) {
+        if (description == 0x00) {
+          info = "Infantil";
+        } else {
+          info = "Infantil";
+        }
+      } else if (genre == 0x0b) {
+        if (description == 0x00) {
+          info = "Erótico";
+        } else {
+          info = "Erótico";
+        }
+      } else if (genre == 0x0c) {
+        if (description == 0x00) {
+          info = "Filme";
+        } else {
+          info = "Filme";
+        }
+      } else if (genre == 0x0d) {
+        if (description == 0x00) {
+          info = "Sorteio";
+        } else if (description == 0x01) {
+          info = "Vendas";
+        } else if (description == 0x02) {
+          info = "Premiação";
+        } else {
+          info = "Sorteio, Vendas e Premiação";
+        }
+      } else if (genre == 0x0e) {
+        if (description == 0x00) {
+          info = "Debate";
+        } else if (description == 0x01) {
+          info = "Entrevista";
+        } else {
+          info = "Debate e Entrevista";
+        }
+      } else if (genre == 0x0f) {
+        if (description == 0x00) {
+          info = "Desenho Adulto";
+        } else if (description == 0x01) {
+          info = "Interatividade";
+        } else if (description == 0x02) {
+          info = "Policial";
+        } else if (description == 0x03) {
+          info = "Religião";
+        } else {
+          info = "Outros";
+        }
+      }
+
+      return info;
     }
 
 };
@@ -819,6 +1174,8 @@ class SIData : public SI {
       _nodes;
     std::map<std::string, std::string> // INFO:: object_key => object_name
       _names;
+    std::mutex
+      _mutex;
     uint32_t
       _download_id;
 
@@ -826,6 +1183,66 @@ class SIData : public SI {
     bool operator==(std::shared_ptr<SIData> param)
     {
       return (DownloadID() == param->DownloadID());
+    }
+
+    std::string GetObjectKeyAsText(std::string key)
+    {
+      std::ostringstream o;
+
+      for (int i=0; i<(int)key.size(); i++) {
+        o << std::hex << std::setw(2) << std::setfill('0') << (int)(key[i] & 0xff);
+      }
+
+      return o.str();
+    }
+
+    std::shared_ptr<struct object_info_t> GetObjectByKey(std::string key)
+    {
+      for (std::vector<std::shared_ptr<struct object_info_t>>::iterator i=_objects.begin(); i!=_objects.end(); i++) {
+        std::shared_ptr<struct object_info_t> object = (*i);
+
+        if (object->object_key == key) {
+          return object;
+        }
+      }
+
+      return nullptr;
+    }
+
+    void ProcessFilesystem(std::string base_directory, std::string current_path, std::string object_key)
+    {
+      std::string 
+        path = base_directory + "/" + current_path;
+
+      std::ostringstream o;
+        
+      o << "mkdir -p \"" << path << "\"";
+
+      if (system(o.str().c_str()) != 0) {
+        printf("SIData::ProcessFilesystem:: unable to create directory [%s]\n", base_directory.c_str());
+      }
+
+      for (std::map<std::string, std::vector<std::string>>::iterator i=_nodes.begin(); i!=_nodes.end(); i++) {
+        if (i->first == object_key) {
+          for (std::vector<std::string>::iterator j=i->second.begin(); j!=i->second.end(); j++) {
+            std::shared_ptr<struct object_info_t> object = GetObjectByKey(*j);
+
+            if (object != nullptr) {
+              if (object->kind == "fil") {
+                std::ostringstream o;
+
+                o << "mv \"" << base_directory << "/" << GetObjectKeyAsText(object->object_key) << "\" \"" << path << "/" << _names[object->object_key].c_str() << "\"";
+
+                if (system(o.str().c_str()) != 0) {
+                  break;
+                }
+              } else if (object->kind == "dir") {
+                ProcessFilesystem(base_directory, current_path + "/" + _names[object->object_key].c_str(), object->object_key);
+              }
+            }
+          }
+        }
+      }
     }
 
   public:
@@ -1035,20 +1452,17 @@ class SIData : public SI {
       return ior;
     }
 
-    void Reset()
-    {
-      _download_id = -1;
-
-      _modules.clear();
-    }
-
     void DownloadID(uint32_t param)
     {
+      std::lock_guard<std::mutex> lock(_mutex);
+
       _download_id = param;
     }
 
     void Module(int module_id, int module_size, int module_version, int block_size)
     {
+      std::lock_guard<std::mutex> lock(_mutex);
+
       for (std::vector<std::shared_ptr<struct module_info_t>>::iterator i=_modules.begin(); i!=_modules.end(); i++) {
         if ((*i)->id == module_id) {
           return;
@@ -1079,13 +1493,15 @@ class SIData : public SI {
 
     void ModuleBlock(int module_id, int module_version, int block_number, std::shared_ptr<std::string> data)
     {
+      std::lock_guard<std::mutex> lock(_mutex);
+
       for (std::vector<std::shared_ptr<struct module_info_t>>::iterator i=_modules.begin(); i!=_modules.end(); i++) {
         std::shared_ptr<struct module_info_t> module = (*i);
 
         if (module->id == module_id) {
           std::map<int, bool>::iterator j = module->blocks.find(block_number);
 
-          if (j != module->blocks.end() and j->second == false) { // and module->version == module_version) {
+          if (j != module->blocks.end() and j->second == false) { // and module->version == module_version) { // TODO:: update module->size when module version was different
             int offset = module->block_size*block_number;
 
             try {
@@ -1123,11 +1539,15 @@ class SIData : public SI {
 
     uint32_t DownloadID()
     {
+      std::lock_guard<std::mutex> lock(_mutex);
+
       return _download_id;
     }
 
     std::vector<std::shared_ptr<struct module_info_t>> Modules()
     {
+      std::lock_guard<std::mutex> lock(_mutex);
+
       std::sort(_modules.begin(), _modules.end(), 
           [](const std::shared_ptr<struct module_info_t> &a, const std::shared_ptr<struct module_info_t> &b) {
             return (a->id < b->id);
@@ -1138,6 +1558,8 @@ class SIData : public SI {
 
     bool IsComplete()
     {
+      std::lock_guard<std::mutex> lock(_mutex);
+
       for (std::vector<std::shared_ptr<struct module_info_t>>::iterator i=_modules.begin(); i!=_modules.end(); i++) {
         std::shared_ptr<struct module_info_t> module = (*i);
 
@@ -1149,17 +1571,6 @@ class SIData : public SI {
       return true;
     }
 
-    std::string GetObjectKeyAsText(std::string key)
-    {
-      std::ostringstream o;
-
-      for (int i=0; i<(int)key.size(); i++) {
-        o << std::hex << std::setw(2) << std::setfill('0') << (int)(key[i] & 0xff);
-      }
-
-      return o.str();
-    }
-
     void Save(std::string path)
     {
       if (IsComplete() == false) {
@@ -1167,6 +1578,8 @@ class SIData : public SI {
 
         return;
       }
+
+      std::lock_guard<std::mutex> lock(_mutex);
 
       std::string
         cmd = std::string("rm -rf \"" + path + "\"; mkdir \"" + path + "\"");
@@ -1265,50 +1678,22 @@ class SIData : public SI {
       ProcessFilesystem(path, "", service_gateway_object_key);
     }
 
-    void ProcessFilesystem(std::string base_directory, std::string current_path, std::string object_key)
+    void Reset()
     {
-      std::string 
-        path = base_directory + "/" + current_path;
+      std::lock_guard<std::mutex> lock(_mutex);
 
-      std::ostringstream o;
-        
-      o << "mkdir -p \"" << path << "\"";
+      _download_id = -1;
 
-      if (system(o.str().c_str()) != 0) {
-        printf("SIData::ProcessFilesystem:: unable to create directory [%s]\n", base_directory.c_str());
-      }
-
-      for (std::map<std::string, std::vector<std::string>>::iterator i=_nodes.begin(); i!=_nodes.end(); i++) {
-        if (i->first == object_key) {
-          for (std::vector<std::string>::iterator j=i->second.begin(); j!=i->second.end(); j++) {
-            std::string key = (*j);
-
-            for (std::vector<std::shared_ptr<struct object_info_t>>::iterator k=_objects.begin(); k!=_objects.end(); k++) {
-              std::shared_ptr<struct object_info_t> object = (*k);
-
-              if (object->object_key == key) {
-                if (object->kind == "fil") {
-                  std::ostringstream o;
-
-                  o << "mv \"" << base_directory << "/" << GetObjectKeyAsText(object->object_key) << "\" \"" << path << "/" << _names[object->object_key] << "\"";
-               
-                  if (system(o.str().c_str()) != 0) {
-                    break;
-                  }
-                } else if (object->kind == "dir") {
-                  ProcessFilesystem(base_directory, current_path + "/" + _names[object->object_key], object->object_key);
-                }
-
-                break;
-              }
-            }
-          }
-        }
-      }
+      _modules.clear();
+      _objects.clear();
+      _nodes.clear();
+      _names.clear();
     }
 
     void Parse()
     {
+      std::lock_guard<std::mutex> lock(_mutex);
+
       char tmp[255];
       int index = 0;
 
@@ -1449,7 +1834,7 @@ class SIData : public SI {
 
               for (int j=0; j<name_component_count; j++) {
                 int id_length = TS_G8(ptr + 0);
-                std::string id(ptr + 1, id_length - 1);
+                std::string id(ptr + 1, id_length);
 
                 ptr = ptr + 1 + id_length;
 
@@ -1587,21 +1972,7 @@ class SIData : public SI {
               int association_tag = TS_G16(ptr + 4);
               // int selector_length = TS_G8(ptr + 6);
 
-              if (use == 0x0b) {
-                use_str = "STREAM_NPT_USE";
-              } else if (use == 0x0c) {
-                use_str = "STREAM_STATUS_AND_EVENT_USE";
-              } else if (use == 0x0d) {
-                use_str = "STREAM_EVENT_USE";
-              } else if (use == 0x0e) {
-                use_str = "STREAM_STATUS_USE";
-              } else if (use == 0x18) {
-                use_str = "BIOP_ES_USE";
-              } else if (use == 0x19) {
-                use_str = "BIOP_PROGRAM_USE";
-              }
-
-              printf("DSMCC:DownloadDataMessage:biop<str>: id:[0x%04x], use:[%s], association tag:[0x%04x]\n", id, use_str.c_str(), association_tag);
+              printf("DSMCC:DownloadDataMessage:biop<str>: id:[0x%04x], use:[%s], association tag:[0x%04x]\n", id, Utils::GetTapUseDescription(use).c_str(), association_tag);
 
               ptr = ptr + 7;
             }
@@ -1624,6 +1995,8 @@ class SIData : public SI {
 
     void Print()
     {
+      std::lock_guard<std::mutex> lock(_mutex);
+
       printf("Data:: download id:[0x%08x], number of modules:[%lu]\n", _download_id, _modules.size());
 
       for (std::vector<std::shared_ptr<struct module_info_t>>::iterator i=_modules.begin(); i!=_modules.end(); i++) {
@@ -1646,26 +2019,6 @@ class SIData : public SI {
           }
         }
         */
-      }
-       
-      printf("Filesystem\n");
-
-      for (std::map<std::string, std::vector<std::string>>::iterator i=_nodes.begin(); i!=_nodes.end(); i++) {
-        printf("\t[%s]\n", _names[i->first].c_str());
-
-        for (std::vector<std::string>::iterator j=i->second.begin(); j!=i->second.end(); j++) {
-          std::string key = (*j);
-
-          for (std::vector<std::shared_ptr<struct object_info_t>>::iterator k=_objects.begin(); k!=_objects.end(); k++) {
-            std::shared_ptr<struct object_info_t> object = (*k);
-
-            if (object->object_key == key) {
-              printf("\t\t[%s]:[%s]\n", object->kind.c_str(), _names[(*j)].c_str());
-
-              break;
-            }
-          }
-        }
       }
     }
 
@@ -2075,21 +2428,8 @@ class PSIParser : public jevent::DemuxListener {
 			} else if (descriptor_tag == 0x02) { // transport protocol
 				int protocol_id = TS_G16(ptr + 0);
 				int transpor_protocol_label = TS_G8(ptr + 2);
-        std::string protocol = "UNKNOWN";
 
-        if (protocol_id == 0x01) {
-          protocol = "Object Carousel";
-        } else if (protocol_id == 0x02) {
-          protocol = "IP";
-        } else if (protocol_id == 0x03) {
-          protocol = "IChannel";
-        } else if (protocol_id == 0x04) {
-          protocol = "Data Carousel";
-        } else if (protocol_id == 0x05) {
-          protocol = "Persistence Carousel";
-        }
-
-				printf(":: transport protocol tag:[0x%04x/%s], transport_protocol_label:[0x%02x]\n", protocol_id, protocol.c_str(), transpor_protocol_label);
+				printf(":: transport protocol tag:[0x%04x/%s], transport_protocol_label:[0x%02x]\n", protocol_id, Utils::GetTransportProtocolDescription(protocol_id).c_str(), transpor_protocol_label);
 
 				if (protocol_id == 0x01) {
 					int remote_connection = TS_GM8(ptr + 3, 0, 1);
@@ -2317,71 +2657,8 @@ class PSIParser : public jevent::DemuxListener {
 				while (services_loop_count < services_loop_length) {
 					int service_id = TS_G16(ptr + 0);
 					int service_type = TS_G8(ptr + 2);
-					std::string service = "Reserved for future use";
 
-					if (service_type == 0x01) {
-						service = "Digital television service";
-					} else if (service_type == 0x02) {
-						service = "Digital radio sound service";
-					} else if (service_type == 0x03) {
-						service = "Teletext ser";
-					} else if (service_type == 0x04) {
-						service = "NVOD reference service ";
-					} else if (service_type == 0x05) {
-						service = "NVOD time-shifted service";
-					} else if (service_type == 0x06) {
-						service = "Mosaic ser";
-					} else if (service_type == 0x07) {
-						service = "FM radio service";
-					} else if (service_type == 0x08) {
-						service = "DVB SRM service ";
-					} else if (service_type == 0x09) {
-						service = "Reserved for future use";
-					} else if (service_type == 0x0a) {
-						service = "Advanced codec digital radio sound service";
-					} else if (service_type == 0x0b) {
-						service = "Advanced codec mosaic service";
-					} else if (service_type == 0x0c) {
-						service = "Data broadcast service";
-					} else if (service_type == 0x0d) {
-						service = "Reserved for Common Interface Usage (EN 50221 [37])";
-					} else if (service_type == 0x0e) {
-						service = "RCS Map (see EN 301 790 [7])";
-					} else if (service_type == 0x0f) {
-						service = "RCS FLS (see EN 301 790 [7])";
-					} else if (service_type == 0x10) {
-						service = "DB MHP service";
-					} else if (service_type == 0x11) {
-						service = "MPEG-2 HD digital television service";
-					} else if (service_type == 0x12) {
-						service = "Reserved for future use";
-					} else if (service_type == 0x13) {
-						service = "Reserved for future use";
-					} else if (service_type == 0x14) {
-						service = "Reserved for future use";
-					} else if (service_type == 0x15) {
-						service = "Reserved for future use";
-					} else if (service_type == 0x16) {
-						service = "Advanced codec SD digital television service";
-					} else if (service_type == 0x17) {
-						service = "Advanced codec SD NVOD time-shifted service";
-					} else if (service_type == 0x18) {
-						service = "Advanced codec SD NVOD reference service";
-					} else if (service_type == 0x19) {
-						service = "Advanced codec HD digital television service";
-					} else if (service_type == 0x1a) {
-						service = "Advanced codec HD NVOD time-shifted service";
-					} else if (service_type == 0x1b) {
-						service = "Advanced codec HD NVOD reference service";
-					} else if (service_type >= 0x1c && service_type <= 0x7f) {
-						service = "Reserved for future use";
-					} else if (service_type >= 0x80 && service_type <= 0xfe) {
-						service = "User defined";
-					} else if (service_type == 0xff) {
-						service = "Reserved for future use";
-					}
-
-					printf(":: service id:[0x%04x], service type:[0x%02x]::[%s]\n", service_id, service_type, service.c_str());
+					printf(":: service id:[0x%04x], service type:[0x%02x]::[%s]\n", service_id, service_type, GetServiceDescription(service_type).c_str());
 
 					ptr = ptr + 3;
 
@@ -2485,143 +2762,9 @@ class PSIParser : public jevent::DemuxListener {
 				int content_nibble = TS_G8(ptr + 0);
 
 				int genre = (content_nibble >> 4) & 0x0f;
-				int genre_description = (content_nibble >> 0) & 0x0f;
+				int genre_info = (content_nibble >> 0) & 0x0f;
 
-				std::string description = "Geral";
-
-				if (genre == 0x00) {
-					if (genre_description == 0x00) {
-						description = "Notícias";
-					} else if (genre_description == 0x01) {
-						description = "Reportagem";
-					} else if (genre_description == 0x02) {
-						description = "Documentário";
-					} else if (genre_description == 0x03) {
-						description = "Biografia";
-					}
-				} else if (genre == 0x01) {
-					if (genre_description == 0x01) {
-						description = "Esportes";
-					} else {
-						description = "Esportes";
-					}
-				} else if (genre == 0x02) {
-					if (genre_description == 0x00) {
-						description = "Educativo";
-					} else {
-						description = "Educativo";
-					}
-				} else if (genre == 0x03) {
-					if (genre_description == 0x00) {
-						description = "Novela";
-					} else {
-						description = "Novela";
-					}
-				} else if (genre == 0x04) {
-					if (genre_description == 0x00) {
-						description = "Mini Serie";
-					} else {
-						description = "Mini Serie";
-					}
-				} else if (genre == 0x05) {
-					if (genre_description == 0x00) {
-						description = "Series";
-					} else {
-						description = "Series";
-					}
-				} else if (genre == 0x06) {
-					if (genre_description == 0x00) {
-						description = "Auditório";
-					} else if (genre_description == 0x01) {
-						description = "Show";
-					} else if (genre_description == 0x02) {
-						description = "Musical";
-					} else if (genre_description == 0x03) {
-						description = "Making Of";
-					} else if (genre_description == 0x04) {
-						description = "Feminino";
-					} else if (genre_description == 0x05) {
-						description = "Entreterimento";
-					} else {
-						description = "Variedades";
-					}
-				} else if (genre == 0x07) {
-					if (genre_description == 0x00) {
-						description = "Reality Show";
-					} else {
-						description = "Reality Show";
-					}
-				} else if (genre == 0x08) {
-					if (genre_description == 0x00) {
-						description = "Cozinha";
-					} else if (genre_description == 0x01) {
-						description = "Fashion";
-					} else if (genre_description == 0x02) {
-						description = "Regional";
-					} else if (genre_description == 0x03) {
-						description = "Saúde";
-					} else if (genre_description == 0x04) {
-						description = "Viagem";
-					} else {
-						description = "Informação";
-					}
-				} else if (genre == 0x09) {
-					if (genre_description == 0x00) {
-						description = "Comédia";
-					} else {
-						description = "Comédia";
-					}
-				} else if (genre == 0x0a) {
-					if (genre_description == 0x00) {
-						description = "Infantil";
-					} else {
-						description = "Infantil";
-					}
-				} else if (genre == 0x0b) {
-					if (genre_description == 0x00) {
-						description = "Erótico";
-					} else {
-						description = "Erótico";
-					}
-				} else if (genre == 0x0c) {
-					if (genre_description == 0x00) {
-						description = "Filme";
-					} else {
-						description = "Filme";
-					}
-				} else if (genre == 0x0d) {
-					if (genre_description == 0x00) {
-						description = "Sorteio";
-					} else if (genre_description == 0x01) {
-						description = "Vendas";
-					} else if (genre_description == 0x02) {
-						description = "Premiação";
-					} else {
-						description = "Sorteio, Vendas e Premiação";
-					}
-				} else if (genre == 0x0e) {
-					if (genre_description == 0x00) {
-						description = "Debate";
-					} else if (genre_description == 0x01) {
-						description = "Entrevista";
-					} else {
-						description = "Debate e Entrevista";
-					}
-				} else if (genre == 0x0f) {
-					if (genre_description == 0x00) {
-						description = "Desenho Adulto";
-					} else if (genre_description == 0x01) {
-						description = "Interatividade";
-					} else if (genre_description == 0x02) {
-						description = "Policial";
-					} else if (genre_description == 0x03) {
-						description = "Religião";
-					} else {
-						description = "Outros";
-					}
-				}
-
-				printf("Description:: %s\n", description.c_str());
+				printf("Description:: %s\n", Utils::GetGenreDescription(genre, genre_info).c_str());
 			} else if (descriptor_tag == 0x55) { // parental rating descriptor
 				std::string country = std::string(ptr, 3);
 				int rate = TS_G8(ptr + 3);
@@ -2629,41 +2772,7 @@ class PSIParser : public jevent::DemuxListener {
 				int rate_age = (rate >> 0) & 0xff; 
 				int rate_content = (rate >> 4) & 0x0f;
 
-				std::string age = "Not defined";
-
-				if (rate_age == 0x01) {
-					age = "L";
-				} else if (rate_age == 0x02) {
-					age = "10";
-				} else if (rate_age == 0x03) {
-					age = "12";
-				} else if (rate_age == 0x04) {
-					age = "14";
-				} else if (rate_age == 0x05) {
-					age = "16";
-				} else if (rate_age == 0x06) {
-					age = "18";
-				}
-
-				std::string content;
-
-				if (rate_content == 0x01) {
-					content = "drogas";
-				} else if (rate_content == 0x02) {
-					content = "violência";
-				} else if (rate_content == 0x03) {
-					content = "violência e drogas";
-				} else if (rate_content == 0x04) {
-					content = "sexo";
-				} else if (rate_content == 0x05) {
-					content = "sexo e drogas";
-				} else if (rate_content == 0x06) {
-					content = "violencia e sexo";
-				} else if (rate_content == 0x07) {
-					content = "violencia, sexo e drogas";
-				}
-
-				printf(":: country:[%s], age:[%d]::[%s], content:[0x%02x]::[%s]\n", country.c_str(), rate_age, age.c_str(), rate_content,  content.c_str());
+				printf(":: country:[%s], age:[%s], content:[%s]\n", country.c_str(), Utils::GetParentalAgeDescription(rate_age).c_str(), Utils::GetParentalContentDescription(rate_content).c_str());
 			} else if (descriptor_tag == 0x58) { // local time offset descriptor
 				std::string country = std::string(ptr, 3);
 				int country_region_id = TS_GM8(ptr + 3, 0, 6);
@@ -2715,37 +2824,7 @@ class PSIParser : public jevent::DemuxListener {
 					ptr = ptr + 1;
         }
 	
-        std::string profile;
-
-        if (profile_and_level >= 0x00 and profile_and_level <= 0x27) {
-          profile = "reserved";
-        } else if (profile_and_level == 0x28) {
-          profile = "AAC Profile";
-        } else if (profile_and_level == 0x29) {
-          profile = "AAC Profile";
-        } else if (profile_and_level == 0x2a) {
-          profile = "AAC Profile";
-        } else if (profile_and_level == 0x2b) {
-          profile = "AAC Profile";
-        } else if (profile_and_level == 0x2c) {
-          profile = "High Efficiency AAC Profile";
-        } else if (profile_and_level == 0x2d) {
-          profile = "High Efficiency AAC Profile";
-        } else if (profile_and_level == 0x2e) {
-          profile = "High Efficiency AAC Profile";
-        } else if (profile_and_level == 0x2f) {
-          profile = "High Efficiency AAC Profile";
-        } else if (profile_and_level >= 0x30 and profile_and_level <= 0x7f) {
-          profile = "Reservado para uso da ISO";
-        } else if (profile_and_level >= 0x80 and profile_and_level <= 0xfd) {
-          profile = "Private";
-        } else if (profile_and_level == 0xfe) {
-          profile = "No specified";
-        } else if (profile_and_level == 0xff) {
-          profile = "None information about audio";
-        }
-
-				printf(":: profile and level:[0x%02x/%s], aac type flag:[%d], aac type:[%d]\n", profile_and_level, profile.c_str(), aac_type_flag, aac_type);
+				printf(":: profile and level:[0x%02x/%s], aac type flag:[%d], aac type:[%d]\n", profile_and_level, Utils::GetAACProfileAndLevelDescription(profile_and_level).c_str(), aac_type_flag, aac_type);
 
 				int private_length = end - ptr;
 
@@ -2771,104 +2850,9 @@ class PSIParser : public jevent::DemuxListener {
             int mode = TS_G8(ptr + 1);
             int number_bytes = TS_G8(ptr + 2);
 
-            std::string compression;
-            std::string mode_info;
-
-            if (compression_type == 0x00) {
-              compression = "no compression";
-            } else if (compression_type == 0x01) {
-              compression = "huffman coding";
-            } else if (compression_type == 0x02) {
-              compression = "huffman coding";
-            } else if (compression_type >= 0x03 and compression_type <= 0xaf) {
-              compression = "reserved";
-            } else if (compression_type >= 0xb0 and compression_type <= 0xff) {
-              compression = "used in other systems";
-            }
-
-            if (mode == 0x00) {
-              mode_info = "select Unicode Code Range 0x0000 - 0x00FF";
-            } else if (mode == 0x01) {
-              mode_info = "select Unicode Code Range 0x0100 - 0x01FF";
-            } else if (mode == 0x02) {
-              mode_info = "select Unicode Code Range 0x0200 - 0x02FF";
-            } else if (mode == 0x03) {
-              mode_info = "select Unicode Code Range 0x0300 - 0x03FF";
-            } else if (mode == 0x04) {
-              mode_info = "select Unicode Code Range 0x0400 - 0x04FF";
-            } else if (mode == 0x05) {
-              mode_info = "select Unicode Code Range 0x0500 - 0x05FF";
-            } else if (mode == 0x06) {
-              mode_info = "select Unicode Code Range 0x0600 - 0x06FF";
-            } else if (mode >= 0x07 and mode <= 0x08) {
-              mode_info = "reserved";
-            } else if (mode == 0x09) {
-              mode_info = "select Unicode Code Range 0x0900 - 0x09FF";
-            } else if (mode == 0x0a) {
-              mode_info = "select Unicode Code Range 0x0A00 - 0x0AFF";
-            } else if (mode == 0x0b) {
-              mode_info = "select Unicode Code Range 0x0B00 - 0x0BFF";
-            } else if (mode == 0x0c) {
-              mode_info = "select Unicode Code Range 0x0C00 - 0x0CFF";
-            } else if (mode == 0x0d) {
-              mode_info = "select Unicode Code Range 0x0D00 - 0x0DFF";
-            } else if (mode == 0x0e) {
-              mode_info = "select Unicode Code Range 0x0E00 - 0x0EFF";
-            } else if (mode == 0x0f) {
-              mode_info = "select Unicode Code Range 0x0F00 - 0x0FFF";
-            } else if (mode == 0x10) {
-              mode_info = "select Unicode Code Range 0x1000 - 0x10FF";
-            } else if (mode >= 0x11 and mode <= 0x1f) {
-              mode_info = "reserved";
-            } else if (mode == 0x20) {
-              mode_info = "select Unicode Code Range 0x2000 - 0x20FF";
-            } else if (mode == 0x21) {
-              mode_info = "select Unicode Code Range 0x2100 - 0x21FF";
-            } else if (mode == 0x22) {
-              mode_info = "select Unicode Code Range 0x2200 - 0x22FF";
-            } else if (mode == 0x23) {
-              mode_info = "select Unicode Code Range 0x2300 - 0x23FF";
-            } else if (mode == 0x24) {
-              mode_info = "select Unicode Code Range 0x2400 - 0x24FF";
-            } else if (mode == 0x25) {
-              mode_info = "select Unicode Code Range 0x2500 - 0x25FF";
-            } else if (mode == 0x26) {
-              mode_info = "select Unicode Code Range 0x2600 - 0x26FF";
-            } else if (mode == 0x27) {
-              mode_info = "select Unicode Code Range 0x2700 - 0x27FF";
-            } else if (mode >= 0x28 and mode <= 0x2f) {
-              mode_info = "reserved";
-            } else if (mode == 0x30) {
-              mode_info = "select Unicode Code Range 0x3000 - 0x30FF";
-            } else if (mode == 0x31) {
-              mode_info = "select Unicode Code Range 0x3100 - 0x31FF";
-            } else if (mode == 0x32) {
-              mode_info = "select Unicode Code Range 0x3200 - 0x32FF";
-            } else if (mode == 0x33) {
-              mode_info = "select Unicode Code Range 0x3300 - 0x33FF";
-            } else if (mode >= 0x34 and mode <= 0x3d) {
-              mode_info = "reserved";
-            } else if (mode == 0x3e) {
-              mode_info = "select Standard Compression Scheme for Unicode (SCSU)";
-            } else if (mode == 0x3f) {
-              mode_info = "select Unicode, UTF-16 form";
-            } else if (mode >= 0x40 and mode <= 0x41) {
-              mode_info = "assigned to ATSC standard for Taiwan";
-            } else if (mode >= 0x42 and mode <= 0x47) {
-              mode_info = "reserved for future ATSC use";
-            } else if (mode == 0x48) {
-              mode_info = "assigned to ATSC standard for South Korea";
-            } else if (mode >= 0x49 and mode <= 0xdf) {
-              mode_info = "reserved for future ATSC use";
-            } else if (mode >= 0xe0 and mode <= 0xfe) {
-              mode_info = "used in other systems";
-            } else if (mode == 0xff) {
-              mode_info = "not applicable";
-            }
-
             ptr = ptr + 3;
 
-				    printf(":: compression type:[%s], mode:[%s]\n", compression.c_str(), mode_info.c_str());
+				    printf(":: compression type:[%s], mode:[%s]\n", Utils::GetLanguageCompressionDescription(compression_type).c_str(), Utils::GetLanguageUnicodeModeDescription(mode).c_str());
 					    
             DumpBytes("Compressed String Bytes", ptr, number_bytes);
           }
