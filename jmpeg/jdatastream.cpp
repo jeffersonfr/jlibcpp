@@ -99,9 +99,19 @@ uint64_t DataStream::GetBits(size_t n)
     *ptr = (uint8_t *)_data.c_str();
   uint64_t 
     bits = 0LL;
+
+  // INFO:: optimization whan return bytes
+  if ((_data_index%8) == 0) {
+    bits = TS_GM64(ptr + _data_index >> 3, 0, n);
+
+    _data_index = _data_index + n;
+
+    return bits;
+  }
+
   size_t 
     start = 0,
-          end = 0;
+    end = 0;
 
   do {
     start = _data_index >> 3;
