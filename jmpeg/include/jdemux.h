@@ -47,6 +47,8 @@ class Demux : public jcommon::Object {
 		/** \brief */
     std::chrono::milliseconds _timeout;
 		/** \brief */
+    std::string _id;
+		/** \brief */
 		int _pid;
 		/** \brief */
     jdemux_type_t _type;
@@ -65,6 +67,12 @@ class Demux : public jcommon::Object {
 		 */
 		virtual ~Demux();
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetID(std::string id);
+		
 		/**
 		 * \brief
 		 *
@@ -100,6 +108,12 @@ class Demux : public jcommon::Object {
 		 *
 		 */
 		virtual void UpdateTimePoint();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual std::string GetID();
 
 		/**
 		 * \brief

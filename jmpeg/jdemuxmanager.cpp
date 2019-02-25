@@ -123,7 +123,7 @@ void DemuxManager::ProcessRaw(const char *data, const int length)
   std::chrono::steady_clock::time_point
     timepoint = std::chrono::steady_clock::now();
   int 
-    pid = TS_GM16(data+1, 3, 13);
+    pid = TS_GM16(data + 1, 3, 13);
 
   // INFO:: process only raw packets
   for (std::vector<Demux *>::iterator i=_demuxes.begin(); i!=_demuxes.end(); i++) {
@@ -153,21 +153,21 @@ void DemuxManager::ProcessPSI(const char *data, const int length)
 {
   static std::map<int, std::string> timeline;
 
-  // int transport_error_indicator = TS_GM8(data+1, 0, 1);
-  int payload_unit_start_indicator = TS_GM8(data+1, 1, 1);
-  // int transport_priority = TS_GM8(data+1, 2, 1);
-  int pid = TS_GM16(data+1, 3, 13);
-  // int scrambling_control = TS_GM8(data+3, 0, 2);
-  int adaptation_field_exist = TS_GM8(data+3, 2, 1);
-  int contains_payload = TS_GM8(data+3, 3, 1);
-  // int continuity_counter = TS_GM8(data+3, 4, 4);
+  // int transport_error_indicator = TS_GM8(data + 1, 0, 1);
+  int payload_unit_start_indicator = TS_GM8(data + 1, 1, 1);
+  // int transport_priority = TS_GM8(data + 1, 2, 1);
+  int pid = TS_GM16(data + 1, 3, 13);
+  // int scrambling_control = TS_GM8(data + 3, 0, 2);
+  int adaptation_field_exist = TS_GM8(data + 3, 2, 1);
+  int contains_payload = TS_GM8(data + 3, 3, 1);
+  // int continuity_counter = TS_GM8(data + 3, 4, 4);
 
   if (contains_payload == 0) {
     return;
   }
 
-  const char *ptr = data+TS_HEADER_LENGTH;
-  const char *end = data+TS_PACKET_LENGTH;
+  const char *ptr = data + TS_HEADER_LENGTH;
+  const char *end = data + TS_PACKET_LENGTH;
 
   // INFO:: discards adaptation field
   if (adaptation_field_exist == 1) {
@@ -187,7 +187,7 @@ void DemuxManager::ProcessPSI(const char *data, const int length)
       previous = timeline[pid];
 
       if (previous.size() > 0) {
-        previous.append(ptr+1, pointer_field);
+        previous.append(ptr + 1, pointer_field);
       }
     }
 
@@ -270,21 +270,21 @@ void DemuxManager::ProcessPES(const char *data, const int length)
   static std::string current;
   static int section_length = 0;
 
-  // int transport_error_indicator = TS_GM8(data+1, 0, 1);
-  int payload_unit_start_indicator = TS_GM8(data+1, 1, 1);
-  // int transport_priority = TS_GM8(data+1, 2, 1);
-  int pid = TS_GM16(data+1, 3, 13);
-  // int scrambling_control = TS_GM8(data+3, 0, 2);
-  int adaptation_field_exist = TS_GM8(data+3, 2, 1);
-  int contains_payload = TS_GM8(data+3, 3, 1);
-  // int continuity_counter = TS_GM8(data+3, 4, 4);
+  // int transport_error_indicator = TS_GM8(data + 1, 0, 1);
+  int payload_unit_start_indicator = TS_GM8(data + 1, 1, 1);
+  // int transport_priority = TS_GM8(data + 1, 2, 1);
+  int pid = TS_GM16(data + 1, 3, 13);
+  // int scrambling_control = TS_GM8(data + 3, 0, 2);
+  int adaptation_field_exist = TS_GM8(data + 3, 2, 1);
+  int contains_payload = TS_GM8(data + 3, 3, 1);
+  // int continuity_counter = TS_GM8(data + 3, 4, 4);
 
   if (contains_payload == 0) {
     return;
   }
 
-  const char *ptr = data+TS_HEADER_LENGTH;
-  const char *end = data+TS_PACKET_LENGTH;
+  const char *ptr = data + TS_HEADER_LENGTH;
+  const char *end = data + TS_PACKET_LENGTH;
 
   // INFO:: discards adaptation field
   if (adaptation_field_exist == 1) {
@@ -300,8 +300,8 @@ void DemuxManager::ProcessPES(const char *data, const int length)
       return;
     }
 
-    int stream_id = TS_G8(ptr+3);
-    int pes_packet_length = TS_G16(ptr+4);
+    int stream_id = TS_G8(ptr + 3);
+    int pes_packet_length = TS_G16(ptr + 4);
     
     section_length = 0;
 
@@ -313,7 +313,7 @@ void DemuxManager::ProcessPES(const char *data, const int length)
         stream_id != 0b11111111 and // program_stream_directory
         stream_id != 0b11110010 and // DSMCC_stream
         stream_id != 0b11111000) { // ITU-T Rec. H.222.1 type E stream
-      int pes_header_data_length = TS_G8(ptr+8) + 3;
+      int pes_header_data_length = TS_G8(ptr + 8) + 3;
 
       section_length = section_length + pes_header_data_length + pes_packet_length;
     } else if (stream_id != 0b10111100 or // program_stream_map
@@ -383,10 +383,12 @@ void DemuxManager::ProcessPES(const char *data, const int length)
   }
 }
 
-struct jstream_counter_t {
-  int continuity_counter;
-  std::map<int, std::string> packets;
-};
+std::map<int, int> DemuxManager::GetPidReport()
+{
+ 	std::lock_guard<std::mutex> guard(_demux_mutex);
+
+  return _pid_report;
+}
 
 void DemuxManager::Run()
 {
@@ -395,6 +397,11 @@ void DemuxManager::Run()
 	if (_source == nullptr) {
 		return;
 	}
+
+  struct jstream_counter_t {
+    int continuity_counter;
+    std::map<int, std::string> packets;
+  };
 
   std::map<int, struct jstream_counter_t> counter;
 
@@ -415,14 +422,24 @@ void DemuxManager::Run()
 			continue;
 		}
 
-    int transport_error_indicator = TS_GM8(data+1, 0, 1);
-    // int payload_unit_start_indicator = TS_GM8(data+1, 1, 1);
-    // int transport_priority = TS_GM8(data+1, 2, 1);
-    int pid = TS_GM16(data+1, 3, 13);
-    // int scrambling_control = TS_GM8(data+3, 0, 2);
-    // int adaptation_field_exist = TS_GM8(data+3, 2, 1);
-    int contains_payload = TS_GM8(data+3, 3, 1);
-    int continuity_counter = TS_GM8(data+3, 4, 4);
+    int transport_error_indicator = TS_GM8(data + 1, 0, 1);
+    // int payload_unit_start_indicator = TS_GM8(data + 1, 1, 1);
+    // int transport_priority = TS_GM8(data + 1, 2, 1);
+    int pid = TS_GM16(data + 1, 3, 13);
+    // int scrambling_control = TS_GM8(data + 3, 0, 2);
+    // int adaptation_field_exist = TS_GM8(data + 3, 2, 1);
+    int contains_payload = TS_GM8(data + 3, 3, 1);
+    int continuity_counter = TS_GM8(data + 3, 4, 4);
+
+		_demux_mutex.lock();
+
+    if (_pid_report.find(pid) == _pid_report.end()) {
+		  _pid_report[pid] = 1;
+    }
+
+		_pid_report[pid] += 1;
+	
+		_demux_mutex.unlock();
 
     if (transport_error_indicator == 1) {
       return;

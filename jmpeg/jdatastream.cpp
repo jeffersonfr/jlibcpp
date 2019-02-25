@@ -100,14 +100,27 @@ uint64_t DataStream::GetBits(size_t n)
   uint64_t 
     bits = 0LL;
 
-  // INFO:: optimization whan return bytes
-  if ((_data_index%8) == 0) {
-    bits = TS_GM64(ptr + _data_index >> 3, 0, n);
+  /*
+  int
+    offset = _data_index%8;
 
+  if (offset != 0) {
+    int d = n;
+
+    if ((offset + n) > 8) {
+      d = 8 - offset;
+    }
+
+    bits = TS_GM8(ptr + (_data_index >> 3), offset, d);
+    n = n - d;
     _data_index = _data_index + n;
-
-    return bits;
   }
+
+  if (n > 0) {
+    bits = (bits << n) | TS_GM64(ptr + (_data_index >> 3), 0, n);
+    _data_index = _data_index + n;
+  }
+  */
 
   size_t 
     start = 0,

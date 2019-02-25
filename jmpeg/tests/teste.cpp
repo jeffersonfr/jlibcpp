@@ -27,6 +27,8 @@
 #include "jevent/jdemuxlistener.h"
 #include "jlogger/jloggerlib.h"
 #include "jmath/jcrc.h"
+#include "jcommon/jparammapper.h"
+#include "jcommon/jstringtokenizer.h"
 #include "jexception/joverflowexception.h"
 #include "jexception/joutofboundsexception.h"
 
@@ -2399,100 +2401,33 @@ class SIFacade {
 class PSIParser : public jevent::DemuxListener {
 
 	private:
-		std::map<std::string, jmpeg::Demux *> _demuxes;
 		std::map<int, SIService::stream_type_t> _stream_types;
+		std::vector<jmpeg::Demux *> _demuxes;
 		std::string _dsmcc_private_payload;
-		int _pcr_pid;
-		int _closed_caption_pid;
-		int _dsmcc_sequence_number;
-		int _dsmcc_message_pid;
-		int _dsmcc_descriptors_pid;
-		int _libras_message_pid;
 
 	private:
-		void StartPSIDemux(std::string id, int pid, int tid, int timeout)
-		{
-      if (_demuxes.find(id) != _demuxes.end()) {
-        printf("Demux [%s] already created\n", id.c_str());
-
-        return;
-      }
-
-			jmpeg::PSIDemux *demux = new jmpeg::PSIDemux();
-
-			demux->RegisterDemuxListener(this);
-			demux->SetPID(pid);
-			demux->SetTID(tid);
-			demux->SetTimeout(std::chrono::milliseconds(timeout));
-			demux->SetCRCCheckEnabled(false);
-			demux->Start();
-
-			_demuxes[id] = demux;
-		}
-
-		void StartPrivateDemux(std::string id, int pid, int tid, int timeout)
-		{
-      if (_demuxes.find(id) != _demuxes.end()) {
-        printf("Demux [%s] already created\n", id.c_str());
-
-        return;
-      }
-
-			jmpeg::PrivateDemux *demux = new jmpeg::PrivateDemux();
-
-			demux->RegisterDemuxListener(this);
-			demux->SetPID(pid);
-			demux->SetTID(tid);
-			demux->SetTimeout(std::chrono::milliseconds(timeout));
-			demux->SetCRCCheckEnabled(false);
-			demux->Start();
-
-			_demuxes[id] = demux;
-		}
-
-		void StartPESDemux(std::string id, int pid, int timeout)
-		{
-      if (_demuxes.find(id) != _demuxes.end()) {
-        printf("Demux [%s] already created\n", id.c_str());
-
-        return;
-      }
-
-			jmpeg::PESDemux *demux = new jmpeg::PESDemux();
-
-			demux->RegisterDemuxListener(this);
-			demux->SetPID(pid);
-			demux->SetTimeout(std::chrono::milliseconds(timeout));
-			demux->Start();
-
-			_demuxes[id] = demux;
-		}
-
 		void StopDemux(std::string id)
 		{
-		  std::map<std::string, jmpeg::Demux *>::iterator i = _demuxes.find(id);
+      for (std::vector<jmpeg::Demux *>::iterator i=_demuxes.begin(); i!=_demuxes.end(); i++) {
+        jmpeg::Demux *demux = (*i);
 
-      if (i == _demuxes.end()) {
-        printf("Demux [%s] no exists\n", id.c_str());
+        if (demux->GetID() == id) {
+          printf("Demux [%s] stopped\n", id.c_str());
 
-        return;
+          demux->Stop();
+
+          _demuxes.erase(i);
+
+          return;
+        }
       }
-
-      i->second->Stop();
-
-      _demuxes.erase(i);
+     
+      printf("Demux [%s] no exists\n", id.c_str());
 		}
 
 	public:
 		PSIParser()
 		{
-			_pcr_pid = -1;
-			_closed_caption_pid = -1;
-			_dsmcc_message_pid = -1;
-			_dsmcc_descriptors_pid = -1;
-			_dsmcc_sequence_number = 0;
-      _libras_message_pid = -1;
-
 			_stream_types[0x00] = SIService::stream_type_t::RESERVED;
 			_stream_types[0x01] = SIService::stream_type_t::VIDEO;
 			_stream_types[0x02] = SIService::stream_type_t::VIDEO;
@@ -2528,17 +2463,87 @@ class PSIParser : public jevent::DemuxListener {
 
 		virtual ~PSIParser()
 		{
-			for (std::map<std::string, jmpeg::Demux *>::iterator i=_demuxes.begin(); i!=_demuxes.end(); i++) {
-				jmpeg::Demux *demux = i->second;
+      for (std::vector<jmpeg::Demux *>::iterator i=_demuxes.begin(); i!=_demuxes.end(); i++) {
+        jmpeg::Demux *demux = (*i);
 
-				demux->Stop();
-			}
+        demux->Stop();
+        delete demux;
+      }
 
-			for (std::map<std::string, jmpeg::Demux *>::iterator i=_demuxes.begin(); i!=_demuxes.end(); i++) {
-				jmpeg::Demux *demux = i->second;
+      _demuxes.clear();
+		}
 
-				delete demux;
-			}
+		void StartPSIDemux(std::string id, int pid, int tid, int timeout)
+		{
+      for (std::vector<jmpeg::Demux *>::iterator i=_demuxes.begin(); i!=_demuxes.end(); i++) {
+        jmpeg::Demux *demux = (*i);
+
+        if (demux->GetID() == id) {
+          printf("Demux [%s] already created\n", id.c_str());
+
+          return;
+        }
+      }
+
+			jmpeg::PSIDemux *demux = new jmpeg::PSIDemux();
+
+      demux->SetID(id);
+			demux->RegisterDemuxListener(this);
+			demux->SetPID(pid);
+			demux->SetTID(tid);
+			demux->SetTimeout(std::chrono::milliseconds(timeout));
+			demux->SetCRCCheckEnabled(false);
+			demux->Start();
+
+			_demuxes.push_back(demux);
+		}
+
+		void StartPrivateDemux(std::string id, int pid, int tid, int timeout)
+		{
+      for (std::vector<jmpeg::Demux *>::iterator i=_demuxes.begin(); i!=_demuxes.end(); i++) {
+        jmpeg::Demux *demux = (*i);
+
+        if (demux->GetID() == id) {
+          printf("Demux [%s] already created\n", id.c_str());
+
+          return;
+        }
+      }
+
+			jmpeg::PrivateDemux *demux = new jmpeg::PrivateDemux();
+
+      demux->SetID(id);
+			demux->RegisterDemuxListener(this);
+			demux->SetPID(pid);
+			demux->SetTID(tid);
+			demux->SetTimeout(std::chrono::milliseconds(timeout));
+			demux->SetCRCCheckEnabled(false);
+			demux->Start();
+
+			_demuxes.push_back(demux);
+		}
+
+		void StartPESDemux(std::string id, int pid, int timeout)
+		{
+      for (std::vector<jmpeg::Demux *>::iterator i=_demuxes.begin(); i!=_demuxes.end(); i++) {
+        jmpeg::Demux *demux = (*i);
+
+        if (demux->GetID() == id) {
+          printf("Demux [%s] already created\n", id.c_str());
+
+          return;
+        }
+      }
+
+			jmpeg::PESDemux *demux = new jmpeg::PESDemux();
+
+      demux->SetID(id);
+			demux->RegisterDemuxListener(this);
+			demux->SetPID(pid);
+			demux->SetTimeout(std::chrono::milliseconds(timeout));
+			demux->Start();
+
+			_demuxes.push_back(demux);
 		}
 
 		virtual void AITDescriptorDump(const char *data, int length)
@@ -2838,16 +2843,18 @@ class PSIParser : public jevent::DemuxListener {
 
         SIService *param = dynamic_cast<SIService *>(si);
         
-        if (service_type == 0x01) {
-          param->ServiceType(SIService::service_type_t::HD);
-        } else if (service_type == 0xc0) {
-          param->ServiceType(SIService::service_type_t::LD);
-        } else {
-          param->ServiceType(SIService::service_type_t::SD);
-        }
+        if (param != nullptr) {
+          if (service_type == 0x01) {
+            param->ServiceType(SIService::service_type_t::HD);
+          } else if (service_type == 0xc0) {
+            param->ServiceType(SIService::service_type_t::LD);
+          } else {
+            param->ServiceType(SIService::service_type_t::SD);
+          }
 
-        param->ServiceProvider(service_provider_name);
-        param->ServiceName(service_name);
+          param->ServiceProvider(service_provider_name);
+          param->ServiceName(service_name);
+        }
 
 				printf("\t\t:: service type:[0x%02x/%s], service provider name:[%s], service name:[%s]\n", service_type, GetServiceDescription(service_type).c_str(), service_provider_name.c_str(), service_name.c_str());
 			} else if (descriptor_tag == 0x49) { // country availability descriptor
@@ -2870,8 +2877,10 @@ class PSIParser : public jevent::DemuxListener {
 
         SIEvent *param = dynamic_cast<SIEvent *>(si);
 
-        param->EventName(event_name);
-        param->Description(text);
+        if (param != nullptr) {
+          param->EventName(event_name);
+          param->Description(text);
+        }
 
 				printf("\t\t:: language:[%s], event name:[%s], text:[%s]\n", language.c_str(), event_name.c_str(), text.c_str());
 			} else if (descriptor_tag == 0x4e) { // extended event descriptor
@@ -2956,7 +2965,9 @@ class PSIParser : public jevent::DemuxListener {
 
         SITime *param = dynamic_cast<SITime *>(si);
         
-        param->Country(country);
+        if (param != nullptr) {
+          param->Country(country);
+        }
 
 				printf("\t\t:: country:[%s], country id:[%d], local time offset polarity:[%d], local time offset:[%d], time of change:[%02d%02d%02d-%02d%02d%02d], next time offset:[0x%04x]\n", country.c_str(), country_region_id, local_time_offset_polarity, local_time_offset, Y, M, D, h, m, s, next_time_offset);
 				// printf(":: country:[%s], country id:[%d], local time offset polarity:[%d], local time offset:[%d], time of change:[%lu], next time offset:[0x%04x]\n", country.c_str(), country_region_id, local_time_offset_polarity, local_time_offset, time_of_change, next_time_offset);
@@ -3089,8 +3100,10 @@ class PSIParser : public jevent::DemuxListener {
 
         SINetwork *param = dynamic_cast<SINetwork *>(si);
 
-        param->TransportStreamName(ts_name);
-        param->ChannelNumber(remote_control_key_identification);
+        if (param != nullptr) {
+          param->TransportStreamName(ts_name);
+          param->ChannelNumber(remote_control_key_identification);
+        }
 
 				printf("\t\t:: remote control key identification:[0x%02x], ts name:[%s]\n", remote_control_key_identification, ts_name.c_str());
 
@@ -3333,43 +3346,44 @@ class PSIParser : public jevent::DemuxListener {
         }
       }
 
-			if (pid == TS_PAT_PID && tid == TS_PAT_TABLE_ID) {
+			if (demux->GetID() == "pat") {
 				ProcessPAT(event);
-			} else if (pid == TS_CAT_PID && tid == TS_CAT_TABLE_ID) {
-				ProcessCAT(event);
-			} else if (pid == TS_TSDT_PID && tid == TS_TSDT_TABLE_ID) {
-				ProcessTSDT(event);
-			} else if (pid == TS_NIT_PID && tid == TS_NIT_TABLE_ID) {
-				ProcessNIT(event);
-			} else if (pid == TS_SDT_PID && tid == (TS_SDT_TABLE_ID)) {
-				ProcessSDT(event);
-			} else if (pid == TS_BAT_PID && tid == (TS_BAT_TABLE_ID)) {
-				ProcessBAT(event);
-			} else if (pid == TS_TDT_PID && tid == TS_TDT_TABLE_ID) {
-				ProcessTDT(event);
-			} else if (pid == TS_TOT_PID && tid == TS_TOT_TABLE_ID) {
-				ProcessTOT(event);
-			} else if (pid == TS_RST_PID && tid == TS_RST_TABLE_ID) {
-				ProcessRST(event);
-			} else if (pid == TS_EIT_PID && (tid >= 0x4e && tid <= 0x6f)) {
-				ProcessEIT(event);
-			} else if (tid == TS_PMT_TABLE_ID) {
+			} else if (demux->GetID().find("pmt-") == 0) {
 				ProcessPMT(event);
-			} else if (tid == TS_AIT_TABLE_ID) {
+			} else if (demux->GetID() == "cat") {
+				ProcessCAT(event);
+			} else if (demux->GetID() == "tsdt") {
+				ProcessTSDT(event);
+			} else if (demux->GetID() == "nit") {
+				ProcessNIT(event);
+			} else if (demux->GetID() == "sdt") {
+				ProcessSDT(event);
+			} else if (demux->GetID() == "bat") {
+				ProcessBAT(event);
+			} else if (demux->GetID() == "tdt") {
+				ProcessTDT(event);
+			} else if (demux->GetID() == "tot") {
+				ProcessTOT(event);
+			} else if (demux->GetID() == "rst") {
+				ProcessRST(event);
+      } else if (demux->GetID() == "pcr") {
+        ProcessPCR(event);
+			} else if (demux->GetID() == "ait") {
 				ProcessPrivate(event);
-			} else {
-				if (pid == _pcr_pid) {
-					ProcessPCR(event);
-				} else if (pid == _closed_caption_pid) {
-          ProcessClosedCaption(event);
-				} else if (pid == _dsmcc_message_pid) {
-					ProcessDSMCC(event);
-				} else if (pid == _dsmcc_descriptors_pid) {
-					ProcessDSMCC(event);
-				} else if (pid == _libras_message_pid) {
-					ProcessLibras(event);
-				} 
-			}
+			} else if (demux->GetID() == "eit") {
+        if (tid >= 0x4e && tid <= 0x6f) {
+	  			ProcessEIT(event);
+        }
+      } else if (demux->GetID() == "closed-caption") {
+        ProcessClosedCaption(event);
+      } else if (demux->GetID() == "dsmcc-data") {
+        puts("JJ");
+        ProcessDSMCC(event);
+      } else if (demux->GetID() == "dsmcc-descriptors") {
+        ProcessDSMCC(event);
+      } else if (demux->GetID() == "libras-data") {
+        ProcessLibras(event);
+      } 
 
 			printf("\n");
 		}
@@ -3533,20 +3547,12 @@ class PSIParser : public jevent::DemuxListener {
 				} else if (_stream_types[stream_type] == SIService::stream_type_t::PRIVATE) {
 					StartPrivateDemux("private", elementary_pid, 0x74, TS_PRIVATE_TIMEOUT); // Application Information Section
 				} else if (_stream_types[stream_type] == SIService::stream_type_t::SUBTITLE) { // Closed Caption
-          _closed_caption_pid = elementary_pid;
-
 					StartPESDemux("closed-caption", elementary_pid, 3600000);
 				} else if (_stream_types[stream_type] == SIService::stream_type_t::DSMCC_MESSAGE) {
-					_dsmcc_message_pid = elementary_pid;
-					
           StartPrivateDemux("dsmcc-data", elementary_pid, -1, TS_PRIVATE_TIMEOUT);
 				} else if (_stream_types[stream_type] == SIService::stream_type_t::DSMCC_DESCRIPTOR) {
-					_dsmcc_descriptors_pid = elementary_pid;
-					
           StartPrivateDemux("dsmcc-descriptors", elementary_pid, -1, TS_PRIVATE_TIMEOUT);
 				} else if (_stream_types[stream_type] == SIService::stream_type_t::LIBRAS_MESSAGE) { // component_tag<0x92>
-					_libras_message_pid = elementary_pid;
-					
           StartPrivateDemux("libras-data", elementary_pid, -1, TS_PRIVATE_TIMEOUT);
 				} else if (_stream_types[stream_type] == SIService::stream_type_t::LIBRAS_STREAM) { // component_tag<0x93>
 				}
@@ -3580,12 +3586,7 @@ class PSIParser : public jevent::DemuxListener {
 				pcr_pid = vpid; // first video pid
 			}
 			
-      // INFO:: no overwrite
-      if (_pcr_pid < 0) {
-        _pcr_pid = pcr_pid;
-      }
-
-			StartPESDemux("pcr", _pcr_pid, TS_PCR_TIMEOUT);
+			StartPESDemux("pcr", pcr_pid, TS_PCR_TIMEOUT);
 		}
 
 		virtual void ProcessNIT(jevent::DemuxEvent *event)
@@ -4605,6 +4606,8 @@ class PSIParser : public jevent::DemuxListener {
         std::shared_ptr<SIData> param = SIFacade::GetInstance()->Data();
 
         if (param->DownloadID() != (uint32_t)-1 and param->DownloadID() != download_id) {
+          // TODO:: SIData->Reset() ???
+
           return;
         }
             
@@ -4989,64 +4992,6 @@ class PSIParser : public jevent::DemuxListener {
 
 };
 
-class PIDList : public jevent::DemuxListener {
-
-	private:
-		std::map<int, int> _pids;
-    jmpeg::RawDemux *_demux;
-
-	public:
-		PIDList(int pid)
-		{
-      _demux = new jmpeg::RawDemux();
-
-			_demux->RegisterDemuxListener(this);
-			_demux->SetPID(pid);
-			_demux->Start();
-		}
-
-		virtual ~PIDList()
-		{
-      _demux->Stop();
-			_demux->RemoveDemuxListener(this);
-
-      delete _demux;
-      _demux = nullptr;
-
-			printf("\nList of PID's::\n");
-
-      int count = 0;
-
-			for (std::map<int, int>::iterator i=_pids.begin(); i!=_pids.end(); i++) {
-        count = count + i->second;
-			}
-
-			for (std::map<int, int>::iterator i=_pids.begin(); i!=_pids.end(); i++) {
-				printf("pid:[0x%04x], count:[%d]:[%02.04f%%]\n", i->first, i->second, 100.0*i->second/(double)count);
-			}
-
-      printf("\n:: total:[%d]\n", count);
-		}
-
-		virtual void DataArrived(jevent::DemuxEvent *event)
-		{
-			int pid = event->GetPID();
-
-      // INFO:: save the pid counter
-      auto i = _pids.find(pid);
-
-      if (i == _pids.end()) {
-        _pids[pid] = 1;
-      } else {
-        i->second++;
-      }
-		}
-		
-    virtual void DataNotFound(jevent::DemuxEvent *event)
-		{
-		}
-};
-
 class ISDBTInputStream : public jio::FileInputStream {
 
 	private:
@@ -5095,8 +5040,8 @@ class ISDBTInputStream : public jio::FileInputStream {
 
 int main(int argc, char **argv)
 {
-	if (argc != 4 and argc != 5) {
-		std::cout << "usage:: " << argv[0] << " <file.ts> <lgap> <rgap> [pid]" << std::endl;
+	if (argc < 4) {
+		std::cout << "usage:: " << argv[0] << " <file.ts> <lgap> <rgap> [[<id>:<pid>]...]" << std::endl;
 		std::cout << std::endl;
 		std::cout << "  lgap: bytes before ts packet (lgap + 188 bytes)" << std::endl;
 		std::cout << "  rgap: bytes after ts packet (188 + rgap bytes)" << std::endl;
@@ -5106,6 +5051,10 @@ int main(int argc, char **argv)
 		std::cout << "    DVB Packet Size (0 + 188 + 0 = 188 bytes) -> (lgap, rgap) = (0, 0)" << std::endl;
 		std::cout << "    ISDBT Packet Size (0 + 188 + 16 = 204 bytes) -> (lgap, rgap) = (0, 16)" << std::endl;
 		std::cout << "    MTS Packet Size (4 + 188 + 0 = 192 bytes) -> (lgap, rgap) = (4, 0)" << std::endl;
+		std::cout << std::endl;
+		std::cout << "  processing closed caption without pat information in dvb ..." << std::endl;
+		std::cout << "    ./teste <file.ts> 0 0 closed-caption:0x100" << std::endl;
+		std::cout << "  available ids are 'closed-caption', 'dsmcc-data', 'dsmcc-descriptors', 'libras-data'" << std::endl;
 		std::cout << std::endl;
 
 		return -1;
@@ -5118,59 +5067,106 @@ int main(int argc, char **argv)
 
 	manager->SetInputStream(&is);
 	
-  if (argc == 4) {
-    PSIParser 
-      test;
+  PSIParser 
+    test;
 
-    manager->Start();
-    manager->WaitSync();
-    manager->Stop();
+  for (int i=4; i<argc; i++) {
+    jcommon::StringTokenizer token(argv[i], ":");
 
-    // INFO:: dumping methods
-    auto 
-      data = SIFacade::GetInstance()->Data();
-
-    data->Parse();
-    data->Print();
-    data->Save("/tmp/data");
-
-    auto 
-      subtitle = SIFacade::GetInstance()->Subtitle();
-
-    subtitle->Print();
-
-    auto 
-      networks = SIFacade::GetInstance()->Networks();
-
-    for (auto i : networks) {
-      i->Print();
+    if (token.GetSize() != 2) {
+      continue;
     }
 
-    auto 
-      services = SIFacade::GetInstance()->Services();
+    std::string
+      id1 = token.GetToken(0),
+      id2 = token.GetToken(1);
 
-    for (auto i : services) {
-      i->Print();
-    }
-
-    auto 
-      events = SIFacade::GetInstance()->Events();
-
-    for (auto i : events) {
-      i->Print();
-    }
-
-    auto 
-      time = SIFacade::GetInstance()->Time();
-
-    time.Print();
-  } else if (argc == 5) {
-    PIDList 
-      test(atoi(argv[4]));
+    jcommon::ParamMapper 
+      mapper;
     
-    manager->Start();
-    manager->WaitSync();
-    manager->Stop();
+    mapper.SetTextParam(id1, id2);
+
+    if (
+        id1 == "pat" or
+        id1 == "pmt-xx" or
+        id1 == "cat" or
+        id1 == "tsdt" or
+        id1 == "nit" or
+        id1 == "sdt" or
+        id1 == "bat" or
+        id1 == "tdt" or
+        id1 == "tot" or
+        id1 == "rst" or
+        id1 == "pcr" or
+        id1 == "eit") {
+				test.StartPSIDemux(id1, mapper.GetIntegerParam(id1), -1, 0);
+    } else if (
+        id1 == "ait" or
+        id1 == "dsmcc-data" or
+        id1 == "dsmcc-descriptors" or
+        id1 == "libras-data") {
+				test.StartPrivateDemux(id1, mapper.GetIntegerParam(id1), -1, 0);
+    } else if (
+        id1 == "closed-caption") {
+				test.StartPESDemux(id1, mapper.GetIntegerParam(id1), 0);
+    }
+  }
+
+  manager->Start();
+  manager->WaitSync();
+  manager->Stop();
+
+  // INFO:: dumping methods
+  auto 
+    data = SIFacade::GetInstance()->Data();
+
+  data->Parse();
+  data->Print();
+  data->Save("/tmp/data");
+
+  auto 
+    subtitle = SIFacade::GetInstance()->Subtitle();
+
+  subtitle->Print();
+
+  auto 
+    networks = SIFacade::GetInstance()->Networks();
+
+  for (auto i : networks) {
+    i->Print();
+  }
+
+  auto 
+    services = SIFacade::GetInstance()->Services();
+
+  for (auto i : services) {
+    i->Print();
+  }
+
+  auto 
+    events = SIFacade::GetInstance()->Events();
+
+  for (auto i : events) {
+    i->Print();
+  }
+
+  auto 
+    time = SIFacade::GetInstance()->Time();
+
+  time.Print();
+
+  // INFO:: pid report
+  std::map<int, int> pid_report = manager->GetPidReport();
+  int count = 0;
+
+  for (std::map<int, int>::iterator i=pid_report.begin(); i!=pid_report.end(); i++) {
+    count = count + i->second;
+  }
+
+  printf("\n\nPID Report\n");
+
+  for (std::map<int, int>::iterator i=pid_report.begin(); i!=pid_report.end(); i++) {
+    printf("pid:[0x%04x], count:[%d]:[%02.04f%%]\n", i->first, i->second, 100.0*i->second/(double)count);
   }
 
 	return 0;

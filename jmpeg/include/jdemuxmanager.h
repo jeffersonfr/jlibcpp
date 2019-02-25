@@ -39,6 +39,8 @@ class DemuxManager : public jcommon::Object {
 		static DemuxManager *_instance;
 
 		/** \brief */
+    std::map<int, int> _pid_report;
+		/** \brief */
 		std::vector<Demux *> _demuxes;
 		/** \brief */
 		std::vector<Demux *> _sync_demuxes;
@@ -84,6 +86,12 @@ class DemuxManager : public jcommon::Object {
 		 */
 		virtual void RemoveDemux(Demux *demux);
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Run();
+		
 	public:
 		/**
 		 * \brief
@@ -131,7 +139,7 @@ class DemuxManager : public jcommon::Object {
 		 * \brief
 		 *
 		 */
-		virtual void Run();
+		virtual std::map<int, int> GetPidReport();
 		
 };
 

@@ -41,6 +41,11 @@ Demux::~Demux()
 {
 }
 
+void Demux::SetID(std::string id)
+{
+  _id = id;
+}
+
 void Demux::Start()
 {
 	DemuxManager::GetInstance()->AddDemux(this);
@@ -49,6 +54,11 @@ void Demux::Start()
 void Demux::Stop()
 {
 	DemuxManager::GetInstance()->RemoveDemux(this);
+}
+
+std::string Demux::GetID()
+{
+  return _id;
 }
 
 jdemux_type_t Demux::GetType()
