@@ -228,6 +228,10 @@ OBJS_jmpeg += \
 		 jpesdemux.o\
 		 jprivatedemux.o\
 		 jdemuxmanager.o\
+	   jdescriptor.o\
+	   jprivatesection.o\
+	   jprogramserviceinformation.o\
+	   jtransportstreampacket.o\
 	   jmpeglib.o\
 
 OBJS_jlogger += \
