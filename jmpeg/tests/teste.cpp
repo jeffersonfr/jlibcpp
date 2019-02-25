@@ -5054,7 +5054,6 @@ int main(int argc, char **argv)
 		std::cout << std::endl;
 		std::cout << "  processing closed caption without pat information in dvb ..." << std::endl;
 		std::cout << "    ./teste <file.ts> 0 0 closed-caption:0x100" << std::endl;
-		std::cout << "  available ids are 'closed-caption', 'dsmcc-data', 'dsmcc-descriptors', 'libras-data'" << std::endl;
 		std::cout << std::endl;
 
 		return -1;
@@ -5099,16 +5098,16 @@ int main(int argc, char **argv)
         id1 == "rst" or
         id1 == "pcr" or
         id1 == "eit") {
-				test.StartPSIDemux(id1, mapper.GetIntegerParam(id1), -1, 0);
+				test.StartPSIDemux(id1, mapper.GetIntegerParam(id1), -1, 3600000);
     } else if (
         id1 == "ait" or
         id1 == "dsmcc-data" or
         id1 == "dsmcc-descriptors" or
         id1 == "libras-data") {
-				test.StartPrivateDemux(id1, mapper.GetIntegerParam(id1), -1, 0);
+				test.StartPrivateDemux(id1, mapper.GetIntegerParam(id1), -1, 3600000);
     } else if (
         id1 == "closed-caption") {
-				test.StartPESDemux(id1, mapper.GetIntegerParam(id1), 0);
+				test.StartPESDemux(id1, mapper.GetIntegerParam(id1), 3600000);
     }
   }
 
