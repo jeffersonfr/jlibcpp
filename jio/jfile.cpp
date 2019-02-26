@@ -175,7 +175,7 @@ File::~File()
 	Close();
 }
 
-const char File::GetDelimiter()
+char File::GetDelimiter()
 {
 	return '/';
 }

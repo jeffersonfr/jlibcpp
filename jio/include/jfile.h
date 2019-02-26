@@ -120,7 +120,7 @@ class File : public virtual jcommon::Object {
 		 * \brief
 		 *
 		 */
-		static const char GetDelimiter();
+		static char GetDelimiter();
 
 		/**
 		 * \brief

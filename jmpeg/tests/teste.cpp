@@ -2205,7 +2205,9 @@ class SISubtitle : public SI {
         }
       }
 
-      _lines.push_back(text);
+      if (text.empty() == false) {
+        _lines.push_back(text);
+      }
     }
 
     void Print()
@@ -4531,8 +4533,8 @@ class PSIParser : public jevent::DemuxListener {
       int payload_scrambling_control = TS_GM8(ptr + 5, 2, 2);
       int address_scrambling_control = TS_GM8(ptr + 5, 4, 2);
       int llc_snap_flag = TS_GM8(ptr + 5, 6, 1);
-      int section_number = TS_G8(ptr + 6);
-      int last_section_number = TS_G8(ptr + 7);
+      // int section_number = TS_G8(ptr + 6);
+      // int last_section_number = TS_G8(ptr + 7);
       int mac_address_4 = TS_G8(ptr + 8);
       int mac_address_3 = TS_G8(ptr + 9);
       int mac_address_2 = TS_G8(ptr + 10);
