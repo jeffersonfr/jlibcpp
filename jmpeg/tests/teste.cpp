@@ -4528,8 +4528,8 @@ class PSIParser : public jevent::DemuxListener {
 			int section_length = TS_GM16(ptr + 1, 4, 12);
       int mac_address_6 = TS_G8(ptr + 3);
       int mac_address_5 = TS_G8(ptr + 4);
-      // int payload_scrambling_control = TS_GM8(ptr + 5, 2, 2);
-      // int address_scrambling_control = TS_GM8(ptr + 5, 4, 2);
+      int payload_scrambling_control = TS_GM8(ptr + 5, 2, 2);
+      int address_scrambling_control = TS_GM8(ptr + 5, 4, 2);
       int llc_snap_flag = TS_GM8(ptr + 5, 6, 1);
       int section_number = TS_G8(ptr + 6);
       int last_section_number = TS_G8(ptr + 7);
@@ -4540,20 +4540,18 @@ class PSIParser : public jevent::DemuxListener {
 
       ptr = ptr + 12;
 
-      int N = 0;
-
-      printf("DSMCC:mpe: mac address:[0x%02x:%02x:%02x:%02x:%02x:%02x]\n", mac_address_1, mac_address_2, mac_address_3, mac_address_4, mac_address_5, mac_address_6);
+      printf("DSMCC:mpe: mac address:[0x%02x:%02x:%02x:%02x:%02x:%02x], payload scrambling:[0x%01x], address scrambling:[0%01x]\n", mac_address_1, mac_address_2, mac_address_3, mac_address_4, mac_address_5, mac_address_6, payload_scrambling_control, address_scrambling_control);
 
       if (llc_snap_flag == 0x01) {
         // INFO:: LLC_SNAP() ISO/IEC 8802.2 Logical Link Control
+        
+        DumpBytes("LLC SNAP data byte", ptr + 0, section_length - 9 - 4);
       } else {
-        DumpBytes("ip datagram data byte", ptr + 0, N);
-      }
+        int total_length = TS_G16(ptr + 2); // INFO:: IP Datagram
 
-      ptr = ptr + N;
-
-      if (section_number == last_section_number) {
-        DumpBytes("stuffing byte", ptr + 0, section_length - 9 - N - 4);
+        DumpBytes("ip datagram data byte", ptr + 0, total_length);
+      
+        ptr = ptr + total_length;
       }
     }
 
