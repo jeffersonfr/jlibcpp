@@ -324,7 +324,29 @@ class Utils {
     {
       std::string info = "UNKNOWN";
 
-      if (use == 0x0b) {
+      if (use == 0x00) {
+        info = "UKNOWN_USE";
+      } else if (use == 0x01) {
+        info = "MPEG_TS_UP_USE";
+      } else if (use == 0x02) {
+        info = "MPEG_TS_DOWN_USE";
+      } else if (use == 0x03) {
+        info = "MPEG_ES_UP_USE";
+      } else if (use == 0x04) {
+        info = "MPEG_ES_DOWN_USE";
+      } else if (use == 0x05) {
+        info = "DOWNLOAD_CTRL_USE";
+      } else if (use == 0x06) {
+        info = "DOWNLOAD_CTRL_UP_USE";
+      } else if (use == 0x07) {
+        info = "DOWNLOAD_CTRL_DOWN_USE";
+      } else if (use == 0x08) {
+        info = "DOWNLOAD_DATA_USE";
+      } else if (use == 0x09) {
+        info = "DOWNLOAD_DATA_UP_USE";
+      } else if (use == 0x0a) {
+        info = "DOWNLOAD_DATA_DOWN_USE";
+      } else if (use == 0x0b) {
         info = "STREAM_NPT_USE";
       } else if (use == 0x0c) {
         info = "STREAM_STATUS_AND_EVENT_USE";
@@ -332,6 +354,20 @@ class Utils {
         info = "STREAM_EVENT_USE";
       } else if (use == 0x0e) {
         info = "STREAM_STATUS_USE";
+      } else if (use == 0x0f) {
+        info = "RPC_USE";
+      } else if (use == 0x10) {
+        info = "IP_USE";
+      } else if (use == 0x11) {
+        info = "SDB_CTRL_USE";
+      } else if (use == 0x12) {
+        info = "T120_TAP1";
+      } else if (use == 0x13) {
+        info = "T120_TAP2";
+      } else if (use == 0x14) {
+        info = "T120_TAP3";
+      } else if (use == 0x15) {
+        info = "T120_TAP4";
       } else if (use == 0x16) {
         info = "BIOP_DELIVERY_PARA_USE";
       } else if (use == 0x17) {
@@ -340,6 +376,8 @@ class Utils {
         info = "BIOP_ES_USE";
       } else if (use == 0x19) {
         info = "BIOP_PROGRAM_USE";
+      } else if (use == 0x1a) {
+        info = "BIOP_DNL_CTRL_USE";
       }
 
       return info;
@@ -4581,7 +4619,23 @@ class PSIParser : public jevent::DemuxListener {
 
       ptr = ptr + 12 + adaptation_length;
 
-      if (message_id == 0x1002) { // DownloadInfoIndication (DII)
+      if (message_id == 0x1001) { // DownloadInfoRequest (DIR)
+        uint32_t buffer_size = TS_G32(ptr + 0);
+        int maximum_block_size = TS_G16(ptr + 4);
+        
+        printf("DSMCCInfoRequest:: buffer size:[0x%08x], maximum block size:[0x%04x]\n", buffer_size, maximum_block_size);
+
+        ptr = ptr + 6;
+
+        // INFO:: CompatibilityDescriptor()
+        int compatibility_descriptor_length = TS_G16(ptr + 0);
+
+        ptr = ptr + compatibility_descriptor_length + 2;
+
+        int private_data_length = TS_G16(ptr + 0);
+
+        DumpBytes("DSMCC:DownloadInfoRequest: private data byte", ptr + 2, private_data_length);
+      } else if (message_id == 0x1002) { // DownloadInfoIndication (DII)
         uint32_t download_id = TS_G32(ptr + 0);
         int block_size = TS_G16(ptr + 4);
         int window_size = TS_G8(ptr + 6);
@@ -4665,6 +4719,67 @@ class PSIParser : public jevent::DemuxListener {
         DumpBytes("DSMCC:DownloadInfoIndication<DII>: private data byte", ptr + 2, private_data_length);
 
         ptr = ptr + 2 + private_data_length;
+      } else if (message_id == 0x1003) { // DownloadDataBlock (DDB)
+      } else if (message_id == 0x1004) { // DownloadDataRequest (DDR)
+      } else if (message_id == 0x1005) { // DownloadCancel (DC)
+        uint32_t download_id = TS_G32(ptr + 0);
+        int module_id = TS_G16(ptr + 4);
+        int block_number = TS_G16(ptr + 6);
+        int download_cancel_reason = TS_G8(ptr + 8);
+        // int reserved = TS_G8(ptr + 9);
+        int private_data_length = TS_G16(ptr + 10);
+ 
+        std::string reason;
+
+        if (download_cancel_reason == 0x00) {
+          reason = "unknown";
+        } else if (download_cancel_reason == 0x01) {
+          reason = "rsnScenarioTimeout";
+        } else if (download_cancel_reason == 0x02) {
+          reason = "rsnInsufMem";
+        } else if (download_cancel_reason == 0x03) {
+          reason = "rsnAuthDenied";
+        } else if (download_cancel_reason == 0x04) {
+          reason = "rsnFatal";
+        } else if (download_cancel_reason == 0x05) {
+          reason = "rsnInfoRequestError";
+        } else if (download_cancel_reason == 0x06) {
+          reason = "rsnCompatError";
+        } else if (download_cancel_reason == 0x07) {
+          reason = "rsnUnreliableNetwork";
+        } else if (download_cancel_reason == 0x08) {
+          reason = "rsnInvalidData";
+        } else if (download_cancel_reason == 0x09) {
+          reason = "rsnInvalidBlock";
+        } else if (download_cancel_reason == 0x0a) {
+          reason = "rsnInvalidVersion";
+        } else if (download_cancel_reason == 0x0b) {
+          reason = "rsnAbort";
+        } else if (download_cancel_reason == 0x0c) {
+          reason = "rsnRetrans";
+        } else if (download_cancel_reason == 0x0d) {
+          reason = "rsnBadBlockSize";
+        } else if (download_cancel_reason == 0x0e) {
+          reason = "rsnBadWindow";
+        } else if (download_cancel_reason == 0x0f) {
+          reason = "rsnBadAckPeriod";
+        } else if (download_cancel_reason == 0x10) {
+          reason = "rsnBadWindowTimer";
+        } else if (download_cancel_reason == 0x11) {
+          reason = "rsnBadScenarioTimer";
+        } else if (download_cancel_reason == 0x12) {
+          reason = "rsnBadCapabilities";
+        } else if (download_cancel_reason == 0x13) {
+          reason = "rsnBadModuleTable";
+        } else if (download_cancel_reason >= 0x14 and download_cancel_reason <= 0xef) {
+          reason = "unknown";
+        } else if (download_cancel_reason >= 0xf0 and download_cancel_reason <= 0xff) {
+          reason = "unknown";
+        }
+
+        printf("DSMCC:DownloadCancel: download id:[0x%08x], module id:[0x%04x], block number:[0x%04x], download cancel reason:[0x%02x/%s]\n", download_id, module_id, block_number, download_cancel_reason, reason.c_str());
+
+        DumpBytes("DSMCC:DownloadCancel: private data byte", ptr + 12, private_data_length);
       } else if (message_id == 0x1006) { // DownloadServerInitiate (DSI)
         DumpBytes("DSMCC:DownloadServerInitiate<DSI>: server id", ptr + 0, 20);
 
@@ -4772,7 +4887,9 @@ class PSIParser : public jevent::DemuxListener {
 
       ptr = ptr + 12 + adaptation_length;
 
-      if (message_id == 0x1003) { // DownloadDataBlock (DDB)
+      if (message_id == 0x1001) { // DownloadInfoRequest (DIR)
+      } else if (message_id == 0x1002) { // DownloadInfoIndication (DII)
+      } else if (message_id == 0x1003) { // DownloadDataBlock (DDB)
         int module_id = TS_G16(ptr + 0);
         int module_version = TS_G8(ptr + 2);
         // int reserved = TS_G8(ptr + 3);
@@ -4794,6 +4911,34 @@ class PSIParser : public jevent::DemuxListener {
         }
         
         SIFacade::GetInstance()->Data()->ModuleBlock(module_id, module_version, block_number, std::make_shared<std::string>(ptr, message_length - adaptation_length - 6));
+      } else if (message_id == 0x1004) { // DownloadDataRequest (DDR)
+        int module_id = TS_G16(ptr + 0);
+        int block_number = TS_G16(ptr + 2);
+        int download_reason = TS_G8(ptr + 4);
+
+        std::string reason;
+
+        if (download_reason == 0x00) {
+          reason = "unknown";
+        } else if (download_reason == 0x01) {
+          reason = "rsnStart";
+        } else if (download_reason == 0x02) {
+          reason = "rsnAckCont";
+        } else if (download_reason == 0x03) {
+          reason = "rsnNakRetransBlock";
+        } else if (download_reason == 0x04) {
+          reason = "rsnNakRetransWindow";
+        } else if (download_reason == 0x05) {
+          reason = "rsnEnd";
+        } else if (download_reason >= 0x06 and download_reason <= 0xef) {
+          reason = "unknown";
+        } else if (download_reason >= 0xf0 and download_reason <= 0xff) {
+          reason = "unknown";
+        }
+        
+        printf("DSMCC:DownloadDataRequest: module id:[0x%04x], block number:[0x%04x], download reason:[0x%02x/%s]\n", module_id, block_number, download_reason, reason.c_str());
+      } else if (message_id == 0x1005) { // DownloadCancel (DC)
+      } else if (message_id == 0x1006) { // DownloadServerInitiate (DSI)
       }
 		}
 
