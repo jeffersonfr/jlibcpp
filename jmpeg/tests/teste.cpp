@@ -4178,11 +4178,21 @@ class PSIParser : public jevent::DemuxListener {
           return;
         }
 
-        int data_alignment_indicator  = TS_GM8(ptr + 0, 4, 1);
+        // Arib 6-STD-B37, table 2-25
+        int data_alignment_indicator  = TS_GM8(ptr + 0, 5, 1);
+        int pts_dts_flag = TS_GM8(ptr + 1, 0, 2);
+        //int escr_flag = TS_GM8(ptr + 1, 2, 1);
         int pes_header_data_length = TS_G8(ptr + 2);
         uint32_t ccis_code = TS_G32(ptr + 8);
         int caption_conversion_type = TS_G8(ptr + 12);
         int drcs_conversion_type = TS_GM8(ptr + 13, 0, 2);
+        uint64_t pts = 0LL;
+
+        if (pts_dts_flag == 0b10) {
+          pts = (pts << 3) | TS_GM64(ptr + 3, (4 + 0), 3);
+          pts = (pts << 15) | TS_GM64(ptr + 3, (4 + 3 + 1), 15);
+          pts = (pts << 15) | TS_GM64(ptr + 3, (4 + 3 + 1 + 15 + 1), 15);
+        }
 
         std::string caption_conversion_info = "undefined";
         std::string drcs_conversion_info = "undefined";
@@ -4207,10 +4217,11 @@ class PSIParser : public jevent::DemuxListener {
           drcs_conversion_info = "DRCS conversion not possible";
         }
 
-        printf("Process PES:: data alignment indicator:[0x%01x], pes header data length:[%d], ccis code:[0x%08x], caption conversion type:[%s], drcs conversion type:[%s]\n", data_alignment_indicator, pes_header_data_length, ccis_code, caption_conversion_info.c_str(), drcs_conversion_info.c_str());
+        printf("Process PES:: pts:[%lu], data alignment indicator:[0x%01x], pes header data length:[%d], ccis code:[0x%08x], caption conversion type:[%s], drcs conversion type:[%s]\n", pts, data_alignment_indicator, pes_header_data_length, ccis_code, caption_conversion_info.c_str(), drcs_conversion_info.c_str());
 
         ptr = ptr + pes_header_data_length + 3;
 
+        // PES data field (Arib 6-STD B37 v2.4); ABNT NBR 15606-3 (cap. 9); closed caption (synchronous pes; stream_id:[0xbd], data_id:[0x80])
         ProcessClosedCaption(ptr, (event->GetData() + event->GetLength()) - ptr);
       } else if (stream_id == 0b10111100 or // program_stream_map
           stream_id == 0b10111111 or // private_stream_2
@@ -4219,7 +4230,7 @@ class PSIParser : public jevent::DemuxListener {
           stream_id == 0b11111111 or // program_stream_directory
           stream_id == 0b11110010 or // DSMCC_stream
           stream_id == 0b11111000) { // ITU-T Rec. H.222.1 type E stream
-        // PES data field (Arib 6-STD B37 v2.4); ABNT NBR 15606-3 (cap. 9); superimposed (asynchronous pes; stream_id:[0xbd], data_id:[0x81])
+        // PES data field (Arib 6-STD B37 v2.4); ABNT NBR 15606-3 (cap. 9); superimposed (asynchronous pes; stream_id:[0xbf], data_id:[0x81])
         if (stream_id != 0b10111111) {
           return;
         }
