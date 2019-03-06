@@ -64,7 +64,6 @@ enum jcursor_style_t {
 };
 
 class Graphics;
-class Dialog;
 
 /**
  * \brief
@@ -72,8 +71,6 @@ class Dialog;
  * \author Jeff Ferr
  */
 class Window : public jgui::Container {
-
-	friend class Dialog;
 
   /**
    * \brief
@@ -115,6 +112,8 @@ class Window : public jgui::Container {
     Font *_font;
     /** \brief */
     EventManager *_event_manager;
+		/** \brief */
+		Component *_focus_owner;
     /** \brief */
     Theme _theme;
 
@@ -173,7 +172,28 @@ class Window : public jgui::Container {
 		 */
 		virtual jgui::Image * GetIcon();
 
-		/**
+    /**
+     * \brief
+     *
+     */
+    jgui::Component * GetFocusOwner();
+    /**
+     * \brief
+     *
+     */
+    void RequestComponentFocus(jgui::Component *c);
+    /**
+     * \brief
+     *
+     */
+    void ReleaseComponentFocus(jgui::Component *c);
+    /**
+     * \brief
+     *
+     */
+    Container * GetFocusCycleRootAncestor();
+
+    /**
 		 * \brief
 		 *
 		 */

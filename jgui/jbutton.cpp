@@ -165,7 +165,7 @@ bool Button::MouseWheel(jevent::MouseEvent *event)
 
 void Button::Paint(Graphics *g)
 {
-	JDEBUG(JINFO, "paint\n");
+	// JDEBUG(JINFO, "paint\n");
 
 	Component::Paint(g);
 

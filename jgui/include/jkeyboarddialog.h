@@ -17,15 +17,22 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_CALENDAR_H
-#define J_CALENDAR_H
+#ifndef J_KEYBOARDDIALOG_H
+#define J_KEYBOARDDIALOG_H
 
-#include "jgui/jcontainer.h"
+#include "jgui/jdialog.h"
 #include "jgui/jbutton.h"
-#include "jgui/jspin.h"
-#include "jgui/jlabel.h"
-#include "jevent/jselectlistener.h"
+#include "jgui/jtextcomponent.h"
 #include "jevent/jactionlistener.h"
+#include "jevent/jkeylistener.h"
+#include "jevent/jtextlistener.h"
+
+#include <string>
+#include <iostream>
+#include <vector>
+#include <mutex>
+
+#include <stdlib.h>
 
 namespace jgui {
 
@@ -33,172 +40,129 @@ namespace jgui {
  * \brief
  *
  */
-struct jcalendar_warnning_t {
-	jgui::Theme *theme;
-	int day;
-	int month;
-	int year;
+enum jkeyboard_type_t {
+	JKT_QWERTY,
+	JKT_ALPHA_NUMERIC,
+	JKT_NUMERIC,
+	JKT_PHONE,
+	JKT_INTERNET
 };
+
+class TextArea;
 
 /**
  * \brief
  *
  * \author Jeff Ferr
  */
-class Calendar : public jgui::Container, public jevent::ActionListener, public jevent::SelectListener {
+class KeyboardDialog : public jgui::Dialog, public jevent::ActionListener {
 
 	private:
 		/** \brief */
-		std::vector<jcalendar_warnning_t> _warnning_days;
+		std::vector<jevent::KeyListener *> _key_listeners;
 		/** \brief */
-		std::vector<Button *> _buttons;
+    std::mutex _key_listeners_mutex;
 		/** \brief */
-		jgui::Theme _week_day_theme;
-		/** \brief */
-		jgui::Theme _selected_theme;
-		/** \brief */
-		Label *_ldom;
-		/** \brief */
-		Label *_lseg;
-		/** \brief */
-		Label *_lter;
-		/** \brief */
-		Label *_lqua;
-		/** \brief */
-		Label *_lqui;
-		/** \brief */
-		Label *_lsex;
-		/** \brief */
-		Label *_lsab;
-		/** \brief */
-		Spin *_syear;
-		/** \brief */
-		Spin *_smonth;
+		TextArea *_display;
 		/** \brief */
 		std::string _text;
 		/** \brief */
-		int delta;
-		/** \brief */
-		int bx;
-		/** \brief */
-		int by;
-		/** \brief */
-		int bwidth;
-		/** \brief */
-		int bheight;
-		/** \brief */
 		int _state;
 		/** \brief */
-		int _day;
+		bool _shift_pressed;
 		/** \brief */
-		int _month;
+		bool _input_locked;
 		/** \brief */
-		int _year;
+		bool _is_password;
 		/** \brief */
-		int _current_day;
-		/** \brief */
-		int _current_month;
-		/** \brief */
-		int _current_year;
-		/** \brief */
-		int _select_day;
-		/** \brief */
-		int _select_month;
-		/** \brief */
-		int _select_year;
-		/** \brief */
-		bool started;
-		/** \brief */
-		bool _show_text;
-		/** \brief */
-		bool _response;
+		jkeyboard_type_t _type;
 
 	private:
 		/**
 		 * \brief
 		 *
 		 */
-		void BuildCalendar();
-
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		Calendar();
+		void BuildQWERTYKeyboard();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~Calendar();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetDay(int d);
+		void BuildAlphaNumericKeyboard();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetMonth(int m);
+		void BuildNumericKeyboard();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetYear(int y);
+		void BuildPhoneKeyboard();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual int GetDay();
+		void BuildInternetKeyboard();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual int GetMonth();
+		virtual void ProcessCaps(Button *button);
 		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetYear();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void AddWarnning(jgui::Theme *theme, int day, int month, int year);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveWarnning(jcalendar_warnning_t t);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveAll();
-
 		/**
 		 * \brief
 		 *
 		 */
 		virtual void ActionPerformed(jevent::ActionEvent *event);
 		
+	public:
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void ItemChanged(jevent::SelectEvent *event);
+		KeyboardDialog(Container *parent, jkeyboard_type_t type, bool text_visible = true, bool is_password = false);
 		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual ~KeyboardDialog();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jgui::TextComponent * GetTextComponent();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual std::vector<jevent::KeyListener *> & GetKeyListeners();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void RegisterKeyListener(jevent::KeyListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void RemoveKeyListener(jevent::KeyListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void DispatchKeyEvent(jevent::KeyEvent *event);
+
 };
 
 }

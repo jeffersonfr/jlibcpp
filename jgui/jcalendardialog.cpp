@@ -17,15 +17,15 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jgui/jcalendar.h"
+#include "jgui/jcalendardialog.h"
 #include "jcommon/jsystem.h"
 
 namespace jgui {
 
-Calendar::Calendar():
-	jgui::Container()
+CalendarDialog::CalendarDialog(Container *parent):
+	jgui::Dialog(parent)
 {
-	jcommon::Object::SetClassName("jgui::Calendar");
+	jcommon::Object::SetClassName("jgui::CalendarDialog");
 
 	// SetIcon(jcommon::System::GetResourceDirectory() + "/images/calendar_icon.png");
 
@@ -119,7 +119,7 @@ Calendar::Calendar():
 	// AddSubtitle(_DATA_PREFIX"/images/blue_icon.png", "Confirmar");
 }
 
-Calendar::~Calendar() 
+CalendarDialog::~CalendarDialog() 
 {
 	while (_buttons.size() > 0) {
 		Button *b = (*_buttons.begin());
@@ -166,7 +166,7 @@ Calendar::~Calendar()
 	}
 }
 
-void Calendar::SetDay(int d)
+void CalendarDialog::SetDay(int d)
 {
 	if (d < 1) {
 		d = 1;
@@ -179,7 +179,7 @@ void Calendar::SetDay(int d)
 	_day = d-1;
 }
 
-void Calendar::SetMonth(int m)
+void CalendarDialog::SetMonth(int m)
 {
 	if (m < 1) {
 		m = 1;
@@ -192,7 +192,7 @@ void Calendar::SetMonth(int m)
 	_month = m-1;
 }
 
-void Calendar::SetYear(int y)
+void CalendarDialog::SetYear(int y)
 {
 	if (y < 1970) {
 		y = 1970;
@@ -205,22 +205,22 @@ void Calendar::SetYear(int y)
 	_year = y-1970;
 }
 
-int Calendar::GetDay()
+int CalendarDialog::GetDay()
 {
 	return _select_day;
 }
 
-int Calendar::GetMonth()
+int CalendarDialog::GetMonth()
 {
 	return _select_month; // _month+1;
 }
 
-int Calendar::GetYear()
+int CalendarDialog::GetYear()
 {
 	return _select_year; // _year+1970;
 }
 
-void Calendar::AddWarnning(jgui::Theme *theme, int day, int month, int year)
+void CalendarDialog::AddWarnning(jgui::Theme *theme, int day, int month, int year)
 {
 	jcalendar_warnning_t t;
 
@@ -234,7 +234,7 @@ void Calendar::AddWarnning(jgui::Theme *theme, int day, int month, int year)
 	BuildCalendar();
 }
 
-void Calendar::RemoveWarnning(jcalendar_warnning_t t)
+void CalendarDialog::RemoveWarnning(jcalendar_warnning_t t)
 {
 	for (std::vector<jcalendar_warnning_t >::iterator i=_warnning_days.begin(); i!=_warnning_days.end(); i++) {
 		if (t.day == (*i).day && t.month == (*i).month && t.year == (*i).year) {
@@ -245,12 +245,12 @@ void Calendar::RemoveWarnning(jcalendar_warnning_t t)
 	}
 }
 
-void Calendar::RemoveAll()
+void CalendarDialog::RemoveAll()
 {
 	_warnning_days.clear();
 }
 
-void Calendar::BuildCalendar()
+void CalendarDialog::BuildCalendar()
 {
 	Button *button = nullptr;
 	int mes = -1;
@@ -345,7 +345,7 @@ void Calendar::BuildCalendar()
 	Repaint();
 }
 
-void Calendar::ActionPerformed(jevent::ActionEvent *event)
+void CalendarDialog::ActionPerformed(jevent::ActionEvent *event)
 {
   // TODO:: send a generic action event com a data atual selectionada
   // TODO:: deixar o button como checked (toggle)
@@ -353,7 +353,7 @@ void Calendar::ActionPerformed(jevent::ActionEvent *event)
 	// DispatchActionEvent(new jgui::ActionEvent(this));
 }
 
-void Calendar::ItemChanged(jevent::SelectEvent *event)
+void CalendarDialog::ItemChanged(jevent::SelectEvent *event)
 {
   jgui::Spin *spin = (jgui::Spin *)event->GetSource();
   int m = (_month+1),

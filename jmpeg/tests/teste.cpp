@@ -4183,9 +4183,6 @@ class PSIParser : public jevent::DemuxListener {
         int pts_dts_flag = TS_GM8(ptr + 1, 0, 2);
         //int escr_flag = TS_GM8(ptr + 1, 2, 1);
         int pes_header_data_length = TS_G8(ptr + 2);
-        uint32_t ccis_code = TS_G32(ptr + 8);
-        int caption_conversion_type = TS_G8(ptr + 12);
-        int drcs_conversion_type = TS_GM8(ptr + 13, 0, 2);
         uint64_t pts = 0LL;
 
         if (pts_dts_flag == 0b10) {
@@ -4193,6 +4190,10 @@ class PSIParser : public jevent::DemuxListener {
           pts = (pts << 15) | TS_GM64(ptr + 3, (4 + 3 + 1), 15);
           pts = (pts << 15) | TS_GM64(ptr + 3, (4 + 3 + 1 + 15 + 1), 15);
         }
+
+        uint32_t ccis_code = TS_G32(ptr + 8);
+        int caption_conversion_type = TS_G8(ptr + 12);
+        int drcs_conversion_type = TS_GM8(ptr + 13, 0, 2);
 
         std::string caption_conversion_info = "undefined";
         std::string drcs_conversion_info = "undefined";

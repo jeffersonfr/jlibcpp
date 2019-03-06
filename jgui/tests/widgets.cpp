@@ -35,6 +35,7 @@
 #include "jgui/jscrollbar.h"
 #include "jgui/jcalendar.h"
 #include "jgui/jbufferedimage.h"
+#include "jgui/jkeyboard.h"
 #include "jcommon/jsystem.h"
 #include "jevent/jwindowlistener.h"
 
@@ -455,8 +456,12 @@ class Test : public jgui::Window, public jevent::ActionListener, public jevent::
     _mutex.lock();
 
 		if (event->GetSource() == _button1) {
-			_progress->SetValue(_progress->GetValue() + 10);
-			_slider->SetValue(_slider->GetValue() + 10);
+			// _progress->SetValue(_progress->GetValue() + 10);
+			// _slider->SetValue(_slider->GetValue() + 10);
+
+      jgui::Keyboard *kb = new jgui::Keyboard(this, jgui::JKT_QWERTY);
+
+      kb->Exec(false);
 		} else if (event->GetSource() == _button2) {
 			_progress->SetValue(_progress->GetValue() - 10);
 			_slider->SetValue(_slider->GetValue() - 10);

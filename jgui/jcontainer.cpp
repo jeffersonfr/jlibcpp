@@ -20,8 +20,10 @@
 #include "jgui/jcontainer.h"
 #include "jgui/jcardlayout.h"
 #include "jgui/jrectangle.h"
+#include "jgui/jdialog.h"
 #include "jexception/joutofboundsexception.h"
 #include "jexception/jnullpointerexception.h"
+#include "jexception/jinvalidargumentexception.h"
 
 #include <algorithm>
 
@@ -36,11 +38,9 @@ Container::Container(int x, int y, int width, int height):
 	_layout = _default_layout;
 
 	_is_focus_cycle_root = false;
-	_focus = nullptr;
 	_orientation = JCO_LEFT_TO_RIGHT;
 	_is_enabled = true;
 	_is_visible = true;
-	_parent = nullptr;
 	_optimized_paint = false;
 
 	_insets.left = 0;
@@ -151,6 +151,30 @@ bool Container::MoveScrollTowards(Component *next, jevent::jkeyevent_symbol_t sy
 	}
 
 	return true;
+}
+
+void Container::InternalAddDialog(Dialog *dialog)
+{
+  _dialogs_mutex.lock();
+
+  if (std::find(_dialogs.begin(), _dialogs.end(), dialog) != _dialogs.end()) {
+    _dialogs_mutex.unlock();
+
+    throw jexception::RuntimeException("Dialog is already added");
+  }
+
+  _dialogs.push_back(dialog);
+  
+  _dialogs_mutex.unlock();
+}
+
+void Container::InternalRemoveDialog(Dialog *dialog)
+{
+  _dialogs_mutex.lock();
+
+  _dialogs.erase(std::remove(_dialogs.begin(), _dialogs.end(), dialog), _dialogs.end());
+  
+  _dialogs_mutex.unlock();
 }
 
 jsize_t Container::GetScrollDimension()
@@ -402,7 +426,8 @@ void Container::Paint(Graphics *g)
 
 	jpoint_t 
     slocation = GetScrollLocation();
-	jregion_t clip = g->GetClip();
+	jregion_t 
+    clip = g->GetClip();
 
 	Component::Paint(g);
 
@@ -464,6 +489,40 @@ void Container::Paint(Graphics *g)
 		PaintScrollbars(g);
 	}
 
+  // INFO:: paint dialogs over the container
+	g->SetClip(clip.x, clip.y, clip.width, clip.height);
+
+  _dialogs_mutex.lock();
+
+	for (std::vector<jgui::Dialog *>::iterator i=_dialogs.begin(); i!=_dialogs.end(); i++) {
+		Dialog *c = (*i);
+
+		if (c->IsVisible() == true) {
+      jgui::jpoint_t 
+        cl = c->GetLocation();
+      jgui::jsize_t 
+        cs = c->GetSize();
+			int 
+        cx = cl.x - slocation.x,
+				cy = cl.y - slocation.y,
+				cw = cs.width,
+				ch = cs.height;
+
+			if (cw > 0 && ch > 0) {
+				g->Translate(cx, cy);
+				g->ClipRect(0, 0, cw - 1, ch - 1);
+	
+				g->Reset(); 
+				c->Paint(g);
+				
+				g->Translate(-cx, -cy);
+				g->SetClip(clip.x, clip.y, clip.width, clip.height);
+			}
+		}
+	}
+  
+  _dialogs_mutex.unlock();
+
 	g->Reset(); 
 	PaintBorders(g);
 
@@ -477,9 +536,11 @@ void Container::Repaint(Component *cmp)
 		return;
 	}
 
-	if (_parent != nullptr) {
-		_parent->Repaint((cmp == nullptr)?this:cmp);
-	}
+  Container *parent = GetParent();
+
+  if (parent != nullptr) {
+	  parent->Repaint((cmp == nullptr)?this:cmp);
+  }
 
 	Component::DispatchComponentEvent(new jevent::ComponentEvent(this, jevent::JCET_ONPAINT));
 }
@@ -496,6 +557,10 @@ void Container::Add(Component *c, int index)
 
 	if (dynamic_cast<jgui::Container *>(c) == this) {
 		throw jexception::RuntimeException("Adding own container");
+	}
+
+	if (dynamic_cast<jgui::Dialog *>(c) != nullptr) {
+		throw jexception::InvalidArgumentException("Unable to add dialog directly");
 	}
 
   _container_mutex.lock();
@@ -708,52 +773,41 @@ Component * Container::GetComponentAt(int x, int y)
 	return GetTargetComponent(this, x, y, nullptr, nullptr);
 }
 
+jgui::Component * Container::GetFocusOwner()
+{
+  Container *parent = GetParent();
+
+  if (parent != nullptr) {
+    return parent->GetFocusOwner();
+  }
+
+  return nullptr;
+}
+
 void Container::RequestComponentFocus(jgui::Component *c)
 {
-	if (c == nullptr || c->IsFocusable() == false) {
+	if (c == nullptr or c->IsFocusable() == false) {
 		return;
 	}
 
-	if (_parent != nullptr) {
-		_parent->RequestComponentFocus(c);
-	} else {
-		SetIgnoreRepaint(true);
+  Container *parent = GetParent();
 
-		if (_focus != nullptr && _focus != c) {
-			_focus->ReleaseFocus();
-		}
-
-		_focus = c;
-		
-		_focus->Repaint();
-
-		SetIgnoreRepaint(false);
-
-		Repaint(this);
-		
-		dynamic_cast<Component *>(_focus)->DispatchFocusEvent(new jevent::FocusEvent(_focus, jevent::JFET_GAINED));
-	}
+  if (parent != nullptr) {
+    parent->RequestComponentFocus(c);
+  }
 }
 
 void Container::ReleaseComponentFocus(jgui::Component *c)
 {
-	if (c == nullptr) {
+	if (c == nullptr or c->IsFocusable() == false) {
 		return;
 	}
 
-	if (_parent != nullptr) {
-		_focus = nullptr;
+  Container *parent = GetParent();
 
-		_parent->ReleaseComponentFocus(c);
-	} else {
-		if (_focus != nullptr && _focus == c) {
-			_focus->Repaint();
-
-			dynamic_cast<Component *>(_focus)->DispatchFocusEvent(new jevent::FocusEvent(_focus, jevent::JFET_LOST));
-		}
-
-		_focus = nullptr;
-	}
+  if (parent != nullptr) {
+    parent->ReleaseComponentFocus(c);
+  }
 }
 
 bool Container::KeyPressed(jevent::KeyEvent *event)
@@ -761,6 +815,13 @@ bool Container::KeyPressed(jevent::KeyEvent *event)
 	if (Component::KeyPressed(event) == true) {
 		return true;
 	}
+
+  // INFO:: process dialogs first
+  for (std::vector<Dialog *>::iterator i=_dialogs.begin(); i!=_dialogs.end(); i++) {
+    if ((*i)->KeyPressed(event) == true) {
+      return true;
+    }
+  }
 
 	Component *current = GetFocusOwner();
 
@@ -777,11 +838,50 @@ bool Container::KeyPressed(jevent::KeyEvent *event)
 	return false;
 }
 
+bool Container::KeyReleased(jevent::KeyEvent *event)
+{
+	if (Component::KeyReleased(event) == true) {
+		return true;
+	}
+
+  // INFO:: process dialogs first
+  for (std::vector<Dialog *>::iterator i=_dialogs.begin(); i!=_dialogs.end(); i++) {
+    if ((*i)->KeyReleased(event) == true) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+bool Container::KeyTyped(jevent::KeyEvent *event)
+{
+	if (Component::KeyTyped(event) == true) {
+		return true;
+	}
+
+  // INFO:: process dialogs first
+  for (std::vector<Dialog *>::iterator i=_dialogs.begin(); i!=_dialogs.end(); i++) {
+    if ((*i)->KeyTyped(event) == true) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 bool Container::MousePressed(jevent::MouseEvent *event)
 {
 	if (Component::MousePressed(event) == true) {
 		return true;
 	}
+
+  // INFO:: process dialogs first
+  for (std::vector<Dialog *>::iterator i=_dialogs.begin(); i!=_dialogs.end(); i++) {
+    if ((*i)->MousePressed(event) == true) {
+      return true;
+    }
+  }
 
 	jpoint_t 
     elocation = event->GetLocation();
@@ -811,6 +911,13 @@ bool Container::MouseReleased(jevent::MouseEvent *event)
 		return true;
 	}
 
+  // INFO:: process dialogs first
+  for (std::vector<Dialog *>::iterator i=_dialogs.begin(); i!=_dialogs.end(); i++) {
+    if ((*i)->MouseReleased(event) == true) {
+      return true;
+    }
+  }
+
   jgui::jpoint_t
     elocation = event->GetLocation();
 	int 
@@ -838,6 +945,13 @@ bool Container::MouseMoved(jevent::MouseEvent *event)
 	if (Component::MouseMoved(event) == true) {
 		return true;
 	}
+
+  // INFO:: process dialogs first
+  for (std::vector<Dialog *>::iterator i=_dialogs.begin(); i!=_dialogs.end(); i++) {
+    if ((*i)->MouseMoved(event) == true) {
+      return true;
+    }
+  }
 
   jgui::jpoint_t
     elocation = event->GetLocation();
@@ -867,6 +981,13 @@ bool Container::MouseWheel(jevent::MouseEvent *event)
 		return true;
 	}
 
+  // INFO:: process dialogs first
+  for (std::vector<Dialog *>::iterator i=_dialogs.begin(); i!=_dialogs.end(); i++) {
+    if ((*i)->MouseWheel(event) == true) {
+      return true;
+    }
+  }
+
   jgui::jpoint_t
     elocation = event->GetLocation();
   int
@@ -887,15 +1008,6 @@ bool Container::MouseWheel(jevent::MouseEvent *event)
 	}
 
 	return false;
-}
-
-jgui::Component * Container::GetFocusOwner()
-{
-	if (_parent != nullptr) {
-		return _parent->GetFocusOwner();
-	}
-
-	return _focus;
 }
 
 void Container::RaiseComponentToTop(Component *c)

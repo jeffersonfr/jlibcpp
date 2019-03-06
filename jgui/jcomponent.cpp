@@ -46,7 +46,6 @@ Component::Component(int x, int y, int width, int height):
 	_is_focusable = false;
 	_is_enabled = true;
 	_is_visible = true;
-	_has_focus = false;
 	_is_ignore_repaint = false;
 	
 	_keymap = nullptr;
@@ -84,8 +83,10 @@ Component::Component(int x, int y, int width, int height):
 
 Component::~Component()
 {
-	if (_parent != nullptr) {
-		_parent->Remove(this);
+  Container *parent = GetParent();
+
+	if (parent != nullptr) {
+		parent->Remove(this);
 	}
 }
 
@@ -565,8 +566,8 @@ void Component::PaintBackground(Graphics *g)
 		w = size.width - 2*x,
 		h = size.height - 2*y;
 
-	if (_is_enabled == true) {
-		if (_has_focus == true) {
+	if (IsEnabled() == true) {
+		if (HasFocus() == true) {
 			g->SetColor(bgfocus);
 		} else {
 			g->SetColor(bg);
@@ -617,8 +618,8 @@ void Component::PaintBorders(Graphics *g)
 	int 
     step = 0x20;
 
-	if (_is_enabled == true) {
-		if (_has_focus == true) {
+	if (IsEnabled() == true) {
+		if (HasFocus() == true) {
 			color = borderfocus;
 		} else {
 			color = border;
@@ -875,9 +876,11 @@ void Component::Repaint(Component *cmp)
 		return;
 	}
 
-	if (_parent != nullptr) {
-		_parent->Repaint(this);
-	}
+  Container *parent = GetParent();
+
+  if (parent != nullptr) {
+	  parent->Repaint(cmp);
+  }
 
 	DispatchComponentEvent(new jevent::ComponentEvent(this, jevent::JCET_ONPAINT));
 }
@@ -1153,12 +1156,15 @@ bool Component::Intersects(int x1, int y1, int w1, int h1, int x2, int y2, int w
 
 jpoint_t Component::GetAbsoluteLocation()
 {
-	Container 
+  Container 
     *parent = GetParent();
 	jpoint_t
-    location = {.x = 0, .y = 0};
+    location = {
+      .x = 0, 
+      .y = 0
+    };
 
-	if ((void *)parent == nullptr) {
+	if (parent == nullptr) {
 		return location;
 	}
 
@@ -1208,54 +1214,46 @@ jsize_t Component::GetSize()
 
 void Component::RaiseToTop()
 {
-	// frame repaint is needed
+  Container *parent = GetParent();
 
-	if (_parent == nullptr) {
-		return;
-	}
-
-	_parent->RaiseComponentToTop(this);
+	if (parent != nullptr) {
+	  parent->RaiseComponentToTop(this);
+  }
 }
 
 void Component::LowerToBottom()
 {
-	// frame repaint is needed
+  Container *parent = GetParent();
 
-	if (_parent == nullptr) {
-		return;
-	}
-
-	_parent->LowerComponentToBottom(this);
+	if (parent != nullptr) {
+	  parent->LowerComponentToBottom(this);
+  }
 }
 
 void Component::PutAtop(Component *c)
 {
-	// frame repaint is needed
+  if (c == nullptr) {
+    return;
+  }
 
-	if (_parent == nullptr) {
-		return;
-	}
+  Container *parent = GetParent();
 
-	if ((void *)c == nullptr) {
-		return;
-	}
-
-	_parent->PutComponentATop(this, c);
+	if (parent != nullptr) {
+	  parent->PutComponentATop(this, c);
+  }
 }
 
 void Component::PutBelow(Component *c)
 {
-	// frame repaint is needed
+  if (c == nullptr) {
+    return;
+  }
 
-	if (_parent == nullptr) {
-		return;
-	}
+  Container *parent = GetParent();
 
-	if ((void *)c == nullptr) {
-		return;
-	}
-
-	_parent->PutComponentBelow(this, c);
+	if (parent != nullptr) {
+	  parent->PutComponentBelow(this, c);
+  }
 }
 
 void Component::SetGradientLevel(int level)
@@ -1444,13 +1442,13 @@ bool Component::MouseWheel(jevent::MouseEvent *event)
 	return false;
 }
 
-void Component::GetInternalComponents(Container *parent, std::vector<Component *> *components)
+void Component::GetInternalComponents(Container *current, std::vector<Component *> *components)
 {
-	if ((void *)parent == nullptr) {
+	if (current == nullptr) {
 		return;
 	}
 
-	std::vector<Component *> v = parent->GetComponents();
+	std::vector<Component *> v = current->GetComponents();
 
 	for (std::vector<Component *>::iterator i=v.begin(); i!=v.end(); i++) {
 		Container *container = dynamic_cast<jgui::Container *>(*i);
@@ -1461,6 +1459,17 @@ void Component::GetInternalComponents(Container *parent, std::vector<Component *
 
 		components->push_back(*i);
 	}
+}
+
+Container * Component::GetFocusCycleRootAncestor()
+{
+  Container *parent = GetParent();
+
+  if (parent != nullptr) {
+    return parent->GetFocusCycleRootAncestor();
+  }
+
+  return nullptr;
 }
 
 bool Component::ProcessNavigation(jevent::KeyEvent *event)
@@ -1478,13 +1487,16 @@ bool Component::ProcessNavigation(jevent::KeyEvent *event)
 		return false;
 	}
 
-  jgui::jpoint_t location = GetAbsoluteLocation();
-  jgui::jsize_t size = GetSize();
-	jregion_t rect = {
-		location.x, 
-		location.y, 
-		size.width, 
-		size.height
+  jgui::jpoint_t 
+    location = GetAbsoluteLocation();
+  jgui::jsize_t 
+    size = GetSize();
+	jregion_t 
+    rect = {
+  		.x = location.x, 
+	  	.y = location.y, 
+		  .width = size.width, 
+  		.height = size.height
 	};
 
 	Component *next = this;
@@ -1658,29 +1670,31 @@ void Component::FindNextComponentFocus(jregion_t rect, Component **left, Compone
 
 void Component::RequestFocus()
 {
-	if (_has_focus == false) {
-		if (_parent != nullptr) {
-			_has_focus = true;
+  Container *parent = GetParent();
 
-			_parent->RequestComponentFocus(this);
-		}
-	}
+  if (parent != nullptr) {
+    parent->RequestComponentFocus(this);
+  }
 }
 
 void Component::ReleaseFocus()
 {
-	if (_has_focus == true) {
-		if (_parent != nullptr) {
-			_has_focus = false;
+  Container *parent = GetParent();
 
-			_parent->ReleaseComponentFocus(this);
-		}
-	}
+  if (parent != nullptr) {
+    parent->ReleaseComponentFocus(this);
+  }
 }
 
 bool Component::HasFocus()
 {
-	return _has_focus;
+  Container *parent = GetParent();
+
+  if (parent != nullptr) {
+    return parent->GetFocusOwner() == this;
+  }
+
+  return false;
 }
 
 bool Component::IsFocusable()
@@ -1691,27 +1705,6 @@ bool Component::IsFocusable()
 void Component::SetFocusable(bool b)
 {
 	_is_focusable = b;
-}
-
-bool Component::IsFocusCycleRoot()
-{
-	return _is_focus_cycle_root;
-}
-
-void Component::SetFocusCycleRoot(bool b)
-{
-	_is_focus_cycle_root = b;
-}
-
-Container * Component::GetFocusCycleRootAncestor()
-{
-	Container *cmp = GetParent();
-	
-	while (cmp != nullptr && cmp->GetParent() != nullptr && cmp->IsFocusCycleRoot() == false) {
-		cmp = cmp->GetParent();
-	}
-
-	return cmp;
 }
 
 bool Component::IsVisible()

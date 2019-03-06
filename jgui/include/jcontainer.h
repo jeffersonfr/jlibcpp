@@ -32,6 +32,7 @@
 namespace jgui {
 
 class Layout;
+class Dialog;
 
 /**
  * \brief
@@ -41,6 +42,7 @@ class Layout;
 class Container : public jgui::Component {
 
 	friend class Component;
+	friend class Dialog;
 
 	private:
 		/** \brief */
@@ -52,7 +54,9 @@ class Container : public jgui::Component {
 		/** \brief */
 		std::vector<Component *> _components;
 		/** \brief */
-		Component *_focus;
+		std::vector<Dialog *> _dialogs;
+		/** \brief */
+		std::mutex _dialogs_mutex;
 		/** \brief */
 		Layout *_default_layout;
 		/** \brief */
@@ -90,6 +94,18 @@ class Container : public jgui::Component {
 		 * \return true if next Component is now visible
 		 */    
 		virtual bool MoveScrollTowards(Component *next, jevent::jkeyevent_symbol_t symbol);
+
+		/**
+		 * \brief
+		 *
+		 */
+    void InternalAddDialog(Dialog *dialog);
+
+		/**
+		 * \brief
+		 *
+		 */
+    void InternalRemoveDialog(Dialog *dialog);
 
 	public:
 		/**
@@ -253,6 +269,18 @@ class Container : public jgui::Component {
 		 *
 		 */
 		virtual bool KeyPressed(jevent::KeyEvent *event);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool KeyReleased(jevent::KeyEvent *event);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool KeyTyped(jevent::KeyEvent *event);
 
 		/**
 		 * \brief

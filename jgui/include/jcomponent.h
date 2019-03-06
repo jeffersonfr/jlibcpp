@@ -184,8 +184,6 @@ class Component : public jevent::KeyListener, public jevent::MouseListener {
 		/** \brief */
 		int _component_state;
 		/** \brief */
-		bool _has_focus;
-		/** \brief */
 		bool _is_visible;
 		/** \brief */
 		bool _is_cyclic_focus;
@@ -215,7 +213,7 @@ class Component : public jevent::KeyListener, public jevent::MouseListener {
 		 * \brief
 		 *
 		 */
-		virtual void GetInternalComponents(Container *parent, std::vector<Component *> *components);
+		virtual void GetInternalComponents(Container *current, std::vector<Component *> *components);
 
 		/**
 		 * \brief
@@ -854,18 +852,6 @@ class Component : public jevent::KeyListener, public jevent::MouseListener {
 		 *
 		 */
 		virtual bool IsFocusable();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsFocusCycleRoot();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetFocusCycleRoot(bool b);
 
 		/**
 		 * \brief

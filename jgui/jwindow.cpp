@@ -36,6 +36,8 @@ Window::Window(Window *window):
 	Container()
 {
 	jcommon::Object::SetClassName("jgui::Window");
+
+  _focus_owner = nullptr;
 }
 
 Window::Window(int width, int height):
@@ -57,6 +59,8 @@ Window::Window(int x, int y, int width, int height):
     _instance->SetParent(this);
 	} catch (jexception::NullPointerException &) {
 	}
+
+  _focus_owner = nullptr;
 
   _event_manager = new EventManager(this);
 
@@ -176,6 +180,42 @@ void Window::SetIcon(jgui::Image *image)
 jgui::Image * Window::GetIcon()
 {
 	return _instance->GetIcon();
+}
+
+jgui::Component * Window::GetFocusOwner()
+{
+  return _focus_owner;
+}
+
+void Window::RequestComponentFocus(jgui::Component *c)
+{
+  if (_focus_owner != nullptr && _focus_owner != c) {
+    _focus_owner->ReleaseFocus();
+  }
+
+  _focus_owner = c;
+
+  Repaint();
+
+  dynamic_cast<Component *>(c)->DispatchFocusEvent(new jevent::FocusEvent(c, jevent::JFET_GAINED));
+}
+
+void Window::ReleaseComponentFocus(jgui::Component *c)
+{
+  if (_focus_owner == nullptr or _focus_owner != c) {
+    return;
+  }
+
+  _focus_owner = nullptr;
+
+  Repaint();
+
+  dynamic_cast<Component *>(c)->DispatchFocusEvent(new jevent::FocusEvent(c, jevent::JFET_LOST));
+}
+
+Container * Window::GetFocusCycleRootAncestor()
+{
+  return this;
 }
 
 void Window::AddSubtitle(jgui::Image *image, std::string label)
@@ -415,14 +455,6 @@ bool Window::KeyPressed(jevent::KeyEvent *event)
 		return true;
 	}
 
-	std::vector<Component *> components = GetComponents();
-
-	for (std::vector<Component *>::iterator i=components.begin(); i!=components.end(); i++) {
-		if ((*i)->KeyPressed(event) == true) {
-			return true;
-		}
-	}
-
 	return false;
 }
 
@@ -430,14 +462,6 @@ bool Window::KeyReleased(jevent::KeyEvent *event)
 {
 	if (Container::KeyReleased(event) == true) {
 		return true;
-	}
-
-	std::vector<Component *> components = GetComponents();
-
-	for (std::vector<Component *>::iterator i=components.begin(); i!=components.end(); i++) {
-		if ((*i)->KeyReleased(event) == true) {
-			return true;
-		}
 	}
 
 	return false;
@@ -449,14 +473,6 @@ bool Window::KeyTyped(jevent::KeyEvent *event)
 		return true;
 	}
 
-	std::vector<Component *> components = GetComponents();
-
-	for (std::vector<Component *>::iterator i=components.begin(); i!=components.end(); i++) {
-		if ((*i)->KeyTyped(event) == true) {
-			return true;
-		}
-	}
-
 	return false;
 }
 
@@ -464,14 +480,6 @@ bool Window::MousePressed(jevent::MouseEvent *event)
 {
 	if (Container::MousePressed(event) == true) {
 		return true;
-	}
-
-	std::vector<Component *> components = GetComponents();
-
-	for (std::vector<Component *>::iterator i=components.begin(); i!=components.end(); i++) {
-		if ((*i)->MousePressed(event) == true) {
-			return true;
-		}
 	}
 
 	return false;
@@ -483,14 +491,6 @@ bool Window::MouseReleased(jevent::MouseEvent *event)
 		return true;
 	}
 
-	std::vector<Component *> components = GetComponents();
-
-	for (std::vector<Component *>::iterator i=components.begin(); i!=components.end(); i++) {
-		if ((*i)->MouseReleased(event) == true) {
-			return true;
-		}
-	}
-
 	return false;
 }
 
@@ -500,36 +500,6 @@ bool Window::MouseMoved(jevent::MouseEvent *event)
 		return true;
 	}
 
-	std::vector<Component *> components = GetComponents();
-
-	for (std::vector<Component *>::iterator i=components.begin(); i!=components.end(); i++) {
-		if ((*i)->MouseMoved(event) == true) {
-			return true;
-		}
-	}
-
-	/*
-	jsize_t screen = Window::GetInstance()->GetScreenSize();
-	int x = event->GetX()-_location.x;
-	int y = event->GetY()-_location.y;
-
-	if (GetRotation() == JWR_90) {
-		e.SetX(-(y-_scale.height));
-		e.SetY(x);
-	} else if (GetRotation() == JWR_180) {
-		e.SetX(screen.width-x);
-		e.SetY(screen.height-y);
-	} else if (GetRotation() == JWR_270) {
-		e.SetX(y, _scale.width-x);
-		e.SetY();
-	} else {
-		e.SetX(x);
-		e.SetY(y);
-	}
-
-	printf("Mouse Moved:: %d, %d\n", e.GetX(), e.GetY());
-	*/
-
 	return false;
 }
 
@@ -537,14 +507,6 @@ bool Window::MouseWheel(jevent::MouseEvent *event)
 {
 	if (Container::MouseWheel(event) == true) {
 		return true;
-	}
-
-	std::vector<Component *> components = GetComponents();
-
-	for (std::vector<Component *>::iterator i=components.begin(); i!=components.end(); i++) {
-		if ((*i)->MouseWheel(event) == true) {
-			return true;
-		}
 	}
 
 	return false;
