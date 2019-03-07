@@ -68,7 +68,7 @@ void Spin::NextItem()
 
 	Repaint();
 
-	DispatchSelectEvent(new jevent::SelectEvent(_items[_index], _index, jevent::JSET_RIGHT));
+	DispatchSelectEvent(new jevent::SelectEvent(this, _index, jevent::JSET_RIGHT));
 }
 
 void Spin::PreviousItem()
@@ -79,13 +79,13 @@ void Spin::PreviousItem()
 		_index = 0;
 
 		if (_loop == true) {
-			_index = _items.size()-1;
+			_index = _items.size() - 1;
 		}
 	}
 
 	Repaint();
 
-	DispatchSelectEvent(new jevent::SelectEvent(_items[_index], _index, jevent::JSET_LEFT));
+	DispatchSelectEvent(new jevent::SelectEvent(this, _index, jevent::JSET_LEFT));
 }
 
 bool Spin::KeyPressed(jevent::KeyEvent *event)
@@ -127,7 +127,7 @@ bool Spin::KeyPressed(jevent::KeyEvent *event)
 			catched = true;
 		}
 	} else if (action == jevent::JKS_ENTER) {
-		DispatchSelectEvent(new jevent::SelectEvent(_items[_index], _index, jevent::JSET_ACTION));
+		DispatchSelectEvent(new jevent::SelectEvent(this, _index, jevent::JSET_ACTION));
 
 		catched = true;
 	}
@@ -350,7 +350,7 @@ void Spin::Paint(Graphics *g)
 					text = font->TruncateString(text, "...", w);
 				// }
 
-				g->DrawString(text, x + arrow_size + 4, y, w, h, _items[_index]->GetHorizontalAlign(), _items[_index]->GetVerticalAlign());
+				g->DrawString(text, x, y, w, h, _items[_index]->GetHorizontalAlign(), _items[_index]->GetVerticalAlign());
 			}
 		}
 	} else if (_type == JSO_VERTICAL) {

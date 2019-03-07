@@ -22,6 +22,9 @@
 
 #include "jgui/jcontainer.h"
 
+#include <mutex>
+#include <condition_variable>
+
 namespace jgui {
 
 /**
@@ -31,9 +34,17 @@ namespace jgui {
  */
 class Dialog : public jgui::Container {
 
-	private:
+	protected:
 		/** \brief */
 		Component *_focus_owner;
+		/** \brief */
+    jgui::Theme *_dialog_theme;
+		/** \brief */
+    std::mutex _modal_mutex;
+		/** \brief */
+    std::condition_variable _modal_condition;
+		/** \brief */
+    std::string _title;
 		/** \brief */
     bool _is_modal;
 
@@ -48,7 +59,25 @@ class Dialog : public jgui::Container {
 		 * \brief
 		 *
 		 */
+		Dialog(Container *parent, std::string title, int x = 0, int y = 0, int width = 0, int height = 0);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~Dialog();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetTitle(std::string title);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual std::string GetTitle();
 
 		/**
 		 * \brief
@@ -60,7 +89,7 @@ class Dialog : public jgui::Container {
 		 * \brief
 		 *
 		 */
-		virtual void Exec(bool modal = true);
+		virtual void Exec(bool modal = false);
 		
 		/**
 		 * \brief

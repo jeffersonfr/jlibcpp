@@ -473,7 +473,7 @@ void ListBox::Paint(Graphics *g)
 		} else if (_items[i]->GetType() == JIT_TEXT) {
 		} else if (_items[i]->GetType() == JIT_IMAGE) {
 			if (_items[i]->GetImage() != nullptr) {
-				g->DrawImage(_items[i]->GetImage(), hg, y+(is + ig)*i, is, is);
+				g->DrawImage(_items[i]->GetImage(), hg, y + (is + ig)*i, is, is);
 			}
 		}
 

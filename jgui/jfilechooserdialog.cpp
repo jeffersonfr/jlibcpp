@@ -36,13 +36,11 @@ struct ascending_sort {
 };
 
 FileChooserDialog::FileChooserDialog(Container *parent, std::string title, std::string directory, jfilechooser_type_t type):
-	jgui::Dialog(parent, 0, 0, 720, 480)
+	jgui::Dialog(parent, title, 0, 0, 720, 480)
 {
 	jcommon::Object::SetClassName("jgui::FileChooserDialogBox");
 
-	_label = NULL;
 	_file = NULL;
-
 	_base_dir = directory;
 	_current_dir = directory;
 	_has_parent = false;
@@ -54,26 +52,22 @@ FileChooserDialog::FileChooserDialog(Container *parent, std::string title, std::
     size = GetSize();
 	jinsets_t 
     insets = GetInsets();
+  int 
+    dw = size.width - insets.left - insets.right;
 
-	_list = new jgui::ListBox(insets.left, insets.top, size.width - insets.left - insets.right, size.height - insets.top - insets.bottom);
-
-	Add(_list);
+	_image_file = new jgui::BufferedImage(_DATA_PREFIX"/images/file.png");
+	_image_folder = new jgui::BufferedImage(_DATA_PREFIX"/images/folder.png");
 
 	if (_type == JFCT_SAVE_FILE_DIALOG) {
-    jregion_t
-      t = _list->GetVisibleBounds();
+	  _list = new jgui::ListBox(insets.left, insets.top, dw, size.height - insets.top - insets.bottom - 1*(DEFAULT_COMPONENT_HEIGHT + 8) - 8);
+    _file = new jgui::TextField(insets.left, size.height - insets.bottom - 1*(DEFAULT_COMPONENT_HEIGHT + 8), dw, DEFAULT_COMPONENT_HEIGHT);
 
-		_label = new jgui::Label("File name", insets.left, t.y + t.height + 10, size.width - insets.left - insets.right, 45);
-      
-    t = _label->GetVisibleBounds();
-		
-    _file = new jgui::TextField(insets.left, t.y + t.height + 10, size.width - insets.left - insets.right, 45);
-
-		_label->SetBackgroundVisible(false);
-
-		Add(_label);
 		Add(_file);
-	}
+	} else {
+	  _list = new jgui::ListBox(insets.left, insets.top, dw, size.height - insets.top - insets.bottom);
+  }
+
+  Add(_list);
 
 	_list->RequestFocus();
 	_list->RegisterSelectListener(this);
@@ -86,8 +80,6 @@ FileChooserDialog::FileChooserDialog(Container *parent, std::string title, std::
 	} else {
 		AddSubtitle(_DATA_PREFIX"/images/blue_icon.png", "Save");
 	}
-
-	Pack();
 	*/
 }
 
@@ -100,15 +92,20 @@ FileChooserDialog::~FileChooserDialog()
     _list = nullptr;
 	}
 
-	if (_label != NULL) {
-		delete _label;
-    _label = nullptr;
-	}
-
 	if (_file != NULL) {
 		delete _file;
     _file = nullptr;
 	}
+	
+  if (_image_file != nullptr) {
+    delete _image_file;
+    _image_file = nullptr;
+  }
+  
+  if (_image_folder != nullptr) {
+	  delete _image_folder;
+	  _image_folder = nullptr;
+  }
 }
 
 std::string FileChooserDialog::GetFile()
@@ -177,7 +174,7 @@ bool FileChooserDialog::ShowFiles(std::string current_dir)
 	}
 
 	_list->RemoveItems();
-	_list->AddImageItem("..", new jgui::BufferedImage(_DATA_PREFIX"/images/folder.png"));
+	_list->AddImageItem("..", _image_folder);
 	_list->SetCurrentIndex(0);
 
 	if (files.size() == 0) {
@@ -192,7 +189,7 @@ bool FileChooserDialog::ShowFiles(std::string current_dir)
 		for (unsigned int i=0; i<files.size(); i++) {
 			if (IsDirectory(current_dir + jio::File::GetDelimiter() + files[i])) {
 				// adiciona um icone para o diretorio
-				_list->AddImageItem(files[i], new jgui::BufferedImage(_DATA_PREFIX"/images/folder.png")); 
+				_list->AddImageItem(files[i], _image_folder); 
 			}
 		}
 	}
@@ -229,7 +226,7 @@ bool FileChooserDialog::ShowFiles(std::string current_dir)
 
 			if (b == true) {
 				if (IsFile(current_dir + jio::File::GetDelimiter() + file)) {
-					_list->AddImageItem(file, new jgui::BufferedImage(_DATA_PREFIX"/images/file.png"));
+					_list->AddImageItem(file, _image_file);
 				}
 			}
 		}

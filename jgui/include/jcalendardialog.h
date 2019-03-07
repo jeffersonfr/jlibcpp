@@ -77,29 +77,7 @@ class CalendarDialog : public jgui::Dialog, public jevent::ActionListener, publi
 		/** \brief */
 		std::string _text;
 		/** \brief */
-		int delta;
-		/** \brief */
-		int bx;
-		/** \brief */
-		int by;
-		/** \brief */
-		int bwidth;
-		/** \brief */
-		int bheight;
-		/** \brief */
 		int _state;
-		/** \brief */
-		int _day;
-		/** \brief */
-		int _month;
-		/** \brief */
-		int _year;
-		/** \brief */
-		int _current_day;
-		/** \brief */
-		int _current_month;
-		/** \brief */
-		int _current_year;
 		/** \brief */
 		int _select_day;
 		/** \brief */

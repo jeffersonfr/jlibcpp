@@ -25,6 +25,10 @@
 
 #include <algorithm>
 
+#define KEY_WIDTH_1	DEFAULT_COMPONENT_HEIGHT
+#define KEY_WIDTH_2 (4*KEY_WIDTH_1)
+#define KEY_WIDTH_3	(6*KEY_WIDTH_1)
+
 #define KEYBOARD_LAYOUT 																		\
 	_display = new TextArea(); 																\
 																														\
@@ -45,7 +49,7 @@
 																														\
 	container->SetScrollableX(false);													\
 	container->SetScrollableY(false);													\
-	container->SetSize(600, 5*(DEFAULT_COMPONENT_HEIGHT+4));  \
+	container->SetSize(600, 5*(DEFAULT_COMPONENT_HEIGHT + 4));\
 																														\
 	for (int i=0; i<5; i++) { 																\
 		lines[i] = new Container(); 														\
@@ -59,27 +63,22 @@
 		container->Add(lines[i]); 															\
 	} 																												\
 																														\
-	Add(container, jgui::JBLA_SOUTH); 												\
-
-
-#define KEY_WIDTH_1	DEFAULT_COMPONENT_HEIGHT
-#define KEY_WIDTH_2 (4*KEY_WIDTH_1)
-#define KEY_WIDTH_3	(6*KEY_WIDTH_1)
+	Add(container, jgui::JBLA_NORTH); 												\
 
 namespace jgui {
 
 class KeyButton : public Button {
 
 	public:
-		KeyButton(std::string label1, std::string label2, jevent::ActionListener *listener, int width = KEY_WIDTH_1):
+		KeyButton(std::string label1, std::string label2, jevent::ActionListener *listener, int width, int height):
 			Button(label1, 0, 0, 0, 0) 
 		{
 			jcommon::Object::SetClassName("KeyButton");
 
-			jsize_t t;
-
-			t.width = width;
-			t.height = DEFAULT_COMPONENT_HEIGHT;
+			jsize_t t = {
+        .width = width,
+        .height = height
+      };
 
 			SetName(label2);
 			SetPreferredSize(t);
@@ -90,11 +89,9 @@ class KeyButton : public Button {
 };
 
 KeyboardDialog::KeyboardDialog(Container *parent, jkeyboard_type_t type, bool text_visible, bool is_password):
- 	jgui::Dialog(parent)
+ 	jgui::Dialog(parent, "Keyboard")
 {
 	jcommon::Object::SetClassName("jgui::KeyboardDialog");
-
-	// SetIcon(jcommon::System::GetResourceDirectory() + "/images/keyboard_icon.png");
 
 	_display = NULL;
 	_shift_pressed = false;
@@ -561,63 +558,63 @@ void KeyboardDialog::BuildInternetKeyboard()
 {
 	KEYBOARD_LAYOUT
 
-	lines[0]->Add(new KeyButton("@", "#", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("1", "1", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("2", "2", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("3", "3", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("4", "4", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("5", "5", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("6", "6", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("7", "7", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("8", "8", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("9", "9", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("0", "0", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("+", "=", this, KEY_WIDTH_1));
+	lines[0]->Add(new KeyButton("@", "#", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[0]->Add(new KeyButton("1", "1", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[0]->Add(new KeyButton("2", "2", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[0]->Add(new KeyButton("3", "3", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[0]->Add(new KeyButton("4", "4", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[0]->Add(new KeyButton("5", "5", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[0]->Add(new KeyButton("6", "6", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[0]->Add(new KeyButton("7", "7", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[0]->Add(new KeyButton("8", "8", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[0]->Add(new KeyButton("9", "9", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[0]->Add(new KeyButton("0", "0", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[0]->Add(new KeyButton("+", "=", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
 
-	lines[1]->Add(new KeyButton("q", "Q", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("w", "W", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("e", "E", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("r", "R", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("t", "T", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("y", "Y", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("u", "U", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("i", "I", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("o", "O", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("p", "P", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("(", "[", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton(")", "]", this, KEY_WIDTH_1));
+	lines[1]->Add(new KeyButton("q", "Q", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[1]->Add(new KeyButton("w", "W", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[1]->Add(new KeyButton("e", "E", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[1]->Add(new KeyButton("r", "R", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[1]->Add(new KeyButton("t", "T", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[1]->Add(new KeyButton("y", "Y", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[1]->Add(new KeyButton("u", "U", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[1]->Add(new KeyButton("i", "I", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[1]->Add(new KeyButton("o", "O", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[1]->Add(new KeyButton("p", "P", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[1]->Add(new KeyButton("(", "[", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[1]->Add(new KeyButton(")", "]", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
 
-	lines[2]->Add(new KeyButton("a", "A", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("s", "S", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("d", "D", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("f", "F", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("g", "G", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("h", "H", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("j", "J", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("k", "K", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("l", "L", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("~", "^", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("-", "_", this, KEY_WIDTH_1));
+	lines[2]->Add(new KeyButton("a", "A", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[2]->Add(new KeyButton("s", "S", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[2]->Add(new KeyButton("d", "D", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[2]->Add(new KeyButton("f", "F", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[2]->Add(new KeyButton("g", "G", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[2]->Add(new KeyButton("h", "H", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[2]->Add(new KeyButton("j", "J", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[2]->Add(new KeyButton("k", "K", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[2]->Add(new KeyButton("l", "L", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[2]->Add(new KeyButton("~", "^", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[2]->Add(new KeyButton("-", "_", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
 
-	lines[3]->Add(new KeyButton("caps", "caps", this, KEY_WIDTH_2));
-	lines[3]->Add(new KeyButton("/", "|", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("z", "Z", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("x", "X", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("c", "C", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("v", "V", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("b", "B", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("n", "N", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("m", "M", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton(".", ":", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("&", "%", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("?", "!", this, KEY_WIDTH_1));
+	lines[3]->Add(new KeyButton("caps", "caps", this, KEY_WIDTH_2, DEFAULT_COMPONENT_HEIGHT));
+	lines[3]->Add(new KeyButton("/", "|", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[3]->Add(new KeyButton("z", "Z", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[3]->Add(new KeyButton("x", "X", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[3]->Add(new KeyButton("c", "C", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[3]->Add(new KeyButton("v", "V", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[3]->Add(new KeyButton("b", "B", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[3]->Add(new KeyButton("n", "N", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[3]->Add(new KeyButton("m", "M", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[3]->Add(new KeyButton(".", ":", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[3]->Add(new KeyButton("&", "%", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[3]->Add(new KeyButton("?", "!", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
 
-	lines[4]->Add(new KeyButton("shift", "shift", this, KEY_WIDTH_2));
-	lines[4]->Add(new KeyButton("back", "back", this, KEY_WIDTH_2));
-	lines[4]->Add(new KeyButton("http://", "http://", this, KEY_WIDTH_2));
-	lines[4]->Add(new KeyButton("www.", "www.", this, KEY_WIDTH_2));
-	lines[4]->Add(new KeyButton(".com", ".com", this, KEY_WIDTH_2));
-	lines[4]->Add(new KeyButton("enter", "enter", this, KEY_WIDTH_2));
+	lines[4]->Add(new KeyButton("shift", "shift", this, KEY_WIDTH_2, DEFAULT_COMPONENT_HEIGHT));
+	lines[4]->Add(new KeyButton("back", "back", this, KEY_WIDTH_2, DEFAULT_COMPONENT_HEIGHT));
+	lines[4]->Add(new KeyButton("http://", "http://", this, KEY_WIDTH_2, DEFAULT_COMPONENT_HEIGHT));
+	lines[4]->Add(new KeyButton("www.", "www.", this, KEY_WIDTH_2, DEFAULT_COMPONENT_HEIGHT));
+	lines[4]->Add(new KeyButton(".com", ".com", this, KEY_WIDTH_2, DEFAULT_COMPONENT_HEIGHT));
+	lines[4]->Add(new KeyButton("enter", "enter", this, KEY_WIDTH_2, DEFAULT_COMPONENT_HEIGHT));
 
 	lines[0]->GetComponents()[0]->RequestFocus();
 }
@@ -626,46 +623,46 @@ void KeyboardDialog::BuildAlphaNumericKeyboard()
 {
 	KEYBOARD_LAYOUT
 
-	lines[0]->Add(new KeyButton("a", "A", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("b", "B", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("c", "C", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("d", "D", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("e", "E", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("f", "F", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("g", "G", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("h", "H", this, KEY_WIDTH_1));
+	lines[0]->Add(new KeyButton("a", "A", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[0]->Add(new KeyButton("b", "B", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[0]->Add(new KeyButton("c", "C", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[0]->Add(new KeyButton("d", "D", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[0]->Add(new KeyButton("e", "E", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[0]->Add(new KeyButton("f", "F", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[0]->Add(new KeyButton("g", "G", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[0]->Add(new KeyButton("h", "H", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
 
-	lines[1]->Add(new KeyButton("i", "I", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("j", "J", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("k", "K", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("l", "L", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("m", "M", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("n", "N", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("o", "O", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("p", "P", this, KEY_WIDTH_1));
+	lines[1]->Add(new KeyButton("i", "I", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[1]->Add(new KeyButton("j", "J", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[1]->Add(new KeyButton("k", "K", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[1]->Add(new KeyButton("l", "L", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[1]->Add(new KeyButton("m", "M", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[1]->Add(new KeyButton("n", "N", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[1]->Add(new KeyButton("o", "O", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[1]->Add(new KeyButton("p", "P", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
 
-	lines[2]->Add(new KeyButton("q", "Q", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("r", "R", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("s", "S", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("t", "T", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("u", "U", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("v", "V", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("x", "X", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("w", "W", this, KEY_WIDTH_1));
+	lines[2]->Add(new KeyButton("q", "Q", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[2]->Add(new KeyButton("r", "R", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[2]->Add(new KeyButton("s", "S", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[2]->Add(new KeyButton("t", "T", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[2]->Add(new KeyButton("u", "U", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[2]->Add(new KeyButton("v", "V", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[2]->Add(new KeyButton("x", "X", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[2]->Add(new KeyButton("w", "W", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
 
-	lines[3]->Add(new KeyButton("y", "Y", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("z", "Z", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("@", "#", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("(", "*", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton(")", "-", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton(".", ",", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton(";", ":", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("/", "?", this, KEY_WIDTH_1));
+	lines[3]->Add(new KeyButton("y", "Y", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[3]->Add(new KeyButton("z", "Z", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[3]->Add(new KeyButton("@", "#", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[3]->Add(new KeyButton("(", "*", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[3]->Add(new KeyButton(")", "-", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[3]->Add(new KeyButton(".", ",", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[3]->Add(new KeyButton(";", ":", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[3]->Add(new KeyButton("/", "?", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
 
-	lines[4]->Add(new KeyButton("caps", "caps", this, KEY_WIDTH_2));
-	lines[4]->Add(new KeyButton("space", "space", this, KEY_WIDTH_2));
-	lines[4]->Add(new KeyButton("back", "back", this, KEY_WIDTH_2));
-	lines[4]->Add(new KeyButton("enter", "enter", this, KEY_WIDTH_2));
+	lines[4]->Add(new KeyButton("caps", "caps", this, KEY_WIDTH_2, DEFAULT_COMPONENT_HEIGHT));
+	lines[4]->Add(new KeyButton("space", "space", this, KEY_WIDTH_2, DEFAULT_COMPONENT_HEIGHT));
+	lines[4]->Add(new KeyButton("back", "back", this, KEY_WIDTH_2, DEFAULT_COMPONENT_HEIGHT));
+	lines[4]->Add(new KeyButton("enter", "enter", this, KEY_WIDTH_2, DEFAULT_COMPONENT_HEIGHT));
 
 	lines[0]->GetComponents()[0]->RequestFocus();
 }
@@ -674,65 +671,65 @@ void KeyboardDialog::BuildQWERTYKeyboard()
 {
 	KEYBOARD_LAYOUT
 
-	lines[0]->Add(new KeyButton("'", "\"", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("1", "1", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("2", "2", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("3", "3", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("4", "4", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("5", "5", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("6", "6", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("7", "7", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("8", "8", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("9", "9", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("0", "0", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("-", "_", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("=", "+", this, KEY_WIDTH_1));
+	lines[0]->Add(new KeyButton("'", "\"", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[0]->Add(new KeyButton("1", "1", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[0]->Add(new KeyButton("2", "2", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[0]->Add(new KeyButton("3", "3", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[0]->Add(new KeyButton("4", "4", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[0]->Add(new KeyButton("5", "5", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[0]->Add(new KeyButton("6", "6", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[0]->Add(new KeyButton("7", "7", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[0]->Add(new KeyButton("8", "8", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[0]->Add(new KeyButton("9", "9", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[0]->Add(new KeyButton("0", "0", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[0]->Add(new KeyButton("-", "_", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[0]->Add(new KeyButton("=", "+", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
 
-	lines[1]->Add(new KeyButton("tab", "tab", this, KEY_WIDTH_2));
-	lines[1]->Add(new KeyButton("q", "Q", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("w", "W", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("e", "E", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("r", "R", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("t", "T", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("y", "Y", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("u", "U", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("i", "I", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("o", "O", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("p", "P", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("'", "`", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("[", "{", this, KEY_WIDTH_1));
+	lines[1]->Add(new KeyButton("tab", "tab", this, KEY_WIDTH_2, DEFAULT_COMPONENT_HEIGHT));
+	lines[1]->Add(new KeyButton("q", "Q", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[1]->Add(new KeyButton("w", "W", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[1]->Add(new KeyButton("e", "E", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[1]->Add(new KeyButton("r", "R", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[1]->Add(new KeyButton("t", "T", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[1]->Add(new KeyButton("y", "Y", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[1]->Add(new KeyButton("u", "U", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[1]->Add(new KeyButton("i", "I", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[1]->Add(new KeyButton("o", "O", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[1]->Add(new KeyButton("p", "P", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[1]->Add(new KeyButton("'", "`", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[1]->Add(new KeyButton("[", "{", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
 
-	lines[2]->Add(new KeyButton("caps", "caps", this, KEY_WIDTH_2));
-	lines[2]->Add(new KeyButton("a", "A", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("s", "S", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("d", "D", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("f", "F", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("g", "G", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("h", "H", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("j", "J", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("k", "K", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("l", "L", this, KEY_WIDTH_1));
-	// lines[2]->Add(new KeyButton("ç", "Ç", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("~", "^", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("]", "}", this, KEY_WIDTH_1));
+	lines[2]->Add(new KeyButton("caps", "caps", this, KEY_WIDTH_2, DEFAULT_COMPONENT_HEIGHT));
+	lines[2]->Add(new KeyButton("a", "A", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[2]->Add(new KeyButton("s", "S", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[2]->Add(new KeyButton("d", "D", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[2]->Add(new KeyButton("f", "F", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[2]->Add(new KeyButton("g", "G", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[2]->Add(new KeyButton("h", "H", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[2]->Add(new KeyButton("j", "J", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[2]->Add(new KeyButton("k", "K", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[2]->Add(new KeyButton("l", "L", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	// lines[2]->Add(new KeyButton("ç", "Ç", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[2]->Add(new KeyButton("~", "^", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[2]->Add(new KeyButton("]", "}", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
 
-	lines[3]->Add(new KeyButton("shift", "shift", this, KEY_WIDTH_2));
-	lines[3]->Add(new KeyButton("\\", "|", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("z", "Z", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("x", "X", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("c", "C", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("v", "V", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("b", "B", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("n", "N", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("m", "M", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton(",", "<", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton(".", ">", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton(";", ":", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("/", "?", this, KEY_WIDTH_1));
+	lines[3]->Add(new KeyButton("shift", "shift", this, KEY_WIDTH_2, DEFAULT_COMPONENT_HEIGHT));
+	lines[3]->Add(new KeyButton("\\", "|", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[3]->Add(new KeyButton("z", "Z", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[3]->Add(new KeyButton("x", "X", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[3]->Add(new KeyButton("c", "C", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[3]->Add(new KeyButton("v", "V", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[3]->Add(new KeyButton("b", "B", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[3]->Add(new KeyButton("n", "N", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[3]->Add(new KeyButton("m", "M", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[3]->Add(new KeyButton(",", "<", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[3]->Add(new KeyButton(".", ">", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[3]->Add(new KeyButton(";", ":", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[3]->Add(new KeyButton("/", "?", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
 
-	lines[4]->Add(new KeyButton("back", "back", this, KEY_WIDTH_3));
-	lines[4]->Add(new KeyButton("space", "space", this, KEY_WIDTH_3));
-	lines[4]->Add(new KeyButton("enter", "enter", this, KEY_WIDTH_3));
+	lines[4]->Add(new KeyButton("back", "back", this, KEY_WIDTH_3, DEFAULT_COMPONENT_HEIGHT));
+	lines[4]->Add(new KeyButton("space", "space", this, KEY_WIDTH_3, DEFAULT_COMPONENT_HEIGHT));
+	lines[4]->Add(new KeyButton("enter", "enter", this, KEY_WIDTH_3, DEFAULT_COMPONENT_HEIGHT));
 
 	lines[0]->GetComponents()[0]->RequestFocus();
 }
@@ -741,31 +738,31 @@ void KeyboardDialog::BuildNumericKeyboard()
 {
 	KEYBOARD_LAYOUT
 
-	lines[0]->Add(new KeyButton("(", "(", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("7", "7", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("8", "8", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("9", "9", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("+", "+", this, KEY_WIDTH_1));
+	lines[0]->Add(new KeyButton("(", "(", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[0]->Add(new KeyButton("7", "7", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[0]->Add(new KeyButton("8", "8", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[0]->Add(new KeyButton("9", "9", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[0]->Add(new KeyButton("+", "+", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
 
-	lines[1]->Add(new KeyButton(")", ")", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("4", "4", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("5", "5", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("6", "6", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("-", "-", this, KEY_WIDTH_1));
+	lines[1]->Add(new KeyButton(")", ")", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[1]->Add(new KeyButton("4", "4", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[1]->Add(new KeyButton("5", "5", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[1]->Add(new KeyButton("6", "6", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[1]->Add(new KeyButton("-", "-", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
 
-	lines[2]->Add(new KeyButton("%", "%", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("1", "1", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("2", "2", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("3", "3", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("*", "*", this, KEY_WIDTH_1));
+	lines[2]->Add(new KeyButton("%", "%", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[2]->Add(new KeyButton("1", "1", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[2]->Add(new KeyButton("2", "2", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[2]->Add(new KeyButton("3", "3", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[2]->Add(new KeyButton("*", "*", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
 
-	lines[3]->Add(new KeyButton("back", "back", this, KEY_WIDTH_2));
-	lines[3]->Add(new KeyButton(".", ".", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("=", "=", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("/", "/", this, KEY_WIDTH_1));
+	lines[3]->Add(new KeyButton("back", "back", this, KEY_WIDTH_2, DEFAULT_COMPONENT_HEIGHT));
+	lines[3]->Add(new KeyButton(".", ".", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[3]->Add(new KeyButton("=", "=", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[3]->Add(new KeyButton("/", "/", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
 
-	lines[4]->Add(new KeyButton("space", "space", this, KEY_WIDTH_2));
-	lines[4]->Add(new KeyButton("enter", "enter", this, KEY_WIDTH_2));
+	lines[4]->Add(new KeyButton("space", "space", this, KEY_WIDTH_2, DEFAULT_COMPONENT_HEIGHT));
+	lines[4]->Add(new KeyButton("enter", "enter", this, KEY_WIDTH_2, DEFAULT_COMPONENT_HEIGHT));
 
 	lines[0]->GetComponents()[0]->RequestFocus();
 }
@@ -774,29 +771,28 @@ void KeyboardDialog::BuildPhoneKeyboard()
 {
 	KEYBOARD_LAYOUT
 
-	lines[0]->Add(new KeyButton("7", "7", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("8", "8", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("9", "9", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("(", "(", this, KEY_WIDTH_1));
+	lines[0]->Add(new KeyButton("7", "7", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[0]->Add(new KeyButton("8", "8", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[0]->Add(new KeyButton("9", "9", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[0]->Add(new KeyButton("(", "(", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
 
-	lines[1]->Add(new KeyButton("4", "4", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("5", "5", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("6", "6", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton(")", ")", this, KEY_WIDTH_1));
+	lines[1]->Add(new KeyButton("4", "4", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[1]->Add(new KeyButton("5", "5", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[1]->Add(new KeyButton("6", "6", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[1]->Add(new KeyButton(")", ")", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
 
-	lines[2]->Add(new KeyButton("1", "1", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("2", "2", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("3", "3", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("-", "-", this, KEY_WIDTH_1));
+	lines[2]->Add(new KeyButton("1", "1", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[2]->Add(new KeyButton("2", "2", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[2]->Add(new KeyButton("3", "3", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[2]->Add(new KeyButton("-", "-", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
 	
-	lines[3]->Add(new KeyButton("*", "*", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("0", "0", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("+", "+", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("#", "#", this, KEY_WIDTH_1));
+	lines[3]->Add(new KeyButton("*", "*", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[3]->Add(new KeyButton("0", "0", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[3]->Add(new KeyButton("+", "+", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
+	lines[3]->Add(new KeyButton("#", "#", this, KEY_WIDTH_1, DEFAULT_COMPONENT_HEIGHT));
 
-
-	lines[4]->Add(new KeyButton("space", "space", this, KEY_WIDTH_2));
-	lines[4]->Add(new KeyButton("back", "back", this, KEY_WIDTH_2));
+	lines[4]->Add(new KeyButton("space", "space", this, KEY_WIDTH_2, DEFAULT_COMPONENT_HEIGHT));
+	lines[4]->Add(new KeyButton("back", "back", this, KEY_WIDTH_2, DEFAULT_COMPONENT_HEIGHT));
 
 	lines[0]->GetComponents()[0]->RequestFocus();
 }

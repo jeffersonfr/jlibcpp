@@ -25,6 +25,11 @@
 namespace jgui {
 
 Dialog::Dialog(Container *parent, int x, int y, int width, int height):
+	Dialog(parent, "", x, y, width, height)
+{
+}
+
+Dialog::Dialog(Container *parent, std::string title, int x, int y, int width, int height):
 	jgui::Container(x, y, width, height)
 {
   if (parent == nullptr) {
@@ -35,6 +40,17 @@ Dialog::Dialog(Container *parent, int x, int y, int width, int height):
     throw jexception::InvalidArgumentException("Parent must be a window");
   }
 
+	jgui::jinsets_t 
+    insets;
+  
+  insets.left = 8;
+  insets.top = 8;
+  insets.right = 8;
+  insets.bottom = 8;
+
+  SetInsets(insets);
+  SetTitle(title);
+  SetBackgroundVisible(true);
   SetParent(parent);
 
   _focus_owner = nullptr;
@@ -46,9 +62,56 @@ Dialog::~Dialog()
   Close();
 }
 
+void Dialog::SetTitle(std::string title)
+{
+  _title = title;
+  
+	jgui::jinsets_t 
+    insets;
+  
+  insets.left = 8;
+  insets.top = 8;
+  insets.right = 8;
+  insets.bottom = 8;
+
+  if (_title.empty() == false) {
+    jgui::Theme
+      *theme = GetTheme();
+    jgui::Font 
+      *font = theme->GetFont("container.font");
+
+    if (font != nullptr) {
+      insets.top = font->GetSize() + 16;
+    }
+  }
+   
+  SetInsets(insets);
+}
+
+std::string Dialog::GetTitle()
+{
+  return _title;
+}
+
 void Dialog::Paint(Graphics *g)
 {
   Container::Paint(g);
+
+  if (_title.empty() == false) {
+    jgui::Theme
+      *theme = GetTheme();
+    jgui::Font 
+      *font = theme->GetFont("container.font");
+	
+    if (font != nullptr) {
+      jgui::jsize_t
+        size = GetSize();
+
+      g->SetFont(font);
+      g->SetColor(theme->GetIntegerParam("container.fg"));
+      g->DrawString(_title, 0, 8, size.width, font->GetSize(), jgui::JHA_CENTER, jgui::JVA_CENTER);
+    }
+  }
 }
 
 bool Dialog::IsModal()
@@ -59,11 +122,19 @@ bool Dialog::IsModal()
 void Dialog::Exec(bool modal)
 {
   GetParent()->InternalAddDialog(this);
+
+  if (modal == true) {
+    std::unique_lock<std::mutex> lock(_modal_mutex);
+
+    _modal_condition.wait(lock);
+  }
 }
 
 void Dialog::Close()
 {
   GetParent()->InternalRemoveDialog(this);
+
+  _modal_condition.notify_one();
 }
 
 jgui::Component * Dialog::GetFocusOwner()

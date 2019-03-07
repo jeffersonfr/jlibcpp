@@ -35,7 +35,6 @@ Item::Item():
 	_valign = JVA_CENTER;
 
 	_is_enabled = true;
-	_prefetch = nullptr;
 	_is_checked = false;
 	_is_visible = true;
 	_type = JIT_EMPTY;
@@ -50,7 +49,6 @@ Item::Item(std::string value):
 	_valign = JVA_CENTER;
 
 	_is_enabled = true;
-	_prefetch = nullptr;
 	_value = value;
 	_is_checked = false;
 	_is_visible = true;
@@ -66,7 +64,6 @@ Item::Item(std::string value, jgui::Image *image):
 	_valign = JVA_CENTER;
 
 	_is_enabled = true;
-	_prefetch = nullptr;
 	_image = image;
 	_value = value;
 	_is_checked = false;
@@ -83,7 +80,6 @@ Item::Item(std::string value, bool checked):
 	_valign = JVA_CENTER;
 
 	_is_enabled = true;
-	_prefetch = nullptr;
 	_value = value;
 	_is_checked = checked;
 	_is_visible = true;
@@ -92,19 +88,11 @@ Item::Item(std::string value, bool checked):
 
 Item::~Item()
 {
-	if (_prefetch != nullptr) {
-		delete _prefetch;
-		_prefetch = nullptr;
-	}
 }
 
 jcommon::Object * Item::Clone()
 {
 	Item *item = new Item(*this);
-
-	if (_prefetch != nullptr) {
-		item->_prefetch = dynamic_cast<Image *>(item->_prefetch->Clone());
-	}
 
 	for (std::vector<Item *>::iterator i=_childs.begin(); i!=_childs.end(); i++) {
 		item->_childs.push_back(dynamic_cast<Item *>((*i)->Clone()));
@@ -225,7 +213,7 @@ std::string Item::GetValue()
 
 jgui::Image * Item::GetImage()
 {
-	return _prefetch;
+	return _image;
 }
 
 jitem_type_t Item::GetType()
@@ -256,126 +244,6 @@ void ItemComponent::AddInternalItem(Item *item)
 	if (i == _internal.end()) {
 		_internal.push_back(item);
 	}
-}
-
-Color & ItemComponent::GetItemColor()
-{
-	return _item_color;
-}
-
-Color & ItemComponent::GetItemForegroundColor()
-{
-	return _item_fgcolor;
-}
-
-Color & ItemComponent::GetItemFocusColor()
-{
-	return _focus_item_color;
-}
-
-Color & ItemComponent::GetItemForegroundFocusColor()
-{
-	return _focus_item_fgcolor;
-}
-
-Color & ItemComponent::GetSelectedItemColor()
-{
-	return _selected_item_color;
-}
-
-Color & ItemComponent::GetSelectedItemForegroundColor()
-{
-	return _selected_item_fgcolor;
-}
-
-Color & ItemComponent::GetDisabledItemColor()
-{
-	return _disabled_item_color;
-}
-
-Color & ItemComponent::GetDisabledItemForegroundColor()
-{
-	return _disabled_item_fgcolor;
-}
-
-void ItemComponent::SetItemColor(int red, int green, int blue, int alpha)
-{
-	_item_color = Color(red, green, blue, alpha);
-}
-
-void ItemComponent::SetItemForegroundColor(int red, int green, int blue, int alpha)
-{
-	_item_fgcolor = Color(red, green, blue, alpha);
-}
-
-void ItemComponent::SetItemFocusColor(int red, int green, int blue, int alpha)
-{
-	_focus_item_color = Color(red, green, blue, alpha);
-}
-
-void ItemComponent::SetItemForegroundFocusColor(int red, int green, int blue, int alpha)
-{
-	_focus_item_fgcolor = Color(red, green, blue, alpha);
-}
-
-void ItemComponent::SetSelectedItemColor(int red, int green, int blue, int alpha)
-{
-	_selected_item_color = Color(red, green, blue, alpha);
-}
-
-void ItemComponent::SetSelectedItemForegroundColor(int red, int green, int blue, int alpha)
-{
-	_selected_item_fgcolor = Color(red, green, blue, alpha);
-}
-
-void ItemComponent::SetDisabledItemColor(int red, int green, int blue, int alpha)
-{
-	_disabled_item_color = Color(red, green, blue, alpha);
-}
-
-void ItemComponent::SetDisabledItemForegroundColor(int red, int green, int blue, int alpha)
-{
-	_disabled_item_fgcolor = Color(red, green, blue, alpha);
-}
-
-void ItemComponent::SetItemColor(const Color &color)
-{
-	_item_color = color;
-}
-
-void ItemComponent::SetItemForegroundColor(const Color &color)
-{
-	_item_fgcolor = color;
-}
-
-void ItemComponent::SetItemFocusColor(const Color &color)
-{
-	_focus_item_color = color;
-}
-
-void ItemComponent::SetItemForegroundFocusColor(const Color &color)
-{
-	_focus_item_fgcolor = color;
-}
-
-void ItemComponent::SetSelectedItemColor(const Color &color)
-{
-	_selected_item_color = color;
-}
-
-void ItemComponent::SetSelectedItemForegroundColor(const Color &color)
-{
-	_selected_item_fgcolor = color;
-}
-
-void ItemComponent::SetDisabledItemColor(const Color &color)
-{
-	_disabled_item_color = color;
-}
-
-void ItemComponent::SetDisabledItemForegroundColor(const Color &color)
-{
-	_disabled_item_fgcolor = color;
 }
 
 int ItemComponent::GetItemsSize()

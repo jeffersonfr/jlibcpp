@@ -23,13 +23,20 @@
 
 namespace jgui {
 
+Theme * Theme::_default_theme = new Theme();
+
+Theme * Theme::GetDefaultTheme()
+{
+  return _default_theme;
+}
+
 Theme::Theme():
 	jcommon::Object()
 {
 	jcommon::Object::SetClassName("jgui::Theme");
 
 	// INFO:: component
-	SetIntegerParam("component.bg", 0xff000000);
+	SetIntegerParam("component.bg", 0xa0202020);
 	SetIntegerParam("component.fg", 0xfff0f0f0);
 	SetIntegerParam("component.border", 0xff808080);
 	SetIntegerParam("component.scroll", 0xff404040);

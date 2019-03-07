@@ -39,105 +39,109 @@ class Calendar : public virtual jcommon::Object{
 		/** \brief Years */
 		int _year;
 		
+    /**
+     * \brief
+     *
+     */
 		bool is_bissexto(int ano);
 		
 	public:
-		/**
-		* \brief
-		*
-		*/
-		Calendar();
-		
-		/**
-		* \brief
-		*
-		*/
-		Calendar(int day, int month, int year);
+    /**
+     * \brief
+     *
+     */
+    Calendar();
 
-		/**
-		* \brief
-		*
-		*/
-		virtual ~Calendar();
+    /**
+     * \brief
+     *
+     */
+    Calendar(int day, int month, int year);
 
-		/**
-		* \brief
-		*
-		*/
-		void SetTime(int day, int month, int year);
-		
-		/**
-		* \brief
-		*
-		*/
-		int GetDay() ;
-		
-		/**
-		* \brief
-		*
-		*/
-		int GetMonth();
-		
-		/**
-		* \brief
-		*
-		*/
-		int GetYear();
-		
-		/**
-		* \brief
-		*
-		*/
-		bool IsBissexto();
-		
-		/**
-		* \brief
-		*
-		*/
-		void AddDays(int n);
-		
-		/**
-		* \brief
-		*
-		*/
-		void SubDays(int n);
-		
-		/**
-		* \brief
-		*
-		*/
-		void IncrementDay();
-		
-		/**
-		* \brief
-		*
-		*/
-		void DecrementDay();
-		
-		/**
-		* \brief
-		*
-		*/
-		bool IsValid();
-		
-		/**
-		* \brief Conta os dias desta data ateh date2
-		*
-		*/
-		int CountDays(Calendar *date2);
-		
-		/**
-		* \brief
-		*
-		*/
-		virtual bool Equals(Object *o);
-		
-		/**
-		* \brief
-		*
-		*/
-		virtual int Compare(Object *o);
-		
+    /**
+     * \brief
+     *
+     */
+    virtual ~Calendar();
+
+    /**
+     * \brief
+     *
+     */
+    void SetTime(int day, int month, int year);
+
+    /**
+     * \brief
+     *
+     */
+    int GetDay();
+
+    /**
+     * \brief
+     *
+     */
+    int GetMonth();
+
+    /**
+     * \brief
+     *
+     */
+    int GetYear();
+
+    /**
+     * \brief
+     *
+     */
+    bool IsBissexto();
+
+    /**
+     * \brief
+     *
+     */
+    void AddDays(int n);
+
+    /**
+     * \brief
+     *
+     */
+    void SubDays(int n);
+
+    /**
+     * \brief
+     *
+     */
+    void IncrementDay();
+
+    /**
+     * \brief
+     *
+     */
+    void DecrementDay();
+
+    /**
+     * \brief
+     *
+     */
+    bool IsValid();
+
+    /**
+     * \brief Conta os dias desta data ateh date2
+     *
+     */
+    int CountDays(Calendar *date2);
+
+    /**
+     * \brief
+     *
+     */
+    virtual bool Equals(Object *o);
+
+    /**
+     * \brief
+     *
+     */
+    virtual int Compare(Object *o);
+
 };
 
 }

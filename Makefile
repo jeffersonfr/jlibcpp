@@ -313,7 +313,7 @@ OBJS_jgui += \
 		 jtable.o\
 		 jtextarea.o\
 		 jtextcomponent.o\
-		 jtextdialog.o\
+		 jtoastdialog.o\
 		 jtextfield.o\
 		 jtheme.o\
 		 jtreelistview.o\

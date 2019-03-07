@@ -411,24 +411,23 @@ void TreeListView::Paint(Graphics *g)
 		Item *item = _items[i];
 
 		if (item->IsEnabled() == true) {
-			g->SetColor(GetItemColor());
+			g->SetColor(theme->GetIntegerParam("item.fg"));
 		} else {
-			g->SetColor(GetDisabledItemColor());
+			g->SetColor(theme->GetIntegerParam("item.fg.disable"));
 		}
 
 		if (_index != i) {
 			if (_selected_index == i) {	
-				g->SetColor(_selected_item_color);
+				g->SetColor(theme->GetIntegerParam("item.fg.select"));
 			}
 		} else {
-			g->SetColor(_focus_item_color);
+			g->SetColor(theme->GetIntegerParam("item.fg.focus"));
 		}
 
 		g->FillRectangle(x, y+(is + ig)*i, w, is);
 
-		// g->SetColor(_item_color);
 		if (_selected_index == i) {
-			g->SetColor(_selected_item_color);
+			g->SetColor(theme->GetIntegerParam("item.fg.select"));
 		}
 
 		if (_items[i]->GetType() == JIT_EMPTY) {

@@ -114,8 +114,6 @@ class Window : public jgui::Container {
     EventManager *_event_manager;
 		/** \brief */
 		Component *_focus_owner;
-    /** \brief */
-    Theme _theme;
 
 	public:
 		/**

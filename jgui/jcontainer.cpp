@@ -35,6 +35,7 @@ Container::Container(int x, int y, int width, int height):
 	jcommon::Object::SetClassName("jgui::Container");
 
 	_default_layout = new BorderLayout();
+
 	_layout = _default_layout;
 
 	_is_focus_cycle_root = false;
@@ -55,6 +56,7 @@ Container::~Container()
 {
 	if (_default_layout != nullptr) {
 		delete _default_layout;
+		_default_layout = nullptr;
 	}
 }
 
@@ -166,6 +168,8 @@ void Container::InternalAddDialog(Dialog *dialog)
   _dialogs.push_back(dialog);
   
   _dialogs_mutex.unlock();
+
+  Repaint();
 }
 
 void Container::InternalRemoveDialog(Dialog *dialog)
@@ -175,6 +179,8 @@ void Container::InternalRemoveDialog(Dialog *dialog)
   _dialogs.erase(std::remove(_dialogs.begin(), _dialogs.end(), dialog), _dialogs.end());
   
   _dialogs_mutex.unlock();
+  
+  Repaint();
 }
 
 jsize_t Container::GetScrollDimension()
@@ -352,6 +358,8 @@ void Container::Pack(bool fit)
 
   _container_mutex.lock();
 
+  DoLayout();
+
 	if (fit == true) {
 		for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
 			c = (*i);
@@ -416,6 +424,206 @@ void Container::SetInsets(jinsets_t insets)
 
 void Container::PaintGlassPane(Graphics *g)
 {
+}
+
+void Container::PaintBackground(Graphics *g)
+{
+	if (_is_background_visible == false) {
+		return;
+	}
+	
+  jgui::Theme 
+    *theme = GetTheme();
+
+  if (theme == nullptr) {
+    return;
+  }
+
+  jgui::Color 
+    bg = theme->GetIntegerParam("container.bg"),
+	  bgfocus = theme->GetIntegerParam("container.bg.focus"),
+	  bgdisable = theme->GetIntegerParam("container.bg.disable");
+  jgui::jsize_t
+    size = GetSize();
+	jcomponent_border_t 
+    bordertype = (jcomponent_border_t)theme->GetIntegerParam("container.border.style");
+  int
+    x = theme->GetIntegerParam("container.hgap") + theme->GetIntegerParam("container.border.size"),
+		y = theme->GetIntegerParam("container.vgap") + theme->GetIntegerParam("container.border.size"),
+		w = size.width - 2*x,
+		h = size.height - 2*y;
+
+	if (IsEnabled() == true) {
+		if (HasFocus() == true) {
+			g->SetColor(bgfocus);
+		} else {
+			g->SetColor(bg);
+		}
+	} else {
+		g->SetColor(bgdisable);
+	}
+
+	if (bordertype == JCB_ROUND) {
+		g->FillRoundRectangle(x, y, w, h);
+	} else if (bordertype == JCB_BEVEL) {
+		g->FillBevelRectangle(x, y, w, h);
+	} else {
+		g->FillRectangle(x, y, w, h);
+	}
+}
+
+void Container::PaintBorders(Graphics *g)
+{
+  jgui::Theme 
+    *theme = GetTheme();
+
+  if (theme == nullptr) {
+    return;
+  }
+
+	jcomponent_border_t 
+    bordertype = (jcomponent_border_t)theme->GetIntegerParam("container.border.style");
+
+	if (bordertype == JCB_EMPTY) {
+		return;
+	}
+
+  jgui::Color
+    color,
+    border = theme->GetIntegerParam("container.border"),
+	  borderfocus = theme->GetIntegerParam("container.border.focus"),
+	  borderdisable = theme->GetIntegerParam("container.border.disable");
+  jgui::jsize_t
+    size = GetSize();
+	int 
+    bs = theme->GetIntegerParam("container.border.size");
+	int 
+    xp = 0, 
+		yp = 0,
+		wp = size.width,
+		hp = size.height;
+	int 
+    step = 0x20;
+
+	if (IsEnabled() == true) {
+		if (HasFocus() == true) {
+			color = borderfocus;
+		} else {
+			color = border;
+		}
+	} else {
+		color = borderdisable;
+	}
+
+	int 
+    dr = color.GetRed(),
+		dg = color.GetGreen(),
+		db = color.GetBlue(),
+		da = color.GetAlpha();
+	jpen_t 
+    pen = g->GetPen();
+	int 
+    width = pen.width;
+
+	if (bordertype == JCB_LINE) {
+		g->SetColor(dr, dg, db, da);
+		pen.width = -bs;
+		g->SetPen(pen);
+		g->DrawRectangle(xp, yp, wp, hp);
+	} else if (bordertype == JCB_BEVEL) {
+		g->SetColor(dr, dg, db, da);
+		pen.width = -bs;
+		g->SetPen(pen);
+		g->DrawBevelRectangle(xp, yp, wp, hp);
+	} else if (bordertype == JCB_ROUND) {
+		g->SetColor(dr, dg, db, da);
+		pen.width = -bs;
+		g->SetPen(pen);
+		g->DrawRoundRectangle(xp, yp, wp, hp);
+	} else if (bordertype == JCB_RAISED_GRADIENT) {
+		for (int i=0; i<bs && i<wp && i<hp; i++) {
+			g->SetColor(dr+step*(bs-i), dg+step*(bs-i), db+step*(bs-i));
+			g->DrawLine(xp+i, yp+i, xp+wp-i, yp+i); //cima
+			g->SetColor(dr-step*(bs-i), dg-step*(bs-i), db-step*(bs-i));
+			g->DrawLine(xp+i, yp+hp-i, xp+wp-i, yp+hp-i); //baixo
+		}
+
+		for (int i=0; i<bs && i<wp && i<hp; i++) {
+			g->SetColor(dr+step*(bs-i), dg+step*(bs-i), db+step*(bs-i));
+			g->DrawLine(xp+i, yp+i, xp+i, yp+hp-i); //esquerda
+			g->SetColor(dr-step*(bs-i), dg-step*(bs-i), db-step*(bs-i));
+			g->DrawLine(xp+wp-i, yp+i, xp+wp-i, yp+hp-i); //direita
+		}
+	} else if (bordertype == JCB_LOWERED_GRADIENT) {
+		for (int i=0; i<bs && i<wp && i<hp; i++) {
+			g->SetColor(dr-step*(bs-i), dg-step*(bs-i), db-step*(bs-i));
+			g->DrawLine(xp+i, yp+i, xp+wp-i, yp+i); //cima
+			g->SetColor(dr+step*(bs-i), dg+step*(bs-i), db+step*(bs-i));
+			g->DrawLine(xp+i, yp+hp-i, xp+wp-i, yp+hp-i); //baixo
+		}
+
+		for (int i=0; i<bs && i<wp && i<hp; i++) {
+			g->SetColor(dr-step*(bs-i), dg-step*(bs-i), db-step*(bs-i));
+			g->DrawLine(xp+i, yp+i, xp+i, yp+hp-i); //esquerda
+			g->SetColor(dr+step*(bs-i), dg+step*(bs-i), db+step*(bs-i));
+			g->DrawLine(xp+wp-i, yp+i, xp+wp-i, yp+hp-i); //direita
+		}
+	} else if (bordertype == JCB_RAISED_BEVEL) {
+		for (int i=0; i<bs && i<wp && i<hp; i++) {
+			g->SetColor(dr+step, dg+step, db+step);
+			g->DrawLine(xp+i, yp+i, xp+wp-i, yp+i); //cima
+			g->SetColor(dr-step, dg-step, db-step);
+			g->DrawLine(xp+i, yp+hp-i, xp+wp-i, yp+hp-i); //baixo
+		}
+
+		for (int i=0; i<bs && i<wp && i<hp; i++) {
+			g->SetColor(dr+step, dg+step, db+step);
+			g->DrawLine(xp+i, yp+i, xp+i, yp+hp-i); //esquerda
+			g->SetColor(dr-step, dg-step, db-step);
+			g->DrawLine(xp+wp-i, yp+i, xp+wp-i, yp+hp-i); //direita
+		}
+	} else if (bordertype == JCB_LOWERED_BEVEL) {
+		for (int i=0; i<bs && i<wp && i<hp; i++) {
+			g->SetColor(dr-step, dg-step, db-step);
+			g->DrawLine(xp+i, yp+i, xp+wp-i, yp+i); //cima
+			g->SetColor(dr+step, dg+step, db+step);
+			g->DrawLine(xp+i, yp+hp-i, xp+wp-i, yp+hp-i); //baixo
+		}
+
+		for (int i=0; i<bs && i<wp && i<hp; i++) {
+			g->SetColor(dr-step, dg-step, db-step);
+			g->DrawLine(xp+i, yp+i, xp+i, yp+hp-i); //esquerda
+			g->SetColor(dr+step, dg+step, db+step);
+			g->DrawLine(xp+wp-i, yp+i, xp+wp-i, yp+hp-i); //direita
+		}
+	} else if (bordertype == JCB_RAISED_ETCHED) {
+		g->SetColor(dr+step, dg+step, db+step, da);
+		pen.width = -bs;
+		g->SetPen(pen);
+		g->DrawRectangle(xp, yp, wp, hp);
+		
+		g->SetColor(dr-step, dg-step, db-step, da);
+		pen.width = -bs/2;
+		g->SetPen(pen);
+		g->DrawRectangle(xp, yp, wp-bs/2, hp-bs/2);
+	} else if (bordertype == JCB_LOWERED_ETCHED) {
+		g->SetColor(dr-step, dg-step, db-step, da);
+		pen.width = -bs;
+		g->SetPen(pen);
+		g->DrawRectangle(xp, yp, wp, hp);
+		
+		g->SetColor(dr+step, dg+step, db+step, da);
+		pen.width = -bs/2;
+		g->DrawRectangle(xp, yp, wp-bs/2, hp-bs/2);
+	}
+
+	pen.width = width;
+	g->SetPen(pen);
+
+	if (_is_enabled == false) {
+		g->SetColor(0x00, 0x00, 0x00, 0x80);
+		g->FillRectangle(0, 0, size.width, size.height);
+	}
 }
 
 void Container::Paint(Graphics *g)

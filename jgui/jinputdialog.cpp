@@ -23,37 +23,24 @@
 namespace jgui {
 
 InputDialog::InputDialog(Container *parent, std::string title, std::string msg):
-	jgui::Dialog(parent)
+	jgui::Dialog(parent, title, 0, 0, 560, 280)
 {
 	jcommon::Object::SetClassName("jgui::InputDialog");
-
-	int cw = DEFAULT_COMPONENT_WIDTH,
-			ch = DEFAULT_COMPONENT_HEIGHT;
 
   jgui::jsize_t
     size = GetSize();
 	jgui::jinsets_t 
     insets = GetInsets();
 
-	_label = new Label(msg, insets.left, insets.top, size.width - insets.left - insets.right, size.height - insets.top - insets.bottom);
+	_label = new Label(msg, insets.left, insets.top, size.width - insets.left - insets.right, 180);
 
-	// _label->SetGap(10, 10);
 	_label->SetWrap(true);
 	_label->SetHorizontalAlign(JHA_JUSTIFY);
 	_label->SetVerticalAlign(JVA_TOP);
 
-	_label->SetSize(_label->GetPreferredSize());
-
-  jgui::jregion_t
-    t = _label->GetVisibleBounds();
-
-	_field = new TextField(t.x, t.y + t.height + 10, t.width, 40);
-
-  jgui::jregion_t
-    u = _field->GetVisibleBounds();
-
-	_ok = new Button("Ok", t.x + t.width - 2*cw - 1*30, u.y + u.height + 20, cw, ch);
-	_cancel = new Button("Cancel", t.x + t.width - 1*cw - 0*30, u.y + u.height + 20, cw, ch);
+	_field = new TextField(insets.left, insets.top + 180 + 8, size.width - insets.left - insets.right, DEFAULT_COMPONENT_HEIGHT);
+	_cancel = new Button("Cancel", size.width - insets.right - DEFAULT_COMPONENT_WIDTH, insets.top + 180 + 8 + DEFAULT_COMPONENT_HEIGHT + 8, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
+	_ok = new Button("Ok", size.width - insets.right - 2*DEFAULT_COMPONENT_WIDTH - 8, insets.top + 180 + 8 + DEFAULT_COMPONENT_HEIGHT + 8, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
 	
 	_ok->RegisterActionListener(this);
 	_cancel->RegisterActionListener(this);
@@ -63,9 +50,9 @@ InputDialog::InputDialog(Container *parent, std::string title, std::string msg):
 	Add(_ok);
 	Add(_cancel);
 
-	_field->RequestFocus();
-
-	Pack(true);
+	_cancel->RequestFocus();
+  
+  Pack(false);
 }
 
 InputDialog::~InputDialog() 

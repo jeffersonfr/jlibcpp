@@ -33,16 +33,14 @@
 #include "jgui/jlistbox.h"
 #include "jgui/jicon.h"
 #include "jgui/jscrollbar.h"
-#include "jgui/jcalendar.h"
 #include "jgui/jbufferedimage.h"
-#include "jgui/jkeyboard.h"
 #include "jcommon/jsystem.h"
 #include "jevent/jwindowlistener.h"
 
 #include <iostream>
 #include <mutex>
 
-class Test : public jgui::Window, public jevent::ActionListener, public jevent::SelectListener, public jevent::ToggleListener {
+class Widgets : public jgui::Window, public jevent::ActionListener, public jevent::SelectListener, public jevent::ToggleListener {
 
 	private:
     std::mutex _mutex;
@@ -96,7 +94,7 @@ class Test : public jgui::Window, public jevent::ActionListener, public jevent::
 			_theme4;
 
 	public:
-		Test():
+		Widgets():
 			jgui::Window(0, 0, 1280, 720)
 	{
     jgui::jinsets_t
@@ -363,7 +361,7 @@ class Test : public jgui::Window, public jevent::ActionListener, public jevent::
 		_button1->RequestFocus();
 	}
 
-	virtual ~Test()
+	virtual ~Widgets()
 	{
     RemoveAll();
 
@@ -456,12 +454,8 @@ class Test : public jgui::Window, public jevent::ActionListener, public jevent::
     _mutex.lock();
 
 		if (event->GetSource() == _button1) {
-			// _progress->SetValue(_progress->GetValue() + 10);
-			// _slider->SetValue(_slider->GetValue() + 10);
-
-      jgui::Keyboard *kb = new jgui::Keyboard(this, jgui::JKT_QWERTY);
-
-      kb->Exec(false);
+			_progress->SetValue(_progress->GetValue() + 10);
+			_slider->SetValue(_slider->GetValue() + 10);
 		} else if (event->GetSource() == _button2) {
 			_progress->SetValue(_progress->GetValue() - 10);
 			_slider->SetValue(_slider->GetValue() - 10);
@@ -480,7 +474,7 @@ int main(int argc, char **argv)
 {
 	jgui::Application::Init(argc, argv);
 
-	Test app;
+	Widgets app;
 
   app.Exec();
 

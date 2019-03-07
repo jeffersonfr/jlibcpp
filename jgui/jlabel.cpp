@@ -25,15 +25,15 @@
 namespace jgui {
 
 Label::Label(std::string text, int x, int y, int width, int height):
-   	Component(x, y, width, height)
+ 	Component(x, y, width, height)
 {
 	jcommon::Object::SetClassName("jgui::Label");
 
-	_is_wrap = false;
 	_halign = JHA_CENTER;
 	_valign = JVA_CENTER;
 
 	_text = text;
+	_is_wrap = false;
 }
 
 Label::~Label()
@@ -98,9 +98,13 @@ jvertical_align_t Label::GetVerticalAlign()
 
 jsize_t Label::GetPreferredSize()
 {
-	Theme *theme = GetTheme();
+	Theme 
+    *theme = GetTheme();
 
-	jsize_t t {0, 0};
+	jsize_t 
+    t = {
+      0, 0
+    };
 
   if (theme == nullptr) {
     return t;

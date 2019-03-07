@@ -64,17 +64,19 @@ Window::Window(int x, int y, int width, int height):
 
   _event_manager = new EventManager(this);
 
-  _font = new Font(_DATA_PREFIX"/fonts/default.ttf", (jfont_attributes_t)(JFA_NORMAL), DEFAULT_FONT_SIZE);
-
   jgui::jinsets_t insets = {8, 8, 8, 8};
 
   SetInsets(insets);
 
-  _theme.SetFont("component.font", _font);
-  _theme.SetFont("container.font", _font);
-  _theme.SetFont("window.font", _font);
+  jgui::Theme
+    *theme = jgui::Theme::GetDefaultTheme();
 
-  SetTheme(&_theme);
+  _font = new Font(_DATA_PREFIX"/fonts/default.ttf", (jfont_attributes_t)(JFA_NORMAL), DEFAULT_FONT_SIZE);
+
+  theme->SetFont("component.font", _font);
+  theme->SetFont("container.font", _font);
+  theme->SetFont("window.font", _font);
+
   SetTitle("Main");
   SetLayout(new jgui::NullLayout());
 	SetBackgroundVisible(true);
@@ -85,16 +87,20 @@ Window::~Window()
 {
   SetVisible(false);
 
-  delete _event_manager;
-  _event_manager = nullptr;
+  if (_event_manager != nullptr) {
+    delete _event_manager;
+    _event_manager = nullptr;
+  }
+
+  if (_font != nullptr) {
+    delete _font;
+    _font = nullptr;
+  }
 
   try {
     _exec_thread.join();
   } catch (std::system_error &e) {
   }
-
-  delete _font;
-  _font = nullptr;
 }
 
 EventManager * Window::GetEventManager()
@@ -307,7 +313,8 @@ void Window::PaintGlassPane(Graphics *g)
 {
 	Container::PaintGlassPane(g);
 
-	Theme *theme = GetTheme();
+	Theme 
+    *theme = GetTheme();
 
   if (theme == nullptr) {
     return;

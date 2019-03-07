@@ -225,19 +225,13 @@ Theme * Component::GetTheme()
     return _theme;
   }
 
-	Container *cmp = GetParent();
+	Container *parent = GetParent();
 
-  while (cmp != nullptr) {
-    Theme *theme = cmp->GetTheme();
-
-    if (theme != nullptr) {
-      return theme;
-    }
-
-    cmp = cmp->GetParent();
+  if (parent != nullptr) {
+    return parent->GetTheme();
   }
 
-  return nullptr;
+  return Theme::GetDefaultTheme();
 }
 
 void Component::SetTheme(Theme *theme)

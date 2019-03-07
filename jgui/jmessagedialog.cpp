@@ -22,7 +22,7 @@
 namespace jgui {
 
 MessageDialog::MessageDialog(Container *parent, std::string title, std::string msg):
-	jgui::Dialog(parent, 100, 100, 400, 200)
+	jgui::Dialog(parent, title, 0, 0, 560, 280)
 {
 	jcommon::Object::SetClassName("jgui::MessageDialog");
 
@@ -30,30 +30,23 @@ MessageDialog::MessageDialog(Container *parent, std::string title, std::string m
     size = GetSize();
 	jgui::jinsets_t 
     insets = GetInsets();
-	int 
-    cw = DEFAULT_COMPONENT_WIDTH,
-		ch = DEFAULT_COMPONENT_HEIGHT;
 
-	_label = new Label(msg, insets.left, insets.top, size.width - insets.left - insets.right, size.height - insets.top - insets.bottom);
+	_label = new Label(msg, insets.left, insets.top, size.width - insets.left - insets.right, 180);
 
-	// _label->SetGap(10, 10);
 	_label->SetWrap(true);
 	_label->SetHorizontalAlign(JHA_JUSTIFY);
 	_label->SetVerticalAlign(JVA_TOP);
 
-	_label->SetSize(_label->GetPreferredSize());
-
-  jgui::jregion_t
-    t = _label->GetVisibleBounds();
-
-	_ok = new Button("Ok", t.x + t.width - cw, t.y + t.height + 20, cw, ch);
+	_ok = new Button("Ok", size.width - insets.right - DEFAULT_COMPONENT_WIDTH, insets.top + 180 + 8 + 8, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
 	
 	_ok->RegisterActionListener(this);
-
+	
 	Add(_label);
 	Add(_ok);
 
 	_ok->RequestFocus();
+
+  Pack(false);
 }
 
 MessageDialog::~MessageDialog() 
