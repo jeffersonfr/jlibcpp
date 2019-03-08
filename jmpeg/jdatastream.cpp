@@ -187,6 +187,15 @@ std::string DataStream::GetBytes(size_t n)
   return bytes;
 }
 
+uint8_t DataStream::GetRawByte(size_t index)
+{
+  if (index >= _data.size()) {
+    throw jexception::OverflowException("Skip overflow");
+  }
+
+  return *((uint8_t *)_data.c_str() + index);
+}
+
 void DataStream::Skip(size_t n)
 {
   if ((_data_index + n) > (_data.size() << 3)) {
