@@ -1957,18 +1957,12 @@ bool Graphics::DrawImage(Image *img, int xp, int yp)
 			return false;
 		}
 
-		jregion_t clip = GetClip();
-
-		SetClip(xp, yp, size.width, size.height);
-
 		cairo_surface_flush(cairo_surface);
 
 		cairo_save(_cairo_context);
 		cairo_set_source_surface(_cairo_context, cairo_surface, xp+_translate.x, yp+_translate.y);
 		cairo_paint(_cairo_context);
 		cairo_restore(_cairo_context);
-
-		SetClip(clip.x, clip.y, clip.width, clip.height);
 	} else {
 		uint32_t *rgb = nullptr;
 
@@ -2015,18 +2009,10 @@ bool Graphics::DrawImage(Image *img, int xp, int yp, int wp, int hp)
 			return false;
 		}
 
-		jregion_t clip = GetClip();
-
-		SetClip(xp, yp, wp, hp);
-
-		cairo_surface_flush(cairo_surface);
-
 		cairo_save(_cairo_context);
 		cairo_set_source_surface(_cairo_context, cairo_surface, xp+_translate.x, yp+_translate.y);
 		cairo_paint(_cairo_context);
 		cairo_restore(_cairo_context);
-
-		SetClip(clip.x, clip.y, clip.width, clip.height);
 	} else {
 		uint32_t *rgb = nullptr;
 
@@ -2092,18 +2078,12 @@ bool Graphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp,
 			return false;
 		}
 
-		jregion_t clip = GetClip();
-
-		SetClip(xp, yp, wp, hp);
-
 		cairo_surface_flush(cairo_surface);
 
 		cairo_save(_cairo_context);
 		cairo_set_source_surface(_cairo_context, cairo_surface, xp+_translate.x, yp+_translate.y);
 		cairo_paint(_cairo_context);
 		cairo_restore(_cairo_context);
-
-		SetClip(clip.x, clip.y, clip.width, clip.height);
 	} else {
 		uint32_t *rgb = nullptr;
 
