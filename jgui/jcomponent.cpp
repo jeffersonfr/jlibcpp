@@ -395,7 +395,7 @@ jregion_t Component::GetBounds()
 
 jregion_t Component::GetVisibleBounds()
 {
-  return GetVisibleBounds();
+  return GetBounds();
 }
 
 void Component::SetScrollLocation(int x, int y)
