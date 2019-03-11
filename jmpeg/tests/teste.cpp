@@ -4034,6 +4034,144 @@ class PSIParser : public jevent::DemuxListener {
 			}
 		}
 
+		virtual void ProcessCDT(jevent::DemuxEvent *event)
+		{
+      // table_id = 0xc8
+			const char *ptr = event->GetData();
+			
+      int download_data_id = TS_G16(ptr + 3);
+      int original_network_id = TS_G16(ptr + 8);
+      int data_type = TS_G8(ptr + 10);
+
+			printf("CDT:: download data id:[0x%04x], original network id:[0x%04x], data type:[0x%02x]\n", download_data_id, original_network_id, data_type);
+
+			ptr = ptr + 11;
+
+			int descriptors_length = TS_GM16(ptr, 4, 12);
+			int descriptors_count = 0;
+
+			ptr = ptr + 2;
+
+			while (descriptors_count < descriptors_length) {
+				// int descriptor_tag = TS_G8(ptr + 0);
+				int descriptor_length = TS_G8(ptr + 1);
+
+				DescriptorDump(nullptr, ptr, descriptor_length + 2);
+
+				ptr = ptr + descriptor_length + 2;
+
+				descriptors_count = descriptors_count + descriptor_length + 2;	
+			}
+
+      DumpBytes("data module byte", ptr, (event->GetData() + event->GetLength()) - ptr - 4);
+		}
+
+		virtual void ProcessBIT(jevent::DemuxEvent *event)
+		{
+      // table_id = 0xc4
+			const char *ptr = event->GetData();
+			
+      int original_network_id = TS_G16(ptr + 3);
+      int descriptors_length = TS_GM16(ptr + 8, 4, 12);
+      int descriptors_count = 0;
+
+			printf("BIT:: original network id:[0x%04x]\n", original_network_id);
+
+      ptr = ptr + 10;
+
+      while (descriptors_count < descriptors_length) {
+        // int descriptor_tag = TS_G8(ptr + 0);
+        int descriptor_length = TS_G8(ptr + 1);
+
+        DescriptorDump(nullptr, ptr, descriptor_length + 2);
+
+        ptr = ptr + descriptor_length + 2;
+
+        descriptors_count = descriptors_count + descriptor_length + 2;	
+      }
+
+      int loop_length = (event->GetData() + event->GetLength()) - ptr - 4;
+      int loop_count = 0;
+
+      while (loop_count < loop_length) {
+        int broadcast_id = TS_G8(ptr + 0);
+        int broadcaster_descriptors_length = TS_GM16(ptr + 1, 4, 12);
+
+			  printf("BIT:: broadcast id:[0x%04x]\n", broadcast_id);
+
+        ptr = ptr + broadcaster_descriptors_length + 3;
+       
+        int descriptors_count = 0;
+
+        while (descriptors_count < broadcaster_descriptors_length) {
+          // int descriptor_tag = TS_G8(ptr + 0);
+          int descriptor_length = TS_G8(ptr + 1);
+
+          DescriptorDump(nullptr, ptr, descriptor_length + 2);
+
+          ptr = ptr + descriptor_length + 2;
+
+          descriptors_count = descriptors_count + descriptor_length + 2;	
+        }
+
+        loop_count = loop_count + broadcaster_descriptors_length + 3;
+      }
+		}
+
+		virtual void ProcessSDTT(jevent::DemuxEvent *event)
+		{
+      // table_id = 0xc3
+			const char *ptr = event->GetData();
+			
+      int table_id_ext = TS_G16(ptr + 3);
+      int transport_stream_id = TS_G16(ptr + 8);
+      int original_network_id = TS_G16(ptr + 10);
+      int service_id = TS_G16(ptr + 12);
+      int number_of_contents = TS_G8(ptr + 14);
+
+			printf("SDTT:: table id ext:[0x%04x], transport stream id:[0x%04x], original network id:[0x%04x], service id:[0x%04x], number of contents:[%d]\n", table_id_ext, transport_stream_id, original_network_id, service_id, number_of_contents);
+
+      ptr = ptr + 15;
+
+      for (int i=0; i<number_of_contents; i++) {
+        int group = TS_GM16(ptr + 0, 0, 4);
+        int target_version = TS_GM16(ptr + 0, 4, 12);
+        int new_version = TS_GM16(ptr + 2, 0, 12);
+        int download_level = TS_GM16(ptr + 2, 12, 2);
+        int version_indicator = TS_GM16(ptr + 2, 14, 2);
+        int content_description_length = TS_GM16(ptr + 4, 0, 12);
+        int schedule_description_length = TS_GM16(ptr + 6, 0, 12);
+        // int schedule_time_shift_information = TS_GM16(ptr + 6, 12, 4);
+
+			  printf("SDTT:: group:[0x%04x], target version:[0x%04x], new version:[0x%04x], download level:[0x%04x], version indicator:[0x%04x]\n", group, target_version, new_version, download_level, version_indicator);
+
+        ptr = ptr + 8;
+
+        for (int j=0; j<schedule_description_length/8; j++) {
+          int start_time = TS_GM64(ptr + 0, 0, 40);
+          int duration = TS_GM64(ptr + 0, 40, 24);
+
+			    printf("SDTT:: start time:[%d], duration:[%d]\n", start_time, duration);
+
+          ptr = ptr + 8;
+        }
+
+        int descriptors_length = content_description_length - schedule_description_length;
+        int descriptors_count = 0;
+
+        while (descriptors_count < descriptors_length) {
+          // int descriptor_tag = TS_G8(ptr + 0);
+          int descriptor_length = TS_G8(ptr + 1);
+
+          DescriptorDump(nullptr, ptr, descriptor_length + 2);
+
+          ptr = ptr + descriptor_length + 2;
+
+          descriptors_count = descriptors_count + descriptor_length + 2;	
+        }
+      }
+		}
+
 		virtual void ProcessPrivate(jevent::DemuxEvent *event)
 		{
 			const char *ptr = event->GetData();
@@ -4248,6 +4386,30 @@ class PSIParser : public jevent::DemuxListener {
     {
       int data_identifier = TS_G8(ptr + 0);
 
+      std::string data_info;
+
+      if (data_identifier >= 0x00 and data_identifier <= 0x0f) {
+        data_info = "reserved";
+      } else if (data_identifier >= 0x10 and data_identifier <= 0x1f) {
+        data_info = "EBU teletext only or EBU teletext combined with VPS and/or WSS and/or Closed Captioning and/or VBI sample data";
+      } else if (data_identifier >= 0x20 and data_identifier <= 0x7f) {
+        data_info = "reserved";
+      } else if (data_identifier >= 0x80 and data_identifier <= 0x98) {
+        data_info = "user defined";
+
+        if (data_identifier == 0x80) {
+          data_info = "closedcaption";
+        } else if (data_identifier == 0x81) {
+          data_info = "superimposed";
+        }
+      } else if (data_identifier >= 0x99 and data_identifier <= 0x9b) {
+        data_info = "EBU teletext and/or VPS and/or WSS and/or Closed Captioning and/or VBI sample data";
+      } else if (data_identifier >= 0x9c and data_identifier <= 0xff) {
+        data_info = "user defined";
+      }
+
+      printf("Closed Caption:: data identifier:[0x%02x/%s]\n", data_identifier, data_info.c_str());
+
       // closed caption:[0x80/synchronous pes], superimpose:[0x81/asynchronous pes]
       if (data_identifier != 0x80 and data_identifier != 0x81) {
         return;
@@ -4276,21 +4438,21 @@ class PSIParser : public jevent::DemuxListener {
       if (caption_data_type_nibble == 0x00) {
         data_group_info = "Caption management";
       } else if (caption_data_type_nibble == 0x01) {
-        data_group_info = "Caption statement (1st language) ";
+        data_group_info = "Caption statement (1st language)";
       } else if (caption_data_type_nibble == 0x02) {
-        data_group_info = "Caption statement (2nd language) ";
+        data_group_info = "Caption statement (2nd language)";
       } else if (caption_data_type_nibble == 0x03) {
-        data_group_info = "Caption statement (3rd language) ";
+        data_group_info = "Caption statement (3rd language)";
       } else if (caption_data_type_nibble == 0x04) {
-        data_group_info = "Caption statement (4th language) ";
+        data_group_info = "Caption statement (4th language)";
       } else if (caption_data_type_nibble == 0x05) {
-        data_group_info = "Caption statement (5th language) ";
+        data_group_info = "Caption statement (5th language)";
       } else if (caption_data_type_nibble == 0x06) {
-        data_group_info = "Caption statement (6th language) ";
+        data_group_info = "Caption statement (6th language)";
       } else if (caption_data_type_nibble == 0x07) {
-        data_group_info = "Caption statement (7th language) ";
+        data_group_info = "Caption statement (7th language)";
       } else if (caption_data_type_nibble == 0x08) {
-        data_group_info = "Caption statement (8th language) ";
+        data_group_info = "Caption statement (8th language)";
       } else {
         // INFO:: invalid type
         return;
@@ -4314,7 +4476,7 @@ class PSIParser : public jevent::DemuxListener {
 
       ptr = ptr + 5;
 
-      printf("Closed Caption:: data identifier:[0x%02x], subtitle stream id:[0x%02x], data group id:[0x%02x/%s], data group link number:[0x%02x], data group size:[%d]\n", data_identifier, private_stream_id, data_group_id, data_group_info.c_str(), data_group_link_number, data_group_size);
+      printf("Closed Caption:: subtitle stream id:[0x%02x], data group id:[0x%02x/%s], data group link number:[0x%02x], data group size:[%d]\n", private_stream_id, data_group_id, data_group_info.c_str(), data_group_link_number, data_group_size);
 
       if (caption_data_type_nibble == 0x00) { // INFO:: caption management data
         int time_control_mode = TS_GM8(ptr + 0, 0, 2);

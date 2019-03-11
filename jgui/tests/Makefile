@@ -336,4 +336,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *.xml *~ primitives border ball breakout clip custom calc mines ants cube raycaster1 raycaster2 raycaster3 skull swarm mouse watch tank pacman tetris signal stress layouts mhp drawimage drawtypes rotateimage sort noise kmeans som events colorchooser scroll hough 2048 newvox mandelbrot porter fire minecraft fullscreen coloralpha bitmask widgets tree terrain surface function graph opentube cad
+	@rm -rvf *.o *.xml *~ primitives border ball breakout clip custom calc mines ants cube raycaster1 raycaster2 raycaster3 skull swarm mouse watch tank pacman tetris signal stress layouts mhp drawimage drawtypes rotateimage sort noise kmeans som events colorchooser scroll hough 2048 newvox mandelbrot porter fire minecraft fullscreen coloralpha bitmask widgets tree terrain surface function graph opentube dialogs cad

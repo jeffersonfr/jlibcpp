@@ -93,6 +93,12 @@ class DataStream : public jcommon::Object {
      * \brief
      *
      */
+    uint8_t GetRawByte(size_t index);
+    
+    /**
+     * \brief
+     *
+     */
     void Skip(size_t n);
     
     /**
