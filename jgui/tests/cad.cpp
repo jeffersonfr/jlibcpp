@@ -61,10 +61,10 @@
 #include <list>
 #include <string>
 
-struct sShape;
+struct Shape;
 
 struct sNode {
-	sShape *parent;
+	Shape *parent;
 	jgui::jpoint3d_t pos;
 };
 
@@ -73,7 +73,7 @@ float magnitude(jgui::jpoint3d_t t)
   return sqrt(t.x*t.x + t.y*t.y + t.z*t.z);
 }
 
-struct sShape {
+struct Shape {
 	std::vector<sNode> vecNodes;
 	uint32_t nMaxNodes = 0;
 
@@ -128,11 +128,11 @@ struct sShape {
 	}
 };
 
-float sShape::fWorldScale = 1.0f;
-jgui::jpoint3d_t sShape::vWorldOffset = { 0,0 };
+float Shape::fWorldScale = 1.0f;
+jgui::jpoint3d_t Shape::vWorldOffset = { 0,0 };
 
-struct sLine : public sShape {
-	sLine()
+struct Line : public Shape {
+	Line()
 	{
 		nMaxNodes = 2;
 		vecNodes.reserve(nMaxNodes);
@@ -148,8 +148,8 @@ struct sLine : public sShape {
 	}
 };
 
-struct sBox : public sShape {
-	sBox()
+struct Box : public Shape {
+	Box()
 	{
 		nMaxNodes = 2;
 		vecNodes.reserve(nMaxNodes); 
@@ -165,8 +165,8 @@ struct sBox : public sShape {
 	}
 };
 
-struct sCircle : public sShape {
-	sCircle()
+struct Circle : public Shape {
+	Circle()
 	{
 		nMaxNodes = 2;
 		vecNodes.reserve(nMaxNodes);
@@ -186,8 +186,8 @@ struct sCircle : public sShape {
 	}
 };
 
-struct sCurve : public sShape {
-	sCurve()
+struct Curve : public Shape {
+	Curve()
 	{
 		nMaxNodes = 3;
 		vecNodes.reserve(nMaxNodes);
@@ -259,8 +259,8 @@ class CAD : public jgui::Window {
       v.y = (float)(nScreenY)/fScale + vOffset.y;
     }
 
-    sShape* tempShape = nullptr;
-    std::list<sShape*> listShapes;
+    Shape* tempShape = nullptr;
+    std::list<Shape*> listShapes;
     sNode *selectedNode = nullptr;
     jgui::jpoint3d_t vCursor = {0, 0};
 
@@ -281,35 +281,19 @@ class CAD : public jgui::Window {
 		virtual bool KeyPressed(jevent::KeyEvent *event)
     {
 			if (event->GetSymbol() == jevent::JKS_l) {
-        tempShape = new sLine();
-
-        selectedNode = tempShape->GetNextNode(vCursor);
-        selectedNode = tempShape->GetNextNode(vCursor);
+        tempShape = new Line();
       } else if (event->GetSymbol() == jevent::JKS_b) {
-        tempShape = new sBox();
-
-        selectedNode = tempShape->GetNextNode(vCursor);
-        selectedNode = tempShape->GetNextNode(vCursor);
+        tempShape = new Box();
       } else if (event->GetSymbol() == jevent::JKS_c) {
-        tempShape = new sCircle();
-
-        selectedNode = tempShape->GetNextNode(vCursor);
-        selectedNode = tempShape->GetNextNode(vCursor);
+        tempShape = new Circle();
       } else if (event->GetSymbol() == jevent::JKS_s) {
-        tempShape = new sCurve();
-
-        selectedNode = tempShape->GetNextNode(vCursor);
-        selectedNode = tempShape->GetNextNode(vCursor);
-      } else if (event->GetSymbol() == jevent::JKS_m) {
-        selectedNode = nullptr;
-        for (auto &shape : listShapes) {
-          selectedNode = shape->HitNode(vCursor);
-
-          if (selectedNode != nullptr) {
-            break;
-          }
-        }
+        tempShape = new Curve();
+      } else {
+        return true;
       }
+
+      selectedNode = tempShape->GetNextNode(vCursor);
+      selectedNode = tempShape->GetNextNode(vCursor);
 
       return true;
     }
@@ -325,11 +309,6 @@ class CAD : public jgui::Window {
         vStartPan = vMouse;
       }
 
-      if (event->GetButtons() & jevent::JMB_BUTTON2) {
-        vOffset = {vOffset.x - (vMouse.x - vStartPan.x)/fScale, vOffset.y - (vMouse.y - vStartPan.y)/fScale, 0.0f};
-        vStartPan = vMouse;
-      }
-
       jgui::jpoint3d_t vMouseBeforeZoom;
       ScreenToWorld((int)vMouse.x, (int)vMouse.y, vMouseBeforeZoom);
 
@@ -340,8 +319,14 @@ class CAD : public jgui::Window {
       vCursor.x = floorf((vMouseAfterZoom.x + 0.5f) * fGrid);
       vCursor.y = floorf((vMouseAfterZoom.y + 0.5f) * fGrid);
 
-      if (selectedNode != nullptr) {
-        selectedNode->pos = vCursor;
+      for (auto &shape : listShapes) {
+        selectedNode = shape->HitNode(vCursor);
+
+        if (selectedNode != nullptr) {
+          selectedNode->pos = vCursor;
+
+          break;
+        }
       }
 
 			return true;
@@ -368,10 +353,6 @@ class CAD : public jgui::Window {
 
       jgui::jpoint3d_t vMouse = {(float)elocation.x, (float)elocation.y};
 
-      if (event->GetButton() == jevent::JMB_BUTTON2) {
-        vStartPan = vMouse;
-      }
-
       if (event->GetButtons() & jevent::JMB_BUTTON2) {
         vOffset = {vOffset.x - (vMouse.x - vStartPan.x)/fScale, vOffset.y - (vMouse.y - vStartPan.y)/fScale, 0.0f};
         vStartPan = vMouse;
@@ -390,6 +371,7 @@ class CAD : public jgui::Window {
       if (selectedNode != nullptr) {
         selectedNode->pos = vCursor;
       }
+
 			return true;
 		}
 
@@ -401,12 +383,12 @@ class CAD : public jgui::Window {
         fScale *= 0.9f;
       }
 
-      if (fScale < 5.0f) {
-        fScale = 5.0f;
+      if (fScale < 1.0f) {
+        fScale = 1.0f;
       }
 
-      if (fScale > 15.0f) {
-        fScale = 15.0f;
+      if (fScale > 100.0f) {
+        fScale = 100.0f;
       }
 
 			return true;
@@ -417,7 +399,7 @@ class CAD : public jgui::Window {
 			do {
 				Repaint();
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::this_thread::sleep_for(std::chrono::milliseconds(25));
 			} while (IsHidden() == false);
 		}
 
@@ -444,8 +426,7 @@ class CAD : public jgui::Window {
       for (float x = vWorldTopLeft.x; x < vWorldBottomRight.x; x += fGrid) {
         for (float y = vWorldTopLeft.y; y < vWorldBottomRight.y; y += fGrid) {
           WorldToScreen({ x, y }, sx, sy);
-          g->SetColor(jgui::Color::Blue);
-          g->FillCircle(sx, sy, 2);
+          g->SetRGB(0xff00f000, sx, sy);
         }
       }
 
@@ -458,8 +439,8 @@ class CAD : public jgui::Window {
       WorldToScreen({ vWorldBottomRight.x,0 }, ex, ey);
       g->DrawLine(sx, sy, ex, ey);
 
-      sShape::fWorldScale = fScale;
-      sShape::vWorldOffset = vOffset;
+      Shape::fWorldScale = fScale;
+      Shape::vWorldOffset = vOffset;
 
       for (auto &shape : listShapes) {
         shape->DrawYourself(g);
