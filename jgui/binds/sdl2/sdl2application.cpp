@@ -618,7 +618,7 @@ void NativeApplication::InternalLoop()
           }
         } else if (event.type == SDL_MOUSEWHEEL) {
           type = jevent::JMT_ROTATED;
-          mouse_z = event.motion.y;
+          mouse_z = event.wheel.y;
         }
 
         uint32_t state = SDL_GetMouseState(nullptr, nullptr);

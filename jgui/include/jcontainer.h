@@ -226,12 +226,6 @@ class Container : public jgui::Component {
 		 * \brief
 		 *
 		 */
-		virtual jsize_t GetPreferredSize();
-
-		/**
-		 * \brief
-		 *
-		 */
 		virtual jinsets_t GetInsets();
 
 		/**

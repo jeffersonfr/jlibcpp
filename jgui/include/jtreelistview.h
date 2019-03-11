@@ -188,12 +188,6 @@ class TreeListView : public jgui::Component, public jgui::ItemComponent {
 		 * \brief
 		 *
 		 */
-		virtual jsize_t GetPreferredSize();
-
-		/**
-		 * \brief
-		 *
-		 */
 		virtual jsize_t GetScrollDimension();
 
 		/**

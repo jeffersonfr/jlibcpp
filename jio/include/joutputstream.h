@@ -56,18 +56,6 @@ class OutputStream : public virtual jcommon::Object {
 		 * \brief
 		 *
 		 */
-		virtual bool IsEmpty() = 0;
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t Available() = 0;
-
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void SetBlocking(bool block_);
 
 		/**
@@ -75,6 +63,30 @@ class OutputStream : public virtual jcommon::Object {
 		 *
 		 */
 		virtual bool IsBlocking();
+
+		/**
+		 * \brief
+		 * 
+		 */
+		virtual int64_t Write(std::string);
+    
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsClosed();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsEmpty() = 0;
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int64_t Available() = 0;
 
 		/**
 		 * \brief
@@ -98,12 +110,6 @@ class OutputStream : public virtual jcommon::Object {
 		 * \brief
 		 * 
 		 */
-		virtual int64_t Write(std::string);
-    
-		/**
-		 * \brief
-		 * 
-		 */
 		virtual int64_t Flush() = 0;
 
 		/**
@@ -117,12 +123,6 @@ class OutputStream : public virtual jcommon::Object {
 		 *
 		 */
 		virtual void Close() = 0;
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsClosed();
 		
 		/**
 		 * \brief

@@ -383,7 +383,7 @@ jsize_t Component::GetScrollDimension()
 	return GetSize();
 }
 
-jregion_t Component::GetVisibleBounds()
+jregion_t Component::GetBounds()
 {
   return {
     .x = _location.x, 
@@ -391,6 +391,11 @@ jregion_t Component::GetVisibleBounds()
     .width = _size.width, 
     .height = _size.height
   };
+}
+
+jregion_t Component::GetVisibleBounds()
+{
+  return GetVisibleBounds();
 }
 
 void Component::SetScrollLocation(int x, int y)

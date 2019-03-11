@@ -32,7 +32,7 @@ namespace jgui {
 class Color : public virtual jcommon::Object {
 	
 	public:
-    enum {
+    enum jcolor_name_t {
       AliceBlue = 0xfff0f8ff,
       AntiqueWhite = 0xfffaebd7,
       Aqua = 0xff00ffff,

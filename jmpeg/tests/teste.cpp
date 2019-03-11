@@ -23,6 +23,8 @@
 #include "jmpeg/jrawdemux.h"
 #include "jmpeg/jprivatedemux.h"
 #include "jmpeg/jmpeglib.h"
+#include "jnetwork/jdatagramsocket.h"
+#include "jnetwork/jurl.h"
 #include "jio/jfileinputstream.h"
 #include "jevent/jdemuxlistener.h"
 #include "jlogger/jloggerlib.h"
@@ -5160,16 +5162,19 @@ class PSIParser : public jevent::DemuxListener {
 
 };
 
-class ISDBTInputStream : public jio::FileInputStream {
+class ISDBTFileInputStream : public jio::InputStream {
 
 	private:
+    jio::InputStream *_stream;
 		int _lgap;
 		int _rgap;
 
 	public:
-		ISDBTInputStream(std::string file, int lgap, int rgap):
-			jio::FileInputStream(file)
+		ISDBTFileInputStream(std::string file, int lgap, int rgap):
+			jio::InputStream()
 		{
+      _stream = new jio::FileInputStream(file);
+
 			_lgap = lgap;
 			_rgap = rgap;
 
@@ -5177,26 +5182,74 @@ class ISDBTInputStream : public jio::FileInputStream {
       int count = 0;
       int64_t c;
 
-      while ((c = jio::FileInputStream::Read()) != 0x47) { // sync byte
+      while ((c = _stream->Read()) != 0x47) { // sync byte
         count = count + 1;
       }
 
-      jio::FileInputStream::Reset();
-      jio::FileInputStream::Skip(count);
+      _stream->Reset();
+      _stream->Skip(count);
 		}
 		
-		virtual ~ISDBTInputStream() 
+		virtual ~ISDBTFileInputStream() 
 		{
+      if (_stream != nullptr) {
+        delete _stream;
+        _stream = nullptr;
+      }
 		}
 		
 		virtual int64_t Read(char *data, int64_t size)
 		{
-      jio::FileInputStream::Skip(_lgap);
+      _stream->Skip(_lgap);
 			
       int64_t 
-        r = jio::FileInputStream::Read(data, size);
+        r = _stream->Read(data, size);
 
-      jio::FileInputStream::Skip(_rgap);
+      _stream->Skip(_rgap);
+
+			if (r <= 0) {
+				return -1LL;
+			}
+
+			return size;
+		}
+};
+
+class ISDBTDatagramInputStream : public jio::InputStream {
+
+	private:
+    jnetwork::DatagramSocket *_socket;
+    jio::InputStream *_stream;
+		int _lgap;
+		int _rgap;
+
+	public:
+		ISDBTDatagramInputStream(int port, int lgap, int rgap):
+			jio::InputStream()
+		{
+      _socket = new jnetwork::DatagramSocket(port);
+      _stream = _socket->GetInputStream();
+
+			_lgap = lgap;
+			_rgap = rgap;
+		}
+		
+		virtual ~ISDBTDatagramInputStream() 
+		{
+      if (_stream != nullptr) {
+        delete _stream;
+        _stream = nullptr;
+      }
+		}
+		
+		virtual int64_t Read(char *data, int64_t size)
+		{
+      _stream->Skip(_lgap);
+			
+      int64_t 
+        r = _stream->Read(data, size);
+
+      _stream->Skip(_rgap);
 
 			if (r <= 0) {
 				return -1LL;
@@ -5229,10 +5282,24 @@ int main(int argc, char **argv)
 
 	jmpeg::DemuxManager 
     *manager = jmpeg::DemuxManager::GetInstance();
-	ISDBTInputStream 
-    is(argv[1], atoi(argv[2]), atoi(argv[3]));
+  jio::InputStream 
+    *stream = nullptr;
+  jnetwork::URL
+    url(argv[1]);
 
-	manager->SetInputStream(&is);
+  if (url.GetProtocol() == "file") {
+	  stream = new ISDBTFileInputStream(url.GetPath(), atoi(argv[2]), atoi(argv[3]));
+  } else if (url.GetProtocol() == "udp") {
+	  stream = new ISDBTDatagramInputStream(url.GetPort(), atoi(argv[2]), atoi(argv[3]));
+  }
+
+  if (stream == nullptr) {
+		std::cout << "Invalid url:<" << argv[1] << "]" << std::endl;
+
+    return -1;
+  }
+
+	manager->SetInputStream(stream);
 	
   PSIParser 
     test;
@@ -5282,6 +5349,9 @@ int main(int argc, char **argv)
   manager->Start();
   manager->WaitSync();
   manager->Stop();
+
+  delete stream;
+  stream = nullptr;
 
   // INFO:: dumping methods
   auto 

@@ -413,6 +413,12 @@ class Component : public jevent::KeyListener, public jevent::MouseListener {
 		 * \brief
 		 *
 		 */
+		virtual jgui::jregion_t GetBounds();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual jgui::jregion_t GetVisibleBounds();
 		
 		/**

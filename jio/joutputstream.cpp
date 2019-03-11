@@ -52,4 +52,47 @@ int64_t OutputStream::Write(std::string str)
 	return Write((char *)str.c_str(), str.size());
 }
 
+bool OutputStream::IsEmpty()
+{
+  return false;
+}
+
+int64_t OutputStream::Available()
+{
+  return 0LL;
+}
+
+int64_t OutputStream::GetSize()
+{
+  return 0LL;
+}
+
+int64_t OutputStream::Write(int64_t b)
+{
+  return 0LL;
+}
+
+int64_t OutputStream::Write(const char *data, int64_t size)
+{
+  return 0LL;
+}
+
+int64_t OutputStream::Flush()
+{
+  return 0LL;
+}
+
+void OutputStream::Seek(int64_t index)
+{
+}
+
+void OutputStream::Close()
+{
+}
+
+int64_t OutputStream::GetSentBytes()
+{
+  return 0LL;
+}
+
 }

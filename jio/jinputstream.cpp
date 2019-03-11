@@ -72,4 +72,51 @@ std::string InputStream::Read(int64_t size)
 	return s;
 }
 
+bool InputStream::IsEmpty()
+{
+  return false;
+}
+
+int64_t InputStream::Available()
+{
+  return 0LL;
+}
+
+int64_t InputStream::GetSize()
+{
+  return 0LL;
+}
+
+int64_t InputStream::GetPosition()
+{
+  return 0LL;
+}
+
+int64_t InputStream::Read()
+{
+  return 0LL;
+}
+
+int64_t InputStream::Read(char *data, int64_t size)
+{
+  return 0LL;
+}
+
+void InputStream::Skip(int64_t skip)
+{
+}
+
+void InputStream::Reset()
+{
+}
+
+void InputStream::Close()
+{
+}
+
+int64_t InputStream::GetReadedBytes()
+{
+  return 0LL;
+}
+
 }

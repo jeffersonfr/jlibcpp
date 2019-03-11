@@ -407,11 +407,6 @@ void Container::Pack(bool fit)
 	SetSize(max_w + insets.right, max_h + insets.bottom);
 }
 
-jsize_t Container::GetPreferredSize()
-{
-	return GetSize();
-}
-
 jinsets_t Container::GetInsets()
 {
 	return _insets;
@@ -420,6 +415,8 @@ jinsets_t Container::GetInsets()
 void Container::SetInsets(jinsets_t insets)
 {
 	_insets = insets;
+  
+  SetPreferredSize(GetSize());
 }
 
 void Container::PaintGlassPane(Graphics *g)
@@ -795,6 +792,8 @@ void Container::Add(Component *c, int index)
 
   _container_mutex.unlock();
 
+  SetPreferredSize(GetSize());
+
   DoLayout();
 }
 
@@ -907,6 +906,8 @@ void Container::Remove(jgui::Component *c)
   
   _container_mutex.unlock();
     
+  SetPreferredSize(GetSize());
+
   DoLayout();
 }
 
@@ -945,6 +946,8 @@ void Container::RemoveAll()
   _components.clear();
 
  	_container_mutex.unlock();
+
+  SetPreferredSize(GetSize());
 
   DoLayout();
 }
@@ -1084,15 +1087,25 @@ bool Container::MousePressed(jevent::MouseEvent *event)
 		return true;
 	}
 
+	jpoint_t 
+    elocation = event->GetLocation();
+
   // INFO:: process dialogs first
   for (std::vector<Dialog *>::iterator i=_dialogs.begin(); i!=_dialogs.end(); i++) {
-    if ((*i)->MousePressed(event) == true) {
+    jgui::Dialog
+      *dialog = (*i);
+    jgui::jpoint_t
+      dlocation = dialog->GetLocation();
+    jevent::MouseEvent 
+      evt = *event;
+
+    evt.SetLocation(elocation.x - dlocation.x, elocation.y - dlocation.y);
+
+    if ((*i)->MousePressed(&evt) == true) {
       return true;
     }
   }
 
-	jpoint_t 
-    elocation = event->GetLocation();
   int
     dx,
 		dy;

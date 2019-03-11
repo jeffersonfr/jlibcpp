@@ -117,6 +117,7 @@ class Dialogs : public jgui::Window, public jevent::ActionListener {
 		}
 
     if (dialog != nullptr) {
+      dialog->SetLocation(100, 100);
       dialog->Exec();
     }
 	}

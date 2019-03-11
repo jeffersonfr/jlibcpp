@@ -231,33 +231,6 @@ int TreeListView::GetSelectedIndex()
 	return _selected_index;
 }
 
-jsize_t TreeListView::GetPreferredSize()
-{
-	Theme *theme = GetTheme();
-
-	jsize_t t {0, 0};
-
-  if (theme == nullptr) {
-    return t;
-  }
-
-	int 
-    bs = theme->GetIntegerParam("component.border.size");
-  int
-    // hg = theme->GetIntegerParam("component.hgap"),
-    vg = theme->GetIntegerParam("component.vgap");
-  int
-    is = theme->GetIntegerParam("item.size"),
-    ig = theme->GetIntegerParam("item.gap");
-
-  t = GetSize();
-
-	// t.width = t.width;
-	t.height = 2*(vg + bs) + _items.size()*(is + ig) - ig;
-
-	return t;
-}
-
 bool TreeListView::KeyPressed(jevent::KeyEvent *event)
 {
 	if (Component::KeyPressed(event) == true) {

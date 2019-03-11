@@ -68,62 +68,8 @@ class InputStream : public virtual jcommon::Object {
 		 * \brief
 		 * 
 		 */
-		virtual bool IsEmpty() = 0;
-
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual int64_t Available() = 0;
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t GetSize() = 0;
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t GetPosition() = 0;
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual int64_t Read() = 0;
-
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual int64_t Read(char *data, int64_t size) = 0;
-    
-		/**
-		 * \brief
-		 * 
-		 */
 		virtual std::string Read(int64_t size);
     
-		/**
-		 * \brief Salto relativo.
-		 *
-		 */
-		virtual void Skip(int64_t skip) = 0;
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Reset() = 0;
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Close() = 0;
-		
 		/**
 		 * \brief
 		 *
@@ -132,9 +78,63 @@ class InputStream : public virtual jcommon::Object {
 		
 		/**
 		 * \brief
+		 * 
+		 */
+		virtual bool IsEmpty();
+
+		/**
+		 * \brief
+		 * 
+		 */
+		virtual int64_t Available();
+
+		/**
+		 * \brief
 		 *
 		 */
-		virtual int64_t GetReadedBytes() = 0;
+		virtual int64_t GetSize();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int64_t GetPosition();
+		
+		/**
+		 * \brief
+		 * 
+		 */
+		virtual int64_t Read();
+
+		/**
+		 * \brief
+		 * 
+		 */
+		virtual int64_t Read(char *data, int64_t size);
+    
+		/**
+		 * \brief Salto relativo.
+		 *
+		 */
+		virtual void Skip(int64_t skip);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Reset();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Close();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int64_t GetReadedBytes();
 
 };
 
