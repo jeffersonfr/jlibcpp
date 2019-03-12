@@ -347,3 +347,37 @@ ifeq ($(ENABLE_GRAPHICS),openvg)
 
 endif
 
+ifeq ($(ENABLE_GRAPHICS),qt5)
+	CCFLAGS 	+= \
+     -isystem /usr/include/x86_64-linux-gnu/qt5 \
+     -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets \
+     -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui \
+     -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore \
+
+	LDFLAGS		+= \
+     -Wl,-O1 \
+     -lQt5Widgets \
+     -lQt5Gui \
+     -lQt5Core \
+     -lGL \
+     -lpthread \
+
+	DEFINES		+= \
+     -DJGUI_UI \
+		 -DQT5_UI \
+     -DQT_DEPRECATED_WARNINGS \
+     -DQT_NO_DEBUG \
+     -DQT_WIDGETS_LIB \
+     -DQT_GUI_LIB \
+     -DQT_CORE_LIB \
+
+	REQUIRES	+= \
+
+	OBJS_gfx	+= \
+		 qt5application.o\
+
+  OBJS_jgui	+= \
+     $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+
+endif
+
