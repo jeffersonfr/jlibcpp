@@ -1601,7 +1601,7 @@ void Graphics::SetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)
 	int sh = cairo_image_surface_get_height(cairo_surface);
 	
 	if ((x < 0 || (x+wp) > sw) || (y < 0 || (y+hp) > sh)) {
-		throw jexception::OutOfBoundsException("Index out of bounds");
+		// throw jexception::OutOfBoundsException("Index out of bounds");
 	}
 
 	uint8_t *data = cairo_image_surface_get_data(cairo_surface);
@@ -1615,12 +1615,20 @@ void Graphics::SetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)
 
 	if (_pixelformat == JPF_ARGB) {
 		for (int j=0; j<hp; j++) {
+      if ((y + j) < 0 or (y + j) >= sh) {
+        continue;
+      }
+
 			uint8_t *src = (uint8_t *)(rgb + j * wp);
 			uint8_t *dst = (uint8_t *)(data + (y + j) * stride + x*step);
 			int si = 0;
 			int di = 0;
 
 			for (int i=0; i<wp; i++) {
+        if ((x + i) < 0 or (x + i) >= sw) {
+          continue;
+        }
+
 				int a = *(src + si + 3);
 				int r = *(src + si + 2);
 				int g = *(src + si + 1);
@@ -1886,12 +1894,20 @@ void Graphics::SetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)
 		}
 	} else if (_pixelformat == JPF_RGB32) {
 		for (int j=0; j<hp; j++) {
+      if ((y + j) < 0 or (y + j) >= sh) {
+        continue;
+      }
+
 			uint8_t *src = (uint8_t *)(rgb + j * wp);
 			uint8_t *dst = (uint8_t *)(data + (y + j) * stride + x * step);
 			int si = 0;
 			int di = 0;
 
 			for (int i=0; i<wp; i++) {
+        if ((x + i) < 0 or (x + i) >= sw) {
+          continue;
+        }
+
 				*(dst + di + 3) = *(src + si + 3);
 				*(dst + di + 2) = *(src + si + 2);
 				*(dst + di + 1) = *(src + si + 1);
@@ -1903,12 +1919,20 @@ void Graphics::SetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)
 		}
 	} else if (_pixelformat == JPF_RGB24) {
 		for (int j=0; j<hp; j++) {
+      if ((y + j) < 0 or (y + j) >= sh) {
+        continue;
+      }
+
 			uint8_t *src = (uint8_t *)(rgb + j * wp);
 			uint8_t *dst = (uint8_t *)(data + (y + j) * stride + x * step);
 			int si = 0;
 			int di = 0;
 
 			for (int i=0; i<wp; i++) {
+        if ((x + i) < 0 or (x + i) >= sw) {
+          continue;
+        }
+
 				*(dst + di + 2) = *(src + si + 2);
 				*(dst + di + 1) = *(src + si + 1);
 				*(dst + di + 0) = *(src + si + 0);
@@ -1919,12 +1943,20 @@ void Graphics::SetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)
 		}
 	} else if (_pixelformat == JPF_RGB16) {
 		for (int j=0; j<hp; j++) {
+      if ((y + j) < 0 or (y + j) >= sh) {
+        continue;
+      }
+
 			uint8_t *src = (uint8_t *)(rgb + j * wp);
 			uint8_t *dst = (uint8_t *)(data + (y + j) * stride + x * step);
 			int si = 0;
 			int di = 0;
 
 			for (int i=0; i<wp; i++) {
+        if ((x + i) < 0 or (x + i) >= sw) {
+          continue;
+        }
+
 				int r = *(src + si + 2);
 				int g = *(src + si + 1);
 				int b = *(src + si + 0);

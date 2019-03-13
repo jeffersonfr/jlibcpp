@@ -360,7 +360,6 @@ class Scene : public jgui::Container {
       theme->SetFont("container.font", font);
       theme->SetFont("window.font", font);
 
-			SetFocusCycleRoot(true);
 			SetBackgroundVisible(true);
       SetVisible(true);
 		}

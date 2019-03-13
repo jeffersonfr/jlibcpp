@@ -283,6 +283,8 @@ static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(int symbol, bool ca
 	return jevent::JKS_UNKNOWN;
 }
 
+static bool quitting = false;
+
 class QTWindowRender : public QDialog {
 
   protected:
@@ -293,19 +295,16 @@ class QTWindowRender : public QDialog {
       } else if (event->type() == QEvent::ApplicationStateChange) {
           printf("ApplicationStateEvent\n");;
       } else if (event->type() == QEvent::Close) {
-          printf("CloseEvent\n");;
+          printf("CloseEvent\n");
+          
+          quitting = true;
       } else if (event->type() == QEvent::Enter) {
-          printf("EnterEvent\n");;
+          printf("EnterEvent\n");
       } else if (event->type() == QEvent::Leave) {
-          printf("LeaveEvent\n");;
-      } else if (event->type() == QEvent::Expose) {
-          // printf("ExposeEvent\n");
-          repaint();
-      } else if (event->type() == QEvent::UpdateRequest) {
-          // repaint();
-      } else if (event->type() == QEvent::Paint) {
-          // printf("PaintEvent\n");
-          paintEvent(dynamic_cast<QPaintEvent *>(event));
+          printf("LeaveEvent\n");
+      // } else if (event->type() == QEvent::Expose) {
+      // } else if (event->type() == QEvent::UpdateRequest) {
+      // } else if (event->type() == QEvent::Paint) {
       } else if (event->type() == QEvent::Move) {
           printf("MoveEvent\n");
       } else if (event->type() == QEvent::Resize) {
@@ -490,6 +489,8 @@ class QTWindowRender : public QDialog {
       // setAttribute(Qt::WA_PaintOnScreen);
       // setAttribute(Qt::WA_NoSystemBackground);
 
+      setMouseTracking(true);
+
       resize(width, height);
       move(x, y);
     }
@@ -500,6 +501,8 @@ class QTWindowRender : public QDialog {
 
     virtual void paintEvent(QPaintEvent* event)
     {
+      // QDialog::paintEvent(event);
+
       QPainter painter(this);
 
       if (g_window == nullptr || g_window->IsVisible() == false) {
@@ -549,7 +552,9 @@ class QTWindowRender : public QDialog {
       QImage image(data, dw, dh, stride, QImage::Format_RGB32);
       QPixmap pixmap = QPixmap::fromImage(image);
 
+      // painter.beginNativePainting();
       painter.drawPixmap(0, 0, pixmap);
+      // painter.endNativePainting();
 
       g_window->Flush();
 
@@ -590,11 +595,13 @@ void NativeApplication::InternalPaint()
 {
 }
 
-static bool quitting = false;
-
-static void PaintThread(NativeApplication *app)
+void NativeApplication::InternalLoop()
 {
-	while (quitting == false) {
+  quitting = false;
+
+  _handler->setVisible(true);
+
+  do {
     std::vector<jevent::EventObject *> events = g_window->GrabEvents();
 
     if (events.size() > 0) {
@@ -619,23 +626,13 @@ static void PaintThread(NativeApplication *app)
       }
     }
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(25));
-  }
-  
+    _application->processEvents();
+    
+    std::this_thread::yield();
+  } while (quitting == false);
+
   g_window->GrabEvents();
-}
 
-void NativeApplication::InternalLoop()
-{
-  std::thread thread = std::thread(PaintThread, this);
-
-  _handler->setVisible(true);
-  _application->exec();
-
-  quitting = true;
-
-  thread.join();
-  
   g_window->SetVisible(false);
 }
 
