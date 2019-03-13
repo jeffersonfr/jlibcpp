@@ -610,6 +610,192 @@ class Utils {
       return info;
     }
 
+	  static std::string GetMarkerDescription(int marker)
+    {
+      std::string info;
+
+      if (marker == 0x0a) {
+        info = "Aiko";
+      } else if (marker == 0x28) {
+        info = "AOC";
+      } else if (marker == 0xa0) {
+        info = "CCE";
+      } else if (marker == 0x84) {
+        info = "Cineral";
+      } else if (marker == 0xe5) {
+        info = "Digibras";
+      } else if (marker == 0x39) {
+        info = "Elsys";
+      } else if (marker == 0x16) {
+        info = "Envision";
+      } else if (marker == 0x13) {
+        info = "Evadin";
+      } else if (marker == 0x93) {
+        info = "Gradiente";
+      } else if (marker == 0x1f) {
+        info = "Intelbras";
+      } else if (marker == 0xe0) {
+        info = "LGE";
+      } else if (marker == 0x36) {
+        info = "Mitsubishi";
+      } else if (marker == 0xfa) {
+        info = "Philco";
+      } else if (marker == 0xfe) {
+        info = "Philips";
+      } else if (marker == 0xc4) {
+        info = "Panasonic";
+      } else if (marker == 0xc9) {
+        info = "Pionner";
+      } else if (marker == 0xe8) {
+        info = "Positivo";
+      } else if (marker == 0xd9) {
+        info = "Proview";
+      } else if (marker == 0x0e) {
+        info = "Qualcomm";
+      } else if (marker == 0x8d) {
+        info = "Sat Bras";
+      } else if (marker == 0x81) {
+        info = "Sharp (MBK)";
+      } else if (marker == 0x83) {
+        info = "Semp";
+      } else if (marker == 0xa5) {
+        info = "Sony";
+      } else if (marker == 0x82) {
+        info = "Samsung";
+      } else if (marker == 0x96) {
+        info = "Sanyo";
+      } else if (marker == 0xb4) {
+        info = "STB";
+      } else if (marker == 0x90) {
+        info = "SVA";
+      } else if (marker == 0xcb) {
+        info = "Tectoy";
+      } else if (marker == 0xf8) {
+        info = "Thomson";
+      } else if (marker == 0xed) {
+        info = "Toshiba";
+      }
+
+      return info;
+    }
+
+    static std::string GetClosedCaptionFormatDescription(int format) 
+    {
+      std::string info;
+
+      if (format == 0x00) {
+        info = "horizontal writing in standard density";
+      } else if (format == 0x01) {
+        info = "vertical writing in standard density";
+      } else if (format == 0x02) {
+        info = "horizontal writing in high density";
+      } else if (format == 0x03) {
+        info = "vertical writing in high density";
+      } else if (format == 0x04) {
+        info = "horizontal of western language";
+      } else if (format == 0x05) {
+        info = "reserved";
+      } else if (format == 0x06) {
+        info = "horizontal writing in 1920 x 1080";
+      } else if (format == 0x07) {
+        info = "vertical writing in 1920 x 1080";
+      } else if (format == 0x08) {
+        info = "horizontal writing in 960 x 540";
+      } else if (format == 0x09) {
+        info = "vertical writing in 960 x 540";
+      } else if (format == 0x0a) {
+        info = "horizontal writing in 1280 x 720";
+      } else if (format == 0x0b) {
+        info = "vertical writing in 1280 x 720";
+      } else if (format == 0x0b) {
+        info = "horizontal writing in 720 x 480";
+      } else if (format == 0x0b) {
+        info = "vertical writing in 720 x 480";
+      } else {
+        info = "reserved";
+      }
+
+      return info;
+    }
+
+    static std::string GetDownloadCancelReasonDescription(int reason) 
+    {
+      std::string info;
+
+      if (reason == 0x00) {
+        info = "unknown";
+      } else if (reason == 0x01) {
+        info = "rsnScenarioTimeout";
+      } else if (reason == 0x02) {
+        info = "rsnInsufMem";
+      } else if (reason == 0x03) {
+        info = "rsnAuthDenied";
+      } else if (reason == 0x04) {
+        info = "rsnFatal";
+      } else if (reason == 0x05) {
+        info = "rsnInfoRequestError";
+      } else if (reason == 0x06) {
+        info = "rsnCompatError";
+      } else if (reason == 0x07) {
+        info = "rsnUnreliableNetwork";
+      } else if (reason == 0x08) {
+        info = "rsnInvalidData";
+      } else if (reason == 0x09) {
+        info = "rsnInvalidBlock";
+      } else if (reason == 0x0a) {
+        info = "rsnInvalidVersion";
+      } else if (reason == 0x0b) {
+        info = "rsnAbort";
+      } else if (reason == 0x0c) {
+        info = "rsnRetrans";
+      } else if (reason == 0x0d) {
+        info = "rsnBadBlockSize";
+      } else if (reason == 0x0e) {
+        info = "rsnBadWindow";
+      } else if (reason == 0x0f) {
+        info = "rsnBadAckPeriod";
+      } else if (reason == 0x10) {
+        info = "rsnBadWindowTimer";
+      } else if (reason == 0x11) {
+        info = "rsnBadScenarioTimer";
+      } else if (reason == 0x12) {
+        info = "rsnBadCapabilities";
+      } else if (reason == 0x13) {
+        info = "rsnBadModuleTable";
+      } else if (reason >= 0x14 and reason <= 0xef) {
+        info = "unknown";
+      } else if (reason >= 0xf0 and reason <= 0xff) {
+        info = "unknown";
+      }
+
+      return info;
+    }
+
+    static std::string GetDownloadReasonDescription(int reason)
+    {
+      std::string info;
+
+      if (reason == 0x00) {
+        info = "unknown";
+      } else if (reason == 0x01) {
+        info = "rsnStart";
+      } else if (reason == 0x02) {
+        info = "rsnAckCont";
+      } else if (reason == 0x03) {
+        info = "rsnNakRetransBlock";
+      } else if (reason == 0x04) {
+        info = "rsnNakRetransWindow";
+      } else if (reason == 0x05) {
+        info = "rsnEnd";
+      } else if (reason >= 0x06 and reason <= 0xef) {
+        info = "unknown";
+      } else if (reason >= 0xf0 and reason <= 0xff) {
+        info = "unknown";
+      }
+
+      return info;
+    }
+
 };
 
 class SI {
@@ -4123,13 +4309,15 @@ class PSIParser : public jevent::DemuxListener {
       // table_id = 0xc3
 			const char *ptr = event->GetData();
 			
-      int table_id_ext = TS_G16(ptr + 3);
+      // int table_id_ext = TS_G16(ptr + 3);
+      int marker_id = TS_GM16(ptr + 3, 0, 8);
+      int model_id = TS_GM16(ptr + 3, 8, 8);
       int transport_stream_id = TS_G16(ptr + 8);
       int original_network_id = TS_G16(ptr + 10);
       int service_id = TS_G16(ptr + 12);
       int number_of_contents = TS_G8(ptr + 14);
 
-			printf("SDTT:: table id ext:[0x%04x], transport stream id:[0x%04x], original network id:[0x%04x], service id:[0x%04x], number of contents:[%d]\n", table_id_ext, transport_stream_id, original_network_id, service_id, number_of_contents);
+			printf("SDTT:: marker id:[%s], model id:[0x%02x], transport stream id:[0x%04x], original network id:[0x%04x], service id:[0x%04x], number of contents:[%d]\n", Utils::GetMarkerDescription(marker_id).c_str(), model_id, transport_stream_id, original_network_id, service_id, number_of_contents);
 
       ptr = ptr + 15;
 
@@ -4523,7 +4711,6 @@ class PSIParser : public jevent::DemuxListener {
           int rollup_mode = TS_GM8(ptr + 4, 6, 2);
 
           std::string display_condition_info;
-          std::string format_info;
           std::string character_info;
           std::string rollup_info;
 
@@ -4531,38 +4718,6 @@ class PSIParser : public jevent::DemuxListener {
             display_condition_info = "message display of attenuation due to rain";
           } else {
             display_condition_info = "specified otherwise";
-          }
-
-          if (format == 0x00) {
-            format_info = "horizontal writing in standard density";
-          } else if (format == 0x01) {
-            format_info = "vertical writing in standard density";
-          } else if (format == 0x02) {
-            format_info = "horizontal writing in high density";
-          } else if (format == 0x03) {
-            format_info = "vertical writing in high density";
-          } else if (format == 0x04) {
-            format_info = "horizontal of western language";
-          } else if (format == 0x05) {
-            format_info = "reserved";
-          } else if (format == 0x06) {
-            format_info = "horizontal writing in 1920 x 1080";
-          } else if (format == 0x07) {
-            format_info = "vertical writing in 1920 x 1080";
-          } else if (format == 0x08) {
-            format_info = "horizontal writing in 960 x 540";
-          } else if (format == 0x09) {
-            format_info = "vertical writing in 960 x 540";
-          } else if (format == 0x0a) {
-            format_info = "horizontal writing in 1280 x 720";
-          } else if (format == 0x0b) {
-            format_info = "vertical writing in 1280 x 720";
-          } else if (format == 0x0b) {
-            format_info = "horizontal writing in 720 x 480";
-          } else if (format == 0x0b) {
-            format_info = "vertical writing in 720 x 480";
-          } else {
-            format_info = "reserved";
           }
 
           if (character_code == 0x00) {
@@ -4586,7 +4741,7 @@ class PSIParser : public jevent::DemuxListener {
           }
 
           // INFO:: 6-STD B24 v5.2.1 (Data group data/Caption management data)
-          printf("Closed Caption:caption managment: language tag:[0x%01x], display mode:[0x%01x], display condition designation:[0x%02x/%s], language code:[%s], format:[0x%01x/%s], character code:[0x%01x/%s], rollup mode:[0x%01x/%s]\n", language_tag, display_mode, display_condition_designation, display_condition_info.c_str(), language_code.c_str(), format, format_info.c_str(), character_code, character_info.c_str(), rollup_mode, rollup_info.c_str());
+          printf("Closed Caption:caption managment: language tag:[0x%01x], display mode:[0x%01x], display condition designation:[0x%02x/%s], language code:[%s], format:[0x%01x/%s], character code:[0x%01x/%s], rollup mode:[0x%01x/%s]\n", language_tag, display_mode, display_condition_designation, display_condition_info.c_str(), language_code.c_str(), format, Utils::GetClosedCaptionFormatDescription(format).c_str(), character_code, character_info.c_str(), rollup_mode, rollup_info.c_str());
 
           int data_unit_loop_length = TS_GM32(ptr + 5, 0, 24);
 
@@ -4916,55 +5071,7 @@ class PSIParser : public jevent::DemuxListener {
         // int reserved = TS_G8(ptr + 9);
         int private_data_length = TS_G16(ptr + 10);
  
-        std::string reason;
-
-        if (download_cancel_reason == 0x00) {
-          reason = "unknown";
-        } else if (download_cancel_reason == 0x01) {
-          reason = "rsnScenarioTimeout";
-        } else if (download_cancel_reason == 0x02) {
-          reason = "rsnInsufMem";
-        } else if (download_cancel_reason == 0x03) {
-          reason = "rsnAuthDenied";
-        } else if (download_cancel_reason == 0x04) {
-          reason = "rsnFatal";
-        } else if (download_cancel_reason == 0x05) {
-          reason = "rsnInfoRequestError";
-        } else if (download_cancel_reason == 0x06) {
-          reason = "rsnCompatError";
-        } else if (download_cancel_reason == 0x07) {
-          reason = "rsnUnreliableNetwork";
-        } else if (download_cancel_reason == 0x08) {
-          reason = "rsnInvalidData";
-        } else if (download_cancel_reason == 0x09) {
-          reason = "rsnInvalidBlock";
-        } else if (download_cancel_reason == 0x0a) {
-          reason = "rsnInvalidVersion";
-        } else if (download_cancel_reason == 0x0b) {
-          reason = "rsnAbort";
-        } else if (download_cancel_reason == 0x0c) {
-          reason = "rsnRetrans";
-        } else if (download_cancel_reason == 0x0d) {
-          reason = "rsnBadBlockSize";
-        } else if (download_cancel_reason == 0x0e) {
-          reason = "rsnBadWindow";
-        } else if (download_cancel_reason == 0x0f) {
-          reason = "rsnBadAckPeriod";
-        } else if (download_cancel_reason == 0x10) {
-          reason = "rsnBadWindowTimer";
-        } else if (download_cancel_reason == 0x11) {
-          reason = "rsnBadScenarioTimer";
-        } else if (download_cancel_reason == 0x12) {
-          reason = "rsnBadCapabilities";
-        } else if (download_cancel_reason == 0x13) {
-          reason = "rsnBadModuleTable";
-        } else if (download_cancel_reason >= 0x14 and download_cancel_reason <= 0xef) {
-          reason = "unknown";
-        } else if (download_cancel_reason >= 0xf0 and download_cancel_reason <= 0xff) {
-          reason = "unknown";
-        }
-
-        printf("DSMCC:DownloadCancel: download id:[0x%08x], module id:[0x%04x], block number:[0x%04x], download cancel reason:[0x%02x/%s]\n", download_id, module_id, block_number, download_cancel_reason, reason.c_str());
+        printf("DSMCC:DownloadCancel: download id:[0x%08x], module id:[0x%04x], block number:[0x%04x], download cancel reason:[0x%02x/%s]\n", download_id, module_id, block_number, download_cancel_reason, Utils::GetDownloadCancelReasonDescription(download_cancel_reason).c_str());
 
         DumpBytes("DSMCC:DownloadCancel: private data byte", ptr + 12, private_data_length);
       } else if (message_id == 0x1006) { // DownloadServerInitiate (DSI)
@@ -5103,27 +5210,7 @@ class PSIParser : public jevent::DemuxListener {
         int block_number = TS_G16(ptr + 2);
         int download_reason = TS_G8(ptr + 4);
 
-        std::string reason;
-
-        if (download_reason == 0x00) {
-          reason = "unknown";
-        } else if (download_reason == 0x01) {
-          reason = "rsnStart";
-        } else if (download_reason == 0x02) {
-          reason = "rsnAckCont";
-        } else if (download_reason == 0x03) {
-          reason = "rsnNakRetransBlock";
-        } else if (download_reason == 0x04) {
-          reason = "rsnNakRetransWindow";
-        } else if (download_reason == 0x05) {
-          reason = "rsnEnd";
-        } else if (download_reason >= 0x06 and download_reason <= 0xef) {
-          reason = "unknown";
-        } else if (download_reason >= 0xf0 and download_reason <= 0xff) {
-          reason = "unknown";
-        }
-        
-        printf("DSMCC:DownloadDataRequest: module id:[0x%04x], block number:[0x%04x], download reason:[0x%02x/%s]\n", module_id, block_number, download_reason, reason.c_str());
+        printf("DSMCC:DownloadDataRequest: module id:[0x%04x], block number:[0x%04x], download reason:[0x%02x/%s]\n", module_id, block_number, download_reason, Utils::GetDownloadReasonDescription(download_reason).c_str());
       } else if (message_id == 0x1005) { // DownloadCancel (DC)
       } else if (message_id == 0x1006) { // DownloadServerInitiate (DSI)
       }
