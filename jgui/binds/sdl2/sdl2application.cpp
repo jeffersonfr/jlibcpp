@@ -374,7 +374,7 @@ void NativeApplication::InternalPaint()
 	}
 
   jregion_t 
-    bounds = g_window->GetVisibleBounds();
+    bounds = g_window->GetBounds();
   jgui::Image 
     *buffer = new jgui::BufferedImage(jgui::JPF_ARGB, bounds.width, bounds.height);
   jgui::Graphics 
@@ -797,7 +797,7 @@ void NativeWindow::SetBounds(int x, int y, int width, int height)
   SDL_SetWindowSize(_window, width, height);
 }
 
-jgui::jregion_t NativeWindow::GetVisibleBounds()
+jgui::jregion_t NativeWindow::GetBounds()
 {
 	jgui::jregion_t t;
 

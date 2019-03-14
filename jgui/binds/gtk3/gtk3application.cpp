@@ -402,7 +402,7 @@ static gboolean OnDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
 	// NativeWindow 
   //   *handler = reinterpret_cast<NativeWindow *>(user_data);
   jregion_t 
-    bounds = g_window->GetVisibleBounds();
+    bounds = g_window->GetBounds();
   jgui::Image 
     *buffer = new jgui::BufferedImage(jgui::JPF_ARGB, bounds.width, bounds.height);
   jgui::Graphics 
@@ -820,7 +820,7 @@ void NativeWindow::SetBounds(int x, int y, int width, int height)
 	gtk_widget_set_size_request(_window, width, height);
 }
 
-jgui::jregion_t NativeWindow::GetVisibleBounds()
+jgui::jregion_t NativeWindow::GetBounds()
 {
   return _visible_bounds;
 }

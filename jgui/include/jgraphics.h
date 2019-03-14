@@ -649,18 +649,6 @@ class Graphics : public virtual jcommon::Object {
 		 * \brief
 		 *
 		 */
-		virtual jregion_t GetStringExtends(std::string text);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jregion_t GetGlyphExtends(int symbol);
-
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void DrawString(std::string text, int xp, int yp);
 		
 		/**

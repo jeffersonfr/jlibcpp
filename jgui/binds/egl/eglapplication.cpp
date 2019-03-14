@@ -680,7 +680,7 @@ void NativeApplication::InternalPaint()
 	}
 
   jregion_t 
-    bounds = g_window->GetVisibleBounds();
+    bounds = g_window->GetBounds();
   jgui::Image 
     *buffer = new jgui::BufferedImage(jgui::JPF_RGB32, bounds.width, bounds.height);
   jgui::Graphics 
@@ -1370,7 +1370,7 @@ void NativeWindow::ToggleFullScreen()
   };
 
   if (_fullscreen == false) {
-    _previous_bounds = GetVisibleBounds();
+    _previous_bounds = GetBounds();
 
     SetBounds(0, 0, _screen.width, _screen.height);
 
@@ -1452,7 +1452,7 @@ void NativeWindow::SetBounds(int x, int y, int width, int height)
 #endif
 }
 
-jgui::jregion_t NativeWindow::GetVisibleBounds()
+jgui::jregion_t NativeWindow::GetBounds()
 {
 	jgui::jregion_t 
     t = {0, 0, 0, 0};

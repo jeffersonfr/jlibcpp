@@ -50,15 +50,11 @@ Window::Window(int x, int y, int width, int height):
 {
 	jcommon::Object::SetClassName("jgui::Window");
 
-  // TODO:: estah entrando em loop
-  try {
 #ifdef JGUI_UI
-		_instance = new NativeWindow(x, y, width, height);
+	_instance = new NativeWindow(x, y, width, height);
 #endif
   
-    _instance->SetParent(this);
-	} catch (jexception::NullPointerException &) {
-	}
+  _instance->SetParent(this);
 
   _focus_owner = nullptr;
 
@@ -143,9 +139,14 @@ void Window::SetBounds(int x, int y, int width, int height)
   _instance->SetBounds(x, y, width, height);
 }
 
+jgui::jregion_t Window::GetBounds()
+{
+  return _instance->GetBounds();
+}
+
 jgui::jregion_t Window::GetVisibleBounds()
 {
-  return _instance->GetVisibleBounds();
+  return GetBounds();
 }
 
 void Window::SetTitle(std::string title)

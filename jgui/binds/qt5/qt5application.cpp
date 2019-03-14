@@ -27,6 +27,7 @@
 #include "jexception/jillegalargumentexception.h"
 
 #include <thread>
+#include <iostream>
 
 #include <QDialog>
 #include <QResizeEvent>
@@ -52,6 +53,8 @@ static bool _fullscreen_enabled = false;
 static jcursor_style_t _cursor;
 /** \brief */
 static bool _undecorated = false;
+/** \brief */
+static bool _visible = false;
 
 static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(int symbol, bool capital)
 {
@@ -482,17 +485,10 @@ class QTWindowRender : public QDialog {
     }
 
   public:
-    explicit QTWindowRender(int x, int y, int width, int height): 
-      QDialog()
+    explicit QTWindowRender(): 
+      QDialog(nullptr, Qt::WindowTitleHint | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint)
     {
-      // setAttribute(Qt::WA_NativeWindow);
-      // setAttribute(Qt::WA_PaintOnScreen);
-      // setAttribute(Qt::WA_NoSystemBackground);
-
-      setMouseTracking(true);
-
-      resize(width, height);
-      move(x, y);
+      setWindowFlags(Qt::Window);
     }
 
     virtual ~QTWindowRender() 
@@ -512,7 +508,7 @@ class QTWindowRender : public QDialog {
       // NativeWindow 
       //   *handler = reinterpret_cast<NativeWindow *>(user_data);
       jregion_t 
-        bounds = g_window->GetVisibleBounds();
+        bounds = g_window->GetBounds();
       jgui::Image 
         *buffer = new jgui::BufferedImage(jgui::JPF_ARGB, bounds.width, bounds.height);
       jgui::Graphics 
@@ -582,7 +578,9 @@ NativeApplication::~NativeApplication()
 
 void NativeApplication::InternalInit(int argc, char **argv)
 {
-  _application = new QApplication(argc, argv);
+  int i = argc;
+
+  _application = new QApplication(i, argv);
 
   QRect 
     geometry = QApplication::desktop()->screenGeometry();
@@ -599,7 +597,8 @@ void NativeApplication::InternalLoop()
 {
   quitting = false;
 
-  _handler->setVisible(true);
+  _handler->show();
+  _handler->activateWindow();
 
   do {
     std::vector<jevent::EventObject *> events = g_window->GrabEvents();
@@ -652,9 +651,13 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 
   _icon = new BufferedImage(_DATA_PREFIX"/images/small-gnu.png");
 
-  _handler = new QTWindowRender(0, 0, 720, 480);
+  _handler = new QTWindowRender();
 
-  _handler->show();
+  _handler->setMouseTracking(true);
+  _handler->resize(width, height);
+  _handler->move(x, y);
+
+  _visible = true;
 }
 
 NativeWindow::~NativeWindow()
@@ -663,13 +666,40 @@ NativeWindow::~NativeWindow()
   _handler = nullptr;
 }
 
+QByteArray geometry;
+
 void NativeWindow::ToggleFullScreen()
 {
+    const QString 
+      session = QString(getenv("DESKTOP_SESSION")).toLower();
+
 	if (_fullscreen_enabled == false) {
     _fullscreen_enabled = true;
     
+    geometry = _handler->saveGeometry();
+
+    if (session == "ubuntu") {
+      _handler->setFixedSize({_screen.width, _screen.height});
+      _handler->setWindowFlags(Qt::FramelessWindowHint);
+      _handler->setWindowState(_handler->windowState() | Qt::WindowFullScreen);
+      _handler->show();
+      _handler->activateWindow();
+    } else {
+      _handler->showFullScreen();
+    }
 	} else {
     _fullscreen_enabled = false;
+    
+    if (session == "ubuntu") {
+        _handler->setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+        _handler->setMinimumSize(0, 0);
+        _handler->restoreGeometry(geometry);
+        _handler->setWindowFlags(Qt::Dialog);
+        _handler->show();
+        _handler->activateWindow();
+    } else {
+        _handler->showNormal();
+    }
 
 	}
 }
@@ -733,7 +763,7 @@ void NativeWindow::SetBounds(int x, int y, int width, int height)
   _handler->move(x, y);
 }
 
-jgui::jregion_t NativeWindow::GetVisibleBounds()
+jgui::jregion_t NativeWindow::GetBounds()
 {
   QSize 
     size = _handler->size();
@@ -800,12 +830,26 @@ jpoint_t NativeWindow::GetCursorLocation()
 
 void NativeWindow::SetVisible(bool visible)
 {
-  _handler->setVisible(visible);
+  if (_visible == visible) {
+    return;
+  }
+
+  _visible = visible;
+
+  // _handler->setVisible(_visible);
+
+  if (_visible == false) {
+    _handler->hide();
+    // _handler->deactivateWindow();
+  } else {
+    _handler->show();
+    _handler->activateWindow();
+  }
 }
 
 bool NativeWindow::IsVisible()
 {
-  return _handler->isVisible(); 
+  return _visible;
 }
 
 jcursor_style_t NativeWindow::GetCursor()
@@ -910,8 +954,5 @@ jgui::Image * NativeWindow::GetIcon()
 {
   return _icon;
 }
-
-// t.width = gtk_widget_get_allocated_width(_drawing_area);
-// t.height = gtk_widget_get_allocated_height(_drawing_area);
 
 }

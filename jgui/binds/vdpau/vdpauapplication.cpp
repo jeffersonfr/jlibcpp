@@ -466,7 +466,7 @@ void NativeApplication::InternalPaint()
 	}
 
   jregion_t 
-    bounds = g_window->GetVisibleBounds();
+    bounds = g_window->GetBounds();
   jgui::Image 
     *buffer = new jgui::BufferedImage(jgui::JPF_ARGB, bounds.width, bounds.height);
   jgui::Graphics 
@@ -953,7 +953,7 @@ NativeWindow::~NativeWindow()
 void NativeWindow::ToggleFullScreen()
 {
   if (_fullscreen == false) {
-    _previous_bounds = GetVisibleBounds();
+    _previous_bounds = GetBounds();
 
     Atom atoms[2] = { 
       XInternAtom(_display, "_NET_WM_STATE_FULLSCREEN", False), None 
@@ -1096,7 +1096,7 @@ void NativeWindow::SetBounds(int x, int y, int width, int height)
 	XMoveResizeWindow(_display, _window, x, y, width, height);
 }
 
-jgui::jregion_t NativeWindow::GetVisibleBounds()
+jgui::jregion_t NativeWindow::GetBounds()
 {
 	return {
     .x = _visible_bounds.x,

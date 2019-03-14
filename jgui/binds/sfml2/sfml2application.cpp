@@ -343,7 +343,7 @@ void NativeApplication::InternalPaint()
 	}
 
   jregion_t 
-    bounds = g_window->GetVisibleBounds();
+    bounds = g_window->GetBounds();
   jgui::Image 
     *buffer = new jgui::BufferedImage(jgui::JPF_ARGB, bounds.width, bounds.height);
   jgui::Graphics 
@@ -678,7 +678,7 @@ void NativeWindow::ToggleFullScreen()
       return;
     }
 
-    _previous_bounds = GetVisibleBounds();
+    _previous_bounds = GetBounds();
 
     window = new sf::RenderWindow(modes[0], GetTitle().c_str(), flags);
 
@@ -760,7 +760,7 @@ void NativeWindow::SetBounds(int x, int y, int width, int height)
   _window->setView(sf::View(sf::FloatRect(0, 0, width, height)));
 }
 
-jgui::jregion_t NativeWindow::GetVisibleBounds()
+jgui::jregion_t NativeWindow::GetBounds()
 {
   sf::Vector2i 
     location = _window->getPosition();

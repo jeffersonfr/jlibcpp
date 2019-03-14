@@ -1216,30 +1216,6 @@ void Graphics::FillLinearGradient(int xp, int yp, int wp, int hp, int x1p, int y
 	SetCompositeFlags(_composite_flags);
 }
 
-jregion_t Graphics::GetStringExtends(std::string text)
-{
-	jregion_t t;
-
-	t.x = 0;
-	t.y = 0;
-	t.width = 0;
-	t.height = 0;
-
-	return t;
-}
-
-jregion_t Graphics::GetGlyphExtends(int symbol)
-{
-	jregion_t t;
-
-	t.x = 0;
-	t.y = 0;
-	t.width = 0;
-	t.height = 0;
-
-	return t;
-}
-
 void Graphics::DrawString(std::string text, int xp, int yp)
 {
 	if (_font == nullptr) {

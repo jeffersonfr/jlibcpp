@@ -352,7 +352,7 @@ void NativeApplication::InternalPaint()
 	}
 
   jregion_t 
-    bounds = g_window->GetVisibleBounds();
+    bounds = g_window->GetBounds();
   jgui::Image 
     *buffer = new jgui::BufferedImage(jgui::JPF_ARGB, bounds.width, bounds.height);
   jgui::Graphics 
@@ -707,7 +707,7 @@ void NativeWindow::ToggleFullScreen()
   bool enabled = (al_get_display_flags(_display) & ALLEGRO_FULLSCREEN_WINDOW) != 0;
 
 	if (enabled == false) {
-    _previous_bounds = GetVisibleBounds();
+    _previous_bounds = GetBounds();
 
     al_set_display_flag(_display, ALLEGRO_FULLSCREEN_WINDOW, true);
     al_set_display_flag(_display, ALLEGRO_GENERATE_EXPOSE_EVENTS, true);
@@ -780,7 +780,7 @@ void NativeWindow::SetBounds(int x, int y, int width, int height)
 	_surface = al_create_bitmap(width, height);
 }
 
-jgui::jregion_t NativeWindow::GetVisibleBounds()
+jgui::jregion_t NativeWindow::GetBounds()
 {
 	jgui::jregion_t t;
 

@@ -338,7 +338,7 @@ void NativeApplication::InternalPaint()
   // OPTIMIZE:: cairo_xlib_surface_create(Display, Drawable, Visual, width, height)
   
   jregion_t 
-    bounds = g_window->GetVisibleBounds();
+    bounds = g_window->GetBounds();
   jgui::Image 
     *buffer = new jgui::BufferedImage(jgui::JPF_ARGB, bounds.width, bounds.height);
   jgui::Graphics 
@@ -678,7 +678,7 @@ xcb_atom_t getReplyAtomFromCookie(xcb_intern_atom_cookie_t cookie)
 void NativeWindow::ToggleFullScreen()
 {
   if (_fullscreen == false) {
-    _previous_bounds = GetVisibleBounds();
+    _previous_bounds = GetBounds();
 
     SetBounds(0, 0, _screen.width, _screen.height);
 
@@ -779,7 +779,7 @@ void NativeWindow::SetBounds(int x, int y, int width, int height)
   xcb_configure_window(_xconnection, _xwindow, XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y | XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT, values);
 }
 
-jgui::jregion_t NativeWindow::GetVisibleBounds()
+jgui::jregion_t NativeWindow::GetBounds()
 {
 	jgui::jregion_t 
     t = {0, 0, 0, 0};
