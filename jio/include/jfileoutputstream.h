@@ -36,15 +36,17 @@ class FileOutputStream : public jio::OutputStream {
 		/** \brief */
 		File *_file;
 		/** \brief */
-        char *_buffer;
-		/** \brief Seek */
-		int64_t _current;
-        /** \brief */
-        int64_t _buffer_length;
-        /** \brief */
-		int64_t _current_index; 
-        /** \brief */
-        int64_t _sent_bytes;
+    char *_buffer;
+    /** \brief Seek */
+    int64_t _current;
+    /** \brief */
+    int64_t _buffer_length;
+    /** \brief */
+    int64_t _current_index; 
+    /** \brief */
+    int64_t _sent_bytes;
+    /** \brief */
+    bool _flag;
 
 	public:
 		/**

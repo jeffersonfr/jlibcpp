@@ -373,8 +373,19 @@ class Widgets : public jgui::Window, public jevent::ActionListener, public jeven
 		_group->Remove(_radio2);
 		_group->Remove(_radio3);
 
+		std::vector<jgui::Image *> images = _animation->GetImages();
+
+    _animation->RemoveAll();
+
+    for (int i=0; i<(int)images.size(); i++) {
+      jgui::Image *image = images[i];
+
+      delete image;
+    }
+		
+    delete _animation;
+
 		delete _group;
-		delete _animation;
 		delete _marquee;
 		delete _textfield;
 		delete _textarea;
@@ -393,6 +404,9 @@ class Widgets : public jgui::Window, public jevent::ActionListener, public jeven
 		delete _imagebutton2;
 		delete _imagebutton3;
 		delete _spin;
+		delete _slider;
+		delete _scroll;
+		delete _staticimage;
 		delete _list;
 		delete _label1;
 		delete _label2;

@@ -20,6 +20,8 @@
 #include "jgui/jindexedimage.h"
 #include "jgui/jhslcolorspace.h"
 #include "jexception/jruntimeexception.h"
+#include "jexception/jinvalidargumentexception.h"
+#include "jexception/jnullpointerexception.h"
 
 #include <string.h>
 #include <math.h>
@@ -94,15 +96,11 @@ IndexedImage * IndexedImage::Pack(Image *image)
 			jgui::jsize_t 
 				size = image->GetSize();
 			uint32_t 
-				*rgb = nullptr;
+				rgb[size.width*size.height];
 
-			image->GetRGBArray(&rgb, 0, 0, size.width, size.height);
+			image->GetRGBArray(rgb, 0, 0, size.width, size.height);
 
-			if ((void *)rgb != nullptr) {
-				packed = Pack(rgb, size.width, size.height);
-
-				delete [] rgb;
-			}
+			packed = Pack(rgb, size.width, size.height);
 		}
 	}
 
@@ -380,23 +378,18 @@ void IndexedImage::GetPixels(uint8_t **pixels, int xp, int yp, int wp, int hp, i
 	(*pixels) = ptr;
 }
 
-void IndexedImage::GetRGBArray(uint32_t **rgb, int xp, int yp, int wp, int hp)
+void IndexedImage::GetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)
 {
 	jgui::jsize_t 
 		size = GetSize();
 
 	if ((xp + wp) > size.width || (yp + hp) > size.height) {
-		(*rgb) = nullptr;
-
-		return;
+    throw jexception::InvalidArgumentException("The limits are out of bounds");
 	}
 
-	uint32_t 
-		*buffer = nullptr;
-
-	if (*rgb == nullptr) {
-		buffer = new uint32_t[wp*hp];
-	}
+  if (rgb == nullptr) {
+    throw jexception::NullPointerException("Destination buffer must be valid");
+  }
 
 	for (int j=0; j<hp; j++) {
 		int 
@@ -404,11 +397,9 @@ void IndexedImage::GetRGBArray(uint32_t **rgb, int xp, int yp, int wp, int hp)
 			line = j*wp;
 
 		for (int i=0; i<wp; i++) {
-			buffer[line + i] = _palette[_data[data + i]];
+			rgb[line + i] = _palette[_data[data + i]];
 		}
 	}
-
-	*rgb = buffer;
 }
 		
 void IndexedImage::GetPalette(uint32_t **palette, int *size)

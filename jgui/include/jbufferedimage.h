@@ -118,7 +118,7 @@ class BufferedImage : public virtual jgui::Image {
 		 * \brief
 		 *
 		 */
-		virtual void GetRGBArray(uint32_t **rgb, int xp, int yp, int wp, int hp);
+		virtual void GetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp);
 		
 		/**
 		 * \brief

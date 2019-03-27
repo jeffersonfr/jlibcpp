@@ -685,10 +685,9 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 
 NativeWindow::~NativeWindow()
 {
-  munmap(_fb_surface, _fb_vinfo.xres*_fb_vinfo.yres*_fb_vinfo.bits_per_pixel/8);
+  SetVisible(false);
 
-  delete g_window;
-  g_window = nullptr;
+  munmap(_fb_surface, _fb_vinfo.xres*_fb_vinfo.yres*_fb_vinfo.bits_per_pixel/8);
 }
 
 void NativeWindow::ToggleFullScreen()

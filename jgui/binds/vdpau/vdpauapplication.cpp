@@ -946,8 +946,7 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 
 NativeWindow::~NativeWindow()
 {
-  delete g_window;
-  g_window = nullptr;
+  SetVisible(false);
 }
 
 void NativeWindow::ToggleFullScreen()
@@ -1250,11 +1249,10 @@ void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 		return;
 	}
 
-	uint32_t *data = nullptr;
-
 	jsize_t t = shape->GetSize();
+	uint32_t data[t.width*t.height];
 	
-	shape->GetGraphics()->GetRGBArray(&data, 0, 0, t.width, t.height);
+	shape->GetGraphics()->GetRGBArray(data, 0, 0, t.width, t.height);
 
 	if (data == nullptr) {
 		return;

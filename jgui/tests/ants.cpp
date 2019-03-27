@@ -157,7 +157,10 @@ class Main : public jgui::Window {
 
 		virtual ~Main()
 		{
+#if ENABLE_GUI == 1
 			delete fweights;
+      delete foffscreen;
+#endif
 		}
 
 		virtual void ShowApp()
@@ -260,6 +263,9 @@ class Main : public jgui::Window {
 			for (int i=0; i<MAX_COLS; i++) {
 				std::cout << solution[i]->value << " ";
 			}
+
+			delete [] board;
+			delete [] try_solutions;
 
 			std::cout << std::endl;
 		}

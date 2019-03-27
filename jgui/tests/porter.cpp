@@ -51,6 +51,9 @@ class PorterTeste : public jgui::Window {
 
 		virtual ~PorterTeste()
 		{
+      delete _img1;
+      delete _img2;
+      delete _bg;
 		}
 
 		virtual void PaintComposition(jgui::Graphics *g, std::string name, jgui::jcomposite_flags_t t, int x, int y)
@@ -65,10 +68,10 @@ class PorterTeste : public jgui::Window {
 			if (_is_drawimage == true) {
 				ig->DrawImage(_img2, 2*RECT_SIZE/2, 2*RECT_SIZE/2);
 			} else {
-				uint32_t *buffer = nullptr;
 				jgui::jsize_t size = _img2->GetSize();
+				uint32_t buffer[size.width*size.height];
 
-				_img2->GetGraphics()->GetRGBArray(&buffer, 0, 0, size.width, size.height);
+				_img2->GetGraphics()->GetRGBArray(buffer, 0, 0, size.width, size.height);
 
 				ig->SetRGBArray(buffer, 2*RECT_SIZE/2, 2*RECT_SIZE/2, size.width, size.height);
 			}

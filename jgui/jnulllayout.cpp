@@ -49,7 +49,7 @@ jsize_t NullLayout::GetMaximumLayoutSize(Container *parent)
 
 jsize_t NullLayout::GetPreferredLayoutSize(Container *parent)
 {
-	jsize_t t = {100, 100};
+	jsize_t t = {0, 0};
 
 	return t;
 }

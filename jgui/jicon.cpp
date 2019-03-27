@@ -35,13 +35,27 @@ Icon::Icon(jgui::Image *image, int x, int y, int width, int height):
 
 Icon::~Icon()
 {
+  if (_image != nullptr) {
+    delete _image;
+    _image = nullptr;
+  }
 }
 
 void Icon::SetImage(jgui::Image *image)
 {
+  if (_image != nullptr) {
+    delete _image;
+    _image = nullptr;
+  }
+
 	_image = image;
 
 	Repaint();
+}
+
+jgui::Image * Icon::GetImage()
+{
+	return _image;
 }
 
 void Icon::SetHorizontalAlign(jhorizontal_align_t align)

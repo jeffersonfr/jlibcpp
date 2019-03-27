@@ -206,6 +206,10 @@ class Tetris : public jgui::Window {
 
 		virtual ~Tetris()
 		{
+			delete smallfont;
+			delete largefont;
+
+      delete ii;
 		}
 
 		void init()

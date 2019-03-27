@@ -1455,7 +1455,7 @@ uint32_t Graphics::GetRGB(int xp, int yp, uint32_t pixel)
 	return *((uint32_t *)(data + y * stride) + x);
 }
 
-void Graphics::GetRGBArray(uint32_t **rgb, int xp, int yp, int wp, int hp)
+void Graphics::GetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)
 {
 	if (rgb == nullptr) {
 		throw jexception::NullPointerException("Pixel array is null");
@@ -1484,10 +1484,10 @@ void Graphics::GetRGBArray(uint32_t **rgb, int xp, int yp, int wp, int hp)
 		return;
 	}
 
-	uint32_t *ptr = (*rgb);
+	uint32_t *ptr = rgb;
 
 	if (ptr == nullptr) {
-		ptr = new uint32_t[hp*wp];
+    throw jexception::NullPointerException("Destination buffer must be valid");
 	}
 
 	int stride = cairo_image_surface_get_stride(cairo_surface);
@@ -1545,8 +1545,6 @@ void Graphics::GetRGBArray(uint32_t **rgb, int xp, int yp, int wp, int hp)
 			}
 		}
 	}
-
-	(*rgb) = ptr;
 }
 
 void Graphics::SetRGB(uint32_t rgb, int xp, int yp) 
@@ -1972,15 +1970,11 @@ bool Graphics::DrawImage(Image *img, int xp, int yp)
 		cairo_paint(_cairo_context);
 		cairo_restore(_cairo_context);
 	} else {
-		uint32_t *rgb = nullptr;
+		uint32_t rgb[size.width*size.height];
 
-		img->GetRGBArray(&rgb, 0, 0, size.width, size.height);
+		img->GetRGBArray(rgb, 0, 0, size.width, size.height);
 	
-		if (rgb != nullptr) {
-			SetRGBArray(rgb, xp, yp, size.width, size.height);
-
-			delete [] rgb;
-		}
+		SetRGBArray(rgb, xp, yp, size.width, size.height);
 	}
 
 	return true;
@@ -2022,15 +2016,11 @@ bool Graphics::DrawImage(Image *img, int xp, int yp, int wp, int hp)
 		cairo_paint(_cairo_context);
 		cairo_restore(_cairo_context);
 	} else {
-		uint32_t *rgb = nullptr;
+		uint32_t rgb[wp*hp];
 
-		scl->GetRGBArray(&rgb, 0, 0, wp, hp);
+		scl->GetRGBArray(rgb, 0, 0, wp, hp);
 	
-		if (rgb != nullptr) {
-			SetRGBArray(rgb, xp, yp, wp, hp);
-
-			delete [] rgb;
-		}
+		SetRGBArray(rgb, xp, yp, wp, hp);
 	}
 
 	delete scl;
@@ -2093,15 +2083,11 @@ bool Graphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp,
 		cairo_paint(_cairo_context);
 		cairo_restore(_cairo_context);
 	} else {
-		uint32_t *rgb = nullptr;
+		uint32_t rgb[wp*hp];
 
-		scl->GetRGBArray(&rgb, 0, 0, wp, hp);
+		scl->GetRGBArray(rgb, 0, 0, wp, hp);
 	
-		if (rgb != nullptr) {
-			SetRGBArray(rgb, xp, yp, wp, hp);
-
-			delete [] rgb;
-		}
+		SetRGBArray(rgb, xp, yp, wp, hp);
 	}
 
 	delete scl;

@@ -251,6 +251,13 @@ class UserWindow: public jgui::Window {
 
 		virtual ~UserWindow()
 		{
+      while (_events.size() > 0) {
+			  struct event_t *t = _events.begin()->second;
+        
+        _events.erase(_events.begin());
+        
+        delete t;
+      }
 		}
 
 		void RegisterUserEventListener(UserEventListener *listener)

@@ -88,6 +88,12 @@ class Button : public Component {
 		 * \brief
 		 *
 		 */
+		virtual jgui::Image * GetImage();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual std::string GetText();
 
 		/**

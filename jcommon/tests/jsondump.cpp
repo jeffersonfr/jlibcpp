@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "jcommon/jjson.h"
+#include "jio/jmemoryinputstream.h"
 #include "jexception/jparserexception.h"
 
 #include <iostream>
@@ -56,8 +57,8 @@ void print(jcommon::JSONValue *value, int ident = 0)
 {
 	IDENT(ident);
 
-	if (value->GetName() != nullptr) {
-		printf("\"%s\" = ", value->GetName());
+	if (value->GetName().empty() == false) {
+		printf("\"%s\" = ", value->GetName().c_str());
 	}
 
 	switch(value->GetType()) {
@@ -74,24 +75,25 @@ void print(jcommon::JSONValue *value, int ident = 0)
 			printf(value->GetType() == jcommon::JSON_OBJECT ? "}\n" : "]\n");
 			break;
 		case jcommon::JSON_STRING:
-			printf("\"%s\"\n", value->GetString());
+			printf("\"%s\"\n", value->GetValue().c_str());
 			break;
 		case jcommon::JSON_INT:
-			printf("%d\n", value->GetInteger());
+			printf("%d\n", atoi(value->GetValue().c_str()));
 			break;
 		case jcommon::JSON_FLOAT:
-			printf("%f\n", value->GetFloat());
+			printf("%f\n", atof(value->GetValue().c_str()));
 			break;
 		case jcommon::JSON_BOOL:
-			printf(value->GetBoolean()?"true\n":"false\n");
+			printf("%s\n", value->GetValue().c_str());
 			break;
 	}
 }
 
-bool parse(char *source)
+bool parse(char *source, int size)
 {
 	try {
-		jcommon::JSONValue *root = jcommon::JSON::Parse(source);
+    jio::MemoryInputStream stream((uint8_t *)source, size);
+		jcommon::JSONValue *root = jcommon::JSON::Parse(&stream);
 
 		print(root);
 
@@ -116,7 +118,7 @@ int main(int argc, char **argv)
 	for (size_t i = 0; i < sources.size(); ++i) {
 		printf("Parsing %ld\n", i + 1);
 
-		if (parse(&sources[i][0])) {
+		if (parse(&sources[i][0], sources[i].size())) {
 			++passed;
 		}
 	}
@@ -132,7 +134,7 @@ int main(int argc, char **argv)
 	for (size_t i = 0; i < sources.size(); ++i) {
 		printf("Parsing %ld\n", i + 1);
 
-		if (parse(&sources[i][0])) {
+		if (parse(&sources[i][0], sources[i].size())) {
 			++passed;
 		}
 	}

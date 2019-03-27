@@ -194,9 +194,22 @@ class PacMan : public jgui::Window {
 	
 	virtual ~PacMan()
 	{
-		SetTheme(nullptr);
-
 		flag = false;
+
+    delete [] screendata;
+		
+    delete ghost_bmp;
+		delete pacman_bmp;
+
+    delete ii;
+		
+    delete [] ghostx;
+		delete [] ghostdx;
+		delete [] ghosty;
+		delete [] ghostdy;
+		delete [] ghostspeed;
+		delete [] dx;
+		delete [] dy;
 	}
 
 	void Init()

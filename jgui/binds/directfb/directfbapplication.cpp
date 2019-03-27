@@ -770,6 +770,8 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 
 NativeWindow::~NativeWindow()
 {
+  SetVisible(false);
+
 	if (_surface != NULL) {
 		_surface->Release(_surface);
 	  _surface = NULL;
@@ -783,9 +785,6 @@ NativeWindow::~NativeWindow()
 		// _window->Release(_window);
 	  _window = NULL;
 	}
-
-  delete g_window;
-  g_window = nullptr;
 }
 
 void NativeWindow::ToggleFullScreen()
@@ -954,7 +953,7 @@ void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 
 	surface->Lock(surface, DSLF_WRITE, &ptr, &pitch);
 
-	shape->GetGraphics()->GetRGBArray((uint32_t **)&ptr, 0, 0, desc.width, desc.height);
+	shape->GetGraphics()->GetRGBArray((uint32_t *)ptr, 0, 0, desc.width, desc.height);
 
 	surface->Unlock(surface);
 

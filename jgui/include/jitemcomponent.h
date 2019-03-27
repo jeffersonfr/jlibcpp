@@ -45,8 +45,6 @@ class Item : public virtual jcommon::Object {
 		/** \brief */
 		std::vector<Item *> _childs;
 		/** \brief */
-		Image *_prefetch;
-		/** \brief */
 		std::string _value;
 		/** \brief */
     jgui::Image *_image;

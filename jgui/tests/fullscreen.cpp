@@ -36,6 +36,7 @@ class Fullscreen : public jgui::Window {
 
 		virtual ~Fullscreen()
 		{
+      delete _bg;
 		}
 
 		virtual bool KeyReleased(jevent::KeyEvent *event)

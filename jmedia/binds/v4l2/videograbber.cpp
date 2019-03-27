@@ -1,5 +1,5 @@
-#include "jmedia/binds/v4l2/include/videograbber.h"
-#include "jmedia/binds/v4l2/include/videocontrol.h"
+#include "videograbber.h"
+#include "videocontrol.h"
 
 #include "jexception/jruntimeexception.h"
 

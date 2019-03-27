@@ -38,7 +38,6 @@ class Terrain : public jgui::Window {
 
 		virtual ~Terrain()
 		{
-      delete _buffer;
 		}
 
 		virtual void ShowApp() 
@@ -110,6 +109,8 @@ class Terrain : public jgui::Window {
           std::this_thread::sleep_for(std::chrono::milliseconds(35));
         }
 			} while (IsHidden() == false);
+      
+      delete _buffer;
 		}
 
 		void Paint(jgui::Graphics *g) 

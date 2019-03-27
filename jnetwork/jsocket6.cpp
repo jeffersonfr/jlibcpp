@@ -84,10 +84,10 @@ Socket6::Socket6(std::string host_, int port_, int timeout_, int rbuf_, int wbuf
 	_receive_bytes = 0;
 	_timeout = timeout_;
 
-	InetAddress *address = InetAddress6::GetByName(host_);
+	_address = InetAddress6::GetByName(host_);
 
 	CreateSocket();
-	ConnectSocket(address, port_);
+	ConnectSocket(_address, port_);
 	InitStreams(rbuf_, wbuf_);
 
 	_is_closed = false;
@@ -106,11 +106,11 @@ Socket6::Socket6(std::string host_, int port_, InetAddress *local_addr_, int loc
 	_receive_bytes = 0;
 	_timeout = timeout_;
 
-	InetAddress *address = InetAddress6::GetByName(host_);
+	_address = InetAddress6::GetByName(host_);
 
 	CreateSocket();
 	BindSocket(local_addr_, local_port_);
-	ConnectSocket(address, port_);
+	ConnectSocket(_address, port_);
 	InitStreams(rbuf_, wbuf_);
 
 	_is_closed = false;

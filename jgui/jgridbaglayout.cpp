@@ -45,12 +45,25 @@ GridBagLayout::GridBagLayout():
 GridBagLayout::~GridBagLayout()
 {
 	if (layoutInfo != nullptr) {
+    delete [] layoutInfo->weightX;
+    delete [] layoutInfo->weightY;
+    delete [] layoutInfo->minWidth;
+    delete [] layoutInfo->minHeight;
+    
 		delete layoutInfo;
 	}
 
 	if (componentAdjusting != nullptr) {
 		delete componentAdjusting;
 	}
+	
+  while (comptable.size() > 0) {
+    GridBagConstraints *constraint = comptable.begin()->second;
+
+    delete constraint;
+
+    comptable.erase(comptable.begin());
+  }
 }
 
 jsize_t GridBagLayout::GetMinimumLayoutSize(Container *parent)
@@ -1166,6 +1179,13 @@ void GridBagLayout::ArrangeGrid(Container *parent)
 	d = GetMinSize(parent, info);
 
 	if (size.width < d.width || size.height < d.height) {
+    delete [] info->weightX;
+    delete [] info->weightY;
+    delete [] info->minWidth;
+    delete [] info->minHeight;
+    
+    delete info;
+
 		info = GetLayoutInfo(parent, JGBLS_MIN_SIZE);
 		d = GetMinSize(parent, info);
 	}

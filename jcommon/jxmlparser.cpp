@@ -1266,10 +1266,9 @@ void XmlParsingData::Stamp( const char* now, XmlEncoding encoding )
 }
 
 
-const char* XmlBase::SkipWhiteSpace( const char* p, XmlEncoding encoding )
+const char* XmlBase::SkipWhiteSpace(const char* p, XmlEncoding encoding )
 {
-	if ( !p || !*p )
-	{
+	if (!p || *p == 0) {
 		return 0;
 	}
 
@@ -1684,7 +1683,7 @@ const char* XmlDocument::Parse( const char* p, XmlParsingData* prevData, XmlEnco
 		}
 	}
 
-    p = SkipWhiteSpace( p, encoding );
+  p = SkipWhiteSpace( p, encoding );
 	if ( !p )
 	{
 		SetError( TIXML_ERROR_DOCUMENT_EMPTY, 0, 0, TIXML_ENCODING_UNKNOWN );

@@ -224,6 +224,8 @@ void copy_by_value()
 
   std::cout << a << std::endl;
 
+  delete [] mat2;
+
   double **mat3 = new double *[4];              // 2DP matrix
   mat3[0] = new double[4];
   mat3[1] = mat3[0]+2;
@@ -231,6 +233,9 @@ void copy_by_value()
   a = mat3;
 
   std::cout << a << std::endl;
+  
+  delete [] mat3[0];
+  delete [] mat3;
 
   // jmath::Vectors
   //
@@ -257,6 +262,8 @@ void copy_by_value()
   v = vec2;
 
   std::cout << v << std::endl;
+
+  delete [] vec2;
 }
 
 void cossine() 
@@ -760,8 +767,7 @@ void sum_of_elements()
 void pointers_to_matrices() 
 {
   // Make a pointer to slate Matrices.  Each jmath::Matrix is uninitialized.
-  jmath::Matrix<double> *a;
-  a = new jmath::Matrix<double>[6];
+  jmath::Matrix<double> *a = new jmath::Matrix<double>[6];
 
   // Initialize each jmath::Matrix.
   for (int i=0; i<6; i++) {
@@ -772,6 +778,8 @@ void pointers_to_matrices()
   std::cout << a[0] << std::endl;
   std::cout << a[2] << std::endl;
   std::cout << a[5] << std::endl;
+
+  delete [] a;
 }
 
 void system_of_linear_equations() 
@@ -1129,9 +1137,13 @@ void interfacing_matrix()
   // can use the external function unit() to generate a unit slate jmath::Matrix.
   jmath::Matrix<double> m(1,4,1,4);
   double *u = new double[16];
+
   unit(u,4);
   m = u;
+
   std::cout << m;
+
+  delete [] u;
 }
 
 int main()

@@ -17,7 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jmedia/binds/alsa/include/alsalightplayer.h"
+#include "alsalightplayer.h"
+
 #include "jmedia/jvolumecontrol.h"
 #include "jio/jfileinputstream.h"
 #include "jexception/jmediaexception.h"

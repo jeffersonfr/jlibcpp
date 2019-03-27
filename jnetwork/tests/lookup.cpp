@@ -41,8 +41,14 @@ int main(int argc, char **argv)
 	std::vector<jnetwork::InetAddress *> inets = jnetwork::InetAddress4::GetAllByName(argv[1]);
 
 	for (std::vector<jnetwork::InetAddress *>::iterator i=inets.begin(); i!=inets.end(); i++) {
-		std::cout << "all by name:: [" << (*i)->GetHostName() << ", " << (*i)->GetHostAddress() << "]" << std::endl;
+    jnetwork::InetAddress *addr = (*i);
+
+		std::cout << "all by name:: [" << addr->GetHostName() << ", " << addr->GetHostAddress() << "]" << std::endl;
+
+    delete addr;
 	}
+
+  delete inet;
 
 	ReleaseSocketLibrary();
 }

@@ -80,10 +80,10 @@ Socket::Socket(std::string host_, int port_, int timeout_, int rbuf_, int wbuf_)
 	_receive_bytes = 0;
 	_timeout = timeout_;
 
-	InetAddress *address = InetAddress4::GetByName(host_);
+	_address = InetAddress4::GetByName(host_);
 
 	CreateSocket();
-	ConnectSocket(address, port_);
+	ConnectSocket(_address, port_);
 	InitStreams(rbuf_, wbuf_);
 }
 
@@ -100,11 +100,11 @@ Socket::Socket(std::string host_, int port_, InetAddress *local_addr_, int local
 	_receive_bytes = 0;
 	_timeout = timeout_;
 
-	InetAddress *address = InetAddress4::GetByName(host_);
+	_address = InetAddress4::GetByName(host_);
 
 	CreateSocket();
 	BindSocket(local_addr_, local_port_);
-	ConnectSocket(address, port_);
+	ConnectSocket(_address, port_);
 	InitStreams(rbuf_, wbuf_);
 }
 

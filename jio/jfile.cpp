@@ -265,7 +265,8 @@ std::string File::NormalizePath(std::string pathname)
 
 std::string File::GetFixedPath(std::string pathname)
 {
-	jcommon::StringTokenizer tokens(NormalizePath(pathname), "" + GetDelimiter(), jcommon::JTT_STRING, false);
+  std::string normalize = NormalizePath(pathname);
+	jcommon::StringTokenizer tokens(normalize, std::string(1, GetDelimiter()), jcommon::JTT_STRING, false);
 	std::vector<std::string> path;
 	std::vector<std::string>::iterator ipath;
 
@@ -435,7 +436,8 @@ File * File::CreateTemporaryDirectory(std::string path, std::string prefix)
 	aux = mkdtemp(aux);
 
 	if (aux == nullptr) {
-		free(ptr);
+		delete [] ptr;
+    ptr = nullptr;
 
 		return nullptr;
 	}
@@ -443,6 +445,9 @@ File * File::CreateTemporaryDirectory(std::string path, std::string prefix)
 	DIR *dir = opendir(aux);
 
 	path = std::string(aux);
+
+  delete [] ptr;
+  ptr = nullptr;
 
 	if (dir == nullptr) {
 		return nullptr;

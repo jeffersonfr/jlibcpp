@@ -742,8 +742,7 @@ static int read_ICO_file(jio::InputStream *stream, ICOImage** images_ptr) {
 
 	/* Read Icon Directory Entries */
 	icondir.image_entries = nullptr;
-	icondir.image_entries = (ICODirEntry *) malloc(icondir.image_count *
-							sizeof(ICODirEntry));
+	icondir.image_entries = (ICODirEntry *) malloc(icondir.image_count * sizeof(ICODirEntry));
 	if (icondir.image_entries == nullptr) {
 		ico_error_code = icoNoMemory;
 		return -1;
@@ -797,8 +796,7 @@ static int read_ICO_file(jio::InputStream *stream, ICOImage** images_ptr) {
 			images[i].num_colors = 256;
 		}
 		images[i].colors = nullptr;
-		images[i].colors = (ICORGBColor *) malloc(images[i].num_colors *
-							sizeof(ICORGBColor));
+		images[i].colors = (ICORGBColor *) malloc(images[i].num_colors * sizeof(ICORGBColor));
 		if (images[i].colors == nullptr) {
 			ico_error_code = icoNoMemory;
 			goto error;
@@ -815,21 +813,13 @@ static int read_ICO_file(jio::InputStream *stream, ICOImage** images_ptr) {
 		/* Get Image and Mask Data */
 		images[i].data = nullptr;
 		images[i].mask = nullptr;
-		images[i].data = (uint8_t *) malloc((8/bmp_header.bits_per_pixel)*
-						 images[i].width * 
-						 images[i].height * 
-						 sizeof(uint8_t));
-		images[i].mask = (uint8_t *) malloc((8/bmp_header.bits_per_pixel)*
-						 images[i].width * 
-						 images[i].height * 
-						 sizeof(uint8_t));
+		images[i].data = (uint8_t *) malloc((8/bmp_header.bits_per_pixel)* images[i].width * images[i].height * sizeof(uint8_t));
+		images[i].mask = (uint8_t *) malloc((8/bmp_header.bits_per_pixel)* images[i].width * images[i].height * sizeof(uint8_t));
 		if ((images[i].data == nullptr) || (images[i].mask == nullptr)) {
 			ico_error_code = icoNoMemory;
 			goto error;
 		}
-		rv = read_image_data(stream, images[i].width, images[i].height, 
-					bmp_header.bits_per_pixel,
-					images[i].data, images[i].mask);
+		rv = read_image_data(stream, images[i].width, images[i].height, bmp_header.bits_per_pixel, images[i].data, images[i].mask);
 		if (rv != 1) {
 			ico_error_code = icoFileFormatError;
 			JDEBUG(JINFO, "DEBUG: %s: %d: Error reading image data.", __FILE__, __LINE__);
@@ -845,11 +835,19 @@ static int read_ICO_file(jio::InputStream *stream, ICOImage** images_ptr) {
 
 	} /* end get DIB */
 
+	if (icondir.image_entries != nullptr) {
+    free(icondir.image_entries);
+  }
+
 	*images_ptr = images;
+
 	return icondir.image_count;
 
 error:
-	if (icondir.image_entries != nullptr) free(icondir.image_entries);
+	if (icondir.image_entries != nullptr) {
+    free(icondir.image_entries);
+  }
+
 	if (images != nullptr) {
 		for (i=0; i<(int)bmp_header.colors_used; i++) {
 			if (images[i].colors != nullptr) {
@@ -1251,7 +1249,6 @@ cairo_surface_t * create_ico_surface_from_stream(jio::InputStream *stream)
 
 	int sw = image->width;
 	int sh = image->height;
-	unsigned int sz = sw*sh;
 
 	cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, sw, sh);
 
@@ -1267,18 +1264,18 @@ cairo_surface_t * create_ico_surface_from_stream(jio::InputStream *stream)
 
 	uint8_t *ptr = (uint8_t *)data;
 
-	for (int i=0; i<(int)sz; i++) {
+	for (int i=0; i<sw*sh; i++) {
 		ptr[i*4+3] = 0xff;
 		ptr[i*4+2] = image->colors[image->data[i]].red;
 		ptr[i*4+1] = image->colors[image->data[i]].green;
 		ptr[i*4+0] = image->colors[image->data[i]].blue;
 	}
 
-	delete [] image->data;
-	delete [] image->mask;
-	delete [] image->colors;
+	free(image->data);
+	free(image->mask);
+	free(image->colors);
 
-	delete image;
+	free(image);
 
 	cairo_surface_mark_dirty(surface);
 

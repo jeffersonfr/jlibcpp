@@ -190,12 +190,13 @@ class Test : public jgui::Window {
 		{
 			jgui::jsize_t 
         size;
-			uint32_t 
-        *data = nullptr;
 
 			size = _image->GetSize();
 
-			_image->GetGraphics()->GetRGBArray(&data, 0, 0, size.width, size.height);
+			uint32_t 
+        data[size.width*size.height];
+      
+			_image->GetGraphics()->GetRGBArray(data, 0, 0, size.width, size.height);
 
 			// INFO:: convert to gray and binarize
 			uint8_t *gray = new uint8_t[size.width*size.height];
@@ -221,7 +222,7 @@ class Test : public jgui::Window {
 
 			// INFO:: converto to edges
 			uint8_t 
-        *edges = new uint8_t[size.width*size.height];
+        edges[size.width*size.height];
 			int 
         k, 
         offset, 
@@ -276,7 +277,6 @@ class Test : public jgui::Window {
       _hough->GetGraphics()->SetRGBArray(gray32, 0, 0, size.width, size.height);
 
 			delete [] gray;
-			delete [] data;
 
 			// INFO:: initializing hough transform
 			_transform.Transform(edges, size.width, size.height);

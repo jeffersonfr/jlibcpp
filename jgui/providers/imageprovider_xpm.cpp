@@ -228,6 +228,9 @@ cairo_surface_t * create_xpm_surface_from_stream(jio::InputStream *stream)
 
 	memcpy(data, buffer, sz*4);
 
+  delete [] buffer;
+  buffer = nullptr;
+
 	cairo_surface_mark_dirty(surface);
 
 	return surface;

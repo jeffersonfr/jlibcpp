@@ -738,6 +738,8 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 
 NativeWindow::~NativeWindow()
 {
+  SetVisible(false);
+
   // g_signal_handler_disconnect(_window, "destroy");
   // g_signal_handler_disconnect(_drawing_area, "draw");
 	// g_signal_handler_disconnect(G_OBJECT(_drawing_area),"configure-event");
@@ -916,9 +918,9 @@ void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 	}
 
 	jsize_t t = shape->GetSize();
-	uint32_t *data = nullptr;
+	uint32_t data[t.width*t.height];
 
-	shape->GetGraphics()->GetRGBArray(&data, 0, 0, t.width, t.height);
+	shape->GetGraphics()->GetRGBArray(data, 0, 0, t.width, t.height);
 
 	if (data == nullptr) {
 		return;

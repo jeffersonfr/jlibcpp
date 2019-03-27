@@ -38,7 +38,7 @@ class Signal {
 
 		virtual ~Signal()
 		{
-			delete _signals;
+			delete [] _signals;
 		}
 
 		int GetSize()
@@ -91,6 +91,9 @@ class Neuron {
 
 		virtual ~Neuron()
 		{
+			delete _inputs;
+
+			delete [] _weights;
 		}
 
 		void SetWeight(int index, double w)
@@ -156,6 +159,11 @@ class NeuralNet {
 
 		virtual ~NeuralNet()
 		{
+			for (int i=0; i<_neurons_size; i++) {
+				delete _neurons[i];
+			}
+			
+      delete [] _neurons;
 		}
 
 		void SetStep(double d)
@@ -278,6 +286,7 @@ class Noise : public jgui::Window {
 
   private:
     NeuralNet net;
+    double noise[100000];
 
   public:
     Noise():
@@ -295,8 +304,9 @@ class Noise : public jgui::Window {
         toutput;
 
       int training_set = 5000;
-      Signal *sinput[training_set],
-      *soutput[training_set];
+      Signal 
+        *sinput[training_set],
+        *soutput[training_set];
 
       for (int i=0; i<training_set; i++) {
         sinput[i] = new Signal(6);
@@ -319,6 +329,7 @@ class Noise : public jgui::Window {
       }
 
       printf("Training Set\n");
+
       for (int t=0; t<training_set; t++) {
         printf("input:: [ ");
         for (int i=0; i<6; i++) {
@@ -344,6 +355,11 @@ class Noise : public jgui::Window {
       in01.SetSignal(5, v2(t-5));
 
       printf("v1(%d) = %.6f  => %.6f, e::[%.6f]\n", t, v1(t), net.Process(&in01), v1(t)-net.Process(&in01));
+      
+      for (int i=0; i<training_set; i++) {
+        delete sinput[i];
+        delete soutput[i];
+      }
     }
 
     virtual ~Noise()
@@ -354,8 +370,6 @@ class Noise : public jgui::Window {
     {
       return sin(0.075*n);
     }
-
-    double noise[100000];
 
     double v(int n)
     {

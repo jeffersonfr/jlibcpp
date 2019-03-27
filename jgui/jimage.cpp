@@ -104,7 +104,7 @@ void Image::GetPixels(uint8_t **buffer, int xp, int yp, int wp, int hp, int *str
 {
 }
 
-void Image::GetRGBArray(uint32_t **rgb, int xp, int yp, int wp, int hp)
+void Image::GetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)
 {
 }
 		

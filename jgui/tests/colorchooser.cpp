@@ -53,6 +53,8 @@ class ColorChooser : public jgui::Component {
 
 		virtual ~ColorChooser()
 		{
+      delete _image;
+      _image = nullptr;
 		}
 
 		uint8_t FixRGB(double rm1, double rm2, double rh)

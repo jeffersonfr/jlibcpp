@@ -75,6 +75,7 @@ SocketInputStream::~SocketInputStream()
 {
 	if (_buffer != nullptr) {
 		delete [] _buffer;
+    _buffer = nullptr;
 	}
 }
 

@@ -778,8 +778,7 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 
 NativeWindow::~NativeWindow()
 {
-  delete g_window;
-  g_window = nullptr;
+  SetVisible(false);
 }
 
 void NativeWindow::ToggleFullScreen()

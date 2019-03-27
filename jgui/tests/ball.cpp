@@ -226,8 +226,7 @@ class BallDrop : public jgui::Window {
 			ballh = bs.height;
 
 			for(int i=0; i<numballs; ++i) {
-				Ball 
-          *ball = new Ball(size.width/2,0);
+				Ball *ball = new Ball(size.width/2,0);
 
 				ball->Accelerate((myrandom() - 0.5)*.5, 0);
 
@@ -236,6 +235,7 @@ class BallDrop : public jgui::Window {
 			
 			// Allocate rack information
 			numracks = size.width/ballw;
+
 			rackheight = new int[numracks];
 			rackdel = new int[numracks];
 
@@ -247,7 +247,19 @@ class BallDrop : public jgui::Window {
 
 		virtual ~BallDrop()
 		{
-      SetVisible(false);
+			for(int i=0; i<numballs; ++i) {
+        Ball *ball = _balls[i];
+
+        delete ball;
+      }
+
+      delete [] rackheight;
+      delete [] rackdel;
+
+      delete offImage;
+      delete backImage;
+      delete pin;
+      delete ball;
 		}
 
 		virtual void ShowApp() 

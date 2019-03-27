@@ -17,7 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jmedia/binds/libxine/include/libxinelightplayer.h"
+#include "libxinelightplayer.h"
+
 #include "jmedia/jvideosizecontrol.h"
 #include "jmedia/jvideoformatcontrol.h"
 #include "jmedia/jvideodevicecontrol.h"

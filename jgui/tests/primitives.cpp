@@ -70,7 +70,7 @@ class Primitives : public jgui::Window {
         num_colors = 512,
                    bar_width = 400;
       uint32_t 
-        *array = new unsigned int[num_colors];
+        array[num_colors];
       int 
         sixth = num_colors/6,
               dx,
@@ -561,6 +561,8 @@ class Primitives : public jgui::Window {
       gt->SetFont(f4); gt->DrawString(text, 0, 3*(45+10));
 
       jgui::Image *rotate = timage->Rotate(M_PI);
+
+      delete timage;
 
       g->DrawImage(rotate, 10+7*(120+10)+10, 1*(45+10));
 

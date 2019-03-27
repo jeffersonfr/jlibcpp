@@ -26,37 +26,31 @@
 
 int main() 
 {
-	jio::FileOutputStream *fos = new jio::FileOutputStream("/tmp/data.txt");
-	jio::DataOutputStream *dos = new jio::DataOutputStream(fos);
+	jio::FileOutputStream fos("/tmp/data.txt");
+	jio::DataOutputStream dos(&fos);
 	
-	dos->WriteBoolean(true);
-	dos->WriteInteger(3232);
-	dos->WriteString("Hello, world !");
-	dos->WriteFloat(3.141592654);
+	dos.WriteBoolean(true);
+	dos.WriteInteger(3232);
+	dos.WriteString("Hello, world !");
+	dos.WriteFloat(3.141592654);
 
-	dos->Flush();
-	dos->Close();
+	dos.Flush();
+	dos.Close();
 
-	delete dos;
-	delete fos;
-
-	jio::FileInputStream *fis = new jio::FileInputStream("/tmp/data.txt");
-	jio::DataInputStream *dis = new jio::DataInputStream(fis);
+	jio::FileInputStream fis("/tmp/data.txt");
+	jio::DataInputStream dis(&fis);
 
 	std::string s;
 	bool b;
 	int i;
 	float f;
 
-	b = dis->ReadBoolean();
-	i = dis->ReadInteger();
-	s = dis->ReadString();
-	f = dis->ReadFloat();
+	b = dis.ReadBoolean();
+	i = dis.ReadInteger();
+	s = dis.ReadString();
+	f = dis.ReadFloat();
 
 	std::cout << ":: " << b << ", " << i << ", " << s << ", " << f << std::endl;
-
-	delete dis;
-	delete fis;
 
 	return EXIT_SUCCESS;
 }

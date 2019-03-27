@@ -155,6 +155,8 @@ int loadImage(std::vector<uint32_t>& out, unsigned long& w, unsigned long& h, co
 		out[i] = image->GetGraphics()->GetRGB(i%size.width, i/size.width);
 	}
 
+  delete image;
+
 	return 0;
 }
 

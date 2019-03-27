@@ -17,7 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jmedia/binds/mixer/include/mixerlightplayer.h"
+#include "mixerlightplayer.h"
+
 #include "jmedia/jaudiomixercontrol.h"
 #include "jio/jmemoryinputstream.h"
 #include "jexception/jmediaexception.h"

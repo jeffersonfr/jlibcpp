@@ -53,6 +53,9 @@ class Mines : public jgui::Window {
 		jgui::Image *flag;
 		jgui::Image *smile_face;
 		jgui::Image *dead_face;
+		jgui::Image *image1;
+		jgui::Image *image2;
+		jgui::Image *image3;
     std::mutex mines_mutex;
 		block_t *board;
 		int isize;
@@ -110,19 +113,28 @@ Mines::Mines(int x, int y):
 
 	SetupBoard();
 
-	AddSubtitle(new jgui::BufferedImage(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png"), "Novo Jogo");
-	AddSubtitle(new jgui::BufferedImage(jcommon::System::GetResourceDirectory() + "/images/yellow_icon.png"), "Flag");
-	AddSubtitle(new jgui::BufferedImage(jcommon::System::GetResourceDirectory() + "/images/green_icon.png"), "Ajuda");
+  image1 = new jgui::BufferedImage(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png");
+  image2 = new jgui::BufferedImage(jcommon::System::GetResourceDirectory() + "/images/yellow_icon.png");
+  image3 = new jgui::BufferedImage(jcommon::System::GetResourceDirectory() + "/images/green_icon.png");
+
+	AddSubtitle(image1, "Novo Jogo");
+	AddSubtitle(image2, "Flag");
+	AddSubtitle(image3, "Ajuda");
 }
 
 Mines::~Mines() 
 {
-	delete board;
+	delete [] board;
+
 	delete small_bomb;
 	delete huge_bomb;
 	delete flag;
 	delete smile_face;
 	delete dead_face;
+
+  delete image1;
+  delete image2;
+  delete image3;
 }
 
 void Mines::Paint(jgui::Graphics *g)

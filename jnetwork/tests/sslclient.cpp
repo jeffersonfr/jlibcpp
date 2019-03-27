@@ -87,8 +87,10 @@ int main(void)
 
 		std::cout << "\n" << pem << "\n" << std::endl;
 
+    jnetwork::InetAddress *addr = mySocket.GetInetAddress();
+
 		// Send message to server
-		std::cout << "Client running on " << mySocket.GetInetAddress()->GetHostName() << ":" << mySocket.GetPort() << "(" << mySocket.GetInetAddress()->GetHostAddress() << ")" << " sent " << mySocket.Send("Hello Server!", 13) << " bytes" << std::endl;
+		std::cout << "Client running on " << addr->GetHostName() << ":" << mySocket.GetPort() << "(" << addr->GetHostAddress() << ")" << " sent " << mySocket.Send("Hello Server!", 13) << " bytes" << std::endl;
 
 		if (mySocket.VerifyCertificate() == true) {
 			std::cout << "Validation succeded !" << std::endl;

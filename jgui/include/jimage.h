@@ -144,7 +144,7 @@ class Image : public virtual jcommon::Object {
 		 * \brief
 		 *
 		 */
-		virtual void GetRGBArray(uint32_t **rgb, int xp, int yp, int wp, int hp);
+		virtual void GetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp);
 		
 		/**
 		 * \brief

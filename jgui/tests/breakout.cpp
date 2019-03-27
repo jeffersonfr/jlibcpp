@@ -94,7 +94,9 @@ class Breakout : public jgui::Window {
 
 		virtual ~Breakout()
 		{
-      SetVisible(false);
+      delete off;
+
+      delete [] showbrick;
 		}
 
 		void GameInit()

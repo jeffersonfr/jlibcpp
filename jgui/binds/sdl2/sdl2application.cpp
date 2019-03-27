@@ -720,8 +720,7 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 
 NativeWindow::~NativeWindow()
 {
-  delete g_window;
-  g_window = nullptr;
+  SetVisible(false);
 }
 
 void NativeWindow::ToggleFullScreen()
@@ -913,20 +912,14 @@ void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 	jsize_t 
     t = shape->GetSize();
 	uint32_t 
-    *data = nullptr;
+    data[t.width*t.height];
 
-	shape->GetGraphics()->GetRGBArray(&data, 0, 0, t.width, t.height);
-
-	if (data == nullptr) {
-		return;
-	}
+	shape->GetGraphics()->GetRGBArray(data, 0, 0, t.width, t.height);
 
 	SDL_Surface 
     *surface = SDL_CreateRGBSurfaceFrom(data, t.width, t.height, 32, t.width*4, 0, 0, 0, 0);
 
 	if (surface == nullptr) {
-		delete [] data;
-
 		return;
 	}
 
@@ -938,8 +931,6 @@ void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 	}
 
 	SDL_FreeSurface(surface);
-
-	delete [] data;
 }
 
 void NativeWindow::SetRotation(jwindow_rotation_t t)

@@ -54,8 +54,10 @@ FileInputStream::FileInputStream(File *file_):
 FileInputStream::~FileInputStream()
 {
 	if (_flag == 0 && (void *)_file != nullptr) {
-		// _file->Close();
+		_file->Close();
+    
 		delete _file;
+    _file = nullptr;
 	}
 }
 

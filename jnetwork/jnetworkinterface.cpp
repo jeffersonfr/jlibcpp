@@ -111,8 +111,37 @@ NetworkInterface::~NetworkInterface()
 
 		_childs.erase(_childs.begin());
 
+    std::vector<InetAddress *> masks = i->GetNetworkMasks();
+
+    while (masks.size() > 0) {
+      InetAddress *addr = (*masks.begin());
+
+      masks.erase(masks.begin());
+
+      delete addr;
+    }
+
+    std::vector<InetAddress *> addrs = i->GetInetAddresses();
+    
+    while (addrs.size() > 0) {
+      InetAddress *addr = (*addrs.begin());
+
+      addrs.erase(addrs.begin());
+
+      delete addr;
+    }
+
+    std::vector<InetAddress *> baddrs = i->GetBroadcastAddresses();
+    
+    while (baddrs.size() > 0) {
+      InetAddress *addr = (*baddrs.begin());
+
+      baddrs.erase(baddrs.begin());
+
+      delete addr;
+    }
+
 		delete i;
-		i = nullptr;
 	}
 }
 
@@ -304,6 +333,7 @@ std::vector<NetworkInterface *> NetworkInterface::GetNetworkInterfaces()
 				NetworkInterface *parent = new NetworkInterface(nullptr, ifEntry->ifa_name, index, false);
 
 				interfaces.push_back(parent);
+
 				minterfaces[ifEntry->ifa_name] = parent;
 
 				if ((ifEntry->ifa_flags & IFF_UP) == 0) {

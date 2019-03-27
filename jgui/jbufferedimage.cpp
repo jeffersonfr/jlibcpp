@@ -739,17 +739,14 @@ Image * BufferedImage::Rotate(double radians, bool resize)
       *image = new BufferedImage(cairo_create(surface));
 
 		if (GetGraphics()->GetAntialias() == JAM_NONE) {
-			uint32_t *src = new uint32_t[_size.width*_size.height];
-			uint32_t *dst = new uint32_t[iw*ih];
+			uint32_t src[_size.width*_size.height];
+			uint32_t dst[iw*ih];
 
-			GetRGBArray(&src, 0, 0, _size.width, _size.height);
+			GetRGBArray(src, 0, 0, _size.width, _size.height);
 
 			NearesNeighborRotate(src, _size.width, _size.height, dst, iw, ih, radians, true);
 
 			image->GetGraphics()->SetRGBArray(dst, 0, 0, iw, ih);
-
-			delete [] src;
-			delete [] dst;
 		} else {
 			cairo_t *dst_context = dynamic_cast<Graphics *>(image->GetGraphics())->GetCairoContext();
 
@@ -784,17 +781,14 @@ Image * BufferedImage::Rotate(double radians, bool resize)
     *image = new BufferedImage(cairo_create(surface));
 	
 	if (GetGraphics()->GetAntialias() == JAM_NONE) {
-		uint32_t *src = new uint32_t[_size.width*_size.height];
-		uint32_t *dst = new uint32_t[iw*ih];
+		uint32_t src[_size.width*_size.height];
+		uint32_t dst[iw*ih];
 
-		GetRGBArray(&src, 0, 0, _size.width, _size.height);
+		GetRGBArray(src, 0, 0, _size.width, _size.height);
 
 		NearesNeighborRotate(src, _size.width, _size.height, dst, iw, ih, radians, false);
 
 		image->GetGraphics()->SetRGBArray(dst, 0, 0, iw, ih);
-
-		delete [] src;
-		delete [] dst;
 	} else {
 		cairo_t *dst_context = dynamic_cast<Graphics *>(image->GetGraphics())->GetCairoContext();
 
@@ -835,8 +829,6 @@ Image * BufferedImage::Scale(int width, int height)
 
   cairo_t
     *cairo_context = cairo_create(surface);
-  jgui::Image
-    *image = new jgui::BufferedImage(cairo_context);
 	
 #ifdef SVG_IMAGE
   std::string *data = (std::string *)cairo_surface_get_user_data(cairo_surface, nullptr);
@@ -851,13 +843,16 @@ Image * BufferedImage::Scale(int width, int height)
   }
 #endif
 
+  jgui::Image
+    *image = new jgui::BufferedImage(cairo_context);
+
 	if (GetGraphics()->GetAntialias() == JAM_NONE) {
     jinterpolation_method_t method = GetInterpolationMethod();
 
-		uint32_t *src = new uint32_t[_size.width*_size.height];
-		uint32_t *dst = new uint32_t[width*height];
+		uint32_t src[_size.width*_size.height];
+		uint32_t dst[width*height];
 
-		GetRGBArray(&src, 0, 0, _size.width, _size.height);
+		GetRGBArray(src, 0, 0, _size.width, _size.height);
 
     if (method == JIM_NEAREST) {
 		  NearestNeighborScale(src, dst, _size.width, _size.height, width, height); 
@@ -868,9 +863,6 @@ Image * BufferedImage::Scale(int width, int height)
     }
 
 		image->GetGraphics()->SetRGBArray(dst, 0, 0, width, height);
-
-		delete [] src;
-		delete [] dst;
 	} else {
 		cairo_t *cairo_context = dynamic_cast<Graphics *>(image->GetGraphics())->GetCairoContext();
 
@@ -1131,15 +1123,13 @@ void BufferedImage::GetPixels(uint8_t **buffer, int xp, int yp, int wp, int hp, 
 	(*stride) = pitch;
 }
 
-void BufferedImage::GetRGBArray(uint32_t **rgb, int xp, int yp, int wp, int hp)
+void BufferedImage::GetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)
 {
-	if (_graphics != nullptr) {
-		_graphics->GetRGBArray(rgb, xp, yp, wp, hp);
-
+	if (_graphics == nullptr) {
 		return;
 	}
 
-	(*rgb) = nullptr;
+	_graphics->GetRGBArray(rgb, xp, yp, wp, hp);
 }
 		
 jcommon::Object * BufferedImage::Clone()

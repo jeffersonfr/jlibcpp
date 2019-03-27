@@ -63,6 +63,12 @@ class Icon : public jgui::Component {
 		 * \brief
 		 *
 		 */
+		virtual jgui::Image * GetImage();
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetHorizontalAlign(jhorizontal_align_t align);
 		
 		/**

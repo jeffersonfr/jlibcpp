@@ -21,6 +21,7 @@
 #include "jio/jfileoutputstream.h"
 #include "jio/jobjectinputstream.h"
 #include "jio/jobjectoutputstream.h"
+#include "jio/jmemoryinputstream.h"
 #include "jio/jserializable.h"
 #include "jcommon/jjson.h"
 #include "jexception/jruntimeexception.h"
@@ -72,16 +73,19 @@ class Complex : public jio::Serializable {
 		virtual void AssemblyObject(std::string object)
 		{
 			try {
-				jcommon::JSONValue *root = jcommon::JSON::Parse(object.c_str()),
+        jio::MemoryInputStream
+          stream((uint8_t *)object.c_str(), object.size());
+				jcommon::JSONValue 
+          *root = jcommon::JSON::Parse(&stream),
 					*psd = root->GetFirstChild();
 
 				while (psd != nullptr) {
-					if (strcasecmp(psd->GetName(), "real") == 0) {
-						real = psd->GetInteger();
+					if (strcasecmp(psd->GetName().c_str(), "real") == 0) {
+						real = atoi(psd->GetValue().c_str());
 					}
 
-					if (strcasecmp(psd->GetName(), "imag") == 0) {
-						imag = psd->GetInteger();
+					if (strcasecmp(psd->GetName().c_str(), "imag") == 0) {
+						imag = atoi(psd->GetValue().c_str());
 					}
 
 					psd = psd->NextSibling();

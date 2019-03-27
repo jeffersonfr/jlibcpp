@@ -574,6 +574,25 @@ class Quantization {
 			SetUpArrays();
 		}
 
+    virtual ~Quantization()
+    {
+      delete [] _netindex;
+      delete [] _bias;
+      delete [] _freq;
+
+			for (int i=0; i<_netsize; i++) {
+				delete [] _network[i];
+			}
+      
+      delete [] _network;
+			
+			for (int i=0; i<_netsize; i++) {
+				delete [] _colormap[i];
+			}
+      
+      delete [] _colormap;
+    }
+
 		void Start() {
 			Learn();
 			Fix();
@@ -678,6 +697,8 @@ class FilePathImageTest : public Picture {
 
 		virtual ~FilePathImageTest()
 		{
+      delete _image;
+      _image = nullptr;
 		}
 
 };
@@ -700,6 +721,8 @@ class FileImageTest : public Picture {
 
 		virtual ~FileImageTest()
 		{
+      delete _image;
+      _image = nullptr;
 		}
 
 };
@@ -720,6 +743,8 @@ class InputStreamImageTest : public Picture {
 
 		virtual ~InputStreamImageTest()
 		{
+      delete _image;
+      _image = nullptr;
 		}
 
 };
@@ -742,6 +767,8 @@ class CopyImageTest : public Picture {
 
 		virtual ~CopyImageTest()
 		{
+      delete _image;
+      _image = nullptr;
 		}
 
 };
@@ -770,6 +797,8 @@ class BufferedImageTest : public Picture {
 
 		virtual ~BufferedImageTest()
 		{
+      delete _image;
+      _image = nullptr;
 		}
 
 };
@@ -787,9 +816,12 @@ class RGBImageTest : public Picture {
 			jgui::jsize_t
 				size = image->GetSize();
 			uint32_t 
-				*rgb = nullptr;
+				rgb[size.width*size.height];
 
-			image->GetRGBArray(&rgb, 0, 0, size.width, size.height);
+			image->GetRGBArray(rgb, 0, 0, size.width, size.height);
+
+      delete image;
+      image = nullptr;
 
 			_image = new jgui::BufferedImage(jgui::JPF_ARGB, size.width, size.height);
 
@@ -801,6 +833,8 @@ class RGBImageTest : public Picture {
 
 		virtual ~RGBImageTest()
 		{
+      delete _image;
+      _image = nullptr;
 		}
 
 };
@@ -835,6 +869,8 @@ class RawImageTest : public Picture {
 
 		virtual ~RawImageTest()
 		{
+      delete _image;
+      _image = nullptr;
 		}
 
 };
@@ -854,10 +890,13 @@ class IndexedImageTest : public Picture {
 			int 
 				length = size.width*size.height;
 			uint32_t 
-				*rgb = nullptr,
+				rgb[size.width*size.height],
 				*pixels = new uint32_t[length];
 
-			image->GetRGBArray(&rgb, 0, 0, size.width, size.height);
+			image->GetRGBArray(rgb, 0, 0, size.width, size.height);
+
+      delete image;
+      image = nullptr;
 
    		Quantization q(rgb, size.width, size.height, 255, 1.0);
 
@@ -869,11 +908,16 @@ class IndexedImageTest : public Picture {
 
 			_image = jgui::IndexedImage::Pack(pixels, size.width, size.height);
 
+      delete [] pixels;
+      pixels = nullptr;
+
 			_title = "Indexed Image";
 		}
 
 		virtual ~IndexedImageTest()
 		{
+      delete _image;
+      _image = nullptr;
 		}
 
 };

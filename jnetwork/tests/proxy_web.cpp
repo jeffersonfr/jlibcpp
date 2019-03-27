@@ -233,23 +233,21 @@ class Client {
 
 		virtual void Run()
 		{
-			struct timespec ts;
-			struct timeval tv;
 			struct th_proxy_struct **th;
 
 			signal(SIGPIPE, SIG_IGN);
 			for (;;) {
-				th_proxy->mu.lock();
+        std::unique_lock<std::mutex> lock(th_proxy->mu);
 
 				while (th_proxy->sock_in == nullptr) {
-					gettimeofday(&tv, nullptr);
-					ts.tv_sec = tv.tv_sec + TIMEOUT_THREAD_EXIT;
-					ts.tv_nsec = 0;
+          std::chrono::steady_clock::time_point point = std::chrono::steady_clock::now();
+
+          point = point + std::chrono::seconds(TIMEOUT_THREAD_EXIT);
 					
 					try {
-						th_proxy->cond.wait((long long)ts.tv_sec*1000000LL + (long long)ts.tv_nsec/1000LL, &th_proxy->mu);
+						th_proxy->cond.wait_for(lock, std::chrono::seconds(TIMEOUT_THREAD_EXIT));
 					} catch (jexception::SemaphoreTimeoutException &e) {
-						free_q_mu.mock();
+						free_q_mu.lock();
 						th = &free_q;
 						while (*th && *th != th_proxy)
 							th = &((*th)->next_free);
@@ -269,7 +267,8 @@ class Client {
 
 				process_request(th_proxy->sock_in);
 
-				th_proxy->mu.lock();
+				lock.lock();
+
 				th_proxy->sock_in = nullptr;
 				th_proxy->mu.unlock();
 
@@ -315,7 +314,7 @@ struct th_proxy_struct *alloc_proxy_th(void)
 {
 	struct th_proxy_struct *th_proxy;
 
-	free_q_mu.lock();
+  std::unique_lock<std::mutex> lock(free_q_mu);
 
 	do {
 		th_proxy = free_q;
@@ -329,12 +328,10 @@ struct th_proxy_struct *alloc_proxy_th(void)
 				}
 			}
 			if (!th_proxy) {
-				free_q_cond.wait(&free_q_mu);
+				free_q_cond.wait(lock);
 			}
 		}
 	} while (!th_proxy);
-
-	free_q_mu.unlock();
 
 	return th_proxy;
 }
@@ -390,7 +387,6 @@ int process_request(jnetwork::Socket *sockIn)
 	char adr[LADR], *p;
 	int ldata, lreq, port, req_len, req_method;
 	jnetwork::Socket *sockOut = nullptr;
-	FILE *fsin;
 	
 	jnetwork::SocketOptions *o = sockIn->GetSocketOptions();
 
@@ -399,12 +395,8 @@ int process_request(jnetwork::Socket *sockIn)
 
 	delete o;
 
-	if ((fsin = fdopen(sockIn->GetHandler(), "rw")) == nullptr) {
-		goto serverr;
-	}
-
 	// here, we'll analyze the request and get rid of "http://adr:port". The address and port willbe duplicated and used to open the connection
-	if (fgets(data, LDATA, fsin) == nullptr) {
+	if (sockIn->Receive(data, LDATA) <= 0) {
 		goto badreq;
 	}
 
@@ -488,7 +480,7 @@ int process_request(jnetwork::Socket *sockIn)
 		char *p;
 
 		do {
-			if (fgets(data, LDATA, fsin) == nullptr) {
+			if (sockIn->Receive(data, LDATA) <= 0) {
 				break;
 			}
 			ldata = strlen(data);
@@ -505,7 +497,7 @@ int process_request(jnetwork::Socket *sockIn)
 			goto posterr;
 		}
 		while (c_len) {
-			ldata = fread(data, 1, (LDATA > c_len ? c_len : LDATA), fsin);
+			ldata = sockIn->Receive(data, (LDATA > c_len ? c_len : LDATA));
 			sockOut->Send(data, ldata);
 			c_len -= ldata;
 		}
@@ -513,7 +505,7 @@ int process_request(jnetwork::Socket *sockIn)
 		  * METHOD_GET, METHOD_HEAD
 		  */
 		do {
-			if (fgets(data, LDATA, fsin) == nullptr) {
+			if (sockIn->Receive(data, LDATA) <= 0) {
 				break;
 			}
 			ldata = strlen(data);

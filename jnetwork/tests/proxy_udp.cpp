@@ -105,7 +105,9 @@ int init_proxy()
 					udp = (jnetwork::DatagramSocket *)(*i);
 					
 					if (udp->GetOutputStream()->Write(buffer, length) < 0) {
-						std::cout << "Cliente " << udp->GetInetAddress()->GetHostName() << " morto !" << std::endl;
+            jnetwork::InetAddress *addr = udp->GetInetAddress();
+
+						std::cout << "Cliente " << addr->GetHostName() << " morto !" << std::endl;
 					}
 				}
 			}

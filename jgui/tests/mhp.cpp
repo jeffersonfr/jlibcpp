@@ -443,6 +443,9 @@ class AppTest : public Scene {
 		virtual ~AppTest()
 		{
       Stop();
+
+      delete _image;
+      _image = nullptr;
 		}
 
 		virtual bool Animate()

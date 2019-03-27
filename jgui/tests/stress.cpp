@@ -75,6 +75,9 @@ class GraphicPanel : public jgui::Window {
 
   virtual void ShowApp()
   {
+		jgui::Image 
+      *off = nullptr,
+      *pimage = nullptr;
     jgui::Graphics 
       *g = _buffer->GetGraphics();
 		jgui::Font 
@@ -99,6 +102,7 @@ class GraphicPanel : public jgui::Window {
 		  size, 
       iterations = 1000;
 
+    do {
     //////////////////////////////////////////////
     DrawString("DrawString");
 
@@ -120,10 +124,7 @@ class GraphicPanel : public jgui::Window {
     }
 
     if (IsHidden() == true) {
-      delete _buffer;
-      _buffer = nullptr;
-
-      return;
+      break;
     }
 
     //////////////////////////////////////////////
@@ -144,10 +145,7 @@ class GraphicPanel : public jgui::Window {
 		}
 
     if (IsHidden() == true) {
-      delete _buffer;
-      _buffer = nullptr;
-
-      return;
+      break;
     }
 
     //////////////////////////////////////////////
@@ -204,10 +202,7 @@ class GraphicPanel : public jgui::Window {
 		delete fimage;
 
     if (IsHidden() == true) {
-      delete _buffer;
-      _buffer = nullptr;
-
-      return;
+      break;
     }
 
     //////////////////////////////////////////////
@@ -280,10 +275,7 @@ class GraphicPanel : public jgui::Window {
 		g->SetPen(pen);
 
     if (IsHidden() == true) {
-      delete _buffer;
-      _buffer = nullptr;
-
-      return;
+      break;
     }
 
     //////////////////////////////////////////////
@@ -308,10 +300,7 @@ class GraphicPanel : public jgui::Window {
 		}
 
     if (IsHidden() == true) {
-      delete _buffer;
-      _buffer = nullptr;
-
-      return;
+      break;
     }
 
     //////////////////////////////////////////////
@@ -337,10 +326,7 @@ class GraphicPanel : public jgui::Window {
 		}
 
     if (IsHidden() == true) {
-      delete _buffer;
-      _buffer = nullptr;
-
-      return;
+      break;
     }
 
     //////////////////////////////////////////////
@@ -362,10 +348,7 @@ class GraphicPanel : public jgui::Window {
 		}
 
     if (IsHidden() == true) {
-      delete _buffer;
-      _buffer = nullptr;
-
-      return;
+      break;
     }
 
     //////////////////////////////////////////////
@@ -388,10 +371,7 @@ class GraphicPanel : public jgui::Window {
 		}
 
     if (IsHidden() == true) {
-      delete _buffer;
-      _buffer = nullptr;
-
-      return;
+      break;
     }
 
     //////////////////////////////////////////////
@@ -413,10 +393,7 @@ class GraphicPanel : public jgui::Window {
 		}
 
     if (IsHidden() == true) {
-      delete _buffer;
-      _buffer = nullptr;
-
-      return;
+      break;
     }
 
     //////////////////////////////////////////////
@@ -439,10 +416,7 @@ class GraphicPanel : public jgui::Window {
 		}
 
     if (IsHidden() == true) {
-      delete _buffer;
-      _buffer = nullptr;
-
-      return;
+      break;
     }
 
     //////////////////////////////////////////////
@@ -464,10 +438,7 @@ class GraphicPanel : public jgui::Window {
 		}
 
     if (IsHidden() == true) {
-      delete _buffer;
-      _buffer = nullptr;
-
-      return;
+      break;
     }
 
     //////////////////////////////////////////////
@@ -490,10 +461,7 @@ class GraphicPanel : public jgui::Window {
 		}
 
     if (IsHidden() == true) {
-      delete _buffer;
-      _buffer = nullptr;
-
-      return;
+      break;
     }
 
     //////////////////////////////////////////////
@@ -516,10 +484,7 @@ class GraphicPanel : public jgui::Window {
 		}
 		
     if (IsHidden() == true) {
-      delete _buffer;
-      _buffer = nullptr;
-
-      return;
+      break;
     }
 
     //////////////////////////////////////////////
@@ -543,10 +508,7 @@ class GraphicPanel : public jgui::Window {
 		}
 
     if (IsHidden() == true) {
-      delete _buffer;
-      _buffer = nullptr;
-
-      return;
+      break;
     }
 
     //////////////////////////////////////////////
@@ -569,10 +531,7 @@ class GraphicPanel : public jgui::Window {
 		}
 		
     if (IsHidden() == true) {
-      delete _buffer;
-      _buffer = nullptr;
-
-      return;
+      break;
     }
 
     //////////////////////////////////////////////
@@ -596,10 +555,7 @@ class GraphicPanel : public jgui::Window {
 		}
 
     if (IsHidden() == true) {
-      delete _buffer;
-      _buffer = nullptr;
-
-      return;
+      break;
     }
 
     //////////////////////////////////////////////
@@ -622,10 +578,7 @@ class GraphicPanel : public jgui::Window {
 		}
 		
     if (IsHidden() == true) {
-      delete _buffer;
-      _buffer = nullptr;
-
-      return;
+      break;
     }
 
     //////////////////////////////////////////////
@@ -649,16 +602,13 @@ class GraphicPanel : public jgui::Window {
 		}
 
     if (IsHidden() == true) {
-      delete _buffer;
-      _buffer = nullptr;
-
-      return;
+      break;
     }
 
     //////////////////////////////////////////////
 		DrawString("Blits [offscreen]");
 
-		jgui::Image *off = new jgui::BufferedImage("images/tux-zombie.png");
+		off = new jgui::BufferedImage("images/tux-zombie.png");
 
 		for (int i=0; i<iterations; i++) {
 			uint32_t color = (rand()%0xf0f0f0) | 0xff000000;
@@ -673,10 +623,7 @@ class GraphicPanel : public jgui::Window {
 		}
 
     if (IsHidden() == true) {
-      delete _buffer;
-      _buffer = nullptr;
-
-      return;
+      break;
     }
 
     //////////////////////////////////////////////
@@ -710,17 +657,7 @@ class GraphicPanel : public jgui::Window {
 		}
 
     if (IsHidden() == true) {
-      delete _buffer;
-      _buffer = nullptr;
-
-      return;
-    }
-
-    if (IsHidden() == true) {
-      delete _buffer;
-      _buffer = nullptr;
-
-      return;
+      break;
     }
 
     //////////////////////////////////////////////
@@ -733,7 +670,7 @@ class GraphicPanel : public jgui::Window {
 
 		g->Translate(0, 0);
 			
-		jgui::Image *pimage = new jgui::BufferedImage("images/tux-zombie.png");
+		pimage = new jgui::BufferedImage("images/tux-zombie.png");
 
 		for (int i=0; i<iterations; i++) {
 			jgui::Image *image = new jgui::BufferedImage(jgui::JPF_ARGB, size, size);
@@ -772,11 +709,12 @@ class GraphicPanel : public jgui::Window {
 			delete rotate;
 			delete image;
 		}
+    } while (false);
+
+    delete _buffer;
+    _buffer = nullptr;
 
 		delete pimage;
-
-		g->SetFont(nullptr);
-
 		delete off;
 		delete font;
 

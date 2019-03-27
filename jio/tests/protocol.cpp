@@ -82,6 +82,13 @@ class Server {
 			
 				socket->Send(writer.GetData().c_str(), writer.GetData().size());
 			}
+
+      socket->Close();
+
+      delete socket;
+      socket = nullptr;
+
+      server.Close();
 		}
 
 };
@@ -137,6 +144,8 @@ class Client {
 
 				delete [] raw;
 			}
+
+      socket.Close();
 		}
 
 };

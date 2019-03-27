@@ -27,4 +27,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *~ teste  
+	@rm -rvf *.o *~ teste teste.log

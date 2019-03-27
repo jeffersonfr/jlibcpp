@@ -48,7 +48,7 @@ DatagramSocket6::DatagramSocket6(std::string host_, int port_, bool stream_, int
 	_address = InetAddress6::GetByName(host_);
 
 	CreateSocket();
-	ConnectSocket(InetAddress6::GetByName(host_), port_);
+	ConnectSocket(_address, port_);
 	InitStream(rbuf_, wbuf_);
 
 	_sent_bytes = 0;

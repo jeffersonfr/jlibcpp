@@ -112,6 +112,20 @@ class SOM : public jgui::Window {
 		virtual ~SOM()
 		{
 			please_stop = true;
+			
+			for (int i=0; i<NGEONEURON; i++) {
+        delete gn[i];
+      }
+
+      delete [] gn;
+
+			for (int i=0; i<NGEONEURON; i++) {
+				delete [] r[i];
+			}
+			
+      delete [] r;
+
+      delete offscreen;
 		}
 
 		void kohonenInit()
@@ -128,6 +142,7 @@ class SOM : public jgui::Window {
 			NGEONEURON = W * H;
 
 			gn = new Neuron*[NGEONEURON];
+
 			for(int x = 0; x<W; x++)
 				for(int y = 0; y<H; y++){
 					gn[x*W+y] = new Neuron((double)x/(double)(W-1), (double)y/(double)(H-1));
@@ -180,8 +195,9 @@ class SOM : public jgui::Window {
 				py = x2;
 
 				// SEARCH FOR MINIMAL
-				mindist = 100000.0;
 				j = -1;
+				mindist = 100000.0;
+
 				for(int i=0; i<NGEONEURON;i++){
 					double d = (x1 - gn[i]->wx)*(x1 - gn[i]->wx) + (x2 - gn[i]->wy)*(x2 - gn[i]->wy);
 					if(d < mindist){
@@ -287,6 +303,7 @@ class SOM : public jgui::Window {
 
 			if ((offscreen == nullptr) || ((imagewidth != w) || (imageheight != h))) {
 				offscreen = new jgui::BufferedImage(jgui::JPF_ARGB, w, h);
+
 				imagewidth = w;
 				imageheight = h;
 			}

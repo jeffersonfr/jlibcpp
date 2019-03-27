@@ -1567,6 +1567,8 @@ class SortComponent : public jgui::Component, public jcommon::Observer {
 			if (_algorithm != nullptr) {
 				delete _algorithm;
 			}
+
+      delete [] _array;
 		}
 
 		virtual void SetAlgorithm(SortAlgorithm *algorithm)

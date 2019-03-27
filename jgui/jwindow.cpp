@@ -38,6 +38,9 @@ Window::Window(Window *window):
 	jcommon::Object::SetClassName("jgui::Window");
 
   _focus_owner = nullptr;
+  _event_manager = nullptr;
+  _font = nullptr;
+  _instance = nullptr;
 }
 
 Window::Window(int width, int height):
@@ -74,15 +77,13 @@ Window::Window(int x, int y, int width, int height):
   theme->SetFont("window.font", _font);
 
   SetTitle("Main");
-  SetLayout(new jgui::NullLayout());
+  SetLayout(nullptr);
 	SetBackgroundVisible(true);
   SetUndecorated(false);
 }
 
 Window::~Window()
 {
-  SetVisible(false);
-
   if (_event_manager != nullptr) {
     delete _event_manager;
     _event_manager = nullptr;
@@ -97,6 +98,9 @@ Window::~Window()
     _exec_thread.join();
   } catch (std::system_error &e) {
   }
+  
+  delete _instance;
+  _instance = nullptr;
 }
 
 EventManager * Window::GetEventManager()

@@ -51,6 +51,8 @@ FileOutputStream::FileOutputStream(std::string filename_):
 
 		throw jexception::IOException("Open file failed");
 	}
+  
+  _flag = 0;
 }
 
 FileOutputStream::FileOutputStream(File *file_):
@@ -74,12 +76,16 @@ FileOutputStream::FileOutputStream(File *file_):
 		throw jexception::IOException("Out of memory");
 	}
 
+  _flag = 1;
 }
 
 FileOutputStream::~FileOutputStream()
 {
-	if ((void *)_file != nullptr) {
-		// delete _file;
+	if (_flag == 0 && (void *)_file != nullptr) {
+    _file->Close();
+
+		delete _file;
+    _file = nullptr;
 	}
 
 	if ((void *)_buffer != nullptr) {

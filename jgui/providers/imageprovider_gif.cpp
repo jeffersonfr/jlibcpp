@@ -178,8 +178,12 @@ static int GetCode(GIFData *data, int code_size, int flag)
 			return -1;
 		}
 
-		data->buf[0] = data->buf[data->last_byte-2];
-		data->buf[1] = data->buf[data->last_byte-1];
+    if (data->last_byte < 2) {
+      return -1;
+    }
+
+		data->buf[0] = data->buf[data->last_byte - 2];
+		data->buf[1] = data->buf[data->last_byte - 1];
 
 		if ((count = GetDataBlock(data->stream, &data->buf[2] )) == 0) {
 			data->done = true;

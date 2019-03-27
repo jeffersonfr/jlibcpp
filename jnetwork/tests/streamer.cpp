@@ -104,8 +104,6 @@ class Streamer {
 			int pcr_pid = 0, counter = 0;
 			bool is_opcr = false;
 			
-			pipe.Start();
-
 			while (true) {
 				if (input.Read((char *)data, _packet_size) != _packet_size) {
 					if (_loop == true) {

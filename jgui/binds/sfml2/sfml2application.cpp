@@ -643,10 +643,7 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 
 NativeWindow::~NativeWindow()
 {
-  _visible = false;
-
-  delete g_window;
-  g_window = nullptr;
+  SetVisible(false);
 
   delete _window;
   _window = nullptr;
@@ -901,9 +898,9 @@ void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
   jgui::jsize_t 
     size = shape->GetSize();
 	uint32_t 
-    *data = nullptr;
+    data[size.width*size.height];
 
-	shape->GetGraphics()->GetRGBArray(&data, 0, 0, size.width, size.height);
+	shape->GetGraphics()->GetRGBArray(data, 0, 0, size.width, size.height);
 
 	if (data == nullptr) {
 		return;

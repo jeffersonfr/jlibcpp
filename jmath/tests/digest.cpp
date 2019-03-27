@@ -79,7 +79,7 @@ void test(jmath::Digest *d, std::string known)
 
 int main(int argc, char *argv[])
 {
-	int fd = open("/tmp/test.dat", O_RDONLY);
+	int fd = open("data.txt", O_RDONLY);
 	char tmp[4096];
 	int size = read(fd, tmp, 4096);
 

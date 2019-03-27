@@ -153,6 +153,8 @@ class Plotter : public jgui::Window {
 		virtual ~Plotter()
 		{
 			_counter = 0;
+
+      delete _signal;
 		}
 
 		virtual void ShowApp()

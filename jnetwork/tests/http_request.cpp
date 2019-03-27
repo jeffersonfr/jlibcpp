@@ -86,6 +86,11 @@ class HTTPRequest {
 					_resource_data = nullptr;
 					_resource_size = 0;
 
+          c->Close();
+
+          delete c;
+          c = nullptr;
+
 					return;
 				}
 
@@ -97,6 +102,11 @@ class HTTPRequest {
 					_resource_data = nullptr;
 					_resource_size = 0;
 
+          c->Close();
+
+          delete c;
+          c = nullptr;
+
 					return;
 				}
 
@@ -107,6 +117,11 @@ class HTTPRequest {
 					delete [] _resource_data;
 					_resource_data = nullptr;
 					_resource_size = 0;
+
+          c->Close();
+
+          delete c;
+          c = nullptr;
 
 					return;
 				}
@@ -162,6 +177,9 @@ class HTTPRequest {
 				if (_resource_size <= 0) {
 					c->Close();
 
+          delete c;
+          c = nullptr;
+
 					return;
 				}
 
@@ -186,6 +204,9 @@ class HTTPRequest {
 				}
 
 				c->Close();
+
+        delete c;
+        c = nullptr;
 			} catch (jexception::Exception &e) {
 				if (_resource_data != nullptr) {
 					delete [] _resource_data;
@@ -195,6 +216,9 @@ class HTTPRequest {
 
 				if (c != nullptr) {
 					c->Close();
+
+          delete c;
+          c = nullptr;
 				}
 
 				std::cerr << "error [" << strerror(errno) << "]: " << e.What() << std::endl;
@@ -274,7 +298,10 @@ class HTTPRequest {
 
 		void Wait()
 		{
-      _thread.join();
+      try {
+        _thread.join();
+      } catch (...) {
+      }
 		}
 
 		int GetResponseCode()

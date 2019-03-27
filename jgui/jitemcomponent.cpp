@@ -33,7 +33,7 @@ Item::Item():
 
 	_halign = JHA_CENTER;
 	_valign = JVA_CENTER;
-
+	_image = nullptr;
 	_is_enabled = true;
 	_is_checked = false;
 	_is_visible = true;
@@ -50,6 +50,7 @@ Item::Item(std::string value):
 
 	_is_enabled = true;
 	_value = value;
+	_image = nullptr;
 	_is_checked = false;
 	_is_visible = true;
 	_type = JIT_TEXT;
@@ -81,6 +82,7 @@ Item::Item(std::string value, bool checked):
 
 	_is_enabled = true;
 	_value = value;
+	_image = nullptr;
 	_is_checked = checked;
 	_is_visible = true;
 	_type = JIT_CHECK;
@@ -88,6 +90,10 @@ Item::Item(std::string value, bool checked):
 
 Item::~Item()
 {
+  if (_image != nullptr) {
+    delete _image;
+    _image = nullptr;
+  }
 }
 
 jcommon::Object * Item::Clone()

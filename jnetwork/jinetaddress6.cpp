@@ -62,6 +62,10 @@ InetAddress * InetAddress6::GetByName(std::string host_)
 	// Call getaddrinfo(). If the call succeeds, the result variable will hold a linked list 
 	// of addrinfo structures containing response information
 	if (getaddrinfo(host_.c_str(), "", &hints, &result) != 0) {
+    if (result != nullptr) {
+      delete result;
+    }
+
 		throw jexception::UnknownHostException("Host \"" + host_ + "\" not found");
 	}
 

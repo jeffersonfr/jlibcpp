@@ -56,7 +56,7 @@ class ConnectionPipe : public jnetwork::Connection {
 		/** \brief */
 		int _pipe[2];
 		/** \brief */
-		pthread_t _thread;
+    std::thread _thread;
 		/** \brief */
 		Connection *_connection;
 		/** \brief */

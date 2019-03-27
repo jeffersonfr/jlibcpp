@@ -165,6 +165,7 @@ class Neuron {
 
 		virtual ~Neuron()
 		{
+      delete [] _weights;
 		}
 
 		void UpdateWeight(int index, double delta)
@@ -237,6 +238,11 @@ class SOM : public jgui::Window {
 
 		virtual ~SOM()
 		{
+			for (int i=0; i<_neurons_size; i++) {
+				delete _neurons[i];
+			}
+
+      delete [] _neurons;
 		}
 
 		void SetLearningRate(double n)
@@ -456,9 +462,31 @@ class SOM : public jgui::Window {
 
     virtual void ShowApp()
     {
-      Init(CreatePoints(POINTS), 8*POINTS);
-      Training(CreatePoints(POINTS), 8*POINTS);
-      Classify(CreatePoints(4*POINTS), 32*POINTS);
+      double **points1 =  CreatePoints(POINTS);
+      double **points2 =  CreatePoints(POINTS);
+      double **points3 =  CreatePoints(4*POINTS);
+
+      Init(points1, 8*POINTS);
+      Training(points2, 8*POINTS);
+      Classify(points3, 32*POINTS);
+
+      for (size_t i=0; i<POINTS; i++) {
+        delete [] points1[i];
+      }
+
+      delete [] points1;
+      
+      for (size_t i=0; i<POINTS; i++) {
+        delete [] points2[i];
+      }
+
+      delete [] points2;
+      
+      for (size_t i=0; i<4*POINTS; i++) {
+        delete [] points3[i];
+      }
+
+      delete [] points3;
     }
 
 };

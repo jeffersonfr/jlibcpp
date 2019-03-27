@@ -179,12 +179,20 @@ Calculator::Calculator():
 
 Calculator::~Calculator() 
 {
+  jgui::Layout *layout = GetLayout();
+
   RemoveAll();
 
+  delete layout;
+
 	delete _display;
-	_display = nullptr;
+  _display = nullptr;
   
   _container->RemoveAll();
+
+  layout = _container->GetLayout();
+
+  delete layout;
 
   delete _container;
   _container = nullptr;

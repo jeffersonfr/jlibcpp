@@ -46,7 +46,7 @@ DatagramSocket::DatagramSocket(std::string host_, int port_, bool stream_, int t
 	_address = InetAddress4::GetByName(host_);
 
 	CreateSocket();
-	ConnectSocket(InetAddress4::GetByName(host_), port_);
+	ConnectSocket(_address, port_);
 	InitStream(rbuf_, wbuf_);
 
 	_sent_bytes = 0;

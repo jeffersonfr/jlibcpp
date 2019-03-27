@@ -47,12 +47,12 @@ int main()
 		o->SetSendMaximumBuffer(10240);
 		o->SetReceiveMaximumBuffer(10240);
 	
-		delete o;
-
 		std::cout << "Maximun Transfer Unit  :: " << o->GetMaximunTransferUnit() << " bytes" << std::endl;
 		std::cout << "Send Maximun Buffer    :: " << o->GetSendMaximumBuffer() << " bytes" << std::endl;
 		std::cout << "Receive Maximun Buffer :: " << o->GetReceiveMaximumBuffer() << " bytes" << std::endl;
 		std::cout << "Waiting for receive ..." << std::endl;
+
+		delete o;
 
 		size = s.Receive(receive, 1024);
 

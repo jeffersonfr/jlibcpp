@@ -17,8 +17,9 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jmedia/binds/libav/include/libavlightplayer.h"
-#include "jmedia/binds/libav/include/libavplay.h"
+#include "libavlightplayer.h"
+#include "libavplay.h"
+
 #include "jmedia/jvideosizecontrol.h"
 #include "jmedia/jvideoformatcontrol.h"
 #include "jmedia/jvolumecontrol.h"
@@ -407,6 +408,9 @@ LibAVLightPlayer::~LibAVLightPlayer()
 	}
 
 	_controls.clear();
+
+  delete _provider;
+  _provider = nullptr;
 }
 
 void LibAVLightPlayer::Play()

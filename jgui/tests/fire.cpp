@@ -67,6 +67,9 @@ class Fire : public jgui::Window {
     {
       delete [] fire;
       fire = nullptr;
+
+      delete image;
+      image = nullptr;
     }
 
     virtual void Paint(jgui::Graphics *g) 

@@ -380,11 +380,11 @@ class GridBagLayoutInfo {
 		virtual ~GridBagLayoutInfo() 
 		{
 			if (minWidth != nullptr) {
-				delete minWidth;
+				// delete minWidth;
 			}
 
 			if (minHeight != nullptr) {
-				delete minHeight;
+				// delete minHeight;
 			}
 
 			if (maxAscent != nullptr) {
@@ -396,11 +396,11 @@ class GridBagLayoutInfo {
 			}
 
 			if (weightX != nullptr) {
-				delete weightX;
+				// delete weightX;
 			}
 
 			if (weightY != nullptr) {
-				delete weightY;
+				// delete weightY;
 			}
 
 			if (baselineType != nullptr) {

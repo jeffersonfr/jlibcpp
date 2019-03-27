@@ -70,9 +70,11 @@ class Main : public jgui::Window, public jevent::ActionListener {
 			*_previous,
 			*_next;
 		jgui::Theme _theme;
-		std::vector<jgui::Container *> _b,
+		std::vector<jgui::Container *> 
+      _b,
 			_c;
-		std::vector<jgui::Button *> _buttons;
+		std::vector<jgui::Button *> 
+      _buttons;
 
 	public:
 		Main():
@@ -82,7 +84,6 @@ class Main : public jgui::Window, public jevent::ActionListener {
 		
 			_flow = new jgui::FlowLayout();
 			_grid = new jgui::GridLayout(3, 3);
-			_border = new jgui::BorderLayout();
 			_border = new jgui::BorderLayout();
 			_card = new jgui::BorderLayout();
 			_gridbag = new jgui::GridBagLayout();
@@ -261,9 +262,23 @@ class Main : public jgui::Window, public jevent::ActionListener {
 					delete (*ibcomponent);
 				}
 
+        delete bcontainer->GetLayout();
+
 				delete ccontainer;
 				delete bcontainer;
 			}
+			
+      jgui::Layout *layout = GetLayout();
+      
+      delete layout;
+		
+			delete _flow;
+			delete _grid;
+			delete _border;
+			delete _card;
+			delete _gridbag;
+			delete _null;
+
 		}
 
 		virtual void ActionPerformed(jevent::ActionEvent *event)

@@ -20,7 +20,8 @@
 #ifndef J_V4L2LIGHTPLAYER_H
 #define J_V4L2LIGHTPLAYER_H
 
-#include "jmedia/binds/v4l2/include/videograbber.h"
+#include "videograbber.h"
+
 #include "jmedia/jplayer.h"
 #include "jgui/jcomponent.h"
 #include "jnetwork/jurl.h"

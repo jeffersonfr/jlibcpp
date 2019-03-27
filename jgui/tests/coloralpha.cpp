@@ -144,9 +144,9 @@ class ColorAlphaTeste : public jgui::Window {
       jgui::jinsets_t
         insets = GetInsets();
 			uint32_t 
-        *buffer = nullptr;
+        buffer[isize.width*isize.height];
 
-			_fg->GetRGBArray(&buffer, 0, 0, isize.width, isize.height);
+			_fg->GetRGBArray(buffer, 0, 0, isize.width, isize.height);
 
 			for (int i=0; i<isize.width*isize.height; i++) {
 				color_t color;
@@ -180,8 +180,6 @@ class ColorAlphaTeste : public jgui::Window {
 			g->DrawImage(image, insets.left, insets.top, size.width-insets.left-insets.right, size.height-insets.top-insets.bottom);
 
 			delete image;
-
-			delete [] buffer;
 		}
 
 };

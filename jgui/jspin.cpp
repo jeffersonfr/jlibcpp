@@ -303,10 +303,10 @@ void Spin::Paint(Graphics *g)
 		w = size.width - 2*x,
 		h = size.height - 2*y;
   int
-			arrow_size;
+			arrow_size = h/2;
 
 	if (_type == JSO_HORIZONTAL) {
-		arrow_size = h/2;
+		// arrow_size = h/2;
 	} else if (_type == JSO_VERTICAL) {
 		arrow_size = (h-8)/2;
 	}

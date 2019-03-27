@@ -3645,7 +3645,7 @@ class PSIParser : public jevent::DemuxListener {
 
 				printf("PAT:: program number:[0x%04x], map pid:[0x%04x]\n", program_number, map_pid);
 
-				if (program_number == 0x0) {
+				if (program_number == 0x00) {
 					nit_pid = map_pid;
 				} else {
 					char tmp[255];

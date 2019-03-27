@@ -100,6 +100,9 @@ class Main : public jgui::Window {
 		virtual ~Main()
 		{
 			_active = false;
+			
+      delete [] _objects;
+			delete [] _particles;
 		}
 
 		double g(struct particle_t *particle) 

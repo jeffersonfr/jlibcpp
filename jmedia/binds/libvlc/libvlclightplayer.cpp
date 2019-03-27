@@ -17,7 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jmedia/binds/libvlc/include/libvlclightplayer.h"
+#include "libvlclightplayer.h"
+
 #include "jmedia/jvideosizecontrol.h"
 #include "jmedia/jvideoformatcontrol.h"
 #include "jmedia/jvolumecontrol.h"
@@ -567,7 +568,9 @@ LibVLCLightPlayer::LibVLCLightPlayer(jnetwork::URL url):
 	libvlc_media_t *media;
 
 	_engine = libvlc_new(vlc_argc, vlc_argv);
+
 	media = libvlc_media_new_path(_engine, _file.c_str());
+
 	_provider = libvlc_media_player_new_from_media(media);
 
  	libvlc_media_track_t **tracks = nullptr;
@@ -712,6 +715,8 @@ LibVLCLightPlayer::~LibVLCLightPlayer()
 	}
 
 	_controls.clear();
+
+	libvlc_release(_engine);
 }
 
 void LibVLCLightPlayer::Run()

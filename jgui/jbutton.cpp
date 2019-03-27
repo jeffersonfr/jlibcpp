@@ -55,6 +55,10 @@ Button::Button(std::string text, jgui::Image *image, int x, int y, int width, in
 
 Button::~Button()
 {
+  if (_image != nullptr) {
+    delete _image;
+    _image = nullptr;
+  }
 }
 
 void Button::SetText(std::string text)
@@ -66,9 +70,19 @@ void Button::SetText(std::string text)
 
 void Button::SetImage(jgui::Image *image)
 {
+  if (_image != nullptr) {
+    delete _image;
+    _image = nullptr;
+  }
+
   _image = image;
 
   Repaint();
+}
+
+jgui::Image * Button::GetImage()
+{
+  return _image;
 }
 
 std::string Button::GetText()

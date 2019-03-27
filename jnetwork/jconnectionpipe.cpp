@@ -52,14 +52,13 @@ ConnectionPipe::ConnectionPipe(Connection *connection, jconnection_pipe_t type_,
 	}
 
 	_is_closed = false;
+
+  _thread = std::thread(&ConnectionPipe::Run, this);
 }
 
 ConnectionPipe::~ConnectionPipe()
 {
-	try {
-		Close();
-	} catch (...) {
-	}
+	Close();
 }
 
 int ConnectionPipe::Receive(char *data_, int size_, int time_)
@@ -184,9 +183,17 @@ void ConnectionPipe::Close()
 		close(_pipe[1]);
 	}
 	
-	_connection->Close();
+  try {
+	  _connection->Close();
+  } catch (...) {
+  }
 	
 	_is_closed = true;
+
+  try {
+    _thread.join();
+  } catch (...) {
+  }
 }
 
 jio::InputStream * ConnectionPipe::GetInputStream()

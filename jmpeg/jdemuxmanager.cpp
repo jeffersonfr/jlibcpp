@@ -194,6 +194,12 @@ void DemuxManager::ProcessPSI(const char *data, const int length)
     ptr = ptr + pointer_field + 1;
 
     if (ptr < end) {
+      int length = end - ptr;
+
+      if (length < 3) {
+        return;
+      }
+
       section_length = TS_PSI_G_SECTION_LENGTH(ptr) + 3;
 
       if (section_length > 3) {

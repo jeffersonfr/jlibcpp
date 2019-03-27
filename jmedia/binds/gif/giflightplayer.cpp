@@ -46,7 +46,8 @@
    Free Software Foundation, Inc., 59 Temple Place - Suite 330,
    Boston, MA 02111-1307, USA.
 */
-#include "jmedia/binds/gif/include/giflightplayer.h"
+#include "giflightplayer.h"
+
 #include "jmedia/jvideosizecontrol.h"
 #include "jmedia/jvideoformatcontrol.h"
 #include "jmedia/jvolumecontrol.h"
@@ -798,7 +799,9 @@ class GifVideoSizeControlImpl : public VideoSizeControl {
 GIFLightPlayer::GIFLightPlayer(jnetwork::URL url):
 	jmedia::Player()
 {
-  if (strcasecmp(url.GetPath().c_str() - 3, "gif") != 0) {
+  std::string path = url.GetPath();
+
+  if (path.size() <= 3 and strcasecmp(path.c_str() - 3, "gif") != 0) {
 		throw jexception::MediaException("This file is not a valid gif");
   }
 
@@ -879,6 +882,12 @@ GIFLightPlayer::~GIFLightPlayer()
 	_controls.clear();
 
 	AnimatedGIFData *data = (AnimatedGIFData *)_provider;
+
+  delete data->stream;
+  data->stream = nullptr;
+  
+  delete data->image;
+  data->image = nullptr;
 
 	delete data;
 }

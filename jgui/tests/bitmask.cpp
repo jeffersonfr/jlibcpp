@@ -128,11 +128,14 @@ class BitMask : public jcommon::Object {
 				throw jexception::NullPointerException("Image must be valid");
 			}
 
-			_data = nullptr;
+      jgui::jsize_t
+        size = image->GetSize();
+
+			_data = new uint32_t[size.width*size.height];
 			_size = image->GetSize();
 			_transparent_color = 0x00000000;
 
-			image->GetRGBArray(&_data, 0, 0, _size.width, _size.height);
+			image->GetRGBArray(_data, 0, 0, _size.width, _size.height);
 			
 			if (_data == nullptr) {
 				throw jexception::NullPointerException("Image data must be valid");
@@ -153,11 +156,14 @@ class BitMask : public jcommon::Object {
 				throw jexception::NullPointerException("Image must be valid");
 			}
 
-			_data = nullptr;
+      jgui::jsize_t
+        size = image->GetSize();
+
+			_data = new uint32_t[size.width*size.height];
 			_size = image->GetSize();
 			_transparent_color = 0x00000000;
 
-			image->GetRGBArray(&_data, 0, 0, _size.width, _size.height);
+			image->GetRGBArray(_data, 0, 0, _size.width, _size.height);
 			
 			if (_data == nullptr) {
 				throw jexception::NullPointerException("Image data must be valid");

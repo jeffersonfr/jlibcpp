@@ -89,7 +89,7 @@ class PCXImageLoader {
 		 int iLineCount,iBufferLineLen,iImageLineLen;
 		 long lLinePos=0;
 		 unsigned char bRunLen;
-		 unsigned char *pCur,*pLine,*pInterLine;
+		 unsigned char *pCur,*pInterLine;
 
 		 // Set our pointer to the beginning of the image data
 		 pCur=&pData[128];
@@ -97,10 +97,8 @@ class PCXImageLoader {
 		 // Calculate line lengths for image and buffer, Allocate the buffer scan line
 		 iBufferLineLen=iBPL*iPlanes;
 		 iImageLineLen =iWidth*iPlanes;
-		 pLine=new unsigned char[iBufferLineLen];
 
-		 if(pLine==nullptr)
-			 return PCX_IMG_ERR_MEM_FAIL;
+		 unsigned char pLine[iBufferLineLen];
 
 		 // Allocate space for the image data
 		 if(pImage!=nullptr)
