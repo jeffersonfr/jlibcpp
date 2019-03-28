@@ -428,6 +428,8 @@ void DemuxManager::Run()
 			continue;
 		}
 
+    ProcessRaw(data, TS_PACKET_LENGTH);
+
     int transport_error_indicator = TS_GM8(data + 1, 0, 1);
     // int payload_unit_start_indicator = TS_GM8(data + 1, 1, 1);
     // int transport_priority = TS_GM8(data + 1, 2, 1);
@@ -464,7 +466,6 @@ void DemuxManager::Run()
           std::string pkt = std::string(data, TS_PACKET_LENGTH);
 
           do {
-            ProcessRaw(pkt.c_str(), TS_PACKET_LENGTH);
             ProcessPSI(pkt.c_str(), TS_PACKET_LENGTH);
             ProcessPES(pkt.c_str(), TS_PACKET_LENGTH);
 
@@ -478,7 +479,6 @@ void DemuxManager::Run()
     } else {
       counter[pid].continuity_counter = continuity_counter;
 
-      ProcessRaw(data, TS_PACKET_LENGTH);
       ProcessPSI(data, TS_PACKET_LENGTH);
       ProcessPES(data, TS_PACKET_LENGTH);
     }
