@@ -15,9 +15,15 @@ LDFLAGS		+= \
 OBJS_teste = \
 	   teste.o\
 
-all: teste
+OBJS_debug = \
+	   debug.o\
+
+all: teste debug
 	
 teste: $(OBJS_teste)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
+        
+debug: $(OBJS_debug)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
 .cpp.o: $<  
@@ -27,4 +33,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *~ teste teste.log
+	@rm -rvf *.o *~ teste teste.log debug

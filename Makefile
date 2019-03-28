@@ -444,5 +444,7 @@ ultraclean: clean uninstall
 	@cd jshared/tests && make clean && cd -
 	@cd jipc/tests && make clean && cd -
 	@cd jnetwork/tests && make clean && cd -
+	@cd jevent/tests && make clean && cd -
+	@cd jexception/tests && make clean && cd -
 	@rm -rf $(EXE) $(BINDIR) $(LIBDIR) $(DOCDIR) $(TARGET)/lib/$(EXE) $(TARGET)/$(MODULE) $(TARGET)/include/$(MODULE) 2> /dev/null && $(ECHO) "$(MODULE) ultraclean $(OK)" 
 

@@ -17,31 +17,30 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_LOGGERLIB_H
-#define J_LOGGERLIB_H
+#include "jlogger/jloggerlib.h"
 
-#include <stdio.h>
+#include <stdlib.h>
 
-#define JINFO   1
-#define JWARN   2
-#define JERROR  3
-#define JFATAL  4
-#define JTRACE  5
+void f()
+{
+  JDEBUG(JINFO, "task completed\n");
+}
 
-#define JDEBUG_COLOR(level) ((level == JINFO)?"[0;32m":(level == JWARN)?"[0;33m":(level == JERROR)?"[0;31m":(level == JFATAL)?"[0;31m":"[0m")
-#define JDEBUG_INFO(level) ((level == JINFO)?"[INFO]":(level == JWARN)?"[WARNING]":(level == JERROR)?"[ERROR]":(level == JFATAL)?"[FATAL]":"[TRACE]")
+void g()
+{
+  JDEBUG(JWARN, "task became slow\n");
+}
 
-#ifdef JDEBUG_ENABLED
-  #define JDEBUG(level, msg, args...) \
-    printf("\e%s%s:: <%s> [%s:%d] \e[0m" msg, JDEBUG_COLOR(level), JDEBUG_INFO(level), __FILE__, __func__, __LINE__, ## args); fflush(stdout);
-#else
-  #define JDEBUG(level, msg, args...)
-#endif
+void h()
+{
+  JDEBUG(JERROR, "problem to complete task\n");
+}
 
-#endif
+int main(int argc, char *argv[])
+{
+  f();
+  g();
+  h();
 
-
-
-
-
-
+  return EXIT_SUCCESS;
+}
