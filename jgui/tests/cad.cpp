@@ -126,6 +126,11 @@ struct Shape {
 			g->FillCircle(sx, sy, 2);
 		}
 	}
+
+  virtual ~Shape()
+  {
+  }
+
 };
 
 float Shape::fWorldScale = 1.0f;
@@ -276,6 +281,11 @@ class CAD : public jgui::Window {
 
     virtual ~CAD()
 		{
+      for (std::list<Shape *>::iterator i=listShapes.begin(); i!=listShapes.end(); i++) {
+        Shape *shape = (*i);
+
+        delete shape;
+      }
 		}
 
 		virtual bool KeyPressed(jevent::KeyEvent *event)

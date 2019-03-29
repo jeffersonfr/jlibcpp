@@ -174,7 +174,7 @@ bool FileChooserDialog::ShowFiles(std::string current_dir)
 	}
 
 	_list->RemoveItems();
-	_list->AddImageItem("..", _image_folder);
+	_list->AddImageItem("..", dynamic_cast<jgui::Image *>(_image_folder->Clone()));
 	_list->SetCurrentIndex(0);
 
 	if (files.size() == 0) {
@@ -189,7 +189,7 @@ bool FileChooserDialog::ShowFiles(std::string current_dir)
 		for (unsigned int i=0; i<files.size(); i++) {
 			if (IsDirectory(current_dir + jio::File::GetDelimiter() + files[i])) {
 				// adiciona um icone para o diretorio
-				_list->AddImageItem(files[i], _image_folder); 
+				_list->AddImageItem(files[i], dynamic_cast<jgui::Image *>(_image_folder->Clone())); 
 			}
 		}
 	}
@@ -226,7 +226,7 @@ bool FileChooserDialog::ShowFiles(std::string current_dir)
 
 			if (b == true) {
 				if (IsFile(current_dir + jio::File::GetDelimiter() + file)) {
-					_list->AddImageItem(file, _image_file);
+					_list->AddImageItem(file, dynamic_cast<jgui::Image *>(_image_file->Clone()));
 				}
 			}
 		}

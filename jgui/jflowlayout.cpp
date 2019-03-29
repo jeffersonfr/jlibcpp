@@ -54,7 +54,7 @@ int FlowLayout::GetVGap()
 
 bool FlowLayout::GetAlignOnBaseline()
 {
-		return _align_on_baseline;
+		return (bool)_align_on_baseline;
 }
 
 void FlowLayout::SetAlign(jflowlayout_align_t align)

@@ -120,22 +120,54 @@ KeyboardDialog::~KeyboardDialog()
 {
 	Layout *layout = GetLayout();
 
+  std::vector<jgui::Component *> components = GetComponents();
+  
+  for (int i=0; i<(int)components.size(); i++) {
+    jgui::Component *component = components[i];
+
+    if (dynamic_cast<jgui::Container *>(component) != nullptr) {
+      jgui::Container *container = dynamic_cast<jgui::Container *>(component);
+      std::vector<jgui::Component *> components2 = container->GetComponents();
+
+      for (int i=0; i<(int)components2.size(); i++) {
+        jgui::Component *component2 = components2[i];
+    
+        if (dynamic_cast<jgui::Container *>(component2) != nullptr) {
+          jgui::Container *container2 = dynamic_cast<jgui::Container *>(component2);
+          std::vector<jgui::Component *> components3 = container2->GetComponents();
+
+          for (int i=0; i<(int)components3.size(); i++) {
+            jgui::Component *component3 = components3[i];
+
+            delete component3;
+          }
+
+          container2->RemoveAll();
+          layout = container2->GetLayout();
+          container2->SetLayout(nullptr);
+
+          delete layout;
+        }
+
+        delete component2;
+      }
+
+      container->RemoveAll();
+      layout = container->GetLayout();
+      container->SetLayout(nullptr);
+
+      delete layout;
+    }
+
+    delete component;
+  }
+
   RemoveAll();
-	SetLayout(NULL);
+  layout = GetLayout();
+  SetLayout(NULL);
 
 	delete layout;
-
-  // TODO:: remove registers
-  // TODO:: delete buttons
-
-  _key_listeners_mutex.lock();
-
-  _key_listeners.clear();
-
-  _key_listeners_mutex.unlock();
-
-  delete _display;
-  _display = nullptr;
+  layout = nullptr;
 }
 
 void KeyboardDialog::ActionPerformed(jevent::ActionEvent *event)

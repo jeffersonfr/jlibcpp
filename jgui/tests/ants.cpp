@@ -22,6 +22,7 @@
 #include "jgui/jwindow.h"
 
 #include <iostream>
+#include <mutex>
 
 #define ENABLE_GUI	1
 #define DRAW_ANTS		0
@@ -59,6 +60,8 @@ class Main : public jgui::Window {
       *foffscreen;
 		jgui::Font 
       *fweights;
+    std::mutex
+      _mutex;
 #endif
 		path_t 
       *board,
@@ -157,10 +160,6 @@ class Main : public jgui::Window {
 
 		virtual ~Main()
 		{
-#if ENABLE_GUI == 1
-			delete fweights;
-      delete foffscreen;
-#endif
 		}
 
 		virtual void ShowApp()
@@ -251,9 +250,11 @@ class Main : public jgui::Window {
 				// end update
 
 #if ENABLE_GUI == 1
-				if (IsHidden() == false) {
-					Repaint();
+				if (IsHidden() == true) {
+          break;
 				}
+					
+        Repaint();
 #endif
 			}
 
@@ -264,8 +265,23 @@ class Main : public jgui::Window {
 				std::cout << solution[i]->value << " ";
 			}
 
+      _mutex.lock();
+
 			delete [] board;
+      board = nullptr;
+
 			delete [] try_solutions;
+      try_solutions = nullptr;
+
+#if ENABLE_GUI == 1
+			delete fweights;
+      fweights = nullptr;
+
+      delete foffscreen;
+      foffscreen = nullptr;
+#endif
+      
+      _mutex.unlock();
 
 			std::cout << std::endl;
 		}
@@ -273,6 +289,14 @@ class Main : public jgui::Window {
 #if ENABLE_GUI == 1
 		virtual void Paint(jgui::Graphics *g)
 		{
+      _mutex.lock();
+
+      if (board == nullptr) {
+        _mutex.unlock();
+
+        return;
+      }
+
 			jgui::jsize_t
 				size = GetSize();
 			char tmp[255];
@@ -331,6 +355,8 @@ class Main : public jgui::Window {
 					solution[i]->x*(BLOCK_WIDTH+BLOCK_GAP)+BLOCK_WIDTH/2, 
 					solution[i]->y*(BLOCK_HEIGHT+BLOCK_GAP)+BLOCK_HEIGHT/2);
 			}
+
+      _mutex.unlock();
 		}
 #endif
 

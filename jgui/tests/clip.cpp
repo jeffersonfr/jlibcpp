@@ -74,6 +74,13 @@ class Main : public jgui::Window {
 		virtual ~Main()
 		{
 			RemoveAll();
+
+      _container1->RemoveAll();
+      _container2->RemoveAll();
+
+      delete _container1;
+      delete _container2;
+      delete _button1;
 		}
 
 };

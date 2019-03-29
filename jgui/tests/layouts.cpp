@@ -278,7 +278,6 @@ class Main : public jgui::Window, public jevent::ActionListener {
 			delete _card;
 			delete _gridbag;
 			delete _null;
-
 		}
 
 		virtual void ActionPerformed(jevent::ActionEvent *event)

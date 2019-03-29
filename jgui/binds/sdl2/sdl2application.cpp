@@ -665,9 +665,9 @@ void NativeApplication::InternalLoop()
 
 void NativeApplication::InternalQuit()
 {
+  // TODO:: force the close of window (Alt+F4)
   SDL_DestroyRenderer(_renderer);
   SDL_DestroyWindow(_window);
-
 	SDL_Quit();
 }
 

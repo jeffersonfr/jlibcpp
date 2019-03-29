@@ -184,6 +184,7 @@ Calculator::~Calculator()
   RemoveAll();
 
   delete layout;
+  layout = nullptr;
 
 	delete _display;
   _display = nullptr;
@@ -193,6 +194,7 @@ Calculator::~Calculator()
   layout = _container->GetLayout();
 
   delete layout;
+  layout = nullptr;
 
   delete _container;
   _container = nullptr;
@@ -553,8 +555,9 @@ bool Calculator::KeyPressed(jevent::KeyEvent *event)
 	if (_state == 1) {
 		_display->Clear();
 	} else if (_state == 2 || _state == 3 || _state == 5 || _state == 7) {
-		char *tmp = strdup(_number0.c_str()),
-				 *i1;
+		char 
+      *tmp = strdup(_number0.c_str()),
+			*i1;
 
 		if (strlen(tmp) > 9) {
 			i1 = strchr(tmp, '.');
@@ -591,7 +594,7 @@ bool Calculator::KeyPressed(jevent::KeyEvent *event)
 			}
 		}
 
-		delete tmp;
+		free(tmp);
 	} else if (_state == 4) {
 		char *tmp = strdup(_number1.c_str());
 
@@ -618,7 +621,7 @@ bool Calculator::KeyPressed(jevent::KeyEvent *event)
 			_display->SetText(_number1);
 		}
 
-		delete tmp;
+		free(tmp);
 	}
 
 	return true;
@@ -633,8 +636,9 @@ void Calculator::ActionPerformed(jevent::ActionEvent *event)
 	if (_state == 1) {
 		_display->Clear();
 	} else if (_state == 2 || _state == 3 || _state == 5 || _state == 7) {
-		char *tmp = strdup(_number0.c_str()),
-				 *i1;
+		char 
+      *tmp = strdup(_number0.c_str()),
+			*i1;
 
 		if (strlen(tmp) > 9) {
 			i1 = strchr(tmp, '.');
@@ -671,7 +675,7 @@ void Calculator::ActionPerformed(jevent::ActionEvent *event)
 			}
 		}
 
-		delete tmp;
+		free(tmp);
 	} else if (_state == 4) {
 		char *tmp = strdup(_number1.c_str());
 
@@ -698,7 +702,7 @@ void Calculator::ActionPerformed(jevent::ActionEvent *event)
 			_display->SetText(_number1);
 		}
 
-		delete tmp;
+		free(tmp);
 	}
 }
 

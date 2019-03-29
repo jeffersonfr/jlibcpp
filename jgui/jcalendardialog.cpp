@@ -342,7 +342,6 @@ void CalendarDialog::BuildCalendar()
 
 		_buttons.push_back(button);
 
-    printf(":-------------------> %d, %d, %d -> %d, %d, %d\n", dd, mm, yy, i+1, tm1->tm_mon, tm1->tm_year);
 		if (dd == (i + 1) && tm1->tm_mon == mm && tm1->tm_year == yy) {
 			button->SetTheme(&_selected_theme);
 		}
