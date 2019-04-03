@@ -300,12 +300,6 @@ class Window : public jgui::Container {
 		virtual void Paint(Graphics *g);
 
 		/**
-		 * \brief Called after all drawings have been synchronized.
-		 *
-		 */
-		virtual void Flush();
-
-		/**
 		 * \brief
 		 *
 		 */
@@ -370,18 +364,6 @@ class Window : public jgui::Container {
 		 *
 		 */
 		virtual jwindow_rotation_t GetRotation();
-
-		/**
-		 * \brief
-		 *
-		 */
-    virtual void PushEvent(jevent::EventObject *event);
-
-		/**
-		 * \brief
-		 *
-		 */
-    virtual std::vector<jevent::EventObject *> GrabEvents();
 
 		/**
 		 * \brief

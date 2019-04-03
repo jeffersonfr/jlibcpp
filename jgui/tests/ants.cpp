@@ -160,6 +160,7 @@ class Main : public jgui::Window {
 
 		virtual ~Main()
 		{
+      _mutex.unlock();
 		}
 
 		virtual void ShowApp()
@@ -254,6 +255,8 @@ class Main : public jgui::Window {
           break;
 				}
 					
+        _mutex.lock();
+
         Repaint();
 #endif
 			}
@@ -264,8 +267,6 @@ class Main : public jgui::Window {
 			for (int i=0; i<MAX_COLS; i++) {
 				std::cout << solution[i]->value << " ";
 			}
-
-      _mutex.lock();
 
 			delete [] board;
       board = nullptr;
@@ -281,16 +282,12 @@ class Main : public jgui::Window {
       foffscreen = nullptr;
 #endif
       
-      _mutex.unlock();
-
 			std::cout << std::endl;
 		}
 
 #if ENABLE_GUI == 1
 		virtual void Paint(jgui::Graphics *g)
 		{
-      _mutex.lock();
-
       if (board == nullptr) {
         _mutex.unlock();
 

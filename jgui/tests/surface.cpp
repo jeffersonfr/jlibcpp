@@ -33,10 +33,11 @@
 class Surface : public jgui::Window {
 
 	private:
-    jgui::Image *_buffer;
-
+    jgui::Image 
+      *_buffer;
     std::mutex
-      _mutex;
+      _mutex_sync,
+      _mutex_draw;
     float 
       nodesize,
       relax,
@@ -92,6 +93,9 @@ class Surface : public jgui::Window {
 
 		virtual ~Surface()
 		{
+      _mutex_sync.unlock();
+      _mutex_sync.unlock();
+
       delete _buffer;
       _buffer = nullptr;
 		}
@@ -167,7 +171,7 @@ class Surface : public jgui::Window {
         *g = _buffer->GetGraphics();
 
 			do {
-        _mutex.lock();
+        _mutex_draw.lock();
 
         g->Clear();
 
@@ -200,11 +204,11 @@ class Surface : public jgui::Window {
           g->DrawLine(point_worka[a][b], point_workb[a][b], point_worka[a][b + 1], point_workb[a][b + 1]);
         }
         
-        _mutex.unlock();
+        _mutex_draw.unlock();
+        
+        _mutex_sync.lock();
 
         Repaint();
-
-        // std::this_thread::sleep_for(std::chrono::milliseconds(10));
 			} while (IsHidden() == false);
 		}
 
@@ -213,14 +217,13 @@ class Surface : public jgui::Window {
       jgui::jsize_t
         size = GetSize();
 
-      _mutex.lock();
+      _mutex_draw.lock();
 
       g->DrawImage(_buffer, 0, 0, size.width, size.height);
-    }
 
-	  virtual void Flush()
-    {
-      _mutex.unlock();
+      _mutex_draw.unlock();
+      
+      _mutex_sync.unlock();
     }
 
 };

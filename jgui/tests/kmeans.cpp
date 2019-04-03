@@ -20,6 +20,8 @@
 #include "jgui/japplication.h"
 #include "jgui/jwindow.h"
 
+#include <mutex>
+
 #include <math.h>
 
 const uint32_t POINTS = 4000;
@@ -206,6 +208,8 @@ class Neuron {
 class SOM : public jgui::Window {
 
 	private:
+    std::mutex
+      _mutex;
 		Neuron 
       **_neurons;
 		double 
@@ -222,6 +226,9 @@ class SOM : public jgui::Window {
 		SOM(int ninputs, int neurons):
 			jgui::Window(3*240, 3*128)
 		{
+      _train_input = nullptr;
+      _train_input_size = 0;
+
 			_classify_input = nullptr;
 			_classify_input_size = 0;
 
@@ -238,6 +245,8 @@ class SOM : public jgui::Window {
 
 		virtual ~SOM()
 		{
+      _mutex.unlock();
+
 			for (int i=0; i<_neurons_size; i++) {
 				delete _neurons[i];
 			}
@@ -390,12 +399,16 @@ class SOM : public jgui::Window {
 			printf("Acerto:: Total[%d], Erro[%d], Acerto[%.2f%%], Erro[%.2f%%]\n", 
 					train_input_size, k, 100.0*((train_input_size-k)/(double)train_input_size), 100.0*(k/(double)train_input_size));
 
+      _mutex.lock();
+
 			Repaint();
 		}
 
 		virtual void Paint(jgui::Graphics *g)
 		{
       if (_train_input == nullptr) {
+        _mutex.unlock();
+
         return;
       }
 
@@ -458,6 +471,8 @@ class SOM : public jgui::Window {
 			g->SetColor(0x00, 0x00, 0x00, 0xff);
 			g->DrawCircle(dx, dy, 1*s);
 			g->DrawCircle(3*dx, dy, 1*s);
+
+      _mutex.unlock();
 		}
 
     virtual void ShowApp()

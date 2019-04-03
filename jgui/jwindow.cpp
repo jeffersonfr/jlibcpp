@@ -276,37 +276,7 @@ void Window::Repaint(Component *cmp)
 		return;
 	}
 
-  PushEvent(new jevent::WindowEvent(this, jevent::JWET_PAINTED));
-}
-
-void Window::PushEvent(jevent::EventObject *event)
-{
-  if ((void *)event == nullptr) {
-    return;
-  }
-
-  std::unique_lock<std::mutex> lock(_event_mutex);
-
-  if (_window_events.size() > 1) {
-    _event_condition.wait(lock);
-  }
-
-  _window_events.push_back(event);
-}
-
-std::vector<jevent::EventObject *> Window::GrabEvents()
-{
-  std::lock_guard<std::mutex> lock(_event_mutex);
-
-  std::vector<jevent::EventObject *> events;
-
-  events = _window_events;
-
-  _window_events.clear();
-
-  _event_condition.notify_all();
-
-  return events;
+  _instance->Repaint(cmp);
 }
 
 void Window::PaintBackground(Graphics *g)
@@ -435,10 +405,6 @@ void Window::PaintGlassPane(Graphics *g)
 void Window::Paint(jgui::Graphics *g)
 {
 	Container::Paint(g);
-}
-
-void Window::Flush()
-{
 }
 
 void Window::SetVisible(bool visible)

@@ -197,6 +197,12 @@ class NativeWindow : public jgui::Window {
 		 */
 		virtual jgui::Image * GetIcon();
 
+    /**
+     * \brief
+     *
+     */
+		virtual void Repaint(Component *cmp = nullptr);
+
 };
 
 }

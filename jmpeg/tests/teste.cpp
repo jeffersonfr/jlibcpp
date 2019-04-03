@@ -2700,6 +2700,29 @@ class PSIParser : public jevent::DemuxListener {
       _demuxes.clear();
 		}
 
+		void StartRawDemux(std::string id, int pid, int timeout)
+		{
+      for (std::vector<jmpeg::Demux *>::iterator i=_demuxes.begin(); i!=_demuxes.end(); i++) {
+        jmpeg::Demux *demux = (*i);
+
+        if (demux->GetID() == id) {
+          printf("Demux [%s] already created\n", id.c_str());
+
+          return;
+        }
+      }
+
+			jmpeg::RawDemux *demux = new jmpeg::RawDemux();
+
+      demux->SetID(id);
+			demux->RegisterDemuxListener(this);
+			demux->SetPID(pid);
+			demux->SetTimeout(std::chrono::milliseconds(timeout));
+			demux->Start();
+
+			_demuxes.push_back(demux);
+		}
+
 		void StartPSIDemux(std::string id, int pid, int tid, int timeout)
 		{
       for (std::vector<jmpeg::Demux *>::iterator i=_demuxes.begin(); i!=_demuxes.end(); i++) {
@@ -3396,24 +3419,48 @@ class PSIParser : public jevent::DemuxListener {
 					DumpBytes("Private Data", ptr, private_length);
 				}
         */
-			} else if (descriptor_tag == 0xcf) { // logo transmission descriptor [ABNTNBR 15603-2D1 2007]
+			} else if (descriptor_tag == 0xcf) { // logo transmission descriptor [ABNTNBR 15608-3 2008]
 				int logo_transmission_type = TS_G8(ptr + 0);
 
         printf("\t\t:: logo transmission type:[0x%02x]\n", logo_transmission_type);
 
         if (logo_transmission_type == 0x01) {
 				  // int reserved = TS_GM16(ptr + 1, 0, 7);
-				  // int logo_identified = TS_GM16(ptr + 1, 7, 9);
+				  int logo_identifier = TS_GM16(ptr + 1, 7, 9);
 				  // int reserved = TS_GM16(ptr + 3, 0, 4);
-				  // int logo_version = TS_GM16(ptr + 3, 4, 12);
-				  // int download_data_identified = TS_G16(ptr + 5);
+				  int logo_version = TS_GM16(ptr + 3, 4, 12);
+				  int download_data_identifier = TS_G16(ptr + 5);
+        
+          printf("\t\t\t:: logo identifier:[0x%04x], logo version:[0x%04x], download data identifier:[0x%04x]\n", logo_identifier, logo_version, download_data_identifier);
         } else if (logo_transmission_type == 0x02) {
 				  // int reserved = TS_GM16(ptr + 1, 0, 7);
-				  // int logo_identified = TS_GM16(ptr + 1, 7, 9);
+				  // int logo_identifier = TS_GM16(ptr + 1, 7, 9);
         } else if (logo_transmission_type == 0x03) {
           // std::string logo_character_string(ptr + 1, descriptor_length - 1);
+					DumpBytes("logo char", ptr + 1, descriptor_length - 1);
         } else {
-					DumpBytes("Reserved", ptr + 1, descriptor_length - 1);
+					DumpBytes("reserved", ptr + 1, descriptor_length - 1);
+        }
+			} else if (descriptor_tag == 0xd7) { // si parameter descriptor [ABNTNBR 15603-1 2008]
+        int parameter_version = TS_G8(ptr + 0);
+        int update_time = TS_G16(ptr + 1);
+
+        printf("\t\t:: parameter version:[0x%02x], update time:[%d]\n", parameter_version, update_time);
+
+        int length = descriptor_length - 3;
+
+        ptr = ptr + 3;
+
+        while (length > 0) {
+          int table_id = TS_G8(ptr + 0);
+          int table_description_length = TS_G8(ptr + 1);
+          std::string table_description_byte(ptr + 2, table_description_length);
+
+          printf("\t\t:: table id:[0x%02x], table description byte:[%s]\n", table_id, table_description_byte.c_str());
+
+          ptr = ptr + 1 + 1 + table_description_length;
+
+          length = length - 1 - 1 - table_description_length;
         }
 			} else if (descriptor_tag == 0xfa) { // terrestrial delivery system descriptor
 				int area_code = TS_GM16(ptr, 0, 12);
@@ -3597,6 +3644,12 @@ class PSIParser : public jevent::DemuxListener {
         ProcessPCR(event);
 			} else if (demux->GetID() == "ait") {
 				ProcessPrivate(event);
+			} else if (demux->GetID() == "cdt") {
+				ProcessCDT(event);
+			} else if (demux->GetID() == "bit") {
+				ProcessBIT(event);
+			} else if (demux->GetID() == "sdtt") {
+				ProcessSDTT(event);
 			} else if (demux->GetID() == "eit") {
         if (tid >= 0x4e && tid <= 0x6f) {
 	  			ProcessEIT(event);
@@ -3633,6 +3686,11 @@ class PSIParser : public jevent::DemuxListener {
 			StartPSIDemux("rst", TS_RST_PID, TS_RST_TABLE_ID, TS_RST_TIMEOUT);
 			StartPSIDemux("eit", TS_EIT_PID, -1, TS_EIT_TIMEOUT);
 			// StartPSIDemux("eit-now&next", -1, 0x4e, TS_EIT_TIMEOUT);
+			
+      // INFO:: extra tables (15608-3)
+      StartPSIDemux("sdtt", TS_SDTT_PID, TS_SDTT_TABLE_ID, 5000); // software download trigger table (0x23: fullseg, 0x28: oneseg)
+      StartPSIDemux("bit", TS_BIT_PID, TS_BIT_TABLE_ID, 5000); // broadcast identifier table
+      StartPSIDemux("cdt", TS_CDT_PID, TS_CDT_TABLE_ID, 5000); // common data table
 
 			int nit_pid = TS_NIT_PID;
 			int count = ((section_length - 5)/4 - 1); // last 4 bytes are CRC	
@@ -3812,7 +3870,7 @@ class PSIParser : public jevent::DemuxListener {
 				pcr_pid = vpid; // first video pid
 			}
 			
-			StartPESDemux("pcr", pcr_pid, TS_PCR_TIMEOUT);
+			StartRawDemux("pcr", pcr_pid, TS_PCR_TIMEOUT);
 		}
 
 		virtual void ProcessNIT(jevent::DemuxEvent *event)
@@ -4475,11 +4533,33 @@ class PSIParser : public jevent::DemuxListener {
 		{
 			const char *ptr = event->GetData();
 
-			uint64_t program_clock_reference_base = (uint64_t)TS_GM32(ptr, 0, 32) << 1 | TS_GM8(ptr + 4, 0, 1);
-			// int reserved = TS_GM8(ptr + 4, 1, 6);
-			uint64_t program_clock_reference_extension = (uint64_t)TS_GM16(ptr + 4, 7, 9);
-					
-			printf("PCR:: base:[%lu], extension:[%lu]\n", program_clock_reference_base, program_clock_reference_extension);
+      // int transport_error_indicator = TS_GM8(ptr + 1, 0, 1);
+      // int payload_unit_start_indicator = TS_GM8(ptr + 1, 1, 1);
+      // int transport_priority = TS_GM8(ptr + 1, 2, 1);
+      // int pid = TS_GM16(ptr + 1, 3, 13);
+      // int scrambling_control = TS_GM8(ptr + 3, 0, 2);
+      int adaptation_field_exist = TS_GM8(ptr + 3, 2, 1);
+      // int contains_payload = TS_GM8(ptr + 3, 3, 1);
+      // int continuity_counter = TS_GM8(ptr + 3, 4, 4);
+
+      ptr = ptr + TS_HEADER_LENGTH;
+
+      // INFO:: discards adaptation field
+      if (adaptation_field_exist == 1) {
+        int adaptation_field_length = TS_G8(ptr + 0);
+
+        if (adaptation_field_length > 0) {
+          int pcr_flag = TS_GM8(ptr + 1, 3, 1);
+
+          if (pcr_flag == 1) {
+            uint64_t program_clock_reference_base = (uint64_t)TS_GM32(ptr, 0, 32) << 1 | TS_GM8(ptr + 4, 0, 1);
+            // int reserved = TS_GM8(ptr + 4, 1, 6);
+            uint64_t program_clock_reference_extension = (uint64_t)TS_GM16(ptr + 4, 7, 9);
+
+			      printf("PCR:: base:[%lu], extension:[%lu]\n", program_clock_reference_base, program_clock_reference_extension);
+          }
+        }
+      }
 		}
 
 		virtual void ProcessPES(jevent::DemuxEvent *event)

@@ -80,6 +80,8 @@ static jcursor_style_t _cursor;
 static bool _visible = true;
 /** \brief */
 static jgui::jregion_t _previous_bounds;
+/** \brief */
+static bool _need_repaint = false;
 
 static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(xcb_keycode_t symbol, bool capital)
 {
@@ -384,8 +386,6 @@ void NativeApplication::InternalPaint()
 
   xcb_flush(_xconnection);
 
-  g_window->Flush();
-
   delete buffer;
   buffer = nullptr;
 
@@ -424,30 +424,10 @@ void NativeApplication::InternalLoop()
   xcb_change_property(_xconnection, XCB_PROP_MODE_REPLACE, _xwindow, (*reply).atom, 4, 32, 1, &(*reply2).atom);
 
 	while (quitting == false) {
-    // INFO:: process api events
-    // TODO:: ver isso melhor, pq o PushEvent + GrabEvent (com mutex descomentado) causa dead-lock no sistema
-    std::vector<jevent::EventObject *> events = g_window->GrabEvents();
+    if (_need_repaint == true) {
+      _need_repaint = false;
 
-    if (events.size() > 0) {
-      jevent::EventObject *event = events.front();
-
-      if (dynamic_cast<jevent::WindowEvent *>(event) != nullptr) {
-        jevent::WindowEvent *window_event = dynamic_cast<jevent::WindowEvent *>(event);
-
-        if (window_event->GetType() == jevent::JWET_PAINTED) {
-          InternalPaint();
-        }
-      }
-
-      // INFO:: discard all remaining events
-      while (events.size() > 0) {
-        jevent::EventObject *event = events.front();
-
-        events.erase(events.begin());
-
-        delete event;
-        event = nullptr;
-      }
+      InternalPaint();
     }
 
     while ((event = xcb_poll_for_event(_xconnection))) {
@@ -593,7 +573,6 @@ void NativeApplication::InternalLoop()
   xcb_disconnect(_xconnection);
   
   g_window->SetVisible(false);
-  g_window->GrabEvents();
 }
 
 void NativeApplication::InternalQuit()
@@ -653,6 +632,11 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 NativeWindow::~NativeWindow()
 {
   SetVisible(false);
+}
+
+void NativeWindow::Repaint(Component *cmp)
+{
+  _need_repaint = true;
 }
 
 xcb_intern_atom_cookie_t getCookieForAtom(const char *state_name) 

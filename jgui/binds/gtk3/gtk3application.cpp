@@ -58,6 +58,8 @@ static bool _cursor_enabled = true;
 static jcursor_style_t _cursor;
 /** \brief */
 static bool _visible = false;
+/** \brief */
+static bool _need_repaint = false;
 
 static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(guint symbol)
 {
@@ -438,8 +440,6 @@ static gboolean OnDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
 	cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
   cairo_paint(cr);
 
-  g_window->Flush();
-
   delete buffer;
   buffer = nullptr;
 
@@ -591,18 +591,14 @@ static void ConfigureApplication(GtkApplication *app, gpointer user_data)
   _window = gtk_application_window_new(app);
 
   gtk_window_set_title(GTK_WINDOW(_window), "");
-  // gtk_container_set_border_width(GTK_CONTAINER(_window), 0);
+  gtk_window_set_default_size(GTK_WINDOW(_window), _visible_bounds.width, _visible_bounds.height);
 
   _frame = gtk_frame_new(nullptr);
 
-  // gtk_frame_set_shadow_type(GTK_FRAME(_frame), GTK_SHADOW_IN);
   gtk_container_add(GTK_CONTAINER(_window), _frame);
 
   _drawing_area = gtk_drawing_area_new();
   
-  // gtk_container_set_border_width(GTK_CONTAINER(_drawing_area), 0);
-
-  gtk_widget_set_size_request(_drawing_area, _visible_bounds.width, _visible_bounds.height);
   gtk_container_add(GTK_CONTAINER(_frame), _drawing_area);
 
 	g_signal_connect(G_OBJECT(_drawing_area),"configure-event", G_CALLBACK (OnConfigureEvent), nullptr);
@@ -654,42 +650,22 @@ void NativeApplication::InternalInit(int argc, char **argv)
 
 void NativeApplication::InternalPaint()
 {
-  gtk_widget_queue_draw(_drawing_area);
+  // gtk_widget_queue_draw(_drawing_area);
 }
 
 static bool quitting = false;
 
 static void PaintThread(NativeApplication *app)
 {
-	while (quitting == false) {
-    std::vector<jevent::EventObject *> events = g_window->GrabEvents();
+  while (quitting == false) {
+    if (_need_repaint == true) {
+      _need_repaint = false;
 
-    if (events.size() > 0) {
-      jevent::EventObject *event = events.front();
-
-      if (dynamic_cast<jevent::WindowEvent *>(event) != nullptr) {
-        jevent::WindowEvent *window_event = dynamic_cast<jevent::WindowEvent *>(event);
-
-        if (window_event->GetType() == jevent::JWET_PAINTED) {
-          gtk_widget_queue_draw(_drawing_area);
-        }
-      }
-
-      // INFO:: discard all remaining events
-      while (events.size() > 0) {
-        jevent::EventObject *event = events.front();
-
-        events.erase(events.begin());
-
-        delete event;
-        event = nullptr;
-      }
+      gtk_widget_queue_draw(GTK_WIDGET(_drawing_area));
     }
 
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
-  
-  g_window->GrabEvents();
 }
 
 void NativeApplication::InternalLoop()
@@ -722,14 +698,14 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 
 	_window = nullptr;
 
-  _icon = new BufferedImage(_DATA_PREFIX"/images/small-gnu.png");
-
-  _handler = gtk_application_new("jlibcpp.gtk", G_APPLICATION_FLAGS_NONE);
-
   _visible_bounds.x = x;
   _visible_bounds.y = y;
   _visible_bounds.width = width;
   _visible_bounds.height = height;
+
+  _icon = new BufferedImage(_DATA_PREFIX"/images/small-gnu.png");
+
+  _handler = gtk_application_new("jlibcpp.gtk", G_APPLICATION_FLAGS_NONE);
 
   g_signal_connect(_handler, "activate", G_CALLBACK(ConfigureApplication), nullptr);
 
@@ -753,6 +729,11 @@ NativeWindow::~NativeWindow()
   g_object_unref(_frame);
   g_object_unref(_window);
   g_object_unref(_handler);
+}
+
+void NativeWindow::Repaint(Component *cmp)
+{
+  _need_repaint = true;
 }
 
 void NativeWindow::ToggleFullScreen()
@@ -787,7 +768,9 @@ void NativeWindow::SetParent(jgui::Container *c)
 
 void NativeWindow::SetTitle(std::string title)
 {
-	gtk_window_set_title(GTK_WINDOW(_window), title.c_str());
+  if (_window != nullptr) {
+	  gtk_window_set_title(GTK_WINDOW(_window), title.c_str());
+  }
 }
 
 std::string NativeWindow::GetTitle()
@@ -807,7 +790,9 @@ float NativeWindow::GetOpacity()
 
 void NativeWindow::SetUndecorated(bool undecorated)
 {
-	gtk_window_set_decorated(GTK_WINDOW(_window), undecorated == false);
+  if (_window != nullptr) {
+	  gtk_window_set_decorated(GTK_WINDOW(_window), undecorated == false);
+  }
 }
 
 bool NativeWindow::IsUndecorated()

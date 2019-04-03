@@ -46,6 +46,8 @@ QApplication *_application = nullptr;
 /** \brief */
 static QDialog *_handler = nullptr;
 /** \brief */
+static QByteArray _geometry;
+/** \brief */
 static float _opacity = 1.0f;
 /** \brief */
 static bool _fullscreen_enabled = false;
@@ -55,6 +57,8 @@ static jcursor_style_t _cursor;
 static bool _undecorated = false;
 /** \brief */
 static bool _visible = false;
+/** \brief */
+static bool _need_repaint = false;
 
 static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(int symbol, bool capital)
 {
@@ -552,8 +556,6 @@ class QTWindowRender : public QDialog {
       painter.drawPixmap(0, 0, pixmap);
       // painter.endNativePainting();
 
-      g_window->Flush();
-
       delete buffer;
       buffer = nullptr;
 
@@ -583,10 +585,10 @@ void NativeApplication::InternalInit(int argc, char **argv)
   _application = new QApplication(i, argv);
 
   QRect 
-    geometry = QApplication::desktop()->screenGeometry();
+    _geometry = QApplication::desktop()->screenGeometry();
 
-	_screen.width = geometry.width();
-	_screen.height = geometry.height();
+	_screen.width = _geometry.width();
+	_screen.height = _geometry.height();
 }
 
 void NativeApplication::InternalPaint()
@@ -601,36 +603,16 @@ void NativeApplication::InternalLoop()
   _handler->activateWindow();
 
   do {
-    std::vector<jevent::EventObject *> events = g_window->GrabEvents();
+    if (_need_repaint == true) {
+      _need_repaint = false;
 
-    if (events.size() > 0) {
-      jevent::EventObject *event = events.front();
-
-      if (dynamic_cast<jevent::WindowEvent *>(event) != nullptr) {
-        jevent::WindowEvent *window_event = dynamic_cast<jevent::WindowEvent *>(event);
-
-        if (window_event->GetType() == jevent::JWET_PAINTED) {
-          _handler->repaint();
-        }
-      }
-
-      // INFO:: discard all remaining events
-      while (events.size() > 0) {
-        jevent::EventObject *event = events.front();
-
-        events.erase(events.begin());
-
-        delete event;
-        event = nullptr;
-      }
+      _handler->repaint();
     }
 
     _application->processEvents();
     
     std::this_thread::yield();
   } while (quitting == false);
-
-  g_window->GrabEvents();
 
   g_window->SetVisible(false);
 }
@@ -665,7 +647,10 @@ NativeWindow::~NativeWindow()
   SetVisible(false);
 }
 
-QByteArray geometry;
+void NativeWindow::Repaint(Component *cmp)
+{
+  _need_repaint = true;
+}
 
 void NativeWindow::ToggleFullScreen()
 {
@@ -675,7 +660,7 @@ void NativeWindow::ToggleFullScreen()
 	if (_fullscreen_enabled == false) {
     _fullscreen_enabled = true;
     
-    geometry = _handler->saveGeometry();
+    _geometry = _handler->saveGeometry();
 
     if (session == "ubuntu") {
       _handler->setFixedSize({_screen.width, _screen.height});
@@ -692,7 +677,7 @@ void NativeWindow::ToggleFullScreen()
     if (session == "ubuntu") {
         _handler->setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
         _handler->setMinimumSize(0, 0);
-        _handler->restoreGeometry(geometry);
+        _handler->restoreGeometry(_geometry);
         _handler->setWindowFlags(Qt::Dialog);
         _handler->show();
         _handler->activateWindow();

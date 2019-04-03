@@ -67,7 +67,7 @@ static bool _visible = true;
 /** \brief */
 static jgui::jregion_t _previous_bounds;
 /** \brief */
-static bool _refresh = false;
+static bool _need_repaint = false;
 
 static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(int symbol, bool capital)
 {
@@ -417,8 +417,6 @@ void NativeApplication::InternalPaint()
     al_wait_for_vsync();
   }
 
-  g_window->Flush();
-
   delete buffer;
   buffer = nullptr;
 
@@ -441,34 +439,10 @@ void NativeApplication::InternalLoop()
 	al_register_event_source(queue, al_get_display_event_source(_display));
 
 	while (quitting == false) {
-    std::vector<jevent::EventObject *> events = g_window->GrabEvents();
+    if (_need_repaint == true) {
+      _need_repaint = false;
 
-    if (events.size() > 0) {
-      jevent::EventObject *event = events.front();
-
-      if (dynamic_cast<jevent::WindowEvent *>(event) != nullptr) {
-        jevent::WindowEvent *window_event = dynamic_cast<jevent::WindowEvent *>(event);
-
-        if (window_event->GetType() == jevent::JWET_PAINTED) {
-          InternalPaint();
-        }
-      }
-
-      // INFO:: discard all remaining events
-      while (events.size() > 0) {
-        jevent::EventObject *event = events.front();
-
-        events.erase(events.begin());
-
-        delete event;
-        event = nullptr;
-      }
-    }
-
-    if (_refresh == true) {
       InternalPaint();
-
-      _refresh = false;
     }
 
 		if (al_wait_for_event_timed(queue, &event, 0) == false) {
@@ -641,7 +615,6 @@ void NativeApplication::InternalLoop()
   al_destroy_event_queue(queue);
   
   g_window->SetVisible(false);
-  g_window->GrabEvents();
 }
 
 void NativeApplication::InternalQuit()
@@ -665,7 +638,7 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 	_last_keypress = std::chrono::steady_clock::now();
 	_click_count = 1;
 
-  // al_set_new_display_refresh_rate(60);
+  // al_set_new_display_need_repaint_rate(60);
 	al_set_new_bitmap_flags(ALLEGRO_MEMORY_BITMAP | ALLEGRO_NO_PREMULTIPLIED_ALPHA);
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ARGB_8888);
 	al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
@@ -701,6 +674,11 @@ NativeWindow::~NativeWindow()
   _display = nullptr;
 }
 
+void NativeWindow::Repaint(Component *cmp)
+{
+  _need_repaint = true;
+}
+
 void NativeWindow::ToggleFullScreen()
 {
   bool enabled = (al_get_display_flags(_display) & ALLEGRO_FULLSCREEN_WINDOW) != 0;
@@ -719,7 +697,7 @@ void NativeWindow::ToggleFullScreen()
     SetBounds(_previous_bounds.x, _previous_bounds.y, _previous_bounds.width, _previous_bounds.height);
 	}
 
-	_refresh = true;
+	_need_repaint = true;
 }
 
 void NativeWindow::SetParent(jgui::Container *c)

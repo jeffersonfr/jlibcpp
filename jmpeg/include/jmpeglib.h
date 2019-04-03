@@ -79,6 +79,9 @@
 #define TS_RST_PID 0x13
 #define TS_TDT_PID 0x14
 #define TS_TOT_PID 0x14
+#define TS_SDTT_PID 0x23
+#define TS_BIT_PID 0x24
+#define TS_CDT_PID 0x29
 
 #define TS_PSI_HEADER_LENGTH 8
 
@@ -96,6 +99,9 @@
 #define TS_TOT_TABLE_ID 0x73
 #define TS_AIT_TABLE_ID 0x74
 #define TS_EIT_TABLE_ID 0x78
+#define TS_SDTT_TABLE_ID 0xc3
+#define TS_BIT_TABLE_ID 0xc4
+#define TS_CDT_TABLE_ID 0xc8
 
 #define TS_DESCRIPTOR_HEADER_LENGTH 2
 

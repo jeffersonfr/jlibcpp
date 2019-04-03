@@ -68,6 +68,8 @@ static bool _visible = true;
 static bool _fullscreen = false;
 /** \brief */
 static jgui::jregion_t _previous_bounds;
+/** \brief */
+static bool _need_repaint = false;
 
 static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(sf::Keyboard::Key symbol)
 {
@@ -412,8 +414,6 @@ void NativeApplication::InternalPaint()
 	_window->draw(sprite);
 	_window->display();
 	
-  g_window->Flush();
-
   delete buffer;
   buffer = nullptr;
 
@@ -426,28 +426,10 @@ void NativeApplication::InternalLoop()
   bool quitting = false;
 
 	while (quitting == false && _window->isOpen() == true) {
-    std::vector<jevent::EventObject *> events = g_window->GrabEvents();
+    if (_need_repaint == true) {
+      _need_repaint = false;
 
-    if (events.size() > 0) {
-      jevent::EventObject *event = events.front();
-
-      if (dynamic_cast<jevent::WindowEvent *>(event) != nullptr) {
-        jevent::WindowEvent *window_event = dynamic_cast<jevent::WindowEvent *>(event);
-
-        if (window_event->GetType() == jevent::JWET_PAINTED) {
-          InternalPaint();
-        }
-      }
-
-      // INFO:: discard all remaining events
-      while (events.size() > 0) {
-        jevent::EventObject *event = events.front();
-
-        events.erase(events.begin());
-
-        delete event;
-        event = nullptr;
-      }
+      InternalPaint();
     }
 
 		// while (window->waitEvent(event)) {
@@ -599,7 +581,6 @@ void NativeApplication::InternalLoop()
   }
   
   g_window->SetVisible(false);
-  g_window->GrabEvents();
 }
 
 void NativeApplication::InternalQuit()
@@ -647,6 +628,11 @@ NativeWindow::~NativeWindow()
 
   delete _window;
   _window = nullptr;
+}
+
+void NativeWindow::Repaint(Component *cmp)
+{
+  _need_repaint = true;
 }
 
 void NativeWindow::ToggleFullScreen()

@@ -295,7 +295,6 @@ endif
 
 ifeq ($(ENABLE_GRAPHICS),egl)
 	CCFLAGS 	+= \
-     # RASPBERRY_PI
      -I/opt/vc/include \
 
 	LDFLAGS		+= \
@@ -305,7 +304,6 @@ ifeq ($(ENABLE_GRAPHICS),egl)
      `pkg-config --libs glesv2` \
      -lGLU -lGL\
      -ljpeg \
-     # RASPBERRY_PI
      -L/opt/vc/lib \
 		 -lbrcmGLESv2 \
 		 -lbrcmEGL \

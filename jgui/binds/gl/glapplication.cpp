@@ -58,6 +58,8 @@ static bool _visible = true;
 static bool _fullscreen = false;
 /** \brief */
 static jgui::jregion_t _previous_bounds;
+/** \brief */
+static bool _need_repaint = false;
 
 static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(int symbol)
 {
@@ -384,7 +386,6 @@ void NativeApplication::InternalLoop()
   // glutMainLoopEvent(); // single loop event
 
   g_window->SetVisible(false);
-  g_window->GrabEvents();
 }
 
 void NativeApplication::InternalQuit()
@@ -465,8 +466,6 @@ void OnDraw()
   }
   
   glutSwapBuffers();
-
-  g_window->Flush();
 
   delete buffer;
   buffer = nullptr;
@@ -682,28 +681,10 @@ static bool quitting = false;
 
 void OnTimer(int value)
 {
-  std::vector<jevent::EventObject *> events = g_window->GrabEvents();
+  if (_need_repaint == true) {
+    _need_repaint = false;
 
-  if (events.size() > 0) {
-    jevent::EventObject *event = events.front();
-
-    if (dynamic_cast<jevent::WindowEvent *>(event) != nullptr) {
-      jevent::WindowEvent *window_event = dynamic_cast<jevent::WindowEvent *>(event);
-
-      if (window_event->GetType() == jevent::JWET_PAINTED) {
-        glutPostRedisplay();
-      }
-    }
-
-    // INFO:: discard all remaining events
-    while (events.size() > 0) {
-      jevent::EventObject *event = events.front();
-
-      events.erase(events.begin());
-
-      delete event;
-      event = nullptr;
-    }
+    glutPostRedisplay();
   }
 
   /*
@@ -822,6 +803,11 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 NativeWindow::~NativeWindow()
 {
   SetVisible(false);
+}
+
+void NativeWindow::Repaint(Component *cmp)
+{
+  _need_repaint = true;
 }
 
 void NativeWindow::ToggleFullScreen()

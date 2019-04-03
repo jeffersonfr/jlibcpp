@@ -22,6 +22,7 @@
 #include "jcommon/jobservable.h"
 
 #include <thread>
+#include <mutex>
 
 uint32_t _colors[] = {
 	0xff808080,
@@ -1545,6 +1546,7 @@ class SortComponent : public jgui::Component, public jcommon::Observer {
 	private:
 		SortAlgorithm *_algorithm;
     std::thread _thread;
+    std::mutex _mutex;
 		int *_array;
 		int _array_size;
 
@@ -1606,6 +1608,8 @@ class SortComponent : public jgui::Component, public jcommon::Observer {
 			}
 
 			Repaint();
+
+      _mutex.lock();
 		}
 
 		virtual void Run()
@@ -1696,11 +1700,8 @@ class SortComponent : public jgui::Component, public jcommon::Observer {
 			g->SetColor(jgui::Color::White);
 			g->SetFont(font);
 			g->DrawString(_algorithm->GetName(), 0, 0, size.width, size.height);
-		}
 
-		virtual void Update(void *v)
-		{
-			Repaint();
+      _mutex.unlock();
 		}
 
 };

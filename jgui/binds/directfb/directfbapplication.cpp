@@ -64,6 +64,8 @@ static Window *g_window = nullptr;
 static jcursor_style_t _cursor = JCS_DEFAULT;
 /** \brief */
 static bool _is_cursor_enabled = true;
+/** \brief */
+static bool _need_repaint = false;
 
 jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(DFBInputDeviceKeySymbol symbol)
 {
@@ -503,8 +505,6 @@ void NativeApplication::InternalPaint()
   	_surface->Flip(_surface, nullptr, (DFBSurfaceFlipFlags)(DSFLIP_BLIT | DSFLIP_WAITFORSYNC));
   }
 
-  g_window->Flush();
-
   cairo_surface_destroy(cairo_surface);
 
   delete buffer;
@@ -526,28 +526,10 @@ void NativeApplication::InternalLoop()
 	}
 
 	while (quitting == false) {
-    std::vector<jevent::EventObject *> events = g_window->GrabEvents();
+    if (_need_repaint == true) {
+      _need_repaint = false;
 
-    if (events.size() > 0) {
-      jevent::EventObject *event = events.front();
-
-      if (dynamic_cast<jevent::WindowEvent *>(event) != nullptr) {
-        jevent::WindowEvent *window_event = dynamic_cast<jevent::WindowEvent *>(event);
-
-        if (window_event->GetType() == jevent::JWET_PAINTED) {
-          InternalPaint();
-        }
-      }
-
-      // INFO:: discard all remaining events
-      while (events.size() > 0) {
-        jevent::EventObject *event = events.front();
-
-        events.erase(events.begin());
-
-        delete event;
-        event = nullptr;
-      }
+      InternalPaint();
     }
 
     event_buffer->WaitForEventWithTimeout(event_buffer, 0, 100);
@@ -680,7 +662,6 @@ void NativeApplication::InternalLoop()
 	}
 
   g_window->SetVisible(false);
-  g_window->GrabEvents();
 }
 
 void NativeApplication::InternalQuit()
@@ -785,6 +766,11 @@ NativeWindow::~NativeWindow()
 		// _window->Release(_window);
 	  _window = NULL;
 	}
+}
+
+void NativeWindow::Repaint(Component *cmp)
+{
+  _need_repaint = true;
 }
 
 void NativeWindow::ToggleFullScreen()

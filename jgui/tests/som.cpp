@@ -21,6 +21,8 @@
 #include "jgui/jwindow.h"
 #include "jgui/jbufferedimage.h"
 
+#include <mutex>
+
 double	COUNTRY = 1.00;
 
 class Neuron {
@@ -70,6 +72,7 @@ class Neuron {
 class SOM : public jgui::Window {
 
   private:
+    std::mutex _mutex;
 
 	public:
 		enum {
@@ -113,6 +116,8 @@ class SOM : public jgui::Window {
 		{
 			please_stop = true;
 			
+      _mutex.unlock();
+
 			for (int i=0; i<NGEONEURON; i++) {
         delete gn[i];
       }
@@ -221,6 +226,8 @@ class SOM : public jgui::Window {
 				// RE-COMPUTE r MATRIX
 				makeR(theta);
 
+        _mutex.lock();
+
 				Repaint();
 			}
 		}
@@ -317,6 +324,8 @@ class SOM : public jgui::Window {
 			g->SetColor(bkC);
 			g->FillRectangle(w/2+30,0,w/2+130, 20);
 			g->SetColor(fgC);
+
+      _mutex.unlock();
 		}
 
 };

@@ -36,9 +36,13 @@ EventManager::EventManager(jgui::Window *window):
 
 EventManager::~EventManager()
 {
+  std::unique_lock<std::mutex> lock(_mutex);
+
   _alive = false;
 
   _condition.notify_one();
+
+  lock.unlock();
 
   _thread.join();
 }
@@ -80,11 +84,13 @@ const std::vector<jevent::EventObject *> & EventManager::GetEvents()
 void EventManager::ProcessEvents()
 {
   do {
-    while (_events.size() == 0 && _alive == true) {
-      std::unique_lock<std::mutex> lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
 
+    while (_events.size() == 0 && _alive == true) {
       _condition.wait(lock);
     }
+
+    lock.unlock();
 
     if (_alive == false) {
       break;

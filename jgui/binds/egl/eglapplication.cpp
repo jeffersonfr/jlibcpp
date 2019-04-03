@@ -137,6 +137,8 @@ static bool _is_cursor_enabled = true;
 static jcursor_style_t _cursor;
 /** \brief */
 static bool _visible = true;
+/** \brief */
+static bool _need_repaint = false;
 
 #ifdef RASPBERRY_PI
 
@@ -814,8 +816,6 @@ void NativeApplication::InternalPaint()
 
   glDeleteTextures(1, &texture);
   
-  g_window->Flush();
-
   delete buffer;
   buffer = nullptr;
 
@@ -870,39 +870,21 @@ void NativeApplication::InternalLoop()
 #endif
 
 	while (quitting == false) {
-    // INFO:: process api events
-    // TODO:: ver isso melhor, pq o PushEvent + GrabEvent (com mutex descomentado) causa dead-lock no sistema
-    std::vector<jevent::EventObject *> events = g_window->GrabEvents();
-
-    if (events.size() > 0) {
-      jevent::EventObject *event = events.front();
-
-      if (dynamic_cast<jevent::WindowEvent *>(event) != nullptr) {
-        jevent::WindowEvent *window_event = dynamic_cast<jevent::WindowEvent *>(event);
-
-        if (window_event->GetType() == jevent::JWET_PAINTED) {
-          InternalPaint();
-        }
-      }
-
-      // INFO:: discard all remaining events
-      while (events.size() > 0) {
-        jevent::EventObject *event = events.front();
-
-        events.erase(events.begin());
-
-        delete event;
-        event = nullptr;
-      }
-    } else if (_is_cursor_enabled == true) {
 #ifdef RASPBERRY_PI
       if (mouse_x != _mouse_x or mouse_y != _mouse_y) {
         mouse_x = _mouse_x;
         mouse_y = _mouse_y;
 
-        InternalPaint();
+        if (_is_cursor_enabled == true) {
+          _need_repaint = true;
+        }
       }
 #endif
+
+    if (_need_repaint == true) {
+      _need_repaint = false;
+
+      InternalPaint();
     }
 
 #ifdef RASPBERRY_PI
@@ -1193,7 +1175,6 @@ void NativeApplication::InternalLoop()
   }
 
   g_window->SetVisible(false);
-  g_window->GrabEvents();
 }
 
 void NativeApplication::InternalQuit()
@@ -1350,6 +1331,11 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 NativeWindow::~NativeWindow()
 {
   SetVisible(false);
+}
+
+void NativeWindow::Repaint(Component *cmp)
+{
+  _need_repaint = true;
 }
 
 void NativeWindow::ToggleFullScreen()

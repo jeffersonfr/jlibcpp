@@ -21,6 +21,8 @@
 #include "jgui/jwindow.h"
 #include "jgui/jgraphics.h"
 
+#include <mutex>
+
 typedef struct { 
 	float 
     x,
@@ -30,6 +32,8 @@ typedef struct {
 class GraphicsTeste : public jgui::Window {
 
 	private:
+    std::mutex
+      _mutex;
 		float 
       A, 
       B,			// Coordenadas do centro da tela                
@@ -83,7 +87,7 @@ class GraphicsTeste : public jgui::Window {
 
 		virtual ~GraphicsTeste()
 		{
-			SetVisible(false);
+      _mutex.unlock();
 		}
 
 		void ProjetaPonto(float x, float y, float z) 
@@ -216,7 +220,11 @@ class GraphicsTeste : public jgui::Window {
 				GiraCubo_z(&p1, &p2, &p3, &p4, &q1, &q2, &q3, &q4, -angulo);
 				GiraCubo_y(&p1, &p2, &p3, &p4, &q1, &q2, &q3, &q4, angulo*2);
 
-				Repaint();
+        if (IsHidden() == false) {
+          _mutex.lock();
+
+				  Repaint();
+        }
 			}
 
 			/*
@@ -250,6 +258,8 @@ class GraphicsTeste : public jgui::Window {
 			jgui::Window::Paint(g);
 
 			DesenhaCubo(g, &p1, &p2, &p3, &p4, &q1, &q2, &q3, &q4);
+
+      _mutex.unlock();
 		}
 };
 

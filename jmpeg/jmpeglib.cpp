@@ -49,6 +49,12 @@ std::string GetTableDescription(int pid, int tid)
     }
   } else if (pid == TS_RST_PID && tid == TS_RST_TABLE_ID) {
     return "Running Status Table";
+  } else if (pid == TS_BIT_PID && tid == TS_BIT_TABLE_ID) {
+    return "Broadcast Information Table";
+  } else if (pid == TS_CDT_PID && tid == TS_CDT_TABLE_ID) {
+    return "Common Data Table";
+  } else if (pid == TS_SDTT_PID && tid == TS_SDTT_TABLE_ID) {
+    return "Software Download Trigger Table";
   } else { // INFO:: considering only table id information
     if (tid == TS_PAT_TABLE_ID) {
 			return "Program Association Table ?";

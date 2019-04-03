@@ -110,6 +110,8 @@ static bool _visible = true;
 static jgui::jregion_t _previous_bounds;
 /** \brief */
 static Atom _wm_delete_message;
+/** \brief */
+static bool _need_repaint = false;
 
 static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(KeySym symbol)
 {
@@ -529,8 +531,6 @@ void NativeApplication::InternalPaint()
 
   PresentationQueueDisplay(vdp_queue, vdp_surface, 0, 0, this_time);
 
-  g_window->Flush();
-
   delete buffer;
   buffer = nullptr;
   
@@ -557,32 +557,20 @@ void NativeApplication::InternalLoop()
   //   - Discard both duplicated KeyPress and KeyRelease events when EnableKeyRepeat is false
   
 	while (quitting == false) {
-    std::vector<jevent::EventObject *> events = g_window->GrabEvents();
+    if (_need_repaint == true) {
+      _need_repaint = false;
 
-    if (events.size() > 0) {
-      jevent::EventObject *event = events.front();
-
-      if (dynamic_cast<jevent::WindowEvent *>(event) != nullptr) {
-        jevent::WindowEvent *window_event = dynamic_cast<jevent::WindowEvent *>(event);
-
-        if (window_event->GetType() == jevent::JWET_PAINTED) {
-          InternalPaint();
-        }
-      }
-
-      // INFO:: discard all remaining events
-      while (events.size() > 0) {
-        jevent::EventObject *event = events.front();
-
-        events.erase(events.begin());
-
-        delete event;
-        event = nullptr;
-      }
+      InternalPaint();
     }
 
     while (XCheckIfEvent(_display, &event, &check_x11_event, reinterpret_cast<XPointer>(_window))) {
       if (event.type == DestroyNotify) {
+        quitting = true;
+        
+        g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_CLOSED));
+      } else if (event.type == ClientMessage) {
+        // CHANGE:: destroynotify ???
+
         quitting = true;
         
         g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_CLOSED));
@@ -619,7 +607,6 @@ void NativeApplication::InternalLoop()
         InternalPaint();
         
         g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_RESIZED));
-      } else if (event.type == ClientMessage) {
       } else if (event.type == KeyPress || event.type == KeyRelease) {
         if (event.xkey.keycode < 256) {
           // To detect if it is a repeated key event, we check the current state of the key.
@@ -765,7 +752,6 @@ void NativeApplication::InternalLoop()
   }
 
   g_window->SetVisible(false);
-  g_window->GrabEvents();
 }
 
 void NativeApplication::InternalQuit()
@@ -947,6 +933,11 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 NativeWindow::~NativeWindow()
 {
   SetVisible(false);
+}
+
+void NativeWindow::Repaint(Component *cmp)
+{
+  _need_repaint = true;
 }
 
 void NativeWindow::ToggleFullScreen()

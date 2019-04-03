@@ -69,6 +69,8 @@ static jcursor_style_t _cursor = JCS_DEFAULT;
 static bool _is_cursor_enabled = true;
 /** \brief */
 static struct cursor_params_t _current_cursor;
+/** \brief */
+static bool _need_repaint = false;
 
 static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(int symbol, bool shift)
 {
@@ -429,8 +431,6 @@ void NativeApplication::InternalPaint()
     ioctl(_fb_handle, FBIO_WAITFORVSYNC, &dummy);
   }
 
-  g_window->Flush();
-
   cairo_surface_destroy(cairo_surface);
 
   delete buffer;
@@ -465,36 +465,20 @@ void NativeApplication::InternalLoop()
 
   fcntl(fdm, F_SETFL, O_NONBLOCK);
 
-	while (quitting == false) {
-    std::vector<jevent::EventObject *> events = g_window->GrabEvents();
+  while (quitting == false) {
+    if (mouse_x != _mouse_x or mouse_y != _mouse_y) {
+      mouse_x = _mouse_x;
+      mouse_y = _mouse_y;
 
-    if (events.size() > 0) {
-      jevent::EventObject *event = events.front();
-
-      if (dynamic_cast<jevent::WindowEvent *>(event) != nullptr) {
-        jevent::WindowEvent *window_event = dynamic_cast<jevent::WindowEvent *>(event);
-
-        if (window_event->GetType() == jevent::JWET_PAINTED) {
-          InternalPaint();
-        }
+      if (_is_cursor_enabled == true) {
+        _need_repaint = true;
       }
+    }
 
-      // INFO:: discard all remaining events
-      while (events.size() > 0) {
-        jevent::EventObject *event = events.front();
+    if (_need_repaint == true) {
+      _need_repaint = false;
 
-        events.erase(events.begin());
-
-        delete event;
-        event = nullptr;
-      }
-    } else if (_is_cursor_enabled == true) {
-      if (mouse_x != _mouse_x or mouse_y != _mouse_y) {
-        mouse_x = _mouse_x;
-        mouse_y = _mouse_y;
-
-        InternalPaint();
-      }
+      InternalPaint();
     }
 
     if (read(fdk, &ev, sizeof ev) == sizeof(ev)) {
@@ -649,7 +633,6 @@ void NativeApplication::InternalLoop()
   close(fdm);
 
   g_window->SetVisible(false);
-  g_window->GrabEvents();
 }
 
 void NativeApplication::InternalQuit()
@@ -688,6 +671,11 @@ NativeWindow::~NativeWindow()
   SetVisible(false);
 
   munmap(_fb_surface, _fb_vinfo.xres*_fb_vinfo.yres*_fb_vinfo.bits_per_pixel/8);
+}
+
+void NativeWindow::Repaint(Component *cmp)
+{
+  _need_repaint = true;
 }
 
 void NativeWindow::ToggleFullScreen()
