@@ -27,6 +27,7 @@
 #include "jexception/jillegalargumentexception.h"
 
 #include <thread>
+#include <mutex>
 
 #include <xcb/xcb.h>
 #include <xcb/xcb_image.h>
@@ -43,45 +44,51 @@
 namespace jgui {
 
 /** \brief */
-static xcb_connection_t *_xconnection = nullptr;
+static xcb_connection_t *sg_xcb_connection = nullptr;
 /** \brief */
-static xcb_screen_t *_xscreen = nullptr;
+static xcb_screen_t *sg_xcb_screen = nullptr;
 /** \brief */
-static xcb_window_t _xwindow = 0;
+static xcb_window_t sg_xcb_window = 0;
 /** \brief */
-static xcb_gcontext_t _xcontext;
+static xcb_gcontext_t sg_xcb_context = 0;
 /** \brief */
-static jgui::Image *_icon = nullptr;
+static jgui::Image *sg_icon = nullptr;
 /** \brief */
-static std::chrono::time_point<std::chrono::steady_clock> _last_keypress;
+static std::chrono::time_point<std::chrono::steady_clock> sg_last_keypress;
 /** \brief */
-static int _mouse_x;
+static int sg_mouse_x = 0;
 /** \brief */
-static int _mouse_y;
+static int sg_mouse_y = 0;
 /** \brief */
-static int _click_count;
+static int sg_click_count = 0;
 /** \brief */
-static Window *g_window = nullptr;
+static std::string sg_title;
 /** \brief */
-static std::string _title;
+static float sg_opacity = 1.0f;
 /** \brief */
-static float _opacity = 1.0f;
+static bool sg_fullscreen = false;
 /** \brief */
-static bool _fullscreen = false;
+static bool sg_undecorated = false;
 /** \brief */
-static bool _undecorated = false;
+static bool sg_resizable = true;
 /** \brief */
-static bool _resizable = true;
+static bool sg_cursor_enabled = true;
 /** \brief */
-static bool _cursor_enabled = true;
+static bool sg_visible = true;
 /** \brief */
-static jcursor_style_t _cursor;
+static std::mutex sg_loop_mutex;
 /** \brief */
-static bool _visible = true;
+static bool sg_quitting = false;
 /** \brief */
-static jgui::jregion_t _previous_bounds;
+static jgui::jsize_t sg_screen = {0, 0};
 /** \brief */
-static bool _need_repaint = false;
+static jgui::jregion_t sg_previous_bounds;
+/** \brief */
+static bool sg_repaint = false;
+/** \brief */
+static jcursor_style_t sg_jgui_cursor;
+/** \brief */
+static Window *sg_jgui_window = nullptr;
 
 static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(xcb_keycode_t symbol, bool capital)
 {
@@ -284,8 +291,6 @@ static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(xcb_keycode_t symbo
 	return jevent::JKS_UNKNOWN;
 }
 
-static jgui::jsize_t _screen = {0, 0};
-
 NativeApplication::NativeApplication():
 	jgui::Application()
 {
@@ -298,17 +303,19 @@ NativeApplication::~NativeApplication()
 
 void NativeApplication::InternalInit(int argc, char **argv)
 {
-  _xconnection = xcb_connect(nullptr,nullptr);
+  sg_xcb_connection = xcb_connect(nullptr,nullptr);
 
-  if (xcb_connection_has_error(_xconnection)) {
+  if (xcb_connection_has_error(sg_xcb_connection)) {
 		throw jexception::RuntimeException("Unable to open display");
   }
 
   // get the first screen
-  _xscreen = xcb_setup_roots_iterator(xcb_get_setup(_xconnection)).data;
+  sg_xcb_screen = xcb_setup_roots_iterator(xcb_get_setup(sg_xcb_connection)).data;
 
-  _screen.width = _xscreen->width_in_pixels;
-  _screen.height = _xscreen->height_in_pixels;
+  sg_screen.width = sg_xcb_screen->width_in_pixels;
+  sg_screen.height = sg_xcb_screen->height_in_pixels;
+  
+  sg_quitting = false;
 }
 
 static xcb_visualtype_t * find_visual(xcb_connection_t *c, xcb_visualid_t visual)
@@ -333,14 +340,14 @@ static xcb_visualtype_t * find_visual(xcb_connection_t *c, xcb_visualid_t visual
 
 void NativeApplication::InternalPaint()
 {
-	if (g_window == nullptr || g_window->IsVisible() == false) {
+	if (sg_jgui_window == nullptr || sg_jgui_window->IsVisible() == false) {
 		return;
 	}
 
   // OPTIMIZE:: cairo_xlib_surface_create(Display, Drawable, Visual, width, height)
   
   jregion_t 
-    bounds = g_window->GetBounds();
+    bounds = sg_jgui_window->GetBounds();
   jgui::Image 
     *buffer = new jgui::BufferedImage(jgui::JPF_ARGB, bounds.width, bounds.height);
   jgui::Graphics 
@@ -351,8 +358,8 @@ void NativeApplication::InternalPaint()
 	g->Reset();
 	g->Translate(-t.x, -t.y);
   g->SetClip(0, 0, bounds.width, bounds.height);
-	g_window->DoLayout();
-  g_window->Paint(g);
+	sg_jgui_window->DoLayout();
+  sg_jgui_window->Paint(g);
 	g->Translate(t.x, t.y);
 
   cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
@@ -364,7 +371,7 @@ void NativeApplication::InternalPaint()
   }
 
   xcb_visualtype_t 
-    *vt = find_visual(_xconnection, _xscreen->root_visual);
+    *vt = find_visual(sg_xcb_connection, sg_xcb_screen->root_visual);
 
   if (vt == nullptr) {
     delete buffer;
@@ -373,23 +380,23 @@ void NativeApplication::InternalPaint()
   }
 
   cairo_surface_t 
-    *surface = cairo_xcb_surface_create(_xconnection, _xwindow, vt, bounds.width, bounds.height);
+    *surface = cairo_xcb_surface_create(sg_xcb_connection, sg_xcb_window, vt, bounds.width, bounds.height);
   cairo_t 
     *cr = cairo_create(surface);
 
-  xcb_flush(_xconnection);
+  xcb_flush(sg_xcb_connection);
   cairo_surface_flush(cairo_surface);
   cairo_set_source_surface(cr, cairo_surface, 0, 0);
 	cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
   cairo_paint(cr);
   cairo_surface_finish(surface);
 
-  xcb_flush(_xconnection);
+  xcb_flush(sg_xcb_connection);
 
   delete buffer;
   buffer = nullptr;
 
-  g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_PAINTED));
+  sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
 }
 
 struct my_event_queue_t {
@@ -403,35 +410,36 @@ void update_event_queue(){
 
   event_queue.prev = event_queue.current;
   event_queue.current = event_queue.next;
-  event_queue.next = xcb_poll_for_queued_event(_xconnection);
+  event_queue.next = xcb_poll_for_queued_event(sg_xcb_connection);
 }
 
 void NativeApplication::InternalLoop()
 {
+  std::lock_guard<std::mutex> lock(sg_loop_mutex);
+
   xcb_generic_event_t *event;
-  bool quitting = false;
-
+  
   xcb_intern_atom_cookie_t 
-    cookie = xcb_intern_atom(_xconnection, 1, 12, "WM_PROTOCOLS");
+    cookie = xcb_intern_atom(sg_xcb_connection, 1, 12, "WM_PROTOCOLS");
   xcb_intern_atom_reply_t
-    *reply = xcb_intern_atom_reply(_xconnection, cookie, 0);
+    *reply = xcb_intern_atom_reply(sg_xcb_connection, cookie, 0);
 
   xcb_intern_atom_cookie_t 
-    cookie2 = xcb_intern_atom(_xconnection, 0, 16, "WM_DELETE_WINDOW");
+    cookie2 = xcb_intern_atom(sg_xcb_connection, 0, 16, "WM_DELETE_WINDOW");
   xcb_intern_atom_reply_t 
-    *reply2 = xcb_intern_atom_reply(_xconnection, cookie2, 0);
+    *reply2 = xcb_intern_atom_reply(sg_xcb_connection, cookie2, 0);
 
-  xcb_change_property(_xconnection, XCB_PROP_MODE_REPLACE, _xwindow, (*reply).atom, 4, 32, 1, &(*reply2).atom);
+  xcb_change_property(sg_xcb_connection, XCB_PROP_MODE_REPLACE, sg_xcb_window, (*reply).atom, 4, 32, 1, &(*reply2).atom);
 
-	while (quitting == false) {
-    if (_need_repaint == true) {
-      _need_repaint = false;
+	while (sg_quitting == false) {
+    if (sg_repaint == true) {
+      sg_repaint = false;
 
       InternalPaint();
     }
 
-    while ((event = xcb_poll_for_event(_xconnection))) {
-    // while (e = xcb_wait_for_event(_xconnection)) {
+    while ((event = xcb_poll_for_event(sg_xcb_connection))) {
+    // while (e = xcb_wait_for_event(sg_xcb_connection)) {
       uint32_t id = event->response_type & ~0x80;
 
       if (id == XCB_EXPOSE) {
@@ -439,18 +447,18 @@ void NativeApplication::InternalLoop()
       } else if (id == XCB_ENTER_NOTIFY) {
         // SetCursor(GetCursor());
 
-        g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_ENTERED));
+        sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_ENTERED));
       } else if (id == XCB_LEAVE_NOTIFY) {
         // SetCursor(JCS_DEFAULT);
 
-        g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_LEAVED));
+        sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_LEAVED));
       } else if (id == XCB_FOCUS_IN) {
       } else if (id == XCB_FOCUS_OUT) {
       } else if (id == XCB_CREATE_NOTIFY) {
       } else if (id == XCB_DESTROY_NOTIFY) {
       } else if (id == XCB_UNMAP_NOTIFY) {
       } else if (id == XCB_MAP_NOTIFY) {
-        g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_OPENED));
+        sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_OPENED));
       } else if (id == XCB_RESIZE_REQUEST) {
       } else if (id == XCB_KEY_PRESS || id == XCB_KEY_RELEASE) {
         xcb_key_press_event_t *e = (xcb_key_press_event_t *)event;
@@ -491,7 +499,7 @@ void NativeApplication::InternalLoop()
 
         jevent::jkeyevent_symbol_t symbol = TranslateToNativeKeySymbol(e->detail, (shift != 0 && capslock == 0) || (shift == 0 && capslock != 0));
 
-        g_window->GetEventManager()->PostEvent(new jevent::KeyEvent(g_window, type, mod, jevent::KeyEvent::GetCodeFromSymbol(symbol), symbol));
+        sg_jgui_window->GetEventManager()->PostEvent(new jevent::KeyEvent(sg_jgui_window, type, mod, jevent::KeyEvent::GetCodeFromSymbol(symbol), symbol));
       } else if (id == XCB_BUTTON_PRESS || id == XCB_BUTTON_RELEASE || id == XCB_MOTION_NOTIFY) {
         xcb_button_press_event_t *e = (xcb_button_press_event_t *)event;
 
@@ -500,11 +508,11 @@ void NativeApplication::InternalLoop()
         jevent::jmouseevent_type_t type = jevent::JMT_UNKNOWN;
         int mouse_z = 0;
 
-        _mouse_x = e->event_x;
-        _mouse_y = e->event_y;
+        sg_mouse_x = e->event_x;
+        sg_mouse_y = e->event_y;
 
-        _mouse_x = CLAMP(_mouse_x, 0, _screen.width - 1);
-        _mouse_y = CLAMP(_mouse_y, 0, _screen.height - 1);
+        sg_mouse_x = CLAMP(sg_mouse_x, 0, sg_screen.width - 1);
+        sg_mouse_y = CLAMP(sg_mouse_y, 0, sg_screen.height - 1);
 
         if (id == XCB_MOTION_NOTIFY) {
           type = jevent::JMT_MOVED;
@@ -523,18 +531,18 @@ void NativeApplication::InternalLoop()
             button = jevent::JMB_BUTTON3;
           }
 
-          _click_count = 1;
+          sg_click_count = 1;
 
           if (type == jevent::JMT_PRESSED) {
             auto current = std::chrono::steady_clock::now();
             
-            if ((std::chrono::duration_cast<std::chrono::milliseconds>(current - _last_keypress).count()) < 200L) {
-              _click_count = _click_count + 1;
+            if ((std::chrono::duration_cast<std::chrono::milliseconds>(current - sg_last_keypress).count()) < 200L) {
+              sg_click_count = sg_click_count + 1;
             }
 
-            _last_keypress = current;
+            sg_last_keypress = current;
 
-            mouse_z = _click_count;
+            mouse_z = sg_click_count;
           }
         // } else if (event.type == SDL_MOUSEWHEEL) {
         //  type = jevent::JMT_ROTATED;
@@ -553,32 +561,32 @@ void NativeApplication::InternalLoop()
           buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON3);
         }
 
-        g_window->GetEventManager()->PostEvent(new jevent::MouseEvent(g_window, type, button, buttons, mouse_z, _mouse_x, _mouse_y));
+        sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, buttons, mouse_z, sg_mouse_x, sg_mouse_y));
       } else if (id == XCB_CLIENT_MESSAGE) {
         if ((*(xcb_client_message_event_t*)event).data.data32[0] == (*reply2).atom) {
-          quitting = true;
+          sg_quitting = true;
 
-          g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_CLOSED));
+          sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_CLOSED));
         }
       }
 
       free(event);
 
-      xcb_flush(_xconnection);
+      xcb_flush(sg_xcb_connection);
     }
     
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
 
-  xcb_disconnect(_xconnection);
-  
-  g_window->SetVisible(false);
+  sg_jgui_window->SetVisible(false);
 }
 
 void NativeApplication::InternalQuit()
 {
-  xcb_destroy_window(_xconnection, _xwindow);
-  xcb_disconnect(_xconnection);
+  sg_quitting = true;
+
+  sg_loop_mutex.lock();
+  sg_loop_mutex.unlock();
 }
 
 NativeWindow::NativeWindow(int x, int y, int width, int height):
@@ -586,62 +594,63 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 {
 	jcommon::Object::SetClassName("jgui::NativeWindow");
 
-	if (_xwindow != 0) {
+	if (sg_xcb_window != 0) {
 		throw jexception::RuntimeException("Cannot create more than one window");
   }
 
-  _icon = new BufferedImage(_DATA_PREFIX"/images/small-gnu.png");
+  sg_icon = new BufferedImage(_DATA_PREFIX"/images/small-gnu.png");
 
-	_xwindow = 0;
-	_mouse_x = 0;
-	_mouse_y = 0;
-	_last_keypress = std::chrono::steady_clock::now();
-	_click_count = 1;
+	sg_xcb_window = 0;
+	sg_mouse_x = 0;
+	sg_mouse_y = 0;
+	sg_last_keypress = std::chrono::steady_clock::now();
+	sg_click_count = 1;
 
   uint32_t
     mask,
     values[2];
 
-  _xwindow = xcb_generate_id(_xconnection);
+  sg_xcb_window = xcb_generate_id(sg_xcb_connection);
 
   mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
-  values[0] = _xscreen->black_pixel;
+  values[0] = sg_xcb_screen->black_pixel;
   values[1] = XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_KEY_PRESS | XCB_EVENT_MASK_KEY_RELEASE | 
     XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE | XCB_EVENT_MASK_POINTER_MOTION | 
     XCB_EVENT_MASK_ENTER_WINDOW | XCB_EVENT_MASK_LEAVE_WINDOW | XCB_EVENT_MASK_STRUCTURE_NOTIFY;
 
   xcb_create_window(
-      _xconnection, XCB_COPY_FROM_PARENT, _xwindow, _xscreen->root, x, y, width, height, 1, XCB_WINDOW_CLASS_INPUT_OUTPUT, _xscreen->root_visual, mask, values);
+      sg_xcb_connection, XCB_COPY_FROM_PARENT, sg_xcb_window, sg_xcb_screen->root, x, y, width, height, 1, XCB_WINDOW_CLASS_INPUT_OUTPUT, sg_xcb_screen->root_visual, mask, values);
 
   mask = XCB_GC_FOREGROUND | XCB_GC_GRAPHICS_EXPOSURES;
-  values[0] = _xscreen->black_pixel;
+  values[0] = sg_xcb_screen->black_pixel;
   values[1] = 0;
 
-  _xcontext = xcb_generate_id(_xconnection);
+  sg_xcb_context = xcb_generate_id(sg_xcb_connection);
 
-  xcb_create_gc(_xconnection, _xcontext, _xwindow, mask, values);
+  xcb_create_gc(sg_xcb_connection, sg_xcb_context, sg_xcb_window, mask, values);
 
   // INFO:: change parameters after the window creation
   // const static uint32_t values[] = { XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_BUTTON_PRESS };
   // xcb_change_window_attributes (connection, window, XCB_CW_EVENT_MASK, values);
 
-  xcb_map_window(_xconnection, _xwindow);
-  xcb_flush(_xconnection);
+  xcb_map_window(sg_xcb_connection, sg_xcb_window);
+  xcb_flush(sg_xcb_connection);
 }
 
 NativeWindow::~NativeWindow()
 {
-  SetVisible(false);
+  xcb_destroy_window(sg_xcb_connection, sg_xcb_window);
+  xcb_disconnect(sg_xcb_connection);
 }
 
 void NativeWindow::Repaint(Component *cmp)
 {
-  _need_repaint = true;
+  sg_repaint = true;
 }
 
 xcb_intern_atom_cookie_t getCookieForAtom(const char *state_name) 
 {
-  return xcb_intern_atom(_xconnection, 0, sizeof(state_name)/sizeof(char), state_name);
+  return xcb_intern_atom(sg_xcb_connection, 0, sizeof(state_name)/sizeof(char), state_name);
 }
 
 xcb_atom_t getReplyAtomFromCookie(xcb_intern_atom_cookie_t cookie) 
@@ -649,7 +658,7 @@ xcb_atom_t getReplyAtomFromCookie(xcb_intern_atom_cookie_t cookie)
   xcb_generic_error_t 
     *error;
   xcb_intern_atom_reply_t 
-    *reply = xcb_intern_atom_reply(_xconnection, cookie, &error);
+    *reply = xcb_intern_atom_reply(sg_xcb_connection, cookie, &error);
 
   if (error) {
     return 0;
@@ -660,21 +669,21 @@ xcb_atom_t getReplyAtomFromCookie(xcb_intern_atom_cookie_t cookie)
 
 void NativeWindow::ToggleFullScreen()
 {
-  if (_fullscreen == false) {
-    _previous_bounds = GetBounds();
+  if (sg_fullscreen == false) {
+    sg_previous_bounds = GetBounds();
 
-    SetBounds(0, 0, _screen.width, _screen.height);
+    SetBounds(0, 0, sg_screen.width, sg_screen.height);
 
-    _fullscreen = true;
+    sg_fullscreen = true;
   } else {
-    xcb_unmap_window(_xconnection, _xwindow);
-    SetBounds(_previous_bounds.x, _previous_bounds.y, _previous_bounds.width, _previous_bounds.height);
-    xcb_map_window(_xconnection, _xwindow);
+    xcb_unmap_window(sg_xcb_connection, sg_xcb_window);
+    SetBounds(sg_previous_bounds.x, sg_previous_bounds.y, sg_previous_bounds.width, sg_previous_bounds.height);
+    xcb_map_window(sg_xcb_connection, sg_xcb_window);
 
-    _fullscreen = false;
+    sg_fullscreen = false;
   }
   
-  xcb_flush(_xconnection);
+  xcb_flush(sg_xcb_connection);
 
   /*
   xcb_intern_atom_cookie_t wm_state_ck = getCookieForAtom("_NET_WM_STATE");
@@ -697,8 +706,8 @@ void NativeWindow::ToggleFullScreen()
   ev.response_type = XCB_CLIENT_MESSAGE;
   ev.type = atom_from_cookie;
   ev.format = 32;
-  ev.window = _xwindow;
-  // ev.data.data32[0] = _fullscreen ? _NET_WM_STATE_ADD : _NET_WM_STATE_REMOVE;
+  ev.window = sg_xcb_window;
+  // ev.data.data32[0] = sg_fullscreen ? _NET_WM_STATE_ADD : _NET_WM_STATE_REMOVE;
   ev.data.data32[0] = _NET_WM_STATE_TOGGLE;
   ev.data.data32[1] = getReplyAtomFromCookie(wm_state_fs_ck);
   ev.data.data32[2] = XCB_ATOM_NONE;
@@ -706,7 +715,7 @@ void NativeWindow::ToggleFullScreen()
   ev.data.data32[4] = 0;
 
   xcb_send_event(
-      _xconnection, 1, _xwindow, XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT | XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY, (const char*)(&ev));
+      sg_xcb_connection, 1, sg_xcb_window, XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT | XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY, (const char*)(&ev));
       */
 }
 
@@ -718,31 +727,31 @@ void NativeWindow::SetParent(jgui::Container *c)
     throw jexception::IllegalArgumentException("Used only by native engine");
   }
 
-  g_window = parent;
+  sg_jgui_window = parent;
 
-  g_window->SetParent(nullptr);
+  sg_jgui_window->SetParent(nullptr);
 }
 
 void NativeWindow::SetTitle(std::string title)
 {
-	_title = title;
+	sg_title = title;
 		
-  xcb_change_property(_xconnection, XCB_PROP_MODE_REPLACE, _xwindow, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, title.size(), title.c_str());
+  xcb_change_property(sg_xcb_connection, XCB_PROP_MODE_REPLACE, sg_xcb_window, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, title.size(), title.c_str());
 }
 
 std::string NativeWindow::GetTitle()
 {
-	return _title;
+	return sg_title;
 }
 
 void NativeWindow::SetOpacity(float opacity)
 {
-  _opacity = opacity;
+  sg_opacity = opacity;
 }
 
 float NativeWindow::GetOpacity()
 {
-  return _opacity;
+  return sg_opacity;
 }
 
 void NativeWindow::SetUndecorated(bool undecorated)
@@ -751,7 +760,7 @@ void NativeWindow::SetUndecorated(bool undecorated)
 
 bool NativeWindow::IsUndecorated()
 {
-  return _undecorated;
+  return sg_undecorated;
 }
 
 void NativeWindow::SetBounds(int x, int y, int width, int height)
@@ -759,7 +768,7 @@ void NativeWindow::SetBounds(int x, int y, int width, int height)
   const uint32_t 
     values[] = {(uint32_t)x, (uint32_t)y, (uint32_t)width, (uint32_t)height};
 
-  xcb_configure_window(_xconnection, _xwindow, XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y | XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT, values);
+  xcb_configure_window(sg_xcb_connection, sg_xcb_window, XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y | XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT, values);
 }
 
 jgui::jregion_t NativeWindow::GetBounds()
@@ -768,11 +777,11 @@ jgui::jregion_t NativeWindow::GetBounds()
     t = {0, 0, 0, 0};
 
   xcb_get_geometry_cookie_t 
-    cookie = xcb_get_geometry(_xconnection, _xwindow);
+    cookie = xcb_get_geometry(sg_xcb_connection, sg_xcb_window);
   xcb_get_geometry_reply_t 
     *reply = nullptr;
 
-  if ((reply = xcb_get_geometry_reply(_xconnection, cookie, nullptr))) {
+  if ((reply = xcb_get_geometry_reply(sg_xcb_connection, cookie, nullptr))) {
     t.x = reply->x;
     t.y = reply->y;
     t.width = reply->width;
@@ -786,12 +795,12 @@ jgui::jregion_t NativeWindow::GetBounds()
 		
 void NativeWindow::SetResizable(bool resizable)
 {
-  _resizable = resizable;
+  sg_resizable = resizable;
 }
 
 bool NativeWindow::IsResizable()
 {
-  return _resizable;
+  return sg_resizable;
 }
 
 void NativeWindow::SetCursorLocation(int x, int y)
@@ -807,15 +816,15 @@ void NativeWindow::SetCursorLocation(int x, int y)
 		y = 0;
 	}
 
-	if (x > _screen.width) {
-		x = _screen.width;
+	if (x > sg_screen.width) {
+		x = sg_screen.width;
 	}
 
-	if (y > _screen.height) {
-		y = _screen.height;
+	if (y > sg_screen.height) {
+		y = sg_screen.height;
 	}
 
-	// XWarpPointer(_display, None, _xwindow, 0, 0, size.width, size.height, x, y);
+	// XWarpPointer(_display, None, sg_xcb_window, 0, 0, size.width, size.height, x, y);
 }
 
 jpoint_t NativeWindow::GetCursorLocation()
@@ -832,38 +841,38 @@ jpoint_t NativeWindow::GetCursorLocation()
 
 void NativeWindow::SetVisible(bool visible)
 {
-  _visible = visible;
+  sg_visible = visible;
 
   if (visible == true) {
-    xcb_map_window(_xconnection, _xwindow);
+    xcb_map_window(sg_xcb_connection, sg_xcb_window);
   } else {
-    xcb_unmap_window(_xconnection, _xwindow);
+    xcb_unmap_window(sg_xcb_connection, sg_xcb_window);
   }
   
-  xcb_flush(_xconnection);
+  xcb_flush(sg_xcb_connection);
 }
 
 bool NativeWindow::IsVisible()
 {
-  return _visible;
+  return sg_visible;
 }
 
 jcursor_style_t NativeWindow::GetCursor()
 {
-  return _cursor;
+  return sg_jgui_cursor;
 }
 
 void NativeWindow::SetCursorEnabled(bool enabled)
 {
-  _cursor_enabled = enabled;
+  sg_cursor_enabled = enabled;
 
-	// XDefineCursor(_display, _window, _is_cursor_enabled);
+	// XDefineCursor(_display, _window, _issg_cursor_enabled);
 	// XFlush(_display);
 }
 
 bool NativeWindow::IsCursorEnabled()
 {
-	return _cursor_enabled;
+	return sg_cursor_enabled;
 }
 
 void NativeWindow::SetCursor(jcursor_style_t style)
@@ -904,19 +913,17 @@ void NativeWindow::SetCursor(jcursor_style_t style)
     type = XC_watch;
   }
 
-  
-
-  xcb_font_t font = xcb_generate_id(_xconnection);
-  xcb_cursor_t cursor = xcb_generate_id(_xconnection);
-  xcb_create_glyph_cursor(_xconnection, cursor, font, font, type, type + 1, 0, 0, 0, 0, 0, 0 );
+  xcb_font_t font = xcb_generate_id(sg_xcb_connection);
+  xcb_cursor_t cursor = xcb_generate_id(sg_xcb_connection);
+  xcb_create_glyph_cursor(sg_xcb_connection, cursor, font, font, type, type + 1, 0, 0, 0, 0, 0, 0 );
 
   uint32_t mask = XCB_CW_CURSOR;
   uint32_t values = cursor;
 
-  xcb_change_window_attributes(_xconnection, _xwindow, mask, &values);
-  xcb_free_cursor(_xconnection, cursor);
+  xcb_change_window_attributes(sg_xcb_connection, sg_xcb_window, mask, &values);
+  xcb_free_cursor(sg_xcb_connection, cursor);
 
-  _cursor = style;
+  sg_jgui_cursor = style;
 }
 
 void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
@@ -987,12 +994,12 @@ jwindow_rotation_t NativeWindow::GetRotation()
 
 void NativeWindow::SetIcon(jgui::Image *image)
 {
-  _icon = image;
+  sg_icon = image;
 }
 
 jgui::Image * NativeWindow::GetIcon()
 {
-  return _icon;
+  return sg_icon;
 }
 
 }

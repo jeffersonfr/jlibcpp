@@ -37,8 +37,7 @@ char map[64*64*64];
 
 int random(int max) 
 {
-	//return random() % max;
-	return (rand()^(rand() << 16)) % max;
+	return ((uint32_t)rand()^((uint32_t)rand() << 16)) % max;
 }
 
 

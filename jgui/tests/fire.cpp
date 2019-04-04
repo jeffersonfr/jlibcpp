@@ -83,7 +83,7 @@ class Fire : public jgui::Window {
         return;
       }
 
-      // cairo_surface_flush(cairo_surface);
+      cairo_surface_flush(cairo_surface);
 
       uint8_t 
         *data = cairo_image_surface_get_data(cairo_surface);
@@ -93,7 +93,7 @@ class Fire : public jgui::Window {
       }
 
       for (int x = 0; x < size.width; x++) {
-        fire[(size.height/2)*size.width + x] = abs(32768 + rand()) % 256;
+        fire[(size.height/2)*size.width + x] = (uint32_t)labs((uint32_t)rand() + (uint32_t)32768) % 256;
       }
 
       uint32_t 
@@ -130,12 +130,16 @@ class Fire : public jgui::Window {
           *ptr2++ = palette[*ptr++];
         }
       }
+      
+      cairo_surface_mark_dirty(cairo_surface);
     }
 
     virtual void ShowApp()
     {
       do {
 	      Repaint();
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(25));
       } while (IsHidden() == false);
     }
 

@@ -60,3 +60,6 @@ R: recompile libsox with the option "--enable-shared"
 
 4. the jmedia does not working correctly
 R: try to remove "bpg" from ENABLE_IMAGE and then "make all install"
+
+5. run gtk3 with root
+R: gksu ./app

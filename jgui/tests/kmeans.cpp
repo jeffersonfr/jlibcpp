@@ -246,12 +246,6 @@ class SOM : public jgui::Window {
 		virtual ~SOM()
 		{
       _mutex.unlock();
-
-			for (int i=0; i<_neurons_size; i++) {
-				delete _neurons[i];
-			}
-
-      delete [] _neurons;
 		}
 
 		void SetLearningRate(double n)
@@ -485,6 +479,8 @@ class SOM : public jgui::Window {
       Training(points2, 8*POINTS);
       Classify(points3, 32*POINTS);
 
+      SetVisible(false);
+
       for (size_t i=0; i<POINTS; i++) {
         delete [] points1[i];
       }
@@ -502,6 +498,14 @@ class SOM : public jgui::Window {
       }
 
       delete [] points3;
+
+			for (int i=0; i<_neurons_size; i++) {
+				delete _neurons[i];
+			}
+
+      delete [] _neurons;
+
+      jgui::Application::Quit();
     }
 
 };

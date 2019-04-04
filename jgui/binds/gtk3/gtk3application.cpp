@@ -27,6 +27,7 @@
 #include "jexception/jillegalargumentexception.h"
 
 #include <thread>
+#include <mutex>
 
 #include <gtk/gtk.h>
 #include <gdk/gdktypes.h>
@@ -35,31 +36,37 @@
 namespace jgui {
 
 /** \brief */
-static jgui::Image *_icon = nullptr;
+static GtkApplication *sg_handler = nullptr;
 /** \brief */
-static Window *g_window = nullptr;
+static GtkWidget *sg_window = nullptr;
 /** \brief */
-static GtkApplication *_handler = nullptr;
+static GtkWidget *sg_frame = nullptr;
 /** \brief */
-static GtkWidget *_window = nullptr;
+static GtkWidget *sg_widget = nullptr;
 /** \brief */
-static GtkWidget *_frame = nullptr;
+static jgui::jregion_t sg_visible_bounds;
 /** \brief */
-static GtkWidget *_drawing_area = nullptr;
+static float sg_opacity = 1.0f;
 /** \brief */
-static jgui::jregion_t _visible_bounds;
+static bool sg_fullscreen = false;
 /** \brief */
-static float _opacity = 1.0f;
+static bool sgsg_jgui_cursor_enabled = true;
 /** \brief */
-static bool _fullscreen_enabled = false;
+static bool sg_visible = false;
 /** \brief */
-static bool _cursor_enabled = true;
+static bool sg_repaint = false;
 /** \brief */
-static jcursor_style_t _cursor;
+static bool sg_quitting = false;
 /** \brief */
-static bool _visible = false;
+static jgui::jsize_t sg_screen = {0, 0};
 /** \brief */
-static bool _need_repaint = false;
+static std::mutex sg_loop_mutex;
+/** \brief */
+static jgui::Image *sg_jgui_icon = nullptr;
+/** \brief */
+static Window *sg_jgui_window = nullptr;
+/** \brief */
+static jcursor_style_t sg_jgui_cursor = JCS_DEFAULT;
 
 static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(guint symbol)
 {
@@ -397,14 +404,14 @@ static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(guint symbol)
 
 static gboolean OnDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
 {
-	if (g_window == nullptr || g_window->IsVisible() == false) {
+	if (sg_jgui_window == nullptr || sg_jgui_window->IsVisible() == false) {
 		return FALSE;
 	}
 
 	// NativeWindow 
   //   *handler = reinterpret_cast<NativeWindow *>(user_data);
   jregion_t 
-    bounds = g_window->GetBounds();
+    bounds = sg_jgui_window->GetBounds();
   jgui::Image 
     *buffer = new jgui::BufferedImage(jgui::JPF_ARGB, bounds.width, bounds.height);
   jgui::Graphics 
@@ -417,14 +424,14 @@ static gboolean OnDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
     w = gtk_widget_get_allocated_width(widget),
 	  h = gtk_widget_get_allocated_height(widget);
 
-  cairo_surface_t *surface = gdk_window_create_similar_surface(gtk_widget_get_window(widget), CAIRO_CONTENT_COLOR, w, h);
+  cairo_surface_t *surface = gdk_window_create_similar_surface(gtk_widget_getsg_window(widget), CAIRO_CONTENT_COLOR, w, h);
   */
 
 	g->Reset();
 	g->Translate(-t.x, -t.y);
   g->SetClip(0, 0, bounds.width, bounds.height);
-	g_window->DoLayout();
-  g_window->Paint(g);
+	sg_jgui_window->DoLayout();
+  sg_jgui_window->Paint(g);
 	g->Translate(t.x, t.y);
 
   cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
@@ -443,7 +450,7 @@ static gboolean OnDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
   delete buffer;
   buffer = nullptr;
 
-  g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_PAINTED));
+  sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
 
   return TRUE;
 }
@@ -479,7 +486,7 @@ static gboolean OnKeyPressEvent(GtkWidget *widget, GdkEventKey *event, gpointer 
 
 	jevent::jkeyevent_symbol_t symbol = TranslateToNativeKeySymbol(event->keyval);
 
-  g_window->GetEventManager()->PostEvent(new jevent::KeyEvent(g_window, type, mod, jevent::KeyEvent::GetCodeFromSymbol(symbol), symbol));
+  sg_jgui_window->GetEventManager()->PostEvent(new jevent::KeyEvent(sg_jgui_window, type, mod, jevent::KeyEvent::GetCodeFromSymbol(symbol), symbol));
 
 	return FALSE;
 }
@@ -513,7 +520,7 @@ static gboolean OnMouseMoveEvent(GtkWidget *widget, GdkEventMotion *event, gpoin
 		buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON3);
   }
 
-  g_window->GetEventManager()->PostEvent(new jevent::MouseEvent(g_window, type, button, buttons, mouse_z, mouse_x, mouse_y));
+  sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, buttons, mouse_z, mouse_x, mouse_y));
 
   return TRUE;
 }
@@ -566,60 +573,58 @@ static gboolean OnMousePressEvent(GtkWidget *widget, GdkEventButton *event, gpoi
 		buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON3);
   }
 
-  g_window->GetEventManager()->PostEvent(new jevent::MouseEvent(g_window, type, button, buttons, mouse_z, mouse_x, mouse_y));
+  sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, buttons, mouse_z, mouse_x, mouse_y));
 
   return TRUE;
 }
 
 static void OnClose(void)
 {
-	// gtk_window_close((GtkWindow *)_window);
+	// gtk_window_close((GtkWindow *)sg_window);
 }
 
 static gboolean OnConfigureEvent(GtkWidget *widget, GdkEventConfigure *event, gpointer user_data)
 {
-  gtk_window_get_position((GtkWindow *)_window, &_visible_bounds.x, &_visible_bounds.y);
-  gtk_window_get_size((GtkWindow *)_window, &_visible_bounds.width, &_visible_bounds.height);
+  gtk_window_get_position((GtkWindow *)sg_window, &sg_visible_bounds.x, &sg_visible_bounds.y);
+  gtk_window_get_size((GtkWindow *)sg_window, &sg_visible_bounds.width, &sg_visible_bounds.height);
 
-  gtk_widget_queue_draw(_drawing_area);
+  gtk_widget_queue_draw(sg_widget);
 
   return TRUE;
 }
 
 static void ConfigureApplication(GtkApplication *app, gpointer user_data)
 {
-  _window = gtk_application_window_new(app);
+  sg_window = gtk_application_window_new(app);
 
-  gtk_window_set_title(GTK_WINDOW(_window), "");
-  gtk_window_set_default_size(GTK_WINDOW(_window), _visible_bounds.width, _visible_bounds.height);
+  gtk_window_set_title(GTK_WINDOW(sg_window), "");
+  gtk_window_set_default_size(GTK_WINDOW(sg_window), sg_visible_bounds.width, sg_visible_bounds.height);
 
-  _frame = gtk_frame_new(nullptr);
+  sg_frame = gtk_frame_new(nullptr);
 
-  gtk_container_add(GTK_CONTAINER(_window), _frame);
+  gtk_container_add(GTK_CONTAINER(sg_window), sg_frame);
 
-  _drawing_area = gtk_drawing_area_new();
+  sg_widget = gtk_drawing_area_new();
   
-  gtk_container_add(GTK_CONTAINER(_frame), _drawing_area);
+  gtk_container_add(GTK_CONTAINER(sg_frame), sg_widget);
 
-	g_signal_connect(G_OBJECT(_drawing_area),"configure-event", G_CALLBACK (OnConfigureEvent), nullptr);
-  g_signal_connect(_window, "destroy", G_CALLBACK(OnClose), nullptr);
-  g_signal_connect(_drawing_area, "draw", G_CALLBACK(OnDraw), nullptr);
-	g_signal_connect(G_OBJECT(_window), "key_press_event", G_CALLBACK(OnKeyPressEvent), nullptr);
-	g_signal_connect(G_OBJECT(_window), "key_release_event", G_CALLBACK(OnKeyPressEvent), nullptr);
-	g_signal_connect(G_OBJECT(_window), "motion_notify_event", G_CALLBACK(OnMouseMoveEvent), nullptr);
-	g_signal_connect(G_OBJECT(_window), "button_press_event", G_CALLBACK(OnMousePressEvent), nullptr);
-	g_signal_connect(G_OBJECT(_window), "button_release_event", G_CALLBACK(OnMousePressEvent), nullptr);
+	g_signal_connect(G_OBJECT(sg_widget),"configure-event", G_CALLBACK (OnConfigureEvent), nullptr);
+  g_signal_connect(sg_window, "destroy", G_CALLBACK(OnClose), nullptr);
+  g_signal_connect(sg_widget, "draw", G_CALLBACK(OnDraw), nullptr);
+	g_signal_connect(G_OBJECT(sg_window), "key_press_event", G_CALLBACK(OnKeyPressEvent), nullptr);
+	g_signal_connect(G_OBJECT(sg_window), "key_release_event", G_CALLBACK(OnKeyPressEvent), nullptr);
+	g_signal_connect(G_OBJECT(sg_window), "motion_notify_event", G_CALLBACK(OnMouseMoveEvent), nullptr);
+	g_signal_connect(G_OBJECT(sg_window), "button_press_event", G_CALLBACK(OnMousePressEvent), nullptr);
+	g_signal_connect(G_OBJECT(sg_window), "button_release_event", G_CALLBACK(OnMousePressEvent), nullptr);
 
   gtk_widget_set_events(
-      _drawing_area, gtk_widget_get_events(_drawing_area) | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK);
+      sg_widget, gtk_widget_get_events(sg_widget) | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK);
   
-  gtk_widget_show_now(_window);
-  gtk_widget_show_all(_window);
+  gtk_widget_show_now(sg_window);
+  gtk_widget_show_all(sg_window);
   
-  g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_OPENED));
+  sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_OPENED));
 }
-
-static jgui::jsize_t _screen = {0, 0};
 
 NativeApplication::NativeApplication():
 	jgui::Application()
@@ -629,8 +634,8 @@ NativeApplication::NativeApplication():
 
 NativeApplication::~NativeApplication()
 {
-  delete g_window;
-  g_window = nullptr;
+  delete sg_jgui_window;
+  sg_jgui_window = nullptr;
 }
 
 void NativeApplication::InternalInit(int argc, char **argv)
@@ -644,24 +649,24 @@ void NativeApplication::InternalInit(int argc, char **argv)
 
   gdk_monitor_get_geometry(monitor, &geometry);
 
-	_screen.width = geometry.width;
-	_screen.height = geometry.height;
+	sg_screen.width = geometry.width;
+	sg_screen.height = geometry.height;
+
+  sg_quitting = false;
 }
 
 void NativeApplication::InternalPaint()
 {
-  // gtk_widget_queue_draw(_drawing_area);
+  // gtk_widget_queue_draw(sg_widget);
 }
-
-static bool quitting = false;
 
 static void PaintThread(NativeApplication *app)
 {
-  while (quitting == false) {
-    if (_need_repaint == true) {
-      _need_repaint = false;
+  while (sg_quitting == false) {
+    if (sg_repaint == true) {
+      sg_repaint = false;
 
-      gtk_widget_queue_draw(GTK_WIDGET(_drawing_area));
+      gtk_widget_queue_draw(GTK_WIDGET(sg_widget));
     }
 
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -670,21 +675,28 @@ static void PaintThread(NativeApplication *app)
 
 void NativeApplication::InternalLoop()
 {
+  std::lock_guard<std::mutex> lock(sg_loop_mutex);
+
   std::thread thread = std::thread(PaintThread, this);
 
- 	g_application_run(G_APPLICATION(_handler), 0, nullptr);
+ 	g_application_run(G_APPLICATION(sg_handler), 0, nullptr);
 
-  quitting = true;
+  sg_quitting = true;
 
   thread.join();
   
-  g_window->SetVisible(false);
+  sg_jgui_window->SetVisible(false);
 }
 
 void NativeApplication::InternalQuit()
 {
-  gtk_window_close((GtkWindow *)_window);
-  // gtk_main_quit();
+  sg_quitting = true;
+
+  g_application_release(G_APPLICATION(sg_handler));
+  g_application_quit(G_APPLICATION(sg_handler));
+
+  sg_loop_mutex.lock();
+  sg_loop_mutex.unlock();
 }
 
 NativeWindow::NativeWindow(int x, int y, int width, int height):
@@ -692,65 +704,66 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 {
 	jcommon::Object::SetClassName("jgui::NativeWindow");
 
-	if (_window != nullptr) {
+	if (sg_window != nullptr) {
 		throw jexception::RuntimeException("Cannot create more than one window");
   }
 
-	_window = nullptr;
+	sg_window = nullptr;
 
-  _visible_bounds.x = x;
-  _visible_bounds.y = y;
-  _visible_bounds.width = width;
-  _visible_bounds.height = height;
+  sg_visible_bounds.x = x;
+  sg_visible_bounds.y = y;
+  sg_visible_bounds.width = width;
+  sg_visible_bounds.height = height;
 
-  _icon = new BufferedImage(_DATA_PREFIX"/images/small-gnu.png");
+  sg_jgui_icon = new BufferedImage(_DATA_PREFIX"/images/small-gnu.png");
 
-  _handler = gtk_application_new("jlibcpp.gtk", G_APPLICATION_FLAGS_NONE);
+  sg_handler = gtk_application_new("jlibcpp.gtk", G_APPLICATION_FLAGS_NONE);
 
-  g_signal_connect(_handler, "activate", G_CALLBACK(ConfigureApplication), nullptr);
+  g_signal_connect(sg_handler, "activate", G_CALLBACK(ConfigureApplication), nullptr);
 
-  _visible = true;
+  sg_visible = true;
 }
 
 NativeWindow::~NativeWindow()
 {
-  SetVisible(false);
+  // g_signalsg_handler_disconnect(sg_window, "destroy");
+  // g_signalsg_handler_disconnect(sg_widget, "draw");
+	// g_signalsg_handler_disconnect(G_OBJECT(sg_widget),"configure-event");
+	// g_signalsg_handler_disconnect(G_OBJECT(sg_window), "key_press_event");
+	// g_signalsg_handler_disconnect(G_OBJECT(sg_window), "key_release_event");
+	// g_signalsg_handler_disconnect(G_OBJECT(sg_window), "motion_notify_event");
+	// g_signalsg_handler_disconnect(G_OBJECT(sg_window), "button_press_event");
+	// g_signalsg_handler_disconnect(G_OBJECT(sg_window), "button_release_event");
 
-  // g_signal_handler_disconnect(_window, "destroy");
-  // g_signal_handler_disconnect(_drawing_area, "draw");
-	// g_signal_handler_disconnect(G_OBJECT(_drawing_area),"configure-event");
-	// g_signal_handler_disconnect(G_OBJECT(_window), "key_press_event");
-	// g_signal_handler_disconnect(G_OBJECT(_window), "key_release_event");
-	// g_signal_handler_disconnect(G_OBJECT(_window), "motion_notify_event");
-	// g_signal_handler_disconnect(G_OBJECT(_window), "button_press_event");
-	// g_signal_handler_disconnect(G_OBJECT(_window), "button_release_event");
+  g_object_unref(sg_widget);
+  g_object_unref(sg_frame);
+  g_object_unref(sg_window);
+  g_object_unref(sg_handler);
 
-  g_object_unref(_drawing_area);
-  g_object_unref(_frame);
-  g_object_unref(_window);
-  g_object_unref(_handler);
+  gtk_window_close((GtkWindow *)sg_window);
+  // gtk_main_quit();
 }
 
 void NativeWindow::Repaint(Component *cmp)
 {
-  _need_repaint = true;
+  sg_repaint = true;
 }
 
 void NativeWindow::ToggleFullScreen()
 {
   // gtk_window_unfullscreen (GtkWindow *window);
   // gtk_window_fullscreen_on_monitor (GtkWindow *window, GdkScreen *screen, gint monitor);
-	if (_fullscreen_enabled == false) {
-    _fullscreen_enabled = true;
+	if (sg_fullscreen == false) {
+    sg_fullscreen = true;
     
-		gtk_window_fullscreen((GtkWindow *)_window);
+		gtk_window_fullscreen((GtkWindow *)sg_window);
 	} else {
-    _fullscreen_enabled = false;
+    sg_fullscreen = false;
 
-		gtk_window_unfullscreen((GtkWindow *)_window);
+		gtk_window_unfullscreen((GtkWindow *)sg_window);
 	}
 
-  gtk_widget_queue_draw(_drawing_area);
+  gtk_widget_queue_draw(sg_widget);
 }
 
 void NativeWindow::SetParent(jgui::Container *c)
@@ -761,65 +774,65 @@ void NativeWindow::SetParent(jgui::Container *c)
     throw jexception::IllegalArgumentException("Used only by native engine");
   }
 
-  g_window = parent;
+  sg_jgui_window = parent;
 
-  g_window->SetParent(nullptr);
+  sg_jgui_window->SetParent(nullptr);
 }
 
 void NativeWindow::SetTitle(std::string title)
 {
-  if (_window != nullptr) {
-	  gtk_window_set_title(GTK_WINDOW(_window), title.c_str());
+  if (sg_window != nullptr) {
+	  gtk_window_set_title(GTK_WINDOW(sg_window), title.c_str());
   }
 }
 
 std::string NativeWindow::GetTitle()
 {
-	return gtk_window_get_title(GTK_WINDOW(_window));
+	return gtk_window_get_title(GTK_WINDOW(sg_window));
 }
 
 void NativeWindow::SetOpacity(float opacity)
 {
-	_opacity = opacity;
+	sg_opacity = opacity;
 }
 
 float NativeWindow::GetOpacity()
 {
-  return _opacity;
+  return sg_opacity;
 }
 
 void NativeWindow::SetUndecorated(bool undecorated)
 {
-  if (_window != nullptr) {
-	  gtk_window_set_decorated(GTK_WINDOW(_window), undecorated == false);
+  if (sg_window != nullptr) {
+	  gtk_window_set_decorated(GTK_WINDOW(sg_window), undecorated == false);
   }
 }
 
 bool NativeWindow::IsUndecorated()
 {
-  return gtk_window_get_decorated(GTK_WINDOW(_window));
+  return gtk_window_get_decorated(GTK_WINDOW(sg_window));
 }
 
 void NativeWindow::SetBounds(int x, int y, int width, int height)
 {
-  gtk_window_move(GTK_WINDOW(_window), x, y);
-  gtk_window_resize(GTK_WINDOW(_window), width, height);
-	gtk_widget_set_size_request(_window, width, height);
+  gtk_window_move(GTK_WINDOW(sg_window), x, y);
+  gtk_window_resize(GTK_WINDOW(sg_window), width, height);
+	gtk_widget_set_size_request(sg_window, width, height);
 }
 
 jgui::jregion_t NativeWindow::GetBounds()
 {
-  return _visible_bounds;
+  return sg_visible_bounds;
 }
 
 void NativeWindow::SetResizable(bool resizable)
 {
-  gtk_window_set_resizable((GtkWindow *)_window, resizable);
+  gtk_window_set_resizable((GtkWindow *)sg_window, resizable);
 }
 
 bool NativeWindow::IsResizable()
 {
-  return gtk_window_get_resizable((GtkWindow *)_window);
+  return gtk_window_get_resizable((GtkWindow *)sg_window);
 }
 
 void NativeWindow::SetCursorLocation(int x, int y)
@@ -832,12 +845,12 @@ void NativeWindow::SetCursorLocation(int x, int y)
 		y = 0;
 	}
 
-	if (x > _screen.width) {
-		x = _screen.width;
+	if (x > sg_screen.width) {
+		x = sg_screen.width;
 	}
 
-	if (y > _screen.height) {
-		y = _screen.height;
+	if (y > sg_screen.height) {
+		y = sg_screen.height;
 	}
 
   // TODO::
@@ -857,42 +870,42 @@ jpoint_t NativeWindow::GetCursorLocation()
 
 void NativeWindow::SetVisible(bool visible)
 {
-  _visible = visible;
+  sg_visible = visible;
 
   if (visible == true) {
-    gtk_widget_show(_window);
-    // gtk_widget_show_all(_window);
+    gtk_widget_show(sg_window);
+    // gtk_widget_show_all(sg_window);
   } else {
-    gtk_widget_hide(_window);
+    gtk_widget_hide(sg_window);
   }
 }
 
 bool NativeWindow::IsVisible()
 {
-  return _visible; 
+  return sg_visible; 
 
   // INFO:: first calls return false ...
-  // return (bool)gtk_widget_is_visible(_window);
+  // return (bool)gtk_widget_issg_visible(sg_window);
 }
 
 jcursor_style_t NativeWindow::GetCursor()
 {
-  return _cursor;
+  return sg_jgui_cursor;
 }
 
 void NativeWindow::SetCursorEnabled(bool enabled)
 {
-	_cursor_enabled = enabled;
+	sgsg_jgui_cursor_enabled = enabled;
 }
 
 bool NativeWindow::IsCursorEnabled()
 {
-  return _cursor_enabled;
+  return sgsg_jgui_cursor_enabled;
 }
 
 void NativeWindow::SetCursor(jcursor_style_t style)
 {
-  _cursor = style;
+  sg_jgui_cursor = style;
 }
 
 void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
@@ -925,15 +938,15 @@ jwindow_rotation_t NativeWindow::GetRotation()
 
 void NativeWindow::SetIcon(jgui::Image *image)
 {
-  _icon = image;
+  sg_jgui_icon = image;
 }
 
 jgui::Image * NativeWindow::GetIcon()
 {
-  return _icon;
+  return sg_jgui_icon;
 }
 
-// t.width = gtk_widget_get_allocated_width(_drawing_area);
-// t.height = gtk_widget_get_allocated_height(_drawing_area);
+// t.width = gtk_widget_get_allocated_width(sg_widget);
+// t.height = gtk_widget_get_allocated_height(sg_widget);
 
 }

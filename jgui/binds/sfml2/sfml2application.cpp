@@ -28,6 +28,7 @@
 #include "jexception/jillegalargumentexception.h"
 
 #include <thread>
+#include <mutex>
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
@@ -37,39 +38,45 @@
 namespace jgui {
 
 /** \brief */
-static sf::RenderWindow *_window = nullptr;
+static sf::RenderWindow *sg_window = nullptr;
 /** \brief */
-static jgui::Image *_icon = nullptr;
+static jgui::Image *sg_jgui_icon = nullptr;
 /** \brief */
-static std::chrono::time_point<std::chrono::steady_clock> _last_keypress;
+static std::chrono::time_point<std::chrono::steady_clock> sg_last_keypress;
 /** \brief */
-static int _mouse_x;
+static int sg_mouse_x = 0;
 /** \brief */
-static int _mouse_y;
+static int sg_mouse_y = 0;
 /** \brief */
-static int _click_count;
+static int _click_count = 0;
 /** \brief */
-static Window *g_window = nullptr;
+static std::string sg_title;
 /** \brief */
-static std::string _title;
+static float sg_opacity = 1.0f;
 /** \brief */
-static float _opacity = 1.0f;
+static bool sg_undecorated = false;
 /** \brief */
-static bool _undecorated = false;
+static bool sg_resizable = true;
 /** \brief */
-static bool _resizable = true;
+static bool sg_cursor_enabled = true;
 /** \brief */
-static bool _cursor_enabled = true;
+static bool sg_visible = true;
 /** \brief */
-static jcursor_style_t _cursor;
+static bool sg_quitting = false;
 /** \brief */
-static bool _visible = true;
+static bool sg_fullscreen = false;
 /** \brief */
-static bool _fullscreen = false;
+static jgui::jsize_t sg_screen = {0, 0};
 /** \brief */
-static jgui::jregion_t _previous_bounds;
+static std::mutex sg_loop_mutex;
 /** \brief */
-static bool _need_repaint = false;
+static jgui::jregion_t sg_previous_bounds;
+/** \brief */
+static bool sg_repaint = false;
+/** \brief */
+static Window *sg_jgui_window = nullptr;
+/** \brief */
+static jcursor_style_t sg_jgui_cursor;
 
 static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(sf::Keyboard::Key symbol)
 {
@@ -316,8 +323,6 @@ static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(sf::Keyboard::Key s
 	return jevent::JKS_UNKNOWN;
 }
 
-static jgui::jsize_t _screen = {0, 0};
-
 NativeApplication::NativeApplication():
 	jgui::Application()
 {
@@ -334,18 +339,20 @@ void NativeApplication::InternalInit(int argc, char **argv)
 
 	sf::VideoMode display = sf::VideoMode::getDesktopMode();
 
-	_screen.width = display.width;
-	_screen.height = display.height;
+	sg_screen.width = display.width;
+	sg_screen.height = display.height;
+  
+  sg_quitting = false;
 }
 
 void NativeApplication::InternalPaint()
 {
-	if (g_window == nullptr || g_window->IsVisible() == false) {
+	if (sg_jgui_window == nullptr || sg_jgui_window->IsVisible() == false) {
 		return;
 	}
 
   jregion_t 
-    bounds = g_window->GetBounds();
+    bounds = sg_jgui_window->GetBounds();
   jgui::Image 
     *buffer = new jgui::BufferedImage(jgui::JPF_ARGB, bounds.width, bounds.height);
   jgui::Graphics 
@@ -356,8 +363,8 @@ void NativeApplication::InternalPaint()
 	g->Reset();
 	g->Translate(-t.x, -t.y);
   g->SetClip(0, 0, bounds.width, bounds.height);
-	g_window->DoLayout();
-  g_window->Paint(g);
+	sg_jgui_window->DoLayout();
+  sg_jgui_window->Paint(g);
 	g->Translate(t.x, t.y);
 
   cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
@@ -408,44 +415,45 @@ void NativeApplication::InternalPaint()
 
 	texture.update(data);
 
-  _window->setVerticalSyncEnabled(g->IsVerticalSyncEnabled());
+  sg_window->setVerticalSyncEnabled(g->IsVerticalSyncEnabled());
 
-	_window->clear();
-	_window->draw(sprite);
-	_window->display();
+	sg_window->clear();
+	sg_window->draw(sprite);
+	sg_window->display();
 	
   delete buffer;
   buffer = nullptr;
 
-  g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_PAINTED));
+  sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
 }
 
 void NativeApplication::InternalLoop()
 {
-	sf::Event event;
-  bool quitting = false;
+  std::lock_guard<std::mutex> lock(sg_loop_mutex);
 
-	while (quitting == false && _window->isOpen() == true) {
-    if (_need_repaint == true) {
-      _need_repaint = false;
+	sf::Event event;
+  
+	while (sg_quitting == false && sg_window->isOpen() == true) {
+    if (sg_repaint == true) {
+      sg_repaint = false;
 
       InternalPaint();
     }
 
 		// while (window->waitEvent(event)) {
-		while (_window->pollEvent(event)) {
+		while (sg_window->pollEvent(event)) {
       if (event.type == sf::Event::MouseEntered) {
         // SetCursor(GetCursor());
 
-        g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_ENTERED));
+        sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_ENTERED));
       } else if (event.type == sf::Event::MouseLeft) {
         // SetCursor(JCS_DEFAULT);
 
-        g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_LEAVED));
+        sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_LEAVED));
       } else if (event.type == sf::Event::Resized) {
         InternalPaint();
 
-        g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_RESIZED));
+        sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_RESIZED));
       // } else if (event.type == sf::Event::Hidden) {
       // } else if (event.type == sf::Event::Exposed) {
       // } else if (event.type == sf::Event::Moved) {
@@ -454,7 +462,7 @@ void NativeApplication::InternalLoop()
       } else if (event.type == sf::Event::TouchEnded) {
       } else if (event.type == sf::Event::LostFocus) {
       } else if (event.type == sf::Event::GainedFocus) {
-        g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_OPENED));
+        sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_OPENED));
       } else if (event.type == sf::Event::KeyPressed || event.type == sf::Event::KeyReleased) {
         jevent::jkeyevent_type_t type;
         jevent::jkeyevent_modifiers_t mod;
@@ -492,7 +500,7 @@ void NativeApplication::InternalLoop()
 
         jevent::jkeyevent_symbol_t symbol = TranslateToNativeKeySymbol(event.key.code);
 
-        g_window->GetEventManager()->PostEvent(new jevent::KeyEvent(g_window, type, mod, jevent::KeyEvent::GetCodeFromSymbol(symbol), symbol));
+        sg_jgui_window->GetEventManager()->PostEvent(new jevent::KeyEvent(sg_jgui_window, type, mod, jevent::KeyEvent::GetCodeFromSymbol(symbol), symbol));
       } else if (
           event.type == sf::Event::MouseMoved || 
           event.type == sf::Event::MouseButtonPressed || 
@@ -507,8 +515,8 @@ void NativeApplication::InternalLoop()
         if (event.type == sf::Event::MouseMoved) {
           type = jevent::JMT_MOVED;
 
-          _mouse_x = event.mouseMove.x;
-          _mouse_y = event.mouseMove.y;
+          sg_mouse_x = event.mouseMove.x;
+          sg_mouse_y = event.mouseMove.y;
         } else if (event.type == sf::Event::MouseButtonPressed || event.type == sf::Event::MouseButtonReleased) {
           if (event.type == sf::Event::MouseButtonPressed) {
             type = jevent::JMT_PRESSED;
@@ -516,8 +524,8 @@ void NativeApplication::InternalLoop()
             type = jevent::JMT_RELEASED;
           }
 
-          _mouse_x = event.mouseButton.x;
-          _mouse_y = event.mouseButton.y;
+          sg_mouse_x = event.mouseButton.x;
+          sg_mouse_y = event.mouseButton.y;
 
           if (event.mouseButton.button == sf::Mouse::Left) {
             button = jevent::JMB_BUTTON1;
@@ -532,11 +540,11 @@ void NativeApplication::InternalLoop()
           if (type == jevent::JMT_PRESSED) {
             auto current = std::chrono::steady_clock::now();
             
-            if ((std::chrono::duration_cast<std::chrono::milliseconds>(current - _last_keypress).count()) < 200L) {
+            if ((std::chrono::duration_cast<std::chrono::milliseconds>(current - sg_last_keypress).count()) < 200L) {
               _click_count = _click_count + 1;
             }
 
-            _last_keypress = current;
+            sg_last_keypress = current;
 
             mouse_z = _click_count;
           }
@@ -544,12 +552,12 @@ void NativeApplication::InternalLoop()
           type = jevent::JMT_ROTATED;
 
           if (event.type == sf::Event::MouseWheelMoved) {
-            _mouse_x = event.mouseWheel.x;
-            _mouse_y = event.mouseWheel.y;
+            sg_mouse_x = event.mouseWheel.x;
+            sg_mouse_y = event.mouseWheel.y;
             mouse_z = event.mouseWheel.delta;
           } else if (event.type == sf::Event::MouseWheelScrolled) {
-            _mouse_x = event.mouseWheelScroll.x;
-            _mouse_y = event.mouseWheelScroll.y;
+            sg_mouse_x = event.mouseWheelScroll.x;
+            sg_mouse_y = event.mouseWheelScroll.y;
             mouse_z = event.mouseWheelScroll.delta;
           }
         }
@@ -566,28 +574,29 @@ void NativeApplication::InternalLoop()
           buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON3);
         }
 
-        // AddEvent(new MouseEvent(nullptr, type, button, buttons, mouse_z, _mouse_x, _mouse_y));
-        g_window->GetEventManager()->PostEvent(new jevent::MouseEvent(g_window, type, button, buttons, mouse_z, _mouse_x, _mouse_y));
+        // AddEvent(new MouseEvent(nullptr, type, button, buttons, mouse_z, sg_mouse_x, sg_mouse_y));
+        sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, buttons, mouse_z, sg_mouse_x, sg_mouse_y));
       } else if (event.type == sf::Event::Closed) {
-        _window->close();
+        sg_window->close();
 
-        quitting = true;
+        sg_quitting = true;
         
-        g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_CLOSED));
+        sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_CLOSED));
       }
 		}
 
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
   
-  g_window->SetVisible(false);
+  sg_jgui_window->SetVisible(false);
 }
 
 void NativeApplication::InternalQuit()
 {
-  if (_window != nullptr) {
-    _window->close();
-  }
+  sg_quitting = true;
+
+  sg_loop_mutex.lock();
+  sg_loop_mutex.unlock();
 }
 
 NativeWindow::NativeWindow(int x, int y, int width, int height):
@@ -595,44 +604,44 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 {
 	jcommon::Object::SetClassName("jgui::NativeWindow");
 
-	if (_window != nullptr) {
+	if (sg_window != nullptr) {
 		throw jexception::RuntimeException("Cannot create more than one window");
   }
 
-  _icon = new BufferedImage(_DATA_PREFIX"/images/small-gnu.png");
+  sg_jgui_icon = new BufferedImage(_DATA_PREFIX"/images/small-gnu.png");
 
-	_window = nullptr;
-	_mouse_x = 0;
-	_mouse_y = 0;
-	_last_keypress = std::chrono::steady_clock::now();
+	sg_window = nullptr;
+	sg_mouse_x = 0;
+	sg_mouse_y = 0;
+	sg_last_keypress = std::chrono::steady_clock::now();
 	_click_count = 1;
 
 	int flags = (int)(sf::Style::Titlebar | sf::Style::Resize | sf::Style::Close);
 
   // TODO:: set location too
-	_window = new sf::RenderWindow(sf::VideoMode(width, height), _title.c_str(), flags);
+	sg_window = new sf::RenderWindow(sf::VideoMode(width, height), sg_title.c_str(), flags);
 
-	if (_window == nullptr) {
+	if (sg_window == nullptr) {
 		throw jexception::RuntimeException("Cannot create a window");
 	}
 
-	_window->requestFocus();
-	_window->setVerticalSyncEnabled(true);
-	_window->setFramerateLimit(120);
-	_window->setActive(false);
+	sg_window->requestFocus();
+	sg_window->setVerticalSyncEnabled(true);
+	sg_window->setFramerateLimit(120);
+	sg_window->setActive(false);
 }
 
 NativeWindow::~NativeWindow()
 {
-  SetVisible(false);
+  sg_window->close();
 
-  delete _window;
-  _window = nullptr;
+  delete sg_window;
+  sg_window = nullptr;
 }
 
 void NativeWindow::Repaint(Component *cmp)
 {
-  _need_repaint = true;
+  sg_repaint = true;
 }
 
 void NativeWindow::ToggleFullScreen()
@@ -651,9 +660,9 @@ void NativeWindow::ToggleFullScreen()
   sf::RenderWindow 
     *window = nullptr;
   sf::RenderWindow 
-    *old = _window;
+    *old = sg_window;
 
-  if (_fullscreen == false) {
+  if (sg_fullscreen == false) {
     std::vector<sf::VideoMode> 
       modes = sf::VideoMode::getFullscreenModes();
 
@@ -661,20 +670,20 @@ void NativeWindow::ToggleFullScreen()
       return;
     }
 
-    _previous_bounds = GetBounds();
+    sg_previous_bounds = GetBounds();
 
     window = new sf::RenderWindow(modes[0], GetTitle().c_str(), flags);
 
-    _fullscreen = true;
+    sg_fullscreen = true;
   } else {
-    window = new sf::RenderWindow(sf::VideoMode(_previous_bounds.width, _previous_bounds.height), GetTitle().c_str(), flags);
+    window = new sf::RenderWindow(sf::VideoMode(sg_previous_bounds.width, sg_previous_bounds.height), GetTitle().c_str(), flags);
 
-    window->setPosition(sf::Vector2i(_previous_bounds.x, _previous_bounds.y));
+    window->setPosition(sf::Vector2i(sg_previous_bounds.x, sg_previous_bounds.y));
 
-    _fullscreen = false;
+    sg_fullscreen = false;
   }
 
-  if (_window == nullptr) {
+  if (sg_window == nullptr) {
     return;
   }
 
@@ -683,7 +692,7 @@ void NativeWindow::ToggleFullScreen()
   window->setFramerateLimit(120);
   window->setActive(false);
 
-  _window = window;
+  sg_window = window;
 
   delete old;
   old = nullptr;
@@ -697,58 +706,58 @@ void NativeWindow::SetParent(jgui::Container *c)
     throw jexception::IllegalArgumentException("Used only by native engine");
   }
 
-  // TODO:: g_window precisa ser a window que contem ela
+  // TODO:: sg_jgui_window precisa ser a window que contem ela
   // TODO:: pegar os windows por evento ou algo assim
-  g_window = parent;
+  sg_jgui_window = parent;
 
-  g_window->SetParent(nullptr);
+  sg_jgui_window->SetParent(nullptr);
 }
 
 void NativeWindow::SetTitle(std::string title)
 {
-  _title = title;
+  sg_title = title;
 
-	_window->setTitle(_title.c_str());
+	sg_window->setTitle(sg_title.c_str());
 }
 
 std::string NativeWindow::GetTitle()
 {
-  return _title;
+  return sg_title;
 }
 
 void NativeWindow::SetOpacity(float opacity)
 {
-  _opacity = opacity;
+  sg_opacity = opacity;
 }
 
 float NativeWindow::GetOpacity()
 {
-  return _opacity;
+  return sg_opacity;
 }
 
 void NativeWindow::SetUndecorated(bool undecorated)
 {
-  _undecorated = undecorated;
+  sg_undecorated = undecorated;
 }
 
 bool NativeWindow::IsUndecorated()
 {
-  return _undecorated;
+  return sg_undecorated;
 }
 
 void NativeWindow::SetBounds(int x, int y, int width, int height)
 {
-	_window->setPosition(sf::Vector2i(x, y));
-	_window->setSize(sf::Vector2u(width, height));
-  _window->setView(sf::View(sf::FloatRect(0, 0, width, height)));
+	sg_window->setPosition(sf::Vector2i(x, y));
+	sg_window->setSize(sf::Vector2u(width, height));
+  sg_window->setView(sf::View(sf::FloatRect(0, 0, width, height)));
 }
 
 jgui::jregion_t NativeWindow::GetBounds()
 {
   sf::Vector2i 
-    location = _window->getPosition();
+    location = sg_window->getPosition();
   sf::Vector2u 
-    size = _window->getSize();
+    size = sg_window->getSize();
 
 	return {
     .x = location.x, 
@@ -760,12 +769,12 @@ jgui::jregion_t NativeWindow::GetBounds()
 	
 void NativeWindow::SetResizable(bool resizable)
 {
-  _resizable = resizable;
+  sg_resizable = resizable;
 }
 
 bool NativeWindow::IsResizable()
 {
-  return _resizable;
+  return sg_resizable;
 }
 
 void NativeWindow::SetCursorLocation(int x, int y)
@@ -778,12 +787,12 @@ void NativeWindow::SetCursorLocation(int x, int y)
 		y = 0;
 	}
 
-	if (x > _screen.width) {
-		x = _screen.width;
+	if (x > sg_screen.width) {
+		x = sg_screen.width;
 	}
 
-	if (y > _screen.height) {
-		y = _screen.height;
+	if (y > sg_screen.height) {
+		y = sg_screen.height;
 	}
 
 	sf::Mouse::setPosition(sf::Vector2i(x, y));
@@ -806,31 +815,31 @@ jpoint_t NativeWindow::GetCursorLocation()
 
 void NativeWindow::SetVisible(bool visible)
 {
-  _visible = visible;
+  sg_visible = visible;
 
-  _window->setVisible(visible);
+  sg_window->setVisible(visible);
 }
 
 bool NativeWindow::IsVisible()
 {
-  return _visible;
+  return sg_visible;
 }
 
 jcursor_style_t NativeWindow::GetCursor()
 {
-  return _cursor;
+  return sg_jgui_cursor;
 }
 
 void NativeWindow::SetCursorEnabled(bool enabled)
 {
-  _cursor_enabled = enabled;
+  sg_cursor_enabled = enabled;
 
-	_window->setMouseCursorVisible(_cursor_enabled);
+	sg_window->setMouseCursorVisible(sg_cursor_enabled);
 }
 
 bool NativeWindow::IsCursorEnabled()
 {
-  return _cursor_enabled;
+  return sg_cursor_enabled;
 }
 
 void NativeWindow::SetCursor(jcursor_style_t style)
@@ -867,11 +876,11 @@ void NativeWindow::SetCursor(jcursor_style_t style)
   sf::Cursor cursor;
 
   if (cursor.loadFromSystem(type) == true) {
-    _window->setMouseCursor(cursor);
+    sg_window->setMouseCursor(cursor);
   }
   */
 	
-  _cursor = style;
+  sg_jgui_cursor = style;
 }
 
 void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
@@ -895,7 +904,7 @@ void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
   sf::Cursor cursor;
 
   if (cursor.loadFromPixels(data, sf::Vector2u(size.width, size.height), sf::Vector2u(hotx, hoty)) == true) {
-    _window->setMouseCursor(cursor);
+    sg_window->setMouseCursor(cursor);
   }
 
 	delete [] data;
@@ -914,12 +923,12 @@ jwindow_rotation_t NativeWindow::GetRotation()
 
 void NativeWindow::SetIcon(jgui::Image *image)
 {
-  _icon = image;
+  sg_jgui_icon = image;
 }
 
 jgui::Image * NativeWindow::GetIcon()
 {
-  return _icon;
+  return sg_jgui_icon;
 }
 
 }

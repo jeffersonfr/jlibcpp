@@ -1608,8 +1608,6 @@ class SortComponent : public jgui::Component, public jcommon::Observer {
 			}
 
 			Repaint();
-
-      _mutex.lock();
 		}
 
 		virtual void Run()
@@ -1672,6 +1670,13 @@ class SortComponent : public jgui::Component, public jcommon::Observer {
 			return catched;
 		}
 
+		virtual void Update(void *)
+    {
+      _mutex.lock();
+
+      Repaint();
+    }
+
 		virtual void Paint(jgui::Graphics *g)
 		{
 			jgui::Component::Paint(g);
@@ -1700,7 +1705,7 @@ class SortComponent : public jgui::Component, public jcommon::Observer {
 			g->SetColor(jgui::Color::White);
 			g->SetFont(font);
 			g->DrawString(_algorithm->GetName(), 0, 0, size.width, size.height);
-
+      
       _mutex.unlock();
 		}
 

@@ -220,8 +220,8 @@ class GraphicsTeste : public jgui::Window {
       jgui::jsize_t
         size = GetSize();
 			int 
-        w = size.width,
-			  h = size.height;
+        w = SCREEN_WIDTH,
+			  h = SCREEN_HEIGHT;
 
 			//start the main loop
 			for(int x = 0; x < w; x++) {

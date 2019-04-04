@@ -101,16 +101,23 @@ class Terrain : public jgui::Window {
 
               g->SetColor(150, 150, 0);
               g->FillPolygon(0, 0, p, 4);
+
+              if (IsHidden() == true) {
+                goto _exit;
+              }
             }
           }
 
           Repaint();
 
-          std::this_thread::sleep_for(std::chrono::milliseconds(35));
+          std::this_thread::sleep_for(std::chrono::milliseconds(25));
         }
 			} while (IsHidden() == false);
       
+_exit:{
       delete _buffer;
+      _buffer = nullptr;
+      }
 		}
 
 		void Paint(jgui::Graphics *g) 

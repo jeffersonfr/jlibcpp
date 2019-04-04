@@ -383,12 +383,12 @@ static void dec_makehuff(struct dec_hufftbl *hu, int *hufflen, uint8_t *huffvals
             x = d >> (DECBITS - 1 - v - i);
             
             if (v && x < (1 << (v - 1))) {
-              x += (-1 << v) + 1;
+              x += (0xffffffff << v) + 1;
             }
 
-            x = x << 16 | (hu->vals[k] & 0xf0) << 4 | (DECBITS - (i + 1 + v)) | 128;
+            x = (uint32_t)x << 16 | (hu->vals[k] & 0xf0) << 4 | (DECBITS - (i + 1 + v)) | 128;
           } else {
-            x = v << 16 | (hu->vals[k] & 0xf0) << 4 | (DECBITS - (i + 1));
+            x = (uint32_t)v << 16 | (hu->vals[k] & 0xf0) << 4 | (DECBITS - (i + 1));
           }
 
           hu->llvals[c | d] = x;

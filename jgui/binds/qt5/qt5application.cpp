@@ -27,6 +27,7 @@
 #include "jexception/jillegalargumentexception.h"
 
 #include <thread>
+#include <mutex>
 #include <iostream>
 
 #include <QDialog>
@@ -38,27 +39,33 @@
 namespace jgui {
 
 /** \brief */
-static jgui::Image *_icon = nullptr;
+static QApplication *sg_application = nullptr;
 /** \brief */
-static Window *g_window = nullptr;
+static QDialog *sg_handler = nullptr;
 /** \brief */
-QApplication *_application = nullptr;
+static QByteArray sg_geometry;
 /** \brief */
-static QDialog *_handler = nullptr;
+static float sg_opacity = 1.0f;
 /** \brief */
-static QByteArray _geometry;
+static bool sg_fullscreen = false;
 /** \brief */
-static float _opacity = 1.0f;
+static bool sg_undecorated = false;
 /** \brief */
-static bool _fullscreen_enabled = false;
+static bool sg_visible = false;
 /** \brief */
-static jcursor_style_t _cursor;
+static bool sg_repaint = false;
 /** \brief */
-static bool _undecorated = false;
+static bool sg_quitting = false;
 /** \brief */
-static bool _visible = false;
+static jgui::jsize_t sg_screen = {0, 0};
 /** \brief */
-static bool _need_repaint = false;
+static std::mutex sg_loop_mutex;
+/** \brief */
+static jcursor_style_t sg_jgui_cursor;
+/** \brief */
+static jgui::Image *sg_jgui_icon = nullptr;
+/** \brief */
+static Window *sg_jgui_window = nullptr;
 
 static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(int symbol, bool capital)
 {
@@ -290,8 +297,6 @@ static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(int symbol, bool ca
 	return jevent::JKS_UNKNOWN;
 }
 
-static bool quitting = false;
-
 class QTWindowRender : public QDialog {
 
   protected:
@@ -304,7 +309,7 @@ class QTWindowRender : public QDialog {
       } else if (event->type() == QEvent::Close) {
           printf("CloseEvent\n");
           
-          quitting = true;
+          sg_quitting = true;
       } else if (event->type() == QEvent::Enter) {
           printf("EnterEvent\n");
       } else if (event->type() == QEvent::Leave) {
@@ -370,7 +375,7 @@ class QTWindowRender : public QDialog {
 
         jevent::jkeyevent_symbol_t symbol = TranslateToNativeKeySymbol(e->key(), (shift != 0 && capslock == 0) || (shift == 0 && capslock != 0));
 
-        g_window->GetEventManager()->PostEvent(new jevent::KeyEvent(g_window, type, mod, jevent::KeyEvent::GetCodeFromSymbol(symbol), symbol));
+        sg_jgui_window->GetEventManager()->PostEvent(new jevent::KeyEvent(sg_jgui_window, type, mod, jevent::KeyEvent::GetCodeFromSymbol(symbol), symbol));
       } else if (
           event->type() == QEvent::MouseButtonDblClick or
           event->type() == QEvent::MouseButtonPress or
@@ -437,7 +442,7 @@ class QTWindowRender : public QDialog {
           button = jevent::JMB_BUTTON3;
         }
 
-        g_window->GetEventManager()->PostEvent(new jevent::MouseEvent(g_window, type, button, buttons, mouse_z, mouse_x, mouse_y));
+        sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, buttons, mouse_z, mouse_x, mouse_y));
       } else if (event->type() == QEvent::Wheel) {
         QWheelEvent *e = dynamic_cast<QWheelEvent *>(event);
 
@@ -474,7 +479,7 @@ class QTWindowRender : public QDialog {
           mouse_z = -1;
         }
 
-        g_window->GetEventManager()->PostEvent(new jevent::MouseEvent(g_window, type, button, buttons, mouse_z, mouse_x, mouse_y));
+        sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, buttons, mouse_z, mouse_x, mouse_y));
       } else if (event->type() == QEvent::WindowActivate) {
           // printf("WindowActivateEvent\n");
       } else if (event->type() == QEvent::WindowDeactivate) {
@@ -505,14 +510,14 @@ class QTWindowRender : public QDialog {
 
       QPainter painter(this);
 
-      if (g_window == nullptr || g_window->IsVisible() == false) {
+      if (sg_jgui_window == nullptr || sg_jgui_window->IsVisible() == false) {
         return;
       }
 
       // NativeWindow 
       //   *handler = reinterpret_cast<NativeWindow *>(user_data);
       jregion_t 
-        bounds = g_window->GetBounds();
+        bounds = sg_jgui_window->GetBounds();
       jgui::Image 
         *buffer = new jgui::BufferedImage(jgui::JPF_ARGB, bounds.width, bounds.height);
       jgui::Graphics 
@@ -523,8 +528,8 @@ class QTWindowRender : public QDialog {
       g->Reset();
       g->Translate(-t.x, -t.y);
       g->SetClip(0, 0, bounds.width, bounds.height);
-      g_window->DoLayout();
-      g_window->Paint(g);
+      sg_jgui_window->DoLayout();
+      sg_jgui_window->Paint(g);
       g->Translate(t.x, t.y);
 
       cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
@@ -559,12 +564,10 @@ class QTWindowRender : public QDialog {
       delete buffer;
       buffer = nullptr;
 
-      g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_PAINTED));
+      sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
     }
 
 };
-
-static jgui::jsize_t _screen = {0, 0};
 
 NativeApplication::NativeApplication():
 	jgui::Application()
@@ -574,21 +577,23 @@ NativeApplication::NativeApplication():
 
 NativeApplication::~NativeApplication()
 {
-  delete g_window;
-  g_window = nullptr;
+  delete sg_jgui_window;
+  sg_jgui_window = nullptr;
 }
 
 void NativeApplication::InternalInit(int argc, char **argv)
 {
   int i = argc;
 
-  _application = new QApplication(i, argv);
+  sg_application = new QApplication(i, argv);
 
   QRect 
-    _geometry = QApplication::desktop()->screenGeometry();
+    sg_geometry = QApplication::desktop()->screenGeometry();
 
-	_screen.width = _geometry.width();
-	_screen.height = _geometry.height();
+	sg_screen.width = sg_geometry.width();
+	sg_screen.height = sg_geometry.height();
+  
+  sg_quitting = false;
 }
 
 void NativeApplication::InternalPaint()
@@ -597,29 +602,32 @@ void NativeApplication::InternalPaint()
 
 void NativeApplication::InternalLoop()
 {
-  quitting = false;
+  std::lock_guard<std::mutex> lock(sg_loop_mutex);
 
-  _handler->show();
-  _handler->activateWindow();
+  sg_handler->show();
+  sg_handler->activateWindow();
 
   do {
-    if (_need_repaint == true) {
-      _need_repaint = false;
+    if (sg_repaint == true) {
+      sg_repaint = false;
 
-      _handler->repaint();
+      sg_handler->repaint();
     }
 
-    _application->processEvents();
+    sg_application->processEvents();
     
     std::this_thread::yield();
-  } while (quitting == false);
+  } while (sg_quitting == false);
 
-  g_window->SetVisible(false);
+  sg_jgui_window->SetVisible(false);
 }
 
 void NativeApplication::InternalQuit()
 {
-  QCoreApplication::quit();
+  sg_quitting = true;
+
+  sg_loop_mutex.lock();
+  sg_loop_mutex.unlock();
 }
 
 NativeWindow::NativeWindow(int x, int y, int width, int height):
@@ -627,29 +635,29 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 {
 	jcommon::Object::SetClassName("jgui::NativeWindow");
 
-	if (g_window != nullptr) {
+	if (sg_jgui_window != nullptr) {
 		throw jexception::RuntimeException("Cannot create more than one window");
   }
 
-  _icon = new BufferedImage(_DATA_PREFIX"/images/small-gnu.png");
+  sg_jgui_icon = new BufferedImage(_DATA_PREFIX"/images/small-gnu.png");
 
-  _handler = new QTWindowRender();
+  sg_handler = new QTWindowRender();
 
-  _handler->setMouseTracking(true);
-  _handler->resize(width, height);
-  _handler->move(x, y);
+  sg_handler->setMouseTracking(true);
+  sg_handler->resize(width, height);
+  sg_handler->move(x, y);
 
-  _visible = true;
+  sg_visible = true;
 }
 
 NativeWindow::~NativeWindow()
 {
-  SetVisible(false);
+  QCoreApplication::quit();
 }
 
 void NativeWindow::Repaint(Component *cmp)
 {
-  _need_repaint = true;
+  sg_repaint = true;
 }
 
 void NativeWindow::ToggleFullScreen()
@@ -657,34 +665,33 @@ void NativeWindow::ToggleFullScreen()
     const QString 
       session = QString(getenv("DESKTOP_SESSION")).toLower();
 
-	if (_fullscreen_enabled == false) {
-    _fullscreen_enabled = true;
+	if (sg_fullscreen == false) {
+    sg_fullscreen = true;
     
-    _geometry = _handler->saveGeometry();
+    sg_geometry = sg_handler->saveGeometry();
 
     if (session == "ubuntu") {
-      _handler->setFixedSize({_screen.width, _screen.height});
-      _handler->setWindowFlags(Qt::FramelessWindowHint);
-      _handler->setWindowState(_handler->windowState() | Qt::WindowFullScreen);
-      _handler->show();
-      _handler->activateWindow();
+      sg_handler->setFixedSize({sg_screen.width, sg_screen.height});
+      sg_handler->setWindowFlags(Qt::FramelessWindowHint);
+      sg_handler->setWindowState(sg_handler->windowState() | Qt::WindowFullScreen);
+      sg_handler->show();
+      sg_handler->activateWindow();
     } else {
-      _handler->showFullScreen();
+      sg_handler->showFullScreen();
     }
 	} else {
-    _fullscreen_enabled = false;
+    sg_fullscreen = false;
     
     if (session == "ubuntu") {
-        _handler->setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
-        _handler->setMinimumSize(0, 0);
-        _handler->restoreGeometry(_geometry);
-        _handler->setWindowFlags(Qt::Dialog);
-        _handler->show();
-        _handler->activateWindow();
+        sg_handler->setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+        sg_handler->setMinimumSize(0, 0);
+        sg_handler->restoreGeometry(sg_geometry);
+        sg_handler->setWindowFlags(Qt::Dialog);
+        sg_handler->show();
+        sg_handler->activateWindow();
     } else {
-        _handler->showNormal();
+        sg_handler->showNormal();
     }
-
 	}
 }
 
@@ -696,63 +703,63 @@ void NativeWindow::SetParent(jgui::Container *c)
     throw jexception::IllegalArgumentException("Used only by native engine");
   }
 
-  g_window = parent;
+  sg_jgui_window = parent;
 
-  g_window->SetParent(nullptr);
+  sg_jgui_window->SetParent(nullptr);
 }
 
 void NativeWindow::SetTitle(std::string title)
 {
-	_handler->setWindowTitle(title.c_str());
+	sg_handler->setWindowTitle(title.c_str());
 }
 
 std::string NativeWindow::GetTitle()
 {
-	return _handler->windowTitle().toStdString();
+	return sg_handler->windowTitle().toStdString();
 }
 
 void NativeWindow::SetOpacity(float opacity)
 {
-	_opacity = opacity;
+	sg_opacity = opacity;
 }
 
 float NativeWindow::GetOpacity()
 {
-  return _opacity;
+  return sg_opacity;
 }
 
 void NativeWindow::SetUndecorated(bool undecorated)
 {
-  _undecorated = undecorated;
+  sg_undecorated = undecorated;
 
   if (undecorated == true) {
-    _handler->setWindowFlags(Qt::CustomizeWindowHint);
-    _handler->setWindowFlags(Qt::FramelessWindowHint);
+    sg_handler->setWindowFlags(Qt::CustomizeWindowHint);
+    sg_handler->setWindowFlags(Qt::FramelessWindowHint);
   } else {
-    _handler->setWindowFlags(Qt::WindowTitleHint);
-    _handler->setWindowFlags(Qt::WindowMinimizeButtonHint);
-    _handler->setWindowFlags(Qt::WindowMaximizeButtonHint);
-    _handler->setWindowFlags(Qt::WindowCloseButtonHint);
+    sg_handler->setWindowFlags(Qt::WindowTitleHint);
+    sg_handler->setWindowFlags(Qt::WindowMinimizeButtonHint);
+    sg_handler->setWindowFlags(Qt::WindowMaximizeButtonHint);
+    sg_handler->setWindowFlags(Qt::WindowCloseButtonHint);
   }
 }
 
 bool NativeWindow::IsUndecorated()
 {
-  return _undecorated;
+  return sg_undecorated;
 }
 
 void NativeWindow::SetBounds(int x, int y, int width, int height)
 {
-  _handler->resize(width, height);
-  _handler->move(x, y);
+  sg_handler->resize(width, height);
+  sg_handler->move(x, y);
 }
 
 jgui::jregion_t NativeWindow::GetBounds()
 {
   QSize 
-    size = _handler->size();
+    size = sg_handler->size();
   QPoint
-    location = _handler->pos();
+    location = sg_handler->pos();
 
   return {
     .x = location.x(),
@@ -781,15 +788,15 @@ void NativeWindow::SetCursorLocation(int x, int y)
 		y = 0;
 	}
 
-	if (x > _screen.width) {
-		x = _screen.width;
+	if (x > sg_screen.width) {
+		x = sg_screen.width;
 	}
 
-	if (y > _screen.height) {
-		y = _screen.height;
+	if (y > sg_screen.height) {
+		y = sg_screen.height;
 	}
 
-  QCursor cursor = _handler->cursor();
+  QCursor cursor = sg_handler->cursor();
 
   cursor.setPos(QPoint(x, y));
 }
@@ -802,7 +809,7 @@ jpoint_t NativeWindow::GetCursorLocation()
 	t.y = 0;
 
   QCursor 
-    cursor = _handler->cursor();
+    cursor = sg_handler->cursor();
   QPoint
     location = cursor.pos();
 
@@ -814,47 +821,47 @@ jpoint_t NativeWindow::GetCursorLocation()
 
 void NativeWindow::SetVisible(bool visible)
 {
-  if (_visible == visible) {
+  if (sg_visible == visible) {
     return;
   }
 
-  _visible = visible;
+  sg_visible = visible;
 
-  // _handler->setVisible(_visible);
+  // sg_handler->setVisible(sg_visible);
 
-  if (_visible == false) {
-    _handler->hide();
-    // _handler->deactivateWindow();
+  if (sg_visible == false) {
+    sg_handler->hide();
+    // sg_handler->deactivateWindow();
   } else {
-    _handler->show();
-    _handler->activateWindow();
+    sg_handler->show();
+    sg_handler->activateWindow();
   }
 }
 
 bool NativeWindow::IsVisible()
 {
-  return _visible;
+  return sg_visible;
 }
 
 jcursor_style_t NativeWindow::GetCursor()
 {
-  return _cursor;
+  return sg_jgui_cursor;
 }
 
 void NativeWindow::SetCursorEnabled(bool enabled)
 {
-  QCursor cursor = _handler->cursor();
+  QCursor cursor = sg_handler->cursor();
 
   if (enabled == false) {
     cursor.setShape(Qt::BlankCursor);
   } else {
-    SetCursor(_cursor);
+    SetCursor(sg_jgui_cursor);
   }
 }
 
 bool NativeWindow::IsCursorEnabled()
 {
-  return _handler->cursor().shape() != Qt::BlankCursor;
+  return sg_handler->cursor().shape() != Qt::BlankCursor;
 }
 
 void NativeWindow::SetCursor(jcursor_style_t style)
@@ -892,9 +899,9 @@ void NativeWindow::SetCursor(jcursor_style_t style)
 
   cursor.setShape(type);
 
-  _handler->setCursor(cursor);
+  sg_handler->setCursor(cursor);
 
-  _cursor = style;
+  sg_jgui_cursor = style;
 }
 
 void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
@@ -917,7 +924,7 @@ void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
   QPixmap pixmap = QPixmap::fromImage(image);
   QCursor cursor_default = QCursor(pixmap, hotx, hoty);
 
-  _handler->setCursor(cursor_default);
+  sg_handler->setCursor(cursor_default);
 }
 
 void NativeWindow::SetRotation(jwindow_rotation_t t)
@@ -931,12 +938,12 @@ jwindow_rotation_t NativeWindow::GetRotation()
 
 void NativeWindow::SetIcon(jgui::Image *image)
 {
-  _icon = image;
+  sg_jgui_icon = image;
 }
 
 jgui::Image * NativeWindow::GetIcon()
 {
-  return _icon;
+  return sg_jgui_icon;
 }
 
 }

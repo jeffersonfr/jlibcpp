@@ -283,6 +283,8 @@ class Main : public jgui::Window {
 #endif
       
 			std::cout << std::endl;
+
+      jgui::Application::Quit();
 		}
 
 #if ENABLE_GUI == 1

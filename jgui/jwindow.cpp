@@ -84,6 +84,11 @@ Window::Window(int x, int y, int width, int height):
 
 Window::~Window()
 {
+  try {
+    _exec_thread.join();
+  } catch (std::system_error &e) {
+  }
+  
   if (_event_manager != nullptr) {
     delete _event_manager;
     _event_manager = nullptr;
@@ -94,11 +99,6 @@ Window::~Window()
     _font = nullptr;
   }
 
-  try {
-    _exec_thread.join();
-  } catch (std::system_error &e) {
-  }
-  
   delete _instance;
   _instance = nullptr;
 }

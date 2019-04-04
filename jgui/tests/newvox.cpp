@@ -111,18 +111,16 @@ class NewVox : public jgui::Window {
 		// the scaling factor is a 16.8 fixed point value.
 		void Line(int x0, int y0, int x1, int y1, int hy, int s)
 		{
-			jgui::jsize_t
-				size = GetSize();
 			int 
 				i,
 				sx,
 				sy;
 
 			// Compute xy speed
-			sx = (x1 - x0)/size.width; 
-			sy = (y1 - y0)/size.height;
+			sx = (x1 - x0)/MAXW; 
+			sy = (y1 - y0)/MAXH;
 
-			for ( i=0; i<size.width; i++ ) {
+			for ( i=0; i<MAXW; i++ ) {
 				int c,y,h,u0,v0,u1,v1,a,b,h0,h1,h2,h3;
 
 				// Compute the xy coordinates; a and b will be the position inside the single map cell (0..255).
@@ -154,7 +152,7 @@ class NewVox : public jgui::Window {
 				c=((h0<<8)+b*(h2-h0));
 
 				// Compute screen height using the scaling factor
-				y=(((h-hy)*s)>>11)+100;
+				y=(((h-hy)*s)>>11)+128;
 
 				// Draw the column 
 				if ( y<(a=lasty[i]) ) {
@@ -162,7 +160,7 @@ class NewVox : public jgui::Window {
 						sc,
 						cc;
 					uint8_t 
-						*b = Video + a*size.width + i;
+						*b = Video + a*MAXW + i;
 
 					if ( lastc[i]==-1 )
 						lastc[i]=c;
@@ -170,10 +168,10 @@ class NewVox : public jgui::Window {
 					sc=(c-lastc[i])/(a-y);
 					cc=lastc[i];
 
-					int limit = size.height - 1;
+					int limit = MAXH - 1;
 
 					if ( a>limit ) { 
-						b-=(a-limit)*size.width; 
+						b-=(a-limit)*MAXW; 
 						cc+=(a-limit)*sc; 
 						a=limit; 
 					}
@@ -185,7 +183,7 @@ class NewVox : public jgui::Window {
 					while ( y<a ) {
 						*b=cc>>18; 
 						cc+=sc;
-						b-=size.width;
+						b-=MAXW;
 						a--;
 					}
 					lasty[i]=y;
@@ -234,27 +232,14 @@ class NewVox : public jgui::Window {
 
 		virtual void Paint(jgui::Graphics *g)
 		{
-			jgui::jsize_t
-				size = GetSize();
-			int d,
-					a,
-					b,
-					h,
-					u0,
-					v0,
-					u1,
-					v1,
-					h0,
-					h1,
-					h2,
-					h3;
+			int d, a, b, h, u0, v0, u1, v1, h0, h1, h2, h3;
 
 			// Clear offscreen buffer
-			memset(Video, 0, size.width*size.height);
+			memset(Video, 0, MAXW*MAXH);
 
 			// Initialize last-y and last-color arrays
-			for ( d=0; d<size.width; d++ ) {
-				lasty[d]=size.height;
+			for ( d=0; d<MAXW; d++ ) {
+				lasty[d]=MAXH;
 				lastc[d]=-1;
 			}
 
@@ -282,24 +267,24 @@ class NewVox : public jgui::Window {
 				Line(x0+d*65536*cos(a-FOV),y0+d*65536*sin(a-FOV), x0+d*65536*cos(a+FOV),y0+d*65536*sin(a+FOV), h-30,100*256/(d+1));
 			}
 
-			uint32_t buffer[size.width*size.height];
+			uint32_t buffer[MAXW*MAXH];
 			uint8_t *src = Video;
 			uint32_t *dst = buffer;
 			int col, row;
 
-			for ( row=0; row<size.height; row++ ) {
-				for ( col=0; col<size.width; col++ ) {
+			for ( row=0; row<MAXH; row++ ) {
+				for ( col=0; col<MAXW; col++ ) {
 					uint8_t p = Palette[*(src + col)];
 
 					*(dst + col) = 0xff000000 | (p << 0x10) | (p << 0x08) | p;
 				}
 
-				src += size.width;
-				dst += size.width;
+				src += MAXW;
+				dst += MAXW;
 			}
 			
 			g->SetCompositeFlags(jgui::JCF_SRC);
-			g->SetRGBArray(buffer, 0, 0, size.width, size.height);
+			g->SetRGBArray(buffer, 0, 0, MAXW, MAXH);
 		}
 
 		virtual bool KeyPressed(jevent::KeyEvent *event)

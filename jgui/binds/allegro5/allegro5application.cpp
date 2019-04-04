@@ -27,47 +27,54 @@
 #include "jexception/jillegalargumentexception.h"
 
 #include <thread>
+#include <mutex>
 
 #include <allegro5/allegro.h>
 
 namespace jgui {
 
 /** \brief */
-static std::map<int, int> _key_modifiers;
+static std::map<int, int> sg_key_modifiers;
 /** \brief */
-static std::map<int, int> _mouse_buttons;
+static std::map<int, int> sg_mouse_buttons;
 /** \brief */
-static ALLEGRO_DISPLAY *_display = nullptr;
+static ALLEGRO_DISPLAY *sg_display = nullptr;
 /** \brief */
-static ALLEGRO_BITMAP *_surface = nullptr;
+static ALLEGRO_BITMAP *sg_surface = nullptr;
 /** \brief */
-static ALLEGRO_MOUSE_CURSOR *_cursor_bitmap = nullptr;
+static ALLEGRO_MOUSE_CURSOR *sg_jgui_cursor_bitmap = nullptr;
 /** \brief */
-static jgui::Image *_icon = nullptr;
+static std::chrono::time_point<std::chrono::steady_clock> sg_last_keypress;
 /** \brief */
-static std::chrono::time_point<std::chrono::steady_clock> _last_keypress;
+static int sg_mouse_x = 0;
 /** \brief */
-static int _mouse_x;
+static int sg_mouse_y = 0;
 /** \brief */
-static int _mouse_y;
+static int sg_click_count = 0;
 /** \brief */
-static int _click_count;
+static Window *sg_jgui_window = nullptr;
 /** \brief */
-static Window *g_window = nullptr;
+static std::string sg_title;
 /** \brief */
-static std::string _title;
+static float sg_opacity = 1.0f;
 /** \brief */
-static float _opacity = 1.0f;
+static bool sg_jgui_cursor_enabled = true;
 /** \brief */
-static bool _cursor_enabled = true;
+static bool sg_visible = true;
 /** \brief */
-static jcursor_style_t _cursor;
+static jgui::jregion_t sg_previous_bounds;
 /** \brief */
-static bool _visible = true;
+static bool sg_repaint = false;
 /** \brief */
-static jgui::jregion_t _previous_bounds;
+static std::mutex sg_loop_mutex;
 /** \brief */
-static bool _need_repaint = false;
+static bool sg_quitting = false;
+/** \brief */
+static jgui::jsize_t sg_screen = {0, 0};
+/** \brief */
+static jcursor_style_t sg_jgui_cursor = JCS_DEFAULT;
+/** \brief */
+static jgui::Image *sg_jgui_icon = nullptr;
 
 static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(int symbol, bool capital)
 {
@@ -301,8 +308,6 @@ static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(int symbol, bool ca
 	return jevent::JKS_UNKNOWN;
 }
 
-static jgui::jsize_t _screen = {0, 0};
-
 NativeApplication::NativeApplication():
 	jgui::Application()
 {
@@ -328,31 +333,33 @@ void NativeApplication::InternalInit(int argc, char **argv)
 		throw jexception::RuntimeException("Could not get screen mode");
 	}
 
-	_screen.width = mode.width;
-	_screen.height = mode.height;
+	sg_screen.width = mode.width;
+	sg_screen.height = mode.height;
 
-	_key_modifiers[ALLEGRO_KEY_LSHIFT] = false;
-	_key_modifiers[ALLEGRO_KEY_RSHIFT] = false;
-	_key_modifiers[ALLEGRO_KEY_LCTRL] = false;
-	_key_modifiers[ALLEGRO_KEY_RCTRL] = false;
-	_key_modifiers[ALLEGRO_KEY_ALT] = false;
-	_key_modifiers[ALLEGRO_KEY_ALTGR] = false;
-	_key_modifiers[ALLEGRO_KEY_LWIN] = false;
-	_key_modifiers[ALLEGRO_KEY_RWIN] = false;
-	_key_modifiers[ALLEGRO_KEY_MENU] = false;
-	_key_modifiers[ALLEGRO_KEY_SCROLLLOCK] = false;
-	_key_modifiers[ALLEGRO_KEY_NUMLOCK] = false;
-	_key_modifiers[ALLEGRO_KEY_CAPSLOCK] = false;
+	sg_key_modifiers[ALLEGRO_KEY_LSHIFT] = false;
+	sg_key_modifiers[ALLEGRO_KEY_RSHIFT] = false;
+	sg_key_modifiers[ALLEGRO_KEY_LCTRL] = false;
+	sg_key_modifiers[ALLEGRO_KEY_RCTRL] = false;
+	sg_key_modifiers[ALLEGRO_KEY_ALT] = false;
+	sg_key_modifiers[ALLEGRO_KEY_ALTGR] = false;
+	sg_key_modifiers[ALLEGRO_KEY_LWIN] = false;
+	sg_key_modifiers[ALLEGRO_KEY_RWIN] = false;
+	sg_key_modifiers[ALLEGRO_KEY_MENU] = false;
+	sg_key_modifiers[ALLEGRO_KEY_SCROLLLOCK] = false;
+	sg_key_modifiers[ALLEGRO_KEY_NUMLOCK] = false;
+	sg_key_modifiers[ALLEGRO_KEY_CAPSLOCK] = false;
+  
+  sg_quitting = false;
 }
 
 void NativeApplication::InternalPaint()
 {
-	if (g_window == nullptr || g_window->IsVisible() == false) {
+	if (sg_jgui_window == nullptr || sg_jgui_window->IsVisible() == false) {
 		return;
 	}
 
   jregion_t 
-    bounds = g_window->GetBounds();
+    bounds = sg_jgui_window->GetBounds();
   jgui::Image 
     *buffer = new jgui::BufferedImage(jgui::JPF_ARGB, bounds.width, bounds.height);
   jgui::Graphics 
@@ -363,8 +370,8 @@ void NativeApplication::InternalPaint()
 	g->Reset();
 	g->Translate(-t.x, -t.y);
   g->SetClip(0, 0, bounds.width, bounds.height);
-	g_window->DoLayout();
-  g_window->Paint(g);
+	sg_jgui_window->DoLayout();
+  sg_jgui_window->Paint(g);
 	g->Translate(t.x, t.y);
 
   cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
@@ -390,7 +397,7 @@ void NativeApplication::InternalPaint()
   }
 
 	ALLEGRO_LOCKED_REGION 
-    *lock = al_lock_bitmap(_surface, ALLEGRO_PIXEL_FORMAT_ARGB_8888, ALLEGRO_LOCK_WRITEONLY);
+    *lock = al_lock_bitmap(sg_surface, ALLEGRO_PIXEL_FORMAT_ARGB_8888, ALLEGRO_LOCK_WRITEONLY);
 	int 
     size = dw*dh;
 	uint8_t 
@@ -407,10 +414,10 @@ void NativeApplication::InternalPaint()
     dst = dst + 4;
   }
 
-	al_unlock_bitmap(_surface);
+	al_unlock_bitmap(sg_surface);
 	
 	al_clear_to_color(al_map_rgb(0, 0, 0));
-	al_draw_bitmap(_surface, 0, 0, 0);
+	al_draw_bitmap(sg_surface, 0, 0, 0);
 	al_flip_display();
   
   if (g->IsVerticalSyncEnabled() == true) {
@@ -420,14 +427,15 @@ void NativeApplication::InternalPaint()
   delete buffer;
   buffer = nullptr;
 
-  g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_PAINTED));
+  sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
 }
 
 void NativeApplication::InternalLoop()
 {
-	ALLEGRO_EVENT event;
-  bool quitting = false;
+  std::lock_guard<std::mutex> lock(sg_loop_mutex);
 
+	ALLEGRO_EVENT event;
+  
 	ALLEGRO_EVENT_QUEUE *queue = al_create_event_queue();
 
   if (queue == nullptr) {
@@ -436,27 +444,29 @@ void NativeApplication::InternalLoop()
 
 	al_register_event_source(queue, al_get_keyboard_event_source());
 	al_register_event_source(queue, al_get_mouse_event_source());
-	al_register_event_source(queue, al_get_display_event_source(_display));
+	al_register_event_source(queue, al_get_display_event_source(sg_display));
 
-	while (quitting == false) {
-    if (_need_repaint == true) {
-      _need_repaint = false;
+	while (sg_quitting == false) {
+    if (sg_repaint == true) {
+      sg_repaint = false;
 
       InternalPaint();
     }
 
-		if (al_wait_for_event_timed(queue, &event, 0) == false) {
+    if (al_get_next_event(queue, &event) == false) {
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
       
       continue;
     }
-    
+ 
+    al_drop_next_event(queue);
+
     // al_wait_for_event(queue, &event);
 
 		if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
-      quitting = true;
+      sg_quitting = true;
 
-      g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_CLOSED));
+      sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_CLOSED));
     } else if (event.type == ALLEGRO_EVENT_MOUSE_ENTER_DISPLAY) {
       // SDL_CaptureMouse(true);
       // void SDL_SetWindowGrab(SDL_Window* window, SDL_bool grabbed);
@@ -464,7 +474,7 @@ void NativeApplication::InternalLoop()
 
       // SetCursor(GetCursor());
 
-      g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_ENTERED));
+      sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_ENTERED));
     } else if (event.type == ALLEGRO_EVENT_MOUSE_LEAVE_DISPLAY) {
       // SDL_CaptureMouse(false);
       // void SDL_SetWindowGrab(SDL_Window* window, SDL_bool grabbed);
@@ -472,11 +482,11 @@ void NativeApplication::InternalLoop()
 
       // SetCursor(JCS_DEFAULT);
 
-      g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_LEAVED));
+      sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_LEAVED));
     } else if (event.type == ALLEGRO_EVENT_DISPLAY_RESIZE) {
       InternalPaint();
 
-      g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_RESIZED));
+      sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_RESIZED));
     } else if (event.type == ALLEGRO_EVENT_DISPLAY_EXPOSE) {
       InternalPaint();
     } else if (event.type == ALLEGRO_EVENT_KEY_CHAR || event.type == ALLEGRO_EVENT_KEY_DOWN || event.type == ALLEGRO_EVENT_KEY_UP) {
@@ -498,26 +508,26 @@ void NativeApplication::InternalLoop()
         case ALLEGRO_KEY_SCROLLLOCK:
         case ALLEGRO_KEY_NUMLOCK:
         case ALLEGRO_KEY_CAPSLOCK:
-          _key_modifiers[event.keyboard.keycode] = (event.type == ALLEGRO_EVENT_KEY_DOWN)?true:false;
+          sg_key_modifiers[event.keyboard.keycode] = (event.type == ALLEGRO_EVENT_KEY_DOWN)?true:false;
         default:
           break;
       };
 
-      if (_key_modifiers[ALLEGRO_KEY_LSHIFT] == true) {
+      if (sg_key_modifiers[ALLEGRO_KEY_LSHIFT] == true) {
         mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_SHIFT);
-      } else if (_key_modifiers[ALLEGRO_KEY_RSHIFT] == true) {
+      } else if (sg_key_modifiers[ALLEGRO_KEY_RSHIFT] == true) {
         mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_SHIFT);
-      } else if (_key_modifiers[ALLEGRO_KEY_LCTRL] == true) {
+      } else if (sg_key_modifiers[ALLEGRO_KEY_LCTRL] == true) {
         mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_CONTROL);
-      } else if (_key_modifiers[ALLEGRO_KEY_RCTRL] == true) {
+      } else if (sg_key_modifiers[ALLEGRO_KEY_RCTRL] == true) {
         mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_CONTROL);
-      } else if (_key_modifiers[ALLEGRO_KEY_ALT] == true) {
+      } else if (sg_key_modifiers[ALLEGRO_KEY_ALT] == true) {
         mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_ALT);
-      } else if (_key_modifiers[ALLEGRO_KEY_ALTGR] == true) {
+      } else if (sg_key_modifiers[ALLEGRO_KEY_ALTGR] == true) {
         mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_ALTGR);
-      } else if (_key_modifiers[ALLEGRO_KEY_LWIN] == true) {
+      } else if (sg_key_modifiers[ALLEGRO_KEY_LWIN] == true) {
         mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_META);
-      } else if (_key_modifiers[ALLEGRO_KEY_RWIN] == true) {
+      } else if (sg_key_modifiers[ALLEGRO_KEY_RWIN] == true) {
         // mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_RMETA);
       }
 
@@ -529,41 +539,41 @@ void NativeApplication::InternalLoop()
         type = jevent::JKT_RELEASED;
       }
 
-      int shift = _key_modifiers[ALLEGRO_KEY_LSHIFT] | _key_modifiers[ALLEGRO_KEY_RSHIFT];
-      int capslock = _key_modifiers[ALLEGRO_KEY_CAPSLOCK];
+      int shift = sg_key_modifiers[ALLEGRO_KEY_LSHIFT] | sg_key_modifiers[ALLEGRO_KEY_RSHIFT];
+      int capslock = sg_key_modifiers[ALLEGRO_KEY_CAPSLOCK];
 
       jevent::jkeyevent_symbol_t symbol = TranslateToNativeKeySymbol(event.keyboard.keycode, (shift != 0 && capslock == 0) || (shift == 0 && capslock != 0));
 
-      g_window->GetEventManager()->PostEvent(new jevent::KeyEvent(g_window, type, mod, jevent::KeyEvent::GetCodeFromSymbol(symbol), symbol));
+      sg_jgui_window->GetEventManager()->PostEvent(new jevent::KeyEvent(sg_jgui_window, type, mod, jevent::KeyEvent::GetCodeFromSymbol(symbol), symbol));
     } else if (event.type == ALLEGRO_EVENT_MOUSE_AXES || event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN || event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP || event.type == ALLEGRO_EVENT_MOUSE_WARPED) {
       jevent::jmouseevent_button_t button = jevent::JMB_NONE;
       jevent::jmouseevent_button_t buttons = jevent::JMB_NONE;
       jevent::jmouseevent_type_t type = jevent::JMT_UNKNOWN;
       int mouse_z = 0;
 
-      _mouse_x = event.mouse.x;
-      _mouse_y = event.mouse.y;
+      sg_mouse_x = event.mouse.x;
+      sg_mouse_y = event.mouse.y;
 
-      _mouse_x = CLAMP(_mouse_x, 0, _screen.width - 1);
-      _mouse_y = CLAMP(_mouse_y, 0, _screen.height - 1);
+      sg_mouse_x = CLAMP(sg_mouse_x, 0, sg_screen.width - 1);
+      sg_mouse_y = CLAMP(sg_mouse_y, 0, sg_screen.height - 1);
 
       if (event.type == ALLEGRO_EVENT_MOUSE_AXES) {
         type = jevent::JMT_MOVED;
       } else if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN || event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
         if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
-          if (_mouse_buttons[event.mouse.button - 1] == true) {
+          if (sg_mouse_buttons[event.mouse.button - 1] == true) {
             continue;
           }
 
-          _mouse_buttons[event.mouse.button - 1] = true;
+          sg_mouse_buttons[event.mouse.button - 1] = true;
 
           type = jevent::JMT_PRESSED;
         } else if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
-          if (_mouse_buttons[event.mouse.button - 1] == false) {
+          if (sg_mouse_buttons[event.mouse.button - 1] == false) {
             continue;
           }
 
-          _mouse_buttons[event.mouse.button - 1] = false;
+          sg_mouse_buttons[event.mouse.button - 1] = false;
 
           type = jevent::JMT_RELEASED;
         }
@@ -576,49 +586,53 @@ void NativeApplication::InternalLoop()
           button = jevent::JMB_BUTTON3;
         }
 
-        // _click_count = 1;
+        // sg_click_count = 1;
 
         if (type == jevent::JMT_PRESSED) {
           auto current = std::chrono::steady_clock::now();
 
-          if ((std::chrono::duration_cast<std::chrono::milliseconds>(current - _last_keypress).count()) < 200L) {
-            _click_count = _click_count + 1;
+          if ((std::chrono::duration_cast<std::chrono::milliseconds>(current - sg_last_keypress).count()) < 200L) {
+            sg_click_count = sg_click_count + 1;
           } else {
-            _click_count = 1;
+            sg_click_count = 1;
           }
 
-          _last_keypress = current;
+          sg_last_keypress = current;
 
-          mouse_z = _click_count % 200;
+          mouse_z = sg_click_count % 200;
         }
       } else if (event.type == ALLEGRO_EVENT_MOUSE_WARPED) {
         type = jevent::JMT_ROTATED;
         mouse_z = event.mouse.dz;
       }
 
-      if (_mouse_buttons[1 - 1] == true) {
+      if (sg_mouse_buttons[1 - 1] == true) {
         buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON1);
       }
 
-      if (_mouse_buttons[2 - 1] == true) {
+      if (sg_mouse_buttons[2 - 1] == true) {
         buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON2);
       }
 
-      if (_mouse_buttons[3 - 1] == true) {
+      if (sg_mouse_buttons[3 - 1] == true) {
         buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON3);
       }
 
-      g_window->GetEventManager()->PostEvent(new jevent::MouseEvent(g_window, type, button, buttons, mouse_z, _mouse_x, _mouse_y));
+      sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, buttons, mouse_z, sg_mouse_x, sg_mouse_y));
     }
   }
 
   al_destroy_event_queue(queue);
   
-  g_window->SetVisible(false);
+  sg_jgui_window->SetVisible(false);
 }
 
 void NativeApplication::InternalQuit()
 {
+  sg_quitting = true;
+
+  sg_loop_mutex.lock();
+  sg_loop_mutex.unlock();
 }
 
 NativeWindow::NativeWindow(int x, int y, int width, int height):
@@ -626,19 +640,19 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 {
 	jcommon::Object::SetClassName("jgui::NativeWindow");
 
-	if (_surface != nullptr) {
+	if (sg_surface != nullptr) {
 		throw jexception::RuntimeException("Cannot create more than one window");
   }
 
-  _icon = new BufferedImage(_DATA_PREFIX"/images/small-gnu.png");
+  sg_jgui_icon = new BufferedImage(_DATA_PREFIX"/images/small-gnu.png");
 
-	_surface = nullptr;
-	_mouse_x = 0;
-	_mouse_y = 0;
-	_last_keypress = std::chrono::steady_clock::now();
-	_click_count = 1;
+	sg_surface = nullptr;
+	sg_mouse_x = 0;
+	sg_mouse_y = 0;
+	sg_last_keypress = std::chrono::steady_clock::now();
+	sg_click_count = 1;
 
-  // al_set_new_display_need_repaint_rate(60);
+  // al_set_new_displaysg_repaint_rate(60);
 	al_set_new_bitmap_flags(ALLEGRO_MEMORY_BITMAP | ALLEGRO_NO_PREMULTIPLIED_ALPHA);
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ARGB_8888);
 	al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
@@ -648,16 +662,16 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 	al_set_new_display_option(ALLEGRO_VSYNC, 1, ALLEGRO_SUGGEST); // ALLEGRO_REQUIRE;
 	al_set_new_display_flags(ALLEGRO_RESIZABLE);
 
-	_display = al_create_display(width, height);
+	sg_display = al_create_display(width, height);
 
-	if (_display == nullptr) {
+	if (sg_display == nullptr) {
 		throw jexception::RuntimeException("Cannot create a window");
 	}
 
-	_surface = al_create_bitmap(width, height);
+	sg_surface = al_create_bitmap(width, height);
 	
-	if (_surface == nullptr) {
-	  al_destroy_display(_display);
+	if (sg_surface == nullptr) {
+	  al_destroy_display(sg_display);
 
 		throw jexception::RuntimeException("Cannot get a window's surface");
 	}
@@ -667,37 +681,37 @@ NativeWindow::~NativeWindow()
 {
   SetVisible(false);
 
-  al_destroy_bitmap(_surface);
-  _surface = nullptr;
+  al_destroy_bitmap(sg_surface);
+  sg_surface = nullptr;
 
-	al_destroy_display(_display);
-  _display = nullptr;
+	al_destroy_display(sg_display);
+  sg_display = nullptr;
 }
 
 void NativeWindow::Repaint(Component *cmp)
 {
-  _need_repaint = true;
+  sg_repaint = true;
 }
 
 void NativeWindow::ToggleFullScreen()
 {
-  bool enabled = (al_get_display_flags(_display) & ALLEGRO_FULLSCREEN_WINDOW) != 0;
+  bool enabled = (al_get_display_flags(sg_display) & ALLEGRO_FULLSCREEN_WINDOW) != 0;
 
 	if (enabled == false) {
-    _previous_bounds = GetBounds();
+    sg_previous_bounds = GetBounds();
 
-    al_set_display_flag(_display, ALLEGRO_FULLSCREEN_WINDOW, true);
-    al_set_display_flag(_display, ALLEGRO_GENERATE_EXPOSE_EVENTS, true);
+    al_set_display_flag(sg_display, ALLEGRO_FULLSCREEN_WINDOW, true);
+    al_set_display_flag(sg_display, ALLEGRO_GENERATE_EXPOSE_EVENTS, true);
     
-    SetBounds(0, 0, _screen.width, _screen.height);
+    SetBounds(0, 0, sg_screen.width, sg_screen.height);
 	} else {
-    al_set_display_flag(_display, ALLEGRO_FULLSCREEN_WINDOW, false);
-    al_set_display_flag(_display, ALLEGRO_GENERATE_EXPOSE_EVENTS, true);
+    al_set_display_flag(sg_display, ALLEGRO_FULLSCREEN_WINDOW, false);
+    al_set_display_flag(sg_display, ALLEGRO_GENERATE_EXPOSE_EVENTS, true);
     
-    SetBounds(_previous_bounds.x, _previous_bounds.y, _previous_bounds.width, _previous_bounds.height);
+    SetBounds(sg_previous_bounds.x, sg_previous_bounds.y, sg_previous_bounds.width, sg_previous_bounds.height);
 	}
 
-	_need_repaint = true;
+	sg_repaint = true;
 }
 
 void NativeWindow::SetParent(jgui::Container *c)
@@ -708,75 +722,75 @@ void NativeWindow::SetParent(jgui::Container *c)
     throw jexception::IllegalArgumentException("Used only by native engine");
   }
 
-  g_window = parent;
+  sg_jgui_window = parent;
 
-  g_window->SetParent(nullptr);
+  sg_jgui_window->SetParent(nullptr);
 }
 
 void NativeWindow::SetTitle(std::string title)
 {
-  _title = title;
+  sg_title = title;
 
-  al_set_window_title(_display, title.c_str());
+  al_set_window_title(sg_display, title.c_str());
 }
 
 std::string NativeWindow::GetTitle()
 {
-  return _title;
+  return sg_title;
 }
 
 void NativeWindow::SetOpacity(float opacity)
 {
-  _opacity = opacity;
+  sg_opacity = opacity;
 }
 
 float NativeWindow::GetOpacity()
 {
-  return _opacity;
+  return sg_opacity;
 }
 
 void NativeWindow::SetUndecorated(bool undecorated)
 {
-  al_set_display_flag(_display, ALLEGRO_FRAMELESS, undecorated);
+  al_set_display_flag(sg_display, ALLEGRO_FRAMELESS, undecorated);
 }
 
 bool NativeWindow::IsUndecorated()
 {
-  return (al_get_display_flags(_display) & ALLEGRO_FRAMELESS) != 0;
+  return (al_get_display_flags(sg_display) & ALLEGRO_FRAMELESS) != 0;
 }
 
 void NativeWindow::SetBounds(int x, int y, int width, int height)
 {
-	al_set_window_position(_display, x, y);
-	al_resize_display(_display, width, height);
+	al_set_window_position(sg_display, x, y);
+	al_resize_display(sg_display, width, height);
  
-	if (_surface != nullptr) { 
-		al_destroy_bitmap(_surface);
+	if (sg_surface != nullptr) { 
+		al_destroy_bitmap(sg_surface);
 	}
 
-	_surface = al_create_bitmap(width, height);
+	sg_surface = al_create_bitmap(width, height);
 }
 
 jgui::jregion_t NativeWindow::GetBounds()
 {
 	jgui::jregion_t t;
 
-  t.width = al_get_bitmap_width(_surface);
-  t.height = al_get_bitmap_height(_surface);
+  t.width = al_get_bitmap_width(sg_surface);
+  t.height = al_get_bitmap_height(sg_surface);
 
-	al_get_window_position(_display, &t.x, &t.y);
+	al_get_window_position(sg_display, &t.x, &t.y);
 
 	return t;
 }
 		
 void NativeWindow::SetResizable(bool resizable)
 {
-  al_set_display_flag(_display, ALLEGRO_RESIZABLE, resizable);
+  al_set_display_flag(sg_display, ALLEGRO_RESIZABLE, resizable);
 }
 
 bool NativeWindow::IsResizable()
 {
-  return (al_get_display_flags(_display) & ALLEGRO_RESIZABLE) != 0;
+  return (al_get_display_flags(sg_display) & ALLEGRO_RESIZABLE) != 0;
 }
 
 void NativeWindow::SetCursorLocation(int x, int y)
@@ -789,15 +803,15 @@ void NativeWindow::SetCursorLocation(int x, int y)
 		y = 0;
 	}
 
-	if (x > _screen.width) {
-		x = _screen.width;
+	if (x > sg_screen.width) {
+		x = sg_screen.width;
 	}
 
-	if (y > _screen.height) {
-		y = _screen.height;
+	if (y > sg_screen.height) {
+		y = sg_screen.height;
 	}
 
-	al_set_mouse_xy(_display, x, y);
+	al_set_mouse_xy(sg_display, x, y);
 }
 
 jpoint_t NativeWindow::GetCursorLocation()
@@ -814,35 +828,35 @@ jpoint_t NativeWindow::GetCursorLocation()
 
 void NativeWindow::SetVisible(bool visible)
 {
-  _visible = visible;
+  sg_visible = visible;
 
   // TODO:: delete and create the window
 }
 
 bool NativeWindow::IsVisible()
 {
-  return _visible;
+  return sg_visible;
 }
 
 jcursor_style_t NativeWindow::GetCursor()
 {
-  return _cursor;
+  return sg_jgui_cursor;
 }
 
 void NativeWindow::SetCursorEnabled(bool enabled)
 {
-  _cursor_enabled = enabled;
+  sg_jgui_cursor_enabled = enabled;
 
-	if (_cursor_enabled == false) {
-		al_hide_mouse_cursor(_display);
+	if (sg_jgui_cursor_enabled == false) {
+		al_hide_mouse_cursor(sg_display);
 	} else {
-		al_show_mouse_cursor(_display);
+		al_show_mouse_cursor(sg_display);
 	}
 }
 
 bool NativeWindow::IsCursorEnabled()
 {
-	return _cursor_enabled;
+	return sg_jgui_cursor_enabled;
 }
 
 void NativeWindow::SetCursor(jcursor_style_t style)
@@ -879,9 +893,9 @@ void NativeWindow::SetCursor(jcursor_style_t style)
     type = ALLEGRO_SYSTEM_MOUSE_CURSOR_BUSY;
   }
 
-  al_set_system_mouse_cursor(_display, type);
+  al_set_system_mouse_cursor(sg_display, type);
 
-  _cursor = style;
+  sg_jgui_cursor = style;
 }
 
 void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
@@ -899,8 +913,8 @@ void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 		return;
 	}
 
-	if (_cursor_bitmap != nullptr) {
-		al_destroy_mouse_cursor(_cursor_bitmap);
+	if (sg_jgui_cursor_bitmap != nullptr) {
+		al_destroy_mouse_cursor(sg_jgui_cursor_bitmap);
 	}
 
 	ALLEGRO_BITMAP *sprite = al_create_bitmap(t.width, t.height);
@@ -922,9 +936,9 @@ void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 
 	al_unlock_bitmap(sprite);
 
-	_cursor_bitmap = al_create_mouse_cursor(sprite, hotx, hoty);
+	sg_jgui_cursor_bitmap = al_create_mouse_cursor(sprite, hotx, hoty);
 
-	al_set_mouse_cursor(_display, _cursor_bitmap);
+	al_set_mouse_cursor(sg_display, sg_jgui_cursor_bitmap);
 }
 
 void NativeWindow::SetRotation(jwindow_rotation_t t)
@@ -939,12 +953,12 @@ jwindow_rotation_t NativeWindow::GetRotation()
 
 void NativeWindow::SetIcon(jgui::Image *image)
 {
-  _icon = image;
+  sg_jgui_icon = image;
 }
 
 jgui::Image * NativeWindow::GetIcon()
 {
-  return _icon;
+  return sg_jgui_icon;
 }
 
 }

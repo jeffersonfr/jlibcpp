@@ -532,13 +532,13 @@ static uint32_t * ReadGIF(GIFData *data, int imageNumber, int *width, int *heigh
 	bool useGlobalColormap;
 
 	if (data->stream->Read((char *)buf, 6) <= 0) {
-		JDEBUG(JINFO, "error reading magic number" );
+		JDEBUG(JINFO, "error reading magic number\n" );
 
 		return nullptr;
 	}
 
 	if (strncmp( (char *)buf, "GIF", 3 ) != 0) {
-		JDEBUG(JINFO, "not a GIF file" );
+		JDEBUG(JINFO, "not a GIF file\n" );
 
 		return nullptr;
 	}
@@ -546,13 +546,13 @@ static uint32_t * ReadGIF(GIFData *data, int imageNumber, int *width, int *heigh
 	memcpy(version, (char *)buf + 3, 4);
 
 	if ((strcmp(version, "87a") != 0) && (strcmp(version, "89a") != 0)) {
-		JDEBUG(JINFO, "bad version number, not '87a' or '89a'" );
+		JDEBUG(JINFO, "bad version number, not '87a' or '89a'\n" );
 
 		return nullptr;
 	}
 
 	if (data->stream->Read((char *)buf, 7) <= 0) {
-		JDEBUG(JINFO, "failed to read screen descriptor" );
+		JDEBUG(JINFO, "failed to read screen descriptor\n" );
 
 		return nullptr;
 	}
@@ -567,7 +567,7 @@ static uint32_t * ReadGIF(GIFData *data, int imageNumber, int *width, int *heigh
 	// Global Colormap
 	if (BitSet(buf[4], LOCALCOLORMAP)) {
 		if (ReadColorMap(data->stream, data->BitPixel, data->ColorMap )) {
-			JDEBUG(JINFO, "error reading global colormap" );
+			JDEBUG(JINFO, "error reading global colormap\n" );
 
 			return nullptr;
 		}
@@ -575,7 +575,7 @@ static uint32_t * ReadGIF(GIFData *data, int imageNumber, int *width, int *heigh
 
 	if (data->AspectRatio != 0 && data->AspectRatio != 49) {
 		// float r = ( (float) data->AspectRatio + 15.0 ) / 64.0;
-		JDEBUG(JINFO, "warning - non-square pixels");
+		JDEBUG(JINFO, "warning - non-square pixels\n");
 	}
 
 	data->transparent = -1;
@@ -585,7 +585,7 @@ static uint32_t * ReadGIF(GIFData *data, int imageNumber, int *width, int *heigh
 
 	for (;;) {
 		if (data->stream->Read((char *)&c, 1) <= 0) {
-			JDEBUG(JINFO, "EOF / read error on image data" );
+			JDEBUG(JINFO, "EOF / read error on image data\n" );
 
 			return nullptr;
 		}
@@ -593,7 +593,7 @@ static uint32_t * ReadGIF(GIFData *data, int imageNumber, int *width, int *heigh
 		// GIF terminator
 		if (c == ';') {
 			if (imageCount < imageNumber) {
-				JDEBUG(JINFO, "only %d image%s found in file", imageCount, imageCount>1?"s":"" );
+				JDEBUG(JINFO, "only %d image%s found in file\n", imageCount, imageCount>1?"s":"" );
 			}
 
 			return nullptr;
@@ -602,7 +602,7 @@ static uint32_t * ReadGIF(GIFData *data, int imageNumber, int *width, int *heigh
 		// Extension
 		if (c == '!') {
 			if (data->stream->Read((char *)&c, 1) <= 0) {
-				JDEBUG(JINFO, "EOF / read error on extention function code");
+				JDEBUG(JINFO, "EOF / read error on extention function code\n" );
 			}
 
 			DoExtension( data, c );
@@ -612,7 +612,7 @@ static uint32_t * ReadGIF(GIFData *data, int imageNumber, int *width, int *heigh
 
 		// Not a valid start character
 		if (c != ',') {
-			JDEBUG(JINFO, "bogus character 0x%02x, ignoring", (int) c );
+			JDEBUG(JINFO, "bogus character 0x%02x, ignoring\n", (int) c );
 			
 			continue;
 		}
@@ -620,7 +620,7 @@ static uint32_t * ReadGIF(GIFData *data, int imageNumber, int *width, int *heigh
 		++imageCount;
 
 		if (data->stream->Read((char *)buf, 9) <= 0) {
-			JDEBUG(JINFO, "couldn't read left/top/width/height");
+			JDEBUG(JINFO, "couldn't read left/top/width/height\n");
 
 			return nullptr;
 		}
@@ -643,7 +643,7 @@ static uint32_t * ReadGIF(GIFData *data, int imageNumber, int *width, int *heigh
 			bitPixel = 2 << (buf[8] & 0x07);
 			
 			if (ReadColorMap(data->stream, bitPixel, localColorMap) != true) {
-				JDEBUG(JINFO, "error reading local colormap" );
+				JDEBUG(JINFO, "error reading local colormap\n" );
 
 				return nullptr;
 			}

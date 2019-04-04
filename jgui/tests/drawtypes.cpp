@@ -41,7 +41,7 @@ class Main : public jgui::Window {
 			jgui::Window(0, 0, 1280, 720)
 		{
       LoadImage("bmp");
-      LoadImage("gif");
+      // LoadImage("gif");
       LoadImage("ico");
       LoadImage("jpg");
       LoadImage("pcx");
@@ -53,7 +53,9 @@ class Main : public jgui::Window {
       LoadImage("svg");
       LoadImage("jp2");
       LoadImage("heic");
-      LoadImage("bpg");
+      // LoadImage("bpg");
+      LoadImage("webp");
+      LoadImage("mjpeg");
       LoadImage("tif");
 		}
 

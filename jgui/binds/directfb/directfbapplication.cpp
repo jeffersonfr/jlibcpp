@@ -26,6 +26,7 @@
 #include "jexception/jillegalargumentexception.h"
 
 #include <thread>
+#include <mutex>
 
 #include <directfb.h>
 
@@ -38,34 +39,40 @@ struct cursor_params_t {
 };
 
 /** \brief */
-std::map<jcursor_style_t, struct cursor_params_t> _cursors;
+std::map<jcursor_style_t, struct cursor_params_t> sg_jgui_cursors;
 
 /** \brief */
-IDirectFB *_directfb;
+IDirectFB *sg_directfb;
 /** \brief */
-IDirectFBDisplayLayer *_layer;
+IDirectFBDisplayLayer *sg_layer;
 /** \brief */
-IDirectFBWindow *_window;
+IDirectFBWindow *sg_window;
 /** \brief */
-IDirectFBSurface *_surface;
+IDirectFBSurface *sg_surface;
 /** \brief */
-static jgui::Image *_icon = nullptr;
+static jgui::Image *sg_jgui_icon = nullptr;
 /** \brief */
-static std::chrono::time_point<std::chrono::steady_clock> _last_keypress;
+static std::chrono::time_point<std::chrono::steady_clock> sg_last_keypress;
 /** \brief */
-static int _mouse_x;
+static int sg_mouse_x = 0;
 /** \brief */
-static int _mouse_y;
+static int sg_mouse_y = 0;
 /** \brief */
-static int _click_count;
+static int sg_click_count = 0;
 /** \brief */
-static Window *g_window = nullptr;
+static bool sg_cursor_enabled = true;
 /** \brief */
-static jcursor_style_t _cursor = JCS_DEFAULT;
+static bool sg_repaint = false;
 /** \brief */
-static bool _is_cursor_enabled = true;
+static std::mutex sg_loop_mutex;
 /** \brief */
-static bool _need_repaint = false;
+static bool sg_quitting = false;
+/** \brief */
+static jgui::jsize_t sg_screen = {0, 0};
+/** \brief */
+static jcursor_style_t sg_jgui_cursor = JCS_DEFAULT;
+/** \brief */
+static Window *sg_jgui_window = nullptr;
 
 jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(DFBInputDeviceKeySymbol symbol)
 {
@@ -351,8 +358,6 @@ jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(DFBInputDeviceKeySymbol sy
 	return jevent::JKS_UNKNOWN;
 }
 
-static jgui::jsize_t _screen = {0, 0};
-
 NativeApplication::NativeApplication():
 	jgui::Application()
 {
@@ -365,7 +370,7 @@ NativeApplication::~NativeApplication()
 
 void NativeApplication::InternalInit(int argc, char **argv)
 {
-	if ((IDirectFB **)_directfb != nullptr) {
+	if ((IDirectFB **)sg_directfb != nullptr) {
 		return;
 	}
 
@@ -374,28 +379,28 @@ void NativeApplication::InternalInit(int argc, char **argv)
 	}
 
 	// Create the super interface
-	if (DirectFBCreate((IDirectFB **)&_directfb) != DFB_OK) {
+	if (DirectFBCreate((IDirectFB **)&sg_directfb) != DFB_OK) {
 		throw jexception::RuntimeException("Problem to create directfb reference");
 	}
 
 	DFBDisplayLayerConfig config;
 
 	// Get the primary display layer
-	if (_directfb->GetDisplayLayer(_directfb, (DFBDisplayLayerID)DLID_PRIMARY, &_layer) != DFB_OK) {
+	if (sg_directfb->GetDisplayLayer(sg_directfb, (DFBDisplayLayerID)DLID_PRIMARY, &sg_layer) != DFB_OK) {
 		throw jexception::RuntimeException("Problem to get display layer");
 	}
 	
-	_layer->SetCooperativeLevel(_layer, (DFBDisplayLayerCooperativeLevel)(DLSCL_ADMINISTRATIVE));
-	// _layer->SetCooperativeLevel(_layer, (DFBDisplayLayerCooperativeLevel)(DLSCL_EXCLUSIVE));
+	sg_layer->SetCooperativeLevel(sg_layer, (DFBDisplayLayerCooperativeLevel)(DLSCL_ADMINISTRATIVE));
+	// sg_layer->SetCooperativeLevel(sg_layer, (DFBDisplayLayerCooperativeLevel)(DLSCL_EXCLUSIVE));
 
 	DFBGraphicsDeviceDescription deviceDescription;
 	
-	_layer->GetConfiguration(_layer, &config);
+	sg_layer->GetConfiguration(sg_layer, &config);
 
-	_screen.width = config.width;
-	_screen.height = config.height;
+	sg_screen.width = config.width;
+	sg_screen.height = config.height;
 	
-	_directfb->GetDeviceDescription(_directfb, &deviceDescription);
+	sg_directfb->GetDeviceDescription(sg_directfb, &deviceDescription);
 
 	if (!((deviceDescription.blitting_flags & DSBLIT_BLEND_ALPHACHANNEL) && (deviceDescription.blitting_flags & DSBLIT_BLEND_COLORALPHA))) {
 		config.flags = (DFBDisplayLayerConfigFlags)(DLCONF_BUFFERMODE | DLCONF_OPTIONS);
@@ -403,7 +408,7 @@ void NativeApplication::InternalInit(int argc, char **argv)
 		config.buffermode = DLBM_BACKSYSTEM;
 	  config.options = DLOP_FLICKER_FILTERING;
 
-		_layer->SetConfiguration(_layer, &config);
+		sg_layer->SetConfiguration(sg_layer, &config);
 	}
 
 #define CURSOR_INIT(type, ix, iy, hotx, hoty) 													\
@@ -414,7 +419,7 @@ void NativeApplication::InternalInit(int argc, char **argv)
 																																				\
 	t.cursor->GetGraphics()->DrawImage(cursors, ix*w, iy*h, w, h, 0, 0);	\
 																																				\
-	_cursors[type] = t;																										\
+	sg_jgui_cursors[type] = t;																										\
 
 	struct cursor_params_t t;
 	int w = 30,
@@ -440,16 +445,18 @@ void NativeApplication::InternalInit(int argc, char **argv)
 	CURSOR_INIT(JCS_WAIT, 8, 0, 15, 15);
 	
 	delete cursors;
+  
+  sg_quitting = false;
 }
 
 void NativeApplication::InternalPaint()
 {
-	if (g_window == nullptr || g_window->IsVisible() == false) {
+	if (sg_jgui_window == nullptr || sg_jgui_window->IsVisible() == false) {
 		return;
 	}
 
   jregion_t 
-    bounds = g_window->GetBounds();
+    bounds = sg_jgui_window->GetBounds();
   jgui::Image 
     *buffer = new jgui::BufferedImage(jgui::JPF_ARGB, bounds.width, bounds.height);
   jgui::Graphics 
@@ -460,8 +467,8 @@ void NativeApplication::InternalPaint()
 	g->Reset();
 	g->Translate(-t.x, -t.y);
   g->SetClip(0, 0, bounds.width, bounds.height);
-	g_window->DoLayout();
-  g_window->Paint(g);
+	sg_jgui_window->DoLayout();
+  sg_jgui_window->Paint(g);
 	g->Translate(t.x, t.y);
 
   cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
@@ -486,7 +493,7 @@ void NativeApplication::InternalPaint()
     return;
   }
 
-	if (_surface == nullptr) {
+	if (sg_surface == nullptr) {
 		return;
 	}
 
@@ -497,12 +504,12 @@ void NativeApplication::InternalPaint()
 	rect.w = dw;
 	rect.h = dh;
 
-	_surface->Write(_surface, &rect, data, stride);
+	sg_surface->Write(sg_surface, &rect, data, stride);
 		
   if (g->IsVerticalSyncEnabled() == false) {
-  	_surface->Flip(_surface, nullptr, (DFBSurfaceFlipFlags)(DSFLIP_NONE));
+  	sg_surface->Flip(sg_surface, nullptr, (DFBSurfaceFlipFlags)(DSFLIP_NONE));
   } else {
-  	_surface->Flip(_surface, nullptr, (DFBSurfaceFlipFlags)(DSFLIP_BLIT | DSFLIP_WAITFORSYNC));
+  	sg_surface->Flip(sg_surface, nullptr, (DFBSurfaceFlipFlags)(DSFLIP_BLIT | DSFLIP_WAITFORSYNC));
   }
 
   cairo_surface_destroy(cairo_surface);
@@ -510,29 +517,30 @@ void NativeApplication::InternalPaint()
   delete buffer;
   buffer = nullptr;
 
-  g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_PAINTED));
+  sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
 }
 
 void NativeApplication::InternalLoop()
 {
+  std::lock_guard<std::mutex> lock(sg_loop_mutex);
+
   IDirectFBEventBuffer *event_buffer;
   DFBWindowEvent event;
-  static bool quitting = false;
   
-  _window->CreateEventBuffer(_window, &event_buffer);
+  sg_window->CreateEventBuffer(sg_window, &event_buffer);
 
 	if (event_buffer == nullptr) {
 		return;
 	}
 
-	while (quitting == false) {
-    if (_need_repaint == true) {
-      _need_repaint = false;
+	while (sg_quitting == false) {
+    if (sg_repaint == true) {
+      sg_repaint = false;
 
       InternalPaint();
     }
 
-    event_buffer->WaitForEventWithTimeout(event_buffer, 0, 100);
+    event_buffer->WaitForEventWithTimeout(event_buffer, 0, 1);
 
     while (event_buffer->GetEvent(event_buffer, DFB_EVENT(&event)) == DFB_OK) {
       event_buffer->Reset(event_buffer);
@@ -544,7 +552,7 @@ void NativeApplication::InternalLoop()
 
         // SetCursor(GetCursor());
 
-        g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_ENTERED));
+        sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_ENTERED));
       } else if (event.type == DWET_LEAVE) {
         // SDL_CaptureMouse(false);
         // void SDL_SetWindowGrab(SDL_Window* window, SDL_bool grabbed);
@@ -552,7 +560,7 @@ void NativeApplication::InternalLoop()
 
         // SetCursor(JCS_DEFAULT);
 
-        g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_LEAVED));
+        sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_LEAVED));
       } else if (event.type == DWET_KEYDOWN || event.type == DWET_KEYUP) {
         jevent::jkeyevent_type_t type;
         jevent::jkeyevent_modifiers_t mod;
@@ -587,15 +595,15 @@ void NativeApplication::InternalLoop()
 
         jevent::jkeyevent_symbol_t symbol = TranslateToNativeKeySymbol(event.key_symbol);
 
-        g_window->GetEventManager()->PostEvent(new jevent::KeyEvent(g_window, type, mod, jevent::KeyEvent::GetCodeFromSymbol(symbol), symbol));
+        sg_jgui_window->GetEventManager()->PostEvent(new jevent::KeyEvent(sg_jgui_window, type, mod, jevent::KeyEvent::GetCodeFromSymbol(symbol), symbol));
       } else if (event.type == DWET_BUTTONDOWN || event.type == DWET_BUTTONUP || event.type == DWET_WHEEL || event.type == DWET_MOTION) {
         jevent::jmouseevent_button_t button = jevent::JMB_NONE;
         jevent::jmouseevent_button_t buttons = jevent::JMB_NONE;
         jevent::jmouseevent_type_t type = jevent::JMT_UNKNOWN;
         int mouse_z = 0;
 
-        _mouse_x = event.cx;
-        _mouse_y = event.cy;
+        sg_mouse_x = event.cx;
+        sg_mouse_y = event.cy;
 
         if (event.type == DWET_MOTION) {
           type = jevent::JMT_MOVED;
@@ -606,11 +614,11 @@ void NativeApplication::InternalLoop()
           if (event.type == DWET_BUTTONDOWN) {
             type = jevent::JMT_PRESSED;
 
-            _window->GrabPointer(_window);
+            sg_window->GrabPointer(sg_window);
           } else if (event.type == DWET_BUTTONUP) {
             type = jevent::JMT_RELEASED;
 
-            _window->UngrabPointer(_window);
+            sg_window->UngrabPointer(sg_window);
           }
 
           if (event.button == DIBI_LEFT) {
@@ -621,18 +629,18 @@ void NativeApplication::InternalLoop()
             button = jevent::JMB_BUTTON3;
           }
 
-          _click_count = 1;
+          sg_click_count = 1;
 
           if (type == jevent::JMT_PRESSED) {
             auto current = std::chrono::steady_clock::now();
             
-            if ((std::chrono::duration_cast<std::chrono::milliseconds>(current - _last_keypress).count()) < 200L) {
-              _click_count = _click_count + 1;
+            if ((std::chrono::duration_cast<std::chrono::milliseconds>(current - sg_last_keypress).count()) < 200L) {
+              sg_click_count = sg_click_count + 1;
             }
 
-            _last_keypress = current;
+            sg_last_keypress = current;
 
-            mouse_z = _click_count;
+            mouse_z = sg_click_count;
           }
         }
 
@@ -648,33 +656,26 @@ void NativeApplication::InternalLoop()
           buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON3);
         }
 
-        g_window->GetEventManager()->PostEvent(new jevent::MouseEvent(g_window, type, button, buttons, mouse_z, _mouse_x, _mouse_y));
+        sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, buttons, mouse_z, sg_mouse_x, sg_mouse_y));
       }
     }
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
 
-  quitting = true;
+  sg_quitting = true;
   
 	if (event_buffer != nullptr) {
 		event_buffer->Release(event_buffer);
 	}
 
-  g_window->SetVisible(false);
+  sg_jgui_window->SetVisible(false);
 }
 
 void NativeApplication::InternalQuit()
 {
-	if (_layer != nullptr) {
-		_layer->Release(_layer);
-		_layer = nullptr;
-	}
+  sg_quitting = true;
 
-	if (_directfb != nullptr) {
-		_directfb->Release(_directfb);
-		_directfb = nullptr;
-	}
+  sg_loop_mutex.lock();
+  sg_loop_mutex.unlock();
 }
 
 NativeWindow::NativeWindow(int x, int y, int width, int height):
@@ -682,17 +683,17 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 {
 	jcommon::Object::SetClassName("jgui::NativeWindow");
 
-	if (_window != nullptr) {
+	if (sg_window != nullptr) {
 		throw jexception::RuntimeException("Cannot create more than one window");
   }
 
-  _icon = new BufferedImage(_DATA_PREFIX"/images/small-gnu.png");
+  sg_jgui_icon = new BufferedImage(_DATA_PREFIX"/images/small-gnu.png");
 
-	_window = nullptr;
-	_mouse_x = 0;
-	_mouse_y = 0;
-	_last_keypress = std::chrono::steady_clock::now();
-	_click_count = 1;
+	sg_window = nullptr;
+	sg_mouse_x = 0;
+	sg_mouse_y = 0;
+	sg_last_keypress = std::chrono::steady_clock::now();
+	sg_click_count = 1;
 
 	DFBWindowDescription desc;
 
@@ -707,70 +708,87 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 	desc.width  = width;
 	desc.height = height;
 
-	IDirectFBDisplayLayer *layer;
+	IDirectFBDisplayLayer *layer = nullptr;
 	
-	if (_directfb->GetDisplayLayer(_directfb, (DFBDisplayLayerID)(DLID_PRIMARY), &layer) != DFB_OK) {
+	if (sg_directfb->GetDisplayLayer(sg_directfb, (DFBDisplayLayerID)(DLID_PRIMARY), &layer) != DFB_OK) {
 		throw jexception::RuntimeException("Problem to get the device layer");
 	} 
 
-	if (layer->CreateWindow(layer, &desc, &_window) != DFB_OK) {
+	if (layer->CreateWindow(layer, &desc, &sg_window) != DFB_OK) {
 		throw jexception::RuntimeException("Cannot create a window");
 	}
 
-	if (_window->GetSurface(_window, &_surface) != DFB_OK) {
-		_window->Release(_window);
+	if (sg_window->GetSurface(sg_window, &sg_surface) != DFB_OK) {
+		sg_window->Release(sg_window);
 
 		throw jexception::RuntimeException("Cannot get a window's surface");
 	}
 
-	// Add ghost option (behave like an overlay)
-	// _window->SetOptions(_window, (DFBWindowOptions)(DWOP_ALPHACHANNEL | DWOP_SCALE)); // | DWOP_GHOST));
-	// Move window to upper stacking class
-	// _window->SetStackingClass(_window, DWSC_UPPER);
-	// _window->RequestFocus(_window);
-	// Make it the top most window
-	// _window->RaiseToTop(_window);
-	_window->SetOpacity(_window, 0xff);
-	// _surface->SetRenderOptions(_surface, DSRO_ALL);
-	// _window->DisableEvents(_window, (DFBWindowEventType)(DWET_BUTTONDOWN | DWET_BUTTONUP | DWET_MOTION));
-	
-	_surface->SetDrawingFlags(_surface, (DFBSurfaceDrawingFlags)(DSDRAW_BLEND));
-	_surface->SetBlittingFlags(_surface, (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_ALPHACHANNEL));
-	_surface->SetPorterDuff(_surface, (DFBSurfacePorterDuffRule)(DSPD_NONE));
+    sg_window->GrabKeyboard(sg_window);
+    sg_window->GrabPointer(sg_window);
 
-	_surface->Clear(_surface, 0x00, 0x00, 0x00, 0x00);
+	// Add ghost option (behave like an overlay)
+	// sg_window->SetOptions(sg_window, (DFBWindowOptions)(DWOP_ALPHACHANNEL | DWOP_SCALE)); // | DWOP_GHOST));
+	// Move window to upper stacking class
+	// sg_window->SetStackingClass(sg_window, DWSC_UPPER);
+	// sg_window->RequestFocus(sg_window);
+	// Make it the top most window
+	// sg_window->RaiseToTop(sg_window);
+	sg_window->SetOpacity(sg_window, 0xff);
+	// sg_surface->SetRenderOptions(sg_surface, DSRO_ALL);
+	// sg_window->DisableEvents(sg_window, (DFBWindowEventType)(DWET_BUTTONDOWN | DWET_BUTTONUP | DWET_MOTION));
+	
+	sg_surface->SetDrawingFlags(sg_surface, (DFBSurfaceDrawingFlags)(DSDRAW_NOFX)); // BLEND));
+	sg_surface->SetBlittingFlags(sg_surface, (DFBSurfaceBlittingFlags)(DSBLIT_NOFX)); // BLEND_ALPHACHANNEL));
+	sg_surface->SetPorterDuff(sg_surface, (DFBSurfacePorterDuffRule)(DSPD_NONE));
+
+	sg_surface->Clear(sg_surface, 0x00, 0x00, 0x00, 0x00);
 #if ((DIRECTFB_MAJOR_VERSION * 1000000) + (DIRECTFB_MINOR_VERSION * 1000) + DIRECTFB_MICRO_VERSION) >= 1007000
-	_surface->Flip(_surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_FLUSH));
+	sg_surface->Flip(sg_surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_FLUSH));
 #else
-	_surface->Flip(_surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_NONE));
+	sg_surface->Flip(sg_surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_NONE));
 #endif
-	_surface->Clear(_surface, 0x00, 0x00, 0x00, 0x00);
+	sg_surface->Clear(sg_surface, 0x00, 0x00, 0x00, 0x00);
   
-  SetCursor(_cursors[JCS_DEFAULT].cursor, _cursors[JCS_DEFAULT].hot_x, _cursors[JCS_DEFAULT].hot_y);
+  SetCursor(sg_jgui_cursors[JCS_DEFAULT].cursor, sg_jgui_cursors[JCS_DEFAULT].hot_x, sg_jgui_cursors[JCS_DEFAULT].hot_y);
 }
 
 NativeWindow::~NativeWindow()
 {
-  SetVisible(false);
+  delete sg_jgui_icon;
+  sg_jgui_icon = nullptr;
+  
+  sg_window->UngrabKeyboard(sg_window);
+  sg_window->UngrabPointer(sg_window);
 
-	if (_surface != NULL) {
-		_surface->Release(_surface);
-	  _surface = NULL;
+	if (sg_surface != NULL) {
+		sg_surface->Release(sg_surface);
+	  sg_surface = NULL;
 	}
 
-	if (_window != NULL) {
-		_window->SetOpacity(_window, 0x00);
-		_window->Close(_window);
+	if (sg_window != NULL) {
+		sg_window->SetOpacity(sg_window, 0x00);
+		sg_window->Close(sg_window);
 		// CHANGE:: freeze if resize before the first 'release' in tests/restore.cpp
-		// _window->Destroy(_window);
-		// _window->Release(_window);
-	  _window = NULL;
+		// sg_window->Destroy(sg_window);
+		// sg_window->Release(sg_window);
+	  sg_window = NULL;
+	}
+
+	if (sg_layer != nullptr) {
+		sg_layer->Release(sg_layer);
+		sg_layer = nullptr;
+	}
+
+	if (sg_directfb != nullptr) {
+		sg_directfb->Release(sg_directfb);
+		sg_directfb = nullptr;
 	}
 }
 
 void NativeWindow::Repaint(Component *cmp)
 {
-  _need_repaint = true;
+  sg_repaint = true;
 }
 
 void NativeWindow::ToggleFullScreen()
@@ -786,11 +804,11 @@ void NativeWindow::SetParent(jgui::Container *c)
     throw jexception::IllegalArgumentException("Used only by native engine");
   }
 
-  // TODO:: g_window precisa ser a window que contem ela
+  // TODO:: sg_jgui_window precisa ser a window que contem ela
   // TODO:: pegar os windows por evento ou algo assim
-  g_window = parent;
+  sg_jgui_window = parent;
 
-  g_window->SetParent(nullptr);
+  sg_jgui_window->SetParent(nullptr);
 }
 
 void NativeWindow::SetTitle(std::string title)
@@ -804,14 +822,14 @@ std::string NativeWindow::GetTitle()
 
 void NativeWindow::SetOpacity(float opacity)
 {
-	_window->SetOpacity(_window, (int)(opacity * 255.0f));
+	sg_window->SetOpacity(sg_window, (int)(opacity * 255.0f));
 }
 
 float NativeWindow::GetOpacity()
 {
   uint8_t o;
 
-  _window->GetOpacity(_window, &o);
+  sg_window->GetOpacity(sg_window, &o);
 
 	return (o * 100.0f)/255.0f;
 }
@@ -827,9 +845,9 @@ bool NativeWindow::IsUndecorated()
 
 void NativeWindow::SetBounds(int x, int y, int width, int height)
 {
-  if (_window != NULL) {
-    _window->SetBounds(_window, x, y, width, height);
-    _window->ResizeSurface(_window, width, height);
+  if (sg_window != NULL) {
+    sg_window->SetBounds(sg_window, x, y, width, height);
+    sg_window->ResizeSurface(sg_window, width, height);
   }
 }
 
@@ -837,8 +855,8 @@ jgui::jregion_t NativeWindow::GetBounds()
 {
 	jgui::jregion_t t;
 
-	_window->GetPosition(_window, &t.x, &t.y);
-	_window->GetSize(_window, &t.width, &t.height);
+	sg_window->GetPosition(sg_window, &t.x, &t.y);
+	sg_window->GetSize(sg_window, &t.width, &t.height);
 
 	return t;
 }
@@ -854,7 +872,7 @@ bool NativeWindow::IsResizable()
 
 void NativeWindow::SetCursorLocation(int x, int y)
 {
-	_layer->WarpCursor(_layer, x, y);
+	sg_layer->WarpCursor(sg_layer, x, y);
 }
 
 jpoint_t NativeWindow::GetCursorLocation()
@@ -864,7 +882,7 @@ jpoint_t NativeWindow::GetCursorLocation()
 	p.x = 0;
 	p.y = 0;
 
-	_layer->GetCursorPosition(_layer, &p.x, &p.y);
+	sg_layer->GetCursorPosition(sg_layer, &p.x, &p.y);
 
 	return p;
 }
@@ -882,7 +900,7 @@ bool NativeWindow::IsVisible()
 {
   uint8_t o;
 
-  _window->GetOpacity(_window, &o);
+  sg_window->GetOpacity(sg_window, &o);
 
   if (o == 0x00) {
     return false;
@@ -893,14 +911,14 @@ bool NativeWindow::IsVisible()
 
 jcursor_style_t NativeWindow::GetCursor()
 {
-  return _cursor;
+  return sg_jgui_cursor;
 }
 
 void NativeWindow::SetCursorEnabled(bool enabled)
 {
-  _is_cursor_enabled = (enabled == false)?false:true;
+  sg_cursor_enabled = (enabled == false)?false:true;
 
-	_layer->EnableCursor(_layer, _is_cursor_enabled);
+	sg_layer->EnableCursor(sg_layer, sg_cursor_enabled);
 }
 
 bool NativeWindow::IsCursorEnabled()
@@ -910,9 +928,9 @@ bool NativeWindow::IsCursorEnabled()
 
 void NativeWindow::SetCursor(jcursor_style_t style)
 {
-	_cursor = style;
+	sg_jgui_cursor = style;
 
-	SetCursor(_cursors[style].cursor, _cursors[style].hot_x, _cursors[style].hot_y);
+	SetCursor(sg_jgui_cursors[style].cursor, sg_jgui_cursors[style].hot_x, sg_jgui_cursors[style].hot_y);
 }
 
 void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
@@ -930,7 +948,7 @@ void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 	desc.width = size.width;
 	desc.height = size.height;
 
-	if (_directfb->CreateSurface(_directfb, &desc, &surface) != DFB_OK) {
+	if (sg_directfb->CreateSurface(sg_directfb, &desc, &surface) != DFB_OK) {
 		throw jexception::RuntimeException("Cannot allocate memory to the image surface");
 	}
 
@@ -943,7 +961,7 @@ void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 
 	surface->Unlock(surface);
 
-	_layer->SetCursorShape(_layer, surface, hotx, hoty);
+	sg_layer->SetCursorShape(sg_layer, surface, hotx, hoty);
 
 	surface->Release(surface);
 }
@@ -951,8 +969,8 @@ void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 void NativeWindow::SetRotation(jwindow_rotation_t t)
 {
 #if ((DIRECTFB_MAJOR_VERSION * 1000000) + (DIRECTFB_MINOR_VERSION * 1000) + DIRECTFB_MICRO_VERSION) >= 1007000
-	if (_window != NULL) {
-		_window->SetRotation(_window, rotation);
+	if (sg_window != NULL) {
+		sg_window->SetRotation(sg_window, rotation);
 	}
 #endif
 }
@@ -964,12 +982,12 @@ jwindow_rotation_t NativeWindow::GetRotation()
 
 void NativeWindow::SetIcon(jgui::Image *image)
 {
-  _icon = image;
+  sg_jgui_icon = image;
 }
 
 jgui::Image * NativeWindow::GetIcon()
 {
-  return _icon;
+  return sg_jgui_icon;
 }
 
 }

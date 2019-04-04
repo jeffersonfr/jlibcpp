@@ -27,6 +27,7 @@
 #include "jexception/jillegalargumentexception.h"
 
 #include <thread>
+#include <mutex>
 
 #include <X11/Xlib.h>
 #include <X11/cursorfont.h>
@@ -38,7 +39,6 @@
 
 namespace jgui {
 
-// WINDOW PARAMS
 /** \brief */
 struct cursor_params_t {
   Image *cursor;
@@ -46,72 +46,78 @@ struct cursor_params_t {
   int hot_y;
 };
 
-VdpDevice vdp_device;
-VdpPresentationQueueTarget vdp_target;
-VdpPresentationQueue vdp_queue;
-VdpOutputSurface vdp_surface;
-VdpTime vdp_time = 0;
-VdpGetProcAddress *vdp_proc_address;
+static VdpDevice sg_vdp_device;
+static VdpPresentationQueueTarget sg_vdp_target;
+static VdpPresentationQueue sg_vdp_queue;
+static VdpOutputSurface sg_vdp_surface;
+static VdpTime sg_vdp_time = 0;
+static VdpGetProcAddress *sg_vdp_proc_address;
 
-VdpPresentationQueueTargetCreateX11 *PresentationQueueTargetCreate = NULL;
-VdpGetErrorString *GetErrorString = NULL;
-VdpDeviceDestroy *DeviceDestroy = NULL;
-VdpGetInformationString *GetInformationString = NULL;
-VdpPresentationQueueTargetDestroy *PresentationQueueTargetDestroy = NULL;
-VdpOutputSurfaceCreate *OutputSurfaceCreate = NULL;
-VdpOutputSurfaceDestroy *OutputSurfaceDestroy = NULL;
-VdpOutputSurfacePutBitsNative *OutputSurfacePutBitsNative = NULL;
-VdpOutputSurfaceRenderOutputSurface *OutputSurfaceRenderOutputSurface = NULL;
-VdpPresentationQueueCreate *PresentationQueueCreate = NULL;
-VdpPresentationQueueDestroy *PresentationQueueDestroy = NULL;
-VdpPresentationQueueDisplay *PresentationQueueDisplay = NULL;
-VdpPresentationQueueGetTime *PresentationQueueGetTime = NULL;
-VdpPresentationQueueBlockUntilSurfaceIdle *PresentationQueueBlockUntilSurfaceIdle = NULL;
+static VdpPresentationQueueTargetCreateX11 *PresentationQueueTargetCreate = NULL;
+static VdpGetErrorString *GetErrorString = NULL;
+static VdpDeviceDestroy *DeviceDestroy = NULL;
+static VdpGetInformationString *GetInformationString = NULL;
+static VdpPresentationQueueTargetDestroy *PresentationQueueTargetDestroy = NULL;
+static VdpOutputSurfaceCreate *OutputSurfaceCreate = NULL;
+static VdpOutputSurfaceDestroy *OutputSurfaceDestroy = NULL;
+static VdpOutputSurfacePutBitsNative *OutputSurfacePutBitsNative = NULL;
+static VdpOutputSurfaceRenderOutputSurface *OutputSurfaceRenderOutputSurface = NULL;
+static VdpPresentationQueueCreate *PresentationQueueCreate = NULL;
+static VdpPresentationQueueDestroy *PresentationQueueDestroy = NULL;
+static VdpPresentationQueueDisplay *PresentationQueueDisplay = NULL;
+static VdpPresentationQueueGetTime *PresentationQueueGetTime = NULL;
+static VdpPresentationQueueBlockUntilSurfaceIdle *PresentationQueueBlockUntilSurfaceIdle = NULL;
+
+static Atom sg_wm_delete_message;
 
 /** \brief */
-static ::Display *_display = nullptr;
+static ::Display *sg_display = nullptr;
 /** \brief */
-static ::Window _window = 0;
+static ::Window sg_window = 0;
 /** \brief */
-static ::XEvent _last_key_release_event;
+static ::XEvent sg_lastsg_key_release_event;
 /** \brief */
-static jgui::jregion_t _visible_bounds;
+static jgui::jregion_t sg_visible_bounds;
 /** \brief */
-static bool _key_repeat;
+static bool sg_key_repeat;
 /** \brief */
-static jgui::Image *_icon = nullptr;
+static std::chrono::time_point<std::chrono::steady_clock> sg_last_keypress;
 /** \brief */
-static std::chrono::time_point<std::chrono::steady_clock> _last_keypress;
+static int sg_mouse_x;
 /** \brief */
-static int _mouse_x;
+static int sg_mouse_y;
 /** \brief */
-static int _mouse_y;
+static int sg_click_count;
 /** \brief */
-static int _click_count;
+static Window *sg_jgui_window = nullptr;
 /** \brief */
-static Window *g_window = nullptr;
+static std::string sg_title;
 /** \brief */
-static std::string _title;
+static float sg_opacity = 1.0f;
 /** \brief */
-static float _opacity = 1.0f;
+static bool sg_fullscreen = false;
 /** \brief */
-static bool _fullscreen = false;
+static bool sg_undecorated = false;
 /** \brief */
-static bool _undecorated = false;
+static bool sg_resizable = true;
 /** \brief */
-static bool _resizable = true;
+static bool sg_cursor_enabled = true;
 /** \brief */
-static bool _cursor_enabled = true;
+static bool sg_visible = true;
 /** \brief */
-static jcursor_style_t _cursor;
+static jgui::jregion_t sg_previous_bounds;
 /** \brief */
-static bool _visible = true;
+static bool sg_repaint = false;
 /** \brief */
-static jgui::jregion_t _previous_bounds;
+static bool sg_quitting = false;
 /** \brief */
-static Atom _wm_delete_message;
+static jgui::jsize_t sg_screen = {0, 0};
 /** \brief */
-static bool _need_repaint = false;
+static std::mutex sg_loop_mutex;
+/** \brief */
+static jgui::Image *sg_jgui_icon = nullptr;
+/** \brief */
+static jcursor_style_t sg_jgui_cursor = JCS_DEFAULT;
 
 static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(KeySym symbol)
 {
@@ -421,8 +427,6 @@ static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(KeySym symbol)
 	return jevent::JKS_UNKNOWN;
 }
 
-static jgui::jsize_t _screen = {0, 0};
-
 NativeApplication::NativeApplication():
 	jgui::Application()
 {
@@ -431,44 +435,46 @@ NativeApplication::NativeApplication():
 
 NativeApplication::~NativeApplication()
 {
-  PresentationQueueDestroy(vdp_queue);
-  PresentationQueueTargetDestroy(vdp_target);
-  DeviceDestroy(vdp_device);
+  PresentationQueueDestroy(sg_vdp_queue);
+  PresentationQueueTargetDestroy(sg_vdp_target);
+  DeviceDestroy(sg_vdp_device);
 
-  XUnmapWindow(_display, _window);
-  XDestroyWindow(_display, _window);
-  XFlush(_display);
-  XSync(_display, False);
-	XCloseDisplay(_display);
+  XUnmapWindow(sg_display, sg_window);
+  XDestroyWindow(sg_display, sg_window);
+  XFlush(sg_display);
+  XSync(sg_display, False);
+	XCloseDisplay(sg_display);
 
-  _window = 0;
+  sg_window = 0;
 }
 
 void NativeApplication::InternalInit(int argc, char **argv)
 {
 	// Open a connection with the X server
-	_display = XOpenDisplay(nullptr);
+	sg_display = XOpenDisplay(nullptr);
 
-	if (_display == nullptr) {
+	if (sg_display == nullptr) {
 		throw jexception::RuntimeException("Unable to connect with X server");
 	}
 
-	int screen = DefaultScreen(_display);
+	int screen = DefaultScreen(sg_display);
 
-	_screen.width = DisplayWidth(_display, screen);
-	_screen.height = DisplayHeight(_display, screen);
+	sg_screen.width = DisplayWidth(sg_display, screen);
+	sg_screen.height = DisplayHeight(sg_display, screen);
 
 	XInitThreads();
+  
+  sg_quitting = false;
 }
 
 void NativeApplication::InternalPaint()
 {
-	if (g_window == nullptr || g_window->IsVisible() == false) {
+	if (sg_jgui_window == nullptr || sg_jgui_window->IsVisible() == false) {
 		return;
 	}
 
   jregion_t 
-    bounds = g_window->GetBounds();
+    bounds = sg_jgui_window->GetBounds();
   jgui::Image 
     *buffer = new jgui::BufferedImage(jgui::JPF_ARGB, bounds.width, bounds.height);
   jgui::Graphics 
@@ -479,8 +485,8 @@ void NativeApplication::InternalPaint()
 	g->Reset();
 	g->Translate(-t.x, -t.y);
   g->SetClip(0, 0, bounds.width, bounds.height);
-	g_window->DoLayout();
-  g_window->Paint(g);
+	sg_jgui_window->DoLayout();
+  sg_jgui_window->Paint(g);
 	g->Translate(t.x, t.y);
 
   cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
@@ -516,25 +522,25 @@ void NativeApplication::InternalPaint()
   uint32_t
     period = 30000000;
 
-  PresentationQueueBlockUntilSurfaceIdle(vdp_queue, vdp_surface, &vdp_time);
-  OutputSurfacePutBitsNative(vdp_surface, (void const *const *)src, pitches, nullptr);
+  PresentationQueueBlockUntilSurfaceIdle(sg_vdp_queue, sg_vdp_surface, &sg_vdp_time);
+  OutputSurfacePutBitsNative(sg_vdp_surface, (void const *const *)src, pitches, nullptr);
 
-  if (!vdp_time) {
-    PresentationQueueGetTime(vdp_queue, &vdp_time);
+  if (!sg_vdp_time) {
+    PresentationQueueGetTime(sg_vdp_queue, &sg_vdp_time);
     
-    vdp_time += 30000000;
+    sg_vdp_time += 30000000;
   } else {
-    vdp_time += period;
+    sg_vdp_time += period;
   }
 
-  this_time = vdp_time;
+  this_time = sg_vdp_time;
 
-  PresentationQueueDisplay(vdp_queue, vdp_surface, 0, 0, this_time);
+  PresentationQueueDisplay(sg_vdp_queue, sg_vdp_surface, 0, 0, this_time);
 
   delete buffer;
   buffer = nullptr;
   
-  g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_PAINTED));
+  sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
 }
 
 // Filter the events received by windows (only allow those matching a specific window)
@@ -546,8 +552,9 @@ static Bool check_x11_event(Display*, XEvent* event, XPointer userData)
 
 void NativeApplication::InternalLoop()
 {
+  std::lock_guard<std::mutex> lock(sg_loop_mutex);
+
 	XEvent event;
-  bool quitting = false;
 
   // This function implements a workaround to properly discard repeated key events when necessary. 
   // The problem is that the system's key events policy doesn't match SFML's one: X server will 
@@ -556,24 +563,24 @@ void NativeApplication::InternalLoop()
   //   - Discard duplicated KeyRelease events when EnableKeyRepeat is true
   //   - Discard both duplicated KeyPress and KeyRelease events when EnableKeyRepeat is false
   
-	while (quitting == false) {
-    if (_need_repaint == true) {
-      _need_repaint = false;
+	while (sg_quitting == false) {
+    if (sg_repaint == true) {
+      sg_repaint = false;
 
       InternalPaint();
     }
 
-    while (XCheckIfEvent(_display, &event, &check_x11_event, reinterpret_cast<XPointer>(_window))) {
+    while (XCheckIfEvent(sg_display, &event, &check_x11_event, reinterpret_cast<XPointer>(sg_window))) {
       if (event.type == DestroyNotify) {
-        quitting = true;
+        sg_quitting = true;
         
-        g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_CLOSED));
+        sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_CLOSED));
       } else if (event.type == ClientMessage) {
         // CHANGE:: destroynotify ???
 
-        quitting = true;
+        sg_quitting = true;
         
-        g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_CLOSED));
+        sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_CLOSED));
       } else if (event.type == Expose) {
         InternalPaint();
       } else if (event.type == MapNotify) {
@@ -587,7 +594,7 @@ void NativeApplication::InternalLoop()
 
         // SetCursor(GetCursor());
 
-        g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_ENTERED));
+        sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_ENTERED));
       } else if (event.type == LeaveNotify) {
         // SDL_CaptureMouse(false);
         // void SDL_SetWindowGrab(SDL_Window* window, SDL_bool grabbed);
@@ -595,18 +602,18 @@ void NativeApplication::InternalLoop()
 
         // SetCursor(JCS_DEFAULT);
 
-        g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_LEAVED));
+        sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_LEAVED));
       } else if (event.type == FocusIn) {
       } else if (event.type == FocusOut) {
       } else if (event.type == ConfigureNotify) {
-        _visible_bounds.x = event.xconfigure.x;
-        _visible_bounds.y = event.xconfigure.y;
-        _visible_bounds.width = event.xconfigure.width;
-        _visible_bounds.height = event.xconfigure.height;
+        sg_visible_bounds.x = event.xconfigure.x;
+        sg_visible_bounds.y = event.xconfigure.y;
+        sg_visible_bounds.width = event.xconfigure.width;
+        sg_visible_bounds.height = event.xconfigure.height;
 
         InternalPaint();
         
-        g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_RESIZED));
+        sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_RESIZED));
       } else if (event.type == KeyPress || event.type == KeyRelease) {
         if (event.xkey.keycode < 256) {
           // To detect if it is a repeated key event, we check the current state of the key.
@@ -615,19 +622,19 @@ void NativeApplication::InternalLoop()
           //   and we need to properly forward the first one.
           char keys[32];
 
-          XQueryKeymap(_display, keys);
+          XQueryKeymap(sg_display, keys);
 
           if (keys[event.xkey.keycode / 8] & (1 << (event.xkey.keycode % 8))) {
             // KeyRelease event + key down = repeated event --> discard
             if (event.type == KeyRelease) {
-              _last_key_release_event = event;
+              sg_lastsg_key_release_event = event;
 
               continue;
             }
 
             // KeyPress event + key repeat disabled + matching KeyRelease event = repeated event --> discard
-            if ((event.type == KeyPress) && !_key_repeat &&
-                (_last_key_release_event.xkey.keycode == event.xkey.keycode) && (_last_key_release_event.xkey.time == event.xkey.time)) {
+            if ((event.type == KeyPress) && !sg_key_repeat &&
+                (sg_lastsg_key_release_event.xkey.keycode == event.xkey.keycode) && (sg_lastsg_key_release_event.xkey.time == event.xkey.time)) {
               // continue;
             }
           }
@@ -671,7 +678,7 @@ void NativeApplication::InternalLoop()
 
         jevent::jkeyevent_symbol_t symbol = TranslateToNativeKeySymbol(sym);
 
-        g_window->GetEventManager()->PostEvent(new jevent::KeyEvent(g_window, type, mod, jevent::KeyEvent::GetCodeFromSymbol(symbol), symbol));
+        sg_jgui_window->GetEventManager()->PostEvent(new jevent::KeyEvent(sg_jgui_window, type, mod, jevent::KeyEvent::GetCodeFromSymbol(symbol), symbol));
       } else if (event.type == ButtonPress || event.type == ButtonRelease || event.type == MotionNotify) {
         jevent::jmouseevent_button_t button = jevent::JMB_NONE;
         jevent::jmouseevent_button_t buttons = jevent::JMB_NONE;
@@ -681,8 +688,8 @@ void NativeApplication::InternalLoop()
         if (event.type == MotionNotify) {
           type = jevent::JMT_MOVED;
 
-          _mouse_x = event.xmotion.x;
-          _mouse_y = event.xmotion.y;
+          sg_mouse_x = event.xmotion.x;
+          sg_mouse_y = event.xmotion.y;
         } else if (event.type == ButtonPress || event.type == ButtonRelease) {
           if (event.type == ButtonPress) {
             type = jevent::JMT_PRESSED;
@@ -690,8 +697,8 @@ void NativeApplication::InternalLoop()
             type = jevent::JMT_RELEASED;
           }
 
-          _mouse_x = event.xbutton.x;
-          _mouse_y = event.xbutton.y;
+          sg_mouse_x = event.xbutton.x;
+          sg_mouse_y = event.xbutton.y;
 
           if (event.xbutton.button == Button1) {
             button = jevent::JMB_BUTTON1;
@@ -720,15 +727,15 @@ void NativeApplication::InternalLoop()
           if (type == jevent::JMT_PRESSED) {
             auto current = std::chrono::steady_clock::now();
             
-            if ((std::chrono::duration_cast<std::chrono::milliseconds>(current - _last_keypress).count()) < 200L) {
-              _click_count = _click_count + 1;
+            if ((std::chrono::duration_cast<std::chrono::milliseconds>(current - sg_last_keypress).count()) < 200L) {
+              sg_click_count = sg_click_count + 1;
             } else {
-            	_click_count = 1;
+            	sg_click_count = 1;
             }
 
-            _last_keypress = current;
+            sg_last_keypress = current;
 
-            mouse_z = _click_count;
+            mouse_z = sg_click_count;
           }
         }
 
@@ -744,19 +751,22 @@ void NativeApplication::InternalLoop()
           buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON3);
         }
 
-        g_window->GetEventManager()->PostEvent(new jevent::MouseEvent(g_window, type, button, buttons, mouse_z, _mouse_x, _mouse_y));
+        sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, buttons, mouse_z, sg_mouse_x, sg_mouse_y));
       }
     }
 
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
 
-  g_window->SetVisible(false);
+  sg_jgui_window->SetVisible(false);
 }
 
 void NativeApplication::InternalQuit()
 {
-	XCloseDisplay(_display);
+  sg_quitting = true;
+
+  sg_loop_mutex.lock();
+  sg_loop_mutex.unlock();
 }
 
 NativeWindow::NativeWindow(int x, int y, int width, int height):
@@ -764,54 +774,54 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 {
 	jcommon::Object::SetClassName("jgui::NativeWindow");
 
-	if (_window != 0) {
+	if (sg_window != 0) {
 		throw jexception::RuntimeException("Cannot create more than one window");
   }
 
-  _icon = new BufferedImage(_DATA_PREFIX"/images/small-gnu.png");
+  sg_jgui_icon = new BufferedImage(_DATA_PREFIX"/images/small-gnu.png");
 
-	_window = 0;
-	_mouse_x = 0;
-	_mouse_y = 0;
-	_last_keypress = std::chrono::steady_clock::now();
-	_click_count = 1;
+	sg_window = 0;
+	sg_mouse_x = 0;
+	sg_mouse_y = 0;
+	sg_last_keypress = std::chrono::steady_clock::now();
+	sg_click_count = 1;
 
 	XSetWindowAttributes attr;
 
 	attr.event_mask = 0;
 	attr.override_redirect = False;
 
-  XLockDisplay(_display);
+  XLockDisplay(sg_display);
 
 	int 
-    screen = DefaultScreen(_display);
+    screen = DefaultScreen(sg_display);
 
-	_window = XCreateWindow(
-			_display, 
-			XRootWindow(_display, screen), 
+	sg_window = XCreateWindow(
+			sg_display, 
+			XRootWindow(sg_display, screen), 
 			x, 
 			y, 
 			width, 
 			height, 
 			0, 
-			DefaultDepth(_display, screen), 
+			DefaultDepth(sg_display, screen), 
 			InputOutput, 
-			DefaultVisual(_display, screen), 
+			DefaultVisual(sg_display, screen), 
 			CWEventMask | CWOverrideRedirect, 
 			&attr
 	);
 
-	if (_window == 0) {
+	if (sg_window == 0) {
 		throw jexception::RuntimeException("Cannot create a window");
 	}
 
-  _wm_delete_message = XInternAtom(_display, "WM_DELETE_WINDOW", False);
+  sg_wm_delete_message = XInternAtom(sg_display, "WM_DELETE_WINDOW", False);
 
-  XSetWMProtocols(_display, _window, &_wm_delete_message, 1);
+  XSetWMProtocols(sg_display, sg_window, &sg_wm_delete_message, 1);
 
 	// Set the window's style (tell the windows manager to change our window's 
 	// decorations and functions according to the requested style)
-	Atom WMHintsAtom = XInternAtom(_display, "_MOTIF_WM_HINTS", False);
+	Atom WMHintsAtom = XInternAtom(sg_display, "_MOTIF_WM_HINTS", False);
 
 	if (WMHintsAtom) {
 		static const unsigned long MWM_HINTS_FUNCTIONS   = 1 << 0;
@@ -853,7 +863,7 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 		const uint8_t
       *ptr = reinterpret_cast<const unsigned char*>(&hints);
 
-		XChangeProperty(_display, _window, WMHintsAtom, WMHintsAtom, 32, PropModeReplace, ptr, 5);
+		XChangeProperty(sg_display, sg_window, WMHintsAtom, WMHintsAtom, 32, PropModeReplace, ptr, 5);
 	}
 
 	/*
@@ -864,123 +874,123 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 	sizeHints.min_width = sizeHints.max_width  = width;
 	sizeHints.min_height = sizeHints.max_height = height;
 
-	XSetWMNormalHints(_display, _window, &sizeHints); 
+	XSetWMNormalHints(sg_display, sg_window, &sizeHints); 
 	*/
 
 	XSelectInput(
-			_display, _window, ExposureMask | EnterNotify | LeaveNotify | KeyPress | KeyRelease | ButtonPress | ButtonRelease | MotionNotify | PointerMotionMask | StructureNotifyMask | SubstructureNotifyMask
+			sg_display, sg_window, ExposureMask | EnterNotify | LeaveNotify | KeyPress | KeyRelease | ButtonPress | ButtonRelease | MotionNotify | PointerMotionMask | StructureNotifyMask | SubstructureNotifyMask
 	);
 
-  _visible_bounds.x = x;
-  _visible_bounds.y = y;
-  _visible_bounds.width = width;
-  _visible_bounds.height = height;
+  sg_visible_bounds.x = x;
+  sg_visible_bounds.y = y;
+  sg_visible_bounds.width = width;
+  sg_visible_bounds.height = height;
 
-  XMapRaised(_display, _window);
+  XMapRaised(sg_display, sg_window);
 
   VdpStatus 
-    status = vdp_device_create_x11(_display, DefaultScreen(_display), &vdp_device, &vdp_proc_address);
+    status = vdp_device_create_x11(sg_display, DefaultScreen(sg_display), &sg_vdp_device, &sg_vdp_proc_address);
   
   if (status) {
-    XUnlockDisplay(_display);
+    XUnlockDisplay(sg_display);
     
 		throw jexception::RuntimeException("Unable to create a vdpau device");
   }
 
 #define CHECK_STATUS(x) \
   if (x) { \
-    XUnlockDisplay(_display); \
+    XUnlockDisplay(sg_display); \
 		throw jexception::RuntimeException("Unable to load the current vdpau function"); \
   } \
 
-  CHECK_STATUS(vdp_proc_address(vdp_device, VDP_FUNC_ID_PRESENTATION_QUEUE_TARGET_CREATE_X11, (void **)&PresentationQueueTargetCreate));
-  CHECK_STATUS(vdp_proc_address(vdp_device, VDP_FUNC_ID_GET_ERROR_STRING, (void **)&GetErrorString));
-  CHECK_STATUS(vdp_proc_address(vdp_device, VDP_FUNC_ID_GET_INFORMATION_STRING, (void **)&GetInformationString));
-  CHECK_STATUS(vdp_proc_address(vdp_device, VDP_FUNC_ID_DEVICE_DESTROY, (void **)&DeviceDestroy));
-  CHECK_STATUS(vdp_proc_address(vdp_device, VDP_FUNC_ID_PRESENTATION_QUEUE_TARGET_DESTROY, (void **)&PresentationQueueTargetDestroy));
-  CHECK_STATUS(vdp_proc_address(vdp_device, VDP_FUNC_ID_OUTPUT_SURFACE_CREATE, (void **)&OutputSurfaceCreate));
-  CHECK_STATUS(vdp_proc_address(vdp_device, VDP_FUNC_ID_OUTPUT_SURFACE_DESTROY, (void **)&OutputSurfaceDestroy));
-  CHECK_STATUS(vdp_proc_address(vdp_device, VDP_FUNC_ID_OUTPUT_SURFACE_PUT_BITS_NATIVE, (void **)&OutputSurfacePutBitsNative));
-  CHECK_STATUS(vdp_proc_address(vdp_device, VDP_FUNC_ID_OUTPUT_SURFACE_RENDER_OUTPUT_SURFACE, (void **)&OutputSurfaceRenderOutputSurface));
-  CHECK_STATUS(vdp_proc_address(vdp_device, VDP_FUNC_ID_PRESENTATION_QUEUE_CREATE, (void **)&PresentationQueueCreate));
-  CHECK_STATUS(vdp_proc_address(vdp_device, VDP_FUNC_ID_PRESENTATION_QUEUE_CREATE, (void **)&PresentationQueueDestroy));
-  CHECK_STATUS(vdp_proc_address(vdp_device, VDP_FUNC_ID_PRESENTATION_QUEUE_DISPLAY, (void **)&PresentationQueueDisplay));
-  CHECK_STATUS(vdp_proc_address(vdp_device, VDP_FUNC_ID_PRESENTATION_QUEUE_GET_TIME, (void **)&PresentationQueueGetTime));
-  CHECK_STATUS(vdp_proc_address(vdp_device, VDP_FUNC_ID_PRESENTATION_QUEUE_BLOCK_UNTIL_SURFACE_IDLE, (void **)&PresentationQueueBlockUntilSurfaceIdle));
+  CHECK_STATUS(sg_vdp_proc_address(sg_vdp_device, VDP_FUNC_ID_PRESENTATION_QUEUE_TARGET_CREATE_X11, (void **)&PresentationQueueTargetCreate));
+  CHECK_STATUS(sg_vdp_proc_address(sg_vdp_device, VDP_FUNC_ID_GET_ERROR_STRING, (void **)&GetErrorString));
+  CHECK_STATUS(sg_vdp_proc_address(sg_vdp_device, VDP_FUNC_ID_GET_INFORMATION_STRING, (void **)&GetInformationString));
+  CHECK_STATUS(sg_vdp_proc_address(sg_vdp_device, VDP_FUNC_ID_DEVICE_DESTROY, (void **)&DeviceDestroy));
+  CHECK_STATUS(sg_vdp_proc_address(sg_vdp_device, VDP_FUNC_ID_PRESENTATION_QUEUE_TARGET_DESTROY, (void **)&PresentationQueueTargetDestroy));
+  CHECK_STATUS(sg_vdp_proc_address(sg_vdp_device, VDP_FUNC_ID_OUTPUT_SURFACE_CREATE, (void **)&OutputSurfaceCreate));
+  CHECK_STATUS(sg_vdp_proc_address(sg_vdp_device, VDP_FUNC_ID_OUTPUT_SURFACE_DESTROY, (void **)&OutputSurfaceDestroy));
+  CHECK_STATUS(sg_vdp_proc_address(sg_vdp_device, VDP_FUNC_ID_OUTPUT_SURFACE_PUT_BITS_NATIVE, (void **)&OutputSurfacePutBitsNative));
+  CHECK_STATUS(sg_vdp_proc_address(sg_vdp_device, VDP_FUNC_ID_OUTPUT_SURFACE_RENDER_OUTPUT_SURFACE, (void **)&OutputSurfaceRenderOutputSurface));
+  CHECK_STATUS(sg_vdp_proc_address(sg_vdp_device, VDP_FUNC_ID_PRESENTATION_QUEUE_CREATE, (void **)&PresentationQueueCreate));
+  CHECK_STATUS(sg_vdp_proc_address(sg_vdp_device, VDP_FUNC_ID_PRESENTATION_QUEUE_CREATE, (void **)&PresentationQueueDestroy));
+  CHECK_STATUS(sg_vdp_proc_address(sg_vdp_device, VDP_FUNC_ID_PRESENTATION_QUEUE_DISPLAY, (void **)&PresentationQueueDisplay));
+  CHECK_STATUS(sg_vdp_proc_address(sg_vdp_device, VDP_FUNC_ID_PRESENTATION_QUEUE_GET_TIME, (void **)&PresentationQueueGetTime));
+  CHECK_STATUS(sg_vdp_proc_address(sg_vdp_device, VDP_FUNC_ID_PRESENTATION_QUEUE_BLOCK_UNTIL_SURFACE_IDLE, (void **)&PresentationQueueBlockUntilSurfaceIdle));
   
-  status = PresentationQueueTargetCreate(vdp_device,_window, &vdp_target);
-  status = PresentationQueueCreate(vdp_device, vdp_target, &vdp_queue);
+  status = PresentationQueueTargetCreate(sg_vdp_device,sg_window, &sg_vdp_target);
+  status = PresentationQueueCreate(sg_vdp_device, sg_vdp_target, &sg_vdp_queue);
 
   if (status) {
-    XUnlockDisplay(_display);
+    XUnlockDisplay(sg_display);
     
 		throw jexception::RuntimeException("Unable to create a presentation queue");
   }
 
-  status = OutputSurfaceCreate(vdp_device, VDP_RGBA_FORMAT_B8G8R8A8, width, height, &vdp_surface);
+  status = OutputSurfaceCreate(sg_vdp_device, VDP_RGBA_FORMAT_B8G8R8A8, width, height, &sg_vdp_surface);
 
   if (status) {
-    XUnlockDisplay(_display);
+    XUnlockDisplay(sg_display);
 
 		throw jexception::RuntimeException("Unable to create an output surface");
   }
 
-  XUnlockDisplay(_display);
+  XUnlockDisplay(sg_display);
 
-	XMapWindow(_display, _window);
+	XMapWindow(sg_display, sg_window);
 }
 
 NativeWindow::~NativeWindow()
 {
-  SetVisible(false);
+	XCloseDisplay(sg_display);
 }
 
 void NativeWindow::Repaint(Component *cmp)
 {
-  _need_repaint = true;
+  sg_repaint = true;
 }
 
 void NativeWindow::ToggleFullScreen()
 {
-  if (_fullscreen == false) {
-    _previous_bounds = GetBounds();
+  if (sg_fullscreen == false) {
+    sg_previous_bounds = GetBounds();
 
     Atom atoms[2] = { 
-      XInternAtom(_display, "_NET_WM_STATE_FULLSCREEN", False), None 
+      XInternAtom(sg_display, "_NET_WM_STATE_FULLSCREEN", False), None 
     };
 
-    XMoveResizeWindow(_display, _window, 0, 0, _screen.width, _screen.height);
-    XChangeProperty(_display, _window, 
-        XInternAtom(_display, "_NET_WM_STATE", False), XA_ATOM, 32, PropModeReplace, (unsigned char*)atoms, 1);
+    XMoveResizeWindow(sg_display, sg_window, 0, 0, sg_screen.width, sg_screen.height);
+    XChangeProperty(sg_display, sg_window, 
+        XInternAtom(sg_display, "_NET_WM_STATE", False), XA_ATOM, 32, PropModeReplace, (unsigned char*)atoms, 1);
 
     /*
-    XMoveResizeWindow(_display, _window, 0, 0, _screen.width, _screen.height);
+    XMoveResizeWindow(sg_display, sg_window, 0, 0, sg_screen.width, sg_screen.height);
 
     XEvent xev;
 
-    Atom wm_state = XInternAtom(_display, "_NET_WM_STATE", False);
-    Atom fullscreen = XInternAtom(_display, "_NET_WM_STATE_FULLSCREEN", False);
+    Atom wm_state = XInternAtom(sg_display, "_NET_WM_STATE", False);
+    Atom fullscreen = XInternAtom(sg_display, "_NET_WM_STATE_FULLSCREEN", False);
 
     memset(&xev, 0, sizeof(xev));
 
     xev.type = ClientMessage;
-    xev.xclient.window = _window;
+    xev.xclient.window = sg_window;
     xev.xclient.message_type = wm_state;
     xev.xclient.format = 32;
     xev.xclient.data.l[0] = 1;
     xev.xclient.data.l[1] = fullscreen;
     xev.xclient.data.l[2] = 0;
 
-    XSendEvent(_display, XRootWindow(_display, DefaultScreen(_display)), False, SubstructureNotifyMask, &xev);
+    XSendEvent(sg_display, XRootWindow(sg_display, DefaultScreen(sg_display)), False, SubstructureNotifyMask, &xev);
     */
 
-    _fullscreen = true;
+    sg_fullscreen = true;
   } else {
-	  XUnmapWindow(_display, _window);
-    XMoveResizeWindow(_display, _window, _previous_bounds.x, _previous_bounds.y, _previous_bounds.width, _previous_bounds.height);
-	  XMapWindow(_display, _window);
+	  XUnmapWindow(sg_display, sg_window);
+    XMoveResizeWindow(sg_display, sg_window, sg_previous_bounds.x, sg_previous_bounds.y, sg_previous_bounds.width, sg_previous_bounds.height);
+	  XMapWindow(sg_display, sg_window);
 
-    _fullscreen = false;
+    sg_fullscreen = false;
   }
 }
 
@@ -992,42 +1002,42 @@ void NativeWindow::SetParent(jgui::Container *c)
     throw jexception::IllegalArgumentException("Used only by native engine");
   }
 
-  g_window = parent;
+  sg_jgui_window = parent;
 
-  g_window->SetParent(nullptr);
+  sg_jgui_window->SetParent(nullptr);
 }
 
 void NativeWindow::SetTitle(std::string title)
 {
-	_title = title;
+	sg_title = title;
 	
-   XStoreName(_display, _window, title.c_str());
+   XStoreName(sg_display, sg_window, title.c_str());
 }
 
 std::string NativeWindow::GetTitle()
 {
-	return _title;
+	return sg_title;
 }
 
 void NativeWindow::SetOpacity(float opacity)
 {
-  _opacity = opacity;
+  sg_opacity = opacity;
 }
 
 float NativeWindow::GetOpacity()
 {
-  return _opacity;
+  return sg_opacity;
 }
 
 void NativeWindow::SetUndecorated(bool undecorated)
 {
-	_undecorated = undecorated;
+	sg_undecorated = undecorated;
   
   // XSetWindowBorderWidth()
 
 	// Set the window's style (tell the windows manager to change our window's 
 	// decorations and functions according to the requested style)
-	Atom WMHintsAtom = XInternAtom(_display, "_MOTIF_WM_HINTS", False);
+	Atom WMHintsAtom = XInternAtom(sg_display, "_MOTIF_WM_HINTS", False);
 
 	if (WMHintsAtom) {
 		static const unsigned long MWM_HINTS_FUNCTIONS   = 1 << 0;
@@ -1066,44 +1076,44 @@ void NativeWindow::SetUndecorated(bool undecorated)
 		hints.Decorations = True;
 		hints.Functions   = MWM_FUNC_MOVE | MWM_FUNC_CLOSE;
 
-		if (_undecorated == true) {
+		if (sg_undecorated == true) {
 			hints.Decorations = False;
 		}
 
 		const unsigned char *ptr = reinterpret_cast<const unsigned char*>(&hints);
 
-		XChangeProperty(_display, _window, WMHintsAtom, WMHintsAtom, 32, PropModeReplace, ptr, 5);
+		XChangeProperty(sg_display, sg_window, WMHintsAtom, WMHintsAtom, 32, PropModeReplace, ptr, 5);
 	}
 }
 
 bool NativeWindow::IsUndecorated()
 {
-  return _undecorated;
+  return sg_undecorated;
 }
 
 void NativeWindow::SetBounds(int x, int y, int width, int height)
 {
-	XMoveResizeWindow(_display, _window, x, y, width, height);
+	XMoveResizeWindow(sg_display, sg_window, x, y, width, height);
 }
 
 jgui::jregion_t NativeWindow::GetBounds()
 {
 	return {
-    .x = _visible_bounds.x,
-    .y = _visible_bounds.y,
-    .width = _visible_bounds.width,
-    .height = _visible_bounds.height,
+    .x = sg_visible_bounds.x,
+    .y = sg_visible_bounds.y,
+    .width = sg_visible_bounds.width,
+    .height = sg_visible_bounds.height,
   };
 }
 
 void NativeWindow::SetResizable(bool resizable)
 {
-  _resizable = resizable;
+  sg_resizable = resizable;
 }
 
 bool NativeWindow::IsResizable()
 {
-  return _resizable;
+  return sg_resizable;
 }
 
 void NativeWindow::SetCursorLocation(int x, int y)
@@ -1116,17 +1126,17 @@ void NativeWindow::SetCursorLocation(int x, int y)
 		y = 0;
 	}
 
-	if (x > _screen.width) {
-		x = _screen.width;
+	if (x > sg_screen.width) {
+		x = sg_screen.width;
 	}
 
-	if (y > _screen.height) {
-		y = _screen.height;
+	if (y > sg_screen.height) {
+		y = sg_screen.height;
 	}
 
-	XWarpPointer(_display, None, _window, 0, 0, 0, 0, x, y);
-	// XWarpPointer(_display, None, XRootWindow(_display, DefaultScreen(_display)), 0, 0, 0, 0, x, y);
-	XFlush(_display);
+	XWarpPointer(sg_display, None, sg_window, 0, 0, 0, 0, x, y);
+	// XWarpPointer(sg_display, None, XRootWindow(sg_display, DefaultScreen(sg_display)), 0, 0, 0, 0, x, y);
+	XFlush(sg_display);
 }
 
 jpoint_t NativeWindow::GetCursorLocation()
@@ -1138,54 +1148,54 @@ jpoint_t NativeWindow::GetCursorLocation()
 
 	::Window child_return;
 
-	XTranslateCoordinates(_display, _window, XRootWindow(_display, DefaultScreen(_display)), 0, 0, &t.x, &t.y, &child_return);
+	XTranslateCoordinates(sg_display, sg_window, XRootWindow(sg_display, DefaultScreen(sg_display)), 0, 0, &t.x, &t.y, &child_return);
 
 	return t;
 }
 
 void NativeWindow::SetVisible(bool visible)
 {
-  _visible = visible;
+  sg_visible = visible;
 
   if (visible == true) {
-	  XMapWindow(_display, _window);
+	  XMapWindow(sg_display, sg_window);
   } else {
-	  XUnmapWindow(_display, _window);
+	  XUnmapWindow(sg_display, sg_window);
   }
 }
 
 bool NativeWindow::IsVisible()
 {
-  return _visible;
+  return sg_visible;
 }
 
 jcursor_style_t NativeWindow::GetCursor()
 {
-  return _cursor;
+  return sg_jgui_cursor;
 }
 
 void NativeWindow::SetCursorEnabled(bool enabled)
 {
-  _cursor_enabled = enabled;
+  sg_cursor_enabled = enabled;
 
   if (enabled == false) {
-    XUndefineCursor(_display, _window);
+    XUndefineCursor(sg_display, sg_window);
 
-    XFlush(_display);
-    XSync(_display, False);
+    XFlush(sg_display);
+    XSync(sg_display, False);
   } else {
-    SetCursor(_cursor);
+    SetCursor(sg_jgui_cursor);
   }
 }
 
 bool NativeWindow::IsCursorEnabled()
 {
-	return _cursor_enabled;
+	return sg_cursor_enabled;
 }
 
 void NativeWindow::SetCursor(jcursor_style_t style)
 {
-  if (_cursor_enabled == false) {
+  if (sg_cursor_enabled == false) {
     return;
   }
 
@@ -1225,12 +1235,12 @@ void NativeWindow::SetCursor(jcursor_style_t style)
     type = XC_watch;
   }
 
-  Cursor cursor = XCreateFontCursor(_display, type);
+  Cursor cursor = XCreateFontCursor(sg_display, type);
 
-  XDefineCursor(_display, _window, cursor);
-  XSync(_display, False);
+  XDefineCursor(sg_display, sg_window, cursor);
+  XSync(sg_display, False);
 
-  _cursor = style;
+  sg_jgui_cursor = style;
 }
 
 void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
@@ -1250,20 +1260,20 @@ void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 	}
 
 	// Create the icon pixmap
-	int screen = DefaultScreen(_display);
-	Visual *visual = DefaultVisual(_display, screen);
-	unsigned int depth = DefaultDepth(_display, screen);
-	XImage *image = XCreateImage(_display, visual, depth, ZPixmap, 0, (char *)data, t.width, t.height, 32, 0);
-	::Window root_window = XRootWindow(_display, screen);
+	int screen = DefaultScreen(sg_display);
+	Visual *visual = DefaultVisual(sg_display, screen);
+	unsigned int depth = DefaultDepth(sg_display, screen);
+	XImage *image = XCreateImage(sg_display, visual, depth, ZPixmap, 0, (char *)data, t.width, t.height, 32, 0);
+	::Window rootsg_window = XRootWindow(sg_display, screen);
 
 	if (image == nullptr) {
 		return;
 	}
 
-	Pixmap pixmap = XCreatePixmap(_display, RootWindow(_display, screen), t.width, t.height, depth);
-	GC gc = XCreateGC(_display, pixmap, 0, nullptr);
+	Pixmap pixmap = XCreatePixmap(sg_display, RootWindow(sg_display, screen), t.width, t.height, depth);
+	GC gc = XCreateGC(sg_display, pixmap, 0, nullptr);
 	
-	XPutImage(_display, pixmap, gc, image, 0, 0, 0, 0, t.width, t.height);
+	XPutImage(sg_display, pixmap, gc, image, 0, 0, 0, 0, t.width, t.height);
 
 	XColor color;
 
@@ -1272,12 +1282,12 @@ void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 	color.green = 0;
 	color.blue = 0;
 
-	Cursor cursor = XCreatePixmapCursor(_display, pixmap, pixmap, &color, &color, 0, 0);
+	Cursor cursor = XCreatePixmapCursor(sg_display, pixmap, pixmap, &color, &color, 0, 0);
 
-	// XUndefineCursor(_display, root_window);
-	XDefineCursor(_display, root_window, cursor);
-	XSync(_display, root_window);
-	XFreePixmap(_display, pixmap);
+	// XUndefineCursor(sg_display, rootsg_window);
+	XDefineCursor(sg_display, rootsg_window, cursor);
+	XSync(sg_display, rootsg_window);
+	XFreePixmap(sg_display, pixmap);
 
 	// XChangeWindowAttributes() this funciontion change attributes like cursor
   
@@ -1296,12 +1306,12 @@ jwindow_rotation_t NativeWindow::GetRotation()
 
 void NativeWindow::SetIcon(jgui::Image *image)
 {
-  _icon = image;
+  sg_jgui_icon = image;
 }
 
 jgui::Image * NativeWindow::GetIcon()
 {
-  return _icon;
+  return sg_jgui_icon;
 }
 
 }

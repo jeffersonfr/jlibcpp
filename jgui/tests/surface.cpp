@@ -95,9 +95,6 @@ class Surface : public jgui::Window {
 		{
       _mutex_sync.unlock();
       _mutex_sync.unlock();
-
-      delete _buffer;
-      _buffer = nullptr;
 		}
 
     virtual bool MouseMoved(jevent::MouseEvent *event) 
@@ -210,6 +207,9 @@ class Surface : public jgui::Window {
 
         Repaint();
 			} while (IsHidden() == false);
+
+      delete _buffer;
+      _buffer = nullptr;
 		}
 
 		void Paint(jgui::Graphics *g) 
