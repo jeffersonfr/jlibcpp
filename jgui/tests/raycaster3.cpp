@@ -217,8 +217,6 @@ class GraphicsTeste : public jgui::Window {
 		{
 			// jgui::Window::Paint(g);
 
-      jgui::jsize_t
-        size = GetSize();
 			int 
         w = SCREEN_WIDTH,
 			  h = SCREEN_HEIGHT;

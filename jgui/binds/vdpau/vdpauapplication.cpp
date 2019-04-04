@@ -606,6 +606,7 @@ void NativeApplication::InternalLoop()
       } else if (event.type == FocusIn) {
       } else if (event.type == FocusOut) {
       } else if (event.type == ConfigureNotify) {
+        /*
         sg_visible_bounds.x = event.xconfigure.x;
         sg_visible_bounds.y = event.xconfigure.y;
         sg_visible_bounds.width = event.xconfigure.width;
@@ -614,6 +615,7 @@ void NativeApplication::InternalLoop()
         InternalPaint();
         
         sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_RESIZED));
+        */
       } else if (event.type == KeyPress || event.type == KeyRelease) {
         if (event.xkey.keycode < 256) {
           // To detect if it is a repeated key event, we check the current state of the key.
