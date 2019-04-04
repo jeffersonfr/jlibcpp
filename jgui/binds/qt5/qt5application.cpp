@@ -605,7 +605,7 @@ void NativeApplication::InternalLoop()
   std::lock_guard<std::mutex> lock(sg_loop_mutex);
 
   sg_handler->show();
-  sg_handler->activateWindow();
+  // sg_handler->activateWindow();
 
   do {
     if (sg_repaint == true) {
@@ -616,7 +616,7 @@ void NativeApplication::InternalLoop()
 
     sg_application->processEvents();
     
-    std::this_thread::yield();
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
   } while (sg_quitting == false);
 
   sg_jgui_window->SetVisible(false);
@@ -643,9 +643,9 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 
   sg_handler = new QTWindowRender();
 
+  sg_handler->setVisible(true);
   sg_handler->setMouseTracking(true);
-  sg_handler->resize(width, height);
-  sg_handler->move(x, y);
+  sg_handler->setGeometry(x, y, width, height);
 
   sg_visible = true;
 }

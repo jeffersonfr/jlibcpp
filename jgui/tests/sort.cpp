@@ -1631,7 +1631,12 @@ class SortComponent : public jgui::Component, public jcommon::Observer {
 			if (_algorithm->IsLocked() == true) {
 		  	_algorithm->Stop();
 
-			  _thread.join();
+				if (_algorithm->IsLocked() == false) {
+          try {
+            _thread.join();
+          } catch (...) {
+          }
+        }
       }
 		}
 
