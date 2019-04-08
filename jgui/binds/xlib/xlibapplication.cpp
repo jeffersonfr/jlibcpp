@@ -411,13 +411,6 @@ NativeApplication::NativeApplication():
 
 NativeApplication::~NativeApplication()
 {
-  XUnmapWindow(sg_display, sg_window);
-  XDestroyWindow(sg_display, sg_window);
-  XFlush(sg_display);
-  XSync(sg_display, False);
-	XCloseDisplay(sg_display);
-
-  sg_window = 0;
 }
 
 void NativeApplication::InternalInit(int argc, char **argv)
@@ -876,7 +869,13 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 
 NativeWindow::~NativeWindow()
 {
+  XUnmapWindow(sg_display, sg_window);
+  XDestroyWindow(sg_display, sg_window);
+  XFlush(sg_display);
+  XSync(sg_display, False);
 	XCloseDisplay(sg_display);
+
+  sg_window = 0;
 }
 
 void NativeWindow::Repaint(Component *cmp)

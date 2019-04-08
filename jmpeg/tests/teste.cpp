@@ -3642,8 +3642,6 @@ class PSIParser : public jevent::DemuxListener {
 				ProcessRST(event);
       } else if (demux->GetID() == "pcr") {
         ProcessPCR(event);
-			} else if (demux->GetID() == "ait") {
-				ProcessPrivate(event);
 			} else if (demux->GetID() == "cdt") {
 				ProcessCDT(event);
 			} else if (demux->GetID() == "bit") {
@@ -3662,6 +3660,8 @@ class PSIParser : public jevent::DemuxListener {
         ProcessDSMCC(event);
       } else if (demux->GetID() == "libras-data") {
         ProcessLibras(event);
+			} else if (demux->GetID() == "private") {
+				ProcessPrivate(event);
       } 
 
 			printf("\n");

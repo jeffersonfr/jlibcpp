@@ -435,17 +435,6 @@ NativeApplication::NativeApplication():
 
 NativeApplication::~NativeApplication()
 {
-  PresentationQueueDestroy(sg_vdp_queue);
-  PresentationQueueTargetDestroy(sg_vdp_target);
-  DeviceDestroy(sg_vdp_device);
-
-  XUnmapWindow(sg_display, sg_window);
-  XDestroyWindow(sg_display, sg_window);
-  XFlush(sg_display);
-  XSync(sg_display, False);
-	XCloseDisplay(sg_display);
-
-  sg_window = 0;
 }
 
 void NativeApplication::InternalInit(int argc, char **argv)
@@ -606,16 +595,17 @@ void NativeApplication::InternalLoop()
       } else if (event.type == FocusIn) {
       } else if (event.type == FocusOut) {
       } else if (event.type == ConfigureNotify) {
-        /*
         sg_visible_bounds.x = event.xconfigure.x;
         sg_visible_bounds.y = event.xconfigure.y;
         sg_visible_bounds.width = event.xconfigure.width;
         sg_visible_bounds.height = event.xconfigure.height;
 
+        OutputSurfaceDestroy(sg_vdp_surface);
+        OutputSurfaceCreate(sg_vdp_device, VDP_RGBA_FORMAT_B8G8R8A8, sg_visible_bounds.width, sg_visible_bounds.height, &sg_vdp_surface);
+
         InternalPaint();
         
         sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_RESIZED));
-        */
       } else if (event.type == KeyPress || event.type == KeyRelease) {
         if (event.xkey.keycode < 256) {
           // To detect if it is a repeated key event, we check the current state of the key.
@@ -920,7 +910,7 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
   CHECK_STATUS(sg_vdp_proc_address(sg_vdp_device, VDP_FUNC_ID_PRESENTATION_QUEUE_GET_TIME, (void **)&PresentationQueueGetTime));
   CHECK_STATUS(sg_vdp_proc_address(sg_vdp_device, VDP_FUNC_ID_PRESENTATION_QUEUE_BLOCK_UNTIL_SURFACE_IDLE, (void **)&PresentationQueueBlockUntilSurfaceIdle));
   
-  status = PresentationQueueTargetCreate(sg_vdp_device,sg_window, &sg_vdp_target);
+  status = PresentationQueueTargetCreate(sg_vdp_device, sg_window, &sg_vdp_target);
   status = PresentationQueueCreate(sg_vdp_device, sg_vdp_target, &sg_vdp_queue);
 
   if (status) {
@@ -944,7 +934,18 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 
 NativeWindow::~NativeWindow()
 {
+  OutputSurfaceDestroy(sg_vdp_surface);
+  PresentationQueueDestroy(sg_vdp_queue);
+  PresentationQueueTargetDestroy(sg_vdp_target);
+  // DeviceDestroy(sg_vdp_device);
+
+  XUnmapWindow(sg_display, sg_window);
+  XDestroyWindow(sg_display, sg_window);
+  XFlush(sg_display);
+  XSync(sg_display, False);
 	XCloseDisplay(sg_display);
+
+  sg_window = 0;
 }
 
 void NativeWindow::Repaint(Component *cmp)

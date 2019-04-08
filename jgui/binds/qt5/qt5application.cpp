@@ -577,8 +577,6 @@ NativeApplication::NativeApplication():
 
 NativeApplication::~NativeApplication()
 {
-  delete sg_jgui_window;
-  sg_jgui_window = nullptr;
 }
 
 void NativeApplication::InternalInit(int argc, char **argv)
