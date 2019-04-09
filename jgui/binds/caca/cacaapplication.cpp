@@ -28,6 +28,8 @@
 #include <thread>
 #include <mutex>
 
+#include <caca.h>
+
 #include <fcntl.h>
 #include <linux/input.h>
 #include <linux/fb.h>
@@ -35,22 +37,12 @@
 
 namespace jgui {
 
-struct cursor_params_t {
-  jgui::Image *cursor;
-  int hot_x;
-  int hot_y;
-};
-
 /** \brief */
-static std::map<jcursor_style_t, struct cursor_params_t> sg_jgui_cursors;
+caca_display_t *dp = nullptr;
 /** \brief */
-static int sg_handler = 0;
+cucul_canvas_t *cv = nullptr;
 /** \brief */
-static char *sg_surface = nullptr;
-/** \brief */
-static struct fb_var_screeninfo sg_vinfo;
-/** \brief */
-static struct fb_fix_screeninfo sg_finfo;
+cucul_dither_t *dither = nullptr;
 /** \brief */
 static std::chrono::time_point<std::chrono::steady_clock> sg_last_keypress;
 /** \brief */
@@ -70,13 +62,9 @@ static bool sg_quitting = false;
 /** \brief */
 static jgui::jsize_t sg_screen = {0, 0};
 /** \brief */
-static struct cursor_params_t sg_cursor_params;
-/** \brief */
 static Window *sg_jgui_window = nullptr;
 /** \brief */
 static jcursor_style_t sg_jgui_cursor = JCS_DEFAULT;
-/** \brief */
-static jgui::Image *sg_jgui_icon = nullptr;
 
 static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(int symbol, bool shift)
 {
@@ -281,80 +269,38 @@ NativeApplication::~NativeApplication()
 
 void NativeApplication::InternalInit(int argc, char **argv)
 {
-  sg_handler = open("/dev/fb0", O_RDWR);
+  cv = cucul_create_canvas(0, 0);
 
-  if (sg_handler == -1) {
-		throw jexception::RuntimeException("Cannot open framebuffer device");
+  if (cv == nullptr) {
+    exit(-1);
   }
 
-  if (ioctl(sg_handler, FBIOGET_FSCREENINFO, &sg_finfo) == -1) {
-		throw jexception::RuntimeException("Unable to reading fixed information");
+  dp = caca_create_display_with_driver(cv, nullptr); //"ncurses");
+
+  if (dp == nullptr) {
+    cucul_free_canvas(cv);
+
+    exit(-1);
   }
 
-  if (ioctl(sg_handler, FBIOGET_VSCREENINFO, &sg_vinfo) == -1) {
-		throw jexception::RuntimeException("Unable to reading variable information");
+	int width = cucul_get_canvas_width(cv);
+	int height = cucul_get_canvas_height(cv);
+
+  dither = cucul_create_dither(
+      32, width, height, width*4, 0x00ff0000, 0x0000ff00, 0x000000ff, 0x00000000);
+
+  if (dither == nullptr) {
+    cucul_free_canvas(cv);
+    caca_free_display(dp);
+
+    exit(-1);
   }
 
-  /*
-  // INFO:: force resolution (fbset)
-  vinfo.xres = 320;
-  vinfo.yres = 240;
-  vinfo.xres_virtual = 320;
-  vinfo.yres_virtual = 480; // double the physical height (PAN)
-  vinfo.bits_per_pixel = 8;
-  
-  if (ioctl(fbfd, FBIOPUT_VSCREENINFO, &vinfo)) {
-    printf("Error setting variable information.\n");
-  }
+  cucul_clear_canvas(cv);
 
-  // INFO:: after vsync ...  
-  vinfo.yoffset = vinfo.yres;
+	sg_screen.width = width;
+	sg_screen.height = height;
 
-  if (ioctl(fbfd, FBIOPAN_DISPLAY, &vinfo)) {
-    printf("Pan failed.\n");
-  }
-  */
-
-  printf("FrameBuffer:: %dx%d, %dbpp\n", sg_vinfo.xres, sg_vinfo.yres, sg_vinfo.bits_per_pixel);
-
-	sg_screen.width = sg_vinfo.xres;
-	sg_screen.height = sg_vinfo.yres;
-
-#define CURSOR_INIT(type, ix, iy, hotx, hoty) 													\
-	t.cursor = new jgui::BufferedImage(JPF_ARGB, w, h);												\
-																																				\
-	t.hot_x = hotx;																												\
-	t.hot_y = hoty;																												\
-																																				\
-	t.cursor->GetGraphics()->DrawImage(cursors, ix*w, iy*h, w, h, 0, 0);	\
-																																				\
-	sg_jgui_cursors[type] = t;																										\
-
-	struct cursor_params_t t;
-	int w = 30,
-			h = 30;
-
-	Image *cursors = new jgui::BufferedImage(_DATA_PREFIX"/images/cursors.png");
-
-	CURSOR_INIT(JCS_DEFAULT, 0, 0, 8, 8);
-	CURSOR_INIT(JCS_CROSSHAIR, 4, 3, 15, 15);
-	CURSOR_INIT(JCS_EAST, 4, 4, 22, 15);
-	CURSOR_INIT(JCS_WEST, 5, 4, 9, 15);
-	CURSOR_INIT(JCS_NORTH, 6, 4, 15, 8);
-	CURSOR_INIT(JCS_SOUTH, 7, 4, 15, 22);
-	CURSOR_INIT(JCS_HAND, 1, 0, 15, 15);
-	CURSOR_INIT(JCS_MOVE, 8, 4, 15, 15);
-	CURSOR_INIT(JCS_NS, 2, 4, 15, 15);
-	CURSOR_INIT(JCS_WE, 3, 4, 15, 15);
-	CURSOR_INIT(JCS_NW_CORNER, 8, 1, 10, 10);
-	CURSOR_INIT(JCS_NE_CORNER, 9, 1, 20, 10);
-	CURSOR_INIT(JCS_SW_CORNER, 6, 1, 10, 20);
-	CURSOR_INIT(JCS_SE_CORNER, 7, 1, 20, 20);
-	CURSOR_INIT(JCS_TEXT, 7, 0, 15, 15);
-	CURSOR_INIT(JCS_WAIT, 8, 0, 15, 15);
-	
-	delete cursors;
-  
   sg_quitting = false;
 }
 
@@ -380,13 +326,16 @@ void NativeApplication::InternalPaint()
   sg_jgui_window->Paint(g);
 	g->Translate(t.x, t.y);
 
-    if (sg_cursor_enabled == true) {
-        g->DrawImage(sg_cursor_params.cursor, sg_mouse_x, sg_mouse_y);
-    }
+  cairo_surface_t *cairo_surface = nullptr;
+	int iw = cucul_get_canvas_width(cv);
+	int ih = cucul_get_canvas_height(cv);
 
-  cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
+  jgui::Image *scale = buffer->Scale(iw, ih);
+
+  cairo_surface = cairo_get_target(scale->GetGraphics()->GetCairoContext());
 
   if (cairo_surface == nullptr) {
+    delete scale;
     delete buffer;
 
     return;
@@ -401,50 +350,39 @@ void NativeApplication::InternalPaint()
   uint8_t *data = cairo_image_surface_get_data(cairo_surface);
 
   if (data == nullptr) {
+    delete scale;
     delete buffer;
 
     return;
   }
 
-	uint8_t *src = data;
-	uint8_t *dst = (uint8_t *)sg_surface;
-	int size = dw*dh;
+  if (dither != nullptr) {
+    /* 
+     * INFO:: algorithms for dithering
+     * none
+     * no dithering
+     * ordered2
+     * 2x2 ordered dithering
+     * ordered4
+     * 4x4 ordered dithering
+     * ordered8
+     * 8x8 ordered dithering
+     * random
+     * random dithering
+     * fstein
+     * Floyd-Steinberg dithering
+     */
 
-	for (int i=0; i<size; i++) {
-    if (sg_vinfo.bits_per_pixel == 32) { // BGRA
-      dst[2] = src[2];
-      dst[1] = src[1];
-      dst[0] = src[0];
-      dst[3] = src[3];
-
-      src = src + 4;
-      dst = dst + 4;
-    } else if (sg_vinfo.bits_per_pixel == 24) { // BGR24
-      dst[2] = src[2];
-      dst[1] = src[1];
-      dst[0] = src[0];
-
-      src = src + 4;
-      dst = dst + 3;
-    } else if (sg_vinfo.bits_per_pixel == 16) { // BGR565
-      *((uint16_t *)dst) = ((src[0] & 0x1f) << 11) | ((src[1] & 0x3f) << 5) | (src[2] & 0x1f);
-
-      src = src + 4;
-      dst = dst + 2;
-    }
-	}
-
-  if (g->IsVerticalSyncEnabled() == true) {
-    int 
-      dummy = 0;
-
-    ioctl(sg_handler, FBIO_WAITFORVSYNC, &dummy);
+    caca_set_dither_algorithm(dither, "none");
+    cucul_set_color_ansi(cv, CUCUL_COLOR_DEFAULT, CUCUL_COLOR_BLACK);
+    cucul_dither_bitmap(cv, 0, 0, dw, dh, dither, data);
+    caca_refresh_display(dp);
   }
 
   cairo_surface_destroy(cairo_surface);
 
+  delete scale;
   delete buffer;
-  buffer = nullptr;
 
   sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
 }
@@ -453,9 +391,10 @@ void NativeApplication::InternalLoop()
 {
   std::lock_guard<std::mutex> lock(sg_loop_mutex);
 
+  struct caca_event cv;
   struct input_event ev;
   bool shift = false;
-  int mouse_x = 0, mouse_y = 0;
+  // int mouse_x = 0, mouse_y = 0;
   uint32_t last_mouse_state = 0x00;
   
   int 
@@ -476,20 +415,35 @@ void NativeApplication::InternalLoop()
 
   fcntl(fdm, F_SETFL, O_NONBLOCK);
 
+
   while (sg_quitting == false) {
-    if (mouse_x != sg_mouse_x or mouse_y != sg_mouse_y) {
-      mouse_x = sg_mouse_x;
-      mouse_y = sg_mouse_y;
-
-      if (sg_cursor_enabled == true) {
-        sg_repaint = true;
-      }
-    }
-
     if (sg_repaint == true) {
       sg_repaint = false;
 
       InternalPaint();
+    }
+
+    while (caca_get_event(dp, CACA_EVENT_ANY, &cv, 0) > 0) {
+      switch (caca_get_event_type(&cv)) {
+        case CACA_EVENT_RESIZE:
+          if (dither != nullptr) {
+            cucul_free_dither(dither);
+          }
+
+          dither = cucul_create_dither(
+              32, cv.data.resize.w, cv.data.resize.h, cv.data.resize.w*4, 0x00ff0000, 0x0000ff00, 0x000000ff, 0x00000000);
+
+          if (dither == nullptr) {
+            sg_quitting = true;
+          }
+  
+          break;
+        case CACA_EVENT_QUIT:
+          sg_quitting = true;
+          break;
+        default:
+          break;
+      }
     }
 
     if (read(fdk, &ev, sizeof ev) == sizeof(ev)) {
@@ -628,11 +582,11 @@ void NativeApplication::InternalLoop()
 
       // SDL_GrabMode SDL_WM_GrabInput(SDL_GrabMode mode); // <SDL_GRAB_ON, SDL_GRAB_OFF>
 
-      sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, buttons, mouse_z, sg_mouse_x + sg_cursor_params.hot_x, sg_mouse_y + sg_cursor_params.hot_y));
+      sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, buttons, mouse_z, sg_mouse_x, sg_mouse_y));
 
       continue;
     }
-
+    
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
 
@@ -659,37 +613,30 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 {
 	jcommon::Object::SetClassName("jgui::NativeWindow");
 
-	if (sg_surface != nullptr) {
-		throw jexception::RuntimeException("Cannot create more than one window");
-  }
-
-  sg_jgui_icon = new BufferedImage(_DATA_PREFIX"/images/small-gnu.png");
-
 	sg_mouse_x = 0;
 	sg_mouse_y = 0;
 	sg_last_keypress = std::chrono::steady_clock::now();
 	sg_click_count = 1;
 
-  sg_surface = (char *)mmap(
-      0, sg_vinfo.xres*sg_vinfo.yres*sg_vinfo.bits_per_pixel/8, PROT_READ | PROT_WRITE, MAP_SHARED, sg_handler, 0);
-
-  if (sg_surface == MAP_FAILED) {
-		throw jexception::RuntimeException("Unable to map framebuffer device to memory");
-  }
-  
-  SetCursor(sg_jgui_cursors[JCS_DEFAULT].cursor, sg_jgui_cursors[JCS_DEFAULT].hot_x, sg_jgui_cursors[JCS_DEFAULT].hot_y);
+  sg_screen.width = width;
+  sg_screen.height = height;
 }
 
 NativeWindow::~NativeWindow()
 {
-  if (sg_cursor_params.cursor != nullptr) {
-    delete sg_cursor_params.cursor;
-    sg_cursor_params.cursor = nullptr;
+  cucul_clear_canvas(cv);
+
+  if (dither != nullptr) {
+    cucul_free_dither(dither);
   }
-
-  munmap(sg_surface, sg_vinfo.xres*sg_vinfo.yres*sg_vinfo.bits_per_pixel/8);
-
-  close(sg_handler);
+  
+  if (dp != nullptr) {
+    caca_free_display(dp);
+  }
+  
+  if (cv != nullptr) {
+    cucul_free_canvas(cv);
+  }
 }
 
 void NativeWindow::Repaint(Component *cmp)
@@ -718,6 +665,7 @@ void NativeWindow::SetParent(jgui::Container *c)
 
 void NativeWindow::SetTitle(std::string title)
 {
+  // caca_set_display_title(dp, _title.c_str());
 }
 
 std::string NativeWindow::GetTitle()
@@ -745,6 +693,8 @@ bool NativeWindow::IsUndecorated()
 
 void NativeWindow::SetBounds(int x, int y, int width, int height)
 {
+  sg_screen.width = width;
+  sg_screen.height = height;
 }
 
 jgui::jregion_t NativeWindow::GetBounds()
@@ -770,22 +720,21 @@ bool NativeWindow::IsResizable()
 
 void NativeWindow::SetCursorLocation(int x, int y)
 {
-  sg_mouse_x = (x < 0)?0:(x > sg_screen.width)?sg_screen.width:x;
-  sg_mouse_y = (y < 0)?0:(y > sg_screen.height)?sg_screen.height:y;
 }
 
 jpoint_t NativeWindow::GetCursorLocation()
 {
 	jpoint_t p;
 
-	p.x = sg_mouse_x;
-	p.y = sg_mouse_y;
+	p.x = 0;
+	p.y = 0;
 
 	return p;
 }
 
 void NativeWindow::SetVisible(bool visible)
 {
+  
 }
 
 bool NativeWindow::IsVisible()
@@ -811,25 +760,10 @@ bool NativeWindow::IsCursorEnabled()
 void NativeWindow::SetCursor(jcursor_style_t style)
 {
 	sg_jgui_cursor = style;
-
-	SetCursor(sg_jgui_cursors[style].cursor, sg_jgui_cursors[style].hot_x, sg_jgui_cursors[style].hot_y);
 }
 
 void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 {
-	if ((void *)shape == nullptr) {
-		return;
-	}
-
-  if (sg_cursor_params.cursor != nullptr) {
-    delete sg_cursor_params.cursor;
-    sg_cursor_params.cursor = nullptr;
-  }
-
-  sg_cursor_params.cursor = dynamic_cast<jgui::Image *>(shape->Clone());
-
-  sg_cursor_params.hot_x = hotx;
-  sg_cursor_params.hot_y = hoty;
 }
 
 void NativeWindow::SetRotation(jwindow_rotation_t t)
@@ -843,12 +777,11 @@ jwindow_rotation_t NativeWindow::GetRotation()
 
 void NativeWindow::SetIcon(jgui::Image *image)
 {
-  sg_jgui_icon = image;
 }
 
 jgui::Image * NativeWindow::GetIcon()
 {
-  return sg_jgui_icon;
+  return nullptr;
 }
 
 }

@@ -57,7 +57,7 @@ ENABLE_DEBUG ?= yes
 # {no, yes}
 ENABLE_SANITIZE ?= no
 
-# {allegro5, directfb, dispmanx, egl, fb, gl, gtk3, openvg, qt5, sdl2, sfml2, vdpau, vnc, xcb, xlib}
+# {allegro5, directfb, dispmanx, egl, fb, gl, gtk3, openvg, qt5, sdl2, sfml2, vdpau, vnc, xcb, xlib, caca}
 ENABLE_GRAPHICS ?= sdl2
 
 # {bmp, gif, ico, jpg, pcx, png, ppm, tga, xbm, xpm, heif, webp, jp2000, svg, tif, bpg, mjpeg, flif}

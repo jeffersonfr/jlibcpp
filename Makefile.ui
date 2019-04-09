@@ -379,3 +379,25 @@ ifeq ($(ENABLE_GRAPHICS),qt5)
 
 endif
 
+ifeq ($(ENABLE_GRAPHICS),caca)
+	CCFLAGS 	+= \
+
+	LDFLAGS		+= \
+     -Wl,-O1 \
+     -lcaca\
+     -lpthread \
+
+	DEFINES		+= \
+     -DJGUI_UI \
+		 -DCACA_UI \
+
+	REQUIRES	+= \
+
+	OBJS_gfx	+= \
+		 cacaapplication.o\
+
+  OBJS_jgui	+= \
+     $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+
+endif
+
