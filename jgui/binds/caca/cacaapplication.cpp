@@ -391,11 +391,9 @@ void NativeApplication::InternalLoop()
 {
   std::lock_guard<std::mutex> lock(sg_loop_mutex);
 
-  struct caca_event cv;
+  struct caca_event cev;
   struct input_event ev;
   bool shift = false;
-  // int mouse_x = 0, mouse_y = 0;
-  uint32_t last_mouse_state = 0x00;
   
   int 
     fdk = open("/dev/input/by-path/platform-i8042-serio-0-event-kbd", O_RDONLY);
@@ -406,16 +404,6 @@ void NativeApplication::InternalLoop()
 
   fcntl(fdk, F_SETFL, O_NONBLOCK);
 
-  int 
-    fdm = open("/dev/input/mice", O_RDONLY);
-
-  if(fdm == -1) {   
-    printf("Cannot open the mouse device\n");
-  }   
-
-  fcntl(fdm, F_SETFL, O_NONBLOCK);
-
-
   while (sg_quitting == false) {
     if (sg_repaint == true) {
       sg_repaint = false;
@@ -423,26 +411,96 @@ void NativeApplication::InternalLoop()
       InternalPaint();
     }
 
-    while (caca_get_event(dp, CACA_EVENT_ANY, &cv, 0) > 0) {
-      switch (caca_get_event_type(&cv)) {
-        case CACA_EVENT_RESIZE:
+    while (caca_get_event(dp, CACA_EVENT_ANY, &cev, 0) > 0) {
+      caca_event_type mtype = caca_get_event_type(&cev);
+
+      if (mtype == CACA_EVENT_MOUSE_PRESS or mtype == CACA_EVENT_MOUSE_RELEASE or mtype == CACA_EVENT_MOUSE_MOTION) {
+        static int 
+          buttonMask = 0x00;
+
+        int 
+          mbutton = cev.data.mouse.button;
+        int 
+          x = cev.data.mouse.x,
+          y = cev.data.mouse.y;
+
+        if (mtype == CACA_EVENT_MOUSE_PRESS) {
+          buttonMask = buttonMask | (1 << (mbutton - 1));
+        } else if (mtype == CACA_EVENT_MOUSE_RELEASE) {
+          buttonMask = buttonMask & ~(1 << (mbutton - 1));
+        }
+
+        jevent::jmouseevent_button_t button = jevent::JMB_NONE;
+        jevent::jmouseevent_button_t buttons = jevent::JMB_NONE;
+        jevent::jmouseevent_type_t type = jevent::JMT_UNKNOWN;
+        int mouse_z = 0;
+
+        if (mtype == CACA_EVENT_MOUSE_PRESS) {
+          type = jevent::JMT_PRESSED;
+        } else if (mtype == CACA_EVENT_MOUSE_RELEASE) {
+          type = jevent::JMT_RELEASED;
+        } else if (mtype == CACA_EVENT_MOUSE_MOTION) {
+          type = jevent::JMT_MOVED;
+        }
+
+        sg_mouse_x = CLAMP(x, 0, sg_screen.width - 1);
+        sg_mouse_y = CLAMP(y, 0, sg_screen.height - 1);
+
+        if (mbutton == 1) {
+          button = jevent::JMB_BUTTON1;
+        } else if (mbutton == 2) {
+          button = jevent::JMB_BUTTON2;
+        } else if (mbutton == 3) {
+          button = jevent::JMB_BUTTON3;
+        }
+
+        sg_click_count = 1;
+
+        if (type == jevent::JMT_PRESSED) {
+          auto current = std::chrono::steady_clock::now();
+
+          if ((std::chrono::duration_cast<std::chrono::milliseconds>(current - sg_last_keypress).count()) < 200L) {
+            sg_click_count = sg_click_count + 1;
+          }
+
+          sg_last_keypress = current;
+
+          mouse_z = sg_click_count;
+        }
+
+        if (buttonMask & 0x01) {
+          buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON1);
+        }
+
+        if (buttonMask & 0x02) {
+          buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON2);
+        }
+
+        if (buttonMask & 0x04) {
+          buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON3);
+        }
+
+        float dx = (sg_mouse_x*
+            sg_screen.width)/
+          cucul_get_canvas_width(cv);
+        float dy = (sg_mouse_y*sg_screen.height)/cucul_get_canvas_height(cv);
+
+        sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, buttons, mouse_z, dx, dy));
+      } else if (mtype == CACA_EVENT_RESIZE) {
           if (dither != nullptr) {
             cucul_free_dither(dither);
           }
 
           dither = cucul_create_dither(
-              32, cv.data.resize.w, cv.data.resize.h, cv.data.resize.w*4, 0x00ff0000, 0x0000ff00, 0x000000ff, 0x00000000);
+              32, cev.data.resize.w, cev.data.resize.h, cev.data.resize.w*4, 0x00ff0000, 0x0000ff00, 0x000000ff, 0x00000000);
 
           if (dither == nullptr) {
             sg_quitting = true;
           }
-  
-          break;
-        case CACA_EVENT_QUIT:
+
+          InternalPaint();
+      } else if (mtype == CACA_EVENT_QUIT) {
           sg_quitting = true;
-          break;
-        default:
-          break;
       }
     }
 
@@ -503,90 +561,6 @@ void NativeApplication::InternalLoop()
       }
     }
 
-    signed char data[3];
-
-    if (read(fdm, data, sizeof(data)) == sizeof(data)) {
-      int 
-        buttonMask = data[0];
-      int 
-        x = sg_mouse_x + data[1],
-        y = sg_mouse_y - data[2];
-      
-      x = (x < 0)?0:(x > sg_screen.width)?sg_screen.width:x;
-      y = (y < 0)?0:(y > sg_screen.height)?sg_screen.height:y;
-
-      jevent::jmouseevent_button_t button = jevent::JMB_NONE;
-      jevent::jmouseevent_button_t buttons = jevent::JMB_NONE;
-      jevent::jmouseevent_type_t type = jevent::JMT_UNKNOWN;
-      int mouse_z = 0;
-
-      type = jevent::JMT_PRESSED;
-
-      if (sg_mouse_x != x || sg_mouse_y != y) {
-        type = jevent::JMT_MOVED;
-      }
-
-      sg_mouse_x = CLAMP(x, 0, sg_screen.width - 1);
-      sg_mouse_y = CLAMP(y, 0, sg_screen.height - 1);
-
-      if ((buttonMask & 0x01) == 0 && (last_mouse_state & 0x01)) {
-        type = jevent::JMT_RELEASED;
-      } else if ((buttonMask & 0x02) == 0 && (last_mouse_state & 0x02)) {
-        type = jevent::JMT_RELEASED;
-      } else if ((buttonMask & 0x04) == 0 && (last_mouse_state & 0x04)) {
-        type = jevent::JMT_RELEASED;
-      } 
-
-      if ((buttonMask & 0x01) != (last_mouse_state & 0x01)) {
-        button = jevent::JMB_BUTTON1;
-      } else if ((buttonMask & 0x02) != (last_mouse_state & 0x02)) {
-        button = jevent::JMB_BUTTON3;
-      } else if ((buttonMask & 0x04) != (last_mouse_state & 0x04)) {
-        button = jevent::JMB_BUTTON2;
-      }
-
-      last_mouse_state = buttonMask;
-
-      sg_click_count = 1;
-
-      if (type == jevent::JMT_PRESSED) {
-        auto current = std::chrono::steady_clock::now();
-
-        if ((std::chrono::duration_cast<std::chrono::milliseconds>(current - sg_last_keypress).count()) < 200L) {
-          sg_click_count = sg_click_count + 1;
-        }
-
-        sg_last_keypress = current;
-
-        mouse_z = sg_click_count;
-      }
-
-      /*
-      if ((buttonMask & 0x08) || (buttonMask & 0x10)) {
-        type = jevent::JMT_ROTATED;
-        mouse_z = 1;
-      }
-      */
-
-      if (buttonMask & 0x01) {
-        buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON1);
-      }
-
-      if (buttonMask & 0x02) {
-        buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON3);
-      }
-
-      if (buttonMask & 0x04) {
-        buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON2);
-      }
-
-      // SDL_GrabMode SDL_WM_GrabInput(SDL_GrabMode mode); // <SDL_GRAB_ON, SDL_GRAB_OFF>
-
-      sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, buttons, mouse_z, sg_mouse_x, sg_mouse_y));
-
-      continue;
-    }
-    
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
 
@@ -595,7 +569,6 @@ void NativeApplication::InternalLoop()
   sg_quitting = true;
  
   close(fdk);
-  close(fdm);
 
   sg_jgui_window->SetVisible(false);
 }
