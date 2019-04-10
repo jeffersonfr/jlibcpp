@@ -401,3 +401,27 @@ ifeq ($(ENABLE_GRAPHICS),caca)
 
 endif
 
+ifeq ($(ENABLE_GRAPHICS),flaschen)
+	CCFLAGS 	+= \
+     -I/opt/flaschen-taschen/api/include\
+
+	LDFLAGS		+= \
+     -L/opt/flaschen-taschen/api/lib\
+     -Wl,-O1 \
+     -lftclient\
+     -lpthread \
+
+	DEFINES		+= \
+     -DJGUI_UI \
+		 -DFLASCHEN_UI \
+
+	REQUIRES	+= \
+
+	OBJS_gfx	+= \
+		 flaschenapplication.o\
+
+  OBJS_jgui	+= \
+     $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+
+endif
+
