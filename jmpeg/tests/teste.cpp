@@ -3592,14 +3592,17 @@ class PSIParser : public jevent::DemuxListener {
 			const char *ptr = event->GetData();
 			int pid = event->GetPID();
 			int tid = TS_G8(ptr + 0);
-			int len = event->GetLength();
+			int length = event->GetLength();
 
       if (demux->GetType() == jmpeg::JDT_RAW) {
-			  printf("Raw Packet:: pid:[0x%04x], length:[%d]\n", pid, len);
+			  printf("Raw Packet:: pid:[0x%04x], length:[%d]\n", pid, length);
       } else if (demux->GetType() == jmpeg::JDT_PES) {
-			  printf("PES Section:: pid:[0x%04x], length:[%d]\n", pid, len);
+			  printf("PES Section:: pid:[0x%04x], length:[%d]\n", pid, length);
       } else {
-			  printf("PSI Section:[%s]: pid:[0x%04x], table id:[0x%04x], length:[%d]\n", GetTableDescription(pid, tid).c_str(), pid, tid, len);
+			  int version = TS_GM8(ptr + 5, 2, 5);
+			  int current_next_indicator = TS_GM8(ptr + 5, 7, 1);
+
+			  printf("PSI Section:[%s]: pid:[0x%04x], table id:[0x%04x], version:[0x%02x], current next indicator:[%d], length:[%d]\n", GetTableDescription(pid, tid).c_str(), pid, tid, version, current_next_indicator, length);
       
         if (demux->GetType() == jmpeg::JDT_PSI) {
           jmpeg::PSIDemux *d = dynamic_cast<jmpeg::PSIDemux *>(demux);

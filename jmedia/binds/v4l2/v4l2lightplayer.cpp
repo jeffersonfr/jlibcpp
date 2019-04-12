@@ -43,7 +43,7 @@ class V4l2PlayerComponentImpl : public jgui::Component {
 		/** \brief */
 		Player *_player;
 		/** \brief */
-		jgui::Image *_image;
+		cairo_surface_t *_surface;
 		/** \brief */
     std::mutex  _mutex;
 		/** \brief */
@@ -58,7 +58,7 @@ class V4l2PlayerComponentImpl : public jgui::Component {
 			jgui::Component(x, y, w, h)
 		{
 			_buffer = nullptr;
-			_image = nullptr;
+			_surface = nullptr;
 			_player = player;
 			
 			_frame_size.width = w;
@@ -74,10 +74,9 @@ class V4l2PlayerComponentImpl : public jgui::Component {
 
 		virtual ~V4l2PlayerComponentImpl()
 		{
-			if (_image != nullptr) {
-				delete _image;
-				_image = nullptr;
-			}
+      if (_surface != nullptr) {
+        cairo_surface_destroy(_surface);
+      }
 
 			if (_buffer != nullptr) {
 				delete [] _buffer;
@@ -123,25 +122,12 @@ class V4l2PlayerComponentImpl : public jgui::Component {
 			int sw = width;
 			int sh = height;
 
-			cairo_surface_t *cairo_surface = cairo_image_surface_create_for_data(
-					(uint8_t *)_buffer, CAIRO_FORMAT_ARGB32, sw, sh, cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, sw));
-			cairo_t *cairo_context = cairo_create(cairo_surface);
-
 			_mutex.lock();
 
-			if (_image != nullptr) {
-				delete _image;
-				_image = nullptr;
-			}
-
-			_image = new jgui::BufferedImage(cairo_context);
-
-			_player->DispatchFrameGrabberEvent(new jevent::FrameGrabberEvent(_image, jevent::JFE_GRABBED));
-
-			cairo_surface_flush(cairo_surface);
-			cairo_surface_destroy(cairo_surface);
-
-			_mutex.unlock();
+			_surface = cairo_image_surface_create_for_data(
+					(uint8_t *)_buffer, CAIRO_FORMAT_ARGB32, sw, sh, cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, sw));
+			
+      _mutex.unlock();
 
 			Repaint();
 		}
@@ -155,8 +141,27 @@ class V4l2PlayerComponentImpl : public jgui::Component {
 
 			_mutex.lock();
 
-			g->DrawImage(_image, _src.x, _src.y, _src.width, _src.height, 0, 0, size.width, size.height);
-				
+      if (_surface == nullptr) {
+        _mutex.unlock();
+
+        return;
+      }
+
+			cairo_t *context = cairo_create(_surface);
+      jgui::Image *image = new jgui::BufferedImage(context);
+
+			_player->DispatchFrameGrabberEvent(new jevent::FrameGrabberEvent(image, jevent::JFE_GRABBED));
+
+			cairo_surface_mark_dirty(_surface);
+
+			g->DrawImage(image, _src.x, _src.y, _src.width, _src.height, 0, 0, size.width, size.height);
+
+      delete image;
+      image = nullptr;
+
+			cairo_surface_destroy(_surface);
+      _surface = nullptr;
+
 			_mutex.unlock();
 		}
 

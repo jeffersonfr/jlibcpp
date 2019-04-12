@@ -105,7 +105,7 @@ class LibvlcPlayerComponentImpl : public jgui::Component {
 		/** \brief */
 		Player *_player;
 		/** \brief */
-		jgui::Image *_image;
+		cairo_surface_t *_surface;
 		/** \brief */
     std::mutex _mutex;
 		/** \brief */
@@ -130,7 +130,7 @@ class LibvlcPlayerComponentImpl : public jgui::Component {
 
 			_buffer_index = 0;
 
-			_image = nullptr;
+			_surface = nullptr;
 			_player = player;
 			
 			_frame_size.width = w;
@@ -151,10 +151,9 @@ class LibvlcPlayerComponentImpl : public jgui::Component {
 
 		virtual ~LibvlcPlayerComponentImpl()
 		{
-			if (_image != nullptr) {
-				delete _image;
-				_image = nullptr;
-			}
+      if (_surface != nullptr) {
+        cairo_surface_destroy(_surface);
+      }
 
 			if (_buffer != nullptr) {
 				delete [] _buffer[0];
@@ -175,25 +174,12 @@ class LibvlcPlayerComponentImpl : public jgui::Component {
 			int sw = _frame_size.width;
 			int sh = _frame_size.height;
 
-			cairo_surface_t *cairo_surface = cairo_image_surface_create_for_data(
-					(uint8_t *)_buffer[(_buffer_index+1)%2], CAIRO_FORMAT_ARGB32, sw, sh, cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, sw));
-			cairo_t *cairo_context = cairo_create(cairo_surface);
-
 			_mutex.lock();
 
-			if (_image != nullptr) {
-				delete _image;
-				_image = nullptr;
-			}
-
-			_image = new jgui::BufferedImage(cairo_context);
-
-			_player->DispatchFrameGrabberEvent(new jevent::FrameGrabberEvent(_image, jevent::JFE_GRABBED));
-
-			cairo_surface_flush(cairo_surface);
-			cairo_surface_destroy(cairo_surface);
-
-			_mutex.unlock();
+			_surface = cairo_image_surface_create_for_data(
+					(uint8_t *)_buffer[(_buffer_index+1)%2], CAIRO_FORMAT_ARGB32, sw, sh, cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, sw));
+			
+      _mutex.unlock();
 
       Repaint();
 		}
@@ -207,8 +193,27 @@ class LibvlcPlayerComponentImpl : public jgui::Component {
 
 			_mutex.lock();
 
-			g->DrawImage(_image, _src.x, _src.y, _src.width, _src.height, 0, 0, size.width, size.height);
-				
+      if (_surface == nullptr) {
+        _mutex.unlock();
+
+        return;
+      }
+
+			cairo_t *context = cairo_create(_surface);
+      jgui::Image *image = new jgui::BufferedImage(context);
+
+			_player->DispatchFrameGrabberEvent(new jevent::FrameGrabberEvent(image, jevent::JFE_GRABBED));
+
+			cairo_surface_mark_dirty(_surface);
+
+			g->DrawImage(image, _src.x, _src.y, _src.width, _src.height, 0, 0, size.width, size.height);
+
+      delete image;
+      image = nullptr;
+
+			cairo_surface_destroy(_surface);
+      _surface = nullptr;
+
 			_mutex.unlock();
 		}
 
@@ -317,8 +322,6 @@ class LibvlcVolumeControlImpl : public VolumeControl {
 		LibVLCLightPlayer *_player;
 		/** \brief */
 		int _level;
-		/** \brief */
-		bool _is_muted;
 
 	public:
 		LibvlcVolumeControlImpl(LibVLCLightPlayer *player):
@@ -326,7 +329,6 @@ class LibvlcVolumeControlImpl : public VolumeControl {
 		{
 			_player = player;
 			_level = 50;
-			_is_muted = false;
 
 			SetLevel(100);
 		}
@@ -352,32 +354,30 @@ class LibvlcVolumeControlImpl : public VolumeControl {
 
 			if (_level <= 0) {
 				_level = 0;
-				_is_muted = true;
 			} else {
 				if (_level > 100) {
 					_level = 100;
 				}
-
-				_is_muted = false;
 			}
 
 			if (_player->_provider != nullptr) {
-				libvlc_audio_set_mute(_player->_provider, (_is_muted == true)?1:0);
 				libvlc_audio_set_volume(_player->_provider, _level);
 			}
 		}
 		
 		virtual bool IsMute()
 		{
-			return _is_muted;
+			if (_player->_provider != nullptr) {
+        return libvlc_audio_get_mute(_player->_provider) != 0;
+      }
+
+      return false;
 		}
 
-		virtual void SetMute(bool b)
+		virtual void SetMute(bool mute)
 		{
-			_is_muted = b;
-			
 			if (_player->_provider != nullptr) {
-				libvlc_audio_set_mute(_player->_provider, (_is_muted == true)?1:0);
+				libvlc_audio_set_mute(_player->_provider, (mute == true)?1:0);
 			}
 		}
 
