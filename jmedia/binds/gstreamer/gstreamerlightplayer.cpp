@@ -66,13 +66,13 @@ class GStreamerPlayerComponentImpl : public jgui::Component {
 			_surface = nullptr;
 			_player = player;
 			
-			_frame_size.width = -1;
-			_frame_size.height = -1;
+			_frame_size.width = w;
+			_frame_size.height = h;
 
 			_src.x = 0;
 			_src.y = 0;
-			_src.width = -1;
-			_src.height = -1;
+			_src.width = w;
+			_src.height = h;
 
 			_dst.x = 0;
 			_dst.y = 0;
@@ -448,6 +448,76 @@ class GStreamerVideoFormatControlImpl : public VideoFormatControl {
 
 };
 
+class GStreamerVolumeControlImpl : public VolumeControl {
+	
+	private:
+		/** \brief */
+		GStreamerLightPlayer *_player;
+		/** \brief */
+		int _level;
+
+	public:
+		GStreamerVolumeControlImpl(GStreamerLightPlayer *player):
+			VolumeControl()
+		{
+			_player = player;
+			_level = 50;
+
+			SetLevel(100);
+		}
+
+		virtual ~GStreamerVolumeControlImpl()
+		{
+		}
+
+		virtual int GetLevel()
+		{
+			gfloat level = 0;
+
+      if (_player->_pipeline != nullptr) {
+        g_object_get(G_OBJECT(_player->_pipeline), "volume", &level, NULL);
+			}
+
+			return (int)(level * 100.0f);
+		}
+
+		virtual void SetLevel(int level)
+		{
+			_level = level;
+
+			if (_level <= 0) {
+				_level = 0;
+			} else {
+				if (_level > 100) {
+					_level = 100;
+				}
+			}
+
+      if (_player->_pipeline != nullptr) {
+        g_object_set(G_OBJECT(_player->_pipeline), "volume", _level/100.0f, NULL);
+			}
+		}
+		
+		virtual bool IsMute()
+		{
+      gint muted = 0;
+
+      if (_player->_pipeline != nullptr) {
+        g_object_get(G_OBJECT(_player->_pipeline), "mute", &muted, NULL);
+      }
+
+      return muted == 1;
+		}
+
+		virtual void SetMute(bool mute)
+		{
+      if (_player->_pipeline != nullptr) {
+        g_object_set(G_OBJECT(_player->_pipeline), "mute", (mute == false)?0:1, NULL);
+      }
+		}
+
+};
+
 static GstFlowReturn SampleCallback(GstAppSink *appsink, gpointer data)
 {
   GStreamerLightPlayer *player = (GStreamerLightPlayer *)data;
@@ -556,11 +626,53 @@ GStreamerLightPlayer::GStreamerLightPlayer(jnetwork::URL url):
 
   _events_thread = std::thread(&GStreamerLightPlayer::Run, this);
     
-  _component = new GStreamerPlayerComponentImpl(this, 0, 0, 192, 108);
-		
-  _controls.push_back(new GStreamerVideoDeviceControlImpl (this));
-  _controls.push_back(new GStreamerVideoSizeControlImpl (this));
-  _controls.push_back(new GStreamerVideoFormatControlImpl (this));
+  gst_element_set_state(_pipeline, GST_STATE_PAUSED);
+
+  GstSample *sample;
+  GstVideoInfo v_info;
+  int audios = 0;
+  int videos = 0;
+  int counter = 10;
+
+  do {
+    g_object_get(G_OBJECT(_pipeline), "n-audio", &audios, "n-video", &videos, NULL);
+
+    if (audios > 0 or videos > 0) {
+      break;
+    }
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  } while (counter > 0);
+
+  gst_element_set_state(_pipeline, GST_STATE_READY);
+
+  if (audios > 0) {
+  _controls.push_back(new GStreamerVolumeControlImpl (this));
+  }
+
+  if (videos > 0) {
+    _controls.push_back(new GStreamerVideoDeviceControlImpl (this));
+    _controls.push_back(new GStreamerVideoSizeControlImpl (this));
+    _controls.push_back(new GStreamerVideoFormatControlImpl (this));
+  }
+  
+  g_object_get(G_OBJECT(_pipeline), "sample", &sample, NULL);
+
+  int iw = 1280;
+  int ih = 720;
+
+  if (sample != nullptr) {
+    GstCaps *caps = gst_sample_get_caps(sample);
+
+    if (caps != nullptr) {
+      if (gst_video_info_from_caps(&v_info, caps) != 0) {
+        iw = v_info.width;
+        ih = v_info.height;
+      }
+    }
+  }
+
+  _component = new GStreamerPlayerComponentImpl(this, 0, 0, iw, ih);
 }
 
 GStreamerLightPlayer::~GStreamerLightPlayer()
@@ -631,6 +743,8 @@ void GStreamerLightPlayer::Play()
   if (_is_closed == true) {
     return;
   }
+  
+  gst_element_set_state(_pipeline, GST_STATE_PLAYING);
 }
 
 void GStreamerLightPlayer::Pause()
