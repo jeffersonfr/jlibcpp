@@ -32,6 +32,10 @@
 
 namespace jgui {
 
+#if SDL_VERSION_ATLEAST(2,0,5)
+  // USE::
+#endif
+
 /** \brief */
 static SDL_Window *sg_window = nullptr;
 /** \brief */

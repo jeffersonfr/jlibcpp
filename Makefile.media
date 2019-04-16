@@ -188,3 +188,24 @@ ifeq ($(findstring mixer, $(ENABLE_VIDEO)), mixer)
 
 endif
 
+ifeq ($(findstring gstreamer, $(ENABLE_VIDEO)), gstreamer)
+	CCFLAGS		+= \
+		 -Ijmedia/binds/gstreamer/include \
+		 -Ijgui/binds/generic/include \
+		 `pkg-config --cflags cairo glib-2.0 gstreamer-1.0 gstreamer-app-1.0 gstreamer-video-1.0`
+
+	LDFLAGS		+= \
+		 `pkg-config --libs alsa cairo glib-2.0 gstreamer-1.0 gstreamer-app-1.0 gstreamer-video-1.0`
+
+	DEFINES		+= \
+		 -DLIBGSTREAMER_MEDIA \
+
+	REQUIRES	+= \
+
+	OBJS_gstreamer	+= \
+		 gstreamerlightplayer.o\
+
+	OBJS_jmedia	+= $(addprefix binds/gstreamer/,$(OBJS_gstreamer))
+
+endif
+

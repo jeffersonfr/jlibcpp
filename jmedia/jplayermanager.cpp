@@ -53,6 +53,10 @@
 #include "mixerlightplayer.h"
 #endif
 
+#if defined(LIBGSTREAMER_MEDIA)
+#include "gstreamerlightplayer.h"
+#endif
+
 namespace jmedia {
 
 std::map<jplayer_hints_t, bool> PlayerManager::_hints;
@@ -138,6 +142,13 @@ Player * PlayerManager::CreatePlayer(std::string url_)
 #if defined(LIBXINE_MEDIA)
 	try {
 		return new LibXineLightPlayer(url_);
+	} catch (jexception::Exception &e) {
+	}
+#endif
+
+#if defined(LIBGSTREAMER_MEDIA)
+	try {
+		return new GStreamerLightPlayer(url_);
 	} catch (jexception::Exception &e) {
 	}
 #endif
