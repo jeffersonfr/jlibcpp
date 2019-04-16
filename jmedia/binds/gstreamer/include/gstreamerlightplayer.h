@@ -55,6 +55,8 @@ class GStreamerLightPlayer : public jmedia::Player {
 		/** \brief */
 		jgui::Component *_component;
 		/** \brief */
+    double _decode_rate;
+		/** \brief */
 		double _aspect;
 		/** \brief */
 		double _frames_per_second;

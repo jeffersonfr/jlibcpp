@@ -495,6 +495,7 @@ GStreamerLightPlayer::GStreamerLightPlayer(jnetwork::URL url):
 	_aspect = 1.0;
 	_frames_per_second = 0.0;
   _component = nullptr;
+  _decode_rate = 1.0;
 
   GstElement *_bin = nullptr;
   GstElement *_filter = nullptr;
@@ -733,11 +734,34 @@ bool GStreamerLightPlayer::IsLoop()
 
 void GStreamerLightPlayer::SetDecodeRate(double rate)
 {
+  _decode_rate = rate;
+
+  gint64 position;
+  GstFormat format = GST_FORMAT_TIME;
+  GstEvent *seek_event;
+
+  if (!gst_element_query_position(_pipeline, format, &position)) {
+    return;
+  }
+
+  GstSeekFlags flags = (GstSeekFlags)(GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_ACCURATE);
+
+  if (_decode_rate > 0) {
+    seek_event = gst_event_new_seek (_decode_rate, GST_FORMAT_TIME, flags, GST_SEEK_TYPE_SET, position, GST_SEEK_TYPE_NONE, 0);
+  } else {
+    seek_event = gst_event_new_seek (_decode_rate, GST_FORMAT_TIME, flags, GST_SEEK_TYPE_SET, 0, GST_SEEK_TYPE_SET, position);
+  }
+
+  GstElement *video_sink = nullptr;
+
+  g_object_get(_pipeline, "video-sink", &video_sink, NULL);
+
+  gst_element_send_event(video_sink, seek_event);
 }
 
 double GStreamerLightPlayer::GetDecodeRate()
 {
-  return 1.0;
+  return _decode_rate;
 }
 
 jgui::Component * GStreamerLightPlayer::GetVisualComponent()
