@@ -1578,7 +1578,7 @@ static int stream_setup(PlayerState *is)
 
     err = avformat_open_input(&ic, is->filename, is->iformat, &format_opts);
     if (err < 0) {
-        // print_error(is->filename, err);
+        av_log(nullptr, AV_LOG_ERROR, "Open [%s] error %d\n", is->filename, err);
         ret = -1;
         goto fail;
     }
@@ -1847,10 +1847,10 @@ void avplay_init()
 
   av_log_set_flags(AV_LOG_SKIP_REPEATED);
 
-  // avcodec_register_all(); // CHANGE:: dont need anymore !
+  avcodec_register_all(); // CHANGE:: dont need anymore !
   avdevice_register_all();
-  // avfilter_register_all(); // CHANGE:: dont need anymore !
-  // av_register_all(); // CHANGE:: dont need anymore !
+  avfilter_register_all(); // CHANGE:: dont need anymore !
+  av_register_all(); // CHANGE:: dont need anymore !
   avformat_network_init();
 
   if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER)) {
