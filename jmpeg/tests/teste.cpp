@@ -3355,7 +3355,7 @@ class PSIParser : public jevent::DemuxListener {
           param->ChannelNumber(remote_control_key_identification);
         }
 
-				printf("\t\t:: remote control key identification:[0x%02x], ts name:[%s]\n", remote_control_key_identification, ts_name.c_str());
+				printf("\t\t:: remote control key identification:[%d], ts name:[%s]\n", remote_control_key_identification, ts_name.c_str());
 
 				ptr = ptr + 2 + ts_name_length;
 
@@ -3707,7 +3707,8 @@ class PSIParser : public jevent::DemuxListener {
 				printf("PAT:: program number:[0x%04x], map pid:[0x%04x]\n", program_number, map_pid);
 
 				if (program_number == 0x00) {
-					nit_pid = map_pid;
+          // CHANGE:: sometimes the headend send invalid values, so I prefer discards
+					// nit_pid = map_pid;
 				} else {
 					char tmp[255];
 
