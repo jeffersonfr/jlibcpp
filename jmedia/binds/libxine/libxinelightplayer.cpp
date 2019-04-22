@@ -126,7 +126,9 @@ class XinePlayerComponentImpl : public jgui::Component {
 				_buffer[1] = new jgui::BufferedImage(jgui::JPF_RGB32, width, height);
 			}
 			
-			uint32_t *buffer = (uint32_t *)_buffer[(_buffer_index++)%2]->LockData();
+			int index = (_buffer_index++)%2;
+
+			uint32_t *buffer = (uint32_t *)_buffer[index]->LockData();
 
 			if (format == XINE_VORAW_YV12) {
 				ColorConversion::GetRGB32FromYV12((uint8_t **)&data0, (uint8_t **)&data1, (uint8_t **)&data2, (uint32_t **)&buffer, width, height);
@@ -136,7 +138,7 @@ class XinePlayerComponentImpl : public jgui::Component {
 				ColorConversion::GetRGB32FromRGB24((uint8_t **)&data0, (uint32_t **)&buffer, width, height);
 			} 
 	
-			_buffer[(_buffer_index++)%2]->UnlockData();
+			_buffer[index]->UnlockData();
 
       Repaint();
 		}
