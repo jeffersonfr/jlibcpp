@@ -444,12 +444,6 @@ BufferedImage::BufferedImage(jio::InputStream *stream):
 	cairo_surface_t *cairo_surface = create_png_surface_from_data(buffer, count);
 
 	if (cairo_surface == nullptr) {
-#ifdef MJPEG_IMAGE
-		cairo_surface = create_mjpeg_surface_from_data(buffer, count);
-#endif
-	}
-
-	if (cairo_surface == nullptr) {
 #ifdef JPG_IMAGE
 		cairo_surface = create_jpg_surface_from_data(buffer, count);
 #endif
@@ -542,6 +536,12 @@ BufferedImage::BufferedImage(jio::InputStream *stream):
 	if (cairo_surface == nullptr) {
 #ifdef XPM_IMAGE
 		cairo_surface = create_xpm_surface_from_data(buffer, count);
+#endif
+	}
+
+	if (cairo_surface == nullptr) {
+#ifdef MJPEG_IMAGE
+		cairo_surface = create_mjpeg_surface_from_data(buffer, count);
 #endif
 	}
 
