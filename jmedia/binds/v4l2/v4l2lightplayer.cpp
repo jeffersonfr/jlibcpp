@@ -43,13 +43,13 @@ class V4l2PlayerComponentImpl : public jgui::Component {
 		/** \brief */
 		Player *_player;
 		/** \brief */
-		cairo_surface_t *_surface;
-		/** \brief */
     std::mutex  _mutex;
 		/** \brief */
 		jgui::jregion_t _src;
 		/** \brief */
-		uint32_t *_buffer;
+		uint32_t **_buffer;
+		/** \brief */
+		int _buffer_index;
 		/** \brief */
 		jgui::jsize_t _frame_size;
 
@@ -58,7 +58,9 @@ class V4l2PlayerComponentImpl : public jgui::Component {
 			jgui::Component(x, y, w, h)
 		{
 			_buffer = nullptr;
-			_surface = nullptr;
+
+			_buffer_index = 0;
+
 			_player = player;
 			
 			_frame_size.width = w;
@@ -74,13 +76,12 @@ class V4l2PlayerComponentImpl : public jgui::Component {
 
 		virtual ~V4l2PlayerComponentImpl()
 		{
-      if (_surface != nullptr) {
-        cairo_surface_destroy(_surface);
-      }
-
 			if (_buffer != nullptr) {
+				delete [] _buffer[0];
+				delete [] _buffer[1];
+
 				delete [] _buffer;
-				_buffer = nullptr;
+        _buffer = nullptr;
 			}
 		}
 
@@ -93,9 +94,6 @@ class V4l2PlayerComponentImpl : public jgui::Component {
 		{
 			_frame_size.width = _src.width = -1;
 			_frame_size.height = _src.height = -1;
-
-			delete [] _buffer;
-			_buffer = nullptr;
 		}
 
 		virtual void UpdateComponent(const uint8_t *buffer, int width, int height, jgui::jpixelformat_t format)
@@ -104,29 +102,43 @@ class V4l2PlayerComponentImpl : public jgui::Component {
 				return;
 			}
 
-			if (_buffer == nullptr) {
-				_frame_size.width = _src.width = width;
-				_frame_size.height = _src.height = height;
-
-				_buffer = new uint32_t[width*height];
-			}
-
-			if (format == jgui::JPF_UYVY) {
-				ColorConversion::GetRGB32FromYUYV((uint8_t **)&buffer, (uint32_t **)&_buffer, width, height);
-			} else if (format == jgui::JPF_RGB24) {
-				ColorConversion::GetRGB32FromRGB24((uint8_t **)&buffer, (uint32_t **)&_buffer, width, height);
-			} else if (format == jgui::JPF_RGB32) {
-				memcpy(_buffer, buffer, width*height*4);
-			}
-
-			int sw = width;
-			int sh = height;
-
 			_mutex.lock();
 
-			_surface = cairo_image_surface_create_for_data(
-					(uint8_t *)_buffer, CAIRO_FORMAT_ARGB32, sw, sh, cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, sw));
+      if (_buffer == nullptr or _frame_size.width != width or _frame_size.height != height) {
+			  _frame_size.width = width;
+			  _frame_size.height = height;
 			
+        if (_buffer != nullptr) {
+          delete [] _buffer[0];
+          delete [] _buffer[1];
+
+          delete [] _buffer;
+        }
+
+        _buffer = new uint32_t*[2];
+
+        _buffer[0] = new uint32_t[width*height];
+        _buffer[1] = new uint32_t[width*height];
+
+        if (_src.width < 0) {
+			    _src.width = _frame_size.width;
+        }
+
+        if (_src.height < 0) {
+			    _src.height = _frame_size.height;
+        }
+      }
+
+      uint32_t *dst = _buffer[(_buffer_index++)%2];
+
+			if (format == jgui::JPF_UYVY) {
+				ColorConversion::GetRGB32FromYUYV((uint8_t **)&buffer, (uint32_t **)&dst, width, height);
+			} else if (format == jgui::JPF_RGB24) {
+				ColorConversion::GetRGB32FromRGB24((uint8_t **)&buffer, (uint32_t **)&dst, width, height);
+			} else if (format == jgui::JPF_RGB32) {
+				memcpy(dst, buffer, width*height*4);
+			}
+
       _mutex.unlock();
 
 			Repaint();
@@ -134,33 +146,36 @@ class V4l2PlayerComponentImpl : public jgui::Component {
 
 		virtual void Paint(jgui::Graphics *g)
 		{
-			jgui::Component::Paint(g);
+			// jgui::Component::Paint(g);
 
       jgui::jsize_t
         size = GetSize();
 
 			_mutex.lock();
 
-      if (_surface == nullptr) {
+      if (_buffer == nullptr or _frame_size.width < 0 or _frame_size.height < 0) {
         _mutex.unlock();
 
         return;
       }
 
-			cairo_t *context = cairo_create(_surface);
+			cairo_surface_t *surface = cairo_image_surface_create_for_data(
+					(uint8_t *)_buffer[(_buffer_index)%2], CAIRO_FORMAT_ARGB32, _frame_size.width, _frame_size.height, cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, _frame_size.width));
+			
+			cairo_t *context = cairo_create(surface);
+
       jgui::Image *image = new jgui::BufferedImage(context);
 
 			_player->DispatchFrameGrabberEvent(new jevent::FrameGrabberEvent(image, jevent::JFE_GRABBED));
 
-			cairo_surface_mark_dirty(_surface);
+			cairo_surface_mark_dirty(surface);
 
 			g->DrawImage(image, _src.x, _src.y, _src.width, _src.height, 0, 0, size.width, size.height);
 
       delete image;
       image = nullptr;
 
-			cairo_surface_destroy(_surface);
-      _surface = nullptr;
+			cairo_surface_destroy(surface);
 
 			_mutex.unlock();
 		}
@@ -211,18 +226,6 @@ class V4l2VideoSizeControlImpl : public VideoSizeControl {
 			V4l2PlayerComponentImpl *impl = dynamic_cast<V4l2PlayerComponentImpl *>(_player->_component);
 
       impl->_mutex.lock();
-			
-			/*
-			VideoGrabber *grabber = _player->_grabber;
-
-			grabber->Stop();
-
-			impl->Reset();
-
-			grabber->Open();
-			grabber->Configure(w, h);
-			grabber->GetVideoControl()->Reset();
-			*/
 			
 			impl->_src.x = x;
 			impl->_src.y = y;

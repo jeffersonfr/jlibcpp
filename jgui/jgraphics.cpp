@@ -1954,7 +1954,6 @@ bool Graphics::DrawImage(Image *img, int xp, int yp)
 	}
 
   Graphics *g = img->GetGraphics();
-  jsize_t size = img->GetSize();
 
 	if (g != nullptr) {
 		cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
@@ -1963,13 +1962,12 @@ bool Graphics::DrawImage(Image *img, int xp, int yp)
 			return false;
 		}
 
-		cairo_surface_flush(cairo_surface);
-
 		cairo_save(_cairo_context);
 		cairo_set_source_surface(_cairo_context, cairo_surface, xp+_translate.x, yp+_translate.y);
 		cairo_paint(_cairo_context);
 		cairo_restore(_cairo_context);
 	} else {
+    jsize_t size = img->GetSize();
 		uint32_t rgb[size.width*size.height];
 
 		img->GetRGBArray(rgb, 0, 0, size.width, size.height);

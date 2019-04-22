@@ -144,7 +144,7 @@ static int ReadColorMap(jio::InputStream *stream, int number, uint8_t buf[3][MAX
 	int i;
 
 	if (FetchData(stream, rgb, sizeof(rgb))) {
-		JDEBUG(JINFO, "bad colormap");
+		JDEBUG(JERROR, "bad colormap");
 
 		return -1;
 	}
@@ -163,7 +163,7 @@ static int GetDataBlock(AnimatedGIFData *data, uint8_t *buf)
 	unsigned char count;
 
 	if (FetchData(data->stream, &count, 1)) {
-		JDEBUG(JINFO, "error in getting DataBlock size");
+		JDEBUG(JERROR, "error in getting DataBlock size");
 
 		return -1;
 	}
@@ -171,7 +171,7 @@ static int GetDataBlock(AnimatedGIFData *data, uint8_t *buf)
 	data->ZeroDataBlock = (count == 0);
 
 	if ((count != 0) && FetchData(data->stream, buf, count)) {
-		JDEBUG(JINFO, "error in reading DataBlock");
+		JDEBUG(JERROR, "error in reading DataBlock");
 
 		return -1;
 	}
@@ -194,7 +194,7 @@ static int GetCode(AnimatedGIFData *data, int code_size, int flag)
 	if ( (data->curbit+code_size) >= data->lastbit) {
 		if (data->done) {
 			if (data->curbit >= data->lastbit) {
-				JDEBUG(JINFO, "ran off the end of my bits");
+				JDEBUG(JERROR, "ran off the end of my bits");
 			}
 			return -1;
 		}
@@ -236,8 +236,9 @@ static int DoExtension( AnimatedGIFData *data, int label )
 			break;
 		case 0xfe:              // Comment Extension 
 			str = (char *)"Comment Extension";
-			while (GetDataBlock(data, (uint8_t*) buf) != 0)
-				JDEBUG(JINFO, "gif comment: %s", buf);
+			while (GetDataBlock(data, (uint8_t*) buf) != 0) {
+				JDEBUG(JWARN, "gif comment: %s", buf);
+			}
 			return false;
 		case 0xf9:              // Graphic Control Extension 
 			str = (char *)"Graphic Control Extension";
@@ -264,7 +265,7 @@ static int DoExtension( AnimatedGIFData *data, int label )
 			break;
 	}
 
-	JDEBUG(JINFO, "got a '%s' extension", str );
+	JDEBUG(JWARN, "got a '%s' extension", str );
 
 	while (GetDataBlock(data, (uint8_t*)buf) != 0);
 
@@ -342,7 +343,7 @@ static int LWZReadByte( AnimatedGIFData *data, int flag, int input_code_size )
 			while ((count = GetDataBlock(data, buf)) > 0);
 
 			if (count != 0) {
-				JDEBUG(JINFO, "missing EOD in data stream (common occurence)");
+				JDEBUG(JERROR, "missing EOD in data stream (common occurence)");
 			}
 
 			return -2;
@@ -359,7 +360,7 @@ static int LWZReadByte( AnimatedGIFData *data, int flag, int input_code_size )
 			*data->sp++ = data->table[1][code];
 
 			if (code == data->table[0][code]) {
-				JDEBUG(JINFO, "circular table entry BIG ERROR");
+				JDEBUG(JERROR, "circular table entry BIG ERROR");
 			}
 
 			code = data->table[0][code];
@@ -395,16 +396,16 @@ static int ReadImage( AnimatedGIFData *data, int left, int top, int width, int h
 
 	//  Initialize the decompression routines
 	if (FetchData( data->stream, &c, 1 )) {
-		JDEBUG(JINFO, "EOF / read error on image data");
+		JDEBUG(JERROR, "EOF / read error on image data");
 	}
 
 	if (LWZReadByte( data, true, c ) < 0) {
-		JDEBUG(JINFO, "error reading image");
+		JDEBUG(JERROR, "error reading image");
 	}
 
 	// If this is an "uninteresting picture" ignore it.
 	if (ignore) {
-		JDEBUG(JINFO, "skipping image...");
+		JDEBUG(JERROR, "skipping image...");
 
 		while (LWZReadByte(data, false, c) >= 0);
 
@@ -413,11 +414,11 @@ static int ReadImage( AnimatedGIFData *data, int left, int top, int width, int h
 
 	switch (data->disposal) {
 		case 2:
-			JDEBUG(JINFO, "restoring to background color...");
+			JDEBUG(JWARN, "restoring to background color...");
 			memset( data->image, 0, data->Width * data->Height * 4 );
 			break;
 		case 3:
-			JDEBUG(JINFO, "restoring to previous frame is unsupported");
+			JDEBUG(JWARN, "restoring to previous frame is unsupported");
 			break;
 		default:
 			break;
@@ -480,7 +481,7 @@ static int ReadImage( AnimatedGIFData *data, int left, int top, int width, int h
 
 fini:
 	if (LWZReadByte( data, false, c ) >= 0) {
-		JDEBUG(JINFO, "too much input data, ignoring extra...");
+		JDEBUG(JWARN, "too much input data, ignoring extra...");
 		//while (LWZReadByte( data, false, c ) >= 0);
 	}
 
@@ -506,13 +507,13 @@ static int GIFReadHeader( AnimatedGIFData *data )
 
 	ret = FetchData( data->stream, buf, 6 );
 	if (ret) {
-		JDEBUG(JINFO, "error reading header");
+		JDEBUG(JERROR, "error reading header");
 
 		return ret;
 	}
 
 	if (memcmp( buf, "GIF", 3 )) {
-		JDEBUG(JINFO, "bad magic");
+		JDEBUG(JWARN, "bad magic");
 
 		return -1;
 	}
@@ -522,7 +523,7 @@ static int GIFReadHeader( AnimatedGIFData *data )
 
 	ret = FetchData( data->stream, buf, 7 );
 	if (ret) {
-		JDEBUG(JINFO, "error reading screen descriptor");
+		JDEBUG(JERROR, "error reading screen descriptor");
 
 		return ret;
 	}
@@ -542,7 +543,7 @@ static int GIFReadHeader( AnimatedGIFData *data )
 
 	if (BitSet(buf[4], LOCALCOLORMAP)) { // Global Colormap
 		if (ReadColorMap( data->stream, data->BitPixel, data->ColorMap )) {
-			JDEBUG(JINFO, "error reading global colormap");
+			JDEBUG(JERROR, "error reading global colormap");
 
 			return -1;
 		}
@@ -570,7 +571,7 @@ static int GIFReadFrame(AnimatedGIFData *data)
 
 		ret = FetchData( data->stream, &c, 1);
 		if (ret) {
-			JDEBUG(JINFO, "EOF / read error on image data" );
+			JDEBUG(JERROR, "EOF / read error on image data" );
 
 			return -1;
 		}
@@ -581,7 +582,7 @@ static int GIFReadFrame(AnimatedGIFData *data)
 
 		if (c == '!') { // Extension
 			if (FetchData( data->stream, &c, 1)) {
-				JDEBUG(JINFO, "EOF / read error on extention function code");
+				JDEBUG(JERROR, "EOF / read error on extention function code");
 
 				return -1;
 			}
@@ -592,14 +593,14 @@ static int GIFReadFrame(AnimatedGIFData *data)
 		} 
 
 		if (c != ',') { // Not a valid start character
-			// JDEBUG(JINFO, "bogus character 0x%02x, ignoring", (int)c);
+			// JDEBUG(JERROR, "bogus character 0x%02x, ignoring", (int)c);
 
 			continue;
 		}
 
 		ret = FetchData(data->stream, buf, 9);
 		if (ret) {
-			JDEBUG(JINFO, "couldn't read left/top/width/height");
+			JDEBUG(JERROR, "couldn't read left/top/width/height");
 
 			return ret;
 		}
@@ -615,12 +616,12 @@ static int GIFReadFrame(AnimatedGIFData *data)
 			int bitPixel = 2 << (buf[8] & 0x07);
 
 			if (ReadColorMap( data->stream, bitPixel, localColorMap )) {
-				JDEBUG(JINFO, "error reading local colormap");
+				JDEBUG(JERROR, "error reading local colormap");
 			}
 		}
 
 		if (ReadImage(data, left, top, width, height, (useGlobalColormap?data->ColorMap:localColorMap), BitSet(buf[8], INTERLACE), 0)) {
-			JDEBUG(JINFO, "error reading image");
+			JDEBUG(JERROR, "error reading image");
 
 			return -1;
 		}

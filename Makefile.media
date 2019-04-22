@@ -44,7 +44,7 @@ ifeq ($(findstring libav, $(ENABLE_VIDEO)), libav)
 		 -Ijgui/binds/generic/include \
 
 	LDFLAGS		+= \
-		 `pkg-config --libs libavcodec libavdevice libavfilter` \
+		 `pkg-config --libs libavcodec libavdevice libavfilter libavresample` \
 
 	DEFINES		+= \
 		 -DLIBAV_MEDIA \

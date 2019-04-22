@@ -123,11 +123,10 @@ class LibvlcPlayerComponentImpl : public jgui::Component {
 		LibvlcPlayerComponentImpl(Player *player, int x, int y, int w, int h):
 			jgui::Component(x, y, w, h)
 		{
-			_buffer = new jgui::Image*[3];
+			_buffer = new jgui::Image*[2];
 			
 			_buffer[0] = new jgui::BufferedImage(jgui::JPF_RGB32, w, h);
 			_buffer[1] = new jgui::BufferedImage(jgui::JPF_RGB32, w, h);
-			_buffer[2] = new jgui::BufferedImage(jgui::JPF_RGB32, w, h);
 
 			_buffer_index = 0;
 
@@ -159,7 +158,6 @@ class LibvlcPlayerComponentImpl : public jgui::Component {
 			if (_buffer != nullptr) {
 				delete _buffer[0];
 				delete _buffer[1];
-				delete _buffer[2];
 
 				delete [] _buffer;
 				_buffer = nullptr;
@@ -183,7 +181,7 @@ class LibvlcPlayerComponentImpl : public jgui::Component {
       jgui::jsize_t
         size = GetSize();
 
-      jgui::Image *image = _buffer[(_buffer_index)%3];
+      jgui::Image *image = _buffer[(_buffer_index)%2];
 
       image->LockData();
 
@@ -205,7 +203,7 @@ static void * LockMediaSurface(void *data, void **p_pixels)
 {
 	LibvlcPlayerComponentImpl *cmp = reinterpret_cast<LibvlcPlayerComponentImpl *>(data);
 	
-  jgui::Image *image = cmp->_buffer[(cmp->_buffer_index)%3];
+  jgui::Image *image = cmp->_buffer[(cmp->_buffer_index)%2];
 
 	(*p_pixels) = image->LockData();
 
@@ -220,7 +218,7 @@ static void DisplayMediaSurface(void *data, void *id)
 {
 	LibvlcPlayerComponentImpl *cmp = reinterpret_cast<LibvlcPlayerComponentImpl *>(data);
 	
-  jgui::Image *image = cmp->_buffer[(cmp->_buffer_index++)%3];
+  jgui::Image *image = cmp->_buffer[(cmp->_buffer_index++)%2];
 
   image->UnlockData();
 

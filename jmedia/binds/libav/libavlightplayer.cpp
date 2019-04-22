@@ -136,6 +136,7 @@ class LibavPlayerComponentImpl : public jgui::Component {
       image = nullptr;
 
 			cairo_surface_destroy(_surface);
+
       _surface = nullptr;
 
 			_mutex.unlock();

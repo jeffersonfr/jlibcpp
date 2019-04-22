@@ -46,7 +46,7 @@ class XinePlayerComponentImpl : public jgui::Component {
 		/** \brief */
 		jgui::jregion_t _src;
 		/** \brief */
-		uint32_t **_buffer;
+    jgui::Image **_buffer;
 		/** \brief */
 		int _buffer_index;
 		/** \brief */
@@ -63,13 +63,13 @@ class XinePlayerComponentImpl : public jgui::Component {
 			_surface = nullptr;
 			_player = player;
 			
-			_frame_size.width = w;
-			_frame_size.height = h;
+			_frame_size.width = -1;
+			_frame_size.height = -1;
 
 			_src.x = 0;
 			_src.y = 0;
-			_src.width = w;
-			_src.height = h;
+			_src.width = -1;
+			_src.height = -1;
 
 			SetVisible(true);
 		}
@@ -81,10 +81,10 @@ class XinePlayerComponentImpl : public jgui::Component {
       }
 
 			if (_buffer != nullptr) {
-				delete [] _buffer[0];
-				delete [] _buffer[1];
+				delete _buffer[0];
+				delete _buffer[1];
 
-				delete _buffer;
+				delete [] _buffer;
 				_buffer = nullptr;
 			}
 		}
@@ -100,17 +100,33 @@ class XinePlayerComponentImpl : public jgui::Component {
 				return;
 			}
 
-			if (_buffer == nullptr) {
-				_frame_size.width = _src.width = width;
-				_frame_size.height = _src.height = height;
+			if (_buffer == nullptr or width != _frame_size.width or height != _frame_size.height) {
+				_frame_size.width = width;
+				_frame_size.height = height;
 
-				_buffer = new uint32_t*[2];
+        if (_src.width < 0) {
+          _src.width = _frame_size.width;
+        }
 
-				_buffer[0] = new uint32_t[width*height];
-				_buffer[1] = new uint32_t[width*height];
+        if (_src.height < 0) {
+          _src.height = _frame_size.height;
+        }
+
+        if (_buffer != nullptr) {
+          delete _buffer[0];
+          delete _buffer[1];
+
+          delete [] _buffer;
+          _buffer = nullptr;
+        }
+
+				_buffer = new jgui::Image*[2];
+
+				_buffer[0] = new jgui::BufferedImage(jgui::JPF_RGB32, width, height);
+				_buffer[1] = new jgui::BufferedImage(jgui::JPF_RGB32, width, height);
 			}
 			
-			uint32_t *buffer = (uint32_t *)_buffer[(_buffer_index+1)%2];
+			uint32_t *buffer = (uint32_t *)_buffer[(_buffer_index++)%2]->LockData();
 
 			if (format == XINE_VORAW_YV12) {
 				ColorConversion::GetRGB32FromYV12((uint8_t **)&data0, (uint8_t **)&data1, (uint8_t **)&data2, (uint32_t **)&buffer, width, height);
@@ -120,52 +136,31 @@ class XinePlayerComponentImpl : public jgui::Component {
 				ColorConversion::GetRGB32FromRGB24((uint8_t **)&data0, (uint32_t **)&buffer, width, height);
 			} 
 	
-			_buffer_index = (_buffer_index + 1)%2;
-
-			int sw = width;
-			int sh = height;
-
-			_mutex.lock();
-
-			_surface = cairo_image_surface_create_for_data(
-					(uint8_t *)buffer, CAIRO_FORMAT_ARGB32, sw, sh, cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, sw));
-			
-      _mutex.unlock();
+			_buffer[(_buffer_index++)%2]->UnlockData();
 
       Repaint();
 		}
 
 		virtual void Paint(jgui::Graphics *g)
 		{
-			jgui::Component::Paint(g);
+			// jgui::Component::Paint(g);
+
+      if (_buffer == nullptr) {
+        return;
+      }
 
       jgui::jsize_t
         size = GetSize();
 
-			_mutex.lock();
+      jgui::Image *image = _buffer[(_buffer_index)%2];
 
-      if (_surface == nullptr) {
-        _mutex.unlock();
-
-        return;
-      }
-
-			cairo_t *context = cairo_create(_surface);
-      jgui::Image *image = new jgui::BufferedImage(context);
+      image->LockData();
 
 			_player->DispatchFrameGrabberEvent(new jevent::FrameGrabberEvent(image, jevent::JFE_GRABBED));
 
-			cairo_surface_mark_dirty(_surface);
-
 			g->DrawImage(image, _src.x, _src.y, _src.width, _src.height, 0, 0, size.width, size.height);
-
-      delete image;
-      image = nullptr;
-
-			cairo_surface_destroy(_surface);
-      _surface = nullptr;
-
-			_mutex.unlock();
+      
+      image->UnlockData();
 		}
 
 		virtual Player * GetPlayer()
@@ -549,8 +544,19 @@ LibXineLightPlayer::LibXineLightPlayer(jnetwork::URL url):
 	xine_init(_xine);
  
 	_post = nullptr;
+
   _ao_port = xine_open_audio_driver(_xine, "auto", nullptr);
+  
+  if (_ao_port == nullptr) {
+    throw jexception::MediaException("Unable to intialize 'auto' audio driver");
+  }
+
   _vo_port = xine_open_video_driver(_xine , "auto", XINE_VISUAL_TYPE_RAW, &t);
+  
+  if (_vo_port == nullptr) {
+    throw jexception::MediaException("Unable to intialize 'auto' video driver");
+  }
+
   _stream = xine_stream_new(_xine, _ao_port, _vo_port);
   _event_queue = xine_event_new_queue(_stream);
   

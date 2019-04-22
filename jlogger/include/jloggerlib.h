@@ -33,9 +33,10 @@
 
 #ifdef JDEBUG_ENABLED
   #define JDEBUG(level, msg, args...) \
-    printf("\e%s%s:: <%s> [%s:%d] \e[0m" msg, JDEBUG_COLOR(level), JDEBUG_INFO(level), __FILE__, __func__, __LINE__, ## args); fflush(stdout);
+    do { printf("\e%s%s:: <%s> [%s:%d] \e[0m" msg, JDEBUG_COLOR(level), JDEBUG_INFO(level), __FILE__, __func__, __LINE__, ## args); fflush(stdout); } while (0);
 #else
-  #define JDEBUG(level, msg, args...)
+  #define JDEBUG(level, msg, args...) \
+    do { } while (0);
 #endif
 
 #endif

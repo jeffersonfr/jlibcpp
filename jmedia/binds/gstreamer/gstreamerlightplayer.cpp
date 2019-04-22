@@ -38,13 +38,9 @@ class GStreamerPlayerComponentImpl : public jgui::Component {
 		/** \brief */
 		Player *_player;
 		/** \brief */
-		cairo_surface_t *_surface;
-		/** \brief */
     std::mutex _mutex;
 		/** \brief */
 		jgui::jregion_t _src;
-		/** \brief */
-		jgui::jregion_t _dst;
 		/** \brief */
 		uint32_t **_buffer;
 		/** \brief */
@@ -53,46 +49,33 @@ class GStreamerPlayerComponentImpl : public jgui::Component {
 		jgui::jsize_t _frame_size;
 
 	public:
-		GStreamerPlayerComponentImpl(Player *player, int x, int y, int w, int h):
-			jgui::Component(x, y, w, h)
+		GStreamerPlayerComponentImpl(Player *player, int x, int y, int width, int height):
+			jgui::Component(x, y, width, height)
 		{
-			_buffer = new uint32_t*[2];
+			_buffer = nullptr;
 			
-			_buffer[0] = new uint32_t[w*h];
-			_buffer[1] = new uint32_t[w*h];
-
 			_buffer_index = 0;
 
-			_surface = nullptr;
 			_player = player;
 			
-			_frame_size.width = w;
-			_frame_size.height = h;
+			_frame_size.width = width;
+			_frame_size.height = height;
 
 			_src.x = 0;
 			_src.y = 0;
-			_src.width = w;
-			_src.height = h;
-
-			_dst.x = 0;
-			_dst.y = 0;
-			_dst.width = w;
-			_dst.height = h;
+			_src.width = width;
+			_src.height = height;
 
 			SetVisible(true);
 		}
 
 		virtual ~GStreamerPlayerComponentImpl()
 		{
-      if (_surface != nullptr) {
-        cairo_surface_destroy(_surface);
-      }
-
 			if (_buffer != nullptr) {
 				delete [] _buffer[0];
 				delete [] _buffer[1];
 
-				delete _buffer;
+				delete [] _buffer;
 				_buffer = nullptr;
 			}
 		}
@@ -106,32 +89,33 @@ class GStreamerPlayerComponentImpl : public jgui::Component {
 		{
 			_mutex.lock();
 
-      if (_frame_size.width < 0 or _frame_size.height < 0) {
-        delete [] _buffer[0];
-        delete [] _buffer[1];
-			
-        _buffer[0] = new uint32_t[width*height];
-			  _buffer[1] = new uint32_t[width*height];
-
+      if (_buffer == nullptr or _frame_size.width != width or _frame_size.height != height) {
 			  _frame_size.width = width;
 			  _frame_size.height = height;
 			
-        if (_src.width < 0 or _src.height < 0) {
-			    _src.width = width;
-			    _src.height = height;
+        if (_buffer != nullptr) {
+          delete [] _buffer[0];
+          delete [] _buffer[1];
+
+          delete [] _buffer;
+        }
+
+        _buffer = new uint32_t*[2];
+
+        _buffer[0] = new uint32_t[width*height];
+        _buffer[1] = new uint32_t[width*height];
+
+        if (_src.width < 0) {
+			    _src.width = _frame_size.width;
+        }
+
+        if (_src.height < 0) {
+			    _src.height = _frame_size.height;
         }
       }
 
-			int sw = _frame_size.width;
-			int sh = _frame_size.height;
+      memcpy(_buffer[(_buffer_index++)%2], data, width*height*4);
 
-      memcpy(_buffer[_buffer_index], data, width*height*4);
-
-      _buffer_index = (_buffer_index + 1)%2;
-
-			_surface = cairo_image_surface_create_for_data(
-					(uint8_t *)_buffer[(_buffer_index+1)%2], CAIRO_FORMAT_ARGB32, sw, sh, cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, sw));
-			
       _mutex.unlock();
 
       Repaint();
@@ -146,30 +130,28 @@ class GStreamerPlayerComponentImpl : public jgui::Component {
 
 			_mutex.lock();
 
-      if (_surface == nullptr) {
+      if (_buffer == nullptr or _frame_size.width < 0 or _frame_size.height < 0) {
         _mutex.unlock();
 
         return;
       }
 
-      if (_frame_size.width < 0 or _frame_size.height < 0) {
-        return;
-      }
-
-			cairo_t *context = cairo_create(_surface);
+			cairo_surface_t *surface = cairo_image_surface_create_for_data(
+					(uint8_t *)_buffer[(_buffer_index)%2], CAIRO_FORMAT_ARGB32, _frame_size.width, _frame_size.height, cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, _frame_size.width));
+			
+			cairo_t *context = cairo_create(surface);
       jgui::Image *image = new jgui::BufferedImage(context);
 
 			_player->DispatchFrameGrabberEvent(new jevent::FrameGrabberEvent(image, jevent::JFE_GRABBED));
 
-			cairo_surface_mark_dirty(_surface);
+			cairo_surface_mark_dirty(surface);
 
 			g->DrawImage(image, _src.x, _src.y, _src.width, _src.height, 0, 0, size.width, size.height);
 
       delete image;
       image = nullptr;
 
-			cairo_surface_destroy(_surface);
-      _surface = nullptr;
+			cairo_surface_destroy(surface);
 
 			_mutex.unlock();
 		}
@@ -791,10 +773,6 @@ void GStreamerLightPlayer::Close()
   gst_element_set_state(_pipeline, GST_STATE_NULL);
   gst_object_unref(_pipeline);
   gst_deinit();
-
-  if (_surface != nullptr) {
-    cairo_surface_destroy(_surface);
-  }
 }
 
 void GStreamerLightPlayer::SetCurrentTime(uint64_t ms)
