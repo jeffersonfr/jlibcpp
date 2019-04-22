@@ -96,11 +96,12 @@ Image * Image::Colorize(Color color)
   return nullptr;
 }
 
-void Image::SetPixels(uint8_t *buffer, int xp, int yp, int wp, int hp, int stride)
+uint8_t * Image::LockData()
 {
+  return nullptr;
 }
 
-void Image::GetPixels(uint8_t **buffer, int xp, int yp, int wp, int hp, int *stride)
+void Image::UnlockData()
 {
 }
 

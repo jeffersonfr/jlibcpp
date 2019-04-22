@@ -3913,7 +3913,7 @@ class PSIParser : public jevent::DemuxListener {
 				int original_network_id = TS_G16(ptr + 2);
 				// int reserved_future_use = TS_GM8(ptr + 4, 0, 4);
 
-				printf("NIT:transport stream: transport stream id:[0x%04x], original network id:[0x%04x]\n", transport_stream_id, original_network_id);
+				printf("NIT:: transport stream: transport stream id:[0x%04x], original network id:[0x%04x]\n", transport_stream_id, original_network_id);
 
 				descriptors_length = TS_GM16(ptr + 4, 4, 12);
 				descriptors_count = 0;

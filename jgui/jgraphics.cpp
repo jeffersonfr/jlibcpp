@@ -1996,13 +1996,7 @@ bool Graphics::DrawImage(Image *img, int xp, int yp, int wp, int hp)
 		return false;
 	}
 
-	jgui::Image *scl = img->Scale(wp, hp);
-
-	if (scl == nullptr) {
-		return false;
-	}
-
-	Graphics *g = scl->GetGraphics();
+	Graphics *g = img->GetGraphics();
 
 	if (g != nullptr) {
 		cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
@@ -2011,19 +2005,29 @@ bool Graphics::DrawImage(Image *img, int xp, int yp, int wp, int hp)
 			return false;
 		}
 
+		jgui::jsize_t isize = img->GetSize();
+
 		cairo_save(_cairo_context);
-		cairo_set_source_surface(_cairo_context, cairo_surface, xp+_translate.x, yp+_translate.y);
+		cairo_translate(_cairo_context, xp+_translate.x, yp+_translate.y);
+		cairo_scale(_cairo_context, wp/(float)isize.width, hp/(float)isize.height);
+		cairo_set_source_surface(_cairo_context, cairo_surface, 0, 0);
 		cairo_paint(_cairo_context);
 		cairo_restore(_cairo_context);
 	} else {
+		jgui::Image *scl = img->Scale(wp, hp);
+
+		if (scl == nullptr) {
+			return false;
+		}
+
 		uint32_t rgb[wp*hp];
 
 		scl->GetRGBArray(rgb, 0, 0, wp, hp);
 	
 		SetRGBArray(rgb, xp, yp, wp, hp);
+	
+		delete scl;
 	}
-
-	delete scl;
 
   return true;
 
@@ -2053,21 +2057,7 @@ bool Graphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp,
 		return false;
 	}
 
-	jgui::Image *aux = img->Crop(sxp, syp, swp, shp);
-
-	if (aux == nullptr) {
-		return false;
-	}
-
-	jgui::Image *scl = aux->Scale(wp, hp);
-
-	if (scl == nullptr) {
-		return false;
-	}
-
-	delete aux;
-
-	Graphics *g = scl->GetGraphics();
+	jgui::Graphics *g = img->GetGraphics();
 
 	if (g != nullptr) {
 		cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
@@ -2076,21 +2066,42 @@ bool Graphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp,
 			return false;
 		}
 
-		cairo_surface_flush(cairo_surface);
+		jgui::jsize_t isize = img->GetSize();
 
 		cairo_save(_cairo_context);
-		cairo_set_source_surface(_cairo_context, cairo_surface, xp+_translate.x, yp+_translate.y);
-		cairo_paint(_cairo_context);
+		
+		float dx = wp/(float)isize.width;
+		float dy = hp/(float)isize.height;
+
+		cairo_translate(_cairo_context, xp+_translate.x, yp+_translate.y);
+		cairo_scale(_cairo_context, dx, dy);
+		cairo_set_source_surface(_cairo_context, cairo_surface, 0, 0);
+		cairo_rectangle(_cairo_context, 0, 0, wp/dx, hp/dy);
+		cairo_fill(_cairo_context);
 		cairo_restore(_cairo_context);
 	} else {
+		jgui::Image *aux = img->Crop(sxp, syp, swp, shp);
+
+		if (aux == nullptr) {
+			return false;
+		}
+
+		jgui::Image *scl = aux->Scale(wp, hp);
+
+		if (scl == nullptr) {
+			return false;
+		}
+
+		delete aux;
+
 		uint32_t rgb[wp*hp];
 
 		scl->GetRGBArray(rgb, 0, 0, wp, hp);
 	
 		SetRGBArray(rgb, xp, yp, wp, hp);
+	
+		delete scl;
 	}
-
-	delete scl;
 
 	return true;
 }

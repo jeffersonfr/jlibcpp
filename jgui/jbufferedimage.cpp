@@ -1056,71 +1056,32 @@ Image * BufferedImage::Colorize(Color color)
 	return image;
 }
 
-void BufferedImage::SetPixels(uint8_t *buffer, int xp, int yp, int wp, int hp, int stride)
+uint8_t * BufferedImage::LockData()
 {
 	cairo_surface_t *cairo_surface = cairo_get_target(dynamic_cast<Graphics *>(GetGraphics())->GetCairoContext());
 
 	if (cairo_surface == nullptr) {
-		return;
+		return nullptr;
 	}
 
-	uint8_t *data = cairo_image_surface_get_data(cairo_surface);
+  _mutex.lock();
 
-	if (data == nullptr) {
-		return;
-	}
-
-	if (stride <= 0) {
-		stride = cairo_image_surface_get_stride(cairo_surface);
-	}
-
-  jgui::jsize_t size = GetSize();
-
-	xp = (xp*stride)/size.width;
-	wp = (wp*stride)/size.height;
-
-	for (int j=0; j<hp; j++) {
-		uint8_t *src = (uint8_t *)(buffer + j * stride);
-		uint8_t *dst = (uint8_t *)(data + (j + yp) * stride);
-
-		for (int i=0; i<wp; i++) {
-			*(dst + (i + xp)) = *(src + i);
-		}
-	}
-
-	cairo_surface_mark_dirty(cairo_surface);
+	return cairo_image_surface_get_data(cairo_surface);
 }
 
-void BufferedImage::GetPixels(uint8_t **buffer, int xp, int yp, int wp, int hp, int *stride)
+void BufferedImage::UnlockData()
 {
 	cairo_surface_t *cairo_surface = cairo_get_target(dynamic_cast<Graphics *>(GetGraphics())->GetCairoContext());
 
 	if (cairo_surface == nullptr) {
+    _mutex.unlock();
+
 		return;
 	}
 
-	uint8_t *data = cairo_image_surface_get_data(cairo_surface);
-
-	if (data == nullptr) {
-		return;
-	}
-
-	int pitch = cairo_image_surface_get_stride(cairo_surface);
-  jgui::jsize_t size = GetSize();
-
-	xp = (xp*pitch)/size.width;
-	wp = (wp*pitch)/size.height;
-
-	for (int j=0; j<hp; j++) {
-		uint8_t *src = (uint8_t *)(data + (j + yp) * pitch + xp);
-		uint8_t *dst = (uint8_t *)(*buffer + j * pitch);
-
-		for (int i=0; i<wp; i++) {
-			*(dst + i) = *(src + i);
-		}
-	}
-
-	(*stride) = pitch;
+  cairo_surface_mark_dirty(cairo_surface);
+    
+  _mutex.unlock();
 }
 
 void BufferedImage::GetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)

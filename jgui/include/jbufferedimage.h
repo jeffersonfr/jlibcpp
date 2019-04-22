@@ -22,6 +22,8 @@
 
 #include "jgui/jimage.h"
 
+#include <mutex>
+
 namespace jgui{
 
 /**
@@ -34,6 +36,8 @@ class BufferedImage : public virtual jgui::Image {
 	protected:
 		/** \brief */
 		Graphics *_graphics;
+		/** \brief */
+    std::mutex _mutex;
 
 	public:
 		/**
@@ -124,13 +128,13 @@ class BufferedImage : public virtual jgui::Image {
 		 * \brief
 		 *
 		 */
-		virtual void SetPixels(uint8_t *buffer, int xp, int yp, int wp, int hp, int stride);
-		
+		virtual uint8_t * LockData();
+	
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void GetPixels(uint8_t **buffer, int xp, int yp, int wp, int hp, int *stride);
+		virtual void UnlockData();
 	
 		/**
 		 * \brief

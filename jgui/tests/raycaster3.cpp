@@ -221,6 +221,11 @@ class GraphicsTeste : public jgui::Window {
         w = SCREEN_WIDTH,
 			  h = SCREEN_HEIGHT;
 
+      static jgui::BufferedImage 
+        image(jgui::JPF_RGB32, SCREEN_WIDTH, SCREEN_HEIGHT);
+      uint32_t 
+        *buffer = (uint32_t *)image.LockData();
+
 			//start the main loop
 			for(int x = 0; x < w; x++) {
 				//calculate ray position and direction 
@@ -327,7 +332,7 @@ class GraphicsTeste : public jgui::Window {
 						color = (color >> 1) & 0xff7f7f7f; // 8355711;
 					}
 
-					buffer[y][x] = color;
+					buffer[y*SCREEN_WIDTH+x] = color;
 				}
 
 				//SET THE ZBUFFER FOR THE SPRITE CASTING
@@ -378,9 +383,9 @@ class GraphicsTeste : public jgui::Window {
 					index = texWidth * floorTexY + floorTexX;
 
 					//floor
-					buffer[y][x] = (texture[3][index] >> 1) & 0xff7f7f7f; // 8355711;
+					buffer[y*SCREEN_WIDTH + x] = (texture[3][index] >> 1) & 0xff7f7f7f; // 8355711;
 					//ceiling (symmetrical!)
-					buffer[h-y][x] = texture[6][index];
+					buffer[(h-y)*SCREEN_WIDTH + x] = texture[6][index];
 				}
 			}
 
@@ -459,14 +464,15 @@ class GraphicsTeste : public jgui::Window {
 							uint32_t color = texture[sprite[spriteOrder[i]].texture][texWidth * texY + texX]; // get current color from the texture
 
 							if ((color & 0x00ffffff) != 0) {
-								buffer[y][stripe] = color; // paint pixel if it isn't black, black is the invisible color
+								buffer[y*SCREEN_WIDTH + stripe] = color; // paint pixel if it isn't black, black is the invisible color
 							}
 						}
 				}
 			}
 
-			g->SetCompositeFlags(jgui::JCF_SRC);
-			g->SetRGBArray((uint32_t *)buffer, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+      image.UnlockData();
+
+      g->DrawImage(&image, 0, 0);
 		}
 
 		virtual bool KeyPressed(jevent::KeyEvent *event)

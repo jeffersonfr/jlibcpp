@@ -113,7 +113,7 @@ class LibvlcPlayerComponentImpl : public jgui::Component {
 		/** \brief */
 		jgui::jregion_t _dst;
 		/** \brief */
-		uint32_t **_buffer;
+    jgui::Image **_buffer;
 		/** \brief */
 		int _buffer_index;
 		/** \brief */
@@ -123,10 +123,11 @@ class LibvlcPlayerComponentImpl : public jgui::Component {
 		LibvlcPlayerComponentImpl(Player *player, int x, int y, int w, int h):
 			jgui::Component(x, y, w, h)
 		{
-			_buffer = new uint32_t*[2];
+			_buffer = new jgui::Image*[3];
 			
-			_buffer[0] = new uint32_t[w*h];
-			_buffer[1] = new uint32_t[w*h];
+			_buffer[0] = new jgui::BufferedImage(jgui::JPF_RGB32, w, h);
+			_buffer[1] = new jgui::BufferedImage(jgui::JPF_RGB32, w, h);
+			_buffer[2] = new jgui::BufferedImage(jgui::JPF_RGB32, w, h);
 
 			_buffer_index = 0;
 
@@ -156,10 +157,11 @@ class LibvlcPlayerComponentImpl : public jgui::Component {
       }
 
 			if (_buffer != nullptr) {
-				delete [] _buffer[0];
-				delete [] _buffer[1];
+				delete _buffer[0];
+				delete _buffer[1];
+				delete _buffer[2];
 
-				delete _buffer;
+				delete [] _buffer;
 				_buffer = nullptr;
 			}
 		}
@@ -171,50 +173,25 @@ class LibvlcPlayerComponentImpl : public jgui::Component {
 
 		virtual void UpdateComponent()
 		{
-			int sw = _frame_size.width;
-			int sh = _frame_size.height;
-
-			_mutex.lock();
-
-			_surface = cairo_image_surface_create_for_data(
-					(uint8_t *)_buffer[(_buffer_index+1)%2], CAIRO_FORMAT_ARGB32, sw, sh, cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, sw));
-			
-      _mutex.unlock();
-
       Repaint();
 		}
 
 		virtual void Paint(jgui::Graphics *g)
 		{
-			jgui::Component::Paint(g);
+			// jgui::Component::Paint(g);
 
       jgui::jsize_t
         size = GetSize();
 
-			_mutex.lock();
+      jgui::Image *image = _buffer[(_buffer_index)%3];
 
-      if (_surface == nullptr) {
-        _mutex.unlock();
-
-        return;
-      }
-
-			cairo_t *context = cairo_create(_surface);
-      jgui::Image *image = new jgui::BufferedImage(context);
+      image->LockData();
 
 			_player->DispatchFrameGrabberEvent(new jevent::FrameGrabberEvent(image, jevent::JFE_GRABBED));
 
-			cairo_surface_mark_dirty(_surface);
-
 			g->DrawImage(image, _src.x, _src.y, _src.width, _src.height, 0, 0, size.width, size.height);
-
-      delete image;
-      image = nullptr;
-
-			cairo_surface_destroy(_surface);
-      _surface = nullptr;
-
-			_mutex.unlock();
+      
+      image->UnlockData();
 		}
 
 		virtual Player * GetPlayer()
@@ -228,9 +205,9 @@ static void * LockMediaSurface(void *data, void **p_pixels)
 {
 	LibvlcPlayerComponentImpl *cmp = reinterpret_cast<LibvlcPlayerComponentImpl *>(data);
 	
-	(*p_pixels) = cmp->_buffer[cmp->_buffer_index];
+  jgui::Image *image = cmp->_buffer[(cmp->_buffer_index)%3];
 
-	cmp->_buffer_index = (cmp->_buffer_index + 1)%2;
+	(*p_pixels) = image->LockData();
 
 	return nullptr; 
 }
@@ -241,6 +218,12 @@ static void UnlockMediaSurface(void *data, void *id, void *const *p_pixels)
 
 static void DisplayMediaSurface(void *data, void *id)
 {
+	LibvlcPlayerComponentImpl *cmp = reinterpret_cast<LibvlcPlayerComponentImpl *>(data);
+	
+  jgui::Image *image = cmp->_buffer[(cmp->_buffer_index++)%3];
+
+  image->UnlockData();
+
 	reinterpret_cast<LibvlcPlayerComponentImpl *>(data)->UpdateComponent();
 }
 
