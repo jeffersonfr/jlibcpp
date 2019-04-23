@@ -19,7 +19,6 @@
  ***************************************************************************/
 #include "jcommon/jsystem.h"
 #include "jcommon/jproperties.h"
-#include "jcommon/jxmlparser.h"
 #include "jcommon/jstringutils.h"
 #include "jcommon/jstringtokenizer.h"
 #include "jcommon/jdynamiclink.h"
@@ -161,18 +160,6 @@ void testOptions(int argc, char **argv)
 	std::cout << "Options:: " << o.ExistsOption("a") << ", " << o.ExistsOption("b") << ", " << o.GetArgument("a") << ", " << o.GetArgument("b") << std::endl;
 }
 
-void create_xml_file()
-{
-	jcommon::XmlDocument doc;
-
-	jcommon::XmlElement *component = new jcommon::XmlElement("component"); 
-	component->SetAttribute("alias", "1");
-   	component->SetAttribute("guid", "2"); 
-
-	doc.LinkEndChild(component);
-	doc.SaveFile("j.xml");
-}
-
 int main(int argc, char *argv[])
 {
 	//testObject();
@@ -182,7 +169,6 @@ int main(int argc, char *argv[])
 	//testSystem();
 	//testStringToken();
 	//testOptions(argc, argv);
-	//create_xml_file();
 
 	return EXIT_SUCCESS;
 }

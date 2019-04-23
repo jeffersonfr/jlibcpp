@@ -12,11 +12,8 @@ LDFLAGS		+= \
 OBJS_teste = \
 	   teste.o\
 
-OBJS_xml_teste = \
-	   xml_teste.o\
-
-OBJS_xml_agenda = \
-	   xml_agenda.o\
+OBJS_xmlteste = \
+	   xmlteste.o\
 
 OBJS_jsondump = \
 	   jsondump.o\
@@ -36,17 +33,14 @@ OBJS_piano = \
 OBJS_timertask = \
 	   timertask.o\
 
-all: teste xml_teste xml_agenda jsondump access buffer piano timertask
+all: teste xmlteste jsondump access buffer piano timertask
 	
 teste: $(OBJS_teste)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
-xml_teste: $(OBJS_xml_teste)
+xmlteste: $(OBJS_xmlteste)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
-xml_agenda: $(OBJS_xml_agenda)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
-
 jsondump: $(OBJS_jsondump)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
 
@@ -72,4 +66,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *.xml *~ teste xml_teste xml_agenda myfile_teste.xml jsondump pointer access buffer piano timertask
+	@rm -rvf *.o *.xml *~ teste xmlteste myfile_teste.xml jsondump pointer access buffer piano timertask
