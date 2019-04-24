@@ -2005,11 +2005,16 @@ bool Graphics::DrawImage(Image *img, int xp, int yp, int wp, int hp)
 
 		jgui::jsize_t isize = img->GetSize();
 
-		cairo_save(_cairo_context);
+		float dx = wp/(float)isize.width;
+		float dy = hp/(float)isize.height;
+    
+    cairo_save(_cairo_context);
 		cairo_translate(_cairo_context, xp+_translate.x, yp+_translate.y);
-		cairo_scale(_cairo_context, wp/(float)isize.width, hp/(float)isize.height);
+		cairo_scale(_cairo_context, dx, dy);
 		cairo_set_source_surface(_cairo_context, cairo_surface, 0, 0);
 		cairo_paint(_cairo_context);
+		//cairo_rectangle(_cairo_context, 0, 0, wp, hp);
+		//cairo_fill(_cairo_context);
 		cairo_restore(_cairo_context);
 	} else {
 		jgui::Image *scl = img->Scale(wp, hp);
@@ -2066,15 +2071,14 @@ bool Graphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp,
 
 		jgui::jsize_t isize = img->GetSize();
 
-		cairo_save(_cairo_context);
-		
 		float dx = wp/(float)isize.width;
 		float dy = hp/(float)isize.height;
 
+		cairo_save(_cairo_context);
 		cairo_translate(_cairo_context, xp+_translate.x, yp+_translate.y);
+		cairo_set_source_surface(_cairo_context, cairo_surface, -sxp, -syp);
+		cairo_rectangle(_cairo_context, 0, 0, wp, hp);
 		cairo_scale(_cairo_context, dx, dy);
-		cairo_set_source_surface(_cairo_context, cairo_surface, 0, 0);
-		cairo_rectangle(_cairo_context, 0, 0, wp/dx, hp/dy);
 		cairo_fill(_cairo_context);
 		cairo_restore(_cairo_context);
 	} else {
