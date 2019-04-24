@@ -35,12 +35,10 @@
 
 namespace jgui {
 
-using namespace nana;
-
 /** \brief */
-static form *fm = nullptr;
+static nana::form *fm = nullptr;
 /** \brief */
-static drawing *dw = nullptr;
+static nana::drawing *dw = nullptr;
 /** \brief */
 static std::mutex sg_paint_mutex;
 /** \brief */
@@ -307,6 +305,8 @@ void NativeApplication::InternalQuit()
 {
   sg_quitting = true;
   
+  fm->close();
+
   sg_loop_mutex.lock();
   sg_loop_mutex.unlock();
 }
@@ -438,7 +438,7 @@ static void key_input_callback(const nana::arg_keyboard &arg)
   sg_jgui_window->GetEventManager()->PostEvent(new jevent::KeyEvent(sg_jgui_window, type, mod, jevent::KeyEvent::GetCodeFromSymbol(symbol), symbol));
 }
 
-static void paint_callback(const paint::graphics& graph)
+static void paint_callback(const nana::paint::graphics& graph)
 {
   if (sg_jgui_window == nullptr || sg_jgui_window->IsVisible() == false) {
     return;
@@ -482,7 +482,7 @@ static void paint_callback(const paint::graphics& graph)
     return;
   }
 
-  paint::pixel_buffer pixbuf{ graph.handle(), rectangle{graph.size()} };
+  nana::paint::pixel_buffer pixbuf{ graph.handle(), nana::rectangle{ graph.size() } };
   // size sz = pixbuf.size();
 
   for (int i=0; i<dh; i++) {
@@ -517,11 +517,11 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 	sg_mouse_y = 0;
 
 
-  fm = new form{API::make_center(width, height)};
+  fm = new nana::form{nana::API::make_center(width, height)};
 
   fm->move(x, y);
 
-  dw = new drawing(*fm);
+  dw = new nana::drawing(*fm);
 
   dw->draw(paint_callback);
   
@@ -555,8 +555,6 @@ NativeWindow::~NativeWindow()
 
 void NativeWindow::Repaint(Component *cmp)
 {
-  std::unique_lock<std::mutex> lock(sg_paint_mutex);
-
   sg_paint_condition.notify_all();
 }
 
@@ -581,11 +579,12 @@ void NativeWindow::SetParent(jgui::Container *c)
 
 void NativeWindow::SetTitle(std::string title)
 {
+  fm->caption(title);
 }
 
 std::string NativeWindow::GetTitle()
 {
-	return std::string();
+	return fm->caption();
 }
 
 void NativeWindow::SetOpacity(float opacity)

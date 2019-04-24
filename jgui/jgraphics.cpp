@@ -2069,17 +2069,27 @@ bool Graphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp,
 			return false;
 		}
 
-		jgui::jsize_t isize = img->GetSize();
-
-		float dx = wp/(float)isize.width;
-		float dy = hp/(float)isize.height;
+		float dx = wp/(float)swp;
+		float dy = hp/(float)shp;
 
 		cairo_save(_cairo_context);
+
+    // crop
+    cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, swp, shp);
+    cairo_t *context = cairo_create(surface);
+
+		cairo_set_source_surface(context, cairo_surface, -sxp, -syp);
+    cairo_paint(context);
+
+    // scale
 		cairo_translate(_cairo_context, xp+_translate.x, yp+_translate.y);
-		cairo_set_source_surface(_cairo_context, cairo_surface, -sxp, -syp);
-		cairo_rectangle(_cairo_context, 0, 0, wp, hp);
 		cairo_scale(_cairo_context, dx, dy);
-		cairo_fill(_cairo_context);
+		cairo_set_source_surface(_cairo_context, surface, 0, 0);
+		cairo_paint(_cairo_context);
+
+    cairo_surface_destroy(surface);
+	  cairo_destroy(context);
+
 		cairo_restore(_cairo_context);
 	} else {
 		jgui::Image *aux = img->Crop(sxp, syp, swp, shp);
