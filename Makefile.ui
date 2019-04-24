@@ -425,3 +425,34 @@ ifeq ($(ENABLE_GRAPHICS),flaschen)
 
 endif
 
+ifeq ($(ENABLE_GRAPHICS),nanax)
+	CCFLAGS 	+= \
+     -I/opt/nana/include \
+
+  # add the following line to nana/CMakeFile.txt ...
+  # set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -fPIC")
+
+	LDFLAGS		+= \
+     -L/opt/nana/build/cmake \
+     -lnana \
+     -lX11 \
+     -lpthread \
+     -lXft \
+     -lfontconfig \
+     -lstdc++fs \
+     -lnana \
+
+	DEFINES		+= \
+     -DJGUI_UI \
+		 -DNANAX_UI \
+
+	REQUIRES	+= \
+
+	OBJS_gfx	+= \
+		 nanaxapplication.o\
+
+  OBJS_jgui	+= \
+     $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+
+endif
+
