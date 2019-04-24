@@ -42,11 +42,13 @@ static form *fm = nullptr;
 /** \brief */
 static drawing *dw = nullptr;
 /** \brief */
+static std::mutex sg_paint_mutex;
+/** \brief */
+static std::condition_variable sg_paint_condition;
+/** \brief */
 static int sg_mouse_x = 0;
 /** \brief */
 static int sg_mouse_y = 0;
-/** \brief */
-static bool sg_repaint = false;
 /** \brief */
 static bool sg_quitting = false;
 /** \brief */
@@ -62,7 +64,6 @@ static jcursor_style_t sg_jgui_cursor = JCS_DEFAULT;
 
 static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(int symbol, bool capital)
 {
-  printf("KEY:: %d\n", symbol);
 	switch (symbol) {
 		case 13:
 			return jevent::JKS_ENTER; // jevent::JKS_RETURN;
@@ -277,13 +278,11 @@ void NativeApplication::InternalPaint()
 static void PaintThread(NativeApplication *app)
 {
   while (sg_quitting == false) {
-    if (sg_repaint == true) {
-      sg_repaint = false;
+    std::unique_lock<std::mutex> lock(sg_paint_mutex);
+    
+    dw->update();
 
-      dw->update();
-    }
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    sg_paint_condition.wait_for(lock, std::chrono::milliseconds(100));
   }
 }
 
@@ -314,6 +313,8 @@ void NativeApplication::InternalQuit()
 
 static void destroy_callback(const nana::arg_destroy &arg)
 {
+  fm->close();
+
   sg_quitting = true;
 
   sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_CLOSED));
@@ -437,6 +438,70 @@ static void key_input_callback(const nana::arg_keyboard &arg)
   sg_jgui_window->GetEventManager()->PostEvent(new jevent::KeyEvent(sg_jgui_window, type, mod, jevent::KeyEvent::GetCodeFromSymbol(symbol), symbol));
 }
 
+static void paint_callback(const paint::graphics& graph)
+{
+  if (sg_jgui_window == nullptr || sg_jgui_window->IsVisible() == false) {
+    return;
+  }
+
+  jregion_t 
+    bounds = sg_jgui_window->GetBounds();
+  jgui::Image 
+    *buffer = new jgui::BufferedImage(jgui::JPF_ARGB, bounds.width, bounds.height);//bounds.width, bounds.height);
+  jgui::Graphics 
+    *g = buffer->GetGraphics();
+  jpoint_t 
+    t = g->Translate();
+
+  g->Reset();
+  g->Translate(-t.x, -t.y);
+  g->SetClip(0, 0, bounds.width, bounds.height); // bounds.width, bounds.height);
+  sg_jgui_window->DoLayout();
+  sg_jgui_window->Paint(g);
+  g->Translate(t.x, t.y);
+
+  cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
+
+  if (cairo_surface == nullptr) {
+    delete buffer;
+
+    return;
+  }
+
+  cairo_surface_flush(cairo_surface);
+
+  int dw = cairo_image_surface_get_width(cairo_surface);
+  int dh = cairo_image_surface_get_height(cairo_surface);
+  // int stride = cairo_image_surface_get_stride(cairo_surface);
+
+  uint8_t *data = cairo_image_surface_get_data(cairo_surface);
+
+  if (data == nullptr) {
+    delete buffer;
+
+    return;
+  }
+
+  paint::pixel_buffer pixbuf{ graph.handle(), rectangle{graph.size()} };
+  // size sz = pixbuf.size();
+
+  for (int i=0; i<dh; i++) {
+    const unsigned char *src = data + i*dw*4;
+
+    pixbuf.fill_row(i, src, dw*4, 32);
+  }
+
+  // pixbuf.put((unsigned char *)data, dw, dh, 32, dw*4, false);
+  pixbuf.paste(graph.handle(), {});
+
+  cairo_surface_destroy(cairo_surface);
+
+  delete buffer;
+  buffer = nullptr;
+
+  sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
+}
+
 NativeWindow::NativeWindow(int x, int y, int width, int height):
 	jgui::Window(dynamic_cast<Window *>(this))
 {
@@ -458,68 +523,7 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 
   dw = new drawing(*fm);
 
-  dw->draw([](paint::graphics& graph) {
-      if (sg_jgui_window == nullptr || sg_jgui_window->IsVisible() == false) {
-        return;
-      }
-
-      jregion_t 
-        bounds = sg_jgui_window->GetBounds();
-      jgui::Image 
-        *buffer = new jgui::BufferedImage(jgui::JPF_ARGB, bounds.width, bounds.height);//bounds.width, bounds.height);
-      jgui::Graphics 
-        *g = buffer->GetGraphics();
-      jpoint_t 
-        t = g->Translate();
-
-      g->Reset();
-      g->Translate(-t.x, -t.y);
-      g->SetClip(0, 0, bounds.width, bounds.height); // bounds.width, bounds.height);
-      sg_jgui_window->DoLayout();
-      sg_jgui_window->Paint(g);
-      g->Translate(t.x, t.y);
-
-      cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
-
-      if (cairo_surface == nullptr) {
-        delete buffer;
-
-        return;
-      }
-
-      cairo_surface_flush(cairo_surface);
-
-      int dw = cairo_image_surface_get_width(cairo_surface);
-      int dh = cairo_image_surface_get_height(cairo_surface);
-      // int stride = cairo_image_surface_get_stride(cairo_surface);
-
-      uint8_t *data = cairo_image_surface_get_data(cairo_surface);
-
-      if (data == nullptr) {
-        delete buffer;
-
-        return;
-      }
-      
-      paint::pixel_buffer pixbuf{ graph.handle(), rectangle{graph.size()} };
-      // size sz = pixbuf.size();
-
-      for (int i=0; i<dh; i++) {
-        const unsigned char *src = data + i*dw*4;
-
-        pixbuf.fill_row(i, src, dw*4, 32);
-      }
-
-      // pixbuf.put((unsigned char *)data, dw, dh, 32, dw*4, false);
-      pixbuf.paste(graph.handle(), {});
-
-      cairo_surface_destroy(cairo_surface);
-
-      delete buffer;
-      buffer = nullptr;
-
-      sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
-  });
+  dw->draw(paint_callback);
   
   // TODO:: cursor, resize, expose
   fm->events().destroy(destroy_callback);
@@ -551,7 +555,9 @@ NativeWindow::~NativeWindow()
 
 void NativeWindow::Repaint(Component *cmp)
 {
-  sg_repaint = true;
+  std::unique_lock<std::mutex> lock(sg_paint_mutex);
+
+  sg_paint_condition.notify_all();
 }
 
 void NativeWindow::ToggleFullScreen()
