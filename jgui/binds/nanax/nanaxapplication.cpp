@@ -385,11 +385,11 @@ static void mouse_input_callback(const nana::arg_mouse &arg)
   }
 
   if (arg.mid_button == true) {
-    buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON2);
+    buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON3);
   }
 
   if (arg.right_button == true) {
-    buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON3);
+    buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON2);
   }
 
   sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, buttons, mouse_z, sg_mouse_x, sg_mouse_y));

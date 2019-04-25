@@ -72,11 +72,7 @@ void DemuxManager::RemoveDemux(Demux *demux)
 
 	_demux_mutex.lock();
 
-	std::vector<Demux *>::iterator i = std::find(_sync_demuxes.begin(), _sync_demuxes.end(), demux);
-	
-	if (i != _sync_demuxes.end()) {
-		_sync_demuxes.erase(i);
-	}
+  _sync_demuxes.erase(std::remove(_sync_demuxes.begin(), _sync_demuxes.end(), demux), _sync_demuxes.end());
 	
 	_demux_mutex.unlock();
 }
@@ -412,6 +408,12 @@ void DemuxManager::Run()
   std::map<int, struct jstream_counter_t> counter;
 
 	while (_is_running) {
+		_demux_mutex.lock();
+
+		_demuxes = _sync_demuxes;
+	
+		_demux_mutex.unlock();
+
 		char packet[TS_PACKET_LENGTH];
 		int length = TS_PACKET_LENGTH;
 
@@ -482,12 +484,6 @@ void DemuxManager::Run()
       ProcessPSI(data, TS_PACKET_LENGTH);
       ProcessPES(data, TS_PACKET_LENGTH);
     }
-
-		_demux_mutex.lock();
-
-		_demuxes = _sync_demuxes;
-	
-		_demux_mutex.unlock();
 	}
 
 	_is_running = false;
