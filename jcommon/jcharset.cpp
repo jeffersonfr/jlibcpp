@@ -101,12 +101,12 @@ Charset::~Charset()
 jcharset_result_t Charset::UnicodeToUTF8(const Char **src_start, const Char *src_end, char **dst_start, const char *dst_end)
 {
 	jcharset_result_t result = JCR_OK;
-	register const Char * src = *src_start;
-	register char * dst = *dst_start;
+	const Char * src = *src_start;
+	char * dst = *dst_start;
 
 	while (src < src_end) {
-		register uint64_t ch;
-		register uint32_t bytes_to_write,
+		uint64_t ch;
+		uint32_t bytes_to_write,
 						 extra_bytes;
 
 		ch = *src++;
@@ -151,12 +151,12 @@ jcharset_result_t Charset::UnicodeToUTF8(const Char **src_start, const Char *src
 jcharset_result_t Charset::UTF8ToUnicode(const char **src_start, const char *src_end, Char **dst_start, const Char *dst_end)
 {
 	jcharset_result_t result = JCR_OK;
-	register const char * src = *src_start;
-	register Char * dst = *dst_start;
+	const char * src = *src_start;
+	Char * dst = *dst_start;
 
 	while (src < src_end) {
-		register Char ch;
-		register unsigned short extra_bytes;
+		Char ch;
+		unsigned short extra_bytes;
 
 		extra_bytes = UTF8ExtraBytes[(uint8_t)*src];
 		/*

@@ -431,15 +431,7 @@ void NativeApplication::InternalPaint()
     return;
   }
 
-  SDL_Rect dst;
-
-  dst.x = 0;
-  dst.y = 0;
-  dst.w = dw;
-  dst.h = dh;
-
-  // SDL_RenderClear(sg_renderer);
-  SDL_RenderCopy(sg_renderer, texture, nullptr, &dst);
+  SDL_RenderCopy(sg_renderer, texture, nullptr, nullptr);
 
   /* INFO:: dirty region
    SDL_Rect src, dst;
@@ -458,7 +450,6 @@ void NativeApplication::InternalPaint()
    */
 
   SDL_RenderPresent(sg_renderer);
-
   SDL_DestroyTexture(texture);
   SDL_FreeSurface(surface);
 
@@ -681,8 +672,8 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 		throw jexception::RuntimeException("Cannot create a window");
 	}
 
-	sg_renderer = SDL_CreateRenderer(sg_window, 0, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-	// sg_renderer = SDL_CreateRenderer(sg_window, 0, SDL_RENDERER_SOFTWARE); // SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
+	sg_renderer = SDL_CreateRenderer(sg_window, 0, SDL_RENDERER_ACCELERATED); // | SDL_RENDERER_PRESENTVSYNC);
+	// sg_renderer = SDL_CreateRenderer(sg_window, 0, SDL_RENDERER_SOFTWARE);
 
 	if (sg_renderer == nullptr) {
 		throw jexception::RuntimeException("Cannot get a window's surface");

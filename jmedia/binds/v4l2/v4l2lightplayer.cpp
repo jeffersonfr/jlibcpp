@@ -170,7 +170,11 @@ class V4l2PlayerComponentImpl : public jgui::Component {
 
 			cairo_surface_mark_dirty(surface);
 
-			g->DrawImage(image, _src.x, _src.y, _src.width, _src.height, 0, 0, size.width, size.height);
+      if (_src.x == 0 and _src.y == 0 and _src.width == _frame_size.width and _src.height == _frame_size.height) {
+			  g->DrawImage(image, 0, 0, size.width, size.height);
+      } else {
+			  g->DrawImage(image, _src.x, _src.y, _src.width, _src.height, 0, 0, size.width, size.height);
+      }
 
       delete image;
       image = nullptr;

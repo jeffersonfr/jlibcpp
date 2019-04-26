@@ -92,8 +92,6 @@ class IlistPlayerComponentImpl : public jgui::Component {
 
 		virtual void UpdateComponent(jgui::Image *frame)
 		{
-			_mutex.lock();
-
 			jgui::jsize_t isize = frame->GetSize();
 
 			if (_frame_size.width != isize.width || _frame_size.height != isize.height) {
@@ -108,9 +106,9 @@ class IlistPlayerComponentImpl : public jgui::Component {
 
 			_player->DispatchFrameGrabberEvent(new jevent::FrameGrabberEvent(frame, jevent::JFE_GRABBED));
 
-			_image = frame;
+			_mutex.lock();
 
-			_mutex.unlock();
+			_image = frame;
 
 			Repaint();
 		}
@@ -122,10 +120,11 @@ class IlistPlayerComponentImpl : public jgui::Component {
       jgui::jsize_t
         size = GetSize();
 
-			_mutex.lock();
-
-			g->DrawImage(_image, _src.x, _src.y, _src.width, _src.height, 0, 0, size.width, size.height);
-			// g->DrawImage(_image, 0, 0, size.width, size.height);
+      if (_src.x == 0 and _src.y == 0 and _src.width == _frame_size.width and _src.height == _frame_size.height) {
+			  g->DrawImage(_image, 0, 0, size.width, size.height);
+      } else {
+			  g->DrawImage(_image, _src.x, _src.y, _src.width, _src.height, 0, 0, size.width, size.height);
+      }
 				
       delete _image;
       _image = nullptr;
@@ -271,6 +270,8 @@ ImageListLightPlayer::~ImageListLightPlayer()
 	}
 
 	_controls.clear();
+	
+  // TODO:: delete images of list
 }
 
 void ImageListLightPlayer::ResetFrames()
@@ -304,8 +305,6 @@ void ImageListLightPlayer::Run()
 			if (_is_loop == false) {
 				DispatchPlayerEvent(new jevent::PlayerEvent(this, jevent::JPE_FINISHED));
 
-				_mutex.unlock();
-
 				break;
 			}
 		}
@@ -324,12 +323,11 @@ void ImageListLightPlayer::Run()
 					us = ((double)us / _decode_rate + 0.);
 				}
 
+        printf("::: %ld\n", us);
         _condition.wait_for(lock, std::chrono::microseconds(us));
 			}
 		} catch (jexception::SemaphoreTimeoutException &e) {
 		}
-
-		_mutex.unlock();
 	}
 }
 
@@ -382,40 +380,26 @@ void ImageListLightPlayer::Resume()
 
 void ImageListLightPlayer::Stop()
 {
-  _mutex.lock();
-
   if (_is_playing == true) {
+    _is_playing = false;
+
     _thread.join();
   }
-
-	_is_playing = false;
 
 	if (_has_video == true) {
 		_component->Repaint();
 	}
 
 	_is_paused = false;
-
-  _mutex.unlock();
 }
 
 void ImageListLightPlayer::Close()
 {
-	if (_is_closed == true) {
-		return;
-	}
+  Stop();
+
+	_condition.notify_all();
 
 	_is_closed = true;
-
-  if (_is_playing == true) {
-    _thread.join();
-  }
-
-	_is_playing = false;
-	
-	_condition.notify_one();
-
-	// TODO:: delete images of list
 }
 
 void ImageListLightPlayer::SetCurrentTime(uint64_t time)

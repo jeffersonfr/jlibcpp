@@ -426,7 +426,7 @@ static int ReadImage( AnimatedGIFData *data, int left, int top, int width, int h
 
 	dst = image = data->image + (top * data->Width + left);
 
-	JDEBUG(JINFO, "reading %dx%d at %dx%d %sGIF image", width, height, left, top, interlace ? " interlaced " : "" );
+	// JDEBUG(JINFO, "reading %dx%d at %dx%d %sGIF image", width, height, left, top, interlace ? " interlaced " : "" );
 
 	while ((v = LWZReadByte( data, false, c )) >= 0 ) {
 		if (v != data->transparent) {
@@ -638,7 +638,7 @@ class GifPlayerComponentImpl : public jgui::Component {
 		/** \brief */
 		Player *_player;
 		/** \brief */
-		jgui::Image *_image;
+		cairo_surface_t *_surface;
 		/** \brief */
     std::mutex _mutex;
 		/** \brief */
@@ -652,7 +652,7 @@ class GifPlayerComponentImpl : public jgui::Component {
 		GifPlayerComponentImpl(Player *player, int x, int y, int w, int h):
 			jgui::Component(x, y, w, h)
 		{
-			_image = nullptr;
+			_surface = nullptr;
 			_player = player;
 			
 			_frame_size.width = w;
@@ -675,10 +675,9 @@ class GifPlayerComponentImpl : public jgui::Component {
 		{
 			_mutex.lock();
 
-			if (_image != nullptr) {
-				delete _image;
-				_image = nullptr;
-			}
+      if (_surface != nullptr) {
+        cairo_surface_destroy(_surface);
+      }
 
 			_mutex.unlock();
 		}
@@ -693,47 +692,38 @@ class GifPlayerComponentImpl : public jgui::Component {
 			int sw = _frame_size.width;
 			int sh = _frame_size.height;
 
-			cairo_surface_t *cairo_surface = cairo_image_surface_create_for_data(
-					(uint8_t *)data, CAIRO_FORMAT_ARGB32, sw, sh, cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, sw));
-			cairo_t *cairo_context = cairo_create(cairo_surface);
-
 			_mutex.lock();
 
-			if (_image != nullptr) {
-				delete _image;
-				_image = nullptr;
-			}
+			_surface = cairo_image_surface_create_for_data(
+					(uint8_t *)data, CAIRO_FORMAT_ARGB32, sw, sh, cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, sw));
 
-			_image = new jgui::BufferedImage(cairo_context);
-
-			_player->DispatchFrameGrabberEvent(new jevent::FrameGrabberEvent(_image, jevent::JFE_GRABBED));
-
-			cairo_surface_flush(cairo_surface);
-			cairo_surface_destroy(cairo_surface);
-
-			_mutex.unlock();
-
-			Run();
-		}
-
-		virtual void Run()
-		{
-			if (IsVisible() != false) {
-				Repaint();
-			}
-		}
+      Repaint();
+    }
 
 		virtual void Paint(jgui::Graphics *g)
 		{
 			jgui::Component::Paint(g);
 
+			if (_surface == nullptr) {
+        return;
+			}
+
       jgui::jsize_t
         size = GetSize();
 
-			_mutex.lock();
+      jgui::BufferedImage image(cairo_create(_surface));
 
-			g->DrawImage(_image, _src.x, _src.y, _src.width, _src.height, 0, 0, size.width, size.height);
-				
+			_player->DispatchFrameGrabberEvent(new jevent::FrameGrabberEvent(&image, jevent::JFE_GRABBED));
+
+      if (_src.x == 0 and _src.y == 0 and _src.width == _frame_size.width and _src.height == _frame_size.height) {
+			  g->DrawImage(&image, 0, 0, size.width, size.height);
+      } else {
+			  g->DrawImage(&image, _src.x, _src.y, _src.width, _src.height, 0, 0, size.width, size.height);
+      }
+		
+      cairo_surface_destroy(_surface);
+      _surface = nullptr;
+
 			_mutex.unlock();
 		}
 
@@ -997,10 +987,10 @@ void GIFLightPlayer::Stop()
   _mutex.lock();
 
   if (_is_playing == true) {
+	  _is_playing = false;
+
     _thread.join();
   }
-
-	_is_playing = false;
 
 	if (_has_video == true) {
 		_component->Repaint();
@@ -1027,6 +1017,8 @@ void GIFLightPlayer::Close()
 	data->condition.notify_one();
 
   if (_is_playing == true) {
+    _is_playing = false;
+
     _thread.join();
   }
 
