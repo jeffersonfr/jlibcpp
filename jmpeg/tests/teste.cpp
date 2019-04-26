@@ -1368,9 +1368,11 @@ class SIData : public SI {
       return (DownloadID() == param->DownloadID());
     }
 
-    std::string GetObjectKeyAsText(std::string key)
+    static std::string GetObjectKeyAsText(int module, std::string key)
     {
       std::ostringstream o;
+
+      o << std::hex << std::setw(16) << std::setfill('0') << module << ".";
 
       for (int i=0; i<(int)key.size(); i++) {
         o << std::hex << std::setw(2) << std::setfill('0') << (int)(key[i] & 0xff);
@@ -1407,20 +1409,24 @@ class SIData : public SI {
 
       for (std::map<std::string, std::vector<std::string>>::iterator i=_nodes.begin(); i!=_nodes.end(); i++) {
         if (i->first == object_key) {
+          std::string module = object_key.substr(0, object_key.find("."));
+
           for (std::vector<std::string>::iterator j=i->second.begin(); j!=i->second.end(); j++) {
-            std::shared_ptr<struct object_info_t> object = GetObjectByKey(*j);
+            std::shared_ptr<struct object_info_t> object = GetObjectByKey((*j));
 
             if (object != nullptr) {
+              std::string id = object->object_key;
+
               if (object->kind == "fil") {
                 std::ostringstream o;
 
-                o << "mv \"" << base_directory << "/" << GetObjectKeyAsText(object->object_key) << "\" \"" << path << "/" << _names[object->object_key].c_str() << "\"";
+                o << "mv \"" << base_directory << "/" << id << "\" \"" << path << "/" << _names[id].c_str() << "\"";
 
                 if (system(o.str().c_str()) != 0) {
                   break;
                 }
               } else if (object->kind == "dir") {
-                ProcessFilesystem(base_directory, current_path + "/" + _names[object->object_key].c_str(), object->object_key);
+                ProcessFilesystem(base_directory, current_path + "/" + _names[id].c_str(), id);
               }
             }
           }
@@ -1553,7 +1559,7 @@ class SIData : public SI {
             ptr = ptr + 5 + component_data_length;
           }
 
-          ior->object_key = object_key;
+          ior->object_key = SIData::GetObjectKeyAsText(module_id, object_key);
         } else if (profile_info == "TAG_LITE_OPTIONS") { // TR 101 202: Table 4.7
           // int profile_data_byte_order = TS_G8(ptr + 0);
           int component_count = TS_G8(ptr + 1);
@@ -1846,7 +1852,7 @@ class SIData : public SI {
           ptr = ptr + 8;
 
           // INFO:: save files to disk
-          std::string path = std::string("/tmp/data/") + GetObjectKeyAsText(object->object_key);
+          std::string path = std::string("/tmp/data/") + object->object_key;
 
           int fd = open(path.c_str(), O_CREAT | O_TRUNC | O_LARGEFILE | O_WRONLY, 0666);
 
@@ -1881,7 +1887,6 @@ class SIData : public SI {
       std::lock_guard<std::mutex> lock(_mutex);
 
       char tmp[255];
-      int index = 0;
 
       for (std::vector<std::shared_ptr<struct module_info_t>>::iterator i=_modules.begin(); i!=_modules.end(); i++) {
         std::shared_ptr<struct module_info_t> module = (*i);
@@ -1919,6 +1924,8 @@ class SIData : public SI {
               message_type != 0x00) { // 0x00: Indicates that the message is being sent from the User to the Network to begin a scenario
             break;
           }
+
+          object_key = GetObjectKeyAsText(module->id, object_key);
 
           // INFO:: creating object reference
           std::shared_ptr<struct object_info_t> object = std::make_shared<struct object_info_t>();
@@ -1962,7 +1969,7 @@ class SIData : public SI {
                 dsm_file_content_size, service_context_list_count, message_body_length, content_length);
 
             // INFO:: save files to disk
-            sprintf(tmp, "/tmp/data/file-%08d", index++);
+            sprintf(tmp, "/tmp/data/%s", object_key.c_str());
 
             int fd = open(tmp, O_CREAT | O_TRUNC | O_LARGEFILE | O_WRONLY, 0666);
 
@@ -2008,6 +2015,7 @@ class SIData : public SI {
             ptr = ptr + 6;
 
             if (object_kind == 0x73726700) {
+              printf("JJJJJJJJJJJ::1: %s\n", object_key.c_str());
               _names[object_key] = "/";
             }
 
@@ -2057,7 +2065,7 @@ class SIData : public SI {
               ptr = ior->ptr;
 
               _nodes[object_key].push_back(ior->object_key);
-
+ 
               _names[ior->object_key] = object_name;
 
               int object_info_length2 = TS_G16(ptr + 0);
@@ -2198,9 +2206,11 @@ class SIData : public SI {
 
         for (std::vector<std::shared_ptr<struct object_info_t>>::iterator j=_objects.begin(); j!=_objects.end(); j++) {
           std::shared_ptr<struct object_info_t> object = (*j);
+          std::string id = object->object_key;
 
           if (object->module->id == module->id) {
-            printf("\t\t[%s]: object key:[%s], object name:[%s]\n", object->kind.c_str(), GetObjectKeyAsText(object->object_key).c_str(), _names[object->object_key].c_str());
+            // INFO:: id = <module_id> + "." + <object_key>
+            printf("\t\t[%s]: object key:[%s], object name:[%s]\n", object->kind.c_str(), id.substr(id.find(".") + 1).c_str(), _names[id].c_str());
           }
         }
       }
