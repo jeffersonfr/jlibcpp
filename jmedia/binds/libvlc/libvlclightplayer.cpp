@@ -187,6 +187,8 @@ class LibvlcPlayerComponentImpl : public jgui::Component {
 
 			_player->DispatchFrameGrabberEvent(new jevent::FrameGrabberEvent(image, jevent::JFE_GRABBED));
 
+	    g->SetAntialias(jgui::JAM_NONE);
+
       if (_src.x == 0 and _src.y == 0 and _src.width == _frame_size.width and _src.height == _frame_size.height) {
 			  g->DrawImage(image, 0, 0, size.width, size.height);
       } else {
@@ -216,16 +218,15 @@ static void * LockMediaSurface(void *data, void **p_pixels)
 
 static void UnlockMediaSurface(void *data, void *id, void *const *p_pixels)
 {
+	LibvlcPlayerComponentImpl *cmp = reinterpret_cast<LibvlcPlayerComponentImpl *>(data);
+
+	jgui::Image *image = cmp->_buffer[(cmp->_buffer_index)%2];
+
+	image->UnlockData();
 }
 
 static void DisplayMediaSurface(void *data, void *id)
 {
-	LibvlcPlayerComponentImpl *cmp = reinterpret_cast<LibvlcPlayerComponentImpl *>(data);
-	
-  jgui::Image *image = cmp->_buffer[(cmp->_buffer_index++)%2];
-
-  image->UnlockData();
-
 	reinterpret_cast<LibvlcPlayerComponentImpl *>(data)->UpdateComponent();
 }
 
