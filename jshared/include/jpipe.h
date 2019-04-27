@@ -33,48 +33,48 @@ namespace jshared {
  */
 class Pipe : public virtual jcommon::Object {
 
-	private:
-		/** \brief */
-		int _pipe[2];
-		/** \brief */
-		bool _is_closed;
+  private:
+    /** \brief */
+    int _pipe[2];
+    /** \brief */
+    bool _is_closed;
 
-	public:
-		/**
-		 * \brief Constructor.
-		 *
-		 */
-		Pipe(int size_, int mode_);
+  public:
+    /**
+     * \brief Constructor.
+     *
+     */
+    Pipe(int size_, int mode_);
 
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~Pipe();
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~Pipe();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int Send(const char *data_, int data_length);
+    /**
+     * \brief
+     *
+     */
+    virtual int Send(const char *data_, int data_length);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int Receive(char *data_, int data_length_);
+    /**
+     * \brief
+     *
+     */
+    virtual int Receive(char *data_, int data_length_);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsClosed();
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsClosed();
 
-		/**
-		 * \brief Close.
-		 *
-		 */
-		virtual void Close();
+    /**
+     * \brief Close.
+     *
+     */
+    virtual void Close();
 
 };
 

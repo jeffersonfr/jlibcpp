@@ -31,36 +31,36 @@
 namespace jgui{
 
 enum jwindow_state_t {
-	JWS_NORMAL,
-	JWS_MAXIMIZE,
-	JWS_MINIMIZE,
+  JWS_NORMAL,
+  JWS_MAXIMIZE,
+  JWS_MINIMIZE,
   JWS_FULLSCREEN
 };
 
 enum jwindow_rotation_t {
-	JWR_NONE,
-	JWR_90,
-	JWR_180,
-	JWR_270
+  JWR_NONE,
+  JWR_90,
+  JWR_180,
+  JWR_270
 };
 
 enum jcursor_style_t {
-	JCS_DEFAULT,
-	JCS_CROSSHAIR,
-	JCS_EAST,
-	JCS_WEST,
-	JCS_NORTH,
-	JCS_SOUTH,
-	JCS_HAND,
-	JCS_MOVE,
-	JCS_NS,
-	JCS_WE,
-	JCS_NW_CORNER,
-	JCS_NE_CORNER,
-	JCS_SW_CORNER,
-	JCS_SE_CORNER,
-	JCS_TEXT,
-	JCS_WAIT
+  JCS_DEFAULT,
+  JCS_CROSSHAIR,
+  JCS_EAST,
+  JCS_WEST,
+  JCS_NORTH,
+  JCS_SOUTH,
+  JCS_HAND,
+  JCS_MOVE,
+  JCS_NS,
+  JCS_WE,
+  JCS_NW_CORNER,
+  JCS_NE_CORNER,
+  JCS_SW_CORNER,
+  JCS_SE_CORNER,
+  JCS_TEXT,
+  JCS_WAIT
 };
 
 class Graphics;
@@ -81,94 +81,94 @@ class Window : public jgui::Container {
     std::string subtitle;
   };
 
-	private:
-		/** \brief */
+  private:
+    /** \brief */
     std::vector<jevent::EventObject *> _window_events;
-		/** \brief */
-	  std::vector<jevent::KeyListener *> _key_listeners;
-		/** \brief */
-	  std::vector<jevent::MouseListener *> _mouse_listeners;
-		/** \brief */
-		std::vector<jevent::WindowListener *> _window_listeners;
-		/** \brief */
-		std::vector<struct frame_subtitle_t> _subtitles;
-		/** \brief */
-		std::thread _exec_thread;
-		/** \brief */
- 	  std::mutex _event_mutex;
-		/** \brief */
- 	  std::condition_variable _event_condition;
-		/** \brief */
- 	  std::mutex _key_listener_mutex;
-		/** \brief */
- 	  std::mutex _mouse_listener_mutex;
-		/** \brief */
-		std::mutex _paint_mutex;
-		/** \brief */
-		std::mutex _window_listener_mutex;
+    /** \brief */
+    std::vector<jevent::KeyListener *> _key_listeners;
+    /** \brief */
+    std::vector<jevent::MouseListener *> _mouse_listeners;
+    /** \brief */
+    std::vector<jevent::WindowListener *> _window_listeners;
+    /** \brief */
+    std::vector<struct frame_subtitle_t> _subtitles;
+    /** \brief */
+    std::thread _exec_thread;
+    /** \brief */
+     std::mutex _event_mutex;
+    /** \brief */
+     std::condition_variable _event_condition;
+    /** \brief */
+     std::mutex _key_listener_mutex;
+    /** \brief */
+     std::mutex _mouse_listener_mutex;
+    /** \brief */
+    std::mutex _paint_mutex;
+    /** \brief */
+    std::mutex _window_listener_mutex;
     /** \brief */
     Window *_instance;
     /** \brief */
     Font *_font;
     /** \brief */
     EventManager *_event_manager;
-		/** \brief */
-		Component *_focus_owner;
+    /** \brief */
+    Component *_focus_owner;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		Window(Window *window);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		Window(int width, int height);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		Window(int x, int y, int width, int height);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~Window();
+  public:
+    /**
+     * \brief
+     *
+     */
+    Window(Window *window);
+    
+    /**
+     * \brief
+     *
+     */
+    Window(int width, int height);
+    
+    /**
+     * \brief
+     *
+     */
+    Window(int x, int y, int width, int height);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~Window();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual EventManager * GetEventManager();
-		
-		/**
-		 * \brief Entry point to applications.
-		 *
-		 */
-		virtual void ShowApp();
+    /**
+     * \brief
+     *
+     */
+    virtual EventManager * GetEventManager();
+    
+    /**
+     * \brief Entry point to applications.
+     *
+     */
+    virtual void ShowApp();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Exec();
+    /**
+     * \brief
+     *
+     */
+    virtual void Exec();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetIcon(jgui::Image *image);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetIcon(jgui::Image *image);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jgui::Image * GetIcon();
+    /**
+     * \brief
+     *
+     */
+    virtual jgui::Image * GetIcon();
 
     /**
      * \brief
@@ -192,280 +192,280 @@ class Window : public jgui::Container {
     Container * GetFocusCycleRootAncestor();
 
     /**
-		 * \brief
-		 *
-		 */
-		virtual void AddSubtitle(jgui::Image *image, std::string label);
+     * \brief
+     *
+     */
+    virtual void AddSubtitle(jgui::Image *image, std::string label);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveAllSubtitles();
+    /**
+     * \brief
+     *
+     */
+    virtual void RemoveAllSubtitles();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void ToggleFullScreen();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetOpacity(float opacity);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual float GetOpacity();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetTitle(std::string title);
+    /**
+     * \brief
+     *
+     */
+    virtual void ToggleFullScreen();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetOpacity(float opacity);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual float GetOpacity();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetTitle(std::string title);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string GetTitle();
+    /**
+     * \brief
+     *
+     */
+    virtual std::string GetTitle();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetResizable(bool b);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetResizable(bool b);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsResizable();
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsResizable();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetUndecorated(bool b);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetUndecorated(bool b);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsUndecorated();
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsUndecorated();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetBounds(int x, int y, int width, int height);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jgui::jregion_t GetBounds();
+    /**
+     * \brief
+     *
+     */
+    virtual void SetBounds(int x, int y, int width, int height);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual jgui::jregion_t GetBounds();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jgui::jregion_t GetVisibleBounds();
+    /**
+     * \brief
+     *
+     */
+    virtual jgui::jregion_t GetVisibleBounds();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Repaint(Component *cmp = nullptr);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void PaintBackground(Graphics *g);
+    /**
+     * \brief
+     *
+     */
+    virtual void Repaint(Component *cmp = nullptr);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void PaintBackground(Graphics *g);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void PaintGlassPane(Graphics *g);
+    /**
+     * \brief
+     *
+     */
+    virtual void PaintGlassPane(Graphics *g);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Paint(Graphics *g);
+    /**
+     * \brief
+     *
+     */
+    virtual void Paint(Graphics *g);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetVisible(bool visible);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsVisible();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetCursorLocation(int x, int y);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetVisible(bool visible);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsVisible();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetCursorLocation(int x, int y);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jpoint_t GetCursorLocation();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetCursorEnabled(bool enable);
+    /**
+     * \brief
+     *
+     */
+    virtual jpoint_t GetCursorLocation();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetCursorEnabled(bool enable);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsCursorEnabled();
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsCursorEnabled();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetCursor(jcursor_style_t cursor);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetCursor(jcursor_style_t cursor);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetCursor(Image *shape, int hotx, int hoty);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetCursor(Image *shape, int hotx, int hoty);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jcursor_style_t GetCursor();
+    /**
+     * \brief
+     *
+     */
+    virtual jcursor_style_t GetCursor();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetRotation(jwindow_rotation_t t);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetRotation(jwindow_rotation_t t);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jwindow_rotation_t GetRotation();
+    /**
+     * \brief
+     *
+     */
+    virtual jwindow_rotation_t GetRotation();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool KeyPressed(jevent::KeyEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual bool KeyPressed(jevent::KeyEvent *event);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool KeyReleased(jevent::KeyEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual bool KeyReleased(jevent::KeyEvent *event);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool KeyTyped(jevent::KeyEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual bool KeyTyped(jevent::KeyEvent *event);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MousePressed(jevent::MouseEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual bool MousePressed(jevent::MouseEvent *event);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MouseReleased(jevent::MouseEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual bool MouseReleased(jevent::MouseEvent *event);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MouseMoved(jevent::MouseEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual bool MouseMoved(jevent::MouseEvent *event);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MouseWheel(jevent::MouseEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual bool MouseWheel(jevent::MouseEvent *event);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RegisterKeyListener(jevent::KeyListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveKeyListener(jevent::KeyListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual const std::vector<jevent::KeyListener *> & GetKeyListeners();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RegisterMouseListener(jevent::MouseListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveMouseListener(jevent::MouseListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual const std::vector<jevent::MouseListener *> & GetMouseListeners();
+    /**
+     * \brief
+     *
+     */
+    virtual void RegisterKeyListener(jevent::KeyListener *listener);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void RemoveKeyListener(jevent::KeyListener *listener);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual const std::vector<jevent::KeyListener *> & GetKeyListeners();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void RegisterMouseListener(jevent::MouseListener *listener);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void RemoveMouseListener(jevent::MouseListener *listener);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual const std::vector<jevent::MouseListener *> & GetMouseListeners();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RegisterWindowListener(jevent::WindowListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveWindowListener(jevent::WindowListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void DispatchWindowEvent(jevent::WindowEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual const std::vector<jevent::WindowListener *> & GetWindowListeners();
+    /**
+     * \brief
+     *
+     */
+    virtual void RegisterWindowListener(jevent::WindowListener *listener);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void RemoveWindowListener(jevent::WindowListener *listener);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void DispatchWindowEvent(jevent::WindowEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual const std::vector<jevent::WindowListener *> & GetWindowListeners();
 
 };
 

@@ -32,45 +32,45 @@ namespace jgui {
  */
 class Theme : public virtual jcommon::ParamMapper {
 
-	private:
+  private:
     /** \brief */
     static Theme *_default_theme;
 
-	private:
+  private:
     /** \brief */
     std::map<std::string, jgui::Font *> _fonts;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		Theme();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~Theme();
+  public:
+    /**
+     * \brief
+     *
+     */
+    Theme();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~Theme();
 
-		/**
-		 * \brief
-		 *
-		 */
-		static Theme * GetDefaultTheme();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jgui::Font * GetFont(std::string id);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetFont(std::string id, jgui::Font *font);
-		
+    /**
+     * \brief
+     *
+     */
+    static Theme * GetDefaultTheme();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual jgui::Font * GetFont(std::string id);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetFont(std::string id, jgui::Font *font);
+    
 };
 
 }

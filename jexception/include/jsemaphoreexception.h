@@ -31,52 +31,52 @@ namespace jexception {
  */
 class SemaphoreException : public jexception::RuntimeException {
 
-	private:
+  private:
 
-	public:
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		SemaphoreException();
+  public:
+    /**
+     * \brief Construtor.
+     *
+     */
+    SemaphoreException();
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		SemaphoreException(std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    SemaphoreException(std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		SemaphoreException(jexception::Exception *exception, std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    SemaphoreException(jexception::Exception *exception, std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> SemaphoreException(const std::string &fmt, T ...vs):
       Exception(fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::SemaphoreException");
     }
-		
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> SemaphoreException(Exception *exception, const std::string &fmt, T ...vs):
       Exception(exception, fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::SemaphoreException");
     }
-		
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~SemaphoreException() throw();
+    
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~SemaphoreException() throw();
 
 };
 

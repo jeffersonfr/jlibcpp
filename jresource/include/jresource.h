@@ -35,86 +35,86 @@ namespace jresource {
  */
 class Resource {
 
-	private:
-		/** \brief */
-		std::vector<jevent::ResourceTypeListener *> _type_listeners;
-		/** \brief */
-		std::vector<jevent::ResourceStatusListener *> _status_listeners;
-		/** \brief */
+  private:
+    /** \brief */
+    std::vector<jevent::ResourceTypeListener *> _type_listeners;
+    /** \brief */
+    std::vector<jevent::ResourceStatusListener *> _status_listeners;
+    /** \brief */
     jevent::ResourceStatusListener *_listener;
-		/** \brief */
-		std::mutex _resource_mutex;
-		/** \brief */
-		std::condition_variable _condition;
-		/** \brief */
-		bool _is_available;
-		
-	public:
-		/**
-		 * \brief
-		 * 
-		 */
-		Resource();
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual ~Resource();
-
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual bool IsAvailable();
-
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void Reserve(jevent::ResourceStatusListener *listener, bool force = false, int64_t timeout = -1LL);
-
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void Release();
+    /** \brief */
+    std::mutex _resource_mutex;
+    /** \brief */
+    std::condition_variable _condition;
+    /** \brief */
+    bool _is_available;
     
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void RegisterResourceTypeListener(jevent::ResourceTypeListener *listener);
+  public:
+    /**
+     * \brief
+     * 
+     */
+    Resource();
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual ~Resource();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void RemoveResourceTypeListener(jevent::ResourceTypeListener *listener);
+    /**
+     * \brief
+     * 
+     */
+    virtual bool IsAvailable();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void DispatchResourceTypeEvent(jevent::ResourceTypeEvent *event);
+    /**
+     * \brief
+     * 
+     */
+    virtual void Reserve(jevent::ResourceStatusListener *listener, bool force = false, int64_t timeout = -1LL);
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void RegisterResourceStatusListener(jevent::ResourceStatusListener *listener);
+    /**
+     * \brief
+     * 
+     */
+    virtual void Release();
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual void RegisterResourceTypeListener(jevent::ResourceTypeListener *listener);
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void RemoveResourceStatusListener(jevent::ResourceStatusListener *listener);
+    /**
+     * \brief
+     * 
+     */
+    virtual void RemoveResourceTypeListener(jevent::ResourceTypeListener *listener);
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void DispatchResourceStatusEvent(jevent::ResourceStatusEvent *event);
+    /**
+     * \brief
+     * 
+     */
+    virtual void DispatchResourceTypeEvent(jevent::ResourceTypeEvent *event);
+
+    /**
+     * \brief
+     * 
+     */
+    virtual void RegisterResourceStatusListener(jevent::ResourceStatusListener *listener);
+
+    /**
+     * \brief
+     * 
+     */
+    virtual void RemoveResourceStatusListener(jevent::ResourceStatusListener *listener);
+
+    /**
+     * \brief
+     * 
+     */
+    virtual void DispatchResourceStatusEvent(jevent::ResourceStatusEvent *event);
 
 };
 

@@ -24,160 +24,160 @@
 
 namespace jio {
 
-#define MASKS_LENGTH	8
+#define MASKS_LENGTH  8
 
 static int masks[8] = {
-	0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01
+  0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01
 };
 
 BitInputStream::BitInputStream(std::string filename):
-	InputStream()
+  InputStream()
 {
-	jcommon::Object::SetClassName("jio::BitInputStream");
+  jcommon::Object::SetClassName("jio::BitInputStream");
 
-	haveByte = false;
-	show = false;
-	currentMask = 0LL;
-	currentByte = 0LL;
+  haveByte = false;
+  show = false;
+  currentMask = 0LL;
+  currentByte = 0LL;
 
-	try {
-		file = jio::File::OpenFile(filename);
-		stream = new FileInputStream(file);
-	} catch (...) {
-		if (file != nullptr) {
-			delete file;
-		}
+  try {
+    file = jio::File::OpenFile(filename);
+    stream = new FileInputStream(file);
+  } catch (...) {
+    if (file != nullptr) {
+      delete file;
+    }
 
-		file = nullptr;
-		stream = nullptr;
+    file = nullptr;
+    stream = nullptr;
 
-		throw jexception::IOException("Cannot open file in BitInputStream");
-	}
+    throw jexception::IOException("Cannot open file in BitInputStream");
+  }
 }
 
 BitInputStream::BitInputStream(InputStream *is):
-	InputStream()
+  InputStream()
 {
-	jcommon::Object::SetClassName("jio::BitInputStream");
+  jcommon::Object::SetClassName("jio::BitInputStream");
 
-	if ((void *)is == nullptr) {
-		throw jexception::IOException("Null pointer exception");
-	}
+  if ((void *)is == nullptr) {
+    throw jexception::IOException("Null pointer exception");
+  }
 
-	stream = is;
-	haveByte = false;
-	show = false;
-	currentMask = 0;
-	currentByte = 0;
-	file = nullptr;
+  stream = is;
+  haveByte = false;
+  show = false;
+  currentMask = 0;
+  currentByte = 0;
+  file = nullptr;
 }
 
 BitInputStream::~BitInputStream()
 {
-	if (stream != nullptr) {
-		delete stream;
-	}
+  if (stream != nullptr) {
+    delete stream;
+  }
 
-	if (file != nullptr) {
-		delete file;
-	}
+  if (file != nullptr) {
+    delete file;
+  }
 }
 
 bool BitInputStream::IsEmpty()
 {
-	return Available() == 0;
+  return Available() == 0;
 }
 
 int64_t BitInputStream::Available()
 {
-	return stream->Available();
+  return stream->Available();
 }
 
 int64_t BitInputStream::GetSize()
 {
-	return file->GetSize();
+  return file->GetSize();
 }
 
 int64_t BitInputStream::GetPosition()
 {
-	return 0LL;
+  return 0LL;
 }
 
 int64_t BitInputStream::Read()
 {
-	int64_t next = stream->Read();
+  int64_t next = stream->Read();
 
-	if (next < 0LL) {
-		return -1LL;
-	}
+  if (next < 0LL) {
+    return -1LL;
+  }
 
-	return next;
+  return next;
 }
 
 int64_t BitInputStream::Read(char *buffer, int64_t size)
 {
-	int64_t i,
-		r;
+  int64_t i,
+    r;
 
-	for (i=0; i<size; i++) {
-		if ((r = Read()) > 0LL) {
-			buffer[i] = (char)r;
-		}
-	}
+  for (i=0; i<size; i++) {
+    if ((r = Read()) > 0LL) {
+      buffer[i] = (char)r;
+    }
+  }
 
-	return i;
+  return i;
 }
 
 void BitInputStream::Skip(int64_t skip)
 {
-	stream->Skip(skip);
+  stream->Skip(skip);
 }
 
 void BitInputStream::Reset()
 {
-	stream->Reset();
+  stream->Reset();
 }
 
 int BitInputStream::ReadBit()
 {
-	if (haveByte == false) {
-		currentByte = Read();
-		haveByte = true;
-	}
+  if (haveByte == false) {
+    currentByte = Read();
+    haveByte = true;
+  }
 
-	int value = (currentByte & masks[currentMask]) / masks[currentMask];
+  int value = (currentByte & masks[currentMask]) / masks[currentMask];
 
-	currentMask++;
-	if (currentMask == MASKS_LENGTH) {
-		haveByte = false;
-		currentMask = 0;
-	}
+  currentMask++;
+  if (currentMask == MASKS_LENGTH) {
+    haveByte = false;
+    currentMask = 0;
+  }
 
-	return value;
+  return value;
 }
 
 int BitInputStream::ReadBits(int num) 
 {
-	if ((num < 0) || (num > 32)) {
-		throw new jexception::OutOfBoundsException("Number of bits is out of range");
-	}
+  if ((num < 0) || (num > 32)) {
+    throw new jexception::OutOfBoundsException("Number of bits is out of range");
+  }
 
-	int bits = 0;
-	for (int i=0; i<num; i++) {
-		bits = (bits << 1) | ReadBit();
-	}
+  int bits = 0;
+  for (int i=0; i<num; i++) {
+    bits = (bits << 1) | ReadBit();
+  }
 
-	return bits;
+  return bits;
 }
 
 void BitInputStream::Close()
 {
-	stream->Close();
+  stream->Close();
 }
 
 int64_t BitInputStream::GetReadedBytes()
 {
-	return 0LL;
+  return 0LL;
 }
 
 }

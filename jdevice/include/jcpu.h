@@ -31,89 +31,89 @@ namespace jdevice {
 */
 class CPU : public jdevice::Device {
 
-	private:
-		/** \brief */
-		std::string _vendor;
-		/** \brief */
-		std::string _model;
-		/** \brief */
-		std::string _name;
-		/** \brief */
-		std::string _mhz;
-		/** \brief */
-		std::string _cache;
-		/** \brief */
-		std::string _bogomips;
-		/** \brief */
-		std::string _flags;
+  private:
+    /** \brief */
+    std::string _vendor;
+    /** \brief */
+    std::string _model;
+    /** \brief */
+    std::string _name;
+    /** \brief */
+    std::string _mhz;
+    /** \brief */
+    std::string _cache;
+    /** \brief */
+    std::string _bogomips;
+    /** \brief */
+    std::string _flags;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		CPU();
+  public:
+    /**
+     * \brief
+     *
+     */
+    CPU();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual ~CPU();
+    /**
+     * \brief
+     * 
+     */
+    virtual ~CPU();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void Builder();
+    /**
+     * \brief
+     * 
+     */
+    virtual void Builder();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		std::string GetVendor();
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		std::string GetModel();
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		std::string GetName();
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		std::string GetMHz();
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		std::string GetCache();
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		std::string GetBogomips();
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		std::string GetFlags();
+    /**
+     * \brief
+     * 
+     */
+    std::string GetVendor();
+    
+    /**
+     * \brief
+     * 
+     */
+    std::string GetModel();
+    
+    /**
+     * \brief
+     * 
+     */
+    std::string GetName();
+    
+    /**
+     * \brief
+     * 
+     */
+    std::string GetMHz();
+    
+    /**
+     * \brief
+     * 
+     */
+    std::string GetCache();
+    
+    /**
+     * \brief
+     * 
+     */
+    std::string GetBogomips();
+    
+    /**
+     * \brief
+     * 
+     */
+    std::string GetFlags();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string What();
-		
+    /**
+     * \brief
+     *
+     */
+    virtual std::string What();
+    
 };
 
 }

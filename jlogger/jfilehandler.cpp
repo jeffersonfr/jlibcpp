@@ -23,37 +23,37 @@
 namespace jlogger {
 
 FileHandler::FileHandler(std::string filename_):
-	jlogger::StreamHandler()
+  jlogger::StreamHandler()
 {
-	jcommon::Object::SetClassName("jlogger::FileHandler");
+  jcommon::Object::SetClassName("jlogger::FileHandler");
 
-	_file = jio::File::OpenFile(filename_, (jio::jfile_flags_t)(jio::JFF_WRITE_ONLY | jio::JFF_LARGEFILE | jio::JFF_APPEND));
+  _file = jio::File::OpenFile(filename_, (jio::jfile_flags_t)(jio::JFF_WRITE_ONLY | jio::JFF_LARGEFILE | jio::JFF_APPEND));
 
-	if (_file == nullptr) {
-		_file = jio::File::CreateFile(filename_, (jio::jfile_flags_t)(jio::JFF_WRITE_ONLY | jio::JFF_LARGEFILE));
-	}
-		
-	if (_file == nullptr) {
-		throw jexception::LoggerException("Unable to create the log file");
-	}
+  if (_file == nullptr) {
+    _file = jio::File::CreateFile(filename_, (jio::jfile_flags_t)(jio::JFF_WRITE_ONLY | jio::JFF_LARGEFILE));
+  }
+    
+  if (_file == nullptr) {
+    throw jexception::LoggerException("Unable to create the log file");
+  }
 }
 
 FileHandler::~FileHandler()
 {
-	try {
-		_file->Close();
-	} catch (...) {
-	}
+  try {
+    _file->Close();
+  } catch (...) {
+  }
 }
 
 void FileHandler::WriteRecord(LogRecord *record_)
 {
-	_mutex.lock();
-	
-	_file->Write(record_->GetRecord().c_str(), record_->GetRecord().size());
-	_file->Flush();
+  _mutex.lock();
+  
+  _file->Write(record_->GetRecord().c_str(), record_->GetRecord().size());
+  _file->Flush();
 
-	_mutex.unlock();
+  _mutex.unlock();
 }
 
 }

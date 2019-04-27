@@ -25,34 +25,34 @@
 
 namespace jmath {
 
-template<>double Math<double>::PI									= 3.14159265358979323846;
-template<>double Math<double>::e									= 2.71828182845904523536;
-template<>double Math<double>::ln10								= 2.30258509299404568402;
-template<>double Math<double>::logE								= 0.43429448190325182765;
-template<>double Math<double>::C									= 2.99792458e8;
-template<>double Math<double>::Cuncertainty				= 0.0;
-template<>double Math<double>::G									= 6.673e-11;
-template<>double Math<double>::Guncertainty				= 0.010e-11;
-template<>double Math<double>::GhbarC							= 6.707e-39;
-template<>double Math<double>::GhbarCuncertainty	= 0.010e-39;
-template<>double Math<double>::Gn									= 9.80665;
-template<>double Math<double>::GnUncertainty			= 0.0;
-template<>double Math<double>::H									= 6.62606876e-34;
-template<>double Math<double>::HUncertainty				= 0.00000052e-34;
-template<>double Math<double>::Hbar								= 1.054571596e-34;
-template<>double Math<double>::HbarUncertainty		= 0.000000082e-34;
-template<>double Math<double>::K									= 1.3806503e-23;
-template<>double Math<double>::KUncertainty				= 0.0000024e-23;
-template<>double Math<double>::Sigma							= 5.6704e-8;
-template<>double Math<double>::SigmaUncertainty		= 0.000040e-8;
-template<>double Math<double>::Na									= 6.02214199e+23;
-template<>double Math<double>::NaUncertainty			= 0.00000047e+23;
-template<>double Math<double>::R									= K*Na;
-template<>double Math<double>::RUncertainty				= R * ((KUncertainty / K) + (NaUncertainty / Na));
-template<>double Math<double>::MWair							= 28.9644;
-template<>double Math<double>::Rgair							= (1000.0 * R) / MWair;
-template<>double Math<double>::Qe									= 1.602176462e-19;
-template<>double Math<double>::QeUncertainty			= 0.000000063e-19;
+template<>double Math<double>::PI                  = 3.14159265358979323846;
+template<>double Math<double>::e                  = 2.71828182845904523536;
+template<>double Math<double>::ln10                = 2.30258509299404568402;
+template<>double Math<double>::logE                = 0.43429448190325182765;
+template<>double Math<double>::C                  = 2.99792458e8;
+template<>double Math<double>::Cuncertainty        = 0.0;
+template<>double Math<double>::G                  = 6.673e-11;
+template<>double Math<double>::Guncertainty        = 0.010e-11;
+template<>double Math<double>::GhbarC              = 6.707e-39;
+template<>double Math<double>::GhbarCuncertainty  = 0.010e-39;
+template<>double Math<double>::Gn                  = 9.80665;
+template<>double Math<double>::GnUncertainty      = 0.0;
+template<>double Math<double>::H                  = 6.62606876e-34;
+template<>double Math<double>::HUncertainty        = 0.00000052e-34;
+template<>double Math<double>::Hbar                = 1.054571596e-34;
+template<>double Math<double>::HbarUncertainty    = 0.000000082e-34;
+template<>double Math<double>::K                  = 1.3806503e-23;
+template<>double Math<double>::KUncertainty        = 0.0000024e-23;
+template<>double Math<double>::Sigma              = 5.6704e-8;
+template<>double Math<double>::SigmaUncertainty    = 0.000040e-8;
+template<>double Math<double>::Na                  = 6.02214199e+23;
+template<>double Math<double>::NaUncertainty      = 0.00000047e+23;
+template<>double Math<double>::R                  = K*Na;
+template<>double Math<double>::RUncertainty        = R * ((KUncertainty / K) + (NaUncertainty / Na));
+template<>double Math<double>::MWair              = 28.9644;
+template<>double Math<double>::Rgair              = (1000.0 * R) / MWair;
+template<>double Math<double>::Qe                  = 1.602176462e-19;
+template<>double Math<double>::QeUncertainty      = 0.000000063e-19;
 
 static const int kWorkMax = 100;
 

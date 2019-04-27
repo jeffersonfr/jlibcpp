@@ -22,11 +22,11 @@
 namespace jevent {
 
 ToggleEvent::ToggleEvent(void *source, bool selected):
-	jevent::EventObject(source)
+  jevent::EventObject(source)
 {
-	jcommon::Object::SetClassName("jevent::ToggleEvent");
+  jcommon::Object::SetClassName("jevent::ToggleEvent");
 
-	_selected = selected;
+  _selected = selected;
 }
 
 ToggleEvent::~ToggleEvent()
@@ -35,7 +35,7 @@ ToggleEvent::~ToggleEvent()
 
 bool ToggleEvent::IsSelected()
 {
-	return _selected;
+  return _selected;
 }
 
 }

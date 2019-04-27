@@ -37,86 +37,86 @@ class SSLSocket;
  */
 class SSLServerSocket6 : public virtual jcommon::Object {
 
-	private:
-		/** \brief Local socket. */
-		sockaddr_in6 _lsock;
-		/** \brief Remote socket. */
-		sockaddr_in6 _rsock;
-		/** \brief */
-		InetAddress6 *_local;
-		/** \brief */
-		SSLContext *_ctx;
-		/** \brief */
-		int _fd;
-		/** \brief */
-		bool _is_closed;
+  private:
+    /** \brief Local socket. */
+    sockaddr_in6 _lsock;
+    /** \brief Remote socket. */
+    sockaddr_in6 _rsock;
+    /** \brief */
+    InetAddress6 *_local;
+    /** \brief */
+    SSLContext *_ctx;
+    /** \brief */
+    int _fd;
+    /** \brief */
+    bool _is_closed;
 
-		/**
-		 * \brief
-		 *
-		 */
-		void CreateSocket();
+    /**
+     * \brief
+     *
+     */
+    void CreateSocket();
 
-		/**
-		 * \brief
-		 *
-		 */
-		void BindSocket(InetAddress *, int);
+    /**
+     * \brief
+     *
+     */
+    void BindSocket(InetAddress *, int);
 
-		/**
-		 * \brief
-		 *
-		 */
-		void ListenSocket(int);
+    /**
+     * \brief
+     *
+     */
+    void ListenSocket(int);
 
-	public:
-		/**
-		 * \brief Constructor.
-		 *
-		 */
-		SSLServerSocket6(SSLContext *ctx, int port, int backlog = 5, InetAddress * = nullptr);
+  public:
+    /**
+     * \brief Constructor.
+     *
+     */
+    SSLServerSocket6(SSLContext *ctx, int port, int backlog = 5, InetAddress * = nullptr);
 
-		/**
-		 * \brief Destructor virtual.
-		 *
-		 */
-		virtual ~SSLServerSocket6();
+    /**
+     * \brief Destructor virtual.
+     *
+     */
+    virtual ~SSLServerSocket6();
 
-		/**
-		 * \brief Accept a new socket.
-		 *
-		 */
-		virtual SSLSocket6 * Accept();
+    /**
+     * \brief Accept a new socket.
+     *
+     */
+    virtual SSLSocket6 * Accept();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual SSLContext * GetContext();
+    /**
+     * \brief
+     *
+     */
+    virtual SSLContext * GetContext();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual InetAddress * GetInetAddress();
+    /**
+     * \brief
+     *
+     */
+    virtual InetAddress * GetInetAddress();
 
-		/**
-		 * \brief Get the local port.
-		 *
-		 */
-		virtual int GetLocalPort();
+    /**
+     * \brief Get the local port.
+     *
+     */
+    virtual int GetLocalPort();
 
-		/**
-		 * \brief Close the server socket.
-		 *
-		 */
-		virtual void Close();
+    /**
+     * \brief Close the server socket.
+     *
+     */
+    virtual void Close();
 
-		/**
-		 * \brief 
-		 *
-		 */
-		virtual bool IsClosed();
+    /**
+     * \brief 
+     *
+     */
+    virtual bool IsClosed();
 
 };
 

@@ -31,52 +31,52 @@ namespace jexception {
  */
 class LoggerException : public jexception::RuntimeException {
 
-	private:
+  private:
 
-	public:
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		LoggerException();
+  public:
+    /**
+     * \brief Construtor.
+     *
+     */
+    LoggerException();
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		LoggerException(std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    LoggerException(std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		LoggerException(jexception::Exception *exception, std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    LoggerException(jexception::Exception *exception, std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> LoggerException(const std::string &fmt, T ...vs):
       Exception(fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::LoggerException");
     }
-		
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> LoggerException(Exception *exception, const std::string &fmt, T ...vs):
       Exception(exception, fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::LoggerException");
     }
-		
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~LoggerException() throw();
+    
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~LoggerException() throw();
 
 };
 

@@ -31,21 +31,21 @@ namespace jevent {
  */
 class Listener : public virtual jcommon::Object {
 
-	private:
+  private:
 
-		
-	public:
-		/**
-		 * \brief
-		 * 
-		 */
-		Listener();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~Listener();
+    
+  public:
+    /**
+     * \brief
+     * 
+     */
+    Listener();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~Listener();
 
 };
 

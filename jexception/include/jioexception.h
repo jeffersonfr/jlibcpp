@@ -31,52 +31,52 @@ namespace jexception {
  */
 class IOException : public jexception::RuntimeException {
 
-	private:
+  private:
 
-	public:
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		IOException();
+  public:
+    /**
+     * \brief Construtor.
+     *
+     */
+    IOException();
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		IOException(std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    IOException(std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		IOException(Exception *exception, std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    IOException(Exception *exception, std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> IOException(const std::string &fmt, T ...vs):
       Exception(fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::IOException");
     }
-		
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> IOException(Exception *exception, const std::string &fmt, T ...vs):
       Exception(exception, fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::IOException");
     }
-		
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~IOException() throw();
+    
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~IOException() throw();
 
 };
 

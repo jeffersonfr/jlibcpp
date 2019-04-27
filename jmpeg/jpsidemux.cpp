@@ -27,51 +27,51 @@
 namespace jmpeg {
 
 PSIDemux::PSIDemux():
-	Demux(JDT_PSI)
+  Demux(JDT_PSI)
 {
-	jcommon::Object::SetClassName("jmpeg::PSIDemux");
+  jcommon::Object::SetClassName("jmpeg::PSIDemux");
 
   _tid = -1;
-	_is_crc_enabled = true;
+  _is_crc_enabled = true;
   _is_crc_failed = false;
 }
-		
+    
 PSIDemux::~PSIDemux()
 {
 }
 
 void PSIDemux::SetTID(int tid)
 {
-	_tid = tid;
+  _tid = tid;
 }
 
 int PSIDemux::GetTID()
 {
-	return _tid;
+  return _tid;
 }
 
 void PSIDemux::SetCRCCheckEnabled(bool b)
 {
-	_is_crc_enabled = b;
+  _is_crc_enabled = b;
 }
 
 bool PSIDemux::IsCRCCheckEnabled()
 {
-	return _is_crc_enabled;
+  return _is_crc_enabled;
 }
 
 bool PSIDemux::IsCRCFailed()
 {
-	return _is_crc_failed;
+  return _is_crc_failed;
 }
 
 bool PSIDemux::Append(const char *data, int data_length)
 {
-	int table_id = TS_G8(data);
+  int table_id = TS_G8(data);
 
-	if (_tid >= 0 && _tid != table_id) {
-		return false;
-	}
+  if (_tid >= 0 && _tid != table_id) {
+    return false;
+  }
 
   int section_length = TS_PSI_G_SECTION_LENGTH(data) + 3;
 
@@ -93,7 +93,7 @@ bool PSIDemux::Append(const char *data, int data_length)
     }
   }
 
-	return true;
+  return true;
 }
 
 }

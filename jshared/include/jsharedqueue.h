@@ -30,22 +30,22 @@
 namespace jshared {
 
 struct jshmhandle_t {
-	int sid;
-	void *mem;
-	int privsz;		// size of single priv structure of upper program 
-	int semid;		// semaphore id 
-	int sz;			// size of shared mem in bytes 
+  int sid;
+  void *mem;
+  int privsz;    // size of single priv structure of upper program 
+  int semid;    // semaphore id 
+  int sz;      // size of shared mem in bytes 
 };
 
 struct jshmprefix_t {
-	int counter;
-	int read;		// offsets from shm->mem where we should read and write
-	int write;		// min value for both is shm->privsz+sizeof(struct shmprefix)
+  int counter;
+  int read;    // offsets from shm->mem where we should read and write
+  int write;    // min value for both is shm->privsz+sizeof(struct shmprefix)
 };
 
 struct jshmbh_t {
-	int sz;
-	unsigned canary;
+  int sz;
+  unsigned canary;
 };
 
 /**
@@ -55,120 +55,120 @@ struct jshmbh_t {
  */
 class SharedQueue : public virtual jcommon::Object {
 
-	private:
+  private:
     /** \brief */
-		struct jshmhandle_t *_shm;
+    struct jshmhandle_t *_shm;
 
-	private:
-		/**
-		 * \brief
-		 *
-		 */
-		void LLHRewind();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int LLMemFree();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int LLMemUsed();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int LLPut(void *data, int sz);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int LLGet(void *data, int sz);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void Lock();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void Unlock();
+  private:
+    /**
+     * \brief
+     *
+     */
+    void LLHRewind();
+    
+    /**
+     * \brief
+     *
+     */
+    int LLMemFree();
+    
+    /**
+     * \brief
+     *
+     */
+    int LLMemUsed();
+    
+    /**
+     * \brief
+     *
+     */
+    int LLPut(void *data, int sz);
+    
+    /**
+     * \brief
+     *
+     */
+    int LLGet(void *data, int sz);
+    
+    /**
+     * \brief
+     *
+     */
+    void Lock();
+    
+    /**
+     * \brief
+     *
+     */
+    void Unlock();
 
-	public:
-		/**
-		 * \brief Constructor. 
-		 *
-		 */
-		SharedQueue(key_t key_, int npages_, int struct_size_);
-	
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~SharedQueue();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Attach();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Deallocate();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Detach();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Setpriv(void *priv);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Getpriv(void *priv);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int Get(void *data,int sz);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int Put(void *data, int sz);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsEmpty();
-		
-		/**
-		 * \brief Close.
-		 *
-		 */
-		virtual void Close();
-		
+  public:
+    /**
+     * \brief Constructor. 
+     *
+     */
+    SharedQueue(key_t key_, int npages_, int struct_size_);
+  
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~SharedQueue();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Attach();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Deallocate();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Detach();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Setpriv(void *priv);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Getpriv(void *priv);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int Get(void *data,int sz);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int Put(void *data, int sz);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsEmpty();
+    
+    /**
+     * \brief Close.
+     *
+     */
+    virtual void Close();
+    
 };
 
 }

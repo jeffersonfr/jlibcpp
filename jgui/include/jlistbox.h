@@ -32,9 +32,9 @@ namespace jgui {
  *
  */
 enum jlistbox_mode_t {
-	JLBM_NONE_SELECTION,
-	JLBM_SINGLE_SELECTION,
-	JLBM_MULTI_SELECTION
+  JLBM_NONE_SELECTION,
+  JLBM_SINGLE_SELECTION,
+  JLBM_MULTI_SELECTION
 };
 
 /**
@@ -44,160 +44,160 @@ enum jlistbox_mode_t {
  */
 class ListBox : public jgui::Component, public jgui::ItemComponent {
 
-	private:
-		/** \brief */
-		int _selected_index;
-		/** \brief */
-		bool _pressed;
-		/** \brief */
-		jlistbox_mode_t _mode;
+  private:
+    /** \brief */
+    int _selected_index;
+    /** \brief */
+    bool _pressed;
+    /** \brief */
+    jlistbox_mode_t _mode;
 
-	private:
-		/**
-		 * \brief
-		 *
-		 */
-		void IncrementLines(int lines);
+  private:
+    /**
+     * \brief
+     *
+     */
+    void IncrementLines(int lines);
 
-		/**
-		 * \brief
-		 *
-		 */
-		void DecrementLines(int lines);
+    /**
+     * \brief
+     *
+     */
+    void DecrementLines(int lines);
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		ListBox(int x = 0, int y = 0, int width = 0, int height = 0);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~ListBox();
+  public:
+    /**
+     * \brief
+     *
+     */
+    ListBox(int x = 0, int y = 0, int width = 0, int height = 0);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~ListBox();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetSelectionType(jlistbox_mode_t type);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jlistbox_mode_t GetSelectionType();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void AddEmptyItem();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void AddTextItem(std::string text);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void AddImageItem(std::string text, jgui::Image *image);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void AddCheckedItem(std::string text, bool checked);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetSelectionType(jlistbox_mode_t type);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual jlistbox_mode_t GetSelectionType();
+    
+    /**
+     * \brief
+     *
+     */
+    void AddEmptyItem();
+    
+    /**
+     * \brief
+     *
+     */
+    void AddTextItem(std::string text);
+    
+    /**
+     * \brief
+     *
+     */
+    void AddImageItem(std::string text, jgui::Image *image);
+    
+    /**
+     * \brief
+     *
+     */
+    void AddCheckedItem(std::string text, bool checked);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsSelected(int i);
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsSelected(int i);
 
-		/**
-		 * \brief Invert current selection state from item. Use with IsSelected() to avoid
-		 * unexpected states.
-		 *
-		 */
-		virtual void SetSelected(int i);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Select(int i);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Deselect(int i);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetSelectedIndex();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetCurrentIndex(int i);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jsize_t GetPreferredSize();
+    /**
+     * \brief Invert current selection state from item. Use with IsSelected() to avoid
+     * unexpected states.
+     *
+     */
+    virtual void SetSelected(int i);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Select(int i);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Deselect(int i);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int GetSelectedIndex();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetCurrentIndex(int i);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual jsize_t GetPreferredSize();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jsize_t GetScrollDimension();
+    /**
+     * \brief
+     *
+     */
+    virtual jsize_t GetScrollDimension();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool KeyPressed(jevent::KeyEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual bool KeyPressed(jevent::KeyEvent *event);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MousePressed(jevent::MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MouseReleased(jevent::MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MouseMoved(jevent::MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MouseWheel(jevent::MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Paint(Graphics *g);
+    /**
+     * \brief
+     *
+     */
+    virtual bool MousePressed(jevent::MouseEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool MouseReleased(jevent::MouseEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool MouseMoved(jevent::MouseEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool MouseWheel(jevent::MouseEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Paint(Graphics *g);
 
 };
 

@@ -32,31 +32,31 @@ namespace jevent {
  */
 class SelectListener : public jevent::Listener {
 
-	protected:
-		/**
-		 * \brief
-		 *
-		 */
-		SelectListener();
+  protected:
+    /**
+     * \brief
+     *
+     */
+    SelectListener();
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~SelectListener();
+  public:
+    /**
+     * \brief
+     *
+     */
+    virtual ~SelectListener();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void ItemChanged(SelectEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void ItemSelected(SelectEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual void ItemChanged(SelectEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void ItemSelected(SelectEvent *event);
 
 };
 

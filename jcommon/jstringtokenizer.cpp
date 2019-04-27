@@ -24,9 +24,9 @@ namespace jcommon {
 
 StringTokenizer::StringTokenizer(std::string string_, std::string token_, jtoken_type_t flag_, bool return_tokens_)
 {
-	jcommon::Object::SetClassName("jcommon::StringTokenizer");
-	
-	BuildTokens(string_, token_, flag_, return_tokens_);
+  jcommon::Object::SetClassName("jcommon::StringTokenizer");
+  
+  BuildTokens(string_, token_, flag_, return_tokens_);
 }
 
 StringTokenizer::~StringTokenizer()
@@ -35,61 +35,61 @@ StringTokenizer::~StringTokenizer()
 
 void StringTokenizer::BuildTokens(std::string string_, std::string token_, jtoken_type_t flag_, bool return_tokens_)
 {
-	if (flag_ == JTT_CHAR) {
-		std::string::size_type idx = 0; 
-		
-		while (true) {
-			if (idx < string_.size()) {
-				std::string::size_type s = string_.find_first_of(token_, idx);
-				std::string::size_type e = string_.find_first_not_of(token_, idx);
+  if (flag_ == JTT_CHAR) {
+    std::string::size_type idx = 0; 
+    
+    while (true) {
+      if (idx < string_.size()) {
+        std::string::size_type s = string_.find_first_of(token_, idx);
+        std::string::size_type e = string_.find_first_not_of(token_, idx);
 
-				if ( !(s == idx && return_tokens_) ) {
-					s = e;
-					e = string_.find_first_of(token_, s);
-				} else {
-					e = s + 1;
-				}
-				
-				idx = e;
-				
-				if (idx == std::string::npos) {
-					break;
-				}
-			
-				_tokens.push_back(string_.substr(s, e-s));
-			} else {
-				break;
-			}
-		}
-	} else if (flag_ == JTT_STRING) {
-		std::string::size_type pos = string_.find(token_);
+        if ( !(s == idx && return_tokens_) ) {
+          s = e;
+          e = string_.find_first_of(token_, s);
+        } else {
+          e = s + 1;
+        }
+        
+        idx = e;
+        
+        if (idx == std::string::npos) {
+          break;
+        }
+      
+        _tokens.push_back(string_.substr(s, e-s));
+      } else {
+        break;
+      }
+    }
+  } else if (flag_ == JTT_STRING) {
+    std::string::size_type pos = string_.find(token_);
 
-		if (pos != std::string::npos) {
-			_tokens.push_back(string_.substr(0, pos));
-			
-			if (return_tokens_ == true) {
-				_tokens.push_back(token_);
-			}
-			
-			BuildTokens(string_.substr(pos+token_.size(), string_.length()), token_, flag_, return_tokens_);
-		} else {
-			_tokens.push_back(string_);
-		}
-	}
+    if (pos != std::string::npos) {
+      _tokens.push_back(string_.substr(0, pos));
+      
+      if (return_tokens_ == true) {
+        _tokens.push_back(token_);
+      }
+      
+      BuildTokens(string_.substr(pos+token_.size(), string_.length()), token_, flag_, return_tokens_);
+    } else {
+      _tokens.push_back(string_);
+    }
+  }
 }
 
 int StringTokenizer::GetSize()
 {
-	return _tokens.size();
+  return _tokens.size();
 }
 
 std::string StringTokenizer::GetToken(int i)
 {
-	if (i < 0 || i > GetSize()) {
-		throw jexception::OutOfBoundsException("Index of token is invalid");
-	}
-	
-	return _tokens[i];
+  if (i < 0 || i > GetSize()) {
+    throw jexception::OutOfBoundsException("Index of token is invalid");
+  }
+  
+  return _tokens[i];
 }
 
 }

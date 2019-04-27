@@ -31,34 +31,34 @@ namespace jlogger {
 */
 class Formatter : public virtual jcommon::Object {
 
-	private:
+  private:
 
-		
-	public:
-		/**
-		 * \brief
-		 * 
-		 */
-		Formatter();
+    
+  public:
+    /**
+     * \brief
+     * 
+     */
+    Formatter();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual ~Formatter();
+    /**
+     * \brief
+     * 
+     */
+    virtual ~Formatter();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void Transform(LogRecord *) = 0;
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual LogRecord * Release() = 0;
-		
+    /**
+     * \brief
+     * 
+     */
+    virtual void Transform(LogRecord *) = 0;
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual LogRecord * Release() = 0;
+    
 };
 
 }

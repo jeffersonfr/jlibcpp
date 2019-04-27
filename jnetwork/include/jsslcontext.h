@@ -58,114 +58,114 @@ namespace jnetwork {
  */
 class SSLContext : public virtual jcommon::Object {
 
-	private:
-		/** \brief */
-		SSL_CTX *_ctx;
+  private:
+    /** \brief */
+    SSL_CTX *_ctx;
 
-	private:
-		/**
-		 * \brief
-		 *
-		 */
-		RSA * GenerateRSAKey(int len, int exp = RSA_KEYEXP);
+  private:
+    /**
+     * \brief
+     *
+     */
+    RSA * GenerateRSAKey(int len, int exp = RSA_KEYEXP);
 
-		/**
-		 * \brief
-		 *
-		 */
-		EVP_PKEY * GeneratePKey(RSA *rsakey);
+    /**
+     * \brief
+     *
+     */
+    EVP_PKEY * GeneratePKey(RSA *rsakey);
 
-		/**
-		 * /brief Create temporary certificate.
-		 *
-		 */
-		X509 * BuildCertificate(std::string name, std::string organization, std::string country, EVP_PKEY *key);
+    /**
+     * /brief Create temporary certificate.
+     *
+     */
+    X509 * BuildCertificate(std::string name, std::string organization, std::string country, EVP_PKEY *key);
 
-	private:
-		/**
-		 * \brief Constructor.
-		 *
-		 */
-		SSLContext(SSL_METHOD *method);
+  private:
+    /**
+     * \brief Constructor.
+     *
+     */
+    SSLContext(SSL_METHOD *method);
 
-		/**
-		 * \brief Constructor.
-		 *
-		 */
-		SSLContext(std::string ca_file, SSL_METHOD *method);
+    /**
+     * \brief Constructor.
+     *
+     */
+    SSLContext(std::string ca_file, SSL_METHOD *method);
 
-	public:
-		/**
-		 * \brief Destructor virtual.
-		 *
-		 */
-		virtual ~SSLContext();
+  public:
+    /**
+     * \brief Destructor virtual.
+     *
+     */
+    virtual ~SSLContext();
 
-		/**
-		 * \brief 
-		 *
-		 */
-		static SSLContext * CreateServerContext(SSL_METHOD *method = nullptr);
+    /**
+     * \brief 
+     *
+     */
+    static SSLContext * CreateServerContext(SSL_METHOD *method = nullptr);
 
-		/**
-		 * \brief 
-		 *
-		 */
-		static SSLContext * CreateClientContext(std::string ca_file, SSL_METHOD *method = nullptr);
+    /**
+     * \brief 
+     *
+     */
+    static SSLContext * CreateClientContext(std::string ca_file, SSL_METHOD *method = nullptr);
 
-		/**
-		 * \brief 
-		 *
-		 */
-		virtual SSL_CTX * GetSSLContext();
+    /**
+     * \brief 
+     *
+     */
+    virtual SSL_CTX * GetSSLContext();
 
-		/**
-		 * \brief 
-		 *
-		 */
-		virtual bool SetCertificate(std::string cert_file, std::string pkey_file);
+    /**
+     * \brief 
+     *
+     */
+    virtual bool SetCertificate(std::string cert_file, std::string pkey_file);
 
-		/**
-		 * \brief 
-		 *
-		 */
-		virtual bool SetCertificate(std::string cert_file, std::string pkey_file, std::string password);
+    /**
+     * \brief 
+     *
+     */
+    virtual bool SetCertificate(std::string cert_file, std::string pkey_file, std::string password);
 
-		/**
-		 * \brief 
-		 *
-		 */
-		virtual bool SetCertificate(std::string cert_file, std::string pkey_file, int passwd_cb(char *buf, int size, int rwflag, void *userdata), char *userdata);
+    /**
+     * \brief 
+     *
+     */
+    virtual bool SetCertificate(std::string cert_file, std::string pkey_file, int passwd_cb(char *buf, int size, int rwflag, void *userdata), char *userdata);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool VerifyRootAuthorityFile(std::string file);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool VerifyRootAuthorityLocation(std::string file);
+    /**
+     * \brief
+     *
+     */
+    virtual bool VerifyRootAuthorityFile(std::string file);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool VerifyRootAuthorityLocation(std::string file);
 
-		/**
-		 * \brief 
-		 *
-		 */
-		virtual void SetRootAuthorities(std::string file, int depth = 1);
+    /**
+     * \brief 
+     *
+     */
+    virtual void SetRootAuthorities(std::string file, int depth = 1);
 
-		/**
-		 * \brief 
-		 *
-		 */
-		virtual void SetDHFile(std::string file);
+    /**
+     * \brief 
+     *
+     */
+    virtual void SetDHFile(std::string file);
 
-		/**
-		 * \brief 
-		 *
-		 */
-		virtual void SetCertificateChain(std::string cert_file);
+    /**
+     * \brief 
+     *
+     */
+    virtual void SetCertificateChain(std::string cert_file);
 
 };
 

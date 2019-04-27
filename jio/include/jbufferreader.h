@@ -18,7 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #ifndef BUFFERREADER_H
-#define	BUFFERREADER_H
+#define  BUFFERREADER_H
 
 #include "jio/jbuffer.h"
 
@@ -26,94 +26,94 @@ namespace jio {
 
 class BufferReader : public virtual jcommon::Object {
 
-	protected:
-		/** \brief */
-		jio::Buffer _buffer;
+  protected:
+    /** \brief */
+    jio::Buffer _buffer;
 
-	public:
-		/**
-		 * \brief Contructor.
-		 *
-		 */
-		BufferReader();
+  public:
+    /**
+     * \brief Contructor.
+     *
+     */
+    BufferReader();
 
-		/**
-		 * \brief Contructor.
-		 *
-		 */
-		BufferReader(char *data, int64_t size);
+    /**
+     * \brief Contructor.
+     *
+     */
+    BufferReader(char *data, int64_t size);
 
-		/**
-		 * \brief Destructor.
-		 *
-		 */
-		virtual ~BufferReader();
+    /**
+     * \brief Destructor.
+     *
+     */
+    virtual ~BufferReader();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void PushData(char *data, int64_t size);
+    /**
+     * \brief
+     *
+     */
+    virtual void PushData(char *data, int64_t size);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool ReadBoolean();
+    /**
+     * \brief
+     *
+     */
+    virtual bool ReadBoolean();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual uint8_t ReadByte();
+    /**
+     * \brief
+     *
+     */
+    virtual uint8_t ReadByte();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual uint16_t ReadShort();
+    /**
+     * \brief
+     *
+     */
+    virtual uint16_t ReadShort();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual uint32_t ReadInteger();
+    /**
+     * \brief
+     *
+     */
+    virtual uint32_t ReadInteger();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual uint64_t ReadLong();
+    /**
+     * \brief
+     *
+     */
+    virtual uint64_t ReadLong();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual float ReadFloat();
+    /**
+     * \brief
+     *
+     */
+    virtual float ReadFloat();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual double ReadDouble();
+    /**
+     * \brief
+     *
+     */
+    virtual double ReadDouble();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string ReadString();
+    /**
+     * \brief
+     *
+     */
+    virtual std::string ReadString();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual char * ReadRaw(int64_t *size);
+    /**
+     * \brief
+     *
+     */
+    virtual char * ReadRaw(int64_t *size);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Reset();
+    /**
+     * \brief
+     *
+     */
+    virtual void Reset();
 
 };
 

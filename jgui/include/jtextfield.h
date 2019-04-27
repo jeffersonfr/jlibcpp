@@ -31,56 +31,56 @@ namespace jgui {
  */
 class TextField : public jgui::TextComponent {
 
-	private:
+  private:
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		TextField(int x = 0, int y = 0, int width = DEFAULT_COMPONENT_WIDTH, int height = DEFAULT_COMPONENT_HEIGHT);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~TextField();
+  public:
+    /**
+     * \brief
+     *
+     */
+    TextField(int x = 0, int y = 0, int width = DEFAULT_COMPONENT_WIDTH, int height = DEFAULT_COMPONENT_HEIGHT);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~TextField();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Paint(Graphics *g);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool KeyPressed(jevent::KeyEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual void Paint(Graphics *g);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool KeyPressed(jevent::KeyEvent *event);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MousePressed(jevent::MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MouseReleased(jevent::MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MouseMoved(jevent::MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MouseWheel(jevent::MouseEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual bool MousePressed(jevent::MouseEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool MouseReleased(jevent::MouseEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool MouseMoved(jevent::MouseEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool MouseWheel(jevent::MouseEvent *event);
 
 };
 

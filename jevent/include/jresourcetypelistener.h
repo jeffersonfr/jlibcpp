@@ -32,33 +32,33 @@ namespace jevent {
  */
 class ResourceTypeListener : public jevent::Listener {
 
-	private:
+  private:
 
-		
-	public:
-		/**
-		 * \brief
-		 * 
-		 */
-		ResourceTypeListener();
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual ~ResourceTypeListener();
+    
+  public:
+    /**
+     * \brief
+     * 
+     */
+    ResourceTypeListener();
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual ~ResourceTypeListener();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void Reserved(ResourceTypeEvent *event);
+    /**
+     * \brief
+     * 
+     */
+    virtual void Reserved(ResourceTypeEvent *event);
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void Released(ResourceTypeEvent *event);
+    /**
+     * \brief
+     * 
+     */
+    virtual void Released(ResourceTypeEvent *event);
 
 };
 

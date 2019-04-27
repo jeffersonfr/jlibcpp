@@ -33,48 +33,48 @@ namespace jmath {
  */
 class Base64 : public virtual jcommon::Object {
 
-	private:
-		/** \brief */
-		std::string jBase64_code;
-		/** \brief */
-		char jBase64_pad;
+  private:
+    /** \brief */
+    std::string jBase64_code;
+    /** \brief */
+    char jBase64_pad;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		Base64();
+  public:
+    /**
+     * \brief
+     *
+     */
+    Base64();
 
-		/**
-		 * \brief
-		 *
-		 */
-		~Base64();
+    /**
+     * \brief
+     *
+     */
+    ~Base64();
 
-		/**
-		 * \brief
-		 *
-		 */
-		void SetCode(std::string code);
+    /**
+     * \brief
+     *
+     */
+    void SetCode(std::string code);
 
-		/**
-		 * \brief
-		 *
-		 */
-		void SetPad(char pad);
+    /**
+     * \brief
+     *
+     */
+    void SetPad(char pad);
 
-		/**
-		 * \brief
-		 *
-		 */
-		char * Encode(uint8_t *src, int length);
+    /**
+     * \brief
+     *
+     */
+    char * Encode(uint8_t *src, int length);
 
-		/**
-		 * \brief
-		 *
-		 */
-		char * Decode(uint8_t *src, int length);
+    /**
+     * \brief
+     *
+     */
+    char * Decode(uint8_t *src, int length);
 };
 
 }

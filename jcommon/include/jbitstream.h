@@ -25,86 +25,86 @@
 namespace jcommon {
 
 class BitStream : public virtual jcommon::Object{
-	
-	private:
-		/** \brief */
-		char *_stream;
-		/** \brief */
-		int _size;
-		/** \brief */
-		int _offset;
-		/** \brief */
-		int _index;
-		/** \brief */
-		int _consumed;
-		
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		BitStream(char *stream, int size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~BitStream();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void Reset();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint64_t GetBits(int size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint8_t* GetBitsArray(int size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int Skip(int n);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int Back(int n);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int GetAvailable();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int GetPosition();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int SetPosition(int p);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		bool TestBit(int index);
-		
+  
+  private:
+    /** \brief */
+    char *_stream;
+    /** \brief */
+    int _size;
+    /** \brief */
+    int _offset;
+    /** \brief */
+    int _index;
+    /** \brief */
+    int _consumed;
+    
+  public:
+    /**
+     * \brief
+     *
+     */
+    BitStream(char *stream, int size);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~BitStream();
+    
+    /**
+     * \brief
+     *
+     */
+    void Reset();
+    
+    /**
+     * \brief
+     *
+     */
+    uint64_t GetBits(int size);
+    
+    /**
+     * \brief
+     *
+     */
+    uint8_t* GetBitsArray(int size);
+    
+    /**
+     * \brief
+     *
+     */
+    int Skip(int n);
+    
+    /**
+     * \brief
+     *
+     */
+    int Back(int n);
+    
+    /**
+     * \brief
+     *
+     */
+    int GetAvailable();
+    
+    /**
+     * \brief
+     *
+     */
+    int GetPosition();
+    
+    /**
+     * \brief
+     *
+     */
+    int SetPosition(int p);
+    
+    /**
+     * \brief
+     *
+     */
+    bool TestBit(int index);
+    
 };
 
 }

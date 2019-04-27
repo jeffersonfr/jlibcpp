@@ -24,19 +24,19 @@ namespace jexception {
 IOException::IOException():
   jexception::RuntimeException()
 {
-	jcommon::Object::SetClassName("jexception::IOException");
+  jcommon::Object::SetClassName("jexception::IOException");
 }
 
 IOException::IOException(std::string reason_):
   jexception::RuntimeException(reason_)
 {
-	jcommon::Object::SetClassName("jexception::IOException");
+  jcommon::Object::SetClassName("jexception::IOException");
 }
 
 IOException::IOException(Exception *exception, std::string reason_):
   jexception::RuntimeException(exception, reason_)
 {
-	jcommon::Object::SetClassName("jexception::IOException");
+  jcommon::Object::SetClassName("jexception::IOException");
 }
 
 IOException::~IOException() throw()

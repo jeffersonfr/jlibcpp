@@ -31,52 +31,52 @@ namespace jexception {
  */
 class PipeException : public jexception::RuntimeException {
 
-	private:
+  private:
 
-	public:
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		PipeException();
+  public:
+    /**
+     * \brief Construtor.
+     *
+     */
+    PipeException();
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		PipeException(std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    PipeException(std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		PipeException(jexception::Exception *exception, std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    PipeException(jexception::Exception *exception, std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> PipeException(const std::string &fmt, T ...vs):
       Exception(fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::PipeException");
     }
-		
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> PipeException(Exception *exception, const std::string &fmt, T ...vs):
       Exception(exception, fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::PipeException");
     }
-		
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~PipeException() throw();
+    
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~PipeException() throw();
 
 };
 

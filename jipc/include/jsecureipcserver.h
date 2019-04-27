@@ -32,30 +32,30 @@ namespace jipc {
  */
 class SecureIPCServer : public IPCServer {
 
-	private:
-		/** \brief */
-		jnetwork::SSLServerSocket *_server;
-		/** \brief */
-		jnetwork::SSLContext *_ctx;
+  private:
+    /** \brief */
+    jnetwork::SSLServerSocket *_server;
+    /** \brief */
+    jnetwork::SSLContext *_ctx;
 
-	public:
-		/**
-		 * \Constructor.
-		 *
-		 */
-		SecureIPCServer(jnetwork::SSLContext *ctx, int port);
+  public:
+    /**
+     * \Constructor.
+     *
+     */
+    SecureIPCServer(jnetwork::SSLContext *ctx, int port);
 
-		/**
-		 * \brief Destructor.
-		 *
-		 */
-		virtual ~SecureIPCServer();
+    /**
+     * \brief Destructor.
+     *
+     */
+    virtual ~SecureIPCServer();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void WaitCall(RemoteCallListener *listener);
+    /**
+     * \brief
+     *
+     */
+    virtual void WaitCall(RemoteCallListener *listener);
 
 };
 

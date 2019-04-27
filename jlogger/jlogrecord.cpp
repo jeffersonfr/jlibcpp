@@ -22,12 +22,12 @@
 namespace jlogger {
 
 LogRecord::LogRecord(jrecord_type_t type_, std::string record_):
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jlogger::LogRecord");
-	
-	_record = record_;
-	_type = type_;
+  jcommon::Object::SetClassName("jlogger::LogRecord");
+  
+  _record = record_;
+  _type = type_;
 }
 
 LogRecord::~LogRecord()
@@ -36,22 +36,22 @@ LogRecord::~LogRecord()
 
 std::string LogRecord::GetRecord()
 {
-	return _record;
+  return _record;
 }
 
 jrecord_type_t LogRecord::GetType()
 {
-	return _type;
+  return _type;
 }
 
 void LogRecord::SetRecord(std::string log)
 {
-	_record = log;
+  _record = log;
 }
 
 void LogRecord::SetType(jrecord_type_t t)
 {
-	_type = t;
+  _type = t;
 }
 
 }

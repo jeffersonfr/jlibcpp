@@ -31,42 +31,42 @@ namespace jevent {
  */
 class EventObject : public virtual jcommon::Object{
 
-	private:
-		/** \brief */
-		void *_source;
-		/** \brief */
-		bool _is_consumed;
+  private:
+    /** \brief */
+    void *_source;
+    /** \brief */
+    bool _is_consumed;
 
-	public:
-		/**
-		 * \brief
-		 * 
-		 */
-		EventObject(void *source);
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual ~EventObject();
+  public:
+    /**
+     * \brief
+     * 
+     */
+    EventObject(void *source);
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual ~EventObject();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void * GetSource();
+    /**
+     * \brief
+     * 
+     */
+    virtual void * GetSource();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void Consume();
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual bool IsConsumed();
+    /**
+     * \brief
+     * 
+     */
+    virtual void Consume();
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual bool IsConsumed();
 
 };
 

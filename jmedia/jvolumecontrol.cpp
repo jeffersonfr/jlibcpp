@@ -22,9 +22,9 @@
 namespace jmedia {
 
 VolumeControl::VolumeControl():
-	Control("audio.volume")
+  Control("audio.volume")
 {
-	jcommon::Object::SetClassName("jmedia::VolumeControl");
+  jcommon::Object::SetClassName("jmedia::VolumeControl");
 }
 
 VolumeControl::~VolumeControl()
@@ -33,7 +33,7 @@ VolumeControl::~VolumeControl()
 
 int VolumeControl::GetLevel()
 {
-	return 0;
+  return 0;
 }
 
 void VolumeControl::SetLevel(int level)
@@ -42,7 +42,7 @@ void VolumeControl::SetLevel(int level)
 
 bool VolumeControl::IsMute()
 {
-	return false;
+  return false;
 }
 
 void VolumeControl::SetMute(bool b)

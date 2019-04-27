@@ -36,78 +36,78 @@ class Socket6;
  */
 class ServerSocket6 : public virtual jcommon::Object {
 
-	private:
-		/** \brief Remote socket. */
-		struct sockaddr_in6 _rsock;
-		/** \brief Local socket. */
-		struct sockaddr_in6 _lsock;
-		/** \brief */
-		InetAddress6 *_local;
-		/** \brief */
-		int _fd;
-		/** \brief */
-		bool _is_closed;
+  private:
+    /** \brief Remote socket. */
+    struct sockaddr_in6 _rsock;
+    /** \brief Local socket. */
+    struct sockaddr_in6 _lsock;
+    /** \brief */
+    InetAddress6 *_local;
+    /** \brief */
+    int _fd;
+    /** \brief */
+    bool _is_closed;
         
-		/**
-		 * \brief
-		 *
-		 */
-		void CreateSocket();
+    /**
+     * \brief
+     *
+     */
+    void CreateSocket();
 
-		/**
-		 * \brief
-		 *
-		 */
-		void BindSocket(InetAddress *, int);
+    /**
+     * \brief
+     *
+     */
+    void BindSocket(InetAddress *, int);
 
-		/**
-		 * \brief
-		 *
-		 */
-		void ListenSocket(int);
+    /**
+     * \brief
+     *
+     */
+    void ListenSocket(int);
 
-	public:
-		/**
-		 * \brief Constructor.
-		 *
-		 */
-		ServerSocket6(int port, int backlog = 5, InetAddress * = nullptr);
+  public:
+    /**
+     * \brief Constructor.
+     *
+     */
+    ServerSocket6(int port, int backlog = 5, InetAddress * = nullptr);
 
-		/**
-		 * \brief Destructor virtual.
-		 *
-		 */
-		virtual ~ServerSocket6();
+    /**
+     * \brief Destructor virtual.
+     *
+     */
+    virtual ~ServerSocket6();
 
-		/**
-		 * \brief Accept a new socket.
-		 *
-		 */
-		Socket6 * Accept();
+    /**
+     * \brief Accept a new socket.
+     *
+     */
+    Socket6 * Accept();
 
-		/**
-		 * \brief
-		 *
-		 */
-		InetAddress * GetInetAddress();
+    /**
+     * \brief
+     *
+     */
+    InetAddress * GetInetAddress();
 
-		/**
-		 * \brief Get the local port.
-		 *
-		 */
-		int GetLocalPort();
+    /**
+     * \brief Get the local port.
+     *
+     */
+    int GetLocalPort();
 
-		/**
-		 * \brief Close the server socket.
-		 *
-		 */
-		void Close();
+    /**
+     * \brief Close the server socket.
+     *
+     */
+    void Close();
 
-		/**
-		 * \brief 
-		 *
-		 */
-		virtual bool IsClosed();
+    /**
+     * \brief 
+     *
+     */
+    virtual bool IsClosed();
 
 };
 

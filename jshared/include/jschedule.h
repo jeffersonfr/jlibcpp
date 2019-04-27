@@ -36,9 +36,9 @@ namespace jshared {
  *
  */
 enum jschedule_policy_t {
-	JSP_FIFO,
-	JSP_ROUND_ROBIN,
-	JSP_OTHER
+  JSP_FIFO,
+  JSP_ROUND_ROBIN,
+  JSP_OTHER
 };
 
 /**
@@ -46,9 +46,9 @@ enum jschedule_policy_t {
  *
  */
 enum jschedule_type_t {
-	PRIORITY_PROCESS	= PRIO_PROCESS,
-	PRIORITY_GROUP		= PRIO_PGRP,
-	PRIORITY_USER			= PRIO_USER
+  PRIORITY_PROCESS  = PRIO_PROCESS,
+  PRIORITY_GROUP    = PRIO_PGRP,
+  PRIORITY_USER      = PRIO_USER
 };
 
 /**
@@ -56,7 +56,7 @@ enum jschedule_type_t {
  *
  */
 struct jschedule_param_t {
-	int priority;
+  int priority;
 };
 
 /**
@@ -68,99 +68,99 @@ class Schedule : public virtual jcommon::Object {
 
     private:
        /** \brief */
-			pid_t _pid;
+      pid_t _pid;
 
-	public:
-		/**
-		 * \brief Constructor.
-		 *
-		 */
-		Schedule(pid_t pid_ = 0);
-	
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~Schedule();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetSchedulerParameter(const jschedule_param_t *param_);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void GetSchedulerParameter(jschedule_param_t *param_);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetScheduler(jschedule_type_t policy_, const jschedule_param_t *param_);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jschedule_policy_t GetScheduler();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetMaximumPriority();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetMinimumPriority();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetScheduleAffinity(uint64_t mask_);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual uint64_t GetScheduleAffinity();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void YieldProcess();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void IncreaseNice();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void DecreaseNice();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetPriority(int n, jschedule_type_t type_);
+  public:
+    /**
+     * \brief Constructor.
+     *
+     */
+    Schedule(pid_t pid_ = 0);
+  
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~Schedule();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetSchedulerParameter(const jschedule_param_t *param_);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void GetSchedulerParameter(jschedule_param_t *param_);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetScheduler(jschedule_type_t policy_, const jschedule_param_t *param_);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual jschedule_policy_t GetScheduler();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int GetMaximumPriority();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int GetMinimumPriority();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetScheduleAffinity(uint64_t mask_);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual uint64_t GetScheduleAffinity();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void YieldProcess();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void IncreaseNice();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void DecreaseNice();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetPriority(int n, jschedule_type_t type_);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetPriority(jschedule_type_t type_);
-		
+    /**
+     * \brief
+     *
+     */
+    virtual int GetPriority(jschedule_type_t type_);
+    
 };
 
 }

@@ -27,10 +27,10 @@
 
 #include <limits.h>
 
-#define MAX_BUFFER_SIZE	1048576
+#define MAX_BUFFER_SIZE  1048576
 
-#define MIN_CHUNK_SIZE	1024
-#define MAX_CHUNK_SIZE	INT_MAX
+#define MIN_CHUNK_SIZE  1024
+#define MAX_CHUNK_SIZE  INT_MAX
 
 namespace jshared {
 
@@ -48,10 +48,10 @@ enum jbuffer_type_t {
  *
  */
 struct jbuffer_chunk_t {
-	uint8_t *data;	// buffer
-	int size;				// size of buffer
-	int rindex;
-	int pindex;
+  uint8_t *data;  // buffer
+  int size;        // size of buffer
+  int rindex;
+  int pindex;
 };
 
 /**
@@ -62,108 +62,108 @@ struct jbuffer_chunk_t {
 class IndexedBuffer : public virtual jcommon::Object {
 
     private:
-		/** \brief */
-		jbuffer_chunk_t *_buffer;
-		/** \brief */
-		int _buffer_size;
-		/** \brief */
-		int _chunk_size;
-		/** \brief */
-		int _write_index;
-		/** \brief */
-		int _pass_index;
-		/** \brief */
-		jbuffer_type_t _type;
-		/** \brief */
+    /** \brief */
+    jbuffer_chunk_t *_buffer;
+    /** \brief */
+    int _buffer_size;
+    /** \brief */
+    int _chunk_size;
+    /** \brief */
+    int _write_index;
+    /** \brief */
+    int _pass_index;
+    /** \brief */
+    jbuffer_type_t _type;
+    /** \brief */
     std::mutex _mutex;
-		/** \brief */
+    /** \brief */
     std::condition_variable _semaphore;
-		
+    
     public:
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		IndexedBuffer(int size = 256, int chunk = MIN_CHUNK_SIZE, jbuffer_type_t type = BUFFER_BLOCK);
+    /**
+     * \brief Construtor.
+     *
+     */
+    IndexedBuffer(int size = 256, int chunk = MIN_CHUNK_SIZE, jbuffer_type_t type = BUFFER_BLOCK);
 
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~IndexedBuffer();
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~IndexedBuffer();
 
-		/**
-		 * \brief 
-		 *
-		 */
-		void Reset();
+    /**
+     * \brief 
+     *
+     */
+    void Reset();
 
-		/**
-		 * \brief 
-		 *
-		 */
-		void Release();
+    /**
+     * \brief 
+     *
+     */
+    void Release();
 
-		/**
-		 * \brief 
-		 *
-		 */
-		void SetChunkSize(int size);
+    /**
+     * \brief 
+     *
+     */
+    void SetChunkSize(int size);
 
-		/**
-		 * \brief 
-		 *
-		 */
-		void SetNodesSize(int size);
+    /**
+     * \brief 
+     *
+     */
+    void SetNodesSize(int size);
 
-		/**
-		 * \brief 
-		 *
-		 */
-		int GetChunkSize();
+    /**
+     * \brief 
+     *
+     */
+    int GetChunkSize();
 
-		/**
-		 * \brief 
-		 *
-		 */
-		int GetNodesSize();
+    /**
+     * \brief 
+     *
+     */
+    int GetNodesSize();
 
-		/**
-		 * \brief
-		 *
-		 */
-		int GetIndex(jbuffer_chunk_t *chunk);
+    /**
+     * \brief
+     *
+     */
+    int GetIndex(jbuffer_chunk_t *chunk);
 
-		/**
-		 * \brief Returns the current size of buffer.
-		 *
-		 * \return -1 caso os indices sejam invalidos, 0 caso esteja vazio, caso contrario 
-		 * retorna o tamanho atual do buffer.
-		 *
-		 */
-		int GetAvailable(jbuffer_chunk_t *chunk);
+    /**
+     * \brief Returns the current size of buffer.
+     *
+     * \return -1 caso os indices sejam invalidos, 0 caso esteja vazio, caso contrario 
+     * retorna o tamanho atual do buffer.
+     *
+     */
+    int GetAvailable(jbuffer_chunk_t *chunk);
 
-		/**
-		 * \brief Read a chunk.
-		 *
-		 * \param data Data deve conter no minimo o tamanho de chunk. A funcao retorna o tamanho lido em size.
-		 *
-		 */
-		int Read(jbuffer_chunk_t *chunk);
+    /**
+     * \brief Read a chunk.
+     *
+     * \param data Data deve conter no minimo o tamanho de chunk. A funcao retorna o tamanho lido em size.
+     *
+     */
+    int Read(jbuffer_chunk_t *chunk);
 
-		/**
-		 * \brief Read a chunk.
-		 *
-		 * \param data Data deve conter no minimo o tamanho de chunk. A funcao retorna o tamanho lido em size.
-		 *
-		 */
-		int Read(jbuffer_chunk_t *chunk, int size);
+    /**
+     * \brief Read a chunk.
+     *
+     * \param data Data deve conter no minimo o tamanho de chunk. A funcao retorna o tamanho lido em size.
+     *
+     */
+    int Read(jbuffer_chunk_t *chunk, int size);
 
-		/**
-		 * \brief 
-		 *
-		 */
-		int Write(uint8_t *data, int size);
+    /**
+     * \brief 
+     *
+     */
+    int Write(uint8_t *data, int size);
 
 };
 

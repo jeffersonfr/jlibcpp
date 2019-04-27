@@ -34,68 +34,68 @@ namespace jgui {
  */
 class Dialog : public jgui::Container {
 
-	protected:
-		/** \brief */
-		Component *_focus_owner;
-		/** \brief */
+  protected:
+    /** \brief */
+    Component *_focus_owner;
+    /** \brief */
     jgui::Theme *_dialog_theme;
-		/** \brief */
+    /** \brief */
     std::mutex _modal_mutex;
-		/** \brief */
+    /** \brief */
     std::condition_variable _modal_condition;
-		/** \brief */
+    /** \brief */
     std::string _title;
-		/** \brief */
+    /** \brief */
     bool _is_modal;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		Dialog(Container *parent, int x = 0, int y = 0, int width = 0, int height = 0);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		Dialog(Container *parent, std::string title, int x = 0, int y = 0, int width = 0, int height = 0);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~Dialog();
+  public:
+    /**
+     * \brief
+     *
+     */
+    Dialog(Container *parent, int x = 0, int y = 0, int width = 0, int height = 0);
+    
+    /**
+     * \brief
+     *
+     */
+    Dialog(Container *parent, std::string title, int x = 0, int y = 0, int width = 0, int height = 0);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~Dialog();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetTitle(std::string title);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetTitle(std::string title);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string GetTitle();
+    /**
+     * \brief
+     *
+     */
+    virtual std::string GetTitle();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsModal();
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsModal();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Exec(bool modal = false);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Paint(Graphics *g);
+    /**
+     * \brief
+     *
+     */
+    virtual void Exec(bool modal = false);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Paint(Graphics *g);
 
     /**
      * \brief
@@ -119,54 +119,54 @@ class Dialog : public jgui::Container {
      */
     Container * GetFocusCycleRootAncestor();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Close();
+    /**
+     * \brief
+     *
+     */
+    virtual void Close();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool KeyPressed(jevent::KeyEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual bool KeyPressed(jevent::KeyEvent *event);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool KeyReleased(jevent::KeyEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual bool KeyReleased(jevent::KeyEvent *event);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool KeyTyped(jevent::KeyEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual bool KeyTyped(jevent::KeyEvent *event);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MousePressed(jevent::MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MouseReleased(jevent::MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MouseMoved(jevent::MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MouseWheel(jevent::MouseEvent *event);
-		
+    /**
+     * \brief
+     *
+     */
+    virtual bool MousePressed(jevent::MouseEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool MouseReleased(jevent::MouseEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool MouseMoved(jevent::MouseEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool MouseWheel(jevent::MouseEvent *event);
+    
 };
 
 }

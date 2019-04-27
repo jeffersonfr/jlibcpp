@@ -31,28 +31,28 @@ namespace jevent {
  */
 class TextEvent : public jevent::EventObject {
 
-	private:
-		/** \brief */
-		std::string _text;
+  private:
+    /** \brief */
+    std::string _text;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		TextEvent(void *source, std::string text);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~TextEvent();
+  public:
+    /**
+     * \brief
+     *
+     */
+    TextEvent(void *source, std::string text);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~TextEvent();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string GetText();
+    /**
+     * \brief
+     *
+     */
+    virtual std::string GetText();
 
 };
 

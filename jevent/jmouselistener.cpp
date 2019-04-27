@@ -22,9 +22,9 @@
 namespace jevent {
 
 MouseListener::MouseListener():
-	jevent::Listener()
+  jevent::Listener()
 {
-	jcommon::Object::SetClassName("jevent::MouseListener");
+  jcommon::Object::SetClassName("jevent::MouseListener");
 }
 
 MouseListener::~MouseListener() 
@@ -33,22 +33,22 @@ MouseListener::~MouseListener()
 
 bool MouseListener::MousePressed(MouseEvent *event)
 {
-	return false;
+  return false;
 }
 
 bool MouseListener::MouseReleased(MouseEvent *event)
 {
-	return false;
+  return false;
 }
 
 bool MouseListener::MouseMoved(MouseEvent *event)
 {
-	return false;
+  return false;
 }
 
 bool MouseListener::MouseWheel(MouseEvent *event)
 {
-	return false;
+  return false;
 }
 
 }

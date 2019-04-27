@@ -31,26 +31,26 @@ namespace jdevice {
 */
 class Storage : public jdevice::Device {
 
-	private:
+  private:
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		Storage();
+  public:
+    /**
+     * \brief
+     *
+     */
+    Storage();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual ~Storage();
+    /**
+     * \brief
+     * 
+     */
+    virtual ~Storage();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void Builder();
+    /**
+     * \brief
+     * 
+     */
+    virtual void Builder();
 
 };
 

@@ -22,22 +22,22 @@
 namespace jnetwork {
 
 Connection::Connection(jconnection_type_t type):
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jnetwork::Connection");
-	
-	_type = type;
-	_is_closed = true;
+  jcommon::Object::SetClassName("jnetwork::Connection");
+  
+  _type = type;
+  _is_closed = true;
 }
 
 jconnection_type_t Connection::GetType()
 {
-	return _type;
+  return _type;
 }
 
 bool Connection::IsClosed()
 {
-	return _is_closed;
+  return _is_closed;
 }
 
 }

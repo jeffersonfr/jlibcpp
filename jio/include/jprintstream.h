@@ -31,40 +31,40 @@ namespace jio {
  */
 class PrintStream : public virtual jcommon::Object {
 
-	private:
-		/** \brief */
-		OutputStream *_stream;
-		
-	public:
-		/**
-		 * \brief
-		 * 
-		 */
-		PrintStream(OutputStream *stream);
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual ~PrintStream();
+  private:
+    /** \brief */
+    OutputStream *_stream;
+    
+  public:
+    /**
+     * \brief
+     * 
+     */
+    PrintStream(OutputStream *stream);
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual ~PrintStream();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		void Flush();
+    /**
+     * \brief
+     * 
+     */
+    void Flush();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		int64_t Write(char c);
+    /**
+     * \brief
+     * 
+     */
+    int64_t Write(char c);
 
-		/**
-		 * \brief
-		 * 
-		 */
-		int64_t Write(const char *, int64_t size);
+    /**
+     * \brief
+     * 
+     */
+    int64_t Write(const char *, int64_t size);
     
 };
 

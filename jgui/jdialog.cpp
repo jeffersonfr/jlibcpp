@@ -25,12 +25,12 @@
 namespace jgui {
 
 Dialog::Dialog(Container *parent, int x, int y, int width, int height):
-	Dialog(parent, "", x, y, width, height)
+  Dialog(parent, "", x, y, width, height)
 {
 }
 
 Dialog::Dialog(Container *parent, std::string title, int x, int y, int width, int height):
-	jgui::Container(x, y, width, height)
+  jgui::Container(x, y, width, height)
 {
   if (parent == nullptr) {
     throw jexception::NullPointerException("Parent must be a valid pointer");
@@ -40,7 +40,7 @@ Dialog::Dialog(Container *parent, std::string title, int x, int y, int width, in
     throw jexception::InvalidArgumentException("Parent must be a window");
   }
 
-	jgui::jinsets_t 
+  jgui::jinsets_t 
     insets;
   
   insets.left = 8;
@@ -66,7 +66,7 @@ void Dialog::SetTitle(std::string title)
 {
   _title = title;
   
-	jgui::jinsets_t 
+  jgui::jinsets_t 
     insets;
   
   insets.left = 8;
@@ -102,7 +102,7 @@ void Dialog::Paint(Graphics *g)
       *theme = GetTheme();
     jgui::Font 
       *font = theme->GetFont("container.font");
-	
+  
     if (font != nullptr) {
       jgui::jsize_t
         size = GetSize();

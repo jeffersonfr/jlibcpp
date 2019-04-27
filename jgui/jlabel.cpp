@@ -25,15 +25,15 @@
 namespace jgui {
 
 Label::Label(std::string text, int x, int y, int width, int height):
- 	Component(x, y, width, height)
+   Component(x, y, width, height)
 {
-	jcommon::Object::SetClassName("jgui::Label");
+  jcommon::Object::SetClassName("jgui::Label");
 
-	_halign = JHA_CENTER;
-	_valign = JVA_CENTER;
+  _halign = JHA_CENTER;
+  _valign = JVA_CENTER;
 
-	_text = text;
-	_is_wrap = false;
+  _text = text;
+  _is_wrap = false;
 }
 
 Label::~Label()
@@ -42,66 +42,66 @@ Label::~Label()
 
 void Label::SetWrap(bool b)
 {
-	if (_is_wrap == b) {
-		return;
-	}
+  if (_is_wrap == b) {
+    return;
+  }
 
-	_is_wrap = b;
+  _is_wrap = b;
 
-	Repaint();
+  Repaint();
 }
 
 bool Label::IsWrap()
 {
-	return _is_wrap;
+  return _is_wrap;
 }
 
 std::string Label::GetText()
 {
-	return _text;
+  return _text;
 }
 
 void Label::SetText(std::string text)
 {
-	_text = text;
+  _text = text;
 
-	Repaint();
+  Repaint();
 }
 
 void Label::SetHorizontalAlign(jhorizontal_align_t align)
 {
-	if (_halign != align) {
-		_halign = align;
+  if (_halign != align) {
+    _halign = align;
 
-		Repaint();
-	}
+    Repaint();
+  }
 }
 
 jhorizontal_align_t Label::GetHorizontalAlign()
 {
-	return _halign;
+  return _halign;
 }
 
 void Label::SetVerticalAlign(jvertical_align_t align)
 {
-	if (_valign != align) {
-		_valign = align;
+  if (_valign != align) {
+    _valign = align;
 
-		Repaint();
-	}
+    Repaint();
+  }
 }
 
 jvertical_align_t Label::GetVerticalAlign()
 {
-	return _valign;
+  return _valign;
 }
 
 jsize_t Label::GetPreferredSize()
 {
-	Theme 
+  Theme 
     *theme = GetTheme();
 
-	jsize_t 
+  jsize_t 
     t = {
       0, 0
     };
@@ -110,38 +110,38 @@ jsize_t Label::GetPreferredSize()
     return t;
   }
 
-	jgui::Font 
+  jgui::Font 
     *font = theme->GetFont("component.font");
   jgui::jsize_t
     size = GetSize();
   int
     gx = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
-		gy = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size");
+    gy = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size");
 
-	if (font != nullptr) {
-		int 
+  if (font != nullptr) {
+    int 
       wp = size.width - 2*gx,
-			hp = font->GetSize();
+      hp = font->GetSize();
 
-		if (wp > 0) {
-			std::vector<std::string> lines;
+    if (wp > 0) {
+      std::vector<std::string> lines;
 
-			font->GetStringBreak(&lines, _text, wp, INT_MAX, _halign);
+      font->GetStringBreak(&lines, _text, wp, INT_MAX, _halign);
 
-			t.height = lines.size()*hp + 2*gy;
-		}
-	}
+      t.height = lines.size()*hp + 2*gy;
+    }
+  }
 
-	return t;
+  return t;
 }
 
 void Label::Paint(Graphics *g)
 {
-	JDEBUG(JINFO, "paint\n");
+  JDEBUG(JINFO, "paint\n");
 
-	Component::Paint(g);
+  Component::Paint(g);
 
-	Theme *theme = GetTheme();
+  Theme *theme = GetTheme();
   
   if (theme == nullptr) {
     return;
@@ -151,38 +151,38 @@ void Label::Paint(Graphics *g)
     *font = theme->GetFont("component.font");
   jgui::Color 
     bg = theme->GetIntegerParam("component.bg"),
-	  fg = theme->GetIntegerParam("component.fg"),
-	  fgfocus = theme->GetIntegerParam("component.fg.focus"),
-	  fgdisable = theme->GetIntegerParam("component.fg.disable");
+    fg = theme->GetIntegerParam("component.fg"),
+    fgfocus = theme->GetIntegerParam("component.fg.focus"),
+    fgdisable = theme->GetIntegerParam("component.fg.disable");
   jgui::jsize_t
     size = GetSize();
   int
     x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
-		y = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
-		w = size.width - 2*x,
-		h = size.height - 2*y;
+    y = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
+    w = size.width - 2*x,
+    h = size.height - 2*y;
 
-	if (font != nullptr) {
-		g->SetFont(font);
+  if (font != nullptr) {
+    g->SetFont(font);
 
-		if (IsEnabled() == true) {
-			if (HasFocus() == true) {
-				g->SetColor(fgfocus);
-			} else {
-				g->SetColor(fg);
-			}
-		} else {
-			g->SetColor(fgdisable);
-		}
+    if (IsEnabled() == true) {
+      if (HasFocus() == true) {
+        g->SetColor(fgfocus);
+      } else {
+        g->SetColor(fg);
+      }
+    } else {
+      g->SetColor(fgdisable);
+    }
 
-		std::string text = GetText();
+    std::string text = GetText();
 
-		if (_is_wrap == false) {
-			text = font->TruncateString(text, "...", w);
-		}
+    if (_is_wrap == false) {
+      text = font->TruncateString(text, "...", w);
+    }
 
-		g->DrawString(text, x, y, w, h, _halign, _valign);
-	}
+    g->DrawString(text, x, y, w, h, _halign, _valign);
+  }
 }
 
 }

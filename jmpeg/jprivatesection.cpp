@@ -27,7 +27,7 @@ namespace jmpeg {
 PrivateSection::PrivateSection(std::shared_ptr<std::string> data):
   jcommon::Object()
 {
-	jcommon::Object::SetClassName("jmpeg::PrivateSection");
+  jcommon::Object::SetClassName("jmpeg::PrivateSection");
 
   _data = data;
 }

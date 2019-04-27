@@ -32,25 +32,25 @@ namespace jevent {
  */
 class TextListener : public jevent::Listener {
 
-	protected:
-		/**
-		 * \brief
-		 *
-		 */
-		TextListener();
+  protected:
+    /**
+     * \brief
+     *
+     */
+    TextListener();
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~TextListener();
+  public:
+    /**
+     * \brief
+     *
+     */
+    virtual ~TextListener();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void TextChanged(TextEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual void TextChanged(TextEvent *event);
 
 };
 

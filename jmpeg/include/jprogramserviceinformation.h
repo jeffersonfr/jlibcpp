@@ -29,22 +29,22 @@ namespace jmpeg {
 
 class ProgramServiceInformation : public jcommon::Object {
 
-	protected:
+  protected:
     /** \brief */
     std::shared_ptr<std::string> _data;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		ProgramServiceInformation(std::shared_ptr<std::string> data);
+  public:
+    /**
+     * \brief
+     *
+     */
+    ProgramServiceInformation(std::shared_ptr<std::string> data);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~ProgramServiceInformation();
+    /**
+     * \brief
+     *
+     */
+    virtual ~ProgramServiceInformation();
  
     /**
      * \brief

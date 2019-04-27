@@ -31,44 +31,44 @@ namespace jgui {
  */
 class NullLayout : public Layout {
 
-	private:
+  private:
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		NullLayout();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~NullLayout();
+  public:
+    /**
+     * \brief
+     *
+     */
+    NullLayout();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~NullLayout();
 
-		/**
-		 * \brief
-		 *
-		 */
+    /**
+     * \brief
+     *
+     */
     virtual jsize_t GetMinimumLayoutSize(Container *parent);
-		
-		/**
-		 * \brief
-		 *
-		 */
+    
+    /**
+     * \brief
+     *
+     */
     virtual jsize_t GetMaximumLayoutSize(Container *parent);
-		
-		/**
-		 * \brief
-		 *
-		 */
+    
+    /**
+     * \brief
+     *
+     */
     virtual jsize_t GetPreferredLayoutSize(Container *parent);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void DoLayout(Container *c);
+    /**
+     * \brief
+     *
+     */
+    virtual void DoLayout(Container *c);
 
 };
 

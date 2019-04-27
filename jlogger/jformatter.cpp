@@ -22,9 +22,9 @@
 namespace jlogger {
 
 Formatter::Formatter():
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jlogger::Formatter");
+  jcommon::Object::SetClassName("jlogger::Formatter");
 }
 
 Formatter::~Formatter()

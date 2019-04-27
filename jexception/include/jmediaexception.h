@@ -31,50 +31,50 @@ namespace jexception {
  */
 class MediaException : public jexception::RuntimeException {
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		MediaException();
+  public:
+    /**
+     * \brief
+     *
+     */
+    MediaException();
 
-		/**
-		 * \brief
-		 *
-		 */
-		MediaException(std::string reason);
+    /**
+     * \brief
+     *
+     */
+    MediaException(std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		MediaException(jexception::Exception *exception, std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    MediaException(jexception::Exception *exception, std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> MediaException(const std::string &fmt, T ...vs):
       Exception(fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::MediaException");
     }
-		
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> MediaException(Exception *exception, const std::string &fmt, T ...vs):
       Exception(exception, fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::MediaException");
     }
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~MediaException() throw ();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~MediaException() throw ();
 
 };
 

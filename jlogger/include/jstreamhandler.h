@@ -31,18 +31,18 @@ namespace jlogger {
 */
 class StreamHandler : public jlogger::LoggerHandler {
 
-	protected:
-	
-	public:
-		/**
-		 * \brief
-		 */
-		StreamHandler();
+  protected:
+  
+  public:
+    /**
+     * \brief
+     */
+    StreamHandler();
 
-		/**
-		 * \brief
-		 */
-		virtual ~StreamHandler();
+    /**
+     * \brief
+     */
+    virtual ~StreamHandler();
 
 };
 

@@ -22,7 +22,7 @@
 namespace jipc {
 
 RemoteCallListener::RemoteCallListener():
-	jcommon::Object()
+  jcommon::Object()
 {
 }
 
@@ -32,7 +32,7 @@ RemoteCallListener::~RemoteCallListener()
 
 Response * RemoteCallListener::ProcessCall(Method *method)
 {
-	return nullptr;
+  return nullptr;
 }
 
 }

@@ -35,106 +35,106 @@ double silence_wave(double s);
 
 class Synthesizer : public virtual jcommon::Object {
 
-	private:
-		/* \brief playback device */
-		std::string _device_name;
-		/* \brief sample format */
-		snd_pcm_format_t _format;
-		/* \brief stream rate */
-		uint32_t _sample_rate;
-		/* \brief ring buffer length in us */
-		uint32_t _buffer_time;
-		/* \brief count of channels */
-		int _channels;
-		/* \brief */
-		snd_output_t *_output;
-		/* \brief */
-		snd_pcm_uframes_t _buffer_size;
-		/* \brief */
-		snd_pcm_uframes_t _period_size;
-		/* \brief */
-		snd_pcm_t *_handle;
-		/* \brief waveform of sound */
-		double (* _function)(double);
-		/* \brief */
-		double _volume;
+  private:
+    /* \brief playback device */
+    std::string _device_name;
+    /* \brief sample format */
+    snd_pcm_format_t _format;
+    /* \brief stream rate */
+    uint32_t _sample_rate;
+    /* \brief ring buffer length in us */
+    uint32_t _buffer_time;
+    /* \brief count of channels */
+    int _channels;
+    /* \brief */
+    snd_output_t *_output;
+    /* \brief */
+    snd_pcm_uframes_t _buffer_size;
+    /* \brief */
+    snd_pcm_uframes_t _period_size;
+    /* \brief */
+    snd_pcm_t *_handle;
+    /* \brief waveform of sound */
+    double (* _function)(double);
+    /* \brief */
+    double _volume;
 
-	private:
-		/**
-		 * \brief
-		 *
-		 */
-		void GenerateSamples(int16_t *samples, int channel, double frequency, int count, double *_phase); 
+  private:
+    /**
+     * \brief
+     *
+     */
+    void GenerateSamples(int16_t *samples, int channel, double frequency, int count, double *_phase); 
 
-		/**
-		 * \brief
-		 *
-		 */
-		int SetAudioParameters(snd_pcm_t *handle, snd_pcm_hw_params_t *params, snd_pcm_access_t access);
+    /**
+     * \brief
+     *
+     */
+    int SetAudioParameters(snd_pcm_t *handle, snd_pcm_hw_params_t *params, snd_pcm_access_t access);
 
-		/**
-		 * \brief
-		 *
-		 */
-		int SetAudioParameters(snd_pcm_t *handle, snd_pcm_sw_params_t *swparams);
+    /**
+     * \brief
+     *
+     */
+    int SetAudioParameters(snd_pcm_t *handle, snd_pcm_sw_params_t *swparams);
 
-		/**
-		 * \brief
-		 *
-		 */
-		int Underflow(snd_pcm_t *handle, int err);
+    /**
+     * \brief
+     *
+     */
+    int Underflow(snd_pcm_t *handle, int err);
 
-		/**
-		 * \brief
-		 *
-		 */
-		int WriteSamples(snd_pcm_t *handle, int channel, double frequency, double periods, int16_t *samples);
+    /**
+     * \brief
+     *
+     */
+    int WriteSamples(snd_pcm_t *handle, int channel, double frequency, double periods, int16_t *samples);
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		Synthesizer(std::string device_name = std::string("default"), int channels = 1, int sample_rate = 8192);
+  public:
+    /**
+     * \brief
+     *
+     */
+    Synthesizer(std::string device_name = std::string("default"), int channels = 1, int sample_rate = 8192);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~Synthesizer();
+    /**
+     * \brief
+     *
+     */
+    virtual ~Synthesizer();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetWave(double (* function)(double));
+    /**
+     * \brief
+     *
+     */
+    virtual void SetWave(double (* function)(double));
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void *GetWave();
+    /**
+     * \brief
+     *
+     */
+    virtual void *GetWave();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetVolume(int volume);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetVolume(int volume);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetVolume();
+    /**
+     * \brief
+     *
+     */
+    virtual int GetVolume();
 
-		/** 
-		 * \brief Plays a beep in the selected channel.
-		 *
-		 * \param channel Individual channel
-		 * \param frequency Value of frequency
-		 * \param duration Delay in milliseconds
-		 */
-		virtual void Play(int channel, double frequency, double duration);
+    /** 
+     * \brief Plays a beep in the selected channel.
+     *
+     * \param channel Individual channel
+     * \param frequency Value of frequency
+     * \param duration Delay in milliseconds
+     */
+    virtual void Play(int channel, double frequency, double duration);
 
 };
 

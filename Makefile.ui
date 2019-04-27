@@ -17,442 +17,459 @@
 #   Free Software Foundation, Inc.,                                       *
 #   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 #**************************************************************************
-CCFLAGS 	+= \
-     -Ijgui \
-	   `pkg-config --cflags cairo` \
+CCFLAGS += \
+  -Ijgui \
+  `pkg-config --cflags cairo` \
 
-LDFLAGS		+= \
-     `pkg-config --libs cairo` \
-     -ljpeg \
+LDFLAGS += \
+  `pkg-config --libs cairo` \
+  -ljpeg \
 
-REQUIRES	+= \
-		 cairo \
+REQUIRES  += \
+  cairo \
 
 # choose the graphic engine
 
-ifeq ($(ENABLE_GRAPHICS),sdl2)
-	CCFLAGS 	+= \
-		 `pkg-config --cflags sdl2` \
+ifeq ($(ENABLE_GRAPHICS), sdl2)
 
-	LDFLAGS		+= \
-		 `pkg-config --libs sdl2` \
-		 -ljpeg \
+  CCFLAGS += \
+    `pkg-config --cflags sdl2` \
 
-	DEFINES		+= \
-     -DJGUI_UI \
-		 -DSDL2_UI \
+  LDFLAGS += \
+    `pkg-config --libs sdl2` \
+    -ljpeg \
 
-	REQUIRES	+= \
-		 sdl2 \
+  DEFINES += \
+    -DJGUI_UI \
+    -DSDL2_UI \
 
-	OBJS_gfx	+= \
-		 sdl2application.o\
+  REQUIRES += \
+    sdl2 \
 
-  OBJS_jgui	+= \
-     $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+  OBJS_gfx += \
+    sdl2application.o\
 
-endif
-
-ifeq ($(ENABLE_GRAPHICS),sfml2)
-	CCFLAGS 	+= \
-
-	LDFLAGS		+= \
-		 -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio \
-     -ljpeg \
-
-	DEFINES		+= \
-     -DJGUI_UI \
-		 -DSFML2_UI \
-
-	REQUIRES	+= \
-
-	OBJS_gfx	+= \
-		 sfml2application.o\
-
-  OBJS_jgui	+= \
-     $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+  OBJS_jgui += \
+    $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
 
 endif
 
-ifeq ($(ENABLE_GRAPHICS),xlib)
-	CCFLAGS 	+= \
+ifeq ($(ENABLE_GRAPHICS), sfml2)
 
-	LDFLAGS		+= \
-     `pkg-config --libs x11` \
-     -ljpeg \
+  CCFLAGS += \
 
-	DEFINES		+= \
-     -DJGUI_UI \
-		 -DXLIB_UI \
+  LDFLAGS += \
+    -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio \
+    -ljpeg \
 
-	REQUIRES	+= \
+  DEFINES += \
+    -DJGUI_UI \
+    -DSFML2_UI \
 
-	OBJS_gfx	+= \
-		 xlibapplication.o\
+  REQUIRES += \
 
-  OBJS_jgui	+= \
-     $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+  OBJS_gfx += \
+    sfml2application.o\
 
-endif
-
-ifeq ($(ENABLE_GRAPHICS),xcb)
-	CCFLAGS 	+= \
-
-	LDFLAGS		+= \
-     `pkg-config --libs xcb` \
-     -ljpeg \
-
-	DEFINES		+= \
-     -DJGUI_UI \
-		 -DXCB_UI \
-
-	REQUIRES	+= \
-
-	OBJS_gfx	+= \
-		 xcbapplication.o\
-
-  OBJS_jgui	+= \
-     $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+  OBJS_jgui += \
+    $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
 
 endif
 
-ifeq ($(ENABLE_GRAPHICS),gtk3)
-	CCFLAGS 	+= \
-		 `pkg-config --cflags gtk+-3.0` \
+ifeq ($(ENABLE_GRAPHICS), xlib)
 
-	LDFLAGS		+= \
-		 `pkg-config --libs gtk+-3.0` \
-		 -ljpeg \
+  CCFLAGS += \
 
-	DEFINES		+= \
-     -DJGUI_UI \
-		 -DGTK3_UI \
+  LDFLAGS += \
+    `pkg-config --libs x11` \
+    -ljpeg \
 
-	REQUIRES	+= \
+  DEFINES += \
+    -DJGUI_UI \
+    -DXLIB_UI \
 
-	OBJS_gfx	+= \
-		 gtk3application.o\
+  REQUIRES += \
 
-  OBJS_jgui	+= \
-     $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+  OBJS_gfx += \
+    xlibapplication.o\
 
-endif
-
-ifeq ($(ENABLE_GRAPHICS),allegro5)
-	CCFLAGS 	+= \
-		 `pkg-config --cflags allegro-5 allegro_video-5 allegro_main-5` \
-
-	LDFLAGS		+= \
-		 `pkg-config --libs allegro-5 allegro_video-5 allegro_main-5` \
-		 -ljpeg \
-
-	DEFINES		+= \
-     -DJGUI_UI \
-		 -DALLEGRO5_UI \
-
-	REQUIRES	+= \
-
-	OBJS_gfx	+= \
-		 allegro5application.o\
-
-  OBJS_jgui	+= \
-     $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+  OBJS_jgui += \
+    $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
 
 endif
 
-ifeq ($(ENABLE_GRAPHICS),gl)
-	CCFLAGS 	+= \
-		 `pkg-config --cflags gl glu` \
+ifeq ($(ENABLE_GRAPHICS), xcb)
 
-	LDFLAGS		+= \
-		 `pkg-config --libs gl glu` \
-     -lglut \
-		 -ljpeg \
+  CCFLAGS += \
 
-	DEFINES		+= \
-     -DJGUI_UI \
-		 -DGL_UI \
+  LDFLAGS += \
+    `pkg-config --libs xcb` \
+    -ljpeg \
 
-	REQUIRES	+= \
+  DEFINES += \
+    -DJGUI_UI \
+    -DXCB_UI \
 
-	OBJS_gfx	+= \
-		 glapplication.o\
+  REQUIRES += \
 
-  OBJS_jgui	+= \
-     $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+  OBJS_gfx += \
+    xcbapplication.o\
 
-endif
-
-ifeq ($(ENABLE_GRAPHICS),dispmanx)
-	CCFLAGS 	+= \
-		 -I/opt/vc/include -L/opt/vc/lib \
-
-	LDFLAGS		+= \
-     -lbcm_host \
-     -lm \
-     -lpng \
-     -lpthread \
-		 -ljpeg \
-
-	DEFINES		+= \
-     -DJGUI_UI \
-		 -DDISPMANX_UI \
-
-	REQUIRES	+= \
-
-	OBJS_gfx	+= \
-		 dispmanxapplication.o\
-
-  OBJS_jgui	+= \
-     $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+  OBJS_jgui += \
+    $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
 
 endif
 
-ifeq ($(ENABLE_GRAPHICS),vdpau)
-	CCFLAGS 	+= \
+ifeq ($(ENABLE_GRAPHICS), gtk3)
 
-	LDFLAGS		+= \
-     `pkg-config --libs x11` \
-     `pkg-config --libs vdpau` \
-     -ljpeg \
+  CCFLAGS += \
+    `pkg-config --cflags gtk+-3.0` \
 
-	DEFINES		+= \
-     -DJGUI_UI \
-		 -DVDPAU_UI \
+  LDFLAGS += \
+    `pkg-config --libs gtk+-3.0` \
+    -ljpeg \
 
-	REQUIRES	+= \
+  DEFINES += \
+    -DJGUI_UI \
+    -DGTK3_UI \
 
-	OBJS_gfx	+= \
-		 vdpauapplication.o\
+  REQUIRES += \
 
-  OBJS_jgui	+= \
-     $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+  OBJS_gfx += \
+    gtk3application.o\
 
-endif
-
-ifeq ($(ENABLE_GRAPHICS),vnc)
-	CCFLAGS 	+= \
-
-	LDFLAGS		+= \
-     `pkg-config --libs libvncserver` \
-     -ljpeg \
-
-	DEFINES		+= \
-     -DJGUI_UI \
-		 -DVNC_UI \
-
-	REQUIRES	+= \
-
-	OBJS_gfx	+= \
-		 vncapplication.o\
-
-  OBJS_jgui	+= \
-     $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+  OBJS_jgui += \
+    $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
 
 endif
 
-ifeq ($(ENABLE_GRAPHICS),directfb)
-	CCFLAGS 	+= \
-     `pkg-config --cflags directfb` \
+ifeq ($(ENABLE_GRAPHICS), allegro5)
 
-	LDFLAGS		+= \
-     `pkg-config --libs directfb` \
-     -ljpeg \
+  CCFLAGS += \
+    `pkg-config --cflags allegro-5 allegro_video-5 allegro_main-5` \
 
-	DEFINES		+= \
-     -DJGUI_UI \
-		 -DDIRECTFB_UI \
+  LDFLAGS += \
+    `pkg-config --libs allegro-5 allegro_video-5 allegro_main-5` \
+    -ljpeg \
 
-	REQUIRES	+= \
+  DEFINES += \
+    -DJGUI_UI \
+    -DALLEGRO5_UI \
 
-	OBJS_gfx	+= \
-		 directfbapplication.o\
+  REQUIRES += \
 
-  OBJS_jgui	+= \
-     $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+  OBJS_gfx += \
+    allegro5application.o\
 
-endif
-
-ifeq ($(ENABLE_GRAPHICS),fb)
-	CCFLAGS 	+= \
-
-	LDFLAGS		+= \
-     -ljpeg \
-
-	DEFINES		+= \
-     -DJGUI_UI \
-		 -DFB_UI \
-
-	REQUIRES	+= \
-
-	OBJS_gfx	+= \
-		 fbapplication.o\
-
-  OBJS_jgui	+= \
-     $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+  OBJS_jgui += \
+    $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
 
 endif
 
-ifeq ($(ENABLE_GRAPHICS),egl)
-	CCFLAGS 	+= \
-     -I/opt/vc/include \
+ifeq ($(ENABLE_GRAPHICS), gl)
 
-	LDFLAGS		+= \
-     `pkg-config --libs xcb` \
-     `pkg-config --libs x11-xcb` \
-     `pkg-config --libs egl` \
-     `pkg-config --libs glesv2` \
-     -lGLU -lGL\
-     -ljpeg \
-     -L/opt/vc/lib \
-		 -lbrcmGLESv2 \
-		 -lbrcmEGL \
+  CCFLAGS += \
+    `pkg-config --cflags gl glu` \
 
-	DEFINES		+= \
-     -DJGUI_UI \
-		 -DEGL_UI \
+  LDFLAGS += \
+    `pkg-config --libs gl glu` \
+    -lglut \
+    -ljpeg \
 
-	REQUIRES	+= \
+  DEFINES += \
+    -DJGUI_UI \
+    -DGL_UI \
 
-	OBJS_gfx	+= \
-		 eglapplication.o\
+  REQUIRES += \
 
-  OBJS_jgui	+= \
-     $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+  OBJS_gfx += \
+    glapplication.o\
+
+  OBJS_jgui += \
+    $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
 
 endif
 
-ifeq ($(ENABLE_GRAPHICS),openvg)
-	CCFLAGS 	+= \
-     -I/opt/vc/include \
+ifeq ($(ENABLE_GRAPHICS), dispmanx)
 
-	LDFLAGS		+= \
-     -L/opt/vc/lib \
-		 -lbrcmGLESv2 \
-		 -lbrcmEGL \
+  CCFLAGS += \
+    -I/opt/vc/include -L/opt/vc/lib \
 
-	DEFINES		+= \
-     -DJGUI_UI \
-		 -DOPENGV_UI \
+  LDFLAGS += \
+    -lbcm_host \
+    -lm \
+    -lpng \
+    -lpthread \
+    -ljpeg \
 
-	REQUIRES	+= \
+  DEFINES += \
+    -DJGUI_UI \
+    -DDISPMANX_UI \
 
-	OBJS_gfx	+= \
-		 openvgapplication.o\
+  REQUIRES += \
 
-  OBJS_jgui	+= \
-     $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+  OBJS_gfx += \
+    dispmanxapplication.o\
 
-endif
-
-ifeq ($(ENABLE_GRAPHICS),qt5)
-	CCFLAGS 	+= \
-     -isystem /usr/include/x86_64-linux-gnu/qt5 \
-     -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets \
-     -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui \
-     -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore \
-
-	LDFLAGS		+= \
-     -Wl,-O1 \
-     -lQt5Widgets \
-     -lQt5Gui \
-     -lQt5Core \
-     -lGL \
-     -lpthread \
-
-	DEFINES		+= \
-     -DJGUI_UI \
-		 -DQT5_UI \
-     -DQT_DEPRECATED_WARNINGS \
-     -DQT_NO_DEBUG \
-     -DQT_WIDGETS_LIB \
-     -DQT_GUI_LIB \
-     -DQT_CORE_LIB \
-
-	REQUIRES	+= \
-
-	OBJS_gfx	+= \
-		 qt5application.o\
-
-  OBJS_jgui	+= \
-     $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+  OBJS_jgui += \
+    $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
 
 endif
 
-ifeq ($(ENABLE_GRAPHICS),caca)
-	CCFLAGS 	+= \
+ifeq ($(ENABLE_GRAPHICS), vdpau)
 
-	LDFLAGS		+= \
-     -Wl,-O1 \
-     -lcaca\
-     -lpthread \
+  CCFLAGS += \
 
-	DEFINES		+= \
-     -DJGUI_UI \
-		 -DCACA_UI \
+  LDFLAGS += \
+    `pkg-config --libs x11` \
+    `pkg-config --libs vdpau` \
+    -ljpeg \
 
-	REQUIRES	+= \
+  DEFINES += \
+    -DJGUI_UI \
+    -DVDPAU_UI \
 
-	OBJS_gfx	+= \
-		 cacaapplication.o\
+  REQUIRES += \
 
-  OBJS_jgui	+= \
-     $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+  OBJS_gfx += \
+    vdpauapplication.o\
 
-endif
-
-ifeq ($(ENABLE_GRAPHICS),flaschen)
-	CCFLAGS 	+= \
-     -I/opt/flaschen-taschen/api/include\
-
-	LDFLAGS		+= \
-     -L/opt/flaschen-taschen/api/lib\
-     -Wl,-O1 \
-     -lftclient\
-     -lpthread \
-
-	DEFINES		+= \
-     -DJGUI_UI \
-		 -DFLASCHEN_UI \
-
-	REQUIRES	+= \
-
-	OBJS_gfx	+= \
-		 flaschenapplication.o\
-
-  OBJS_jgui	+= \
-     $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+  OBJS_jgui += \
+    $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
 
 endif
 
-ifeq ($(ENABLE_GRAPHICS),nanax)
-	CCFLAGS 	+= \
-     -I/opt/nana/include \
+ifeq ($(ENABLE_GRAPHICS), vnc)
+
+  CCFLAGS += \
+
+  LDFLAGS += \
+    `pkg-config --libs libvncserver` \
+    -ljpeg \
+
+  DEFINES += \
+    -DJGUI_UI \
+    -DVNC_UI \
+
+  REQUIRES += \
+
+  OBJS_gfx += \
+    vncapplication.o\
+
+  OBJS_jgui += \
+    $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+
+endif
+
+ifeq ($(ENABLE_GRAPHICS), directfb)
+
+  CCFLAGS += \
+    `pkg-config --cflags directfb` \
+
+  LDFLAGS += \
+    `pkg-config --libs directfb` \
+    -ljpeg \
+
+  DEFINES += \
+    -DJGUI_UI \
+    -DDIRECTFB_UI \
+
+  REQUIRES += \
+
+  OBJS_gfx += \
+    directfbapplication.o\
+
+  OBJS_jgui += \
+    $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+
+endif
+
+ifeq ($(ENABLE_GRAPHICS), fb)
+
+  CCFLAGS += \
+
+  LDFLAGS += \
+    -ljpeg \
+
+  DEFINES += \
+    -DJGUI_UI \
+    -DFB_UI \
+
+  REQUIRES += \
+
+  OBJS_gfx += \
+    fbapplication.o\
+
+  OBJS_jgui += \
+    $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+
+endif
+
+ifeq ($(ENABLE_GRAPHICS), egl)
+
+  CCFLAGS += \
+    -I/opt/vc/include \
+
+  LDFLAGS += \
+    `pkg-config --libs xcb` \
+    `pkg-config --libs x11-xcb` \
+    `pkg-config --libs egl` \
+    `pkg-config --libs glesv2` \
+    -lGLU -lGL\
+    -ljpeg \
+    -L/opt/vc/lib \
+    -lbrcmGLESv2 \
+    -lbrcmEGL \
+
+  DEFINES += \
+    -DJGUI_UI \
+    -DEGL_UI \
+
+  REQUIRES += \
+
+  OBJS_gfx += \
+    eglapplication.o\
+
+  OBJS_jgui += \
+    $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+
+endif
+
+ifeq ($(ENABLE_GRAPHICS), openvg)
+
+  CCFLAGS += \
+    -I/opt/vc/include \
+
+  LDFLAGS += \
+    -L/opt/vc/lib \
+    -lbrcmGLESv2 \
+    -lbrcmEGL \
+
+  DEFINES += \
+    -DJGUI_UI \
+    -DOPENGV_UI \
+
+  REQUIRES += \
+
+  OBJS_gfx += \
+    openvgapplication.o\
+
+  OBJS_jgui += \
+    $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+
+endif
+
+ifeq ($(ENABLE_GRAPHICS), qt5)
+
+  CCFLAGS += \
+    -isystem /usr/include/x86_64-linux-gnu/qt5 \
+    -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets \
+    -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui \
+    -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore \
+
+  LDFLAGS += \
+    -Wl,-O1 \
+    -lQt5Widgets \
+    -lQt5Gui \
+    -lQt5Core \
+    -lGL \
+    -lpthread \
+
+  DEFINES += \
+    -DJGUI_UI \
+    -DQT5_UI \
+    -DQT_DEPRECATED_WARNINGS \
+    -DQT_NO_DEBUG \
+    -DQT_WIDGETS_LIB \
+    -DQT_GUI_LIB \
+    -DQT_CORE_LIB \
+
+  REQUIRES += \
+
+  OBJS_gfx += \
+    qt5application.o\
+
+  OBJS_jgui += \
+    $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+
+endif
+
+ifeq ($(ENABLE_GRAPHICS), caca)
+
+  CCFLAGS += \
+
+  LDFLAGS += \
+    -Wl,-O1 \
+    -lcaca\
+    -lpthread \
+
+  DEFINES    += \
+    -DJGUI_UI \
+    -DCACA_UI \
+
+  REQUIRES += \
+
+  OBJS_gfx += \
+    cacaapplication.o\
+
+  OBJS_jgui += \
+    $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+
+endif
+
+ifeq ($(ENABLE_GRAPHICS), flaschen)
+
+  CCFLAGS += \
+    -I/opt/flaschen-taschen/api/include\
+
+  LDFLAGS += \
+    -L/opt/flaschen-taschen/api/lib\
+    -Wl,-O1 \
+    -lftclient\
+    -lpthread \
+
+  DEFINES += \
+    -DJGUI_UI \
+    -DFLASCHEN_UI \
+
+  REQUIRES += \
+
+  OBJS_gfx += \
+    flaschenapplication.o\
+
+  OBJS_jgui += \
+    $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+
+endif
+
+ifeq ($(ENABLE_GRAPHICS), nanax)
+  CCFLAGS += \
+    -I/opt/nana/include \
 
   # add the following line to nana/CMakeFile.txt ...
   # set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -fPIC")
 
-	LDFLAGS		+= \
-     -L/opt/nana/build/cmake \
-     -lnana \
-     -lX11 \
-     -lpthread \
-     -lXft \
-     -lfontconfig \
-     -lstdc++fs \
-     -lnana \
+  LDFLAGS += \
+    -L/opt/nana/build/cmake \
+    -lnana \
+    -lX11 \
+    -lpthread \
+    -lXft \
+    -lfontconfig \
+    -lstdc++fs \
+    -lnana \
 
-	DEFINES		+= \
-     -DJGUI_UI \
-		 -DNANAX_UI \
+  DEFINES += \
+    -DJGUI_UI \
+    -DNANAX_UI \
 
-	REQUIRES	+= \
+  REQUIRES += \
 
-	OBJS_gfx	+= \
-		 nanaxapplication.o\
+  OBJS_gfx += \
+    nanaxapplication.o\
 
-  OBJS_jgui	+= \
-     $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+  OBJS_jgui += \
+    $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
 
 endif
 

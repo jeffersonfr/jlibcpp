@@ -31,37 +31,37 @@ namespace jipc {
  */
 class Response : public jcommon::ParamMapper {
 
-	public:
-		/**
-		 * \Constructor.
-		 *
-		 */
-		Response();
+  public:
+    /**
+     * \Constructor.
+     *
+     */
+    Response();
 
-		/**
-		 * \brief Destructor.
-		 *
-		 */
-		virtual ~Response();
+    /**
+     * \brief Destructor.
+     *
+     */
+    virtual ~Response();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Initialize(uint8_t *buffer, int size);
+    /**
+     * \brief
+     *
+     */
+    virtual void Initialize(uint8_t *buffer, int size);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string Encode();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string What();
-		
+    /**
+     * \brief
+     *
+     */
+    virtual std::string Encode();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual std::string What();
+    
 };
 
 }

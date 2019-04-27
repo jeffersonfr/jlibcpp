@@ -27,7 +27,7 @@ namespace jmpeg {
 Descriptor::Descriptor(std::shared_ptr<std::string> data):
   jcommon::Object()
 {
-	jcommon::Object::SetClassName("jmpeg::Descriptor");
+  jcommon::Object::SetClassName("jmpeg::Descriptor");
 
   _data = data;
 }

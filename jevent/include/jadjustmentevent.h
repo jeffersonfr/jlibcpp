@@ -29,10 +29,10 @@ namespace jevent {
  *
  */
 enum jadjustmentevent_type_t {
-	JAET_BLOCK_INCREMENT,
-	JAET_BLOCK_DECREMENT,
-	JAET_UNIT_INCREMENT,
-	JAET_UNIT_DECREMENT
+  JAET_BLOCK_INCREMENT,
+  JAET_BLOCK_DECREMENT,
+  JAET_UNIT_INCREMENT,
+  JAET_UNIT_DECREMENT
 };
 
 /**
@@ -42,36 +42,36 @@ enum jadjustmentevent_type_t {
  */
 class AdjustmentEvent : public jevent::EventObject {
 
-	private:
-		/** \brief */
-		jadjustmentevent_type_t _type;
-		/** \brief */
-		double _value;
+  private:
+    /** \brief */
+    jadjustmentevent_type_t _type;
+    /** \brief */
+    double _value;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		AdjustmentEvent(void *source, jadjustmentevent_type_t type, double value);
+  public:
+    /**
+     * \brief
+     *
+     */
+    AdjustmentEvent(void *source, jadjustmentevent_type_t type, double value);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~AdjustmentEvent();
+    /**
+     * \brief
+     *
+     */
+    virtual ~AdjustmentEvent();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual double GetValue();
+    /**
+     * \brief
+     *
+     */
+    virtual double GetValue();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jadjustmentevent_type_t GetType();
+    /**
+     * \brief
+     *
+     */
+    virtual jadjustmentevent_type_t GetType();
 
 };
 

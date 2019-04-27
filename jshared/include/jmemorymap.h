@@ -32,49 +32,49 @@ namespace jshared {
 class MemoryMap : public virtual jcommon::Object {
 
     private:
-			/** \brief Socket handler. */
+      /** \brief Socket handler. */
       jio::File *_file;
-			/** \brief */
-			uint8_t *_address;
-			/** \brief */
+      /** \brief */
+      uint8_t *_address;
+      /** \brief */
       int64_t _length;
 
-		public:
-			/**
-			 * \brief Constructor.
-			 *
-			 */
-			MemoryMap(jio::File *file, int length, bool shared = true, 
+    public:
+      /**
+       * \brief Constructor.
+       *
+       */
+      MemoryMap(jio::File *file, int length, bool shared = true, 
           jio::jfile_permissions_t perms = (jio::jfile_permissions_t)(jio::JFP_USR_READ | jio::JFP_USR_WRITE));
 
-			/**
-			 * \brief Destrutor virtual.
-			 *
-			 */
-			virtual ~MemoryMap();
+      /**
+       * \brief Destrutor virtual.
+       *
+       */
+      virtual ~MemoryMap();
 
-			/**
-			 * \brief
-			 *
-			 */
+      /**
+       * \brief
+       *
+       */
       virtual jio::File * GetFile();
 
-			/**
-			 * \brief
-			 *
-			 */
-			virtual uint8_t * GetAddress();
+      /**
+       * \brief
+       *
+       */
+      virtual uint8_t * GetAddress();
 
-			/**
-			 * \brief
-			 *
-			 */
-			virtual int64_t GetLength();
+      /**
+       * \brief
+       *
+       */
+      virtual int64_t GetLength();
 
-			/**
-			 * \brief
-			 *
-			 */
+      /**
+       * \brief
+       *
+       */
       virtual void SetPermission(jio::jfile_permissions_t perms);
 
 };

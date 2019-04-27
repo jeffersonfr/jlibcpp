@@ -23,30 +23,30 @@
 namespace jgui {
 
 GridLayout::GridLayout(int rows, int cols, int hgap, int vgap):
-	Layout()
+  Layout()
 {
-	jcommon::Object::SetClassName("jgui::GridLayout");
+  jcommon::Object::SetClassName("jgui::GridLayout");
 
-	if (rows < 1) {
-		rows = 1;
-	}
-	
-	if (cols < 1) {
-		cols = 1;
-	}
+  if (rows < 1) {
+    rows = 1;
+  }
+  
+  if (cols < 1) {
+    cols = 1;
+  }
 
-	if (hgap < 0) {
-		hgap = 0;
-	}
+  if (hgap < 0) {
+    hgap = 0;
+  }
 
-	if (vgap < 0) {
-		vgap = 0;
-	}
+  if (vgap < 0) {
+    vgap = 0;
+  }
 
-	_rows = rows;
-	_cols = cols;
-	_hgap = hgap;
-	_vgap = vgap;
+  _rows = rows;
+  _cols = cols;
+  _hgap = hgap;
+  _vgap = vgap;
 }
 
 GridLayout::~GridLayout()
@@ -55,186 +55,186 @@ GridLayout::~GridLayout()
 
 int GridLayout::GetRows()
 {
-	return _rows;
+  return _rows;
 }
 
 int GridLayout::GetColumns()
 {
-	return _cols;
+  return _cols;
 }
 
 int GridLayout::GetHorizontalGap()
 {
-	return _hgap;
+  return _hgap;
 }
 
 int GridLayout::GetVerticalGap()
 {
-	return _vgap;
+  return _vgap;
 }
 
 void GridLayout::SetRows(int rows)
 {
-	if (rows < 1) {
-		rows = 1;
-	}
-	
-	_rows = rows;
+  if (rows < 1) {
+    rows = 1;
+  }
+  
+  _rows = rows;
 }
 
 void GridLayout::SetColumns(int cols)
 {
-	if (cols < 1) {
-		cols = 1;
-	}
+  if (cols < 1) {
+    cols = 1;
+  }
 
-	_cols = cols;
+  _cols = cols;
 }
 
 void GridLayout::SetHorizontalGap(int hgap)
 {
-	if (hgap < 0) {
-		hgap = 0;
-	}
+  if (hgap < 0) {
+    hgap = 0;
+  }
 
-	_hgap = hgap;
+  _hgap = hgap;
 }
 
 void GridLayout::SetVerticalGap(int vgap)
 {
-	if (vgap < 0) {
-		vgap = 0;
-	}
+  if (vgap < 0) {
+    vgap = 0;
+  }
 
-	_vgap = vgap;
+  _vgap = vgap;
 }
 
 jsize_t GridLayout::GetMinimumLayoutSize(Container *parent)
 {
-	// WARN:: sync parent
-	jinsets_t insets = parent->GetInsets();
-	int ncomponents = parent->GetComponentCount(),
-			nrows = _rows,
-			ncols = _cols;
+  // WARN:: sync parent
+  jinsets_t insets = parent->GetInsets();
+  int ncomponents = parent->GetComponentCount(),
+      nrows = _rows,
+      ncols = _cols;
 
-	if (nrows > 0) {
-		ncols = (ncomponents + nrows - 1) / nrows;
-	} else {
-		nrows = (ncomponents + ncols - 1) / ncols;
-	}
-	int w = 0;
-	int h = 0;
+  if (nrows > 0) {
+    ncols = (ncomponents + nrows - 1) / nrows;
+  } else {
+    nrows = (ncomponents + ncols - 1) / ncols;
+  }
+  int w = 0;
+  int h = 0;
 
-	for (int i = 0 ; i < ncomponents ; i++) {
-		Component *comp = parent->GetComponents()[i];
-		
-		jsize_t d = comp->GetMinimumSize();
+  for (int i = 0 ; i < ncomponents ; i++) {
+    Component *comp = parent->GetComponents()[i];
+    
+    jsize_t d = comp->GetMinimumSize();
 
-		if (w < d.width) {
-			w = d.width;
-		}
-		if (h < d.height) {
-			h = d.height;
-		}
-	}
-	
-	jsize_t t = {insets.left + insets.right + ncols*w + (ncols-1)*_hgap, insets.top + insets.bottom + nrows*h + (nrows-1)*_vgap};
+    if (w < d.width) {
+      w = d.width;
+    }
+    if (h < d.height) {
+      h = d.height;
+    }
+  }
+  
+  jsize_t t = {insets.left + insets.right + ncols*w + (ncols-1)*_hgap, insets.top + insets.bottom + nrows*h + (nrows-1)*_vgap};
 
-	return t;
+  return t;
 }
 
 jsize_t GridLayout::GetMaximumLayoutSize(Container *parent)
 {
-	jsize_t t = {INT_MAX, INT_MAX};
+  jsize_t t = {INT_MAX, INT_MAX};
 
-	return t;
+  return t;
 }
 
 jsize_t GridLayout::GetPreferredLayoutSize(Container *parent)
 {
-	// WARN:: sync parent
-	jinsets_t insets = parent->GetInsets();
-	int ncomponents = parent->GetComponentCount(),
-			nrows = _rows,
-			ncols = _cols;
+  // WARN:: sync parent
+  jinsets_t insets = parent->GetInsets();
+  int ncomponents = parent->GetComponentCount(),
+      nrows = _rows,
+      ncols = _cols;
 
-	if (nrows > 0) {
-		ncols = (ncomponents + nrows - 1) / nrows;
-	} else {
-		nrows = (ncomponents + ncols - 1) / ncols;
-	}
+  if (nrows > 0) {
+    ncols = (ncomponents + nrows - 1) / nrows;
+  } else {
+    nrows = (ncomponents + ncols - 1) / ncols;
+  }
 
-	int w = 0;
-	int h = 0;
+  int w = 0;
+  int h = 0;
 
-	for (int i = 0 ; i < ncomponents ; i++) {
-		Component *comp = parent->GetComponents()[i];
+  for (int i = 0 ; i < ncomponents ; i++) {
+    Component *comp = parent->GetComponents()[i];
 
-		jsize_t d = comp->GetMinimumSize();
+    jsize_t d = comp->GetMinimumSize();
 
-		if (w < d.width) {
-			w = d.width;
-		}
-		if (h < d.height) {
-			h = d.height;
-		}
-	}
+    if (w < d.width) {
+      w = d.width;
+    }
+    if (h < d.height) {
+      h = d.height;
+    }
+  }
 
-	jsize_t t = {insets.left + insets.right + ncols*w + (ncols-1)*_hgap, insets.top + insets.bottom + nrows*h + (nrows-1)*_vgap};
+  jsize_t t = {insets.left + insets.right + ncols*w + (ncols-1)*_hgap, insets.top + insets.bottom + nrows*h + (nrows-1)*_vgap};
 
-	return t;
+  return t;
 }
 
 void GridLayout::DoLayout(Container *parent)
 {
-	// WARN:: sync with parent container
-	int 
-		ncomponents = parent->GetComponentCount(),
-		nrows = _rows,
-		ncols = _cols;
-	bool 
-		ltr = (parent->GetComponentOrientation() == JCO_LEFT_TO_RIGHT);
+  // WARN:: sync with parent container
+  int 
+    ncomponents = parent->GetComponentCount(),
+    nrows = _rows,
+    ncols = _cols;
+  bool 
+    ltr = (parent->GetComponentOrientation() == JCO_LEFT_TO_RIGHT);
 
-	if (ncomponents == 0) {
-		return;
-	}
+  if (ncomponents == 0) {
+    return;
+  }
 
-	if (nrows > 0) {
-		ncols = (ncomponents + nrows - 1) / nrows;
-	} else {
-		nrows = (ncomponents + ncols - 1) / ncols;
-	}
+  if (nrows > 0) {
+    ncols = (ncomponents + nrows - 1) / nrows;
+  } else {
+    nrows = (ncomponents + ncols - 1) / ncols;
+  }
 
-	jgui::jinsets_t 
-		insets = parent->GetInsets();
-	jgui::jsize_t 
-		size = parent->GetSize();
-	int 
-		w = size.width - (insets.left + insets.right),
-		h = size.height - (insets.top + insets.bottom);
+  jgui::jinsets_t 
+    insets = parent->GetInsets();
+  jgui::jsize_t 
+    size = parent->GetSize();
+  int 
+    w = size.width - (insets.left + insets.right),
+    h = size.height - (insets.top + insets.bottom);
 
-	w = (w - (ncols - 1) * _hgap) / ncols;
-	h = (h - (nrows - 1) * _vgap) / nrows;
+  w = (w - (ncols - 1) * _hgap) / ncols;
+  h = (h - (nrows - 1) * _vgap) / nrows;
 
-	if (ltr) {
-		for (int c = 0, x = insets.left ; c < ncols ; c++, x += w + _hgap) {
-			for (int r = 0, y = insets.top ; r < nrows ; r++, y += h + _vgap) {
-				int i = r * ncols + c;
-				if (i < ncomponents) {
-					parent->GetComponents()[i]->SetBounds(x, y, w, h);
-				}
-			}
-		}
-	} else {
-		for (int c = 0, x = size.width - insets.right - w; c < ncols ; c++, x -= w + _hgap) {
-			for (int r = 0, y = insets.top ; r < nrows ; r++, y += h + _vgap) {
-				int i = r * ncols + c;
-				if (i < ncomponents) {
-					parent->GetComponents()[i]->SetBounds(x, y, w, h);
-				}
-			}
-		}
-	}
+  if (ltr) {
+    for (int c = 0, x = insets.left ; c < ncols ; c++, x += w + _hgap) {
+      for (int r = 0, y = insets.top ; r < nrows ; r++, y += h + _vgap) {
+        int i = r * ncols + c;
+        if (i < ncomponents) {
+          parent->GetComponents()[i]->SetBounds(x, y, w, h);
+        }
+      }
+    }
+  } else {
+    for (int c = 0, x = size.width - insets.right - w; c < ncols ; c++, x -= w + _hgap) {
+      for (int r = 0, y = insets.top ; r < nrows ; r++, y += h + _vgap) {
+        int i = r * ncols + c;
+        if (i < ncomponents) {
+          parent->GetComponents()[i]->SetBounds(x, y, w, h);
+        }
+      }
+    }
+  }
 }
 
 }

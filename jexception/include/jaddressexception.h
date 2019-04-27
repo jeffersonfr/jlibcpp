@@ -31,52 +31,52 @@ namespace jexception {
  */
 class AddressException : public jexception::RuntimeException {
 
-	private:
+  private:
 
-	public:
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		AddressException();
+  public:
+    /**
+     * \brief Construtor.
+     *
+     */
+    AddressException();
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		AddressException(std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    AddressException(std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		AddressException(Exception *exception, std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    AddressException(Exception *exception, std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> AddressException(const std::string &fmt, T ...vs):
       Exception(fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::AddressException");
     }
-		
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> AddressException(Exception *exception, const std::string &fmt, T ...vs):
       Exception(exception, fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::AddressException");
     }
-		
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~AddressException() throw();
+    
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~AddressException() throw();
 
 };
 

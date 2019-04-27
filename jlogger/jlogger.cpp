@@ -24,150 +24,150 @@
 namespace jlogger {
 
 Logger::Logger(LoggerHandler *handler_, Formatter *format_):
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jlogger::Logger");
-	
-	_handler = handler_;
-	_format = format_;
-	_mask = (jrecord_type_t)(JRT_INFO | JRT_WARNNING | JRT_ERROR | JRT_CRITICAL | JRT_UNKNOWN);
+  jcommon::Object::SetClassName("jlogger::Logger");
+  
+  _handler = handler_;
+  _format = format_;
+  _mask = (jrecord_type_t)(JRT_INFO | JRT_WARNNING | JRT_ERROR | JRT_CRITICAL | JRT_UNKNOWN);
 }
 
 Logger::~Logger()
 {
-	if (_handler != nullptr) {
-		delete _handler;
-	}
+  if (_handler != nullptr) {
+    delete _handler;
+  }
 
-	if (_format != nullptr) {
-		delete _format;
-	}
+  if (_format != nullptr) {
+    delete _format;
+  }
 }
 
 void Logger::AddLogger(Logger *logger)
 {
-	_loggers.push_back(logger);
+  _loggers.push_back(logger);
 }
 
 void Logger::SendLogger(jrecord_type_t type_, std::string record_)
 {
-	if ((_mask & type_) == 0) {
-		return;
-	}
+  if ((_mask & type_) == 0) {
+    return;
+  }
 
-	LogRecord *record = nullptr;
+  LogRecord *record = nullptr;
     
-	try {
-		record = new LogRecord(type_, record_);
+  try {
+    record = new LogRecord(type_, record_);
 
-		if (_format != nullptr) {
-			_format->Transform(record);
-		}
-		
-		_handler->WriteRecord(record);
+    if (_format != nullptr) {
+      _format->Transform(record);
+    }
+    
+    _handler->WriteRecord(record);
 
-		delete record;
-	} catch (std::bad_alloc &) {
-		if (record != nullptr) {
-			delete record;
-		}
-	}
+    delete record;
+  } catch (std::bad_alloc &) {
+    if (record != nullptr) {
+      delete record;
+    }
+  }
 }
 
 void Logger::SendLogger(jrecord_type_t type_, const char *fmt, ...)
 {
-	if ((_mask & type_) == 0) {
-		return;
-	}
+  if ((_mask & type_) == 0) {
+    return;
+  }
 
-	char tmp[4096];
-	va_list va;
+  char tmp[4096];
+  va_list va;
 
-	va_start(va, fmt);
-	vsnprintf(tmp, 4096, fmt, va); tmp[4096-1] = 0;
-	va_end(va);
+  va_start(va, fmt);
+  vsnprintf(tmp, 4096, fmt, va); tmp[4096-1] = 0;
+  va_end(va);
 
-	LogRecord *record = nullptr;
+  LogRecord *record = nullptr;
         
-	try {
-		record = new LogRecord(type_, tmp);
+  try {
+    record = new LogRecord(type_, tmp);
 
-		if (_format != nullptr) {
-			_format->Transform(record);
-		}
-		
-		_handler->WriteRecord(record);
+    if (_format != nullptr) {
+      _format->Transform(record);
+    }
+    
+    _handler->WriteRecord(record);
 
-		delete record;
-	} catch (std::bad_alloc &) {
-		if (record != nullptr) {
-			delete record;
-		}
-	}
+    delete record;
+  } catch (std::bad_alloc &) {
+    if (record != nullptr) {
+      delete record;
+    }
+  }
 }
 
 void Logger::SendLogger(LogRecord *record_)
 {
-	if ((_mask & record_->GetType()) == 0) {
-		return;
-	}
+  if ((_mask & record_->GetType()) == 0) {
+    return;
+  }
 
-	try {
-		if (_format != nullptr) {
-			_format->Transform(record_);
-		}
-		
-		_handler->WriteRecord(record_);
-	} catch (...) {
-	}
+  try {
+    if (_format != nullptr) {
+      _format->Transform(record_);
+    }
+    
+    _handler->WriteRecord(record_);
+  } catch (...) {
+  }
 }
 
 void Logger::SetOutput(int mask_)
 {
-	_mask = (jrecord_type_t)mask_;
+  _mask = (jrecord_type_t)mask_;
 }
 
 void Logger::SetHandler(LoggerHandler *handler_)
 {
-	if (handler_ != nullptr) {
-		if (_handler != nullptr) {
-			delete _handler;
-		}
+  if (handler_ != nullptr) {
+    if (_handler != nullptr) {
+      delete _handler;
+    }
         
-		_handler = handler_;
-	}
+    _handler = handler_;
+  }
 }
 
 void Logger::SetFormatter(Formatter *format_)
 {
-	if (format_ != nullptr) {
-		if (_format != nullptr) {
-			delete _format;
-		}
-		
-		_format = format_;
-	}
+  if (format_ != nullptr) {
+    if (_format != nullptr) {
+      delete _format;
+    }
+    
+    _format = format_;
+  }
 }
 
 void Logger::Release()
 {
-	LogRecord *record = nullptr;
+  LogRecord *record = nullptr;
         
-	try {
-		if (_format != nullptr) {
-			record = _format->Release();
-		}
-	
-		if (record != nullptr) {	
-			_handler->WriteRecord(record);
+  try {
+    if (_format != nullptr) {
+      record = _format->Release();
+    }
+  
+    if (record != nullptr) {  
+      _handler->WriteRecord(record);
 
-			delete record;
-		}
-	} catch (std::bad_alloc &) {
-		if (record != nullptr) {
-			delete record;
-		}
-	}
+      delete record;
+    }
+  } catch (std::bad_alloc &) {
+    if (record != nullptr) {
+      delete record;
+    }
+  }
 }
 
 }

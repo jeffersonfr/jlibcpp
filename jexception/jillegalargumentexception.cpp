@@ -22,21 +22,21 @@
 namespace jexception {
 
 IllegalArgumentException::IllegalArgumentException():
-	jexception::RuntimeException()
+  jexception::RuntimeException()
 {
-	jcommon::Object::SetClassName("jexception::IllegalArgumentException");
+  jcommon::Object::SetClassName("jexception::IllegalArgumentException");
 }
 
 IllegalArgumentException::IllegalArgumentException(std::string reason_):
-	jexception::RuntimeException(reason_)
+  jexception::RuntimeException(reason_)
 {
-	jcommon::Object::SetClassName("jexception::IllegalArgumentException");
+  jcommon::Object::SetClassName("jexception::IllegalArgumentException");
 }
 
 IllegalArgumentException::IllegalArgumentException(Exception *exception, std::string reason_):
-	jexception::RuntimeException(exception, reason_)
+  jexception::RuntimeException(exception, reason_)
 {
-	jcommon::Object::SetClassName("jexception::IllegalArgumentException");
+  jcommon::Object::SetClassName("jexception::IllegalArgumentException");
 }
 
 IllegalArgumentException::~IllegalArgumentException() throw()

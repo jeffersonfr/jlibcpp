@@ -23,9 +23,9 @@ namespace jdevice {
 
 Memory::Memory()
 {
-	// sysinfo
-	
-	Builder();
+  // sysinfo
+  
+  Builder();
 }
 
 Memory::~Memory()
@@ -34,31 +34,31 @@ Memory::~Memory()
 
 void Memory::Builder()
 {
-	memset(&info, 0, sizeof(info));
-	
-	if (sysinfo(&info) < 0) {
-		return;
-	}
+  memset(&info, 0, sizeof(info));
+  
+  if (sysinfo(&info) < 0) {
+    return;
+  }
 }
 
 std::string Memory::What()
 {
-	std::ostringstream o;
+  std::ostringstream o;
 
-	o << "Uptime: " << info.uptime << std::endl;
-	o << "Load average: " << info.loads[2] << std::endl;
-	o<< "Total ram: " << info.totalram << std::endl;
-	o<< "Free ram: " << info.freeram << std::endl;
-	o<< "Shared ram: " << info.sharedram << std::endl;
-	o<< "Buffer ram: " << info.bufferram << std::endl;
-	o<< "Total swap: " << info.totalswap << std::endl;
-	o<< "Free Swap: " << info.freeswap << std::endl;
-	o<< "Procs: " << info.procs << std::endl;
-	o<< "Total high: " << info.totalhigh << std::endl;
-	o<< "Free high: " << info.freehigh << std::endl;
-	o<< "Mem unit: " << info.mem_unit << std::endl;
-	
-	return o.str();
+  o << "Uptime: " << info.uptime << std::endl;
+  o << "Load average: " << info.loads[2] << std::endl;
+  o<< "Total ram: " << info.totalram << std::endl;
+  o<< "Free ram: " << info.freeram << std::endl;
+  o<< "Shared ram: " << info.sharedram << std::endl;
+  o<< "Buffer ram: " << info.bufferram << std::endl;
+  o<< "Total swap: " << info.totalswap << std::endl;
+  o<< "Free Swap: " << info.freeswap << std::endl;
+  o<< "Procs: " << info.procs << std::endl;
+  o<< "Total high: " << info.totalhigh << std::endl;
+  o<< "Free high: " << info.freehigh << std::endl;
+  o<< "Mem unit: " << info.mem_unit << std::endl;
+  
+  return o.str();
 }
 
 }

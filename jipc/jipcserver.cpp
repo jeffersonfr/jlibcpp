@@ -23,9 +23,9 @@
 namespace jipc {
 
 IPCServer::IPCServer():
-	jcommon::Object()
+  jcommon::Object()
 {
-	_response_timeout = -1;
+  _response_timeout = -1;
 }
 
 IPCServer::~IPCServer()
@@ -34,12 +34,12 @@ IPCServer::~IPCServer()
 
 void IPCServer::WaitCall(RemoteCallListener *listener)
 {
-	throw jexception::IPCException("IPCServer:: WaitCall wasn't implemented");
+  throw jexception::IPCException("IPCServer:: WaitCall wasn't implemented");
 }
 
 void IPCServer::SetResponseTimeout(int timeout)
 {
-	_response_timeout = timeout;
+  _response_timeout = timeout;
 }
 
 }

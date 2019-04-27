@@ -31,110 +31,110 @@ namespace jio {
  */
 class InputStream : public virtual jcommon::Object {
 
-	private:
-		/** \brief */
-		bool _is_closed;
+  private:
+    /** \brief */
+    bool _is_closed;
 
-	protected:
-		/** \brief */
-		bool _blocked;
-		
-	public:
-		/**
-		 * \brief
-		 * 
-		 */
-		InputStream();
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual ~InputStream();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetBlocking(bool block_);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsBlocking();
-
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual std::string Read(int64_t size);
+  protected:
+    /** \brief */
+    bool _blocked;
     
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsClosed();
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual bool IsEmpty();
-
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual int64_t Available();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t GetSize();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t GetPosition();
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual int64_t Read();
-
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual int64_t Read(char *data, int64_t size);
+  public:
+    /**
+     * \brief
+     * 
+     */
+    InputStream();
     
-		/**
-		 * \brief Salto relativo.
-		 *
-		 */
-		virtual void Skip(int64_t skip);
+    /**
+     * \brief
+     * 
+     */
+    virtual ~InputStream();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Reset();
+    /**
+     * \brief
+     *
+     */
+    virtual void SetBlocking(bool block_);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Close();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t GetReadedBytes();
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsBlocking();
+
+    /**
+     * \brief
+     * 
+     */
+    virtual std::string Read(int64_t size);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsClosed();
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual bool IsEmpty();
+
+    /**
+     * \brief
+     * 
+     */
+    virtual int64_t Available();
+
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t GetSize();
+
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t GetPosition();
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual int64_t Read();
+
+    /**
+     * \brief
+     * 
+     */
+    virtual int64_t Read(char *data, int64_t size);
+    
+    /**
+     * \brief Salto relativo.
+     *
+     */
+    virtual void Skip(int64_t skip);
+
+    /**
+     * \brief
+     *
+     */
+    virtual void Reset();
+
+    /**
+     * \brief
+     *
+     */
+    virtual void Close();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t GetReadedBytes();
 
 };
 

@@ -35,52 +35,52 @@ namespace jcommon {
  */
 class Options : public virtual jcommon::Object{
 
-	private:
-		/** \brief */
-		std::map<int, std::string> _tags;
-		/** \brief */
-		int _argc;
-		/** \brief */
-		char **_argv;
-		/** \brief */
-		bool _is_default;
-		
-	public:
-		/**
-		* \brief
-		*
-		*/
-		Options(int argc, char **argv);
-		
-		/**
-		* \brief
-		*
-		*/
-		virtual ~Options();
+  private:
+    /** \brief */
+    std::map<int, std::string> _tags;
+    /** \brief */
+    int _argc;
+    /** \brief */
+    char **_argv;
+    /** \brief */
+    bool _is_default;
+    
+  public:
+    /**
+    * \brief
+    *
+    */
+    Options(int argc, char **argv);
+    
+    /**
+    * \brief
+    *
+    */
+    virtual ~Options();
 
-		/**
-		 * \brief abc:d:e[255]:fg[digit]:h[alpha]:ij[decimal]
-		 *
-		 */
-		void SetOptions(std::string);
+    /**
+     * \brief abc:d:e[255]:fg[digit]:h[alpha]:ij[decimal]
+     *
+     */
+    void SetOptions(std::string);
 
-		/**
-		* \brief
-		*
-		*/
-		bool ExistsOption(std::string key);
+    /**
+    * \brief
+    *
+    */
+    bool ExistsOption(std::string key);
 
-		/**
-		* \brief
-		*
-		*/
-		bool ExistsArgument(std::string key);
+    /**
+    * \brief
+    *
+    */
+    bool ExistsArgument(std::string key);
 
-		/**
-		* \brief
-		*
-		*/
-		std::string GetArgument(std::string key);
+    /**
+    * \brief
+    *
+    */
+    std::string GetArgument(std::string key);
 
 };
 

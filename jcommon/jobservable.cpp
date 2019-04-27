@@ -22,9 +22,9 @@
 namespace jcommon {
 
 Observable::Observable():
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jcommon::Observable");
+  jcommon::Object::SetClassName("jcommon::Observable");
 }
 
 Observable::~Observable()
@@ -35,51 +35,51 @@ void Observable::AddObserver(Observer *o)
 {
   std::lock_guard<std::mutex> guard(_mutex);
 
-	_observers.push_back(o);
+  _observers.push_back(o);
 }
 
 void Observable::RemoveObserver(Observer *o)
 {
   std::lock_guard<std::mutex> guard(_mutex);
 
-	std::vector<Observer *>::iterator i = std::find(_observers.begin(), _observers.end(), o);
+  std::vector<Observer *>::iterator i = std::find(_observers.begin(), _observers.end(), o);
 
-	if (i != _observers.end()) {
-		_observers.erase(i);
-	}
+  if (i != _observers.end()) {
+    _observers.erase(i);
+  }
 }
 
 void Observable::RemoveAllObservers()
 {
   std::lock_guard<std::mutex> guard(_mutex);
 
-	_observers.clear();
+  _observers.clear();
 }
 
 void Observable::NotifyObservers(void *v)
 {
   std::lock_guard<std::mutex> guard(_mutex);
 
-	for (std::vector<Observer *>::iterator i=_observers.begin(); i!=_observers.end(); i++) {
-		(*i)->Update(v);
-	}
+  for (std::vector<Observer *>::iterator i=_observers.begin(); i!=_observers.end(); i++) {
+    (*i)->Update(v);
+  }
 }
 
 void Observable::SetChanged(bool b)
 {
-	_changed = b; 
+  _changed = b; 
 }
 
 bool Observable::HasChanged()
 {
-	return _changed;
+  return _changed;
 }
 
 int Observable::CountObservers()
 {
   std::lock_guard<std::mutex> guard(_mutex);
 
-	return _observers.size();
+  return _observers.size();
 }
 
 }

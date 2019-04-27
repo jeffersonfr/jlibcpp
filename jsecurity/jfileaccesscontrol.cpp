@@ -22,9 +22,9 @@
 namespace jsecurity {
 
 FileAccessControl::FileAccessControl():
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jsecurity::FileAccessControl");
+  jcommon::Object::SetClassName("jsecurity::FileAccessControl");
 }
 
 FileAccessControl::~FileAccessControl()

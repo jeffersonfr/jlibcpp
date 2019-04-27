@@ -25,11 +25,11 @@
 namespace jsecurity {
 
 User::User(std::string name):
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jsecurity::User");
+  jcommon::Object::SetClassName("jsecurity::User");
 
-	_name = name;
+  _name = name;
 }
 
 User::~User()
@@ -38,42 +38,42 @@ User::~User()
 
 int User::GetID()
 {
-	return -1;
+  return -1;
 }
 
 void User::AddGroup(Group *group)
 {
-	std::vector<Group *>::iterator i = std::find(_groups.begin(), _groups.end(), group);
+  std::vector<Group *>::iterator i = std::find(_groups.begin(), _groups.end(), group);
 
-	if (i != _groups.end()) {
-		return;
-	}
-	
-	_groups.push_back(group);
+  if (i != _groups.end()) {
+    return;
+  }
+  
+  _groups.push_back(group);
 }
 
 void User::RemoveGroup(Group *group)
 {
-	std::vector<Group *>::iterator i = std::find(_groups.begin(), _groups.end(), group);
+  std::vector<Group *>::iterator i = std::find(_groups.begin(), _groups.end(), group);
 
-	if (i != _groups.end()) {
-		_groups.erase(i);
-	}
+  if (i != _groups.end()) {
+    _groups.erase(i);
+  }
 }
 
 const std::vector<Group *> & User::GetGroups()
 {
-	return _groups;
+  return _groups;
 }
 
 std::string User::GetName()
 {
-	return _name;
+  return _name;
 }
 
 std::string User::GetAddress()
 {
-	return "";
+  return "";
 }
 
 };

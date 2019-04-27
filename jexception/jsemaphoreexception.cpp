@@ -22,19 +22,19 @@
 namespace jexception {
 
 SemaphoreException::SemaphoreException():
-	jexception::RuntimeException()
+  jexception::RuntimeException()
 {
   jcommon::Object::SetClassName("jexception::SemaphoreException");
 }
 
 SemaphoreException::SemaphoreException(std::string reason_):
-	jexception::RuntimeException(reason_)
+  jexception::RuntimeException(reason_)
 {
   jcommon::Object::SetClassName("jexception::SemaphoreException");
 }
 
 SemaphoreException::SemaphoreException(jexception::Exception *exception, std::string reason_):
-	jexception::RuntimeException(exception, reason_)
+  jexception::RuntimeException(exception, reason_)
 {
   jcommon::Object::SetClassName("jexception::SemaphoreException");
 }

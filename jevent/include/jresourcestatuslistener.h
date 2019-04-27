@@ -32,39 +32,39 @@ namespace jevent {
  */
 class ResourceStatusListener : public jevent::Listener {
 
-	private:
+  private:
 
-		
-	public:
-		/**
-		 * \brief
-		 * 
-		 */
-		ResourceStatusListener();
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual ~ResourceStatusListener();
+    
+  public:
+    /**
+     * \brief
+     * 
+     */
+    ResourceStatusListener();
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual ~ResourceStatusListener();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void Released(ResourceStatusEvent *event);
+    /**
+     * \brief
+     * 
+     */
+    virtual void Released(ResourceStatusEvent *event);
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void ReleaseForced(ResourceStatusEvent *event);
+    /**
+     * \brief
+     * 
+     */
+    virtual void ReleaseForced(ResourceStatusEvent *event);
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual bool ReleaseRequested(ResourceStatusEvent *event);
+    /**
+     * \brief
+     * 
+     */
+    virtual bool ReleaseRequested(ResourceStatusEvent *event);
 
 };
 

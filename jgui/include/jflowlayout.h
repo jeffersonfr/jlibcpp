@@ -30,11 +30,11 @@ namespace jgui {
  *
  */
 enum jflowlayout_align_t {
-	JFLA_LEFT,
-	JFLA_CENTER,
-	JFLA_RIGHT,
-	JFLA_LEADING,
-	JFLA_TRAILING
+  JFLA_LEFT,
+  JFLA_CENTER,
+  JFLA_RIGHT,
+  JFLA_LEADING,
+  JFLA_TRAILING
 };
 
 /**
@@ -44,108 +44,108 @@ enum jflowlayout_align_t {
  */
 class FlowLayout : public Layout {
 
-	private:
-		/** \brief */
-		jflowlayout_align_t _align;
-		/** \brief */
-		jflowlayout_align_t _newalign;
-		/** \brief */
-		int _hgap;
-		/** \brief */
-		int _vgap;
-		/** \brief */
-		bool _align_on_baseline;
+  private:
+    /** \brief */
+    jflowlayout_align_t _align;
+    /** \brief */
+    jflowlayout_align_t _newalign;
+    /** \brief */
+    int _hgap;
+    /** \brief */
+    int _vgap;
+    /** \brief */
+    bool _align_on_baseline;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		FlowLayout(jflowlayout_align_t align = JFLA_CENTER, int hgap = 10, int vgap = 10);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~FlowLayout();
+  public:
+    /**
+     * \brief
+     *
+     */
+    FlowLayout(jflowlayout_align_t align = JFLA_CENTER, int hgap = 10, int vgap = 10);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~FlowLayout();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jflowlayout_align_t GetAlign();
+    /**
+     * \brief
+     *
+     */
+    virtual jflowlayout_align_t GetAlign();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetHGap();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetVGap();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool GetAlignOnBaseline();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetAlign(jflowlayout_align_t align);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetHGap(int hgap);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetVGap(int vgap);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetAlignOnBaseline(bool align_on_baseline);
+    /**
+     * \brief
+     *
+     */
+    virtual int GetHGap();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int GetVGap();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool GetAlignOnBaseline();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetAlign(jflowlayout_align_t align);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetHGap(int hgap);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetVGap(int vgap);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetAlignOnBaseline(bool align_on_baseline);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int MoveComponents(Container *target, int x, int y, int width, int height, int rowStart, int rowEnd, bool ltr, bool useBaseline, int *ascent, int *descent);
+    /**
+     * \brief
+     *
+     */
+    virtual int MoveComponents(Container *target, int x, int y, int width, int height, int rowStart, int rowEnd, bool ltr, bool useBaseline, int *ascent, int *descent);
 
-		/**
-		 * \brief
-		 *
-		 */
+    /**
+     * \brief
+     *
+     */
     virtual jsize_t GetMinimumLayoutSize(Container *parent);
-		
-		/**
-		 * \brief
-		 *
-		 */
+    
+    /**
+     * \brief
+     *
+     */
     virtual jsize_t GetMaximumLayoutSize(Container *parent);
-		
-		/**
-		 * \brief
-		 *
-		 */
+    
+    /**
+     * \brief
+     *
+     */
     virtual jsize_t GetPreferredLayoutSize(Container *parent);
-	
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void DoLayout(Container *parent);
+  
+    /**
+     * \brief
+     *
+     */
+    virtual void DoLayout(Container *parent);
 
 };
 

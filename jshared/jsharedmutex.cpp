@@ -26,15 +26,15 @@
 namespace jshared {
 
 SharedMutex::SharedMutex(MemoryMap *mem):
-	jcommon::Object()
+  jcommon::Object()
 {
-	if (mem == nullptr) {
-		throw jexception::NullPointerException("MemoryMap must be valid");
-	}
-	
-	jcommon::Object::SetClassName("jshared::SharedMutex");
-	
-	_mmap = mem;
+  if (mem == nullptr) {
+    throw jexception::NullPointerException("MemoryMap must be valid");
+  }
+  
+  jcommon::Object::SetClassName("jshared::SharedMutex");
+  
+  _mmap = mem;
 }
 
 SharedMutex::~SharedMutex()
@@ -43,30 +43,30 @@ SharedMutex::~SharedMutex()
 
 void SharedMutex::Lock()
 {
-	if (mlock(_mmap->GetAddress(), (size_t)_mmap->GetLength()) < 0) {
-		throw jexception::MemoryException("Lock memory error");
-	}
+  if (mlock(_mmap->GetAddress(), (size_t)_mmap->GetLength()) < 0) {
+    throw jexception::MemoryException("Lock memory error");
+  }
 }
 
 void SharedMutex::Unlock()
 {
-	if (munlock(_mmap->GetAddress(), (size_t)_mmap->GetLength()) < 0) {
-		throw jexception::MemoryException("Unlock memory error");
-	}
+  if (munlock(_mmap->GetAddress(), (size_t)_mmap->GetLength()) < 0) {
+    throw jexception::MemoryException("Unlock memory error");
+  }
 }
 
 void SharedMutex::LockAll()
 {
-	if (mlockall(MCL_CURRENT | MCL_FUTURE) < 0) {
-		throw jexception::MemoryException("Lock error");
-	}
+  if (mlockall(MCL_CURRENT | MCL_FUTURE) < 0) {
+    throw jexception::MemoryException("Lock error");
+  }
 }
 
 void SharedMutex::UnlockAll()
 {
-	if (munlockall() < 0) {
-		throw jexception::MemoryException("Unlock error");
-	}
+  if (munlockall() < 0) {
+    throw jexception::MemoryException("Unlock error");
+  }
 }
 
 }

@@ -28,14 +28,14 @@
 
 #include <algorithm>
 
-#define SUBTITLE_SIZE		32
+#define SUBTITLE_SIZE    32
 
 namespace jgui {
 
 Window::Window(Window *window):
-	Container()
+  Container()
 {
-	jcommon::Object::SetClassName("jgui::Window");
+  jcommon::Object::SetClassName("jgui::Window");
 
   _focus_owner = nullptr;
   _event_manager = nullptr;
@@ -44,17 +44,17 @@ Window::Window(Window *window):
 }
 
 Window::Window(int width, int height):
-	Window(0, 0, width, height)
+  Window(0, 0, width, height)
 {
 }
 
 Window::Window(int x, int y, int width, int height):
-	Container(x, y, width, height)
+  Container(x, y, width, height)
 {
-	jcommon::Object::SetClassName("jgui::Window");
+  jcommon::Object::SetClassName("jgui::Window");
 
 #ifdef JGUI_UI
-	_instance = new NativeWindow(x, y, width, height);
+  _instance = new NativeWindow(x, y, width, height);
 #endif
   
   _instance->SetParent(this);
@@ -78,7 +78,7 @@ Window::Window(int x, int y, int width, int height):
 
   SetTitle("Main");
   SetLayout(nullptr);
-	SetBackgroundVisible(true);
+  SetBackgroundVisible(true);
   SetUndecorated(false);
 }
 
@@ -107,7 +107,7 @@ EventManager * Window::GetEventManager()
 {
   return _event_manager;
 }
-		
+    
 void Window::ShowApp()
 {
   Repaint();
@@ -135,7 +135,7 @@ void Window::ToggleFullScreen()
 
 jcursor_style_t Window::GetCursor()
 {
-	return _instance->GetCursor();
+  return _instance->GetCursor();
 }
 
 void Window::SetBounds(int x, int y, int width, int height)
@@ -155,12 +155,12 @@ jgui::jregion_t Window::GetVisibleBounds()
 
 void Window::SetTitle(std::string title)
 {
-	_instance->SetTitle(title);
+  _instance->SetTitle(title);
 }
 
 std::string Window::GetTitle()
 {
-	return _instance->GetTitle();
+  return _instance->GetTitle();
 }
 
 void Window::SetOpacity(float opacity)
@@ -170,27 +170,27 @@ void Window::SetOpacity(float opacity)
 
 float Window::GetOpacity()
 {
-	return _instance->GetOpacity();
+  return _instance->GetOpacity();
 }
 
 void Window::SetUndecorated(bool undecorate)
 {
-	_instance->SetUndecorated(undecorate);
+  _instance->SetUndecorated(undecorate);
 }
 
 bool Window::IsUndecorated()
 {
-	return _instance->IsUndecorated();
+  return _instance->IsUndecorated();
 }
 
 void Window::SetIcon(jgui::Image *image)
 {
-	_instance->SetIcon(image);
+  _instance->SetIcon(image);
 }
 
 jgui::Image * Window::GetIcon()
 {
-	return _instance->GetIcon();
+  return _instance->GetIcon();
 }
 
 jgui::Component * Window::GetFocusOwner()
@@ -231,180 +231,180 @@ Container * Window::GetFocusCycleRootAncestor()
 
 void Window::AddSubtitle(jgui::Image *image, std::string label)
 {
-	struct frame_subtitle_t t;
+  struct frame_subtitle_t t;
 
-	t.image = image;
-	t.subtitle = label;
+  t.image = image;
+  t.subtitle = label;
 
-	if (_subtitles.size() == 0) {
+  if (_subtitles.size() == 0) {
     jgui::jinsets_t
       insets = GetInsets();
 
-		insets.bottom = insets.bottom + SUBTITLE_SIZE + 8;
+    insets.bottom = insets.bottom + SUBTITLE_SIZE + 8;
 
     SetInsets(insets);
-	}
+  }
 
-	_subtitles.push_back(t);
+  _subtitles.push_back(t);
 }
 
 void Window::RemoveAllSubtitles()
 {
-	if (_subtitles.size() == 0) {
-		return;
-	}
+  if (_subtitles.size() == 0) {
+    return;
+  }
 
   jgui::jinsets_t
     insets = GetInsets();
 
-	insets.bottom = insets.bottom - SUBTITLE_SIZE - 8;
+  insets.bottom = insets.bottom - SUBTITLE_SIZE - 8;
 
   SetInsets(insets);
 
-	for (std::vector<struct frame_subtitle_t>::iterator i=_subtitles.begin(); i!=_subtitles.end(); i++) {
-		jgui::Image *image = (*i).image;
+  for (std::vector<struct frame_subtitle_t>::iterator i=_subtitles.begin(); i!=_subtitles.end(); i++) {
+    jgui::Image *image = (*i).image;
 
-		delete image;
-	}
+    delete image;
+  }
 
-	_subtitles.clear();
+  _subtitles.clear();
 }
 
 void Window::Repaint(Component *cmp)
 {
-	if (IsVisible() == false || IsIgnoreRepaint() == true) {
-		return;
-	}
+  if (IsVisible() == false || IsIgnoreRepaint() == true) {
+    return;
+  }
 
   _instance->Repaint(cmp);
 }
 
 void Window::PaintBackground(Graphics *g)
 {
-	Container::PaintBackground(g);
+  Container::PaintBackground(g);
 }
 
 void Window::PaintGlassPane(Graphics *g)
 {
-	Container::PaintGlassPane(g);
+  Container::PaintGlassPane(g);
 
-	Theme 
+  Theme 
     *theme = GetTheme();
 
   if (theme == nullptr) {
     return;
   }
 
-	jgui::Font 
+  jgui::Font 
     *font = theme->GetFont("window.font");
   jgui::Color 
-	  fg = theme->GetIntegerParam("window.fg");
+    fg = theme->GetIntegerParam("window.fg");
   jgui::jsize_t
     size = GetSize();
   jgui::jinsets_t
     insets = GetInsets();
 
-	g->SetFont(font);
-	g->SetColor(jgui::Color::White);
-	
-	if (_subtitles.size() > 0) {
-		int count = insets.right;
+  g->SetFont(font);
+  g->SetColor(jgui::Color::White);
+  
+  if (_subtitles.size() > 0) {
+    int count = insets.right;
 
-		for (std::vector<frame_subtitle_t>::iterator i=_subtitles.begin(); i!=_subtitles.end(); i++) {
-			if (font != nullptr) {
-				count += font->GetStringWidth((*i).subtitle.c_str());
+    for (std::vector<frame_subtitle_t>::iterator i=_subtitles.begin(); i!=_subtitles.end(); i++) {
+      if (font != nullptr) {
+        count += font->GetStringWidth((*i).subtitle.c_str());
 
-				g->SetColor(fg);
-				g->DrawString((*i).subtitle, size.width-count, size.height-insets.bottom+(SUBTITLE_SIZE-font->GetSize())/2+8);
-			}
+        g->SetColor(fg);
+        g->DrawString((*i).subtitle, size.width-count, size.height-insets.bottom+(SUBTITLE_SIZE-font->GetSize())/2+8);
+      }
 
-			count += 8;
+      count += 8;
 
-			if ((*i).image != nullptr) {
-				count += SUBTITLE_SIZE;
+      if ((*i).image != nullptr) {
+        count += SUBTITLE_SIZE;
 
-				g->DrawImage((*i).image, size.width-count, size.height-insets.bottom+8, SUBTITLE_SIZE, SUBTITLE_SIZE);
-			}
+        g->DrawImage((*i).image, size.width-count, size.height-insets.bottom+8, SUBTITLE_SIZE, SUBTITLE_SIZE);
+      }
 
-			count += 20;
-		}
-	}
+      count += 20;
+    }
+  }
 
-	/*
-	if (_is_undecorated == true) {
-		return;
-	}
+  /*
+  if (_is_undecorated == true) {
+    return;
+  }
 
-	Theme *theme = GetTheme();
-	jgui::Font *font = theme->GetFont("window.font");
-	Color bg = theme->GetColor("widget.bg");
-	Color fg = theme->GetColor("widget.fg");
-	Color scroll = theme->GetColor("widget.scroll");
-	int bordersize = theme->GetBorderSize("widget");
-	
-	jinsets_t insets = GetInsets();
+  Theme *theme = GetTheme();
+  jgui::Font *font = theme->GetFont("window.font");
+  Color bg = theme->GetColor("widget.bg");
+  Color fg = theme->GetColor("widget.fg");
+  Color scroll = theme->GetColor("widget.scroll");
+  int bordersize = theme->GetBorderSize("widget");
+  
+  jinsets_t insets = GetInsets();
 
-	if (_title != "") {
-		g->SetGradientStop(0.0, bg);
-		g->SetGradientStop(1.0, scroll);
-		g->FillLinearGradient(bordersize, bordersize, size.width-2*bordersize, insets.top-2*bordersize, 0, 0, 0, insets.top-2*bordersize);
-		g->ResetGradientStop();
+  if (_title != "") {
+    g->SetGradientStop(0.0, bg);
+    g->SetGradientStop(1.0, scroll);
+    g->FillLinearGradient(bordersize, bordersize, size.width-2*bordersize, insets.top-2*bordersize, 0, 0, 0, insets.top-2*bordersize);
+    g->ResetGradientStop();
 
-		if (font != nullptr) {
-			int y = (insets.top-font->GetSize())/2;
+    if (font != nullptr) {
+      int y = (insets.top-font->GetSize())/2;
 
-			if (y < 0) {
-				y = 0;
-			}
+      if (y < 0) {
+        y = 0;
+      }
 
-			std::string text = _title;
-			
-			// if (_wrap == false) {
-				text = font->TruncateString(text, "...", (size.width-insets.left-insets.right));
-			// }
+      std::string text = _title;
+      
+      // if (_wrap == false) {
+        text = font->TruncateString(text, "...", (size.width-insets.left-insets.right));
+      // }
 
-			g->SetFont(font);
-			g->SetColor(fg);
-			g->DrawString(text, insets.left+(size.width-insets.left-insets.right-font->GetStringWidth(text))/2, y);
-		}
-	}
+      g->SetFont(font);
+      g->SetColor(fg);
+      g->DrawString(text, insets.left+(size.width-insets.left-insets.right-font->GetStringWidth(text))/2, y);
+    }
+  }
 
-	if (_icon_image != nullptr) {
-		int h = (insets.top-20);
+  if (_icon_image != nullptr) {
+    int h = (insets.top-20);
 
-		if (h > 0) {
-			g->DrawImage(_icon_image, insets.left, 10, h, h);
-		}
-	}
+    if (h > 0) {
+      g->DrawImage(_icon_image, insets.left, 10, h, h);
+    }
+  }
 
-	if (_subtitles.size() > 0) {
-		int count = insets.right;
+  if (_subtitles.size() > 0) {
+    int count = insets.right;
 
-		for (std::vector<frame_subtitle_t>::iterator i=_subtitles.begin(); i!=_subtitles.end(); i++) {
-			if (font != nullptr) {
-				count += font->GetStringWidth((*i).subtitle.c_str());
+    for (std::vector<frame_subtitle_t>::iterator i=_subtitles.begin(); i!=_subtitles.end(); i++) {
+      if (font != nullptr) {
+        count += font->GetStringWidth((*i).subtitle.c_str());
 
-				g->SetColor(fg);
-				g->DrawString((*i).subtitle, size.width-count, size.height-insets.bottom+(SUBTITLE_SIZE-font->GetSize())/2+8);
-			}
+        g->SetColor(fg);
+        g->DrawString((*i).subtitle, size.width-count, size.height-insets.bottom+(SUBTITLE_SIZE-font->GetSize())/2+8);
+      }
 
-			count += 8;
+      count += 8;
 
-			if ((*i).image != nullptr) {
-				count += SUBTITLE_SIZE;
+      if ((*i).image != nullptr) {
+        count += SUBTITLE_SIZE;
 
-				g->DrawImage((*i).image, size.width-count, size.height-insets.bottom+8, SUBTITLE_SIZE, SUBTITLE_SIZE);
-			}
+        g->DrawImage((*i).image, size.width-count, size.height-insets.bottom+8, SUBTITLE_SIZE, SUBTITLE_SIZE);
+      }
 
-			count += 20;
-		}
-	}
-	*/
+      count += 20;
+    }
+  }
+  */
 }
 
 void Window::Paint(jgui::Graphics *g)
 {
-	Container::Paint(g);
+  Container::Paint(g);
 }
 
 void Window::SetVisible(bool visible)
@@ -414,12 +414,12 @@ void Window::SetVisible(bool visible)
 
 bool Window::IsVisible()
 {
-	return _instance->IsVisible();
+  return _instance->IsVisible();
 }
-		
+    
 jwindow_rotation_t Window::GetRotation()
 {
-	return _instance->GetRotation();
+  return _instance->GetRotation();
 }
 
 void Window::SetRotation(jwindow_rotation_t t)
@@ -429,65 +429,65 @@ void Window::SetRotation(jwindow_rotation_t t)
 
 bool Window::KeyPressed(jevent::KeyEvent *event)
 {
-	if (Container::KeyPressed(event) == true) {
-		return true;
-	}
+  if (Container::KeyPressed(event) == true) {
+    return true;
+  }
 
-	return false;
+  return false;
 }
 
 bool Window::KeyReleased(jevent::KeyEvent *event)
 {
-	if (Container::KeyReleased(event) == true) {
-		return true;
-	}
+  if (Container::KeyReleased(event) == true) {
+    return true;
+  }
 
-	return false;
+  return false;
 }
 
 bool Window::KeyTyped(jevent::KeyEvent *event)
 {
-	if (Container::KeyTyped(event) == true) {
-		return true;
-	}
+  if (Container::KeyTyped(event) == true) {
+    return true;
+  }
 
-	return false;
+  return false;
 }
 
 bool Window::MousePressed(jevent::MouseEvent *event)
 {
-	if (Container::MousePressed(event) == true) {
-		return true;
-	}
+  if (Container::MousePressed(event) == true) {
+    return true;
+  }
 
-	return false;
+  return false;
 }
 
 bool Window::MouseReleased(jevent::MouseEvent *event)
 {
-	if (Container::MouseReleased(event) == true) {
-		return true;
-	}
+  if (Container::MouseReleased(event) == true) {
+    return true;
+  }
 
-	return false;
+  return false;
 }
 
 bool Window::MouseMoved(jevent::MouseEvent *event)
 {
-	if (Container::MouseMoved(event) == true) {
-		return true;
-	}
+  if (Container::MouseMoved(event) == true) {
+    return true;
+  }
 
-	return false;
+  return false;
 }
 
 bool Window::MouseWheel(jevent::MouseEvent *event)
 {
-	if (Container::MouseWheel(event) == true) {
-		return true;
-	}
+  if (Container::MouseWheel(event) == true) {
+    return true;
+  }
 
-	return false;
+  return false;
 }
 
 void Window::SetCursorLocation(int x, int y)
@@ -502,12 +502,12 @@ jpoint_t Window::GetCursorLocation()
 
 void Window::SetCursorEnabled(bool enable)
 {
-	return _instance->SetCursorEnabled(enable);
+  return _instance->SetCursorEnabled(enable);
 }
 
 bool Window::IsCursorEnabled()
 {
-	return _instance->IsCursorEnabled();
+  return _instance->IsCursorEnabled();
 }
 
 void Window::SetCursor(jcursor_style_t t)
@@ -522,132 +522,132 @@ void Window::SetCursor(jgui::Image *shape, int hotx, int hoty)
 
 void Window::RegisterKeyListener(jevent::KeyListener *listener) 
 {
- 	std::lock_guard<std::mutex> guard(_key_listener_mutex);
+   std::lock_guard<std::mutex> guard(_key_listener_mutex);
 
-	std::vector<jevent::KeyListener *>::iterator i = std::find(_key_listeners.begin(), _key_listeners.end(), listener);
+  std::vector<jevent::KeyListener *>::iterator i = std::find(_key_listeners.begin(), _key_listeners.end(), listener);
 
-	if (i == _key_listeners.end()) {
-		_key_listeners.push_back(listener);
-	}
+  if (i == _key_listeners.end()) {
+    _key_listeners.push_back(listener);
+  }
 }
 
 void Window::RemoveKeyListener(jevent::KeyListener *listener) 
 {
- 	std::lock_guard<std::mutex> guard(_key_listener_mutex);
+   std::lock_guard<std::mutex> guard(_key_listener_mutex);
 
-	for (std::vector<jevent::KeyListener *>::iterator i=_key_listeners.begin(); i!=_key_listeners.end(); i++) {
-		jevent::KeyListener *l = (*i);
+  for (std::vector<jevent::KeyListener *>::iterator i=_key_listeners.begin(); i!=_key_listeners.end(); i++) {
+    jevent::KeyListener *l = (*i);
 
-		if (dynamic_cast<jevent::KeyListener *>(l) == listener) {
-			_key_listeners.erase(i);
+    if (dynamic_cast<jevent::KeyListener *>(l) == listener) {
+      _key_listeners.erase(i);
 
-			break;
-		}
-	}
+      break;
+    }
+  }
 }
 
 const std::vector<jevent::KeyListener *> & Window::GetKeyListeners()
 {
-	return _key_listeners;
+  return _key_listeners;
 }
 
 void Window::RegisterMouseListener(jevent::MouseListener *listener) 
 {
- 	std::lock_guard<std::mutex> guard(_mouse_listener_mutex);
+   std::lock_guard<std::mutex> guard(_mouse_listener_mutex);
 
-	std::vector<jevent::MouseListener *>::iterator i = std::find(_mouse_listeners.begin(), _mouse_listeners.end(), listener);
+  std::vector<jevent::MouseListener *>::iterator i = std::find(_mouse_listeners.begin(), _mouse_listeners.end(), listener);
 
-	if (i == _mouse_listeners.end()) {
-		_mouse_listeners.push_back(listener);
-	}
+  if (i == _mouse_listeners.end()) {
+    _mouse_listeners.push_back(listener);
+  }
 }
 
 void Window::RemoveMouseListener(jevent::MouseListener *listener) 
 {
- 	std::lock_guard<std::mutex> guard(_mouse_listener_mutex);
+   std::lock_guard<std::mutex> guard(_mouse_listener_mutex);
 
-	for (std::vector<jevent::MouseListener *>::iterator i=_mouse_listeners.begin(); i!=_mouse_listeners.end(); i++) {
-		jevent::MouseListener *l = (*i);
+  for (std::vector<jevent::MouseListener *>::iterator i=_mouse_listeners.begin(); i!=_mouse_listeners.end(); i++) {
+    jevent::MouseListener *l = (*i);
 
-		if (dynamic_cast<jevent::MouseListener *>(l) == listener) {
-			_mouse_listeners.erase(i);
+    if (dynamic_cast<jevent::MouseListener *>(l) == listener) {
+      _mouse_listeners.erase(i);
 
-			break;
-		}
-	}
+      break;
+    }
+  }
 }
 
 const std::vector<jevent::MouseListener *> & Window::GetMouseListeners()
 {
-	return _mouse_listeners;
+  return _mouse_listeners;
 }
 
 void Window::RegisterWindowListener(jevent::WindowListener *listener)
 {
-	if (listener == nullptr) {
-		return;
-	}
+  if (listener == nullptr) {
+    return;
+  }
 
- 	std::lock_guard<std::mutex> guard(_window_listener_mutex);
+   std::lock_guard<std::mutex> guard(_window_listener_mutex);
 
-	if (std::find(_window_listeners.begin(), _window_listeners.end(), listener) == _window_listeners.end()) {
-		_window_listeners.push_back(listener);
-	}
+  if (std::find(_window_listeners.begin(), _window_listeners.end(), listener) == _window_listeners.end()) {
+    _window_listeners.push_back(listener);
+  }
 }
 
 void Window::RemoveWindowListener(jevent::WindowListener *listener)
 {
-	if (listener == nullptr) {
-		return;
-	}
+  if (listener == nullptr) {
+    return;
+  }
 
- 	std::lock_guard<std::mutex> guard(_window_listener_mutex);
+   std::lock_guard<std::mutex> guard(_window_listener_mutex);
 
   _window_listeners.erase(std::remove(_window_listeners.begin(), _window_listeners.end(), listener), _window_listeners.end());
 }
 
 void Window::DispatchWindowEvent(jevent::WindowEvent *event)
 {
-	if (event == nullptr) {
-		return;
-	}
+  if (event == nullptr) {
+    return;
+  }
 
-	std::vector<jevent::WindowListener *> listeners;
-	
-	_window_listener_mutex.lock();
+  std::vector<jevent::WindowListener *> listeners;
+  
+  _window_listener_mutex.lock();
 
-	listeners = _window_listeners;
+  listeners = _window_listeners;
 
-	_window_listener_mutex.unlock();
+  _window_listener_mutex.unlock();
 
-	for (std::vector<jevent::WindowListener *>::iterator i=listeners.begin(); i!=listeners.end() && event->IsConsumed() == false; i++) {
-		jevent::WindowListener *listener = (*i);
+  for (std::vector<jevent::WindowListener *>::iterator i=listeners.begin(); i!=listeners.end() && event->IsConsumed() == false; i++) {
+    jevent::WindowListener *listener = (*i);
 
-		if (event->GetType() == jevent::JWET_CLOSING) {
-			listener->WindowClosing(event);
-		} else if (event->GetType() == jevent::JWET_CLOSED) {
-			listener->WindowClosed(event);
-		} else if (event->GetType() == jevent::JWET_OPENED) {
-			listener->WindowOpened(event);
-		} else if (event->GetType() == jevent::JWET_RESIZED) {
-			listener->WindowResized(event);
-		} else if (event->GetType() == jevent::JWET_MOVED) {
-			listener->WindowMoved(event);
-		} else if (event->GetType() == jevent::JWET_PAINTED) {
-			listener->WindowPainted(event);
-		} else if (event->GetType() == jevent::JWET_ENTERED) {
-			listener->WindowEntered(event);
-		} else if (event->GetType() == jevent::JWET_LEAVED) {
-			listener->WindowLeaved(event);
-		}
-	}
+    if (event->GetType() == jevent::JWET_CLOSING) {
+      listener->WindowClosing(event);
+    } else if (event->GetType() == jevent::JWET_CLOSED) {
+      listener->WindowClosed(event);
+    } else if (event->GetType() == jevent::JWET_OPENED) {
+      listener->WindowOpened(event);
+    } else if (event->GetType() == jevent::JWET_RESIZED) {
+      listener->WindowResized(event);
+    } else if (event->GetType() == jevent::JWET_MOVED) {
+      listener->WindowMoved(event);
+    } else if (event->GetType() == jevent::JWET_PAINTED) {
+      listener->WindowPainted(event);
+    } else if (event->GetType() == jevent::JWET_ENTERED) {
+      listener->WindowEntered(event);
+    } else if (event->GetType() == jevent::JWET_LEAVED) {
+      listener->WindowLeaved(event);
+    }
+  }
 
-	delete event;
+  delete event;
 }
 
 const std::vector<jevent::WindowListener *> & Window::GetWindowListeners()
 {
-	return _window_listeners;
+  return _window_listeners;
 }
 
 }

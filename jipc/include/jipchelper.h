@@ -31,9 +31,9 @@ namespace jipc {
  */
 class IPCHelper : public virtual jcommon::Object {
 
-	private:
+  private:
 
-	public:
+  public:
 
 };
 

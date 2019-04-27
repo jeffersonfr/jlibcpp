@@ -31,26 +31,26 @@ namespace jdevice {
 */
 class Video : public jdevice::Device {
 
-	private:
+  private:
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		Video();
+  public:
+    /**
+     * \brief
+     *
+     */
+    Video();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual ~Video();
+    /**
+     * \brief
+     * 
+     */
+    virtual ~Video();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void Builder();
+    /**
+     * \brief
+     * 
+     */
+    virtual void Builder();
 
 };
 

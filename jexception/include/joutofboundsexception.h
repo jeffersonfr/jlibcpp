@@ -31,52 +31,52 @@ namespace jexception {
  */
 class OutOfBoundsException : public jexception::RuntimeException {
 
-	private:
+  private:
 
-	public:
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		OutOfBoundsException();
+  public:
+    /**
+     * \brief Construtor.
+     *
+     */
+    OutOfBoundsException();
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		OutOfBoundsException(std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    OutOfBoundsException(std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		OutOfBoundsException(Exception *exception, std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    OutOfBoundsException(Exception *exception, std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> OutOfBoundsException(const std::string &fmt, T ...vs):
       Exception(fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::OutOfBoundsException");
     }
-		
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> OutOfBoundsException(Exception *exception, const std::string &fmt, T ...vs):
       Exception(exception, fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::OutOfBoundsException");
     }
-		
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~OutOfBoundsException() throw();
+    
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~OutOfBoundsException() throw();
 
 };
 

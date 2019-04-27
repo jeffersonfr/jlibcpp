@@ -22,12 +22,12 @@
 namespace jevent {
 
 EventObject::EventObject(void *source):
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jevent::EventObject");
+  jcommon::Object::SetClassName("jevent::EventObject");
 
-	_source = source;
-	_is_consumed = false;
+  _source = source;
+  _is_consumed = false;
 }
 
 EventObject::~EventObject()
@@ -36,17 +36,17 @@ EventObject::~EventObject()
 
 void * EventObject::GetSource()
 {
-	return _source;
+  return _source;
 }
 
 void EventObject::Consume()
 {
-	_is_consumed = true;
+  _is_consumed = true;
 }
 
 bool EventObject::IsConsumed()
 {
-	return _is_consumed;
+  return _is_consumed;
 }
 
 }

@@ -24,19 +24,19 @@ namespace jexception {
 FileException::FileException():
   jexception::IOException()
 {
-	jcommon::Object::SetClassName("jexception::FileException");
+  jcommon::Object::SetClassName("jexception::FileException");
 }
 
 FileException::FileException(std::string reason_):
   jexception::IOException(reason_)
 {
-	jcommon::Object::SetClassName("jexception::FileException");
+  jcommon::Object::SetClassName("jexception::FileException");
 }
 
 FileException::FileException(jexception::Exception *exception, std::string reason_):
   jexception::IOException(exception, reason_)
 {
-	jcommon::Object::SetClassName("jexception::FileException");
+  jcommon::Object::SetClassName("jexception::FileException");
 }
 
 FileException::~FileException() throw()

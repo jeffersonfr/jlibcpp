@@ -36,43 +36,43 @@ namespace jnetwork {
  */
 class InetAddress : public virtual jcommon::Object {
 
-	protected:
-		/**
-		 * \brief Constructor private.
-		 *
-		 */
-		InetAddress();
+  protected:
+    /**
+     * \brief Constructor private.
+     *
+     */
+    InetAddress();
 
-	public:
-		/**
-		 * \brief Destructor virtual.
-		 *
-		 */
-		virtual ~InetAddress();
+  public:
+    /**
+     * \brief Destructor virtual.
+     *
+     */
+    virtual ~InetAddress();
 
-		/**
-		 * \brief
-		 *
-		 */
-		static bool IsReachable(std::string host);
+    /**
+     * \brief
+     *
+     */
+    static bool IsReachable(std::string host);
 
-		/**
-		 * \brief Get the host name.
-		 *
-		 */
-		virtual std::string GetHostName();
+    /**
+     * \brief Get the host name.
+     *
+     */
+    virtual std::string GetHostName();
 
-		/**
-		 * \brief Get the host address.
-		 *
-		 */
-		virtual std::string GetHostAddress();
+    /**
+     * \brief Get the host address.
+     *
+     */
+    virtual std::string GetHostAddress();
 
-		/**
-		 * \brief Get the address IPv4.
-		 *
-		 */
-		virtual std::vector<uint32_t> GetAddress();
+    /**
+     * \brief Get the address IPv4.
+     *
+     */
+    virtual std::vector<uint32_t> GetAddress();
 
 };
 

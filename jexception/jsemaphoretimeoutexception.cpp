@@ -22,21 +22,21 @@
 namespace jexception {
 
 SemaphoreTimeoutException::SemaphoreTimeoutException():
-	jexception::TimeoutException()
+  jexception::TimeoutException()
 {
-	jcommon::Object::SetClassName("jexception::SemaphoreTimeoutException");
+  jcommon::Object::SetClassName("jexception::SemaphoreTimeoutException");
 }
 
 SemaphoreTimeoutException::SemaphoreTimeoutException(std::string reason_):
-	jexception::TimeoutException(reason_)
+  jexception::TimeoutException(reason_)
 {
-	jcommon::Object::SetClassName("jexception::SemaphoreTimeoutException");
+  jcommon::Object::SetClassName("jexception::SemaphoreTimeoutException");
 }
 
 SemaphoreTimeoutException::SemaphoreTimeoutException(jexception::Exception *exception, std::string reason_):
-	jexception::TimeoutException(exception, reason_)
+  jexception::TimeoutException(exception, reason_)
 {
-	jcommon::Object::SetClassName("jexception::SemaphoreTimeoutException");
+  jcommon::Object::SetClassName("jexception::SemaphoreTimeoutException");
 }
 
 SemaphoreTimeoutException::~SemaphoreTimeoutException() throw()

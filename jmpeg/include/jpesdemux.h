@@ -26,27 +26,27 @@ namespace jmpeg {
 
 class PESDemux : public jmpeg::Demux {
 
-	protected:
+  protected:
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		PESDemux();
+  public:
+    /**
+     * \brief
+     *
+     */
+    PESDemux();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~PESDemux();
+    /**
+     * \brief
+     *
+     */
+    virtual ~PESDemux();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool Append(const char *data, int data_length);
-		
+    /**
+     * \brief
+     *
+     */
+    virtual bool Append(const char *data, int data_length);
+    
 };
 
 }

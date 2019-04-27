@@ -26,19 +26,19 @@
 namespace jio {
 
 PipeStream::PipeStream(int size):
-	jio::InputStream(), jio::OutputStream()
+  jio::InputStream(), jio::OutputStream()
 {
-	InputStream::SetClassName("jio::PipeStream");
-	
-	int r;
-	
+  InputStream::SetClassName("jio::PipeStream");
+  
+  int r;
+  
     r = pipe (_fds);
-	
-	if (r <= 0) {
-		_is_open = false;
-	}
+  
+  if (r <= 0) {
+    _is_open = false;
+  }
 
-	_is_open = true;
+  _is_open = true;
 }
 
 PipeStream::~PipeStream()
@@ -47,24 +47,24 @@ PipeStream::~PipeStream()
 
 int64_t PipeStream::Read(char *data_, int64_t length_) 
 {
-	if (_is_open == false) {
-		return 0;
-	}
-	
-	return read(_fds[0], data_, length_);
+  if (_is_open == false) {
+    return 0;
+  }
+  
+  return read(_fds[0], data_, length_);
 }
 
 int64_t PipeStream::Write(const char *data_, int64_t length_) 
 {
-	return write(_fds[1], data_, length_);
+  return write(_fds[1], data_, length_);
 }
 
 void PipeStream::Close()
 {
-	close(_fds[0]);
-	close(_fds[1]);
+  close(_fds[0]);
+  close(_fds[1]);
 
-	_is_open = false;
+  _is_open = false;
 }
 
 }

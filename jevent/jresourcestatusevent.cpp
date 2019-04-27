@@ -22,9 +22,9 @@
 namespace jevent {
 
 ResourceStatusEvent::ResourceStatusEvent(void *source, jresourceevent_status_t type):
-	jevent::EventObject(source)
+  jevent::EventObject(source)
 {
-	_type = type;
+  _type = type;
 }
 
 ResourceStatusEvent::~ResourceStatusEvent()
@@ -33,7 +33,7 @@ ResourceStatusEvent::~ResourceStatusEvent()
 
 jresourceevent_status_t  ResourceStatusEvent::GetType()
 {
-	return _type;
+  return _type;
 }
 
 }

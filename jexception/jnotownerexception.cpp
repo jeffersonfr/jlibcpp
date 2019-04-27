@@ -22,21 +22,21 @@
 namespace jexception {
 
 NotOwnerException::NotOwnerException():
-	RuntimeException()
+  RuntimeException()
 {
-	jcommon::Object::SetClassName("jexception::NotOwnerException");
+  jcommon::Object::SetClassName("jexception::NotOwnerException");
 }
 
 NotOwnerException::NotOwnerException(std::string reason_):
-	RuntimeException(reason_)
+  RuntimeException(reason_)
 {
-	jcommon::Object::SetClassName("jexception::NotOwnerException");
+  jcommon::Object::SetClassName("jexception::NotOwnerException");
 }
 
 NotOwnerException::NotOwnerException(jexception::Exception *exception, std::string reason_):
-	RuntimeException(exception, reason_)
+  RuntimeException(exception, reason_)
 {
-	jcommon::Object::SetClassName("jexception::NotOwnerException");
+  jcommon::Object::SetClassName("jexception::NotOwnerException");
 }
 
 NotOwnerException::~NotOwnerException() throw()

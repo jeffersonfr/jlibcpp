@@ -24,15 +24,15 @@
 namespace jio {
 
 ObjectOutputStream::ObjectOutputStream(OutputStream *os):
-	Object()
+  Object()
 {
-	jcommon::Object::SetClassName("jio::ObjectOutputStream");
-	
-	if ((void *)os == nullptr) {
-		throw jexception::IOException("Null pointer exception");
-	}
+  jcommon::Object::SetClassName("jio::ObjectOutputStream");
+  
+  if ((void *)os == nullptr) {
+    throw jexception::IOException("Null pointer exception");
+  }
 
-	stream = os;
+  stream = os;
 }
 
 ObjectOutputStream::~ObjectOutputStream()
@@ -41,64 +41,64 @@ ObjectOutputStream::~ObjectOutputStream()
 
 bool ObjectOutputStream::IsEmpty()
 {
-	return Available() == 0;
+  return Available() == 0;
 }
 
 int64_t ObjectOutputStream::Available()
 {
-	if (stream != nullptr) {
-		return stream->Available();
-	}
+  if (stream != nullptr) {
+    return stream->Available();
+  }
 
-	return 0LL;
+  return 0LL;
 }
 
 int64_t ObjectOutputStream::Write(jcommon::Object *object)
 {
-	if (object == nullptr || stream == nullptr) {
-		return -1;
-	}
+  if (object == nullptr || stream == nullptr) {
+    return -1;
+  }
 
-	if (object->InstanceOf("jio::Serializable") == false) {
-		return -1;
-	}
+  if (object->InstanceOf("jio::Serializable") == false) {
+    return -1;
+  }
 
-	jio::Serializable *obj = dynamic_cast<jio::Serializable *>(object);
+  jio::Serializable *obj = dynamic_cast<jio::Serializable *>(object);
 
-	std::string name = obj->GetNameSpace();
+  std::string name = obj->GetNameSpace();
 
-	if (name != "") {
-		name = name + "::";
-	}
+  if (name != "") {
+    name = name + "::";
+  }
 
-	name = name + obj->GetClassName();
+  name = name + obj->GetClassName();
 
-	return stream->Write("{\"" + name + "\": " + obj->SerializeObject() + "}");
+  return stream->Write("{\"" + name + "\": " + obj->SerializeObject() + "}");
 }
 
 int64_t ObjectOutputStream::Flush()
 {
-	if (stream != nullptr) {
-		return stream->Flush();
-	}
+  if (stream != nullptr) {
+    return stream->Flush();
+  }
 
-	return 0LL;
+  return 0LL;
 }
 
 void ObjectOutputStream::Close()
 {
-	if (stream != nullptr) {
-		stream->Close();
-	}
+  if (stream != nullptr) {
+    stream->Close();
+  }
 }
 
 int64_t ObjectOutputStream::GetSentBytes()
 {
-	if (stream != nullptr) {
-		return stream->GetSentBytes();
-	}
+  if (stream != nullptr) {
+    return stream->GetSentBytes();
+  }
 
-	return 0LL;
+  return 0LL;
 }
 
 }

@@ -30,31 +30,31 @@ namespace jmedia {
  * \author Jeff Ferr
  */
 class Control : public jcommon::Object {
-	
-	private:
-		/** \brief */
-		std::string _id;
+  
+  private:
+    /** \brief */
+    std::string _id;
 
-	protected:
-		/**
-		 * \brief
-		 *
-		 */
-		Control(std::string id);
+  protected:
+    /**
+     * \brief
+     *
+     */
+    Control(std::string id);
 
-	public:
+  public:
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~Control();
+    /**
+     * \brief
+     *
+     */
+    virtual ~Control();
 
-		/**
-		 * \brief
-		 *
-		 */
-		std::string GetID();
+    /**
+     * \brief
+     *
+     */
+    std::string GetID();
 
 };
 

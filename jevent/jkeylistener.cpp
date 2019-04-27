@@ -22,9 +22,9 @@
 namespace jevent {
 
 KeyListener::KeyListener():
-	jevent::Listener()
+  jevent::Listener()
 {
-	jcommon::Object::SetClassName("jevent::KeyListener");
+  jcommon::Object::SetClassName("jevent::KeyListener");
 }
 
 KeyListener::~KeyListener() 
@@ -33,17 +33,17 @@ KeyListener::~KeyListener()
 
 bool KeyListener::KeyPressed(KeyEvent *event)
 {
-	return false;
+  return false;
 }
 
 bool KeyListener::KeyReleased(KeyEvent *event)
 {
-	return false;
+  return false;
 }
 
 bool KeyListener::KeyTyped(KeyEvent *event)
 {
-	return false;
+  return false;
 }
 
 }

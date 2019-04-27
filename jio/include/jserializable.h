@@ -31,32 +31,32 @@ namespace jio {
  */
 class Serializable : public jcommon::Object {
 
-	private:
-		
-	public:
-		/**
-		 * \brief
-		 * 
-		 */
-		Serializable();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~Serializable();
+  private:
+    
+  public:
+    /**
+     * \brief
+     * 
+     */
+    Serializable();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~Serializable();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string SerializeObject();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void AssemblyObject(std::string object);
+    /**
+     * \brief
+     *
+     */
+    virtual std::string SerializeObject();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void AssemblyObject(std::string object);
 
 };
 

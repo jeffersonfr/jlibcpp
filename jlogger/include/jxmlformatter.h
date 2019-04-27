@@ -31,33 +31,33 @@ namespace jlogger {
 */
 class XMLFormatter : public jlogger::Formatter {
 
-	private:
-		std::string _name;
-		bool _init;
-	
-	public:
-		/**
-		 * \brief
-		 */
-		XMLFormatter(std::string name_ = "logger");
+  private:
+    std::string _name;
+    bool _init;
+  
+  public:
+    /**
+     * \brief
+     */
+    XMLFormatter(std::string name_ = "logger");
 
-		/**
-		 * \brief
-		 */
-		~XMLFormatter();
+    /**
+     * \brief
+     */
+    ~XMLFormatter();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void Transform(LogRecord *);
+    /**
+     * \brief
+     * 
+     */
+    virtual void Transform(LogRecord *);
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual LogRecord * Release();
-		
+    /**
+     * \brief
+     * 
+     */
+    virtual LogRecord * Release();
+    
 };
 
 }

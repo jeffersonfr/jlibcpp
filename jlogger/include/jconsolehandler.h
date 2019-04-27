@@ -33,24 +33,24 @@ namespace jlogger {
  */
 class ConsoleHandler : public jlogger::StreamHandler {
 
-	private:
-		std::mutex _mutex;
-		
-	public:
-		/**
-		 * \brief
-		 */
-		ConsoleHandler();
-		
-		/**
-		 * \brief
-		 */
-		virtual ~ConsoleHandler();
+  private:
+    std::mutex _mutex;
+    
+  public:
+    /**
+     * \brief
+     */
+    ConsoleHandler();
+    
+    /**
+     * \brief
+     */
+    virtual ~ConsoleHandler();
 
-		/**
-		 * \brief
-		 */
-		virtual void WriteRecord(LogRecord *);
+    /**
+     * \brief
+     */
+    virtual void WriteRecord(LogRecord *);
     
 };
 

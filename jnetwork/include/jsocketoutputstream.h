@@ -35,106 +35,106 @@ namespace jnetwork {
  */
 class SocketOutputStream : public jio::OutputStream {
 
-	private:
-		/** \brief */
-		Connection *_connection;
-		/** \brief */
-		struct sockaddr *_address;
-		/** \brief */
-		char *_buffer;
-		/** \brief */
-		int64_t _buffer_length;
-		/** \brief */
-		int64_t _current_index; 
-		/** \brief */
-		int64_t _sent_bytes;
-		/** \brief */
-		bool _stream;
+  private:
+    /** \brief */
+    Connection *_connection;
+    /** \brief */
+    struct sockaddr *_address;
+    /** \brief */
+    char *_buffer;
+    /** \brief */
+    int64_t _buffer_length;
+    /** \brief */
+    int64_t _current_index; 
+    /** \brief */
+    int64_t _sent_bytes;
+    /** \brief */
+    bool _stream;
 
-	public:
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		SocketOutputStream(Connection *connection_, int64_t size_ = SOCK_WR_BUFFER_SIZE);
+  public:
+    /**
+     * \brief Construtor.
+     *
+     */
+    SocketOutputStream(Connection *connection_, int64_t size_ = SOCK_WR_BUFFER_SIZE);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		SocketOutputStream(Connection *connection_, struct sockaddr *address_, int64_t size_ = SOCK_RD_BUFFER_SIZE);
+    /**
+     * \brief Construtor.
+     *
+     */
+    SocketOutputStream(Connection *connection_, struct sockaddr *address_, int64_t size_ = SOCK_RD_BUFFER_SIZE);
 
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~SocketOutputStream();
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~SocketOutputStream();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsEmpty();
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsEmpty();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t Available();
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t Available();
 
-		/**
-		 * \brief jio::OutputStream
-		 *
-		 */
-		virtual int64_t GetSize();
+    /**
+     * \brief jio::OutputStream
+     *
+     */
+    virtual int64_t GetSize();
 
-		/**
-		 * \brief jio::OutputStream
-		 *
-		 */
-		virtual void Seek(int64_t index);
+    /**
+     * \brief jio::OutputStream
+     *
+     */
+    virtual void Seek(int64_t index);
 
-		/**
-		 * \brief jio::OutputStream
-		 *
-		 */
-		virtual void Close();
+    /**
+     * \brief jio::OutputStream
+     *
+     */
+    virtual void Close();
 
-		/**
-		 * \brief jio::OutputStream
-		 *
-		 */
-		virtual bool IsClosed();
+    /**
+     * \brief jio::OutputStream
+     *
+     */
+    virtual bool IsClosed();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t Write(int64_t c_);
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t Write(int64_t c_);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t Write(const char *data_, int64_t data_length_);
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t Write(const char *data_, int64_t data_length_);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t GetAvailable();
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t GetAvailable();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t GetSentBytes();
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t GetSentBytes();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t Flush();
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t Flush();
 };
 
 }

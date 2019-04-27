@@ -25,72 +25,72 @@ namespace jgui {
 
 CheckButtonGroup::CheckButtonGroup()
 {
-	jcommon::Object::SetClassName("jgui::CheckButtonGroup");
+  jcommon::Object::SetClassName("jgui::CheckButtonGroup");
 }
 
 CheckButtonGroup::~CheckButtonGroup()
 {
- 	std::lock_guard<std::mutex> guard(_group_mutex);
+   std::lock_guard<std::mutex> guard(_group_mutex);
 
-	// INFO:: the user must remove listeners manually
+  // INFO:: the user must remove listeners manually
 }
 
 void CheckButtonGroup::Add(CheckButton *button)
 {
- 	std::lock_guard<std::mutex> guard(_group_mutex);
+   std::lock_guard<std::mutex> guard(_group_mutex);
 
-	if (std::find(_buttons.begin(), _buttons.end(), button) != _buttons.end()) {
-		return;
-	}
+  if (std::find(_buttons.begin(), _buttons.end(), button) != _buttons.end()) {
+    return;
+  }
 
-	button->RegisterToggleListener(this);
+  button->RegisterToggleListener(this);
 
-	_buttons.push_back(button);
+  _buttons.push_back(button);
 }
 
 void CheckButtonGroup::Remove(CheckButton *button)
 {
- 	std::lock_guard<std::mutex> guard(_group_mutex);
+   std::lock_guard<std::mutex> guard(_group_mutex);
 
-	for (std::vector<CheckButton *>::iterator i=_buttons.begin(); i!=_buttons.end(); i++) {
-		if (button == (*i)) {
-			(*i)->RemoveToggleListener(this);
+  for (std::vector<CheckButton *>::iterator i=_buttons.begin(); i!=_buttons.end(); i++) {
+    if (button == (*i)) {
+      (*i)->RemoveToggleListener(this);
 
-			_buttons.erase(i);
+      _buttons.erase(i);
 
       break;
-		}
-	}
+    }
+  }
 }
 
 void CheckButtonGroup::StateChanged(jevent::ToggleEvent *event)
 {
- 	std::lock_guard<std::mutex> guard(_group_mutex);
+   std::lock_guard<std::mutex> guard(_group_mutex);
 
-	CheckButton *cb = (CheckButton *)event->GetSource();
+  CheckButton *cb = (CheckButton *)event->GetSource();
 
-	if (event->IsSelected() == false) {
-		return;
-	}
+  if (event->IsSelected() == false) {
+    return;
+  }
 
-	for (std::vector<CheckButton *>::iterator i=_buttons.begin(); i!=_buttons.end(); i++) {
-		if (cb != (*i)) {
-			(*i)->SetSelected(false);
-		}
-	}
+  for (std::vector<CheckButton *>::iterator i=_buttons.begin(); i!=_buttons.end(); i++) {
+    if (cb != (*i)) {
+      (*i)->SetSelected(false);
+    }
+  }
 }
 
 CheckButton * CheckButtonGroup::GetSelected()
 {
- 	std::lock_guard<std::mutex> guard(_group_mutex);
+   std::lock_guard<std::mutex> guard(_group_mutex);
 
-	for (std::vector<CheckButton *>::iterator i=_buttons.begin(); i!=_buttons.end(); i++) {
-		if ((*i)->IsSelected() == true) {
-			return (*i);
-		}
-	}
+  for (std::vector<CheckButton *>::iterator i=_buttons.begin(); i!=_buttons.end(); i++) {
+    if ((*i)->IsSelected() == true) {
+      return (*i);
+    }
+  }
 
-	return nullptr;
+  return nullptr;
 }
 
 }

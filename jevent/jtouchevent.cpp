@@ -22,33 +22,33 @@
 namespace jevent {
 
 TouchEvent::TouchEvent(void *source, jtouchevent_type_t type, jgui::jpoint_t location, jgui::jpoint_t distance, double pressure, int finger_index):
-	jevent::EventObject(source)
+  jevent::EventObject(source)
 {
-	jcommon::Object::SetClassName("jevent::TouchEvent");
-		
-	_type = type;
-	_location = location;
-	_distance = distance;
-	_pressure = pressure;
-	_delta = 0.0;
-	_radians = 0.0;
-	_finger_index = finger_index;
-	_fingers = -1;
+  jcommon::Object::SetClassName("jevent::TouchEvent");
+    
+  _type = type;
+  _location = location;
+  _distance = distance;
+  _pressure = pressure;
+  _delta = 0.0;
+  _radians = 0.0;
+  _finger_index = finger_index;
+  _fingers = -1;
 }
 
 TouchEvent::TouchEvent(void *source, jtouchevent_type_t type, jgui::jpoint_t distance, double radians, double delta, int fingers):
-	jevent::EventObject(source)
+  jevent::EventObject(source)
 {
-	jcommon::Object::SetClassName("jevent::TouchEvent");
-	
-	_type = type;
-	// _location = location;
-	_distance = distance;
-	_pressure = 0.0;
-	_delta = delta;
-	_radians = radians;
-	_finger_index = -1;
-	_fingers = fingers;
+  jcommon::Object::SetClassName("jevent::TouchEvent");
+  
+  _type = type;
+  // _location = location;
+  _distance = distance;
+  _pressure = 0.0;
+  _delta = delta;
+  _radians = radians;
+  _finger_index = -1;
+  _fingers = fingers;
 }
 
 TouchEvent::~TouchEvent()
@@ -57,42 +57,42 @@ TouchEvent::~TouchEvent()
 
 jtouchevent_type_t TouchEvent::GetType()
 {
-	return _type;
+  return _type;
 }
 
 int TouchEvent::GetFingerIndex()
 {
-	return _finger_index;
+  return _finger_index;
 }
 
 jgui::jpoint_t TouchEvent::GetLocation()
 {
-	return _location;
+  return _location;
 }
 
 jgui::jpoint_t TouchEvent::GetDistance()
 {
-	return _distance;
+  return _distance;
 }
 
 double TouchEvent::GetPressure()
 {
-	return _pressure;
+  return _pressure;
 }
 
 double TouchEvent::GetAngle()
 {
-	return _radians;
+  return _radians;
 }
 
 double TouchEvent::GetDelta()
 {
-	return _delta;
+  return _delta;
 }
 
 double TouchEvent::GetFingers()
 {
-	return _fingers;
+  return _fingers;
 }
 
 }

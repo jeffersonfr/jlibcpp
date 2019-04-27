@@ -32,28 +32,28 @@ namespace jipc {
  */
 class LocalIPCServer : public IPCServer {
 
-	private:
-		/** \brief */
-		jnetwork::LocalServerSocket *_server;
+  private:
+    /** \brief */
+    jnetwork::LocalServerSocket *_server;
 
-	public:
-		/**
-		 * \Constructor.
-		 *
-		 */
-		LocalIPCServer(std::string id);
+  public:
+    /**
+     * \Constructor.
+     *
+     */
+    LocalIPCServer(std::string id);
 
-		/**
-		 * \brief Destructor.
-		 *
-		 */
-		virtual ~LocalIPCServer();
+    /**
+     * \brief Destructor.
+     *
+     */
+    virtual ~LocalIPCServer();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void WaitCall(RemoteCallListener *listener);
+    /**
+     * \brief
+     *
+     */
+    virtual void WaitCall(RemoteCallListener *listener);
 
 };
 

@@ -36,86 +36,86 @@ namespace jgui {
  */
 class Animation : public Component {
 
-	private:
-		/** \brief */
-		std::vector<Image *> _images;
-		/** \brief */
-		std::mutex _animation_mutex;
-		/** \brief */
+  private:
+    /** \brief */
+    std::vector<Image *> _images;
+    /** \brief */
+    std::mutex _animation_mutex;
+    /** \brief */
     std::thread _thread;
-		/** \brief */
-		int _index;
-		/** \brief */
-		int _interval;
-		/** \brief */
-		bool _running;
+    /** \brief */
+    int _index;
+    /** \brief */
+    int _interval;
+    /** \brief */
+    bool _running;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		Animation(int x = 0, int y = 0, int width = 0, int height = 0);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~Animation();
+  public:
+    /**
+     * \brief
+     *
+     */
+    Animation(int x = 0, int y = 0, int width = 0, int height = 0);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~Animation();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetInterval(int i);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void AddImage(jgui::Image *image);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveImage(jgui::Image *image);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveAll();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual const std::vector<jgui::Image *> & GetImages();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Start();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Stop();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Paint(Graphics *g);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Run();
+    /**
+     * \brief
+     *
+     */
+    virtual void SetInterval(int i);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void AddImage(jgui::Image *image);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void RemoveImage(jgui::Image *image);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void RemoveAll();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual const std::vector<jgui::Image *> & GetImages();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Start();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Stop();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Paint(Graphics *g);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Run();
 
 };
 

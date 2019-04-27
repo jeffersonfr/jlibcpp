@@ -34,49 +34,49 @@ class SystemException : public jexception::RuntimeException {
   private:
 
   public:
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		SystemException();
+    /**
+     * \brief Construtor.
+     *
+     */
+    SystemException();
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		SystemException(std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    SystemException(std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		SystemException(jexception::Exception *exception, std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    SystemException(jexception::Exception *exception, std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> SystemException(const std::string &fmt, T ...vs):
       Exception(fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::SystemException");
     }
-		
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> SystemException(Exception *exception, const std::string &fmt, T ...vs):
       Exception(exception, fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::SystemException");
     }
-		
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~SystemException() throw();
+    
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~SystemException() throw();
 
 };
 

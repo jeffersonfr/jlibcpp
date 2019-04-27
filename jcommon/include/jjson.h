@@ -31,13 +31,13 @@ namespace jcommon {
  *
  */
 enum json_type_t {
-	JSON_NULL,
-	JSON_OBJECT,
-	JSON_ARRAY,
-	JSON_STRING,
-	JSON_INT,
-	JSON_FLOAT,
-	JSON_BOOL,
+  JSON_NULL,
+  JSON_OBJECT,
+  JSON_ARRAY,
+  JSON_STRING,
+  JSON_INT,
+  JSON_FLOAT,
+  JSON_BOOL,
 };
 
 /**
@@ -50,107 +50,107 @@ enum json_type_t {
  */
 class JSONValue : public jcommon::Object{
 
-	friend class JSON;
+  friend class JSON;
 
-	private:
-		/** \brief */
-		JSONValue *_parent;
-		/** \brief */
-		JSONValue *_next_sibling;
-		/** \brief */
-		JSONValue *_first_child;
-		/** \brief */
-		JSONValue *_last_child;
-		/** \brief */
+  private:
+    /** \brief */
+    JSONValue *_parent;
+    /** \brief */
+    JSONValue *_next_sibling;
+    /** \brief */
+    JSONValue *_first_child;
+    /** \brief */
+    JSONValue *_last_child;
+    /** \brief */
     std::string _name;
-		/** \brief */
+    /** \brief */
     std::string _value;
-		/** \brief */
-		json_type_t _type;
+    /** \brief */
+    json_type_t _type;
 
-	private:
-		/**
-		 * \brief
-		 *
-		 */
-		void Append(JSONValue *rhs);
+  private:
+    /**
+     * \brief
+     *
+     */
+    void Append(JSONValue *rhs);
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		JSONValue();
+  public:
+    /**
+     * \brief
+     *
+     */
+    JSONValue();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~JSONValue();
+    /**
+     * \brief
+     *
+     */
+    virtual ~JSONValue();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual json_type_t GetType();
+    /**
+     * \brief
+     *
+     */
+    virtual json_type_t GetType();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string GetName();
+    /**
+     * \brief
+     *
+     */
+    virtual std::string GetName();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string GetValue();
+    /**
+     * \brief
+     *
+     */
+    virtual std::string GetValue();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetValue(std::string value);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetValue(std::string value);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual JSONValue * GetParent();
+    /**
+     * \brief
+     *
+     */
+    virtual JSONValue * GetParent();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual JSONValue * NextSibling();
+    /**
+     * \brief
+     *
+     */
+    virtual JSONValue * NextSibling();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual JSONValue * GetFirstChild();
+    /**
+     * \brief
+     *
+     */
+    virtual JSONValue * GetFirstChild();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual JSONValue * GetLastChild();
+    /**
+     * \brief
+     *
+     */
+    virtual JSONValue * GetLastChild();
 
 };
 
 class JSON : public virtual jcommon::Object {
 
-	private:
+  private:
     JSON()
     {
     }
 
-	public:
+  public:
     /**
      * \brief
      *
      */
-		static JSONValue * Parse(jio::InputStream *stream);
+    static JSONValue * Parse(jio::InputStream *stream);
 
     /**
      * \brief

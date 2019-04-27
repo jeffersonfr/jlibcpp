@@ -31,20 +31,20 @@ namespace jevent {
  */
 class ActionEvent : public jevent::EventObject {
 
-	private:
+  private:
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		ActionEvent(void *source);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~ActionEvent();
+  public:
+    /**
+     * \brief
+     *
+     */
+    ActionEvent(void *source);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~ActionEvent();
 
 };
 

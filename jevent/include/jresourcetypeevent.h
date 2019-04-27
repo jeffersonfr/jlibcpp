@@ -25,8 +25,8 @@
 namespace jevent {
 
 enum jresourceevent_type_t {
-	JRT_RESERVED,
-	JRT_RELEASED
+  JRT_RESERVED,
+  JRT_RELEASED
 };
 
 /**
@@ -36,28 +36,28 @@ enum jresourceevent_type_t {
  */
 class ResourceTypeEvent : public jevent::EventObject {
 
-	private:
-		/** \brief */
-		jresourceevent_type_t _type;
-		
-	public:
-		/**
-		 * \brief
-		 * 
-		 */
-		ResourceTypeEvent(void *source, jresourceevent_type_t type);
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual ~ResourceTypeEvent();
+  private:
+    /** \brief */
+    jresourceevent_type_t _type;
+    
+  public:
+    /**
+     * \brief
+     * 
+     */
+    ResourceTypeEvent(void *source, jresourceevent_type_t type);
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual ~ResourceTypeEvent();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual jresourceevent_type_t  GetType();
+    /**
+     * \brief
+     * 
+     */
+    virtual jresourceevent_type_t  GetType();
     
 };
 

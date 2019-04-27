@@ -25,11 +25,11 @@
 namespace jlogger {
 
 enum jrecord_type_t {
-	JRT_INFO			= 0x00000001,
-	JRT_WARNNING	= 0x00000002,
-	JRT_ERROR			= 0x00000004,
-	JRT_CRITICAL	= 0x00000008,
-	JRT_UNKNOWN		= 0x00000010
+  JRT_INFO      = 0x00000001,
+  JRT_WARNNING  = 0x00000002,
+  JRT_ERROR      = 0x00000004,
+  JRT_CRITICAL  = 0x00000008,
+  JRT_UNKNOWN    = 0x00000010
 };
 
 /**
@@ -39,49 +39,49 @@ enum jrecord_type_t {
  */
 class LogRecord : public virtual jcommon::Object {
 
-	private:
-		/** \brief */
-		std::string _record;
-		/** \brief */
-		jrecord_type_t _type;
+  private:
+    /** \brief */
+    std::string _record;
+    /** \brief */
+    jrecord_type_t _type;
     
-	public:
-		/**
-		 * \brief
-		 * 
-		 */
-		LogRecord(jrecord_type_t type_, std::string record_);
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual ~LogRecord();
+  public:
+    /**
+     * \brief
+     * 
+     */
+    LogRecord(jrecord_type_t type_, std::string record_);
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual ~LogRecord();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual std::string GetRecord();
+    /**
+     * \brief
+     * 
+     */
+    virtual std::string GetRecord();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual jrecord_type_t GetType();
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void SetRecord(std::string log);
+    /**
+     * \brief
+     * 
+     */
+    virtual jrecord_type_t GetType();
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual void SetRecord(std::string log);
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void SetType(jrecord_type_t t);
-		
+    /**
+     * \brief
+     * 
+     */
+    virtual void SetType(jrecord_type_t t);
+    
 };
 
 }

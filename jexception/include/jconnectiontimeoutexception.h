@@ -31,52 +31,52 @@ namespace jexception {
  */
 class ConnectionTimeoutException : public jexception::TimeoutException {
 
-	private:
+  private:
 
-	public:
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		ConnectionTimeoutException();
+  public:
+    /**
+     * \brief Construtor.
+     *
+     */
+    ConnectionTimeoutException();
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		ConnectionTimeoutException(std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    ConnectionTimeoutException(std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		ConnectionTimeoutException(jexception::Exception *exception, std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    ConnectionTimeoutException(jexception::Exception *exception, std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> ConnectionTimeoutException(const std::string &fmt, T ...vs):
       Exception(fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::ConnectionTimeoutException");
     }
-		
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> ConnectionTimeoutException(Exception *exception, const std::string &fmt, T ...vs):
       Exception(exception, fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::ConnectionTimeoutException");
     }
-		
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~ConnectionTimeoutException() throw();
+    
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~ConnectionTimeoutException() throw();
 
 };
 

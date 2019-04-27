@@ -35,81 +35,81 @@ namespace jcommon {
  */
 class Policies : public virtual jcommon::Object{
 
-	private:
-		/** \brief  */
-		std::map<std::string, std::string> _polices;
-		/** \brief  */
-		std::string _filename;
-		/** \brief  */
-		std::mutex _mutex;
+  private:
+    /** \brief  */
+    std::map<std::string, std::string> _polices;
+    /** \brief  */
+    std::string _filename;
+    /** \brief  */
+    std::mutex _mutex;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		Policies(std::string filename);
+  public:
+    /**
+     * \brief
+     *
+     */
+    Policies(std::string filename);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~Policies();
+    /**
+     * \brief
+     *
+     */
+    virtual ~Policies();
 
-		/**
-		 * \brief
-		 *
-		 */
-		void Load();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void Save();
-	
-		/**
-		 * \brief
-		 *
-		 */
-		void AddPolice(std::string police);
+    /**
+     * \brief
+     *
+     */
+    void Load();
+    
+    /**
+     * \brief
+     *
+     */
+    void Save();
+  
+    /**
+     * \brief
+     *
+     */
+    void AddPolice(std::string police);
 
-		/**
-		 * \brief
-		 *
-		 */
-		std::vector<std::string> GetPolicies();
+    /**
+     * \brief
+     *
+     */
+    std::vector<std::string> GetPolicies();
 
-		/**
-		 * \brief
-		 *
-		 */
-		std::string GetPoliceByName(std::string police);
+    /**
+     * \brief
+     *
+     */
+    std::string GetPoliceByName(std::string police);
 
-		/**
-		 * \brief
-		 *
-		 */
-		std::string GetPoliceByIndex(int index);
+    /**
+     * \brief
+     *
+     */
+    std::string GetPoliceByIndex(int index);
 
-		/**
-		 * \brief
-		 *
-		 */
-		void RemovePoliceByName(std::string police);
+    /**
+     * \brief
+     *
+     */
+    void RemovePoliceByName(std::string police);
 
-		/**
-		 * \brief
-		 *
-		 */
-		void RemovePoliceByIndex(int index);
+    /**
+     * \brief
+     *
+     */
+    void RemovePoliceByIndex(int index);
 
-		/**
-		 * \brief
-		 *
-		 */
-		void SetPoliceContent(std::string police, std::string value);
-	
+    /**
+     * \brief
+     *
+     */
+    void SetPoliceContent(std::string police, std::string value);
+  
 };
 
 }

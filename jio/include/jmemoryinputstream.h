@@ -31,86 +31,86 @@ namespace jio {
  */
 class MemoryInputStream : public jio::InputStream {
 
-	private:
-		/** \brief */
-		int64_t _buffer_size;
-		/** \brief */
-		int64_t _buffer_index;
-		/** \brief */
-		char *_buffer;
-		
-	public:
-		/**
-		 * \brief
-		 * 
-		 */
-		MemoryInputStream(const uint8_t *data, int64_t size);
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual ~MemoryInputStream();
-
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual bool IsEmpty();
-
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual int64_t Available();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t GetSize();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t GetPosition();
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual int64_t Read();
-
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual int64_t Read(char *data, int64_t size);
+  private:
+    /** \brief */
+    int64_t _buffer_size;
+    /** \brief */
+    int64_t _buffer_index;
+    /** \brief */
+    char *_buffer;
     
-		/**
-		 * \brief Salto relativo.
-		 *
-		 */
-		virtual void Skip(int64_t skip);
+  public:
+    /**
+     * \brief
+     * 
+     */
+    MemoryInputStream(const uint8_t *data, int64_t size);
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual ~MemoryInputStream();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Reset();
+    /**
+     * \brief
+     * 
+     */
+    virtual bool IsEmpty();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Close();
+    /**
+     * \brief
+     * 
+     */
+    virtual int64_t Available();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t GetReadedBytes();
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t GetSize();
+
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t GetPosition();
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual int64_t Read();
+
+    /**
+     * \brief
+     * 
+     */
+    virtual int64_t Read(char *data, int64_t size);
+    
+    /**
+     * \brief Salto relativo.
+     *
+     */
+    virtual void Skip(int64_t skip);
+
+    /**
+     * \brief
+     *
+     */
+    virtual void Reset();
+
+    /**
+     * \brief
+     *
+     */
+    virtual void Close();
+
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t GetReadedBytes();
 
 };
 

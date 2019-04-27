@@ -28,113 +28,113 @@
 namespace jipc {
 
 LocalIPCServer::LocalIPCServer(std::string id):
-	IPCServer()
+  IPCServer()
 {
-	try {
-		_server = new jnetwork::LocalServerSocket(std::string("/tmp/") + id + ".socket");
-	} catch (jexception::ConnectionException &e) {
-		throw jexception::IPCException("Cannot create ipc server.");
-	}
+  try {
+    _server = new jnetwork::LocalServerSocket(std::string("/tmp/") + id + ".socket");
+  } catch (jexception::ConnectionException &e) {
+    throw jexception::IPCException("Cannot create ipc server.");
+  }
 }
 
 LocalIPCServer::~LocalIPCServer()
 {
-	_server->Close();
-	delete _server;
+  _server->Close();
+  delete _server;
 }
 
 void LocalIPCServer::WaitCall(RemoteCallListener *listener)
 {
-	if (listener == nullptr) {
-		return;
-	}
+  if (listener == nullptr) {
+    return;
+  }
 
-	jnetwork::LocalSocket *client = nullptr;
-	Response *response = nullptr;
+  jnetwork::LocalSocket *client = nullptr;
+  Response *response = nullptr;
 
-	try {
-		client = _server->Accept();
+  try {
+    client = _server->Accept();
 
-		char rbuffer[65535];
-		int r,
-				index = 0,
-				size = 1500;
+    char rbuffer[65535];
+    int r,
+        index = 0,
+        size = 1500;
 
-		try {
-			while ((r = client->Receive(rbuffer+index, size, _response_timeout)) > 0) {
-				index = index + r;
+    try {
+      while ((r = client->Receive(rbuffer+index, size, _response_timeout)) > 0) {
+        index = index + r;
 
-				if (r < size) {
-					break;
-				}
-			}
+        if (r < size) {
+          break;
+        }
+      }
 
-			rbuffer[index] = 0;
-		} catch (jexception::IOException &e) {
-			client->Close();
-			delete client;
+      rbuffer[index] = 0;
+    } catch (jexception::IOException &e) {
+      client->Close();
+      delete client;
 
-			throw jexception::IPCException(&e, "Connection broken");
-		}
+      throw jexception::IPCException(&e, "Connection broken");
+    }
 
-		Method method("null");
+    Method method("null");
 
-		method.Initialize((uint8_t *)rbuffer, index);
+    method.Initialize((uint8_t *)rbuffer, index);
 
-		response = listener->ProcessCall(&method);
+    response = listener->ProcessCall(&method);
 
-		if (response != nullptr) {
-			std::string encoded = response->Encode();
-			const char *buffer = encoded.c_str();
-			int length = encoded.size();
+    if (response != nullptr) {
+      std::string encoded = response->Encode();
+      const char *buffer = encoded.c_str();
+      int length = encoded.size();
 
-			index = 0;
+      index = 0;
 
-			try {
-				while (length > 0) {
-					if (size > length) {
-						size = length;
-					}
+      try {
+        while (length > 0) {
+          if (size > length) {
+            size = length;
+          }
 
-					r = client->Send(buffer+index, size, _response_timeout);
+          r = client->Send(buffer+index, size, _response_timeout);
 
-					if (r <= 0) {
-						break;
-					}
+          if (r <= 0) {
+            break;
+          }
 
-					length = length - r;
-					index = index + r;
-				}
-			} catch (jexception::IOException &e) {
-			}
+          length = length - r;
+          index = index + r;
+        }
+      } catch (jexception::IOException &e) {
+      }
 
-			delete response;
-			client->Close();
-			delete client;
-		}
-	} catch (jexception::ConnectionTimeoutException &e) {
-		if (response != nullptr) {
-			delete response;
-		}
+      delete response;
+      client->Close();
+      delete client;
+    }
+  } catch (jexception::ConnectionTimeoutException &e) {
+    if (response != nullptr) {
+      delete response;
+    }
 
-		if (client != nullptr) {
-			client->Close();
-			delete client;
-		}
+    if (client != nullptr) {
+      client->Close();
+      delete client;
+    }
 
-		throw jexception::TimeoutException(&e, "Connection timeout exception");
-	} catch (jexception::Exception &e) {
-		if (response != nullptr) {
-			delete response;
-		}
+    throw jexception::TimeoutException(&e, "Connection timeout exception");
+  } catch (jexception::Exception &e) {
+    if (response != nullptr) {
+      delete response;
+    }
 
-		if (client != nullptr) {
-			client->Close();
-			delete client;
-		}
+    if (client != nullptr) {
+      client->Close();
+      delete client;
+    }
 
-		throw jexception::IPCException(&e, "Connection error");
-	}
+    throw jexception::IPCException(&e, "Connection error");
+  }
 }
 
 }

@@ -32,8 +32,8 @@ namespace jgui {
  *
  */
 enum jmarquee_mode_t {
-	JMM_LOOP,
-	JMM_BOUNCE
+  JMM_LOOP,
+  JMM_BOUNCE
 };
 
 /**
@@ -43,92 +43,92 @@ enum jmarquee_mode_t {
  */
 class Marquee : public Component {
 
-	private:
-		/** \brief */
+  private:
+    /** \brief */
     std::thread _thread;
-		/** \brief */
-		std::mutex _marquee_mutex;
-		/** \brief */
-		std::string _text;
-		/** \brief */
-		jmarquee_mode_t _type;
-		/** \brief */
-		int _position;
-		/** \brief */
-		int _interval;
-		/** \brief */
-		int _index;
-		/** \brief */
-		int _step;
-		/** \brief */
-		bool _running;
+    /** \brief */
+    std::mutex _marquee_mutex;
+    /** \brief */
+    std::string _text;
+    /** \brief */
+    jmarquee_mode_t _type;
+    /** \brief */
+    int _position;
+    /** \brief */
+    int _interval;
+    /** \brief */
+    int _index;
+    /** \brief */
+    int _step;
+    /** \brief */
+    bool _running;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		Marquee(std::string text, int x = 0, int y = 0, int width = DEFAULT_COMPONENT_WIDTH, int height = DEFAULT_COMPONENT_HEIGHT);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~Marquee();
+  public:
+    /**
+     * \brief
+     *
+     */
+    Marquee(std::string text, int x = 0, int y = 0, int width = DEFAULT_COMPONENT_WIDTH, int height = DEFAULT_COMPONENT_HEIGHT);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~Marquee();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetType(jmarquee_mode_t type);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetStep(int i);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetInterval(int i);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetText(std::string text);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string GetText();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Start();
+    /**
+     * \brief
+     *
+     */
+    virtual void SetType(jmarquee_mode_t type);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetStep(int i);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetInterval(int i);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetText(std::string text);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual std::string GetText();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Start();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Stop();
+    /**
+     * \brief
+     *
+     */
+    virtual void Stop();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Paint(Graphics *g);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Run();
+    /**
+     * \brief
+     *
+     */
+    virtual void Paint(Graphics *g);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Run();
 
 };
 

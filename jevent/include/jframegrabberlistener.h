@@ -32,24 +32,24 @@ namespace jevent {
  */
 class FrameGrabberListener : public jevent::Listener {
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		FrameGrabberListener();
+  public:
+    /**
+     * \brief
+     *
+     */
+    FrameGrabberListener();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~FrameGrabberListener();
+    /**
+     * \brief
+     *
+     */
+    virtual ~FrameGrabberListener();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void FrameGrabbed(FrameGrabberEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual void FrameGrabbed(FrameGrabberEvent *event);
 
 };
 

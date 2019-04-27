@@ -29,14 +29,14 @@ namespace jmedia {
  *
  */
 enum jaudio_config_mode_t {
-	ACM_HDMI_PCM,
-	ACM_HDMI_PCM_STEREO,
-	ACM_HDMI_COMPRESSED,
-	ACM_HDMI_PCM_2_1_CH,
-	ACM_HDMI_PCM_5_1_CH,
-	ACM_HDMI_PCM_7_1_CH
+  ACM_HDMI_PCM,
+  ACM_HDMI_PCM_STEREO,
+  ACM_HDMI_COMPRESSED,
+  ACM_HDMI_PCM_2_1_CH,
+  ACM_HDMI_PCM_5_1_CH,
+  ACM_HDMI_PCM_7_1_CH
 };
-	
+  
 /**
  * \brief
  *
@@ -44,54 +44,54 @@ enum jaudio_config_mode_t {
  */
 class AudioConfigurationControl : public Control {
 
-	public:
-		/**
-		 * \brief 
-		 *
-		 */
-		AudioConfigurationControl();
+  public:
+    /**
+     * \brief 
+     *
+     */
+    AudioConfigurationControl();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~AudioConfigurationControl();
+    /**
+     * \brief
+     *
+     */
+    virtual ~AudioConfigurationControl();
 
-		/**
-		 * \brief 
-		 *
-		 */
-		virtual void SetAudioMode(jaudio_config_mode_t);
+    /**
+     * \brief 
+     *
+     */
+    virtual void SetAudioMode(jaudio_config_mode_t);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jaudio_config_mode_t GetHDMIAudioMode();
+    /**
+     * \brief
+     *
+     */
+    virtual jaudio_config_mode_t GetHDMIAudioMode();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetSPDIFPCM(bool pcm);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetSPDIFPCM(bool pcm);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsSPDIFPCM();
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsSPDIFPCM();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetAudioDelay(int64_t delay);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetAudioDelay(int64_t delay);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t GetAudioDelay();
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t GetAudioDelay();
 
 };
 

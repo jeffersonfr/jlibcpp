@@ -29,9 +29,9 @@
 namespace jipc {
 
 LocalIPCClient::LocalIPCClient(std::string id):
-	IPCClient()
+  IPCClient()
 {
-	_id = id;
+  _id = id;
 }
 
 LocalIPCClient::~LocalIPCClient()
@@ -40,70 +40,70 @@ LocalIPCClient::~LocalIPCClient()
 
 void LocalIPCClient::CallMethod(Method *method, Response **response)
 {
-	if (method == nullptr) {
-		throw jexception::NullPointerException("Method cannot be null");
-	}
+  if (method == nullptr) {
+    throw jexception::NullPointerException("Method cannot be null");
+  }
 
-	try {
-		jnetwork::LocalSocket client(std::string("/tmp/") + _id + ".socket");
+  try {
+    jnetwork::LocalSocket client(std::string("/tmp/") + _id + ".socket");
 
-		std::string encoded = method->Encode();
-		const char *buffer = encoded.c_str();
-		int length = encoded.size();
-		int r = 0,
-				index = 0,
-				size = 1500;
+    std::string encoded = method->Encode();
+    const char *buffer = encoded.c_str();
+    int length = encoded.size();
+    int r = 0,
+        index = 0,
+        size = 1500;
 
-		try {
-			while (length > 0) {
-				if (size > length) {
-					size = length;
-				}
+    try {
+      while (length > 0) {
+        if (size > length) {
+          size = length;
+        }
 
-				r = client.Send(buffer+index, size);
+        r = client.Send(buffer+index, size);
 
-				if (r <= 0) {
-					break;
-				}
+        if (r <= 0) {
+          break;
+        }
 
-				length = length - r;
-				index = index + r;
-			}
-		} catch (jexception::IOException &e) {
-			throw jexception::IPCException(&e, "Connection broken");
-		}
+        length = length - r;
+        index = index + r;
+      }
+    } catch (jexception::IOException &e) {
+      throw jexception::IPCException(&e, "Connection broken");
+    }
 
-		char rbuffer[65535];
+    char rbuffer[65535];
 
-		index = 0;
+    index = 0;
 
-		try {
-			while ((r = client.Receive((char *)rbuffer+index, size, _call_timeout)) > 0) {
-				index = index + r;
+    try {
+      while ((r = client.Receive((char *)rbuffer+index, size, _call_timeout)) > 0) {
+        index = index + r;
 
-				if (r < size) {
-					break;
-				}
-			}
+        if (r < size) {
+          break;
+        }
+      }
 
-			rbuffer[index] = 0;
-		} catch (jexception::IOException &e) {
-		}
+      rbuffer[index] = 0;
+    } catch (jexception::IOException &e) {
+    }
 
-		Response *local = (*response);
+    Response *local = (*response);
 
-		if (local == nullptr) {
-			local = new Response();
-		}
+    if (local == nullptr) {
+      local = new Response();
+    }
 
-		local->Initialize((uint8_t *)rbuffer, index);
+    local->Initialize((uint8_t *)rbuffer, index);
 
-		(*response) = local;
-	} catch (jexception::ConnectionTimeoutException &e) {
-		throw jexception::TimeoutException(&e, "Connection timeout exception");
-	} catch (jexception::Exception &e) {
-		throw jexception::IPCException(&e, "Connection error");
-	}
+    (*response) = local;
+  } catch (jexception::ConnectionTimeoutException &e) {
+    throw jexception::TimeoutException(&e, "Connection timeout exception");
+  } catch (jexception::Exception &e) {
+    throw jexception::IPCException(&e, "Connection error");
+  }
 }
 
 }

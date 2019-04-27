@@ -27,38 +27,38 @@
 namespace jdevice {
 
 struct jnetdevice_info_t {
-	char name[8+1];
-	uint8_t mac[6];
-	unsigned int mtu;
-	unsigned int queue_length;
-	unsigned int metric;
-	unsigned short base_addr;
-	unsigned int irq;
-	unsigned int dma;
-	unsigned int port;
-	uint8_t address[4];
-	uint8_t netmask[4];
-	uint8_t broadcast[4];
-	uint8_t dstaddress[4];
-	unsigned int flags;
-	unsigned int rx_bytes;
-	unsigned int rx_packets;
-	unsigned int rx_errors;
-	unsigned int rx_drop;
-	unsigned int rx_fifo;
-	unsigned int rx_frame;
-	unsigned int rx_compressed;
-	unsigned int rx_multicast;
-	unsigned int tx_bytes;
-	unsigned int tx_packets;
-	unsigned int tx_errors;
-	unsigned int tx_drop;
-	unsigned int tx_fifo;
-	unsigned int tx_frame;
-	unsigned int tx_compressed;
-	unsigned int tx_multicast;
+  char name[8+1];
+  uint8_t mac[6];
+  unsigned int mtu;
+  unsigned int queue_length;
+  unsigned int metric;
+  unsigned short base_addr;
+  unsigned int irq;
+  unsigned int dma;
+  unsigned int port;
+  uint8_t address[4];
+  uint8_t netmask[4];
+  uint8_t broadcast[4];
+  uint8_t dstaddress[4];
+  unsigned int flags;
+  unsigned int rx_bytes;
+  unsigned int rx_packets;
+  unsigned int rx_errors;
+  unsigned int rx_drop;
+  unsigned int rx_fifo;
+  unsigned int rx_frame;
+  unsigned int rx_compressed;
+  unsigned int rx_multicast;
+  unsigned int tx_bytes;
+  unsigned int tx_packets;
+  unsigned int tx_errors;
+  unsigned int tx_drop;
+  unsigned int tx_fifo;
+  unsigned int tx_frame;
+  unsigned int tx_compressed;
+  unsigned int tx_multicast;
 };
-	
+  
 /**
  * \brief
  *
@@ -66,35 +66,35 @@ struct jnetdevice_info_t {
 */
 class Network : public jdevice::Device {
 
-	private:
-		/** \brief */
-		std::map<int, jnetdevice_info_t *> _devices;
+  private:
+    /** \brief */
+    std::map<int, jnetdevice_info_t *> _devices;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		Network();
+  public:
+    /**
+     * \brief
+     *
+     */
+    Network();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual ~Network();
+    /**
+     * \brief
+     * 
+     */
+    virtual ~Network();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void Builder();
+    /**
+     * \brief
+     * 
+     */
+    virtual void Builder();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string What();
-		
+    /**
+     * \brief
+     *
+     */
+    virtual std::string What();
+    
 };
 
 }

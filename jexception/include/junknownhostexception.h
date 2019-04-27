@@ -31,52 +31,52 @@ namespace jexception {
  */
 class UnknownHostException : public jexception::RuntimeException {
 
-	private:
+  private:
 
-	public:
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		UnknownHostException();
+  public:
+    /**
+     * \brief Construtor.
+     *
+     */
+    UnknownHostException();
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		UnknownHostException(std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    UnknownHostException(std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		UnknownHostException(jexception::Exception *exception, std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    UnknownHostException(jexception::Exception *exception, std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> UnknownHostException(const std::string &fmt, T ...vs):
       Exception(fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::UnknownHostException");
     }
-		
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> UnknownHostException(Exception *exception, const std::string &fmt, T ...vs):
       Exception(exception, fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::UnknownHostException");
     }
-		
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~UnknownHostException() throw();
+    
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~UnknownHostException() throw();
 
 };
 

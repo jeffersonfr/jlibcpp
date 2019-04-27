@@ -22,11 +22,11 @@
 namespace jgui {
 
 TabbedPane::TabbedPane(int x, int y, int width, int height):
-   	jgui::Container(x, y, width, height)
+     jgui::Container(x, y, width, height)
 {
-	jcommon::Object::SetClassName("jgui::TabbedPane");
+  jcommon::Object::SetClassName("jgui::TabbedPane");
 
-	SetFocusable(true);
+  SetFocusable(true);
 }
 
 TabbedPane::~TabbedPane()
@@ -35,7 +35,7 @@ TabbedPane::~TabbedPane()
 
 int TabbedPane::GetCurrentTab()
 {
-	return 0;
+  return 0;
 }
 
 void TabbedPane::AddTab(std::string title, jgui::Image *image, jgui::Component *component, int index)
@@ -48,7 +48,7 @@ void TabbedPane::RemoveTab(int index)
 
 jgui::Component * TabbedPane::GetTabComponentAt(int index)
 {
-	return nullptr;
+  return nullptr;
 }
 
 void TabbedPane::SetTabTitle(int index, std::string title)
@@ -57,12 +57,12 @@ void TabbedPane::SetTabTitle(int index, std::string title)
 
 std::string TabbedPane::GetTabTitle(int index)
 {
-	return "";
+  return "";
 }
 
 int TabbedPane::GetTabCount()
 {
-	return 0;
+  return 0;
 }
 
 void TabbedPane::SetPaddind(int left, int top, int right, int bottom)
@@ -71,7 +71,7 @@ void TabbedPane::SetPaddind(int left, int top, int right, int bottom)
 
 int TabbedPane::IndexOfComponent(jgui::Component *cmp)
 {
-	return 0;
+  return 0;
 }
 
 void TabbedPane::RegisterTabsListener(jevent::SelectListener *listener)
@@ -88,7 +88,7 @@ void TabbedPane::DispatchTabsEvent(jevent::SelectEvent *event)
 
 const std::vector<jevent::SelectListener *> & TabbedPane::GetTabsListeners()
 {
-	return _select_listeners;
+  return _select_listeners;
 }
 
 

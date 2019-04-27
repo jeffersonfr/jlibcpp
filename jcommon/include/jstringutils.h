@@ -35,21 +35,21 @@ namespace jcommon {
  */
 class StringUtils : public virtual jcommon::Object {
 
-	private:
-		/**
-		 * \brief Constructor.
-		 *
-		 */
-		StringUtils();
+  private:
+    /**
+     * \brief Constructor.
+     *
+     */
+    StringUtils();
 
 
-	public:
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~StringUtils();
-		
+  public:
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~StringUtils();
+    
     template <typename... T> static std::string Format(const std::string &fmt, T ...vs)
     {
       char 
@@ -63,42 +63,42 @@ class StringUtils : public virtual jcommon::Object {
 
       return buf;
     }
-		/**
-		 * \brief 
-		 *
-		 */
-		static std::string LeftTrim(std::string str, std::string chars = std::string(STRING_EMPTY_CHARS));
-		
-		/**
-		 * \brief 
-		 *
-		 */
-		static std::string RightTrim(std::string str, std::string chars = std::string(STRING_EMPTY_CHARS));
+    /**
+     * \brief 
+     *
+     */
+    static std::string LeftTrim(std::string str, std::string chars = std::string(STRING_EMPTY_CHARS));
+    
+    /**
+     * \brief 
+     *
+     */
+    static std::string RightTrim(std::string str, std::string chars = std::string(STRING_EMPTY_CHARS));
 
-		
-		/**
-		 * \brief 
-		 *
-		 */
-		static std::string Trim(std::string str, std::string chars = std::string(STRING_EMPTY_CHARS));
+    
+    /**
+     * \brief 
+     *
+     */
+    static std::string Trim(std::string str, std::string chars = std::string(STRING_EMPTY_CHARS));
 
-		/**
-		 * \brief 
-		 *
-		 */
-		static std::string ToLower(std::string str);
-		
-		/**
-		 * \brief 
-		 *
-		 */
-		static std::string ToUpper(std::string str);
+    /**
+     * \brief 
+     *
+     */
+    static std::string ToLower(std::string str);
+    
+    /**
+     * \brief 
+     *
+     */
+    static std::string ToUpper(std::string str);
 
-		/**
-		 * \brief 
-		 *
-		 */
-		static std::string ReplaceString(std::string str, std::string old, std::string brand);
+    /**
+     * \brief 
+     *
+     */
+    static std::string ReplaceString(std::string str, std::string old, std::string brand);
 };
 
 }

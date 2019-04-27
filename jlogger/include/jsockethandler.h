@@ -36,43 +36,43 @@ namespace jlogger {
 */
 class SocketHandler : jlogger::StreamHandler {
 
-	private:
-		/** \brief */
-		jnetwork::ServerSocket *_server;
-		/** \brief */
-		std::deque<std::string> _logs;
-		/** \brief */
-		std::thread *_thread;
-		/** \brief */
-		std::mutex _mutex;
-		/** \brief */
-		unsigned int _limit;
-	
-	public:
-		/**
-		 * \brief
-		 * 
-		 */
-		SocketHandler(int port, int limit = 25);
+  private:
+    /** \brief */
+    jnetwork::ServerSocket *_server;
+    /** \brief */
+    std::deque<std::string> _logs;
+    /** \brief */
+    std::thread *_thread;
+    /** \brief */
+    std::mutex _mutex;
+    /** \brief */
+    unsigned int _limit;
+  
+  public:
+    /**
+     * \brief
+     * 
+     */
+    SocketHandler(int port, int limit = 25);
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual ~SocketHandler();
+    /**
+     * \brief
+     * 
+     */
+    virtual ~SocketHandler();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void WriteRecord(LogRecord *record_);
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void Run();
-		
+    /**
+     * \brief
+     * 
+     */
+    virtual void WriteRecord(LogRecord *record_);
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual void Run();
+    
 };
 
 }

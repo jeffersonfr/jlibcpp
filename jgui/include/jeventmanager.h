@@ -41,7 +41,7 @@ class EventManager : public jcommon::Object {
 
   friend class jgui::Window;
 
-	private:
+  private:
     /** \brief */
     std::map<std::string, int> _event_count;
     /** \brief */
@@ -59,61 +59,61 @@ class EventManager : public jcommon::Object {
     /** \brief */
     bool _alive;
 
-	protected:
-		/**
-		 * \brief
-		 *
-		 */
-		EventManager(jgui::Window *window);
-		
-		/**
-		 * \brief
-		 *
-		 */
+  protected:
+    /**
+     * \brief
+     *
+     */
+    EventManager(jgui::Window *window);
+    
+    /**
+     * \brief
+     *
+     */
     virtual void ProcessEvents();
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~EventManager();
+  public:
+    /**
+     * \brief
+     *
+     */
+    virtual ~EventManager();
 
-		/**
-		 * \brief Limits the number of events from a type in the queue.
-		 *
-		 */
-		virtual void SetEventCountLimit(jevent::EventObject &event, int count);
-		
-		/**
-		 * \brief Limits the number of events from a type in the queue.
-		 *
-		 */
-		virtual int GetEventCountLimit(jevent::EventObject &event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetClickDelay(size_t ms);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual size_t GetClickDelay();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void PostEvent(jevent::EventObject *event);
+    /**
+     * \brief Limits the number of events from a type in the queue.
+     *
+     */
+    virtual void SetEventCountLimit(jevent::EventObject &event, int count);
+    
+    /**
+     * \brief Limits the number of events from a type in the queue.
+     *
+     */
+    virtual int GetEventCountLimit(jevent::EventObject &event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetClickDelay(size_t ms);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual size_t GetClickDelay();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void PostEvent(jevent::EventObject *event);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual const std::vector<jevent::EventObject *> & GetEvents();
+    /**
+     * \brief
+     *
+     */
+    virtual const std::vector<jevent::EventObject *> & GetEvents();
 
 };
 

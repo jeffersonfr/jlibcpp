@@ -32,30 +32,30 @@ namespace jevent {
  */
 class DemuxListener : public jevent::Listener {
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		DemuxListener();
+  public:
+    /**
+     * \brief
+     *
+     */
+    DemuxListener();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~DemuxListener();
+    /**
+     * \brief
+     *
+     */
+    virtual ~DemuxListener();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void DataArrived(DemuxEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual void DataArrived(DemuxEvent *event);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void DataNotFound(DemuxEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual void DataNotFound(DemuxEvent *event);
 
 };
 

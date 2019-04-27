@@ -30,45 +30,45 @@
 namespace jshared {
 
 MemoryMap::MemoryMap(jio::File *file, int length, bool shared, jio::jfile_permissions_t perms):
-	jcommon::Object()
+  jcommon::Object()
 {
   if (file == nullptr) {
-		throw jexception::NullPointerException("File pointer must be valid");
+    throw jexception::NullPointerException("File pointer must be valid");
   }
 
-	jcommon::Object::SetClassName("jshared::MemoryMap");
+  jcommon::Object::SetClassName("jshared::MemoryMap");
 
   _file = file;
-	_length = length;
+  _length = length;
 
-	int flags = PROT_NONE;
+  int flags = PROT_NONE;
 
-	if ((perms & jio::JFP_USR_READ) != 0) {
-		flags = flags | PROT_READ;
-	}
+  if ((perms & jio::JFP_USR_READ) != 0) {
+    flags = flags | PROT_READ;
+  }
 
-	if ((perms & jio::JFP_USR_WRITE) != 0) {
-		flags = flags | PROT_WRITE;
-	}
+  if ((perms & jio::JFP_USR_WRITE) != 0) {
+    flags = flags | PROT_WRITE;
+  }
 
-	if ((perms & jio::JFP_USR_EXEC) != 0) {
-		flags = flags | PROT_EXEC;
-	}
+  if ((perms & jio::JFP_USR_EXEC) != 0) {
+    flags = flags | PROT_EXEC;
+  }
 
-	if (shared == false) {
-		_address = (uint8_t *)mmap(nullptr, length, flags, MAP_PRIVATE, _file->GetDescriptor(), 0);
-	} else {
-		_address = (uint8_t *)mmap(nullptr, length, flags, MAP_SHARED, _file->GetDescriptor(), 0);
-	}
+  if (shared == false) {
+    _address = (uint8_t *)mmap(nullptr, length, flags, MAP_PRIVATE, _file->GetDescriptor(), 0);
+  } else {
+    _address = (uint8_t *)mmap(nullptr, length, flags, MAP_SHARED, _file->GetDescriptor(), 0);
+  }
 
-	if (_address == MAP_FAILED) {
-		throw jexception::MemoryException("Creating memory map failed");
-	}
+  if (_address == MAP_FAILED) {
+    throw jexception::MemoryException("Creating memory map failed");
+  }
 }
 
 MemoryMap::~MemoryMap()
 {
-	munmap(_address, _length);
+  munmap(_address, _length);
 
   _file->Close();
 
@@ -88,28 +88,28 @@ uint8_t * MemoryMap::GetAddress()
 
 int64_t MemoryMap::GetLength()
 {
-	return _length;
+  return _length;
 }
 
 void MemoryMap::SetPermission(jio::jfile_permissions_t perms)
 {
-	int flags = PROT_NONE;
+  int flags = PROT_NONE;
 
-	if ((perms & jio::JFP_USR_READ) != 0) {
-		flags = flags | PROT_READ;
-	}
+  if ((perms & jio::JFP_USR_READ) != 0) {
+    flags = flags | PROT_READ;
+  }
 
-	if ((perms & jio::JFP_USR_WRITE) != 0) {
-		flags = flags | PROT_WRITE;
-	}
+  if ((perms & jio::JFP_USR_WRITE) != 0) {
+    flags = flags | PROT_WRITE;
+  }
 
-	if ((perms & jio::JFP_USR_EXEC) != 0) {
-		flags = flags | PROT_EXEC;
-	}
+  if ((perms & jio::JFP_USR_EXEC) != 0) {
+    flags = flags | PROT_EXEC;
+  }
 
-	if (mprotect(_address, _length, flags) < 0) {
-		throw jexception::MemoryException("Set permission failed");
-	}
+  if (mprotect(_address, _length, flags) < 0) {
+    throw jexception::MemoryException("Set permission failed");
+  }
 }
 
 }

@@ -22,21 +22,21 @@
 namespace jexception {
 
 RuntimeException::RuntimeException():
-	jexception::Exception(), std::runtime_error("runtime error")
+  jexception::Exception(), std::runtime_error("runtime error")
 {
-	jcommon::Object::SetClassName("jexception::RuntimeException");
+  jcommon::Object::SetClassName("jexception::RuntimeException");
 }
 
 RuntimeException::RuntimeException(std::string reason_):
-	jexception::Exception(reason_), std::runtime_error(reason_)
+  jexception::Exception(reason_), std::runtime_error(reason_)
 {
-	jcommon::Object::SetClassName("jexception::RuntimeException");
+  jcommon::Object::SetClassName("jexception::RuntimeException");
 }
 
 RuntimeException::RuntimeException(jexception::Exception *exception, std::string reason_):
-	jexception::Exception(exception, reason_), std::runtime_error(reason_)
+  jexception::Exception(exception, reason_), std::runtime_error(reason_)
 {
-	jcommon::Object::SetClassName("jexception::RuntimeException");
+  jcommon::Object::SetClassName("jexception::RuntimeException");
 }
 
 RuntimeException::~RuntimeException() throw()
@@ -45,7 +45,7 @@ RuntimeException::~RuntimeException() throw()
 
 std::string RuntimeException::What()
 {
-	return std::runtime_error::what();
+  return std::runtime_error::what();
 }
 
 }

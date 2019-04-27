@@ -104,22 +104,22 @@ class AdaptationField : public jcommon::Object {
 
 class TransportStreamPacket : public jcommon::Object {
 
-	protected:
+  protected:
     /** \brief */
     std::shared_ptr<std::string> _data;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		TransportStreamPacket(std::shared_ptr<std::string> data);
+  public:
+    /**
+     * \brief
+     *
+     */
+    TransportStreamPacket(std::shared_ptr<std::string> data);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~TransportStreamPacket();
+    /**
+     * \brief
+     *
+     */
+    virtual ~TransportStreamPacket();
  
     /**
      * \brief

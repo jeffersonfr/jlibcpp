@@ -24,9 +24,9 @@
 namespace jlogger {
 
 ConsoleHandler::ConsoleHandler():
-	jlogger::StreamHandler()
+  jlogger::StreamHandler()
 {
-	jcommon::Object::SetClassName("jlogger::ConsoleHandler");
+  jcommon::Object::SetClassName("jlogger::ConsoleHandler");
 }
 
 ConsoleHandler::~ConsoleHandler()
@@ -35,15 +35,15 @@ ConsoleHandler::~ConsoleHandler()
 
 void ConsoleHandler::WriteRecord(LogRecord *log)
 {
-	_mutex.lock();
-	
-	if (log->GetType() == JRT_INFO) {
-		std::cout << log->GetRecord() << std::flush;
-	} else {
-		std::cerr << log->GetRecord() << std::flush;
-	}
+  _mutex.lock();
+  
+  if (log->GetType() == JRT_INFO) {
+    std::cout << log->GetRecord() << std::flush;
+  } else {
+    std::cerr << log->GetRecord() << std::flush;
+  }
 
-	_mutex.unlock();
+  _mutex.unlock();
 }
 
 }

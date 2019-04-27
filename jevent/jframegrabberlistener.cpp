@@ -22,9 +22,9 @@
 namespace jevent {
 
 FrameGrabberListener::FrameGrabberListener():
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jevent::FrameGrabberListener");
+  jcommon::Object::SetClassName("jevent::FrameGrabberListener");
 }
 
 FrameGrabberListener::~FrameGrabberListener()

@@ -27,10 +27,10 @@
 namespace jcommon {
 
 enum jtoken_type_t {
-	JTT_CHAR,
-	JTT_STRING
+  JTT_CHAR,
+  JTT_STRING
 };
-	
+  
 /**
  * \brief
  * 
@@ -38,43 +38,43 @@ enum jtoken_type_t {
  */
 class StringTokenizer : public virtual jcommon::Object{
 
-	private:
-		/** \brief Comment */
-		std::vector<std::string> _tokens;
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void BuildTokens(std::string string_, std::string token_, jtoken_type_t flag_, bool return_token_);
-		
-	public:
-		/**
-		 * \brief Para TOKEN_FLAG, o parametro token_ eh utilizado de tal modo que todos os chars
-		 * saum utilizados como token. Para SPLIT_FLAG, o parametro token_ eh tratado como um token
-		 * completo, e naum como uma lista de tokens.
-		 *
-		 */
-		StringTokenizer(std::string string_, std::string token_, jtoken_type_t flag_ = JTT_STRING, bool return_token_ = false);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~StringTokenizer();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int GetSize();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		std::string GetToken(int i);
-		
+  private:
+    /** \brief Comment */
+    std::vector<std::string> _tokens;
+    
+    /**
+     * \brief
+     *
+     */
+    void BuildTokens(std::string string_, std::string token_, jtoken_type_t flag_, bool return_token_);
+    
+  public:
+    /**
+     * \brief Para TOKEN_FLAG, o parametro token_ eh utilizado de tal modo que todos os chars
+     * saum utilizados como token. Para SPLIT_FLAG, o parametro token_ eh tratado como um token
+     * completo, e naum como uma lista de tokens.
+     *
+     */
+    StringTokenizer(std::string string_, std::string token_, jtoken_type_t flag_ = JTT_STRING, bool return_token_ = false);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~StringTokenizer();
+    
+    /**
+     * \brief
+     *
+     */
+    int GetSize();
+    
+    /**
+     * \brief
+     *
+     */
+    std::string GetToken(int i);
+    
 };
 
 }

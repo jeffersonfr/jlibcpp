@@ -17,7 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef	J_SCROLLBAR_H
+#ifndef  J_SCROLLBAR_H
 #define J_SCROLLBAR_H
 
 #include "jgui/jslidercomponent.h"
@@ -31,93 +31,93 @@ namespace jgui {
  */
 class ScrollBar : public jgui::SliderComponent {
 
-	private:
-		/** \brief */
-		std::vector<jevent::AdjustmentListener *> _adjust_listeners;
-		/** \brief */
-		int _index;
-		/** \brief */
-		int _stone_size;
-		/** \brief */
-		int _count_paint;
-		/** \brief */
-		bool _pressed;
-		/** \brief */
-		bool _label_visible;
-		
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		ScrollBar(int x = 0, int y = 0, int width = DEFAULT_COMPONENT_WIDTH, int height = DEFAULT_COMPONENT_HEIGHT);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~ScrollBar();
+  private:
+    /** \brief */
+    std::vector<jevent::AdjustmentListener *> _adjust_listeners;
+    /** \brief */
+    int _index;
+    /** \brief */
+    int _stone_size;
+    /** \brief */
+    int _count_paint;
+    /** \brief */
+    bool _pressed;
+    /** \brief */
+    bool _label_visible;
+    
+  public:
+    /**
+     * \brief
+     *
+     */
+    ScrollBar(int x = 0, int y = 0, int width = DEFAULT_COMPONENT_WIDTH, int height = DEFAULT_COMPONENT_HEIGHT);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~ScrollBar();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jscroll_orientation_t GetScrollOrientation();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetScrollOrientation(jscroll_orientation_t type);
+    /**
+     * \brief
+     *
+     */
+    virtual jscroll_orientation_t GetScrollOrientation();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetScrollOrientation(jscroll_orientation_t type);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetStoneSize();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetStoneSize(int size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool KeyPressed(jevent::KeyEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MousePressed(jevent::MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MouseReleased(jevent::MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MouseMoved(jevent::MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MouseWheel(jevent::MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Paint(Graphics *g);
-		
+    /**
+     * \brief
+     *
+     */
+    virtual int GetStoneSize();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetStoneSize(int size);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool KeyPressed(jevent::KeyEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool MousePressed(jevent::MouseEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool MouseReleased(jevent::MouseEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool MouseMoved(jevent::MouseEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool MouseWheel(jevent::MouseEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Paint(Graphics *g);
+    
 };
 
 }

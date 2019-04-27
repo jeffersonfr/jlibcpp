@@ -17,7 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef	J_PROGRESSBAR_H
+#ifndef  J_PROGRESSBAR_H
 #define J_PROGRESSBAR_H
 
 #include "jgui/jslidercomponent.h"
@@ -34,74 +34,74 @@ class ButtonEvent;
  */
 class ProgressBar : public jgui::Component {
 
-	private:
-		/** \brief */
-		jscroll_orientation_t _type;
-		/** \brief */
-		int _value;
-		/** \brief */
-		int _index;
-		/** \brief */
-		int _delta;
-		/** \brief */
-		int _fixe_delta;
-		/** \brief */
-		int _stone_size;
+  private:
+    /** \brief */
+    jscroll_orientation_t _type;
+    /** \brief */
+    int _value;
+    /** \brief */
+    int _index;
+    /** \brief */
+    int _delta;
+    /** \brief */
+    int _fixe_delta;
+    /** \brief */
+    int _stone_size;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		ProgressBar(int x = 0, int y = 0, int width = DEFAULT_COMPONENT_WIDTH, int height = DEFAULT_COMPONENT_HEIGHT, jscroll_orientation_t type = JSO_HORIZONTAL);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~ProgressBar();
+  public:
+    /**
+     * \brief
+     *
+     */
+    ProgressBar(int x = 0, int y = 0, int width = DEFAULT_COMPONENT_WIDTH, int height = DEFAULT_COMPONENT_HEIGHT, jscroll_orientation_t type = JSO_HORIZONTAL);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~ProgressBar();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jscroll_orientation_t GetScrollOrientation();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetScrollOrientation(jscroll_orientation_t type);
+    /**
+     * \brief
+     *
+     */
+    virtual jscroll_orientation_t GetScrollOrientation();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetScrollOrientation(jscroll_orientation_t type);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetStoneSize();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetStoneSize(int size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual double GetValue();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetValue(double i);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Paint(Graphics *g);
+    /**
+     * \brief
+     *
+     */
+    virtual int GetStoneSize();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetStoneSize(int size);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual double GetValue();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetValue(double i);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Paint(Graphics *g);
 
 };
 

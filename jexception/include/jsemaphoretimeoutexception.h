@@ -31,52 +31,52 @@ namespace jexception {
  */
 class SemaphoreTimeoutException : public jexception::TimeoutException {
 
-	private:
+  private:
 
-	public:
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		SemaphoreTimeoutException();
+  public:
+    /**
+     * \brief Construtor.
+     *
+     */
+    SemaphoreTimeoutException();
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		SemaphoreTimeoutException(std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    SemaphoreTimeoutException(std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		SemaphoreTimeoutException(jexception::Exception *exception, std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    SemaphoreTimeoutException(jexception::Exception *exception, std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> SemaphoreTimeoutException(const std::string &fmt, T ...vs):
       Exception(fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::SemaphoreTimeoutException");
     }
-		
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> SemaphoreTimeoutException(Exception *exception, const std::string &fmt, T ...vs):
       Exception(exception, fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::SemaphoreTimeoutException");
     }
-		
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~SemaphoreTimeoutException() throw();
+    
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~SemaphoreTimeoutException() throw();
 
 };
 

@@ -22,11 +22,11 @@
 namespace jio {
 
 InputStream::InputStream():
-	jcommon::Object()
+  jcommon::Object()
 {
     jcommon::Object::SetClassName("jio::InputStream");
 
-	_blocked = true;
+  _blocked = true;
 }
 
 InputStream::~InputStream()
@@ -35,41 +35,41 @@ InputStream::~InputStream()
 
 void InputStream::SetBlocking(bool block_)
 {
-	_blocked = block_;
+  _blocked = block_;
 }
 
 bool InputStream::IsBlocking()
 {
-	return _blocked;
+  return _blocked;
 }
 
 bool InputStream::IsClosed()
 {
-	return _is_closed;
+  return _is_closed;
 }
 
 std::string InputStream::Read(int64_t size)
 {
-	if (size <= 0) {
-		return "";
-	}
+  if (size <= 0) {
+    return "";
+  }
 
-	char *buf = new char[(int)size + 1];
-	int r;
-	
-	if ((r = (int)Read(buf, (int)size)) == EOF || r <= 0) {
-		delete buf;
+  char *buf = new char[(int)size + 1];
+  int r;
+  
+  if ((r = (int)Read(buf, (int)size)) == EOF || r <= 0) {
+    delete buf;
 
-		return "";
-	}
+    return "";
+  }
 
-	buf[r] = '\0';
+  buf[r] = '\0';
 
-	std::string s = buf;
+  std::string s = buf;
 
-	delete buf;
+  delete buf;
 
-	return s;
+  return s;
 }
 
 bool InputStream::IsEmpty()

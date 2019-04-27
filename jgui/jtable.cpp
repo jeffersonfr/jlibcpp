@@ -24,12 +24,12 @@ namespace jgui {
 
 Cell::Cell(Table *table)
 {
-	jcommon::Object::SetClassName("jgui::Cell");
+  jcommon::Object::SetClassName("jgui::Cell");
 
-	_table = table;
+  _table = table;
 
-	_halign = JHA_CENTER;
-	_valign = JVA_CENTER;
+  _halign = JHA_CENTER;
+  _valign = JVA_CENTER;
 }
 
 Cell::~Cell()
@@ -38,577 +38,577 @@ Cell::~Cell()
 
 void Cell::SetHorizontalAlign(jhorizontal_align_t align)
 {
-	if (_halign != align) {
-		_halign = align;
+  if (_halign != align) {
+    _halign = align;
 
-		_table->Repaint();
-	}
+    _table->Repaint();
+  }
 }
 
 jhorizontal_align_t Cell::GetHorizontalAlign()
 {
-	return _halign;
+  return _halign;
 }
 
 void Cell::SetVerticalAlign(jvertical_align_t align)
 {
-	if (_valign != align) {
-		_valign = align;
+  if (_valign != align) {
+    _valign = align;
 
-		_table->Repaint();
-	}
+    _table->Repaint();
+  }
 }
 
 jvertical_align_t Cell::GetVerticalAlign()
 {
-	return _valign;
+  return _valign;
 }
 
 void Cell::SetValue(std::string value)
 {
-	_value = value;
-	
-	_table->Repaint();
+  _value = value;
+  
+  _table->Repaint();
 }
 
 std::string Cell::GetValue()
 {
-	return _value;
+  return _value;
 }
 
 Color & Cell::GetCellBackgroundColor()
 {
-	return _cell_bgcolor;
+  return _cell_bgcolor;
 }
 
 Color & Cell::GetCellForegroundColor()
 {
-	return _cell_fgcolor;
+  return _cell_fgcolor;
 }
 
 void Cell::SetCellBackgroundColor(const Color &color)
 {
-	_cell_bgcolor = color;
-	
-	_table->Repaint();
+  _cell_bgcolor = color;
+  
+  _table->Repaint();
 }
 
 void Cell::SetCellForegroundColor(const Color &color)
 {
-	_cell_fgcolor = color;
-	
-	_table->Repaint();
+  _cell_fgcolor = color;
+  
+  _table->Repaint();
 }
 
 void Cell::SetCellBackgroundColor(int red, int green, int blue, int alpha)
 {
-	SetCellBackgroundColor(Color(red, green, blue, alpha));
+  SetCellBackgroundColor(Color(red, green, blue, alpha));
 }
 
 void Cell::SetCellForegroundColor(int red, int green, int blue, int alpha)
 {
-	SetCellForegroundColor(Color(red, green, blue, alpha));
+  SetCellForegroundColor(Color(red, green, blue, alpha));
 }
 
 Table::Table(int x, int y, int width, int height):
-	Component(x, y, width, height)
+  Component(x, y, width, height)
 {
-	jcommon::Object::SetClassName("jgui::Table");
+  jcommon::Object::SetClassName("jgui::Table");
 
-	_header_visible = true;
-	_loop = false;
-	
-	std::vector<Cell *> *cols = new std::vector<Cell *>();
+  _header_visible = true;
+  _loop = false;
+  
+  std::vector<Cell *> *cols = new std::vector<Cell *>();
 
-	cols->push_back(nullptr);
+  cols->push_back(nullptr);
 
-	_cells.push_back(cols);
+  _cells.push_back(cols);
 
-	// TODO:: inicializar o tamanho das linhas e das colunas
+  // TODO:: inicializar o tamanho das linhas e das colunas
 
-	SetFocusable(true);
+  SetFocusable(true);
 }
 
 Table::~Table()
 {
-	// TODO:: remove all cell from table
+  // TODO:: remove all cell from table
 }
 
 void Table::SetLoop(bool loop)
 {
-	if (_loop == loop) {
-		return;
-	}
+  if (_loop == loop) {
+    return;
+  }
 
-	_loop = loop;
+  _loop = loop;
 
-	Repaint();
+  Repaint();
 }
 
 int Table::GetNumberOfColumns()
 {
-	return _columns;
+  return _columns;
 }
 
 int Table::GetNumberOfRows()
 {
-	return _rows;
+  return _rows;
 }
 
 void Table::SetNumberOfColumns(int size)
 {
-	int old = _columns;
+  int old = _columns;
 
-	_columns = size;
+  _columns = size;
 
-	if (_columns < 0) {
-		_columns = 0;
-	}
+  if (_columns < 0) {
+    _columns = 0;
+  }
 
-	while (_columns > old) {
-		InsertColumn("null", _columns);
-	}
+  while (_columns > old) {
+    InsertColumn("null", _columns);
+  }
 }
 
 void Table::SetNumberOfRows(int size)
 {
-	int old = _columns;
+  int old = _columns;
 
-	_rows = size;
+  _rows = size;
 
-	if (_rows < 0) {
-		_rows = 0;
-	}
+  if (_rows < 0) {
+    _rows = 0;
+  }
 
-	while (_rows > old) {
-		InsertRow("null", _rows);
-	}
+  while (_rows > old) {
+    InsertRow("null", _rows);
+  }
 }
 
 void Table::InsertColumn(std::string text, int index)
 {
-	if (index < 0 || index > _columns) {
-		return;
-	}
+  if (index < 0 || index > _columns) {
+    return;
+  }
 
-	for (std::vector<std::vector<Cell *> *>::iterator i=_cells.begin(); i!=_cells.end(); i++) {
-		std::vector<Cell *> *v = (std::vector<Cell *> *)(*i);
+  for (std::vector<std::vector<Cell *> *>::iterator i=_cells.begin(); i!=_cells.end(); i++) {
+    std::vector<Cell *> *v = (std::vector<Cell *> *)(*i);
 
-		if (v != nullptr) {
-			v->insert(v->begin()+index, new Cell(this));
-		}
-	}
+    if (v != nullptr) {
+      v->insert(v->begin()+index, new Cell(this));
+    }
+  }
 
-	_columns++;
+  _columns++;
 
-	Repaint();
+  Repaint();
 }
 
 void Table::InsertRow(std::string text, int index)
 {
-	if (index < 0 || index > _rows) {
-		return;
-	}
+  if (index < 0 || index > _rows) {
+    return;
+  }
 
-	std::vector<Cell *> *columns = new std::vector<Cell *>();
+  std::vector<Cell *> *columns = new std::vector<Cell *>();
 
-	for (int i=0; i<_columns; i++) {
-		columns->push_back(nullptr);
-	}
+  for (int i=0; i<_columns; i++) {
+    columns->push_back(nullptr);
+  }
 
-	_cells.insert(_cells.begin()+index, columns);
+  _cells.insert(_cells.begin()+index, columns);
 
-	_rows++;
+  _rows++;
 
-	Repaint();
+  Repaint();
 }
 
 void Table::RemoveColumn(int index)
 {
-	// TODO:: sincronizar todos os metodos que usam iterator
-	if (index < 0 || index >= _columns) {
-		return;
-	}
+  // TODO:: sincronizar todos os metodos que usam iterator
+  if (index < 0 || index >= _columns) {
+    return;
+  }
 
-	for (std::vector<std::vector<Cell *> *>::iterator i=_cells.begin(); i!=_cells.end(); i++) {
-		std::vector<Cell *> *v = (std::vector<Cell *> *)(*i);
+  for (std::vector<std::vector<Cell *> *>::iterator i=_cells.begin(); i!=_cells.end(); i++) {
+    std::vector<Cell *> *v = (std::vector<Cell *> *)(*i);
 
-		if (v != nullptr) {
-			Cell *c = (*v)[index];
+    if (v != nullptr) {
+      Cell *c = (*v)[index];
 
-			v->erase(v->begin()+index);
+      v->erase(v->begin()+index);
 
-			if (c != nullptr) {
-				delete c;
-			}
-		}
-	}
+      if (c != nullptr) {
+        delete c;
+      }
+    }
+  }
 
-	_columns--;
+  _columns--;
 
-	Repaint();
+  Repaint();
 }
 
 void Table::RemoveRow(int index)
 {
-	// TODO:: sincronizar todos os metodos que usam iterator
-	if (index < 0 || index >= _rows) {
-		return;
-	}
+  // TODO:: sincronizar todos os metodos que usam iterator
+  if (index < 0 || index >= _rows) {
+    return;
+  }
 
-	std::vector<Cell *> *row = _cells[index];
+  std::vector<Cell *> *row = _cells[index];
 
-	_cells.erase(_cells.begin()+index);
+  _cells.erase(_cells.begin()+index);
 
-	for (std::vector<Cell *>::iterator i=row->begin(); i!=row->end(); i++) {
-		Cell *c = (Cell *)(*i);
+  for (std::vector<Cell *>::iterator i=row->begin(); i!=row->end(); i++) {
+    Cell *c = (Cell *)(*i);
 
-		if (c != nullptr) {
-			delete c;
-		}
-	}
+    if (c != nullptr) {
+      delete c;
+    }
+  }
 
-	_cells.clear();
+  _cells.clear();
 
-	_rows--;
+  _rows--;
 
-	Repaint();
+  Repaint();
 }
 
 void Table::SetHeaderValue(std::string text, int index)
 {
-	if (index < 0 || index >= _columns) {
-		return;
-	}
+  if (index < 0 || index >= _columns) {
+    return;
+  }
 
-	Cell *c = _header[index];
+  Cell *c = _header[index];
 
-	if (c != nullptr) {
-		c->SetValue(text);
-	}
+  if (c != nullptr) {
+    c->SetValue(text);
+  }
 
-	Repaint();
+  Repaint();
 }
 
 std::string Table::GetHeaderValue(int index)
 {
-	if (index < 0 || index >= _columns) {
-		return "";
-	}
+  if (index < 0 || index >= _columns) {
+    return "";
+  }
 
-	Cell *c = _header[index];
+  Cell *c = _header[index];
 
-	if (c != nullptr) {
-		return c->GetValue();
-	}
+  if (c != nullptr) {
+    return c->GetValue();
+  }
 
-	return "";
+  return "";
 }
 
 void Table::SetHeaderVisible(bool visible)
 {
-	_header_visible = visible;
+  _header_visible = visible;
 
-	Repaint();
+  Repaint();
 }
 
 bool Table::IsHeaderVisible()
 {
-	return _header_visible;
+  return _header_visible;
 }
 
 int Table::GetCurrentColumn()
 {
-	return _column;
+  return _column;
 }
 
 int Table::GetCurrentRow()
 {
-	return _row;
+  return _row;
 }
 
 Cell * Table::GetCurrentCell()
 {
-	return GetCell(_row, _column);
+  return GetCell(_row, _column);
 }
 
 void Table::SetCurrentCell(int row, int column)
 {
-	if (row < 0 || row >= _rows) {
-		return;
-	}
+  if (row < 0 || row >= _rows) {
+    return;
+  }
 
-	if (column < 0 || column >= _columns) {
-		return;
-	}
+  if (column < 0 || column >= _columns) {
+    return;
+  }
 
-	_row = row;
-	_column = column;
+  _row = row;
+  _column = column;
 
-	Repaint();
+  Repaint();
 }
 
 Cell * Table::GetCell(int row, int column)
 {
-	if (row < 0 || row >= _rows) {
-		return nullptr;
-	}
+  if (row < 0 || row >= _rows) {
+    return nullptr;
+  }
 
-	if (column < 0 || column >= _columns) {
-		return nullptr;
-	}
+  if (column < 0 || column >= _columns) {
+    return nullptr;
+  }
 
-	std::vector<Cell *> *v = _cells[row];
+  std::vector<Cell *> *v = _cells[row];
 
-	return (*v)[column];
+  return (*v)[column];
 }
 
 void Table::SetCell(Cell *cell, int row, int column)
 {
-	if (row < 0 || row >= _rows) {
-		return;
-	}
+  if (row < 0 || row >= _rows) {
+    return;
+  }
 
-	if (column < 0 || column >= _columns) {
-		return;
-	}
+  if (column < 0 || column >= _columns) {
+    return;
+  }
 
-	std::vector<Cell *> *v = _cells[row];
+  std::vector<Cell *> *v = _cells[row];
 
-	Cell *c = (*v)[column];
+  Cell *c = (*v)[column];
 
-	if (c != nullptr) {
-		delete c;
-	}
+  if (c != nullptr) {
+    delete c;
+  }
 
-	(*v)[column] = cell;
+  (*v)[column] = cell;
 
-	Repaint();
+  Repaint();
 }
 
 Color & Table::GetGridColor()
 {
-	return _grid_color;
+  return _grid_color;
 }
 
 void Table::SetGridColor(const Color &color)
 {
-	_grid_color = color;
+  _grid_color = color;
 }
 
 void Table::SetGridColor(int red, int green, int blue, int alpha)
 {
-	_grid_color = Color(red, green, blue, alpha);
+  _grid_color = Color(red, green, blue, alpha);
 
-	Repaint();
+  Repaint();
 }
 
 void Table::SetColumnSize(int index, int size)
 {
-	if (index < 0 || index >= _columns) {
-		return;
-	}
-	
-	_column_size[index] = size;
+  if (index < 0 || index >= _columns) {
+    return;
+  }
+  
+  _column_size[index] = size;
 }
 
 int Table::GetColumnSize(int index)
 {
-	if (index < 0 || index >= _columns) {
-		return -1;
-	}
+  if (index < 0 || index >= _columns) {
+    return -1;
+  }
 
-	return _column_size[index];
+  return _column_size[index];
 }
 
 void Table::SetRowSize(int index, int size)
 {
-	if (index < 0 || index >= _rows) {
-		return;
-	}
+  if (index < 0 || index >= _rows) {
+    return;
+  }
 
-	_row_size[index] = size;
+  _row_size[index] = size;
 }
 
 int Table::GetRowSize(int index)
 {
-	if (index < 0 || index >= _rows) {
-		return -1;
-	}
+  if (index < 0 || index >= _rows) {
+    return -1;
+  }
 
-	return _row_size[index];
+  return _row_size[index];
 }
 
 bool Table::KeyPressed(jevent::KeyEvent *event)
 {
-	if (Component::KeyPressed(event) == true) {
-		return true;
-	}
+  if (Component::KeyPressed(event) == true) {
+    return true;
+  }
 
-	jevent::jkeyevent_symbol_t action = event->GetSymbol();
+  jevent::jkeyevent_symbol_t action = event->GetSymbol();
 
-	bool catched = false;
+  bool catched = false;
 
-	if (action == jevent::JKS_CURSOR_UP) {
-		if (_cells.size() > 0) {
-			int old_index = _row;
+  if (action == jevent::JKS_CURSOR_UP) {
+    if (_cells.size() > 0) {
+      int old_index = _row;
 
-			_row--;
+      _row--;
 
-			if (_row < 0) {
-				if (_loop == false) {
-					_row = 0;
-				} else {
-					_row = (int)(_cells.size()-1);
-				}
-			}
+      if (_row < 0) {
+        if (_loop == false) {
+          _row = 0;
+        } else {
+          _row = (int)(_cells.size()-1);
+        }
+      }
 
-			if (_row != old_index) {
-				Repaint();
+      if (_row != old_index) {
+        Repaint();
 
-				// TODO:: DispatchSelectEvent(new SelectEvent(this, _cells[_index].text, _index, UP_ITEM)); 
-			}
-		}
+        // TODO:: DispatchSelectEvent(new SelectEvent(this, _cells[_index].text, _index, UP_ITEM)); 
+      }
+    }
 
-		catched = true;
-	} else if (action == jevent::JKS_CURSOR_DOWN) {
-		if (_cells.size() > 0) { 
-			int old_index = _row;
+    catched = true;
+  } else if (action == jevent::JKS_CURSOR_DOWN) {
+    if (_cells.size() > 0) { 
+      int old_index = _row;
 
-			_row++;
+      _row++;
 
-			if (_row >= (int)_cells.size()) {
-				if (_loop == false) {
-					if (_cells.size() > 0) {
-						_row = _cells.size()-1;
-					} else {
-						_row = 0;
-					}
-				} else {
-					_row = 0;
-				}
-			}
+      if (_row >= (int)_cells.size()) {
+        if (_loop == false) {
+          if (_cells.size() > 0) {
+            _row = _cells.size()-1;
+          } else {
+            _row = 0;
+          }
+        } else {
+          _row = 0;
+        }
+      }
 
-			if (_row != old_index) {
-				Repaint();
+      if (_row != old_index) {
+        Repaint();
 
-				// TODO:: DispatchSelectEvent(new SelectEvent(this, _items[_index].text, _index, DOWN_ITEM)); 
-			}
-		}
+        // TODO:: DispatchSelectEvent(new SelectEvent(this, _items[_index].text, _index, DOWN_ITEM)); 
+      }
+    }
 
-		catched = true;
-	} else if (action == jevent::JKS_ENTER) {
-		if (_cells.size() > 0) { 
-			// TODO:: DispatchSelectEvent(new SelectEvent(this, _items[_index].text, _index, ACTION_ITEM));
-		}
+    catched = true;
+  } else if (action == jevent::JKS_ENTER) {
+    if (_cells.size() > 0) { 
+      // TODO:: DispatchSelectEvent(new SelectEvent(this, _items[_index].text, _index, ACTION_ITEM));
+    }
 
-		catched = true;
-	}
+    catched = true;
+  }
 
-	return catched;
+  return catched;
 }
 
 bool Table::MousePressed(jevent::MouseEvent *event)
 {
-	if (Component::MousePressed(event) == true) {
-		return true;
-	}
+  if (Component::MousePressed(event) == true) {
+    return true;
+  }
 
-	return false;
+  return false;
 }
 
 bool Table::MouseReleased(jevent::MouseEvent *event)
 {
-	if (Component::MouseReleased(event) == true) {
-		return true;
-	}
+  if (Component::MouseReleased(event) == true) {
+    return true;
+  }
 
-	return false;
+  return false;
 }
 
 bool Table::MouseMoved(jevent::MouseEvent *event)
 {
-	if (Component::MouseMoved(event) == true) {
-		return true;
-	}
+  if (Component::MouseMoved(event) == true) {
+    return true;
+  }
 
-	return false;
+  return false;
 }
 
 bool Table::MouseWheel(jevent::MouseEvent *event)
 {
-	if (Component::MouseWheel(event) == true) {
-		return true;
-	}
+  if (Component::MouseWheel(event) == true) {
+    return true;
+  }
 
-	return false;
+  return false;
 }
 
 void Table::Paint(Graphics *g)
 {
-	JDEBUG(JINFO, "paint\n");
+  JDEBUG(JINFO, "paint\n");
 
-	Component::Paint(g);
-	
-	/*
-	g->SetFont(_font);
+  Component::Paint(g);
+  
+  /*
+  g->SetFont(_font);
 
-	int _visible_items = 4,
-		position = _row-_visible_items/2;
+  int _visible_items = 4,
+    position = _row-_visible_items/2;
 
-	if (position > (int)(_cells.size.size()-_visible_items)) {
-		position = (_cells.size()-_visible_items);
-	}
+  if (position > (int)(_cells.size.size()-_visible_items)) {
+    position = (_cells.size()-_visible_items);
+  }
 
-	if (position < 0) {
-		position = 0;
-	}
+  if (position < 0) {
+    position = 0;
+  }
 
-	int i,
-		count = 0,
-		default_y = 0,
-		space = _horizontal_gap,
-		scroll_width = 0,
-		scroll_gap = 0;
+  int i,
+    count = 0,
+    default_y = 0,
+    space = _horizontal_gap,
+    scroll_width = 0,
+    scroll_gap = 0;
 
-	if ((int)_cells.size() < _visible_items) {
-		position = 0;
-	}
+  if ((int)_cells.size() < _visible_items) {
+    position = 0;
+  }
 
-	default_y = (_item_size+_vertical_gap)*count+_vertical_gap;
+  default_y = (_item_size+_vertical_gap)*count+_vertical_gap;
 
-	for (i=position; count<_visible_items && i<(int)_cells.size(); i++, count++) {
-		default_y = (_item_size+_vertical_gap)*count+_vertical_gap;
+  for (i=position; count<_visible_items && i<(int)_cells.size(); i++, count++) {
+    default_y = (_item_size+_vertical_gap)*count+_vertical_gap;
 
-		if (_index != i) {
-			g->SetColor(_item_red, _item_green, _item_blue, _item_alpha);
-			g->FillRectangle(_horizontal_gap, default_y, _width-2*_horizontal_gap-scroll_width-scroll_gap, _item_size);
-		} else {
-			g->FillGradientRectangle(_horizontal_gap, default_y, _width-2*_horizontal_gap-scroll_width-scroll_gap, (int)((_item_size)*0.6), _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
-			g->FillGradientRectangle(_horizontal_gap, default_y+(_item_size)/2, _width-2*_horizontal_gap-scroll_width-scroll_gap, (_item_size)/2, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha);
-		}
+    if (_index != i) {
+      g->SetColor(_item_red, _item_green, _item_blue, _item_alpha);
+      g->FillRectangle(_horizontal_gap, default_y, _width-2*_horizontal_gap-scroll_width-scroll_gap, _item_size);
+    } else {
+      g->FillGradientRectangle(_horizontal_gap, default_y, _width-2*_horizontal_gap-scroll_width-scroll_gap, (int)((_item_size)*0.6), _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
+      g->FillGradientRectangle(_horizontal_gap, default_y+(_item_size)/2, _width-2*_horizontal_gap-scroll_width-scroll_gap, (_item_size)/2, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha);
+    }
 
-		g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
-		g->DrawString(TruncateString(_items[i].text, _width-space-_horizontal_gap-scroll_width-scroll_gap), space, default_y, _width-space-_horizontal_gap-scroll_width-scroll_gap, _item_size, _align);
-	}
+    g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
+    g->DrawString(TruncateString(_items[i].text, _width-space-_horizontal_gap-scroll_width-scroll_gap), space, default_y, _width-space-_horizontal_gap-scroll_width-scroll_gap, _item_size, _align);
+  }
 
-	for (; count<_visible_items; count++) {
-		default_y = (_item_size+_vertical_gap)*count+_vertical_gap;
-		
-		g->SetColor(_item_red, _item_green, _item_blue, _item_alpha);
-		g->FillRectangle(_horizontal_gap, default_y, _width-2*_horizontal_gap-scroll_width-scroll_gap, _item_size);
-	}
-	
-	if (HasFocus() == true) {
-		g->DrawRectangleBorder(0, 0, _width, _height, 0xf0, 0xf0, 0xf0, _border_alpha, 1);
-	}
-	
-	if (_enabled == false) {
-		g->SetColor(0x00, 0x00, 0x00, 0x80);
-		g->FillRectangle(0, 0, _width, _height);
-	}
+  for (; count<_visible_items; count++) {
+    default_y = (_item_size+_vertical_gap)*count+_vertical_gap;
+    
+    g->SetColor(_item_red, _item_green, _item_blue, _item_alpha);
+    g->FillRectangle(_horizontal_gap, default_y, _width-2*_horizontal_gap-scroll_width-scroll_gap, _item_size);
+  }
+  
+  if (HasFocus() == true) {
+    g->DrawRectangleBorder(0, 0, _width, _height, 0xf0, 0xf0, 0xf0, _border_alpha, 1);
+  }
+  
+  if (_enabled == false) {
+    g->SetColor(0x00, 0x00, 0x00, 0x80);
+    g->FillRectangle(0, 0, _width, _height);
+  }
 }
-	*/
+  */
 
 }
 

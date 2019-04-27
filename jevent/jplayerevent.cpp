@@ -22,20 +22,20 @@
 namespace jevent {
 
 PlayerEvent::PlayerEvent(void *source, jplayer_event_t type):
-	jevent::EventObject(source)
+  jevent::EventObject(source)
 {
-	jcommon::Object::SetClassName("jevent::PlayerEvent");
+  jcommon::Object::SetClassName("jevent::PlayerEvent");
 
-	_type = type;
+  _type = type;
 }
-		
+    
 PlayerEvent::~PlayerEvent()
 {
 }
 
 jplayer_event_t PlayerEvent::GetType()
 {
-	return _type;
+  return _type;
 }
 
 }

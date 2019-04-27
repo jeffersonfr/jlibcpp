@@ -31,50 +31,50 @@ namespace jexception {
  */
 class ControlException : public jexception::RuntimeException {
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		ControlException();
+  public:
+    /**
+     * \brief
+     *
+     */
+    ControlException();
 
-		/**
-		 * \brief
-		 *
-		 */
-		ControlException(std::string reason);
+    /**
+     * \brief
+     *
+     */
+    ControlException(std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		ControlException(jexception::Exception *exception, std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    ControlException(jexception::Exception *exception, std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> ControlException(const std::string &fmt, T ...vs):
       Exception(fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::ControlException");
     }
-		
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> ControlException(Exception *exception, const std::string &fmt, T ...vs):
       Exception(exception, fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::ControlException");
     }
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~ControlException() throw ();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~ControlException() throw ();
 
 };
 

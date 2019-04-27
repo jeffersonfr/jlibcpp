@@ -35,80 +35,80 @@ namespace jlogger {
 */
 class Logger : public virtual jcommon::Object {
 
-	friend class LoggerManager;
+  friend class LoggerManager;
 
-	private:
-		/** \brief */
-		std::queue<LogRecord *> _records;
-		/** \brief */
-		std::vector<Logger *> _loggers;
-		/** \brief */
-		LoggerHandler *_handler;
-		/** \brief */
-		Formatter *_format;
-		/** \brief */
-		int _mask;
+  private:
+    /** \brief */
+    std::queue<LogRecord *> _records;
+    /** \brief */
+    std::vector<Logger *> _loggers;
+    /** \brief */
+    LoggerHandler *_handler;
+    /** \brief */
+    Formatter *_format;
+    /** \brief */
+    int _mask;
 
-		/**
-		 * \brief
-		 * 
-		 */
-		Logger(LoggerHandler *handler_ = nullptr, Formatter *format_ = nullptr);
+    /**
+     * \brief
+     * 
+     */
+    Logger(LoggerHandler *handler_ = nullptr, Formatter *format_ = nullptr);
 
-		/**
-		 * \brief
-		 *
-		 */
-		void AddLogger(Logger *logger);
-		
-	public:
-		/**
-		 * \brief
-		 */
-		virtual ~Logger();
-
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void SendLogger(jrecord_type_t type_, std::string record_);
-
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void SendLogger(jrecord_type_t type_, const char *fmt, ...);
-
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void SendLogger(LogRecord *record_);
+    /**
+     * \brief
+     *
+     */
+    void AddLogger(Logger *logger);
     
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void SetOutput(int mask_);
+  public:
+    /**
+     * \brief
+     */
+    virtual ~Logger();
+
+    /**
+     * \brief
+     * 
+     */
+    virtual void SendLogger(jrecord_type_t type_, std::string record_);
+
+    /**
+     * \brief
+     * 
+     */
+    virtual void SendLogger(jrecord_type_t type_, const char *fmt, ...);
+
+    /**
+     * \brief
+     * 
+     */
+    virtual void SendLogger(LogRecord *record_);
     
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void SetHandler(LoggerHandler *handler_);
+    /**
+     * \brief
+     * 
+     */
+    virtual void SetOutput(int mask_);
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual void SetHandler(LoggerHandler *handler_);
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void SetFormatter(Formatter *format_);
+    /**
+     * \brief
+     * 
+     */
+    virtual void SetFormatter(Formatter *format_);
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void Release();
-		
+    /**
+     * \brief
+     * 
+     */
+    virtual void Release();
+    
 };
 
 }

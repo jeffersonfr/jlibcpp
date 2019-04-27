@@ -29,108 +29,108 @@ namespace jgui {
 
 class ToastDialog : public jgui::Dialog {
 
-	private:
-		/** \brief */
-		Label *_label;
-		/** \brief */
+  private:
+    /** \brief */
+    Label *_label;
+    /** \brief */
     int _timeout;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		ToastDialog(Container *parent, std::string msg, bool wrap = false);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~ToastDialog();
+  public:
+    /**
+     * \brief
+     *
+     */
+    ToastDialog(Container *parent, std::string msg, bool wrap = false);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~ToastDialog();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetHorizontalAlign(jhorizontal_align_t align);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetHorizontalAlign(jhorizontal_align_t align);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jhorizontal_align_t GetHorizontalAlign();
+    /**
+     * \brief
+     *
+     */
+    virtual jhorizontal_align_t GetHorizontalAlign();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetVerticalAlign(jvertical_align_t align);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetVerticalAlign(jvertical_align_t align);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jvertical_align_t GetVerticalAlign();
+    /**
+     * \brief
+     *
+     */
+    virtual jvertical_align_t GetVerticalAlign();
 
-		/**
-		 * \brief
-		 *
-		 */
+    /**
+     * \brief
+     *
+     */
     virtual void SetTimeout(int timeout);
 
-		/**
-		 * \brief
-		 *
-		 */
+    /**
+     * \brief
+     *
+     */
     virtual int GetTimeout();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Exec(bool modal = false);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool KeyPressed(jevent::KeyEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual void Exec(bool modal = false);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool KeyPressed(jevent::KeyEvent *event);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool KeyReleased(jevent::KeyEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual bool KeyReleased(jevent::KeyEvent *event);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool KeyTyped(jevent::KeyEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual bool KeyTyped(jevent::KeyEvent *event);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MousePressed(jevent::MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MouseReleased(jevent::MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MouseMoved(jevent::MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MouseWheel(jevent::MouseEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual bool MousePressed(jevent::MouseEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool MouseReleased(jevent::MouseEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool MouseMoved(jevent::MouseEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool MouseWheel(jevent::MouseEvent *event);
 };
 
 }

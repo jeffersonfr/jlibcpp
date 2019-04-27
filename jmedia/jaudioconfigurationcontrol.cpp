@@ -22,11 +22,11 @@
 namespace jmedia {
 
 AudioConfigurationControl::AudioConfigurationControl():
-	Control("audio.configuration")
+  Control("audio.configuration")
 {
-	jcommon::Object::SetClassName("jmedia::AudioConfigurationControl");
+  jcommon::Object::SetClassName("jmedia::AudioConfigurationControl");
 }
-		
+    
 AudioConfigurationControl::~AudioConfigurationControl()
 {
 }
@@ -37,7 +37,7 @@ void AudioConfigurationControl::SetAudioMode(jaudio_config_mode_t)
 
 jaudio_config_mode_t AudioConfigurationControl::GetHDMIAudioMode()
 {
-	return ACM_HDMI_PCM;
+  return ACM_HDMI_PCM;
 }
 
 void AudioConfigurationControl::SetSPDIFPCM(bool pcm)
@@ -46,7 +46,7 @@ void AudioConfigurationControl::SetSPDIFPCM(bool pcm)
 
 bool AudioConfigurationControl::IsSPDIFPCM()
 {
-	return false;
+  return false;
 }
 
 void AudioConfigurationControl::SetAudioDelay(int64_t delay)
@@ -55,7 +55,7 @@ void AudioConfigurationControl::SetAudioDelay(int64_t delay)
 
 int64_t AudioConfigurationControl::GetAudioDelay()
 {
-	return 0;
+  return 0;
 }
 
 }

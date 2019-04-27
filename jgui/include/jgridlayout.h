@@ -31,100 +31,100 @@ namespace jgui {
  */
 class GridLayout : public Layout {
 
-	private:
-		/** \brief */
-		int _hgap;
-		/** \brief */
-		int _vgap;
-		/** \brief */
-		int _rows;
-		/** \brief */
-		int _cols;
+  private:
+    /** \brief */
+    int _hgap;
+    /** \brief */
+    int _vgap;
+    /** \brief */
+    int _rows;
+    /** \brief */
+    int _cols;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		GridLayout(int rows = 1, int cols = 1, int hgap = 10, int vgap = 10);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~GridLayout();
+  public:
+    /**
+     * \brief
+     *
+     */
+    GridLayout(int rows = 1, int cols = 1, int hgap = 10, int vgap = 10);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~GridLayout();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetRows();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetColumns();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetHorizontalGap();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetVerticalGap();
+    /**
+     * \brief
+     *
+     */
+    virtual int GetRows();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int GetColumns();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int GetHorizontalGap();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int GetVerticalGap();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetRows(int rows);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetColumns(int cols);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetHorizontalGap(int hgap);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetVerticalGap(int vgap);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetRows(int rows);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetColumns(int cols);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetHorizontalGap(int hgap);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetVerticalGap(int vgap);
 
-		/**
-		 * \brief
-		 *
-		 */
+    /**
+     * \brief
+     *
+     */
     virtual jsize_t GetMinimumLayoutSize(Container *parent);
-		
-		/**
-		 * \brief
-		 *
-		 */
+    
+    /**
+     * \brief
+     *
+     */
     virtual jsize_t GetMaximumLayoutSize(Container *parent);
-		
-		/**
-		 * \brief
-		 *
-		 */
+    
+    /**
+     * \brief
+     *
+     */
     virtual jsize_t GetPreferredLayoutSize(Container *parent);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void DoLayout(Container *parent);
+    /**
+     * \brief
+     *
+     */
+    virtual void DoLayout(Container *parent);
 
 };
 

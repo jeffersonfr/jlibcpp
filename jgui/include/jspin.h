@@ -35,98 +35,98 @@ namespace jgui {
  */
 class Spin : public jgui::Component, public jgui::ItemComponent {
 
-	private:
-		/** \brief */
-		jscroll_orientation_t _type;
+  private:
+    /** \brief */
+    jscroll_orientation_t _type;
 
-	private:
-		void NextItem();
-		void PreviousItem();
+  private:
+    void NextItem();
+    void PreviousItem();
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		Spin(int x = 0, int y = 0, int width = DEFAULT_COMPONENT_WIDTH, int height = DEFAULT_COMPONENT_HEIGHT);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~Spin();
+  public:
+    /**
+     * \brief
+     *
+     */
+    Spin(int x = 0, int y = 0, int width = DEFAULT_COMPONENT_WIDTH, int height = DEFAULT_COMPONENT_HEIGHT);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~Spin();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jscroll_orientation_t GetScrollOrientation();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetScrollOrientation(jscroll_orientation_t type);
+    /**
+     * \brief
+     *
+     */
+    virtual jscroll_orientation_t GetScrollOrientation();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetScrollOrientation(jscroll_orientation_t type);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void AddEmptyItem();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void AddTextItem(std::string text);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void AddImageItem(std::string text, jgui::Image *image);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void AddCheckedItem(std::string text, bool checked);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Paint(Graphics *g);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool KeyPressed(jevent::KeyEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual void AddEmptyItem();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void AddTextItem(std::string text);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void AddImageItem(std::string text, jgui::Image *image);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void AddCheckedItem(std::string text, bool checked);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Paint(Graphics *g);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool KeyPressed(jevent::KeyEvent *event);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MousePressed(jevent::MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MouseReleased(jevent::MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MouseMoved(jevent::MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MouseWheel(jevent::MouseEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual bool MousePressed(jevent::MouseEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool MouseReleased(jevent::MouseEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool MouseMoved(jevent::MouseEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool MouseWheel(jevent::MouseEvent *event);
 
 };
 

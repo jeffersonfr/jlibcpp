@@ -27,22 +27,22 @@
 #include <sys/ipc.h>
 #include <sys/msg.h>
 
-#define MAX_PACKET_SIZE	256
+#define MAX_PACKET_SIZE  256
 
 namespace jshared {
 
 struct jpage_msg_t {
-	long mtype;
-	char msg[MAX_PACKET_SIZE];
+  long mtype;
+  char msg[MAX_PACKET_SIZE];
 };
 
 struct msgbuf {
-	int mtype;
+  int mtype;
 };
 
 union msg_t {
-	struct msgbuf buf;
-	jpage_msg_t msg;
+  struct msgbuf buf;
+  jpage_msg_t msg;
 };
 
 /**
@@ -60,49 +60,49 @@ class MessageQueue : public virtual jcommon::Object{
       /** \brief */
       bool _blocking;
 
-	public:
-		/**
-		 * \brief Constructor.
-		 *
-		 */
-		MessageQueue(key_t key_ = JIPC_PRIVATE, int perms_ = 0600, int size_ = MAX_PACKET_SIZE, int maxmsgs_ = 0);
-	
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~MessageQueue();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetMessageIndex();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Send(const void *data_, int size_, long type_ = 1);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Receive(void *data_, int size_, long mtype_ = 0, int flag_ = 0);
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void SetBlocking(bool b_);
-		
-		/**
-		 * \brief Close.
-		 *
-		 */
-		virtual void Release();
-		
+  public:
+    /**
+     * \brief Constructor.
+     *
+     */
+    MessageQueue(key_t key_ = JIPC_PRIVATE, int perms_ = 0600, int size_ = MAX_PACKET_SIZE, int maxmsgs_ = 0);
+  
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~MessageQueue();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int GetMessageIndex();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Send(const void *data_, int size_, long type_ = 1);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Receive(void *data_, int size_, long mtype_ = 0, int flag_ = 0);
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual void SetBlocking(bool b_);
+    
+    /**
+     * \brief Close.
+     *
+     */
+    virtual void Release();
+    
 };
 
 }

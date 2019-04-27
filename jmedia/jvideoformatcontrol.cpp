@@ -22,11 +22,11 @@
 namespace jmedia {
 
 VideoFormatControl::VideoFormatControl():
-	Control("video.format")
+  Control("video.format")
 {
-	jcommon::Object::SetClassName("jmedia::VideoFormatControl");
+  jcommon::Object::SetClassName("jmedia::VideoFormatControl");
 }
-		
+    
 VideoFormatControl::~VideoFormatControl()
 {
 }
@@ -53,27 +53,27 @@ void VideoFormatControl::SetVideoFormatSD(jsd_video_format_t vf)
 
 jaspect_ratio_t VideoFormatControl::GetAspectRatio()
 {
-	return LAR_16x9;
+  return LAR_16x9;
 }
 
 double VideoFormatControl::GetFramesPerSecond()
 {
-	return 0.0;
+  return 0.0;
 }
 
 jvideo_mode_t VideoFormatControl::GetContentMode()
 {
-	return LVM_FULL;
+  return LVM_FULL;
 }
 
 jhd_video_format_t VideoFormatControl::GetVideoFormatHD()
 {
-	return LHVF_1080i;
+  return LHVF_1080i;
 }
 
 jsd_video_format_t VideoFormatControl::GetVideoFormatSD()
 {
-	return LSVF_PAL_M;
+  return LSVF_PAL_M;
 }
 
 }

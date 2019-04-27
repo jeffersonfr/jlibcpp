@@ -24,19 +24,19 @@ namespace jexception {
 CompileException::CompileException():
     RuntimeException()
 {
-	jcommon::Object::SetClassName("jexception::CompileException");
+  jcommon::Object::SetClassName("jexception::CompileException");
 }
 
 CompileException::CompileException(std::string reason_):
     RuntimeException(reason_)
 {
-	jcommon::Object::SetClassName("jexception::CompileException");
+  jcommon::Object::SetClassName("jexception::CompileException");
 }
 
 CompileException::CompileException(Exception *exception, std::string reason_):
     RuntimeException(exception, reason_)
 {
-	jcommon::Object::SetClassName("jexception::CompileException");
+  jcommon::Object::SetClassName("jexception::CompileException");
 }
 
 CompileException::~CompileException() throw()

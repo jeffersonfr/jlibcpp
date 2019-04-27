@@ -34,10 +34,10 @@
 namespace jshared {
 
 struct jnamedsemaphore_t {
-	pthread_mutex_t lock;
-	pthread_cond_t nonzero;
-	unsigned size;
-	unsigned count;
+  pthread_mutex_t lock;
+  pthread_cond_t nonzero;
+  unsigned size;
+  unsigned count;
 };
 
 /**
@@ -47,59 +47,59 @@ struct jnamedsemaphore_t {
  */
 class NamedSemaphore : public virtual jcommon::Object {
 
-	private:
-		struct jnamedsemaphore_t *_handler;
+  private:
+    struct jnamedsemaphore_t *_handler;
 
-	public:
-		/**
-		 * \brief Open a semaphore. IPC_PRIVATE parameter create a new semaphore for
-		 * only one process.
-		 *
-		 */
-		NamedSemaphore(std::string name);
+  public:
+    /**
+     * \brief Open a semaphore. IPC_PRIVATE parameter create a new semaphore for
+     * only one process.
+     *
+     */
+    NamedSemaphore(std::string name);
 
-		/**
-		 * \brief Open a semaphore. IPC_PRIVATE parameter create a new semaphore for
-		 * only one process.
-		 *
-		 */
-		NamedSemaphore(std::string name, int access);
+    /**
+     * \brief Open a semaphore. IPC_PRIVATE parameter create a new semaphore for
+     * only one process.
+     *
+     */
+    NamedSemaphore(std::string name, int access);
 
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~NamedSemaphore();
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~NamedSemaphore();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Wait();
+    /**
+     * \brief
+     *
+     */
+    virtual void Wait();
 
-		/**
-		 * \brief Wait milliseconds.
-		 *
-		 */
-		virtual void Wait(uint64_t time_);
+    /**
+     * \brief Wait milliseconds.
+     *
+     */
+    virtual void Wait(uint64_t time_);
 
-		/**
-		 * \brief .
-		 *
-		 */
-		virtual void Notify();
+    /**
+     * \brief .
+     *
+     */
+    virtual void Notify();
 
-		/**
-		 * \brief .
-		 *
-		 */
-		virtual void NotifyAll();
+    /**
+     * \brief .
+     *
+     */
+    virtual void NotifyAll();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Release();
+    /**
+     * \brief
+     *
+     */
+    virtual void Release();
 
 };
 

@@ -31,26 +31,26 @@ namespace jdevice {
 */
 class Audio : public jdevice::Device {
 
-	private:
+  private:
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		Audio();
+  public:
+    /**
+     * \brief
+     *
+     */
+    Audio();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual ~Audio();
+    /**
+     * \brief
+     * 
+     */
+    virtual ~Audio();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void Builder();
+    /**
+     * \brief
+     * 
+     */
+    virtual void Builder();
 
 };
 

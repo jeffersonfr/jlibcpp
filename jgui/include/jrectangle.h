@@ -31,48 +31,48 @@ namespace jgui {
  */
 class Rectangle : public virtual jcommon::Object {
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~Rectangle();
+  public:
+    /**
+     * \brief
+     *
+     */
+    virtual ~Rectangle();
 
-		/**
-		 * \brief
-		 *
-		 */
-		static bool Contains(jregion_t region1, jregion_t region2);
+    /**
+     * \brief
+     *
+     */
+    static bool Contains(jregion_t region1, jregion_t region2);
 
-		/**
-		 * \brief
-		 *
-		 */
-		static bool Contains(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2);
+    /**
+     * \brief
+     *
+     */
+    static bool Contains(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2);
 
-		/**
-		 * \brief
-		 *
-		 */
-		static bool Intersects(jregion_t region1, jregion_t region2);
+    /**
+     * \brief
+     *
+     */
+    static bool Intersects(jregion_t region1, jregion_t region2);
 
-		/**
-		 * \brief
-		 *
-		 */
-		static bool Intersects(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2);
+    /**
+     * \brief
+     *
+     */
+    static bool Intersects(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2);
 
-		/**
-		 * \brief
-		 *
-		 */
-		static jregion_t Intersection(jregion_t region1, jregion_t region2);
+    /**
+     * \brief
+     *
+     */
+    static jregion_t Intersection(jregion_t region1, jregion_t region2);
 
-		/**
-		 * \brief
-		 *
-		 */
-		static jregion_t Intersection(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2);
+    /**
+     * \brief
+     *
+     */
+    static jregion_t Intersection(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2);
 
 };
 

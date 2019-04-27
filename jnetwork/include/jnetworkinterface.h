@@ -36,206 +36,206 @@ namespace jnetwork {
  */
 class NetworkInterface : public virtual jcommon::Object {
 
-	private:
-		/** \brief */
-		std::vector<NetworkInterface *> _childs;
-		/** \brief */
-		std::vector<InetAddress *> _masks;
-		/** \brief */
-		std::vector <InetAddress *> _addresses;
-		/** \brief */
-		std::vector <InetAddress *> _broadcast_addresses;
-		/** \brief */
-		std::vector<uint8_t> _hwaddress;
-		/** \brief */
-		NetworkInterface *_parent;
-		/** \brief */
-		std::string _name;
-		/** \brief */
-		int _index;
-		/** \brief */
-		int _mtu;
-		/** \brief */
-		int _dma;
-		/** \brief */
-		int _irq;
-		/** \brief */
-		int _metric;
-		/** \brief */
-		uint32_t _flags;
-		/** \brief */
-		bool _is_virtual;
+  private:
+    /** \brief */
+    std::vector<NetworkInterface *> _childs;
+    /** \brief */
+    std::vector<InetAddress *> _masks;
+    /** \brief */
+    std::vector <InetAddress *> _addresses;
+    /** \brief */
+    std::vector <InetAddress *> _broadcast_addresses;
+    /** \brief */
+    std::vector<uint8_t> _hwaddress;
+    /** \brief */
+    NetworkInterface *_parent;
+    /** \brief */
+    std::string _name;
+    /** \brief */
+    int _index;
+    /** \brief */
+    int _mtu;
+    /** \brief */
+    int _dma;
+    /** \brief */
+    int _irq;
+    /** \brief */
+    int _metric;
+    /** \brief */
+    uint32_t _flags;
+    /** \brief */
+    bool _is_virtual;
 
-	private:
-		/**
-		 * \brief Constructor private.
-		 *
-		 */
-		NetworkInterface(NetworkInterface *parent, std::string name, int index, bool is_virtual);
+  private:
+    /**
+     * \brief Constructor private.
+     *
+     */
+    NetworkInterface(NetworkInterface *parent, std::string name, int index, bool is_virtual);
 
-		/**
-		 * \brief
-		 *
-		 */
-		void AddNetworkMask(InetAddress *addr);
+    /**
+     * \brief
+     *
+     */
+    void AddNetworkMask(InetAddress *addr);
 
-		/**
-		 * \brief
-		 *
-		 */
-		void AddInetAddress(InetAddress *addr);
+    /**
+     * \brief
+     *
+     */
+    void AddInetAddress(InetAddress *addr);
 
-		/**
-		 * \brief
-		 *
-		 */
-		void AddBroadcastAddress(InetAddress *addr);
+    /**
+     * \brief
+     *
+     */
+    void AddBroadcastAddress(InetAddress *addr);
 
-		/**
-		 * \brief
-		 *
-		 */
-		void AddSubInterface(NetworkInterface *i);
+    /**
+     * \brief
+     *
+     */
+    void AddSubInterface(NetworkInterface *i);
 
-	public:
-		/**
-		 * \brief Destructor virtual.
-		 *
-		 */
-		virtual ~NetworkInterface();
+  public:
+    /**
+     * \brief Destructor virtual.
+     *
+     */
+    virtual ~NetworkInterface();
 
-		/**
-		 * \brief Convenience method to search for a network interface that has the specified Internet Protocol (IP) address bound to it.
-		 *
-		 */
-		static NetworkInterface * GetByInetAddress(InetAddress *addr);
+    /**
+     * \brief Convenience method to search for a network interface that has the specified Internet Protocol (IP) address bound to it.
+     *
+     */
+    static NetworkInterface * GetByInetAddress(InetAddress *addr);
 
-		/**
-		 * \brief Searches for the network interface with the specified name.
-		 *
-		 */
-		static NetworkInterface * GetByName(std::string name);
+    /**
+     * \brief Searches for the network interface with the specified name.
+     *
+     */
+    static NetworkInterface * GetByName(std::string name);
 
-		/**
-		 * \brief Returns all the interfaces on this machine.
-		 *
-		 */
-		static std::vector<NetworkInterface *> GetNetworkInterfaces();
+    /**
+     * \brief Returns all the interfaces on this machine.
+     *
+     */
+    static std::vector<NetworkInterface *> GetNetworkInterfaces();
 
-		/**
-		 * \brief Get the display name of this network interface.
-		 *
-		 */
-		virtual std::string GetDisplayName();
+    /**
+     * \brief Get the display name of this network interface.
+     *
+     */
+    virtual std::string GetDisplayName();
 
-		/**
-		 * \brief Returns the hardware address (usually MAC) of the interface if it has one and if it can be accessed given the current privileges.
-		 *
-		 */
-		virtual const std::vector<uint8_t> & GetHardwareAddress();
+    /**
+     * \brief Returns the hardware address (usually MAC) of the interface if it has one and if it can be accessed given the current privileges.
+     *
+     */
+    virtual const std::vector<uint8_t> & GetHardwareAddress();
 
-		/**
-		 * \brief 
-		 *
-		 */
-		virtual const std::vector<InetAddress *> & GetNetworkMasks();
+    /**
+     * \brief 
+     *
+     */
+    virtual const std::vector<InetAddress *> & GetNetworkMasks();
 
-		/**
-		 * \brief Convenience method to return an Enumeration with all or a subset of the InetAddresses bound to this network interface.
-		 *
-		 */
-		virtual const std::vector<InetAddress *> & GetInetAddresses();
+    /**
+     * \brief Convenience method to return an Enumeration with all or a subset of the InetAddresses bound to this network interface.
+     *
+     */
+    virtual const std::vector<InetAddress *> & GetInetAddresses();
 
-		/**
-		 * \brief Get a List of all or a subset of the  <address, broadcast> of this network interface.
-		 *
-		 */
-		virtual const std::vector<InetAddress *> & GetBroadcastAddresses();
+    /**
+     * \brief Get a List of all or a subset of the  <address, broadcast> of this network interface.
+     *
+     */
+    virtual const std::vector<InetAddress *> & GetBroadcastAddresses();
 
-		/**
-		 * \brief Returns the Maximum Transmission Unit (MTU) of this interface.
-		 *
-		 */
-		virtual int GetDMA();
+    /**
+     * \brief Returns the Maximum Transmission Unit (MTU) of this interface.
+     *
+     */
+    virtual int GetDMA();
 
-		/**
-		 * \brief Returns the Maximum Transmission Unit (MTU) of this interface.
-		 *
-		 */
-		virtual int GetIRQ();
+    /**
+     * \brief Returns the Maximum Transmission Unit (MTU) of this interface.
+     *
+     */
+    virtual int GetIRQ();
 
-		/**
-		 * \brief Returns the Maximum Transmission Unit (MTU) of this interface.
-		 *
-		 */
-		virtual int GetMetric();
+    /**
+     * \brief Returns the Maximum Transmission Unit (MTU) of this interface.
+     *
+     */
+    virtual int GetMetric();
 
-		/**
-		 * \brief Returns the Maximum Transmission Unit (MTU) of this interface.
-		 *
-		 */
-		virtual int GetMTU();
+    /**
+     * \brief Returns the Maximum Transmission Unit (MTU) of this interface.
+     *
+     */
+    virtual int GetMTU();
 
-		/**
-		 * \brief Get the name of this network interface.
-		 *
-		 */
-		virtual std::string GetName();
+    /**
+     * \brief Get the name of this network interface.
+     *
+     */
+    virtual std::string GetName();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetIndex();
+    /**
+     * \brief
+     *
+     */
+    virtual int GetIndex();
 
-		/** 
-		 * \brief Returns the parent NetworkInterface of this interface if this is a subinterface, or null if it is a physical (non 
-		 * virtual) interface or has no parent. 
-		 *
-		 */
-		virtual NetworkInterface * GetParent();
+    /** 
+     * \brief Returns the parent NetworkInterface of this interface if this is a subinterface, or null if it is a physical (non 
+     * virtual) interface or has no parent. 
+     *
+     */
+    virtual NetworkInterface * GetParent();
 
-		/**
-		 * \brief Get an Enumeration with all the subinterfaces (also known as virtual interfaces) attached to this network interface.
-		 *
-		 */
-		virtual const std::vector<NetworkInterface *> & GetSubInterfaces();
+    /**
+     * \brief Get an Enumeration with all the subinterfaces (also known as virtual interfaces) attached to this network interface.
+     *
+     */
+    virtual const std::vector<NetworkInterface *> & GetSubInterfaces();
 
-		/**
-		 * \brief Returns whether a network interface is a loopback interface.
-		 *
-		 */
-		virtual bool IsLoopback();
+    /**
+     * \brief Returns whether a network interface is a loopback interface.
+     *
+     */
+    virtual bool IsLoopback();
 
-		/**
-		 * \brief Returns whether a network interface is a point to point interface.
-		 *
-		 */
-		virtual bool IsPointToPoint();
+    /**
+     * \brief Returns whether a network interface is a point to point interface.
+     *
+     */
+    virtual bool IsPointToPoint();
 
-		/**
-		 * \brief Returns whether a network interface is up and running.
-		 *
-		 */
-		virtual bool IsUp();
+    /**
+     * \brief Returns whether a network interface is up and running.
+     *
+     */
+    virtual bool IsUp();
 
-		/**
-		 * \brief Returns whether this interface is a virtual interface (also called subinterface).
-		 *
-		 */
-		virtual bool IsVirtual();
+    /**
+     * \brief Returns whether this interface is a virtual interface (also called subinterface).
+     *
+     */
+    virtual bool IsVirtual();
 
-		/**
-		 * \brief Returns whether a network interface supports multicasting or not.
-		 *
-		 */
-		virtual bool SupportsMulticast();
+    /**
+     * \brief Returns whether a network interface supports multicasting or not.
+     *
+     */
+    virtual bool SupportsMulticast();
 
-		/**
-		 * \brief Returns a string representation of the object.
-		 *
-		 */
-		virtual std::string What();
+    /**
+     * \brief Returns a string representation of the object.
+     *
+     */
+    virtual std::string What();
 
 };
 

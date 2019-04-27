@@ -22,9 +22,9 @@
 namespace jevent {
 
 Listener::Listener():
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jevent::Listener");
+  jcommon::Object::SetClassName("jevent::Listener");
 }
 
 Listener::~Listener()

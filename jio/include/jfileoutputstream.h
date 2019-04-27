@@ -32,10 +32,10 @@ namespace jio {
  */
 class FileOutputStream : public jio::OutputStream {
 
-	private:
-		/** \brief */
-		File *_file;
-		/** \brief */
+  private:
+    /** \brief */
+    File *_file;
+    /** \brief */
     char *_buffer;
     /** \brief Seek */
     int64_t _current;
@@ -48,78 +48,78 @@ class FileOutputStream : public jio::OutputStream {
     /** \brief */
     bool _flag;
 
-	public:
-		/**
-		 * \brief
-		 * 
-		 */
-		FileOutputStream(std::string filename_);
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		FileOutputStream(File *file_);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~FileOutputStream();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsEmpty();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t Available();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t GetSize();
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual int64_t Write(int64_t b);
-
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual int64_t Write(const char *, int64_t size);
+  public:
+    /**
+     * \brief
+     * 
+     */
+    FileOutputStream(std::string filename_);
     
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual int64_t Flush();
+    /**
+     * \brief
+     * 
+     */
+    FileOutputStream(File *file_);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~FileOutputStream();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Seek(int64_t index);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Close();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t GetSentBytes();
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsEmpty();
+
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t Available();
+
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t GetSize();
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual int64_t Write(int64_t b);
+
+    /**
+     * \brief
+     * 
+     */
+    virtual int64_t Write(const char *, int64_t size);
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual int64_t Flush();
+
+    /**
+     * \brief
+     *
+     */
+    virtual void Seek(int64_t index);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Close();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t GetSentBytes();
 
 };
 

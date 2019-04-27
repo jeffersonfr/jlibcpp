@@ -40,56 +40,56 @@ namespace jgui {
  */
 class YesNoDialog : public jgui::Dialog, public jevent::ActionListener {
 
-	private:
-		/** \brief */
-		Label *_label;
-		/** \brief */
-		Button *_yes;
-		/** \brief */
-		Button *_no;
+  private:
+    /** \brief */
+    Label *_label;
+    /** \brief */
+    Button *_yes;
+    /** \brief */
+    Button *_no;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		YesNoDialog(Container *parent, std::string title, std::string msg);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~YesNoDialog();
+  public:
+    /**
+     * \brief
+     *
+     */
+    YesNoDialog(Container *parent, std::string title, std::string msg);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~YesNoDialog();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetHorizontalAlign(jhorizontal_align_t align);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetHorizontalAlign(jhorizontal_align_t align);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jhorizontal_align_t GetHorizontalAlign();
+    /**
+     * \brief
+     *
+     */
+    virtual jhorizontal_align_t GetHorizontalAlign();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetVerticalAlign(jvertical_align_t align);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetVerticalAlign(jvertical_align_t align);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jvertical_align_t GetVerticalAlign();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void ActionPerformed(jevent::ActionEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual jvertical_align_t GetVerticalAlign();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void ActionPerformed(jevent::ActionEvent *event);
 
 };
 

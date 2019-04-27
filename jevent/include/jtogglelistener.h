@@ -32,25 +32,25 @@ namespace jevent {
  */
 class ToggleListener : public jevent::Listener {
 
-	protected:
-		/**
-		 * \brief
-		 *
-		 */
-		ToggleListener();
+  protected:
+    /**
+     * \brief
+     *
+     */
+    ToggleListener();
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~ToggleListener();
+  public:
+    /**
+     * \brief
+     *
+     */
+    virtual ~ToggleListener();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void StateChanged(ToggleEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual void StateChanged(ToggleEvent *event);
 
 };
 

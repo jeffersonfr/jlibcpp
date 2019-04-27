@@ -40,175 +40,175 @@ class ServerSocket6;
  */
 class Socket6 : public jnetwork::Connection {
 
-	friend class ServerSocket6;
+  friend class ServerSocket6;
 
    private:
-		/** \brief */
-		SocketInputStream *_is;
-		/** \brief */
-		SocketOutputStream *_os;
-		/** \brief */
-		InetAddress *_address;
-		/** \brief Bytes sent. */
-		int64_t _sent_bytes;
-		/** \brief Bytes received. */
-		int64_t _receive_bytes;
-		/** \brief */
-		int _timeout;
-		/** \brief */
-		struct sockaddr_in6 _lsock;
-		/** \brief */
-		struct sockaddr_in6 _server_sock;
+    /** \brief */
+    SocketInputStream *_is;
+    /** \brief */
+    SocketOutputStream *_os;
+    /** \brief */
+    InetAddress *_address;
+    /** \brief Bytes sent. */
+    int64_t _sent_bytes;
+    /** \brief Bytes received. */
+    int64_t _receive_bytes;
+    /** \brief */
+    int _timeout;
+    /** \brief */
+    struct sockaddr_in6 _lsock;
+    /** \brief */
+    struct sockaddr_in6 _server_sock;
 
-		/**
-		 * \brief Create a new socket.
-		 *
-		 */
-		void CreateSocket();
+    /**
+     * \brief Create a new socket.
+     *
+     */
+    void CreateSocket();
 
-		/**
-		 * \brief
-		 *
-		 */
-		void BindSocket(InetAddress *, int);
+    /**
+     * \brief
+     *
+     */
+    void BindSocket(InetAddress *, int);
 
-		/**
-		 * \brief Connect the socket.
-		 *
-		 */
-		void ConnectSocket(InetAddress *, int);
+    /**
+     * \brief Connect the socket.
+     *
+     */
+    void ConnectSocket(InetAddress *, int);
 
-		/**
-		 * \brief
-		 *
-		 */
-		void InitStreams(int64_t rbuf_, int64_t wbuf_);
+    /**
+     * \brief
+     *
+     */
+    void InitStreams(int64_t rbuf_, int64_t wbuf_);
 
-	 protected:
-		/**
-		 * \brief Constructor.
-		 *
-		 */
-		Socket6(int fd_, struct sockaddr_in6 server_, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
-	
-	 public:
-		/**
-		 * \brief Constructor.
-		 *
-		 */
-		Socket6(InetAddress *addr_, int port_, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
+   protected:
+    /**
+     * \brief Constructor.
+     *
+     */
+    Socket6(int fd_, struct sockaddr_in6 server_, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
+  
+   public:
+    /**
+     * \brief Constructor.
+     *
+     */
+    Socket6(InetAddress *addr_, int port_, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
 
-		/**
-		 * \brief Constructor.
-		 *
-		 */
-		Socket6(InetAddress *addr_, int port_, InetAddress *local_addr_, int local_port_, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
+    /**
+     * \brief Constructor.
+     *
+     */
+    Socket6(InetAddress *addr_, int port_, InetAddress *local_addr_, int local_port_, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
 
-		/**
-		 * \brief
-		 *
-		 */
-		Socket6(std::string host_, int port_, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
+    /**
+     * \brief
+     *
+     */
+    Socket6(std::string host_, int port_, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
 
-		/**
-		 * \brief Constructor.
-		 *
-		 */
-		Socket6(std::string host_, int port_, InetAddress *local_addr_, int local_port_, int timeout_ = 0, int rbuf_ = SOCK_WR_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
+    /**
+     * \brief Constructor.
+     *
+     */
+    Socket6(std::string host_, int port_, InetAddress *local_addr_, int local_port_, int timeout_ = 0, int rbuf_ = SOCK_WR_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
 
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~Socket6();
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~Socket6();
 
-		/**
-		 * \brief Send bytes to a destination.
-		 *
-		 */
-		virtual int Send(const char *b_, int size_, bool block_ = true);
+    /**
+     * \brief Send bytes to a destination.
+     *
+     */
+    virtual int Send(const char *b_, int size_, bool block_ = true);
 
-		/**
-		 * \brief Send bytes to a destination waiting a timeout.
-		 *
-		 */
-		virtual int Send(const char *b_, int size_, int time_);
+    /**
+     * \brief Send bytes to a destination waiting a timeout.
+     *
+     */
+    virtual int Send(const char *b_, int size_, int time_);
 
-		/**
-		 * \brief Receive bytes from a source.
-		 *
-		 * \return the number of bytes received, or 0 if the peer has shutdown (now throws).
-		 *
-		 * \exception SocketException an error occurred.
-		 *
-		 */
-		virtual int Receive(char *data_, int data_length_, bool block_ = true);
+    /**
+     * \brief Receive bytes from a source.
+     *
+     * \return the number of bytes received, or 0 if the peer has shutdown (now throws).
+     *
+     * \exception SocketException an error occurred.
+     *
+     */
+    virtual int Receive(char *data_, int data_length_, bool block_ = true);
 
-		/**
-		 * \brief Receive bytes from a source waiting a timeout.
-		 *
-		 */
-		virtual int Receive(char *data_, int data_length_, int time_);
+    /**
+     * \brief Receive bytes from a source waiting a timeout.
+     *
+     */
+    virtual int Receive(char *data_, int data_length_, int time_);
 
-		/**
-		 * \brief Close the socket.
-		 *
-		 */
-		virtual void Close();
+    /**
+     * \brief Close the socket.
+     *
+     */
+    virtual void Close();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jio::InputStream * GetInputStream();
+    /**
+     * \brief
+     *
+     */
+    virtual jio::InputStream * GetInputStream();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jio::OutputStream * GetOutputStream();
+    /**
+     * \brief
+     *
+     */
+    virtual jio::OutputStream * GetOutputStream();
 
-		/**
-		 * \brief
-		 *
-		 */
-		InetAddress * GetInetAddress();
+    /**
+     * \brief
+     *
+     */
+    InetAddress * GetInetAddress();
 
-		/**
-		 * \brief Get the local port.
-		 *
-		 */
-		int GetLocalPort();
+    /**
+     * \brief Get the local port.
+     *
+     */
+    int GetLocalPort();
 
-		/**
-		 * \brief Get the port.
-		 *
-		 */
-		int GetPort();
+    /**
+     * \brief Get the port.
+     *
+     */
+    int GetPort();
 
-		/**
-		 * \brief Get the bytes sent to a destination.
-		 *
-		 */
-		virtual int64_t GetSentBytes();
+    /**
+     * \brief Get the bytes sent to a destination.
+     *
+     */
+    virtual int64_t GetSentBytes();
 
-		/**
-		 * \brief Get de bytes received from a source.
-		 *
-		 */
-		virtual int64_t GetReadedBytes();
+    /**
+     * \brief Get de bytes received from a source.
+     *
+     */
+    virtual int64_t GetReadedBytes();
 
-		/**
-		 * \brief Get the socket options.
-		 *
-		 */
-		SocketOptions * GetSocketOptions();
+    /**
+     * \brief Get the socket options.
+     *
+     */
+    SocketOptions * GetSocketOptions();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string What();
+    /**
+     * \brief
+     *
+     */
+    virtual std::string What();
 
 };
 

@@ -24,11 +24,11 @@
 namespace jshared {
 
 ProcessInputStream::ProcessInputStream(int fd):
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jshared::ProcessInputStream");
-	
-	_fd = fd;
+  jcommon::Object::SetClassName("jshared::ProcessInputStream");
+  
+  _fd = fd;
 }
 
 ProcessInputStream::~ProcessInputStream()
@@ -37,60 +37,60 @@ ProcessInputStream::~ProcessInputStream()
 
 bool ProcessInputStream::IsEmpty() 
 {
-	return false;
+  return false;
 }
 
 int64_t ProcessInputStream::Available()
 {
-	return 0LL;
+  return 0LL;
 }
 
 int64_t ProcessInputStream::GetSize()
 {
-	return 0LL;
+  return 0LL;
 }
 
 int64_t ProcessInputStream::GetPosition()
 {
-	return 0LL;
+  return 0LL;
 }
 
 int64_t ProcessInputStream::Read()
 {
-	int64_t r;
-	char byte;
+  int64_t r;
+  char byte;
 
-	if ((r = Read(&byte, 1LL)) <= 0LL) {
-		return -1LL;
-	}
+  if ((r = Read(&byte, 1LL)) <= 0LL) {
+    return -1LL;
+  }
 
-	return (int64_t)byte;
+  return (int64_t)byte;
 }
 
 int64_t ProcessInputStream::Read(char *data, int64_t size)
 {
-	if (IsBlocking() == true) {
-		return read(_fd, data, size);
-	} else {
-		struct timeval t;
-		fd_set readfs;
+  if (IsBlocking() == true) {
+    return read(_fd, data, size);
+  } else {
+    struct timeval t;
+    fd_set readfs;
 
-		FD_ZERO(&readfs);
-		FD_SET(_fd, &readfs);
+    FD_ZERO(&readfs);
+    FD_SET(_fd, &readfs);
 
-		t.tv_sec = 1LL;
-		t.tv_usec = 0LL;
+    t.tv_sec = 1LL;
+    t.tv_usec = 0LL;
 
-		if (select(_fd+1, &readfs, nullptr, nullptr, &t) < 0) {
-			return -1LL;
-		}
+    if (select(_fd+1, &readfs, nullptr, nullptr, &t) < 0) {
+      return -1LL;
+    }
 
-		if (FD_ISSET(_fd, &readfs)) {
-			return read(_fd, data, size);
-		}
-	}
+    if (FD_ISSET(_fd, &readfs)) {
+      return read(_fd, data, size);
+    }
+  }
 
-	return -1LL;
+  return -1LL;
 }
 
 void ProcessInputStream::Skip(int64_t skip)
@@ -103,17 +103,17 @@ void ProcessInputStream::Reset()
 
 void ProcessInputStream::Close()
 {
-	::close(_fd);
+  ::close(_fd);
 }
 
 bool ProcessInputStream::IsClosed()
 {
-	return false;
+  return false;
 }
 
 int64_t ProcessInputStream::GetReadedBytes()
 {
-	return 0LL;
+  return 0LL;
 }
 
 }

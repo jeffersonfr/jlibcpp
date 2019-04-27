@@ -24,19 +24,19 @@ namespace jexception {
 OverflowException::OverflowException():
   RuntimeException()
 {
-	jcommon::Object::SetClassName("jexception::OverflowException");
+  jcommon::Object::SetClassName("jexception::OverflowException");
 }
 
 OverflowException::OverflowException(std::string reason_):
   RuntimeException(reason_)
 {
-	jcommon::Object::SetClassName("jexception::OverflowException");
+  jcommon::Object::SetClassName("jexception::OverflowException");
 }
 
 OverflowException::OverflowException(Exception *exception, std::string reason_):
   RuntimeException(exception, reason_)
 {
-	jcommon::Object::SetClassName("jexception::OverflowException");
+  jcommon::Object::SetClassName("jexception::OverflowException");
 }
 
 OverflowException::~OverflowException() throw()

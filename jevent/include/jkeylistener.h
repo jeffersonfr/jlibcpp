@@ -32,38 +32,38 @@ namespace jevent {
  */
 class KeyListener : public jevent::Listener {
 
-	private:
+  private:
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		KeyListener();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~KeyListener();
+  public:
+    /**
+     * \brief
+     *
+     */
+    KeyListener();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~KeyListener();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool KeyPressed(jevent::KeyEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual bool KeyPressed(jevent::KeyEvent *event);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool KeyReleased(jevent::KeyEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual bool KeyReleased(jevent::KeyEvent *event);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool KeyTyped(jevent::KeyEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual bool KeyTyped(jevent::KeyEvent *event);
 
 };
 

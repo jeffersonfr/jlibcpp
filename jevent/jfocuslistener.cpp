@@ -22,9 +22,9 @@
 namespace jevent {
 
 FocusListener::FocusListener():
-	jevent::Listener()
+  jevent::Listener()
 {
-	jcommon::Object::SetClassName("jevent::FocusListener");
+  jcommon::Object::SetClassName("jevent::FocusListener");
 }
 
 FocusListener::~FocusListener()

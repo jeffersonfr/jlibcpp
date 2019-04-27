@@ -32,34 +32,34 @@ namespace jipc {
  */
 class IPCServer : public virtual jcommon::Object {
 
-	protected:
-		/** \brief */
-		int _response_timeout;
+  protected:
+    /** \brief */
+    int _response_timeout;
 
-	public:
-		/**
-		 * \Constructor.
-		 *
-		 */
-		IPCServer();
+  public:
+    /**
+     * \Constructor.
+     *
+     */
+    IPCServer();
 
-		/**
-		 * \brief Destructor.
-		 *
-		 */
-		virtual ~IPCServer();
+    /**
+     * \brief Destructor.
+     *
+     */
+    virtual ~IPCServer();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void WaitCall(RemoteCallListener *listener);
+    /**
+     * \brief
+     *
+     */
+    virtual void WaitCall(RemoteCallListener *listener);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetResponseTimeout(int timeout);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetResponseTimeout(int timeout);
 
 };
 

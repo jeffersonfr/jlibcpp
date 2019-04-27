@@ -29,8 +29,8 @@ namespace jevent {
  *
  */
 enum jdemuxevent_type_t {
-	JDET_DATA_ARRIVED,
-	JDET_DATA_NOT_FOUND
+  JDET_DATA_ARRIVED,
+  JDET_DATA_NOT_FOUND
 };
 
 /**
@@ -40,52 +40,52 @@ enum jdemuxevent_type_t {
  */
 class DemuxEvent : public jevent::EventObject {
 
-	private:
-		/** \brief Program Identify */
-		int _pid;
-		/** \brief */
-		const char *_data;
-		/** \brief */
-		int _data_length;
-		/** \brief */
-		jdemuxevent_type_t _type;
+  private:
+    /** \brief Program Identify */
+    int _pid;
+    /** \brief */
+    const char *_data;
+    /** \brief */
+    int _data_length;
+    /** \brief */
+    jdemuxevent_type_t _type;
 
-	public:
-		/**
-		 * \brief 
-		 *
-		 */
-		DemuxEvent(void *source, jdemuxevent_type_t type, const char *data, int data_length, int pid);
+  public:
+    /**
+     * \brief 
+     *
+     */
+    DemuxEvent(void *source, jdemuxevent_type_t type, const char *data, int data_length, int pid);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~DemuxEvent();
+    /**
+     * \brief
+     *
+     */
+    virtual ~DemuxEvent();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jdemuxevent_type_t GetType();
+    /**
+     * \brief
+     *
+     */
+    virtual jdemuxevent_type_t GetType();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual const char * GetData();
+    /**
+     * \brief
+     *
+     */
+    virtual const char * GetData();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetLength();
+    /**
+     * \brief
+     *
+     */
+    virtual int GetLength();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetPID();
+    /**
+     * \brief
+     *
+     */
+    virtual int GetPID();
 
 };
 

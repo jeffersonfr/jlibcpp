@@ -22,21 +22,21 @@
 namespace jexception {
 
 SecurityException::SecurityException():
-	jexception::RuntimeException()
+  jexception::RuntimeException()
 {
-	jcommon::Object::SetClassName("jexception::SecurityException");
+  jcommon::Object::SetClassName("jexception::SecurityException");
 }
 
 SecurityException::SecurityException(std::string reason_):
-	jexception::RuntimeException(reason_)
+  jexception::RuntimeException(reason_)
 {
-	jcommon::Object::SetClassName("jexception::SecurityException");
+  jcommon::Object::SetClassName("jexception::SecurityException");
 }
 
 SecurityException::SecurityException(jexception::Exception *exception, std::string reason_):
-	jexception::RuntimeException(exception, reason_)
+  jexception::RuntimeException(exception, reason_)
 {
-	jcommon::Object::SetClassName("jexception::SecurityException");
+  jcommon::Object::SetClassName("jexception::SecurityException");
 }
 
 SecurityException::~SecurityException() throw()

@@ -39,145 +39,145 @@ namespace jio {
 
 static int GetFlags(jfile_flags_t flags)
 {
-	int o = 0;
+  int o = 0;
 
-	if (flags & JFF_WRITE_ONLY) {
-		 o = o | O_WRONLY;
-	}
+  if (flags & JFF_WRITE_ONLY) {
+     o = o | O_WRONLY;
+  }
 
-	if (flags & JFF_READ_ONLY) {
-		o = o | O_RDONLY;
-	}
-	
-	if (flags & JFF_READ_WRITE) {
-		o = o | O_RDWR;
-	}
-	
-	if (flags & JFF_TRUNCATE) {
-		o = o | O_TRUNC;
-	}
-	
-	if (flags & JFF_APPEND) {
-		o = o | O_APPEND;
-	}
-	
-	if (flags & JFF_NON_BLOCK) {
-		o = o | O_NONBLOCK;
-	}
-	
-	if (flags & JFF_SYNC) {
-		o = o | O_SYNC;
-	}
-	
-	if (flags & JFF_NON_FOLLOW) {
-		o = o | O_NOFOLLOW;
-	}
-	
-	if (flags & JFF_ASYNC) {
-		o = o | O_ASYNC;
-	}
-	
-	if (flags & JFF_LARGEFILE) {
-		o = o | O_LARGEFILE;
-	}
+  if (flags & JFF_READ_ONLY) {
+    o = o | O_RDONLY;
+  }
+  
+  if (flags & JFF_READ_WRITE) {
+    o = o | O_RDWR;
+  }
+  
+  if (flags & JFF_TRUNCATE) {
+    o = o | O_TRUNC;
+  }
+  
+  if (flags & JFF_APPEND) {
+    o = o | O_APPEND;
+  }
+  
+  if (flags & JFF_NON_BLOCK) {
+    o = o | O_NONBLOCK;
+  }
+  
+  if (flags & JFF_SYNC) {
+    o = o | O_SYNC;
+  }
+  
+  if (flags & JFF_NON_FOLLOW) {
+    o = o | O_NOFOLLOW;
+  }
+  
+  if (flags & JFF_ASYNC) {
+    o = o | O_ASYNC;
+  }
+  
+  if (flags & JFF_LARGEFILE) {
+    o = o | O_LARGEFILE;
+  }
 
-	return o;
+  return o;
 }
 
 static mode_t GetPermissions(jfile_permissions_t perms)
 {
-	mode_t mode = 0;
+  mode_t mode = 0;
 
-	if (perms & JFP_USR_READ) {
-		mode = mode | S_IRUSR;
-	}
+  if (perms & JFP_USR_READ) {
+    mode = mode | S_IRUSR;
+  }
 
-	if (perms & JFP_USR_WRITE) {
-		mode = mode | S_IWUSR;
-	}
+  if (perms & JFP_USR_WRITE) {
+    mode = mode | S_IWUSR;
+  }
 
-	if (perms & JFP_USR_EXEC) {
-		mode = mode | S_IXUSR;
-	}
+  if (perms & JFP_USR_EXEC) {
+    mode = mode | S_IXUSR;
+  }
 
-	if (perms & JFP_GRP_READ) {
-		mode = mode | S_IRGRP;
-	}
+  if (perms & JFP_GRP_READ) {
+    mode = mode | S_IRGRP;
+  }
 
-	if (perms & JFP_GRP_WRITE) {
-		mode = mode | S_IWGRP;
-	}
+  if (perms & JFP_GRP_WRITE) {
+    mode = mode | S_IWGRP;
+  }
 
-	if (perms & JFP_GRP_EXEC) {
-		mode = mode | S_IXGRP;
-	}
+  if (perms & JFP_GRP_EXEC) {
+    mode = mode | S_IXGRP;
+  }
 
-	if (perms & JFP_OTH_READ) {
-		mode = mode | S_IROTH;
-	}
+  if (perms & JFP_OTH_READ) {
+    mode = mode | S_IROTH;
+  }
 
-	if (perms & JFP_OTH_WRITE) {
-		mode = mode | S_IWOTH;
-	}
+  if (perms & JFP_OTH_WRITE) {
+    mode = mode | S_IWOTH;
+  }
 
-	if (perms & JFP_OTH_EXEC) {
-		mode = mode | S_IXOTH;
-	}
+  if (perms & JFP_OTH_EXEC) {
+    mode = mode | S_IXOTH;
+  }
 
-	return mode;
+  return mode;
 }
 
 File::File(int fd, void *dir, std::string path, jfile_type_t type):
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jio::File");
-	
-	// TODO::
-	// int c = filename_.size() - 1;
-	// _filename.replace("\\", "/");
-	// _filename.remove(c); remove the last slash from url
+  jcommon::Object::SetClassName("jio::File");
+  
+  // TODO::
+  // int c = filename_.size() - 1;
+  // _filename.replace("\\", "/");
+  // _filename.remove(c); remove the last slash from url
 
-	_fd = fd;
-	_dir = dir;
-	_path = path;
-	_type = JFT_UNKNOWN;
-	_is_closed = false;
+  _fd = fd;
+  _dir = dir;
+  _path = path;
+  _type = JFT_UNKNOWN;
+  _is_closed = false;
 
-	memset(&_stat, 0, sizeof(struct stat));
+  memset(&_stat, 0, sizeof(struct stat));
 
-	if (_fd > 0) {
-		if (fstat(_fd, &_stat) < 0) {
-			return;
-		}
+  if (_fd > 0) {
+    if (fstat(_fd, &_stat) < 0) {
+      return;
+    }
 
-		if (S_ISREG(_stat.st_mode)) {
-			_type = JFT_REGULAR;
-		} else if (S_ISDIR(_stat.st_mode)) {
-			_type = JFT_DIRECTORY;
-		} else if (S_ISCHR(_stat.st_mode)) {
-			_type = JFT_CHAR_DEVICE;
-		} else if (S_ISBLK(_stat.st_mode)) {
-			_type = JFT_BLOCK_DEVICE;
-		} else if (S_ISFIFO(_stat.st_mode)) {
-			_type = JFT_FIFO;
-		} else if (S_ISLNK(_stat.st_mode)) {
-			_type = JFT_SYMBOLIC_LINK;
-		} else if (S_ISSOCK(_stat.st_mode)) {
-			_type = JFT_SOCKET;
-		}
-	} else {
-		_type = JFT_DIRECTORY;
-	}
+    if (S_ISREG(_stat.st_mode)) {
+      _type = JFT_REGULAR;
+    } else if (S_ISDIR(_stat.st_mode)) {
+      _type = JFT_DIRECTORY;
+    } else if (S_ISCHR(_stat.st_mode)) {
+      _type = JFT_CHAR_DEVICE;
+    } else if (S_ISBLK(_stat.st_mode)) {
+      _type = JFT_BLOCK_DEVICE;
+    } else if (S_ISFIFO(_stat.st_mode)) {
+      _type = JFT_FIFO;
+    } else if (S_ISLNK(_stat.st_mode)) {
+      _type = JFT_SYMBOLIC_LINK;
+    } else if (S_ISSOCK(_stat.st_mode)) {
+      _type = JFT_SOCKET;
+    }
+  } else {
+    _type = JFT_DIRECTORY;
+  }
 }
 
 File::~File()
 {
-	Close();
+  Close();
 }
 
 char File::GetDelimiter()
 {
-	return '/';
+  return '/';
 }
 
 /**
@@ -187,273 +187,273 @@ char File::GetDelimiter()
  */
 std::string Normalize(std::string pathname, char delimiter, int len, int off) 
 {
-	if (len == 0) {
-		return pathname;
-	}
+  if (len == 0) {
+    return pathname;
+  }
 
-	int n = len;
+  int n = len;
 
-	while ((n > 0) && (pathname[n - 1] == delimiter)) {
-		n--;
-	}
+  while ((n > 0) && (pathname[n - 1] == delimiter)) {
+    n--;
+  }
 
-	if (n == 0) {
-		return std::string("") + delimiter;
-	}
+  if (n == 0) {
+    return std::string("") + delimiter;
+  }
 
-	std::ostringstream o;
-	
-	if (off > 0) {
-		o << pathname.substr(0, off);
-	}
+  std::ostringstream o;
+  
+  if (off > 0) {
+    o << pathname.substr(0, off);
+  }
 
-	char prevChar = 0;
+  char prevChar = 0;
 
-	for (int i = off; i < n; i++) {
-		char c = pathname[i];
+  for (int i = off; i < n; i++) {
+    char c = pathname[i];
 
-		if ((prevChar == delimiter) && (c == delimiter)) 
-			continue;
+    if ((prevChar == delimiter) && (c == delimiter)) 
+      continue;
 
-		if ((prevChar != '.') && (c == '.')) {
-			if (pathname[i+1] == delimiter) {
-				i++;
+    if ((prevChar != '.') && (c == '.')) {
+      if (pathname[i+1] == delimiter) {
+        i++;
 
-				continue;
-			}
-		}
+        continue;
+      }
+    }
 
-		o << c;
+    o << c;
 
-		prevChar = c;
-	}
+    prevChar = c;
+  }
 
-	return o.str();
+  return o.str();
 }
 
 std::string File::NormalizePath(std::string pathname) 
 {
-	int n = (int)pathname.length();
-	char delimiter = GetDelimiter();
-	char prevChar = '\0';
-	
-	for (int i = 0; i < n; i++) {
-		char c = pathname[i];
+  int n = (int)pathname.length();
+  char delimiter = GetDelimiter();
+  char prevChar = '\0';
+  
+  for (int i = 0; i < n; i++) {
+    char c = pathname[i];
 
-		if ((prevChar == delimiter) && (c == delimiter)) {
-			return Normalize(pathname, delimiter, n, i - 1);
-		}
+    if ((prevChar == delimiter) && (c == delimiter)) {
+      return Normalize(pathname, delimiter, n, i - 1);
+    }
 
-		if ((prevChar == '.') && (c == delimiter)) {
-			int k = 0;
+    if ((prevChar == '.') && (c == delimiter)) {
+      int k = 0;
 
-			if (i > 1) {
-				k++;
-			}
+      if (i > 1) {
+        k++;
+      }
 
-			return Normalize(pathname, delimiter, n, i - k - 1);
-		}
+      return Normalize(pathname, delimiter, n, i - k - 1);
+    }
 
-		prevChar = c;
-	}
+    prevChar = c;
+  }
 
-	if (prevChar == delimiter) 
-		return Normalize(pathname, delimiter, n, n - 1);
+  if (prevChar == delimiter) 
+    return Normalize(pathname, delimiter, n, n - 1);
 
-	return pathname;
+  return pathname;
 }
 
 std::string File::GetFixedPath(std::string pathname)
 {
   std::string normalize = NormalizePath(pathname);
-	jcommon::StringTokenizer tokens(normalize, std::string(1, GetDelimiter()), jcommon::JTT_STRING, false);
-	std::vector<std::string> path;
-	std::vector<std::string>::iterator ipath;
+  jcommon::StringTokenizer tokens(normalize, std::string(1, GetDelimiter()), jcommon::JTT_STRING, false);
+  std::vector<std::string> path;
+  std::vector<std::string>::iterator ipath;
 
-	for (int i=0; i<tokens.GetSize(); i++) {
-		std::string token = tokens.GetToken(i);
+  for (int i=0; i<tokens.GetSize(); i++) {
+    std::string token = tokens.GetToken(i);
 
-		if (token != "..") {
-			path.push_back(token);
-		} else {
-			if (path.size() > 1) {
-				path.erase(path.begin()+path.size()-1);
-			} else {
-				// path.push_back(token);
-			}
-		}
-	}
+    if (token != "..") {
+      path.push_back(token);
+    } else {
+      if (path.size() > 1) {
+        path.erase(path.begin()+path.size()-1);
+      } else {
+        // path.push_back(token);
+      }
+    }
+  }
 
-	pathname = "";
+  pathname = "";
 
-	for (int i=0; i<(int)path.size(); i++) {
-		pathname = pathname + path[i];
+  for (int i=0; i<(int)path.size(); i++) {
+    pathname = pathname + path[i];
 
-		if (i < (int)(path.size()-1)) {
-			pathname = pathname + GetDelimiter();
-		}
-	}
+    if (i < (int)(path.size()-1)) {
+      pathname = pathname + GetDelimiter();
+    }
+  }
 
-	return pathname;
+  return pathname;
 }
 
 bool File::Exists(std::string path)
 {
-	/*
-	// INFO:: method 1
-	ifstream f(path.c_str());
-	if (f.good()) {
-		f.close();
-		return true;
-	} else {
-		f.close();
-		return false;
-	}
-	*/
+  /*
+  // INFO:: method 1
+  ifstream f(path.c_str());
+  if (f.good()) {
+    f.close();
+    return true;
+  } else {
+    f.close();
+    return false;
+  }
+  */
 
-	/*
-	// INFO:: method 2
-	if (FILE *file = fopen(path.c_str(), "r")) {
-		fclose(file);
+  /*
+  // INFO:: method 2
+  if (FILE *file = fopen(path.c_str(), "r")) {
+    fclose(file);
 
-		return true;
-	} else {
-		return false;
-	}
-	*/
+    return true;
+  } else {
+    return false;
+  }
+  */
 
-	/*
-	// INFO:: method 3
-	return (access(path.c_str(), F_OK) != -1);
-	*/
+  /*
+  // INFO:: method 3
+  return (access(path.c_str(), F_OK) != -1);
+  */
 
-	// INFO:: method 3
-	struct stat buffer;   
+  // INFO:: method 3
+  struct stat buffer;   
 
-	return (stat(path.c_str(), &buffer) == 0); 
+  return (stat(path.c_str(), &buffer) == 0); 
 }
 
 File * File::OpenFile(std::string path, jfile_flags_t flags)
 {
-	int fd = open(path.c_str(), GetFlags(flags));
+  int fd = open(path.c_str(), GetFlags(flags));
 
-	if (fd < 0) {
-		return nullptr;
-	}
+  if (fd < 0) {
+    return nullptr;
+  }
 
-	return new File(fd, nullptr, path, JFT_REGULAR);
+  return new File(fd, nullptr, path, JFT_REGULAR);
 }
 
 File * File::OpenDirectory(std::string path, jfile_flags_t flags)
 {
-	int fd = open(path.c_str(), GetFlags(flags) | O_DIRECTORY, S_IREAD | S_IWRITE); // S_IRWXU
+  int fd = open(path.c_str(), GetFlags(flags) | O_DIRECTORY, S_IREAD | S_IWRITE); // S_IRWXU
 
-	if (fd < 0) {
-		return nullptr;
-	}
+  if (fd < 0) {
+    return nullptr;
+  }
 
-	DIR *dir = fdopendir(fd);
+  DIR *dir = fdopendir(fd);
 
-	return new File(-1, dir, path, JFT_DIRECTORY);
+  return new File(-1, dir, path, JFT_DIRECTORY);
 }
 
 File * File::CreateFile(std::string path, jfile_flags_t flags, jfile_permissions_t perms)
 {
-	mode_t 
+  mode_t 
     mode = GetPermissions(perms);
-	int 
+  int 
     fd = open(path.c_str(), GetFlags(flags) | O_CREAT | O_EXCL, mode);
 
-	if (fd < 0) {
-		return nullptr;
-	}
+  if (fd < 0) {
+    return nullptr;
+  }
 
-	return new File(fd, nullptr, path, JFT_REGULAR);
+  return new File(fd, nullptr, path, JFT_REGULAR);
 }
 
 File * File::CreateDirectory(std::string path, jfile_permissions_t perms)
 {
-	mode_t 
+  mode_t 
     mode = GetPermissions(perms);
 
-	if (mkdir(path.c_str(), mode) != 0) {
-		return nullptr;
-	}
+  if (mkdir(path.c_str(), mode) != 0) {
+    return nullptr;
+  }
 
-	DIR 
+  DIR 
     *dir = opendir(path.c_str());
 
-	if (dir == nullptr) {
-		return nullptr;
-	}
+  if (dir == nullptr) {
+    return nullptr;
+  }
 
-	return new File(-1, dir, path, JFT_DIRECTORY);
+  return new File(-1, dir, path, JFT_DIRECTORY);
 }
 
 File * File::CreateTemporaryFile(std::string path, std::string prefix, std::string sufix, jfile_flags_t flags)
 {
-	int o = GetFlags(flags);
-	std::string tmp = path + "/";
-	
-	if (prefix.empty() == false) {
-	 	tmp = tmp + prefix;
-	}
+  int o = GetFlags(flags);
+  std::string tmp = path + "/";
+  
+  if (prefix.empty() == false) {
+     tmp = tmp + prefix;
+  }
 
-	tmp = tmp + "XXXXXX";
+  tmp = tmp + "XXXXXX";
 
-	if (sufix.empty() == false) {
-		tmp = tmp + sufix;
-	}
+  if (sufix.empty() == false) {
+    tmp = tmp + sufix;
+  }
 
-	char *aux = strdup(tmp.c_str());
-	int fd;
+  char *aux = strdup(tmp.c_str());
+  int fd;
 
-	if (sufix.empty() == false) {
-		fd = mkostemps(aux, sufix.size(), o);
-	} else {
-		fd = mkostemp(aux, o);
-	}
+  if (sufix.empty() == false) {
+    fd = mkostemps(aux, sufix.size(), o);
+  } else {
+    fd = mkostemp(aux, o);
+  }
 
-	tmp = aux;
+  tmp = aux;
 
-	free(aux);
+  free(aux);
 
-	if (fd < 0) {
-		return nullptr;
-	}
+  if (fd < 0) {
+    return nullptr;
+  }
 
-	return new File(fd, nullptr, tmp, JFT_REGULAR);
+  return new File(fd, nullptr, tmp, JFT_REGULAR);
 }
 
 File * File::CreateTemporaryDirectory(std::string path, std::string prefix)
 {
-	std::string tmp = path + "/" + prefix + "XXXXXX";
-	char *ptr = new char[tmp.size() + 1];
-	char *aux = ptr;
+  std::string tmp = path + "/" + prefix + "XXXXXX";
+  char *ptr = new char[tmp.size() + 1];
+  char *aux = ptr;
 
-	strcpy(aux, (char *)tmp.c_str());
+  strcpy(aux, (char *)tmp.c_str());
 
-	aux = mkdtemp(aux);
+  aux = mkdtemp(aux);
 
-	if (aux == nullptr) {
-		delete [] ptr;
+  if (aux == nullptr) {
+    delete [] ptr;
     ptr = nullptr;
 
-		return nullptr;
-	}
+    return nullptr;
+  }
 
-	DIR *dir = opendir(aux);
+  DIR *dir = opendir(aux);
 
-	path = std::string(aux);
+  path = std::string(aux);
 
   delete [] ptr;
   ptr = nullptr;
 
-	if (dir == nullptr) {
-		return nullptr;
-	}
-	
-	return new File(-1, dir, path, JFT_DIRECTORY);
+  if (dir == nullptr) {
+    return nullptr;
+  }
+  
+  return new File(-1, dir, path, JFT_DIRECTORY);
 }
 
 int File::GetDescriptor()
@@ -463,318 +463,318 @@ int File::GetDescriptor()
 
 jfile_type_t File::GetType()
 {
-	return _type; 
+  return _type; 
 }
 
 std::string File::GetDirectoryDelimiter()
 {
-	return "/";
+  return "/";
 }
 
 bool File::IsSymbolicLink()
 {
-	return false;
+  return false;
 }
 
 bool File::IsDevice()
 {
-	return false;
+  return false;
 }
 
 bool File::IsFile()
 {
-	if (S_ISREG(_stat.st_mode) | S_ISFIFO(_stat.st_mode) | S_ISLNK(_stat.st_mode)) {
-		return true;
-	}
+  if (S_ISREG(_stat.st_mode) | S_ISFIFO(_stat.st_mode) | S_ISLNK(_stat.st_mode)) {
+    return true;
+  }
 
-	return false;
+  return false;
 }
 
 bool File::IsDirectory()
 {
-	return (_type == JFT_DIRECTORY);
+  return (_type == JFT_DIRECTORY);
 }
 
 bool File::IsExecutable()
 {
-	if (S_ISDIR(_stat.st_mode)) {
-		return false;
-	}
-	
-	// check for user permissions
-	if (_stat.st_uid == getuid()) {
-		return (_stat.st_mode & S_IXUSR)?true:false;
-	}
-	
-	// check for group permissions
-	if (_stat.st_gid == getgid()) {
-		return (_stat.st_mode & S_IXGRP)?true:false;
-	}
-	
-	// check for world permissions
-	return (_stat.st_mode & S_IXOTH)?true:false;
+  if (S_ISDIR(_stat.st_mode)) {
+    return false;
+  }
+  
+  // check for user permissions
+  if (_stat.st_uid == getuid()) {
+    return (_stat.st_mode & S_IXUSR)?true:false;
+  }
+  
+  // check for group permissions
+  if (_stat.st_gid == getgid()) {
+    return (_stat.st_mode & S_IXGRP)?true:false;
+  }
+  
+  // check for world permissions
+  return (_stat.st_mode & S_IXOTH)?true:false;
 }
 
 int64_t File::GetSize()
 {
-	if (_stat.st_size == 0) {
-		off_t cur, size;
-	   
-		cur = lseek(_fd, 0, SEEK_CUR);
-		size = lseek(_fd, 1, SEEK_END);
-		lseek(_fd, cur, SEEK_SET);
+  if (_stat.st_size == 0) {
+    off_t cur, size;
+     
+    cur = lseek(_fd, 0, SEEK_CUR);
+    size = lseek(_fd, 1, SEEK_END);
+    lseek(_fd, cur, SEEK_SET);
 
-		return (int64_t)size;
-	}
+    return (int64_t)size;
+  }
 
-	return _stat.st_size;
+  return _stat.st_size;
 }
 
 std::string File::GetName() 
 {
-	std::string name = NormalizePath(_path);
+  std::string name = NormalizePath(_path);
 
-	std::string::size_type i = name.rfind(GetDelimiter());
+  std::string::size_type i = name.rfind(GetDelimiter());
 
-	if (i != std::string::npos) {
-		name = name.substr(i+1);
+  if (i != std::string::npos) {
+    name = name.substr(i+1);
 
-		if (name == "") {
-			return "" + GetDelimiter();
-		}
-	}
+    if (name == "") {
+      return "" + GetDelimiter();
+    }
+  }
 
-	return name;
+  return name;
 }
 
 std::string File::GetPath()
 {
-	return _path;
+  return _path;
 }
 
 std::string File::GetCanonicalPath()
 {
-	return GetFixedPath(GetAbsolutePath());
+  return GetFixedPath(GetAbsolutePath());
 }
 
 std::string File::GetAbsolutePath()
 {
-	if (_path.find(GetDelimiter()) == 0) {
-		return GetPath();
-	}
+  if (_path.find(GetDelimiter()) == 0) {
+    return GetPath();
+  }
 
-	return jcommon::System::GetCurrentDirectory() + GetDelimiter() + GetPath();
+  return jcommon::System::GetCurrentDirectory() + GetDelimiter() + GetPath();
 }
 
 time_t File::GetLastAccessTime()
 {
-	return _stat.st_atime;
+  return _stat.st_atime;
 }
 
 time_t File::GetLastModificationTime()
 {
-	return _stat.st_mtime;
+  return _stat.st_mtime;
 }
 
 time_t File::GetLastStatusChangeTime()
 {
-	return _stat.st_ctime;
+  return _stat.st_ctime;
 }
 
 int64_t File::Read(char *data_, int64_t length_) 
 {
-	int64_t r = (int64_t)read(_fd, data_, (size_t)length_);
-	
-	if (r <= 0LL) {
-		return -1LL;
-	}
-	
-	return r;
+  int64_t r = (int64_t)read(_fd, data_, (size_t)length_);
+  
+  if (r <= 0LL) {
+    return -1LL;
+  }
+  
+  return r;
 }
 
 int64_t File::Write(const char *data_, int64_t length_) 
 {
-	int64_t r = (int64_t)write(_fd, data_, (size_t)length_);
+  int64_t r = (int64_t)write(_fd, data_, (size_t)length_);
 
-	if (r <= 0LL) {
-		return -1LL;
-	}
+  if (r <= 0LL) {
+    return -1LL;
+  }
 
-	return r;
+  return r;
 }
 
 void File::Close()
 {
-	if (_is_closed == true) {
-		return;
-	}
+  if (_is_closed == true) {
+    return;
+  }
 
-	_is_closed = true;
+  _is_closed = true;
 
-	DIR *dir = (DIR *)_dir;
+  DIR *dir = (DIR *)_dir;
 
-	if (dir != nullptr) {
-		closedir(dir);
-	}
+  if (dir != nullptr) {
+    closedir(dir);
+  }
 
-	_dir = nullptr;
+  _dir = nullptr;
 
-	if (_fd > 0) {
-		close(_fd);
-	}
+  if (_fd > 0) {
+    close(_fd);
+  }
 
-	_fd = -1;
+  _fd = -1;
 }
 
 bool File::IsClosed()
 {
-	return _is_closed;
+  return _is_closed;
 }
 
 void File::Flush()
 {
-	if (fsync(_fd) < 0) {
-		throw jexception::FileException("Flushing file error");
-	}
+  if (fsync(_fd) < 0) {
+    throw jexception::FileException("Flushing file error");
+  }
 }
 
 bool File::ListFiles(std::vector<std::string> *files, std::string extension)
 {
-	if (IsDirectory() == false) {
-		return false;
-	}
+  if (IsDirectory() == false) {
+    return false;
+  }
 
-	if (_dir == nullptr) {
-		return false;
-	}
+  if (_dir == nullptr) {
+    return false;
+  }
 
-	struct dirent *namelist;
-	DIR *dir = (DIR *)_dir;
-	
-	rewinddir(dir);
+  struct dirent *namelist;
+  DIR *dir = (DIR *)_dir;
+  
+  rewinddir(dir);
 
-	if (extension == "") {
-		while ((namelist = readdir(dir)) != nullptr) {
-			if (strcmp(namelist->d_name, ".") != 0 && strcmp(namelist->d_name, "..") != 0) {
-				files->push_back(namelist->d_name);
-			}
+  if (extension == "") {
+    while ((namelist = readdir(dir)) != nullptr) {
+      if (strcmp(namelist->d_name, ".") != 0 && strcmp(namelist->d_name, "..") != 0) {
+        files->push_back(namelist->d_name);
+      }
 
-			// WARN:: delete ??
-		}
-	} else {
-		std::string file;
+      // WARN:: delete ??
+    }
+  } else {
+    std::string file;
 
-		while ((namelist = readdir(dir)) != nullptr) {
-			file = namelist->d_name;
+    while ((namelist = readdir(dir)) != nullptr) {
+      file = namelist->d_name;
 
-			if (strcmp(namelist->d_name, ".") != 0 && strcmp(namelist->d_name, "..") != 0 && file.size() > extension.size()) {
-				if (strcmp((const char *)(file.c_str()-extension.size()), extension.c_str()) == 0) {
-					files->push_back(file);
-				}
-			}
+      if (strcmp(namelist->d_name, ".") != 0 && strcmp(namelist->d_name, "..") != 0 && file.size() > extension.size()) {
+        if (strcmp((const char *)(file.c_str()-extension.size()), extension.c_str()) == 0) {
+          files->push_back(file);
+        }
+      }
 
-			// WARN:: delete ??
-		}
-	}
-	
-	return true;
+      // WARN:: delete ??
+    }
+  }
+  
+  return true;
 }
 
 void File::Copy(std::string newpath_)
 {
-	off_t bytes = 0;
-	int output;
+  off_t bytes = 0;
+  int output;
 
-	output = open(newpath_.c_str(), O_RDWR | O_CREAT, S_IWRITE | S_IRGRP | S_IROTH);
-	
-	if (output < 0) {
-		throw jexception::FileException(strerror(errno));
-	}
+  output = open(newpath_.c_str(), O_RDWR | O_CREAT, S_IWRITE | S_IRGRP | S_IROTH);
+  
+  if (output < 0) {
+    throw jexception::FileException(strerror(errno));
+  }
 
-	// sendfile will work with non-socket output on Linux 2.6.33+
-	if (sendfile(output, _fd, &bytes, GetSize()) < 0) {
-		throw jexception::FileException(strerror(errno));
-	}
+  // sendfile will work with non-socket output on Linux 2.6.33+
+  if (sendfile(output, _fd, &bytes, GetSize()) < 0) {
+    throw jexception::FileException(strerror(errno));
+  }
 
-	close(output);
+  close(output);
 }
 
 void File::Move(std::string newpath_)
 {
-	std::string o = GetAbsolutePath();
+  std::string o = GetAbsolutePath();
 
-	if (::link(o.c_str(), newpath_.c_str()) != 0) {
-		throw jexception::FileException(strerror(errno));
-	}
+  if (::link(o.c_str(), newpath_.c_str()) != 0) {
+    throw jexception::FileException(strerror(errno));
+  }
 
-	if (::unlink(o.c_str()) != 0) {
-		::unlink(newpath_.c_str());
+  if (::unlink(o.c_str()) != 0) {
+    ::unlink(newpath_.c_str());
 
-		throw jexception::FileException(strerror(errno));
-	}
+    throw jexception::FileException(strerror(errno));
+  }
 }
 
 void File::Rename(std::string newpath_)
 {
-	std::string o = GetAbsolutePath();
-	
-	int r = rename(o.c_str(), newpath_.c_str());
-		
-	if (r < 0) {
-		if (errno == EISDIR) {
-		} else if (errno == ENOTEMPTY || errno == EEXIST) {
-			throw jexception::FileException("Newpath is a non-empty directory");
-		} else {
-			throw jexception::FileException(strerror(errno));
-		}
-	}
+  std::string o = GetAbsolutePath();
+  
+  int r = rename(o.c_str(), newpath_.c_str());
+    
+  if (r < 0) {
+    if (errno == EISDIR) {
+    } else if (errno == ENOTEMPTY || errno == EEXIST) {
+      throw jexception::FileException("Newpath is a non-empty directory");
+    } else {
+      throw jexception::FileException(strerror(errno));
+    }
+  }
 }
 
 void File::Remove() 
 {
-	std::string s = GetAbsolutePath();
+  std::string s = GetAbsolutePath();
 
-	// calls unlink(2) for files, and rmdir(2) for directories
-	int r = remove(s.c_str());
+  // calls unlink(2) for files, and rmdir(2) for directories
+  int r = remove(s.c_str());
 
-	if (r < 0) {
-		throw jexception::FileException(strerror(errno));
-	}
+  if (r < 0) {
+    throw jexception::FileException(strerror(errno));
+  }
 }
 
 void File::Reset() 
 {
-	lseek(_fd, (off_t)0, SEEK_SET);
+  lseek(_fd, (off_t)0, SEEK_SET);
 }
 
 int64_t File::Tell() 
 {
-	off_t d;
-	
-	if ((d = lseek(_fd, 0, SEEK_CUR)) != -1) {
-		return (int64_t)d;
-	}
-		
-	return -1LL;
+  off_t d;
+  
+  if ((d = lseek(_fd, 0, SEEK_CUR)) != -1) {
+    return (int64_t)d;
+  }
+    
+  return -1LL;
 }
 
 int64_t File::Seek(int64_t n) 
 {
-	return lseek(_fd, (off_t)n, SEEK_CUR);
+  return lseek(_fd, (off_t)n, SEEK_CUR);
 }
 
 void File::Truncate(int64_t n) 
 {
-	int r = ftruncate(_fd, (off_t)n);
+  int r = ftruncate(_fd, (off_t)n);
 
-	if (r < 0) {
-		;
-	}
+  if (r < 0) {
+    ;
+  }
 }
 
 std::string File::What()
 {
-	return "file:" + GetAbsolutePath();
+  return "file:" + GetAbsolutePath();
 }
 
 }

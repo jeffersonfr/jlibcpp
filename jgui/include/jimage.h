@@ -33,8 +33,8 @@ enum jinterpolation_method_t {
 };
 
 enum jflip_flags_t {
-	JFF_HORIZONTAL = 0x01,
-	JFF_VERTICAL = 0x02
+  JFF_HORIZONTAL = 0x01,
+  JFF_VERTICAL = 0x02
 };
 
 class Graphics;
@@ -46,46 +46,46 @@ class Graphics;
  */
 class Image : public virtual jcommon::Object {
 
-	protected:
-		/** \brief */
-		struct jsize_t _size;
-		/** \brief */
+  protected:
+    /** \brief */
+    struct jsize_t _size;
+    /** \brief */
     jinterpolation_method_t _interpolation_method;
-		/** \brief */
-		jpixelformat_t _pixelformat;
+    /** \brief */
+    jpixelformat_t _pixelformat;
 
-	protected:
-		/**
-		 * \brief
-		 *
-		 */
-		Image(jpixelformat_t pixelformat, int width, int height);
+  protected:
+    /**
+     * \brief
+     *
+     */
+    Image(jpixelformat_t pixelformat, int width, int height);
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~Image();
+  public:
+    /**
+     * \brief
+     *
+     */
+    virtual ~Image();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Graphics * GetGraphics();
+    /**
+     * \brief
+     *
+     */
+    virtual Graphics * GetGraphics();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jpixelformat_t GetPixelFormat();
+    /**
+     * \brief
+     *
+     */
+    virtual jpixelformat_t GetPixelFormat();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jsize_t GetSize();
-		
+    /**
+     * \brief
+     *
+     */
+    virtual jsize_t GetSize();
+    
     /**
      * \brief
      *
@@ -98,71 +98,71 @@ class Image : public virtual jcommon::Object {
      */
     virtual jinterpolation_method_t GetInterpolationMethod();
     
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Image * Flip(jflip_flags_t mode);
-		
-		/**
-		 * \brief
-		 *
-		 */
+    /**
+     * \brief
+     *
+     */
+    virtual Image * Flip(jflip_flags_t mode);
+    
+    /**
+     * \brief
+     *
+     */
     virtual Image * Shear(float dx, float dy);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Image * Rotate(double radians, bool resize = true);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Image * Scale(int wp, int hp);
+    /**
+     * \brief
+     *
+     */
+    virtual Image * Rotate(double radians, bool resize = true);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual Image * Scale(int wp, int hp);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Image * Crop(int xp, int yp, int wp, int hp);
+    /**
+     * \brief
+     *
+     */
+    virtual Image * Crop(int xp, int yp, int wp, int hp);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Image * Blend(double alpha);
+    /**
+     * \brief
+     *
+     */
+    virtual Image * Blend(double alpha);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Image * Colorize(Color color);
+    /**
+     * \brief
+     *
+     */
+    virtual Image * Colorize(Color color);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void GetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual uint8_t * LockData();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void UnlockData();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jcommon::Object * Clone();
+    /**
+     * \brief
+     *
+     */
+    virtual void GetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual uint8_t * LockData();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void UnlockData();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual jcommon::Object * Clone();
 
 };
 

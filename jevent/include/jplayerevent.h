@@ -29,11 +29,11 @@ namespace jevent {
  *
  */
 enum jplayer_event_t {
-	JPE_STARTED,
-	JPE_PAUSED,
-	JPE_RESUMED,
-	JPE_STOPPED,
-	JPE_FINISHED
+  JPE_STARTED,
+  JPE_PAUSED,
+  JPE_RESUMED,
+  JPE_STOPPED,
+  JPE_FINISHED
 };
 
 /**
@@ -43,28 +43,28 @@ enum jplayer_event_t {
  */
 class PlayerEvent : public jevent::EventObject {
 
-	private:
+  private:
     /** \brief */
-		jplayer_event_t _type;
+    jplayer_event_t _type;
 
-	public:
-		/**
-		 * \brief 
-		 *
-		 */
-		PlayerEvent(void *source, jplayer_event_t type);
+  public:
+    /**
+     * \brief 
+     *
+     */
+    PlayerEvent(void *source, jplayer_event_t type);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~PlayerEvent();
+    /**
+     * \brief
+     *
+     */
+    virtual ~PlayerEvent();
 
-		/**
-		 * \brief
-		 *
-		 */
-		jplayer_event_t GetType();
+    /**
+     * \brief
+     *
+     */
+    jplayer_event_t GetType();
 
 };
 

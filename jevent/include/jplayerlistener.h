@@ -32,48 +32,48 @@ namespace jevent {
  */
 class PlayerListener : public jevent::Listener {
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		PlayerListener();
+  public:
+    /**
+     * \brief
+     *
+     */
+    PlayerListener();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~PlayerListener();
+    /**
+     * \brief
+     *
+     */
+    virtual ~PlayerListener();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void MediaStarted(PlayerEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual void MediaStarted(PlayerEvent *event);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void MediaResumed(PlayerEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual void MediaResumed(PlayerEvent *event);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void MediaPaused(PlayerEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual void MediaPaused(PlayerEvent *event);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void MediaStopped(PlayerEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual void MediaStopped(PlayerEvent *event);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void MediaFinished(PlayerEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual void MediaFinished(PlayerEvent *event);
 
 };
 

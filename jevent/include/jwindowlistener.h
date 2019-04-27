@@ -32,67 +32,67 @@ namespace jevent {
  */
 class WindowListener : public jevent::Listener {
 
-	protected:
-		/**
-		 * \brief
-		 *
-		 */
-		WindowListener();
+  protected:
+    /**
+     * \brief
+     *
+     */
+    WindowListener();
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~WindowListener();
+  public:
+    /**
+     * \brief
+     *
+     */
+    virtual ~WindowListener();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void WindowOpened(WindowEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void WindowClosing(WindowEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void WindowClosed(WindowEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void WindowResized(WindowEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void WindowMoved(WindowEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual void WindowOpened(WindowEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void WindowClosing(WindowEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void WindowClosed(WindowEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void WindowResized(WindowEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void WindowMoved(WindowEvent *event);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void WindowPainted(WindowEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual void WindowPainted(WindowEvent *event);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void WindowEntered(WindowEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual void WindowEntered(WindowEvent *event);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void WindowLeaved(WindowEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual void WindowLeaved(WindowEvent *event);
 
 };
 

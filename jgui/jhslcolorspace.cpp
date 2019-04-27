@@ -22,102 +22,102 @@
 
 #include <math.h>
 
-#define HSL_MAX_COLORS	256
-#define HSL_LUMINANCE_RED		0.2126f
-#define HSL_LUMINANCE_GREEN	0.7152f
-#define HSL_LUMINANCE_BLUE	0.0722f
+#define HSL_MAX_COLORS  256
+#define HSL_LUMINANCE_RED    0.2126f
+#define HSL_LUMINANCE_GREEN  0.7152f
+#define HSL_LUMINANCE_BLUE  0.0722f
 
 namespace jgui {
 
 HSLColorSpace::HSLColorSpace(int hue, int saturation, int lightness):
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jgui::HSLColorSpace");
-	
-	_hue = (double)hue;
-	_saturation = (double)saturation;
-	_lightness = (double)lightness;
+  jcommon::Object::SetClassName("jgui::HSLColorSpace");
+  
+  _hue = (double)hue;
+  _saturation = (double)saturation;
+  _lightness = (double)lightness;
 
-	_hue = (double)fmod(_hue, 360.0);
-	_saturation = (double)((_saturation < 0.0)?0.0:(_saturation > 100.0)?100.0:_saturation);
-	_lightness = (double)((_lightness < 0.0)?0.0:(_lightness > 100.0)?100.0:_lightness);
+  _hue = (double)fmod(_hue, 360.0);
+  _saturation = (double)((_saturation < 0.0)?0.0:(_saturation > 100.0)?100.0:_saturation);
+  _lightness = (double)((_lightness < 0.0)?0.0:(_lightness > 100.0)?100.0:_lightness);
 
-	Initialize();
+  Initialize();
 }
 
 HSLColorSpace::HSLColorSpace(double hue, double saturation, double lightness):
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jgui::HSLColorSpace");
-	
-	_hue = hue * 360.0;
-	_saturation = saturation * 100.0;
-	_lightness = lightness * 100.0;
+  jcommon::Object::SetClassName("jgui::HSLColorSpace");
+  
+  _hue = hue * 360.0;
+  _saturation = saturation * 100.0;
+  _lightness = lightness * 100.0;
 
-	_hue = (double)fmod(_hue, 360.0);
-	_saturation = (double)((_saturation < 0.0)?0.0:(_saturation > 100.0)?100.0:_saturation);
-	_lightness = (double)((_lightness < 0.0)?0.0:(_lightness > 100.0)?100.0:_lightness);
-	
-	Initialize();
+  _hue = (double)fmod(_hue, 360.0);
+  _saturation = (double)((_saturation < 0.0)?0.0:(_saturation > 100.0)?100.0:_saturation);
+  _lightness = (double)((_lightness < 0.0)?0.0:(_lightness > 100.0)?100.0:_lightness);
+  
+  Initialize();
 }
 
 HSLColorSpace::~HSLColorSpace()
 {
-	delete [] _lum_red_lookup;
-	delete [] _lum_green_lookup;
-	delete [] _lum_blue_lookup;
-		
-	delete [] _final_red_lookup;
-	delete [] _final_green_lookup;
-	delete [] _final_blue_lookup;
+  delete [] _lum_red_lookup;
+  delete [] _lum_green_lookup;
+  delete [] _lum_blue_lookup;
+    
+  delete [] _final_red_lookup;
+  delete [] _final_green_lookup;
+  delete [] _final_blue_lookup;
 }
 
 void HSLColorSpace::Initialize()
 {
-	_lum_red_lookup = new int[HSL_MAX_COLORS];
-	_lum_green_lookup = new int[HSL_MAX_COLORS];
-	_lum_blue_lookup = new int[HSL_MAX_COLORS];
+  _lum_red_lookup = new int[HSL_MAX_COLORS];
+  _lum_green_lookup = new int[HSL_MAX_COLORS];
+  _lum_blue_lookup = new int[HSL_MAX_COLORS];
 
-	double temp_hue = _hue/360.0;
-	double temp_sat = _saturation/100.0;
+  double temp_hue = _hue/360.0;
+  double temp_sat = _saturation/100.0;
 
-	_final_red_lookup = new int[HSL_MAX_COLORS];
-	_final_green_lookup = new int[HSL_MAX_COLORS];
-	_final_blue_lookup = new int[HSL_MAX_COLORS];
+  _final_red_lookup = new int[HSL_MAX_COLORS];
+  _final_green_lookup = new int[HSL_MAX_COLORS];
+  _final_blue_lookup = new int[HSL_MAX_COLORS];
 
-	for (int i=0; i<HSL_MAX_COLORS; i++) {
-		_lum_red_lookup[i] = (int)(i * HSL_LUMINANCE_RED);
-		_lum_green_lookup[i] = (int)(i * HSL_LUMINANCE_GREEN);
-		_lum_blue_lookup[i] = (int)(i * HSL_LUMINANCE_BLUE);
+  for (int i=0; i<HSL_MAX_COLORS; i++) {
+    _lum_red_lookup[i] = (int)(i * HSL_LUMINANCE_RED);
+    _lum_green_lookup[i] = (int)(i * HSL_LUMINANCE_GREEN);
+    _lum_blue_lookup[i] = (int)(i * HSL_LUMINANCE_BLUE);
 
-		double temp_light = (double)i/255.0;
+    double temp_light = (double)i/255.0;
 
-		int red, green, blue;
+    int red, green, blue;
 
-		jgui::Color::HSBtoRGB(temp_hue, temp_sat, temp_light, &red, &green, &blue);
+    jgui::Color::HSBtoRGB(temp_hue, temp_sat, temp_light, &red, &green, &blue);
 
-		Color color(red, green, blue);
+    Color color(red, green, blue);
 
-		_final_red_lookup[i] = (int)(color.GetRed());
-		_final_green_lookup[i] = (int)(color.GetGreen());
-		_final_blue_lookup[i] = (int)(color.GetBlue());
-	}
+    _final_red_lookup[i] = (int)(color.GetRed());
+    _final_green_lookup[i] = (int)(color.GetGreen());
+    _final_blue_lookup[i] = (int)(color.GetBlue());
+  }
 }
 
 void HSLColorSpace::GetRGB(int *red, int *green, int *blue)
 {
-	int lum = _lum_red_lookup[*red] + _lum_green_lookup[*green] + _lum_blue_lookup[*blue];
+  int lum = _lum_red_lookup[*red] + _lum_green_lookup[*green] + _lum_blue_lookup[*blue];
 
-	if (_lightness > 0) {
-		lum = (int) ((double) lum * (100.0 - _lightness) / 100.0);
-		lum += 255.0 - (100.0 - _lightness) * 255.0 / 100.0;
-	} else if (_lightness < 0) {
-		lum = (int) (((double) lum * (_lightness + 100.0)) / 100.0);
-	}
+  if (_lightness > 0) {
+    lum = (int) ((double) lum * (100.0 - _lightness) / 100.0);
+    lum += 255.0 - (100.0 - _lightness) * 255.0 / 100.0;
+  } else if (_lightness < 0) {
+    lum = (int) (((double) lum * (_lightness + 100.0)) / 100.0);
+  }
 
-	*red = _final_red_lookup[lum];
-	*green = _final_green_lookup[lum];
-	*blue = _final_blue_lookup[lum];
+  *red = _final_red_lookup[lum];
+  *green = _final_green_lookup[lum];
+  *blue = _final_blue_lookup[lum];
 }
 
 }

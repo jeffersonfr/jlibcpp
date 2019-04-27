@@ -31,52 +31,52 @@ namespace jexception {
  */
 class MemoryException : public jexception::RuntimeException {
 
-	private:
+  private:
 
-	public:
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		MemoryException();
+  public:
+    /**
+     * \brief Construtor.
+     *
+     */
+    MemoryException();
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		MemoryException(std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    MemoryException(std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		MemoryException(jexception::Exception *exception, std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    MemoryException(jexception::Exception *exception, std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> MemoryException(const std::string &fmt, T ...vs):
       Exception(fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::MemoryException");
     }
-		
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> MemoryException(Exception *exception, const std::string &fmt, T ...vs):
       Exception(exception, fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::MemoryException");
     }
-		
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~MemoryException() throw();
+    
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~MemoryException() throw();
 
 };
 

@@ -35,66 +35,66 @@ namespace jcommon {
  */
 class Observable : public virtual jcommon::Object{
 
-	private:
-		std::vector<Observer *> _observers;
-		std::mutex _mutex;
-		bool _changed;
-		
-	public:
-		/**
-		* \brief
-		*
-		*/
-		Observable();
-		
-		/**
-		* \brief
-		*
-		*/
-		virtual ~Observable();
+  private:
+    std::vector<Observer *> _observers;
+    std::mutex _mutex;
+    bool _changed;
+    
+  public:
+    /**
+    * \brief
+    *
+    */
+    Observable();
+    
+    /**
+    * \brief
+    *
+    */
+    virtual ~Observable();
 
-		/**
-		* \brief
-		*
-		*/
-		void AddObserver(Observer *o);
+    /**
+    * \brief
+    *
+    */
+    void AddObserver(Observer *o);
 
-		/**
-		* \brief
-		*
-		*/
-		void RemoveObserver(Observer *o);
+    /**
+    * \brief
+    *
+    */
+    void RemoveObserver(Observer *o);
 
-		/**
-		* \brief
-		*
-		*/
-		void RemoveAllObservers();
+    /**
+    * \brief
+    *
+    */
+    void RemoveAllObservers();
 
-		/**
-		* \brief
-		*
-		*/
-		void NotifyObservers(void *v = nullptr);
+    /**
+    * \brief
+    *
+    */
+    void NotifyObservers(void *v = nullptr);
 
-		/**
-		* \brief
-		*
-		*/
-		void SetChanged(bool b);
+    /**
+    * \brief
+    *
+    */
+    void SetChanged(bool b);
 
-		/**
-		* \brief
-		*
-		*/
-		bool HasChanged();
+    /**
+    * \brief
+    *
+    */
+    bool HasChanged();
 
-		/**
-		* \brief
-		*
-		*/
-		int CountObservers();
-		
+    /**
+    * \brief
+    *
+    */
+    int CountObservers();
+    
 };
 
 }

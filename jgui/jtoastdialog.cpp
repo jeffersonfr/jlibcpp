@@ -24,22 +24,22 @@
 namespace jgui {
 
 ToastDialog::ToastDialog(Container *parent, std::string msg, bool wrap):
-	jgui::Dialog(parent, 0, 0, 560, 280)
+  jgui::Dialog(parent, 0, 0, 560, 280)
 {
-	jcommon::Object::SetClassName("jgui::ToastDialog");
+  jcommon::Object::SetClassName("jgui::ToastDialog");
 
   jgui::jsize_t
     size = GetSize();
-	jgui::jinsets_t 
+  jgui::jinsets_t 
     insets = GetInsets();
 
-	_label = new Label(msg, insets.left, insets.top, size.width - insets.left - insets.right, 180);
+  _label = new Label(msg, insets.left, insets.top, size.width - insets.left - insets.right, 180);
 
-	_label->SetWrap(true);
-	_label->SetHorizontalAlign(JHA_JUSTIFY);
-	_label->SetVerticalAlign(JVA_TOP);
+  _label->SetWrap(true);
+  _label->SetHorizontalAlign(JHA_JUSTIFY);
+  _label->SetVerticalAlign(JVA_TOP);
 
-	Add(_label);
+  Add(_label);
 
   _timeout = 0;
 
@@ -49,29 +49,29 @@ ToastDialog::ToastDialog(Container *parent, std::string msg, bool wrap):
 ToastDialog::~ToastDialog() 
 {
   if (_label != nullptr) {
-	  delete _label;
+    delete _label;
     _label = nullptr;
   }
 }
 
 void ToastDialog::SetHorizontalAlign(jhorizontal_align_t align)
 {
-	_label->SetHorizontalAlign(align);
+  _label->SetHorizontalAlign(align);
 }
 
 jhorizontal_align_t ToastDialog::GetHorizontalAlign()
 {
-	return _label->GetHorizontalAlign();
+  return _label->GetHorizontalAlign();
 }
 
 void ToastDialog::SetVerticalAlign(jvertical_align_t align)
 {
-	_label->SetVerticalAlign(align);
+  _label->SetVerticalAlign(align);
 }
 
 jvertical_align_t ToastDialog::GetVerticalAlign()
 {
-	return _label->GetVerticalAlign();
+  return _label->GetVerticalAlign();
 }
 
 void ToastDialog::Exec(bool modal)

@@ -28,97 +28,97 @@ namespace jexception {
 Exception::Exception():
     jcommon::Object(), std::exception()
 {
-	jcommon::Object::SetClassName("jexception::Exception");
+  jcommon::Object::SetClassName("jexception::Exception");
 }
 
 Exception::Exception(std::string reason_):
     jcommon::Object(), std::exception()
 {
-	jcommon::Object::SetClassName("jexception::Exception");
-	
-	_reason = reason_;
+  jcommon::Object::SetClassName("jexception::Exception");
+  
+  _reason = reason_;
 }
 
 Exception::Exception(Exception *exception, std::string reason):
     jcommon::Object(), std::exception()
 {
-	jcommon::Object::SetClassName("jexception::Exception");
-	
-	if (exception == nullptr) {
-		return;
-	}
+  jcommon::Object::SetClassName("jexception::Exception");
+  
+  if (exception == nullptr) {
+    return;
+  }
 
-	_reason = reason;
+  _reason = reason;
 
-	SetStackTrace(&exception->GetStackTrace());
+  SetStackTrace(&exception->GetStackTrace());
 
-	_exceptions.push_back(dynamic_cast<Exception *>(exception->Clone()));
+  _exceptions.push_back(dynamic_cast<Exception *>(exception->Clone()));
 }
 
 Exception::~Exception() throw()
 {
-	for (int i=0; i<(int)_exceptions.size(); i++) {
-		delete _exceptions[i];
-	}
+  for (int i=0; i<(int)_exceptions.size(); i++) {
+    delete _exceptions[i];
+  }
 }
 
 std::string Exception::GetMessage()
 {
-	return _reason;
+  return _reason;
 }
 
 Exception * Exception::GetCause()
 {
-	if (_exceptions.empty() == true) {
-		return this;
-	}
+  if (_exceptions.empty() == true) {
+    return this;
+  }
 
-	return _exceptions[0];
+  return _exceptions[0];
 }
 
 const std::vector<Exception *> & Exception::GetStackTrace()
 {
-	return _exceptions;
+  return _exceptions;
 }
 
 void Exception::SetStackTrace(const std::vector<Exception *> *stack)
 {
-	if (stack == nullptr) {
-		return;
-	}
+  if (stack == nullptr) {
+    return;
+  }
 
-	_exceptions.clear();
+  _exceptions.clear();
 
-	for (int i=0; i<(int)stack->size(); i++) {
-		_exceptions.push_back(dynamic_cast<Exception *>((*stack)[i]->Clone()));
-	}
+  for (int i=0; i<(int)stack->size(); i++) {
+    _exceptions.push_back(dynamic_cast<Exception *>((*stack)[i]->Clone()));
+  }
 }
 
 void Exception::PrintStackTrace()
 {
-	std::cout << "[" << GetFullClassName() << "] " << _reason << std::endl;
+  std::cout << "[" << GetFullClassName() << "] " << _reason << std::endl;
 
-	for (int i=(int)_exceptions.size()-1; i>=0; i--) {
-		Exception *e = _exceptions[i];
+  for (int i=(int)_exceptions.size()-1; i>=0; i--) {
+    Exception *e = _exceptions[i];
 
-		std::cout << "[" << e->GetFullClassName() << "] " << e->GetMessage() << std::endl;
-	}
+    std::cout << "[" << e->GetFullClassName() << "] " << e->GetMessage() << std::endl;
+  }
 }
 
 jcommon::Object * Exception::Clone()
 {
-	Exception *o = new Exception(*this);
+  Exception *o = new Exception(*this);
 
-	if (_exceptions.empty() == false) {
-		o->SetStackTrace(&_exceptions);
-	}
+  if (_exceptions.empty() == false) {
+    o->SetStackTrace(&_exceptions);
+  }
 
-	return (jcommon::Object *)o;
+  return (jcommon::Object *)o;
 }
 
 std::string Exception::What()
 {
-	return std::exception::what();
+  return std::exception::what();
 }
 
 }

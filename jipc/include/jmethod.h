@@ -31,53 +31,53 @@ namespace jipc {
  */
 class Method : public jcommon::ParamMapper {
 
-	private:
-		/** \brief */
-		std::string _name;
+  private:
+    /** \brief */
+    std::string _name;
 
-	public:
-		/**
-		 * \Constructor.
-		 *
-		 */
-		Method(std::string name);
+  public:
+    /**
+     * \Constructor.
+     *
+     */
+    Method(std::string name);
 
-		/**
-		 * \brief Destructor.
-		 *
-		 */
-		virtual ~Method();
+    /**
+     * \brief Destructor.
+     *
+     */
+    virtual ~Method();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Initialize(uint8_t *buffer, int size);
+    /**
+     * \brief
+     *
+     */
+    virtual void Initialize(uint8_t *buffer, int size);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string GetName();
+    /**
+     * \brief
+     *
+     */
+    virtual std::string GetName();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetName(std::string name);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetName(std::string name);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string Encode();
+    /**
+     * \brief
+     *
+     */
+    virtual std::string Encode();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string What();
-		
+    /**
+     * \brief
+     *
+     */
+    virtual std::string What();
+    
 };
 
 }

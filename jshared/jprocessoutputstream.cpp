@@ -24,11 +24,11 @@
 namespace jshared {
 
 ProcessOutputStream::ProcessOutputStream(int fd):
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jshared::ProcessOutputStream");
+  jcommon::Object::SetClassName("jshared::ProcessOutputStream");
 
-	_fd = fd;
+  _fd = fd;
 }
 
 ProcessOutputStream::~ProcessOutputStream()
@@ -37,70 +37,70 @@ ProcessOutputStream::~ProcessOutputStream()
 
 bool ProcessOutputStream::IsEmpty()
 {
-	return false;
+  return false;
 }
 
 int64_t ProcessOutputStream::Available()
 {
-	return 0LL;
+  return 0LL;
 }
 
 int64_t ProcessOutputStream::GetSize()
 {
-	return 0LL;
+  return 0LL;
 }
 
 int64_t ProcessOutputStream::Write(int64_t b)
 {
-	char byte = (char)b;
+  char byte = (char)b;
 
-	return Write((const char *)&byte, 1LL);
+  return Write((const char *)&byte, 1LL);
 }
 
 int64_t ProcessOutputStream::Write(const char *data, int64_t size)
 {
-	if (IsBlocking() == true) {
-		int64_t n = 0LL;
+  if (IsBlocking() == true) {
+    int64_t n = 0LL;
 
-		if ((n = write(_fd, data, size)) > 0) {
-			// fsync(_fd);
-		}
+    if ((n = write(_fd, data, size)) > 0) {
+      // fsync(_fd);
+    }
 
-		return n;
-	} else {
-		struct timeval waittime;
-		fd_set writefs;
+    return n;
+  } else {
+    struct timeval waittime;
+    fd_set writefs;
 
-		FD_ZERO(&writefs);
-		FD_SET(_fd, &writefs);
+    FD_ZERO(&writefs);
+    FD_SET(_fd, &writefs);
 
-		waittime.tv_sec = 1L;	// TODO:: usuario especifica ou use pool
-		waittime.tv_usec = 0L;
+    waittime.tv_sec = 1L;  // TODO:: usuario especifica ou use pool
+    waittime.tv_usec = 0L;
 
-		if (select(_fd+1, nullptr, &writefs, nullptr, &waittime) < 0) {
-			return -1LL;
-		}
+    if (select(_fd+1, nullptr, &writefs, nullptr, &waittime) < 0) {
+      return -1LL;
+    }
 
-		int64_t n = 0LL;
+    int64_t n = 0LL;
 
-		if (FD_ISSET(_fd, &writefs)) {
-			if ((n = write(_fd, data, size)) > 0) {
-				fsync(_fd);
-			}
-		}
+    if (FD_ISSET(_fd, &writefs)) {
+      if ((n = write(_fd, data, size)) > 0) {
+        fsync(_fd);
+      }
+    }
 
-		return n;
-	}
+    return n;
+  }
 }
 
 int64_t ProcessOutputStream::Write(std::string)
 {
-	return 0LL;
+  return 0LL;
 }
 
 int64_t ProcessOutputStream::Flush()
 {
-	return 0LL;
+  return 0LL;
 }
 
 void ProcessOutputStream::Seek(int64_t index)
@@ -109,17 +109,17 @@ void ProcessOutputStream::Seek(int64_t index)
 
 void ProcessOutputStream::Close()
 {
-	::close(_fd);
+  ::close(_fd);
 }
 
 bool ProcessOutputStream::IsClosed()
 {
-	return false;
+  return false;
 }
 
 int64_t ProcessOutputStream::GetSentBytes()
 {
-	return 0LL;
+  return 0LL;
 }
 
 }

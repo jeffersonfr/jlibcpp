@@ -33,116 +33,116 @@ class Graphics;
  */
 class IndexedImage : public jgui::Image {
 
-	private:
-		/** \brief */
-		uint32_t *_palette;
-		/** \brief */
-		int _palette_size;
-		/** \brief */
-		uint8_t *_data;
+  private:
+    /** \brief */
+    uint32_t *_palette;
+    /** \brief */
+    int _palette_size;
+    /** \brief */
+    uint8_t *_data;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		IndexedImage(uint32_t *palette, int palette_size, uint8_t *data, int wp, int hp);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		IndexedImage(uint32_t *palette, int palette_size, uint32_t *argb, int wp, int hp);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~IndexedImage();
+  public:
+    /**
+     * \brief
+     *
+     */
+    IndexedImage(uint32_t *palette, int palette_size, uint8_t *data, int wp, int hp);
+    
+    /**
+     * \brief
+     *
+     */
+    IndexedImage(uint32_t *palette, int palette_size, uint32_t *argb, int wp, int hp);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~IndexedImage();
 
-		/**
-		 * \brief Packs the source argb image.
-		 *
-		 */
-		static IndexedImage * Pack(Image *image);
+    /**
+     * \brief Packs the source argb image.
+     *
+     */
+    static IndexedImage * Pack(Image *image);
 
-		/**
-		 * \brief Packs the source argb image.
-		 *
-		 */
-		static IndexedImage * Pack(uint32_t *rgb, int wp, int hp);
+    /**
+     * \brief Packs the source argb image.
+     *
+     */
+    static IndexedImage * Pack(uint32_t *rgb, int wp, int hp);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Image * Flip(jflip_flags_t t);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Image * Rotate(double radians, bool resize = true);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Image * Scale(int wp, int hp);
+    /**
+     * \brief
+     *
+     */
+    virtual Image * Flip(jflip_flags_t t);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual Image * Rotate(double radians, bool resize = true);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual Image * Scale(int wp, int hp);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Image * Crop(int xp, int yp, int wp, int hp);
+    /**
+     * \brief
+     *
+     */
+    virtual Image * Crop(int xp, int yp, int wp, int hp);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Image * Blend(double alpha);
+    /**
+     * \brief
+     *
+     */
+    virtual Image * Blend(double alpha);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Image * Colorize(Color color);
+    /**
+     * \brief
+     *
+     */
+    virtual Image * Colorize(Color color);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual uint8_t * LockData();
-	
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void UnlockData();
-	
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void GetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void GetPalette(uint32_t **palette, int *size);
+    /**
+     * \brief
+     *
+     */
+    virtual uint8_t * LockData();
+  
+    /**
+     * \brief
+     *
+     */
+    virtual void UnlockData();
+  
+    /**
+     * \brief
+     *
+     */
+    virtual void GetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void GetPalette(uint32_t **palette, int *size);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetPalette(uint32_t *palette, int size);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetPalette(uint32_t *palette, int size);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jcommon::Object * Clone();
+    /**
+     * \brief
+     *
+     */
+    virtual jcommon::Object * Clone();
 
 };
 

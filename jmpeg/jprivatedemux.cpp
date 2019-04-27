@@ -27,51 +27,51 @@
 namespace jmpeg {
 
 PrivateDemux::PrivateDemux():
-	jmpeg::Demux(JDT_PRIVATE)
+  jmpeg::Demux(JDT_PRIVATE)
 {
-	jcommon::Object::SetClassName("jmpeg::PrivateDemux");
+  jcommon::Object::SetClassName("jmpeg::PrivateDemux");
 
   _tid = -1;
-	_is_crc_enabled = true;
+  _is_crc_enabled = true;
   _is_crc_failed = false;
 }
-		
+    
 PrivateDemux::~PrivateDemux()
 {
 }
 
 void PrivateDemux::SetTID(int tid)
 {
-	_tid = tid;
+  _tid = tid;
 }
 
 int PrivateDemux::GetTID()
 {
-	return _tid;
+  return _tid;
 }
 
 void PrivateDemux::SetCRCCheckEnabled(bool b)
 {
-	_is_crc_enabled = b;
+  _is_crc_enabled = b;
 }
 
 bool PrivateDemux::IsCRCCheckEnabled()
 {
-	return _is_crc_enabled;
+  return _is_crc_enabled;
 }
 
 bool PrivateDemux::IsCRCFailed()
 {
-	return _is_crc_failed;
+  return _is_crc_failed;
 }
 
 bool PrivateDemux::Append(const char *data, int data_length)
 {
-	int table_id = TS_G8(data);
+  int table_id = TS_G8(data);
 
-	if (_tid >= 0 && _tid != table_id) {
-		return false;
-	}
+  if (_tid >= 0 && _tid != table_id) {
+    return false;
+  }
 
   int section_length = TS_PSI_G_SECTION_LENGTH(data) + 3;
 
@@ -79,7 +79,7 @@ bool PrivateDemux::Append(const char *data, int data_length)
     return false;
   }
 
-	int section_syntax_indicator = TS_GM8(data+1, 1, 1);
+  int section_syntax_indicator = TS_GM8(data+1, 1, 1);
 
   if (section_syntax_indicator != 0) {
     uint32_t 
@@ -97,7 +97,7 @@ bool PrivateDemux::Append(const char *data, int data_length)
     }
   }
 
-	return true;
+  return true;
 }
 
 }

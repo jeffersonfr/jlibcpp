@@ -35,72 +35,72 @@ namespace jmath {
  */
 class Complex : public virtual jcommon::Object {
 
-	private:
-		/** \brief Real */
-		double _real;
-		/** \brief Imaginary */
-		double _imaginary;
+  private:
+    /** \brief Real */
+    double _real;
+    /** \brief Imaginary */
+    double _imaginary;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		Complex(double _real, double _imaginary);
+  public:
+    /**
+     * \brief
+     *
+     */
+    Complex(double _real, double _imaginary);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~Complex();
+    /**
+     * \brief
+     *
+     */
+    virtual ~Complex();
 
-		/**
-		 * \brief
-		 *
-		 */
-		double GetReal();
+    /**
+     * \brief
+     *
+     */
+    double GetReal();
 
-		/**
-		 * \brief
-		 *
-		 */
-		double GetImaginary();
+    /**
+     * \brief
+     *
+     */
+    double GetImaginary();
 
-		/**
-		 * \brief
-		 *
-		 */
-		double GetModule();
+    /**
+     * \brief
+     *
+     */
+    double GetModule();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool Equals(Object *);
+    /**
+     * \brief
+     *
+     */
+    virtual bool Equals(Object *);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int Compare(Object *);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		const Complex & operator=(Complex &c);
+    /**
+     * \brief
+     *
+     */
+    virtual int Compare(Object *);
+    
+    /**
+     * \brief
+     *
+     */
+    const Complex & operator=(Complex &c);
 
-		/**
-		 * \brief
-		 *
-		 */
-		const Complex operator+(Complex &c);
+    /**
+     * \brief
+     *
+     */
+    const Complex operator+(Complex &c);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string What();
+    /**
+     * \brief
+     *
+     */
+    virtual std::string What();
 
 };
 

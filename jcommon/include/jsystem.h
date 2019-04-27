@@ -31,206 +31,206 @@ namespace jcommon {
  */
 class System{
 
-	public:
+  public:
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~System();
+    /**
+     * \brief
+     *
+     */
+    virtual ~System();
 
-		/**
-		 * \brief
-		 *
-		 */
-		static void Beep(int freq, int delay);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		static std::string GetCurrentUserName();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		static void Exit(int i);
+    /**
+     * \brief
+     *
+     */
+    static void Beep(int freq, int delay);
+    
+    /**
+     * \brief
+     *
+     */
+    static std::string GetCurrentUserName();
+    
+    /**
+     * \brief
+     *
+     */
+    static void Exit(int i);
 
-		/**
-		 * \brief
-		 *
-		 */
-		static void Abort();
+    /**
+     * \brief
+     *
+     */
+    static void Abort();
 
-		/**
-		 * \brief
-		 *
-		 */
-		static int GetUserID();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		static int GetProcessID();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		static std::string GetResourceDirectory();
+    /**
+     * \brief
+     *
+     */
+    static int GetUserID();
+    
+    /**
+     * \brief
+     *
+     */
+    static int GetProcessID();
+    
+    /**
+     * \brief
+     *
+     */
+    static std::string GetResourceDirectory();
 
-		/**
-		 * \brief
-		 *
-		 */
-		static std::string GetHomeDirectory();
+    /**
+     * \brief
+     *
+     */
+    static std::string GetHomeDirectory();
 
-		/**
-		 * \brief
-		 *
-		 */
-		static std::string GetCurrentDirectory();
+    /**
+     * \brief
+     *
+     */
+    static std::string GetCurrentDirectory();
 
-		/**
-		 * \brief
-		 *
-		 */
-		static std::string GetEnviromentVariable(std::string key_, std::string default_);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		static void UnsetEnviromentVariable(std::string key_);
-			
-		/**
-		 * \brief
-		 *
-		 */
-		static bool SetEnviromentVariable(std::string key_, std::string value_, bool overwrite_ = true);
+    /**
+     * \brief
+     *
+     */
+    static std::string GetEnviromentVariable(std::string key_, std::string default_);
+    
+    /**
+     * \brief
+     *
+     */
+    static void UnsetEnviromentVariable(std::string key_);
+      
+    /**
+     * \brief
+     *
+     */
+    static bool SetEnviromentVariable(std::string key_, std::string value_, bool overwrite_ = true);
 
-		/**
-		 * \brief
-		 *
-		 */
-		static int GetLastErrorCode();
-		
-		/**
-		 * \brief Error message according with GetLastErrorCode() function.
-		 *
-		 */
-		static std::string GetLastErrorMessage();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		static void EnableKeyboardBuffer(bool b);
+    /**
+     * \brief
+     *
+     */
+    static int GetLastErrorCode();
+    
+    /**
+     * \brief Error message according with GetLastErrorCode() function.
+     *
+     */
+    static std::string GetLastErrorMessage();
+    
+    /**
+     * \brief
+     *
+     */
+    static void EnableKeyboardBuffer(bool b);
 
-		/**
-		 * \brief
-		 *
-		 */
-		static void EnableEcho(bool b);
+    /**
+     * \brief
+     *
+     */
+    static void EnableEcho(bool b);
 
-		/**
-		 * \brief
-		 *
-		 */
-		static int KbHit(void);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		static int Getch(void);
+    /**
+     * \brief
+     *
+     */
+    static int KbHit(void);
+    
+    /**
+     * \brief
+     *
+     */
+    static int Getch(void);
 
-		/**
-		 * \brief
-		 *
-		 */
-		static void ChangeWorkingDirectory(std::string dir);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		static std::string GetProcessName();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		static std::string GetUserName();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		static std::string GetHostName();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		static std::string GetHostArchitecture();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		static std::string GetOSName();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		static std::string GetOSVersion();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		static std::string GetTempDirectory();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		static uint64_t GetDiskFreeSpace();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		static int GetProcessorCount();
-		
-		/**
-		 * \brief Reset the system.
-		 *
-		 */
-		static int ResetSystem();
-		
-		/**
-		 * \brief 
-		 *
-		 */
-		static void Logout();
-		
-		/**
-		 * \brief Shutdown the system.
-		 *
-		 */
-		static int ShutdownSystem();
-		
-		/**
-		 * \brief Reset the current program.
-		 *
-		 */
-		static void ResetProgram(std::string program, char **argv, char **envp);
-		
+    /**
+     * \brief
+     *
+     */
+    static void ChangeWorkingDirectory(std::string dir);
+    
+    /**
+     * \brief
+     *
+     */
+    static std::string GetProcessName();
+    
+    /**
+     * \brief
+     *
+     */
+    static std::string GetUserName();
+    
+    /**
+     * \brief
+     *
+     */
+    static std::string GetHostName();
+    
+    /**
+     * \brief
+     *
+     */
+    static std::string GetHostArchitecture();
+    
+    /**
+     * \brief
+     *
+     */
+    static std::string GetOSName();
+    
+    /**
+     * \brief
+     *
+     */
+    static std::string GetOSVersion();
+    
+    /**
+     * \brief
+     *
+     */
+    static std::string GetTempDirectory();
+    
+    /**
+     * \brief
+     *
+     */
+    static uint64_t GetDiskFreeSpace();
+    
+    /**
+     * \brief
+     *
+     */
+    static int GetProcessorCount();
+    
+    /**
+     * \brief Reset the system.
+     *
+     */
+    static int ResetSystem();
+    
+    /**
+     * \brief 
+     *
+     */
+    static void Logout();
+    
+    /**
+     * \brief Shutdown the system.
+     *
+     */
+    static int ShutdownSystem();
+    
+    /**
+     * \brief Reset the current program.
+     *
+     */
+    static void ResetProgram(std::string program, char **argv, char **envp);
+    
 };
 
 }

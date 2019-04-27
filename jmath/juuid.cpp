@@ -24,22 +24,22 @@ namespace jmath {
 
 UUID::UUID(juuid_type_t type)
 {
-	if (type == JUT_RANDOM) {
-		uuid_generate_random(_uuid);
-	} else if (type == JUT_TIME) {
-		uuid_generate_time(_uuid);
-	} else if (type == JUT_SYNC) {
-		uuid_generate_time_safe(_uuid);
-	} else {
-		uuid_generate(_uuid);
-	}
+  if (type == JUT_RANDOM) {
+    uuid_generate_random(_uuid);
+  } else if (type == JUT_TIME) {
+    uuid_generate_time(_uuid);
+  } else if (type == JUT_SYNC) {
+    uuid_generate_time_safe(_uuid);
+  } else {
+    uuid_generate(_uuid);
+  }
 }
 
 UUID::UUID(std::string uuid)
 {
-	if (uuid_parse(uuid.c_str(), _uuid) != 0) {
-		throw jexception::InvalidArgumentException("The uuid is not valid");
-	}
+  if (uuid_parse(uuid.c_str(), _uuid) != 0) {
+    throw jexception::InvalidArgumentException("The uuid is not valid");
+  }
 }
 
 UUID::~UUID()
@@ -48,58 +48,58 @@ UUID::~UUID()
 
 std::time_t UUID::GetTime()
 {
-	return uuid_time(_uuid, nullptr);
+  return uuid_time(_uuid, nullptr);
 }
 
 jcommon::Object * UUID::Clone()
 {
-	UUID *uuid = new UUID(JUT_NORMAL);
+  UUID *uuid = new UUID(JUT_NORMAL);
 
-	uuid->Copy(this);
+  uuid->Copy(this);
 
-	return uuid;
+  return uuid;
 }
 
 bool UUID::Equals(Object *o)
 {
-	UUID *uuid = dynamic_cast<UUID *>(o);
+  UUID *uuid = dynamic_cast<UUID *>(o);
 
-	if (uuid == nullptr) {
-		return false;
-	}
+  if (uuid == nullptr) {
+    return false;
+  }
 
-	return (Compare(o) == 0);
+  return (Compare(o) == 0);
 }
 
 void UUID::Copy(Object *o)
 {
-	UUID *uuid = dynamic_cast<UUID *>(o);
+  UUID *uuid = dynamic_cast<UUID *>(o);
 
-	if (uuid == nullptr) {
-		throw jexception::InvalidArgumentException("The parameter is not a uuid object");
-	}
+  if (uuid == nullptr) {
+    throw jexception::InvalidArgumentException("The parameter is not a uuid object");
+  }
 
-	uuid_copy(_uuid, uuid->_uuid);
+  uuid_copy(_uuid, uuid->_uuid);
 }
 
 int UUID::Compare(Object *o)
 {
-	UUID *uuid = dynamic_cast<UUID *>(o);
+  UUID *uuid = dynamic_cast<UUID *>(o);
 
-	if (uuid == nullptr) {
-		throw jexception::InvalidArgumentException("The parameter is not a uuid object");
-	}
+  if (uuid == nullptr) {
+    throw jexception::InvalidArgumentException("The parameter is not a uuid object");
+  }
 
-	return uuid_compare(_uuid, uuid->_uuid);
+  return uuid_compare(_uuid, uuid->_uuid);
 }
 
 std::string UUID::What()
 {
-	char tmp[256];
+  char tmp[256];
 
-	uuid_unparse(_uuid, tmp);
+  uuid_unparse(_uuid, tmp);
 
-	return tmp;
+  return tmp;
 }
 
 }

@@ -24,9 +24,9 @@
 namespace jgui {
 
 NullLayout::NullLayout():
-	Layout()
+  Layout()
 {
-	jcommon::Object::SetClassName("jgui::NullLayout");
+  jcommon::Object::SetClassName("jgui::NullLayout");
 }
 
 NullLayout::~NullLayout()
@@ -35,23 +35,23 @@ NullLayout::~NullLayout()
 
 jsize_t NullLayout::GetMinimumLayoutSize(Container *parent)
 {
-	jsize_t t = {0, 0};
+  jsize_t t = {0, 0};
 
-	return t;
+  return t;
 }
 
 jsize_t NullLayout::GetMaximumLayoutSize(Container *parent)
 {
-	jsize_t t = {INT_MAX, INT_MAX};
+  jsize_t t = {INT_MAX, INT_MAX};
 
-	return t;
+  return t;
 }
 
 jsize_t NullLayout::GetPreferredLayoutSize(Container *parent)
 {
-	jsize_t t = {0, 0};
+  jsize_t t = {0, 0};
 
-	return t;
+  return t;
 }
 
 void NullLayout::DoLayout(Container *target)

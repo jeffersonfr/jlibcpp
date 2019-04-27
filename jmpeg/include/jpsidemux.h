@@ -26,63 +26,63 @@ namespace jmpeg {
 
 class PSIDemux : public jmpeg::Demux {
 
-	protected:
-		/** \brief */
-		int _tid;
-		/** \brief */
-		bool _is_crc_enabled;
+  protected:
+    /** \brief */
+    int _tid;
+    /** \brief */
+    bool _is_crc_enabled;
     /** \brief */
     bool _is_crc_failed;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		PSIDemux();
+  public:
+    /**
+     * \brief
+     *
+     */
+    PSIDemux();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~PSIDemux();
+    /**
+     * \brief
+     *
+     */
+    virtual ~PSIDemux();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetTID(int tid);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetTID();
+    /**
+     * \brief
+     *
+     */
+    virtual void SetTID(int tid);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int GetTID();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetCRCCheckEnabled(bool b);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetCRCCheckEnabled(bool b);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsCRCCheckEnabled();
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsCRCCheckEnabled();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsCRCFailed();
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsCRCFailed();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool Append(const char *data, int data_length);
-		
+    /**
+     * \brief
+     *
+     */
+    virtual bool Append(const char *data, int data_length);
+    
 };
 
 }

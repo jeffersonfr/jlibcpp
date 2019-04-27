@@ -25,116 +25,116 @@
 namespace jio {
 
 BitOutputStream::BitOutputStream(std::string filename):
-	OutputStream()
+  OutputStream()
 {
-	jcommon::Object::SetClassName("jio::BitOutputStream");
+  jcommon::Object::SetClassName("jio::BitOutputStream");
 
-	stream = nullptr;
-	haveByte = false;
-	show = false;
-	bitCount = 0;
-	currentByte = 0;
+  stream = nullptr;
+  haveByte = false;
+  show = false;
+  bitCount = 0;
+  currentByte = 0;
 
-	try {
-		stream = new FileOutputStream(filename);
-	} catch (...) {
-		stream = nullptr;
+  try {
+    stream = new FileOutputStream(filename);
+  } catch (...) {
+    stream = nullptr;
 
-		throw jexception::IOException("Cannot open file in BitInputStream");
-	}
+    throw jexception::IOException("Cannot open file in BitInputStream");
+  }
 }
 
 BitOutputStream::BitOutputStream(OutputStream *os):
-	OutputStream()
+  OutputStream()
 {
-	jcommon::Object::SetClassName("jio::BitOutputStream");
+  jcommon::Object::SetClassName("jio::BitOutputStream");
 
-	if ((void *)os == nullptr) {
-		throw jexception::IOException("Null pointer exception");
-	}
+  if ((void *)os == nullptr) {
+    throw jexception::IOException("Null pointer exception");
+  }
 
-	stream = os;
-	haveByte = false;
-	show = false;
-	bitCount = 0;
-	currentByte = 0;
+  stream = os;
+  haveByte = false;
+  show = false;
+  bitCount = 0;
+  currentByte = 0;
 }
 
 BitOutputStream::~BitOutputStream()
 {
-	if (stream != nullptr) {
-		delete stream;
-	}
+  if (stream != nullptr) {
+    delete stream;
+  }
 }
 
 bool BitOutputStream::IsEmpty()
 {
-	return Available() == 0;
+  return Available() == 0;
 }
 
 int64_t BitOutputStream::Available()
 {
-	return 0LL;
+  return 0LL;
 }
 
 int64_t BitOutputStream::Write(int b)
 {
-	return stream->Write(b);
+  return stream->Write(b);
 }
 
 int64_t BitOutputStream::Write(const char *b, int64_t size)
 {
-	return stream->Write(b, size);
+  return stream->Write(b, size);
 }
 
 int64_t BitOutputStream::Flush()
 {
-	while (bitCount > 0) {
-		WriteBit(1);
-	}
-	
-	stream->Flush();
+  while (bitCount > 0) {
+    WriteBit(1);
+  }
+  
+  stream->Flush();
 
-	return 1LL;
+  return 1LL;
 }
 
 void BitOutputStream::Close()
 {
-	stream->Close();
+  stream->Close();
 }
 
 void BitOutputStream::WriteBit(int bit)
 {
-	bit = (bit==0)?0:1;
-	
-	currentByte = currentByte << 1 | bit;
-	bitCount++;
-	
-	if (bitCount == 8) {
-		Write(currentByte);
-		currentByte = 0;
-		bitCount = 0;
-	}
+  bit = (bit==0)?0:1;
+  
+  currentByte = currentByte << 1 | bit;
+  bitCount++;
+  
+  if (bitCount == 8) {
+    Write(currentByte);
+    currentByte = 0;
+    bitCount = 0;
+  }
 }
 
 void BitOutputStream::WriteBits(int bits, int num)
 {
-	if ((num < 0) || (num > 32)) {
-		throw jexception::OutOfBoundsException("Number of bits is out of range");
-	}
-	
-	int mask;
-	
-	for (int i=num-1; i>=0; i--) {
-		mask = 1 << i;
-		
-		WriteBit((bits & mask) / mask);
-	}
+  if ((num < 0) || (num > 32)) {
+    throw jexception::OutOfBoundsException("Number of bits is out of range");
+  }
+  
+  int mask;
+  
+  for (int i=num-1; i>=0; i--) {
+    mask = 1 << i;
+    
+    WriteBit((bits & mask) / mask);
+  }
 }
 
 int64_t BitOutputStream::GetSentBytes()
 {
-	return 0LL;
+  return 0LL;
 }
 
 }

@@ -31,26 +31,26 @@ namespace jdevice {
 */
 class MotherBoard : public jdevice::Device {
 
-	private:
+  private:
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		MotherBoard();
+  public:
+    /**
+     * \brief
+     *
+     */
+    MotherBoard();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual ~MotherBoard();
+    /**
+     * \brief
+     * 
+     */
+    virtual ~MotherBoard();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void Builder();
+    /**
+     * \brief
+     * 
+     */
+    virtual void Builder();
 
 };
 

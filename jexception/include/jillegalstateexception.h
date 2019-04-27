@@ -31,52 +31,52 @@ namespace jexception {
  */
 class IllegalStateException : public jexception::RuntimeException {
 
-	private:
+  private:
 
-	public:
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		IllegalStateException();
+  public:
+    /**
+     * \brief Construtor.
+     *
+     */
+    IllegalStateException();
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		IllegalStateException(std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    IllegalStateException(std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		IllegalStateException(jexception::Exception *exception, std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    IllegalStateException(jexception::Exception *exception, std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> IllegalStateException(const std::string &fmt, T ...vs):
       Exception(fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::IllegalStateException");
     }
-		
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> IllegalStateException(Exception *exception, const std::string &fmt, T ...vs):
       Exception(exception, fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::IllegalStateException");
     }
-		
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~IllegalStateException() throw();
+    
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~IllegalStateException() throw();
 
 };
 

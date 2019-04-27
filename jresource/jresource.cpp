@@ -29,8 +29,8 @@ namespace jresource {
 
 Resource::Resource()
 {
-	_listener = nullptr;
-	_is_available = true;
+  _listener = nullptr;
+  _is_available = true;
 }
 
 Resource::~Resource()
@@ -39,204 +39,204 @@ Resource::~Resource()
 
 bool Resource::IsAvailable()
 {
-	// jthread::AutoLock lock(&_resource_mutex);
+  // jthread::AutoLock lock(&_resource_mutex);
 
-	return _is_available;
+  return _is_available;
 }
 
 void Resource::Reserve(jevent::ResourceStatusListener *listener, bool force, int64_t timeout)
 {
-	if (listener == nullptr) {
-		throw jexception::IllegalArgumentException("Resource listener cannot be null");
-	}
+  if (listener == nullptr) {
+    throw jexception::IllegalArgumentException("Resource listener cannot be null");
+  }
 
-	// jthread::AutoLock lock(&_resource_mutex);
+  // jthread::AutoLock lock(&_resource_mutex);
 
-	if (_is_available == false) {
-		if (force == true) {
+  if (_is_available == false) {
+    if (force == true) {
       jevent::ResourceStatusEvent *event = new jevent::ResourceStatusEvent(this, jevent::JRS_RELEASE_FORCED);
 
-			_listener->ReleaseForced(event);
+      _listener->ReleaseForced(event);
 
-			DispatchResourceStatusEvent(event);
-		} else {
+      DispatchResourceStatusEvent(event);
+    } else {
       jevent::ResourceStatusEvent *event = new jevent::ResourceStatusEvent(this, jevent::JRS_RELEASE_REQUESTED);
 
-			bool request = _listener->ReleaseRequested(event);
+      bool request = _listener->ReleaseRequested(event);
 
-			DispatchResourceStatusEvent(event);
+      DispatchResourceStatusEvent(event);
 
-			if (request == false) {
-				if (timeout <= 0LL) {
+      if (request == false) {
+        if (timeout <= 0LL) {
           jevent::ResourceStatusEvent *e;
 
-					while (_listener->ReleaseRequested((e = new jevent::ResourceStatusEvent(this, jevent::JRS_RELEASE_REQUESTED))) != true) {
-						DispatchResourceStatusEvent(e);
+          while (_listener->ReleaseRequested((e = new jevent::ResourceStatusEvent(this, jevent::JRS_RELEASE_REQUESTED))) != true) {
+            DispatchResourceStatusEvent(e);
 
-						// _sem.Wait(&_resource_mutex);
+            // _sem.Wait(&_resource_mutex);
 
-						std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-					}
-				} else {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+          }
+        } else {
           jevent::ResourceStatusEvent *e;
-					int64_t fixed = 100;
-					int64_t count = fixed;
+          int64_t fixed = 100;
+          int64_t count = fixed;
 
-					while ((request = _listener->ReleaseRequested((e = new jevent::ResourceStatusEvent(this, jevent::JRS_RELEASE_REQUESTED)))) != true) {
-						DispatchResourceStatusEvent(e);
+          while ((request = _listener->ReleaseRequested((e = new jevent::ResourceStatusEvent(this, jevent::JRS_RELEASE_REQUESTED)))) != true) {
+            DispatchResourceStatusEvent(e);
 
-						// _resource_mutex.Unlock();
+            // _resource_mutex.Unlock();
 
-						std::this_thread::sleep_for(std::chrono::milliseconds(fixed));
+            std::this_thread::sleep_for(std::chrono::milliseconds(fixed));
 
-						// _resource_mutex.Lock();
+            // _resource_mutex.Lock();
 
-						count = count + fixed;
+            count = count + fixed;
 
-						if (count > timeout) {
-							request = _listener->ReleaseRequested((e = new jevent::ResourceStatusEvent(this, jevent::JRS_RELEASE_REQUESTED)));
+            if (count > timeout) {
+              request = _listener->ReleaseRequested((e = new jevent::ResourceStatusEvent(this, jevent::JRS_RELEASE_REQUESTED)));
 
-							delete e;
+              delete e;
 
-							break;
-						}
-					}
-					
-					if (request == false) {
-						throw jexception::TimeoutException("Resource time is expired");
-					}
-				}
-			}
-		}
+              break;
+            }
+          }
+          
+          if (request == false) {
+            throw jexception::TimeoutException("Resource time is expired");
+          }
+        }
+      }
+    }
 
     jevent::ResourceStatusEvent *e = new jevent::ResourceStatusEvent(this, jevent::JRS_RELEASED);
 
-		_listener->Released(e);
-					
-		DispatchResourceStatusEvent(e);
-	}
+    _listener->Released(e);
+          
+    DispatchResourceStatusEvent(e);
+  }
 
-	_listener = listener;
-	_is_available = false;
+  _listener = listener;
+  _is_available = false;
 
-	DispatchResourceTypeEvent(new jevent::ResourceTypeEvent(this, jevent::JRT_RESERVED));
+  DispatchResourceTypeEvent(new jevent::ResourceTypeEvent(this, jevent::JRT_RESERVED));
 }
 
 void Resource::Release()
 {
-	// jthread::AutoLock lock(&_resource_mutex);
+  // jthread::AutoLock lock(&_resource_mutex);
 
-	if (IsAvailable() == false) {
+  if (IsAvailable() == false) {
     jevent::ResourceTypeEvent *type_event = new jevent::ResourceTypeEvent(this, jevent::JRT_RELEASED);
     jevent::ResourceStatusEvent *status_event = new jevent::ResourceStatusEvent(this, jevent::JRS_RELEASED);
 
-		_is_available = true;
+    _is_available = true;
 
-		_listener->Released(status_event);
+    _listener->Released(status_event);
 
-		DispatchResourceTypeEvent(type_event);
-		DispatchResourceStatusEvent(status_event);
-	}
-		
-	_condition.notify_all();
+    DispatchResourceTypeEvent(type_event);
+    DispatchResourceStatusEvent(status_event);
+  }
+    
+  _condition.notify_all();
 }
 
 void Resource::RegisterResourceTypeListener(jevent::ResourceTypeListener *listener)
 {
-	if (listener == nullptr) {
-		return;
-	}
+  if (listener == nullptr) {
+    return;
+  }
 
-	if (std::find(_type_listeners.begin(), _type_listeners.end(), listener) == _type_listeners.end()) {
-		_type_listeners.push_back(listener);
-	}
+  if (std::find(_type_listeners.begin(), _type_listeners.end(), listener) == _type_listeners.end()) {
+    _type_listeners.push_back(listener);
+  }
 }
 
 void Resource::RemoveResourceTypeListener(jevent::ResourceTypeListener *listener)
 {
-	if (listener == nullptr) {
-		return;
-	}
+  if (listener == nullptr) {
+    return;
+  }
 
   _type_listeners.erase(std::remove(_type_listeners.begin(), _type_listeners.end(), listener), _type_listeners.end());
 }
 
 void Resource::DispatchResourceTypeEvent(jevent::ResourceTypeEvent *event)
 {
-	if (event == nullptr) {
-		return;
-	}
+  if (event == nullptr) {
+    return;
+  }
 
-	int k = 0,
-			size = (int)_type_listeners.size();
+  int k = 0,
+      size = (int)_type_listeners.size();
 
-	while (k++ < (int)_type_listeners.size() && event->IsConsumed() == false) {
-		jevent::ResourceTypeListener *listener = _type_listeners[k-1];
+  while (k++ < (int)_type_listeners.size() && event->IsConsumed() == false) {
+    jevent::ResourceTypeListener *listener = _type_listeners[k-1];
 
 
-		if (event->GetType() == jevent::JRT_RESERVED) {
-			listener->Reserved(event);
-		} else if (event->GetType() == jevent::JRT_RELEASED) {
-			listener->Released(event);
-		}
+    if (event->GetType() == jevent::JRT_RESERVED) {
+      listener->Reserved(event);
+    } else if (event->GetType() == jevent::JRT_RELEASED) {
+      listener->Released(event);
+    }
 
-		if (size != (int)_type_listeners.size()) {
-			size = (int)_type_listeners.size();
+    if (size != (int)_type_listeners.size()) {
+      size = (int)_type_listeners.size();
 
-			k--;
-		}
-	}
+      k--;
+    }
+  }
 
-	delete event;
+  delete event;
 }
 void Resource::RegisterResourceStatusListener(jevent::ResourceStatusListener *listener)
 {
-	if (listener == nullptr) {
-		return;
-	}
+  if (listener == nullptr) {
+    return;
+  }
 
-	if (std::find(_status_listeners.begin(), _status_listeners.end(), listener) == _status_listeners.end()) {
-		_status_listeners.push_back(listener);
-	}
+  if (std::find(_status_listeners.begin(), _status_listeners.end(), listener) == _status_listeners.end()) {
+    _status_listeners.push_back(listener);
+  }
 }
 
 void Resource::RemoveResourceStatusListener(jevent::ResourceStatusListener *listener)
 {
-	if (listener == nullptr) {
-		return;
-	}
+  if (listener == nullptr) {
+    return;
+  }
 
   _status_listeners.erase(std::remove(_status_listeners.begin(), _status_listeners.end(), listener), _status_listeners.end());
 }
 
 void Resource::DispatchResourceStatusEvent(jevent::ResourceStatusEvent *event)
 {
-	if (event == nullptr) {
-		return;
-	}
+  if (event == nullptr) {
+    return;
+  }
 
-	int k = 0,
-			size = (int)_status_listeners.size();
+  int k = 0,
+      size = (int)_status_listeners.size();
 
-	while (k++ < (int)_status_listeners.size() && event->IsConsumed() == false) {
-		jevent::ResourceStatusListener *listener = _status_listeners[k-1];
+  while (k++ < (int)_status_listeners.size() && event->IsConsumed() == false) {
+    jevent::ResourceStatusListener *listener = _status_listeners[k-1];
 
-		if (event->GetType() == jevent::JRS_RELEASED) {
-			listener->Released(event);
-		} else if (event->GetType() == jevent::JRS_RELEASE_FORCED) {
-			listener->ReleaseForced(event);
-		} else if (event->GetType() == jevent::JRS_RELEASE_REQUESTED) {
-			listener->ReleaseRequested(event);
-		}
+    if (event->GetType() == jevent::JRS_RELEASED) {
+      listener->Released(event);
+    } else if (event->GetType() == jevent::JRS_RELEASE_FORCED) {
+      listener->ReleaseForced(event);
+    } else if (event->GetType() == jevent::JRS_RELEASE_REQUESTED) {
+      listener->ReleaseRequested(event);
+    }
 
-		if (size != (int)_status_listeners.size()) {
-			size = (int)_status_listeners.size();
+    if (size != (int)_status_listeners.size()) {
+      size = (int)_status_listeners.size();
 
-			k--;
-		}
-	}
+      k--;
+    }
+  }
 
-	delete event;
+  delete event;
 }
 
 }

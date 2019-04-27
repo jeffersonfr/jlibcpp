@@ -31,19 +31,19 @@ namespace jlogger {
 */
 class MemoryHandler : public jlogger::LoggerHandler {
 
-	private:
-	
-	
-	public:
-		/**
-		 * \brief
-		 */
-		MemoryHandler();
+  private:
+  
+  
+  public:
+    /**
+     * \brief
+     */
+    MemoryHandler();
 
-		/**
-		 * \brief
-		 */
-		virtual ~MemoryHandler();
+    /**
+     * \brief
+     */
+    virtual ~MemoryHandler();
 
 };
 

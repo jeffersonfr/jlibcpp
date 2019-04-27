@@ -30,8 +30,8 @@ namespace jgui {
  *
  */
 enum jcoordinatelayout_orientation_t {
-	JCLO_HORIZONTAL	= 0x01,
-	JCLO_VERTICAL		= 0x02
+  JCLO_HORIZONTAL  = 0x01,
+  JCLO_VERTICAL    = 0x02
 };
 
 /**
@@ -41,72 +41,72 @@ enum jcoordinatelayout_orientation_t {
  */
 class CoordinateLayout : public Layout {
 
-	private:
-		/** \brief */
-		jcoordinatelayout_orientation_t _type;
-		/** \brief */
+  private:
+    /** \brief */
+    jcoordinatelayout_orientation_t _type;
+    /** \brief */
     jgui::jsize_t _size;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		CoordinateLayout(int width = -1, int height = -1, jcoordinatelayout_orientation_t type = (jcoordinatelayout_orientation_t)(JCLO_HORIZONTAL | JCLO_VERTICAL));
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~CoordinateLayout();
+  public:
+    /**
+     * \brief
+     *
+     */
+    CoordinateLayout(int width = -1, int height = -1, jcoordinatelayout_orientation_t type = (jcoordinatelayout_orientation_t)(JCLO_HORIZONTAL | JCLO_VERTICAL));
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~CoordinateLayout();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetSize(jgui::jsize_t size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetType(jcoordinatelayout_orientation_t type);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetSize(jgui::jsize_t size);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetType(jcoordinatelayout_orientation_t type);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jgui::jsize_t GetSize();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jcoordinatelayout_orientation_t GetType();
+    /**
+     * \brief
+     *
+     */
+    virtual jgui::jsize_t GetSize();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual jcoordinatelayout_orientation_t GetType();
 
-		/**
-		 * \brief
-		 *
-		 */
+    /**
+     * \brief
+     *
+     */
     virtual jsize_t GetMinimumLayoutSize(Container *parent);
-		
-		/**
-		 * \brief
-		 *
-		 */
+    
+    /**
+     * \brief
+     *
+     */
     virtual jsize_t GetMaximumLayoutSize(Container *parent);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jsize_t GetPreferredSize(Container *target);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual jsize_t GetPreferredSize(Container *target);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void DoLayout(Container *parent);
+    /**
+     * \brief
+     *
+     */
+    virtual void DoLayout(Container *parent);
 
 };
 

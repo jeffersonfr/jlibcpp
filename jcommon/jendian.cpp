@@ -63,9 +63,9 @@
 namespace jcommon {
 
 Endian::Endian():
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jsocket::Endian");
+  jcommon::Object::SetClassName("jsocket::Endian");
 }
 
 Endian::~Endian()
@@ -74,32 +74,32 @@ Endian::~Endian()
 
 uint16_t Endian::HostToNetwork16(uint16_t host16)
 {
-	return htobe16(host16);
+  return htobe16(host16);
 }
 
 uint32_t Endian::HostToNetwork32(uint32_t host32)
 {
-	return htobe32(host32);
+  return htobe32(host32);
 }
 
 uint64_t Endian::HostToNetwork64(uint64_t host64)
 {
-	return htobe64(host64);
+  return htobe64(host64);
 }
 
 uint16_t Endian::NetworkToHost16(uint16_t net16)
 {
-	return be16toh(net16);
+  return be16toh(net16);
 }
 
 uint32_t Endian::NetworkToHost32(uint32_t net32)
 {
-	return be32toh(net32);
+  return be32toh(net32);
 }
 
 uint64_t Endian::NetworkToHost64(uint64_t net64)
 {
-	return be64toh(net64);
+  return be64toh(net64);
 }
 
 }

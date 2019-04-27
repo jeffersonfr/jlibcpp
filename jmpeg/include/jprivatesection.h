@@ -29,22 +29,22 @@ namespace jmpeg {
 
 class PrivateSection : public jcommon::Object {
 
-	protected:
+  protected:
     /** \brief */
     std::shared_ptr<std::string> _data;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		PrivateSection(std::shared_ptr<std::string> data);
+  public:
+    /**
+     * \brief
+     *
+     */
+    PrivateSection(std::shared_ptr<std::string> data);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~PrivateSection();
+    /**
+     * \brief
+     *
+     */
+    virtual ~PrivateSection();
  
     /**
      * \brief

@@ -31,52 +31,52 @@ namespace jexception {
  */
 class InvalidArgumentException : public jexception::RuntimeException {
 
-	private:
+  private:
 
-	public:
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		InvalidArgumentException();
+  public:
+    /**
+     * \brief Construtor.
+     *
+     */
+    InvalidArgumentException();
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		InvalidArgumentException(std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    InvalidArgumentException(std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		InvalidArgumentException(jexception::Exception *exception, std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    InvalidArgumentException(jexception::Exception *exception, std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> InvalidArgumentException(const std::string &fmt, T ...vs):
       Exception(fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::InvalidArgumentException");
     }
-		
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> InvalidArgumentException(Exception *exception, const std::string &fmt, T ...vs):
       Exception(exception, fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::InvalidArgumentException");
     }
-		
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~InvalidArgumentException() throw();
+    
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~InvalidArgumentException() throw();
 
 };
 

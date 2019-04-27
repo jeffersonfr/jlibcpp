@@ -126,9 +126,9 @@ class XinePlayerComponentImpl : public jgui::Component {
 				_buffer[1] = new jgui::BufferedImage(jgui::JPF_RGB32, width, height);
 			}
 			
-			int index = (_buffer_index++)%2;
+			jgui::Image *image = _buffer[(_buffer_index++)%2];
 
-			uint32_t *buffer = (uint32_t *)_buffer[index]->LockData();
+			uint32_t *buffer = (uint32_t *)image->LockData();
 
 			if (format == XINE_VORAW_YV12) {
 				ColorConversion::GetRGB32FromYV12((uint8_t **)&data0, (uint8_t **)&data1, (uint8_t **)&data2, (uint32_t **)&buffer, width, height);
@@ -138,7 +138,7 @@ class XinePlayerComponentImpl : public jgui::Component {
 				ColorConversion::GetRGB32FromRGB24((uint8_t **)&data0, (uint32_t **)&buffer, width, height);
 			} 
 	
-			_buffer[index]->UnlockData();
+			image->UnlockData();
 
       Repaint();
 		}
@@ -154,7 +154,7 @@ class XinePlayerComponentImpl : public jgui::Component {
       jgui::jsize_t
         size = GetSize();
 
-      jgui::Image *image = _buffer[(_buffer_index)%2];
+      jgui::Image *image = _buffer[(_buffer_index + 1)%2];
 
       image->LockData();
 
@@ -535,7 +535,7 @@ LibXineLightPlayer::LibXineLightPlayer(jnetwork::URL url):
 
 	memset(&t, 0, sizeof(t));
 
-	t.supported_formats = (int)(XINE_VORAW_YV12 | XINE_VORAW_YUY2 | XINE_VORAW_RGB);
+	t.supported_formats = (int)(XINE_VORAW_RGB); // | XINE_VORAW_YV12 | XINE_VORAW_YUY2);
 	t.raw_output_cb = render_callback;
 	t.raw_overlay_cb = overlay_callback;
 	t.user_data = _component;

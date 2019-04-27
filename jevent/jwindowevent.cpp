@@ -22,11 +22,11 @@
 namespace jevent {
 
 WindowEvent::WindowEvent(void *source, jwindowevent_type_t type):
-	jevent::EventObject(source)
+  jevent::EventObject(source)
 {
-	jcommon::Object::SetClassName("jevent::WindowEvent");
+  jcommon::Object::SetClassName("jevent::WindowEvent");
 
-	_type = type;
+  _type = type;
 }
 
 WindowEvent::~WindowEvent()
@@ -35,7 +35,7 @@ WindowEvent::~WindowEvent()
 
 jwindowevent_type_t WindowEvent::GetType()
 {
-	return _type;
+  return _type;
 }
 
 }

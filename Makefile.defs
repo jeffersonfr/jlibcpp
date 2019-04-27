@@ -17,39 +17,36 @@
 #   Free Software Foundation, Inc.,                                       *
 #   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 #**************************************************************************
-MODULE		= jlibcpp
+MODULE = jlibcpp
 
-VERSION		= 1.8.0
+VERSION = 1.8.0
 
-EXE				= lib$(MODULE)-$(VERSION).so
+EXE = lib$(MODULE)-$(VERSION).so
 
-HOST			= 
-BUILD			= 
+HOST = 
+BUILD = 
 
-AR				= $(HOST)ar
-CC				= $(HOST)g++
-RANLIB		= $(HOST)ranlib
-STRIP			= $(HOST)strip
+CC = $(HOST)g++
+RANLIB = $(HOST)ranlib
+STRIP = $(HOST)strip
 
-JAVA			= javac
+DOXYGEN = doxygen
 
-DOXYGEN		= doxygen
+INCDIR = include
+LIBDIR = lib
+SRCDIR = src
+BINDIR = bin
+OBJDIR = obj
+TESTDIR = tests
+DOCDIR = doc
 
-INCDIR		= include
-LIBDIR		= lib
-SRCDIR 		= src
-BINDIR 		= bin
-OBJDIR		= obj
-TESTDIR		= tests
-DOCDIR		= doc
+PREFIX = /usr
 
-PREFIX		= /usr
+TARGET = $(BUILD)$(PREFIX)
 
-TARGET		= $(BUILD)$(PREFIX)
+ECHO = echo
 
-ECHO			= echo
-
-OK 				= \033[30;32mOK\033[m
+OK = \033[30;32mOK\033[m
 
 # {no, yes}
 ENABLE_DEBUG ?= yes
@@ -61,61 +58,60 @@ ENABLE_SANITIZE ?= no
 ENABLE_GRAPHICS ?= sdl2
 
 # {bmp, gif, ico, jpg, pcx, png, ppm, tga, xbm, xpm, heif, webp, jp2000, svg, tif, bpg, mjpeg, flif}
-ENABLE_IMAGE ?= bmp, gif, ico, jpg, pcx, png, ppm, tga, xbm, xpm, heif, webp, jp2000, svg, tif, mjpeg, flif
+ENABLE_IMAGE ?= bmp, gif, ico, jpg, pcx, png, ppm, tga, xbm, xpm
+#ENABLE_IMAGE ?= bmp, gif, ico, jpg, pcx, png, ppm, tga, xbm, xpm, heif, webp, jp2000, svg, tif, mjpeg, flif
 
 # {gif, ilist, v4l2, alsa, mixer, libvlc, libav, libxine, gstreamer}
-ENABLE_VIDEO ?= gif, ilist, v4l2, alsa, mixer, libvlc, libav, libxine, gstreamer
+ENABLE_VIDEO ?= gif, ilist, v4l2, alsa, mixer, libvlc, libav, libxine
+#ENABLE_VIDEO ?= gif, ilist, v4l2, alsa, mixer, libvlc, libav, libxine, gstreamer
 
-DEFINES   = \
-		 -D_REENTRANT \
-		 -D_FILE_OFFSET_BITS=64 \
-		 -D_LARGEFILE_SOURCE \
-		 -std=c++17 \
+DEFINES = \
+  -D_REENTRANT \
+  -D_FILE_OFFSET_BITS=64 \
+  -D_LARGEFILE_SOURCE \
+  -std=c++17 \
 
 ifeq ($(ENABLE_DEBUG),yes)
-	
-DEFINES		+= \
-		 -g \
-		 -ggdb \
-		 -DJDEBUG_ENABLED \
+  
+DEFINES += \
+  -g \
+  -ggdb \
+  -DJDEBUG_ENABLED \
 
 endif
 
 ifeq ($(ENABLE_SANITIZE),yes)
-	
-DEFINES		+= \
-		 -fsanitize=address \
-		 -fsanitize=leak \
-		 -fsanitize=undefined \
-		 -fsanitize-address-use-after-scope \
+  
+DEFINES += \
+  -fsanitize=address \
+  -fsanitize=leak \
+  -fsanitize=undefined \
+  -fsanitize-address-use-after-scope \
 
 endif
 
 # -ansi: problemas com va_copy()
-CCFLAGS		= \
-		 $(DEFINES) \
-		 -Wall \
-		 -shared \
-		 -rdynamic \
-		 -fPIC \
-		 -funroll-loops \
-		 -O2 \
-		 -D_GNU_SOURCE \
-		 -fopenmp \
-		 -D_DATA_PREFIX=\"$(PREFIX)/$(MODULE)\" \
-		 -I$(INCDIR) \
-	 	 `pkg-config --cflags libssl` \
+CCFLAGS = \
+  $(DEFINES) \
+  -Wall \
+  -shared \
+  -rdynamic \
+  -fPIC \
+  -funroll-loops \
+  -O2 \
+  -D_GNU_SOURCE \
+  -fopenmp \
+  -D_DATA_PREFIX=\"$(PREFIX)/$(MODULE)\" \
+  -I$(INCDIR) \
+  `pkg-config --cflags libssl` \
 
-LDFLAGS		= \
-		 -lpthread \
-		 -ldl \
-		 -lrt \
-		 -luuid \
-	 	 `pkg-config --libs libssl alsa` \
+LDFLAGS = \
+  -lpthread \
+  -ldl \
+  -lrt \
+  -luuid \
+  `pkg-config --libs libssl alsa` \
 
-ARFLAGS		= \
-		 -rc \
-
-REQUIRES	= \
-		 libssl \
+REQUIRES  = \
+  libssl \
 

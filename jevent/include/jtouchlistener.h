@@ -32,44 +32,44 @@ namespace jevent {
  */
 class TouchListener : public jevent::Listener {
 
-	private:
+  private:
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		TouchListener();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~TouchListener();
+  public:
+    /**
+     * \brief
+     *
+     */
+    TouchListener();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~TouchListener();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool FingerPressed(TouchEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool FingerReleased(TouchEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool FingerMoved(TouchEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool GesturePerformed(TouchEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual bool FingerPressed(TouchEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool FingerReleased(TouchEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool FingerMoved(TouchEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool GesturePerformed(TouchEvent *event);
 
 };
 

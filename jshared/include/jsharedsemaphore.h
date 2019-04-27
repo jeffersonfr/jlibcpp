@@ -40,156 +40,156 @@ namespace jshared {
  */
 class SharedSemaphore : public virtual jcommon::Object {
 
-	class SharedSemaphoreOp {
+  class SharedSemaphoreOp {
 
-		private:
-			/** \brief */
-			int _id;
-			/** \brief */
-			int _index;
-			/** \brief */
-			bool _is_blocking;
+    private:
+      /** \brief */
+      int _id;
+      /** \brief */
+      int _index;
+      /** \brief */
+      bool _is_blocking;
 
-		public:
-			/**
-			 * \brief
-			 *
-			 */
-			SharedSemaphoreOp(int id, int index);
+    public:
+      /**
+       * \brief
+       *
+       */
+      SharedSemaphoreOp(int id, int index);
 
-			/**
-			 * \brief
-			 *
-			 */
-			virtual ~SharedSemaphoreOp();
+      /**
+       * \brief
+       *
+       */
+      virtual ~SharedSemaphoreOp();
 
-			/**
-			 * \brief
-			 *
-			 */
-			virtual void SetBlocking(bool b);
+      /**
+       * \brief
+       *
+       */
+      virtual void SetBlocking(bool b);
 
-			/**
-			 * \brief
-			 *
-			 */
-			virtual bool IsBlocking();
+      /**
+       * \brief
+       *
+       */
+      virtual bool IsBlocking();
 
-			/**
-			 * \brief
-			 *
-			 */
-			virtual int GetLocked();
+      /**
+       * \brief
+       *
+       */
+      virtual int GetLocked();
 
-			/**
-			 * \brief
-			 *
-			 */
-			virtual int GetUnlocked();
+      /**
+       * \brief
+       *
+       */
+      virtual int GetUnlocked();
 
-			/**
-			 * \brief
-			 *
-			 */
-			virtual void Wait();
+      /**
+       * \brief
+       *
+       */
+      virtual void Wait();
 
-			/**
-			 * \brief Wait milliseconds.
-			 *
-			 */
-			virtual void Wait(int ms);
+      /**
+       * \brief Wait milliseconds.
+       *
+       */
+      virtual void Wait(int ms);
 
-			/**
-			 * \brief
-			 *
-			 */
-			virtual void Notify(int n);
+      /**
+       * \brief
+       *
+       */
+      virtual void Notify(int n);
 
-			/**
-			 * \brief
-			 *
-			 */
-			virtual void NotifyAll();
+      /**
+       * \brief
+       *
+       */
+      virtual void NotifyAll();
 
-	};
+  };
 
-	private:
-		/** \brief */
-		key_t _key;
-		/** \brief */
-		int _id;
-		/** \brief */
-		int _nsem;
-		/** \brief */
-		bool _is_blocking;
+  private:
+    /** \brief */
+    key_t _key;
+    /** \brief */
+    int _id;
+    /** \brief */
+    int _nsem;
+    /** \brief */
+    bool _is_blocking;
 
-	public:
-		/**
-		 * \brief Open a semaphore. IPC_PRIVATE parameter create a new semaphore for
-		 * only one process.
-		 *
-		 */
-		SharedSemaphore(key_t key_);
+  public:
+    /**
+     * \brief Open a semaphore. IPC_PRIVATE parameter create a new semaphore for
+     * only one process.
+     *
+     */
+    SharedSemaphore(key_t key_);
 
-		/**
-		 * \brief Create a new semaphore.
-		 *
-		 */
-		SharedSemaphore(key_t key_, int nsem_, int value_ = 1, jshared_permissions_t = JSP_URWX);
+    /**
+     * \brief Create a new semaphore.
+     *
+     */
+    SharedSemaphore(key_t key_, int nsem_, int value_ = 1, jshared_permissions_t = JSP_URWX);
 
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~SharedSemaphore();
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~SharedSemaphore();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual SharedSemaphoreOp At(int index);
+    /**
+     * \brief
+     *
+     */
+    virtual SharedSemaphoreOp At(int index);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetBlocking(bool b);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetBlocking(bool b);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsBlocking();
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsBlocking();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Wait(int *array, int array_size);
+    /**
+     * \brief
+     *
+     */
+    virtual void Wait(int *array, int array_size);
 
-		/**
-		 * \brief Wait milliseconds.
-		 *
-		 */
-		virtual void Wait(int *array, int array_size, int ms);
+    /**
+     * \brief Wait milliseconds.
+     *
+     */
+    virtual void Wait(int *array, int array_size, int ms);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Notify(int *array, int array_size, int n);
+    /**
+     * \brief
+     *
+     */
+    virtual void Notify(int *array, int array_size, int n);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void NotifyAll(int *array, int array_size);
+    /**
+     * \brief
+     *
+     */
+    virtual void NotifyAll(int *array, int array_size);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Release();
+    /**
+     * \brief
+     *
+     */
+    virtual void Release();
 
 };
 

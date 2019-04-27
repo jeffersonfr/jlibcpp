@@ -31,20 +31,20 @@ namespace jdevice {
 */
 class DeviceBuilder : public jcommon::Object {
 
-	private:
-		
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		DeviceBuilder(Device *device);
+  private:
+    
+  public:
+    /**
+     * \brief
+     *
+     */
+    DeviceBuilder(Device *device);
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual ~DeviceBuilder();
+    /**
+     * \brief
+     * 
+     */
+    virtual ~DeviceBuilder();
 
 };
 

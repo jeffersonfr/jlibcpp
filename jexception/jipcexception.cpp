@@ -24,19 +24,19 @@ namespace jexception {
 IPCException::IPCException():
   jexception::RuntimeException()
 {
-	jcommon::Object::SetClassName("jexception::IPCException");
+  jcommon::Object::SetClassName("jexception::IPCException");
 }
 
 IPCException::IPCException(std::string reason_):
     RuntimeException(reason_)
 {
-	jcommon::Object::SetClassName("jexception::IPCException");
+  jcommon::Object::SetClassName("jexception::IPCException");
 }
 
 IPCException::IPCException(jexception::Exception *exception, std::string reason_):
     RuntimeException(exception, reason_)
 {
-	jcommon::Object::SetClassName("jexception::IPCException");
+  jcommon::Object::SetClassName("jexception::IPCException");
 }
 
 IPCException::~IPCException() throw()

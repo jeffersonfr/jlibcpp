@@ -22,9 +22,9 @@
 namespace jgui {
 
 Layout::Layout():
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jgui::Layout");
+  jcommon::Object::SetClassName("jgui::Layout");
 }
 
 Layout::~Layout()
@@ -33,23 +33,23 @@ Layout::~Layout()
 
 jsize_t Layout::GetMinimumLayoutSize(Container *parent)
 {
-	jsize_t t = {0, 0};
+  jsize_t t = {0, 0};
 
-	return t;
+  return t;
 }
 
 jsize_t Layout::GetMaximumLayoutSize(Container *parent)
 {
-	jsize_t t = {0, 0};
+  jsize_t t = {0, 0};
 
-	return t;
+  return t;
 }
 
 jsize_t Layout::GetPreferredLayoutSize(Container *parent)
 {
-	jsize_t t = {0, 0};
+  jsize_t t = {0, 0};
 
-	return t;
+  return t;
 }
 
 void Layout::DoLayout(Container *c)

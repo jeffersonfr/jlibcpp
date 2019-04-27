@@ -22,9 +22,9 @@
 namespace jevent {
 
 AdjustmentListener::AdjustmentListener():
-	jevent::Listener()
+  jevent::Listener()
 {
-	jcommon::Object::SetClassName("jevent::AdjustmentListener");
+  jcommon::Object::SetClassName("jevent::AdjustmentListener");
 }
 
 AdjustmentListener::~AdjustmentListener()

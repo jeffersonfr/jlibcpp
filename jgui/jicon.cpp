@@ -23,14 +23,14 @@
 namespace jgui {
 
 Icon::Icon(jgui::Image *image, int x, int y, int width, int height):
-	Component(x, y, width, height)
+  Component(x, y, width, height)
 {
-	jcommon::Object::SetClassName("jgui::Icon");
+  jcommon::Object::SetClassName("jgui::Icon");
 
-	_halign = JHA_CENTER;
-	_valign = JVA_CENTER;
+  _halign = JHA_CENTER;
+  _valign = JVA_CENTER;
 
-	_image = image;
+  _image = image;
 }
 
 Icon::~Icon()
@@ -48,51 +48,51 @@ void Icon::SetImage(jgui::Image *image)
     _image = nullptr;
   }
 
-	_image = image;
+  _image = image;
 
-	Repaint();
+  Repaint();
 }
 
 jgui::Image * Icon::GetImage()
 {
-	return _image;
+  return _image;
 }
 
 void Icon::SetHorizontalAlign(jhorizontal_align_t align)
 {
-	if (_halign != align) {
-		_halign = align;
+  if (_halign != align) {
+    _halign = align;
 
-		Repaint();
-	}
+    Repaint();
+  }
 }
 
 jhorizontal_align_t Icon::GetHorizontalAlign()
 {
-	return _halign;
+  return _halign;
 }
 
 void Icon::SetVerticalAlign(jvertical_align_t align)
 {
-	if (_valign != align) {
-		_valign = align;
+  if (_valign != align) {
+    _valign = align;
 
-		Repaint();
-	}
+    Repaint();
+  }
 }
 
 jvertical_align_t Icon::GetVerticalAlign()
 {
-	return _valign;
+  return _valign;
 }
-		
+    
 void Icon::Paint(Graphics *g)
 {
-	JDEBUG(JINFO, "paint\n");
+  JDEBUG(JINFO, "paint\n");
 
-	Component::Paint(g);
+  Component::Paint(g);
 
-	Theme *theme = GetTheme();
+  Theme *theme = GetTheme();
 
   if (theme == nullptr) {
     return;
@@ -100,20 +100,20 @@ void Icon::Paint(Graphics *g)
 
   jgui::Color 
     bg = theme->GetIntegerParam("component.bg"),
-	  fg = theme->GetIntegerParam("component.fg"),
-	  fgfocus = theme->GetIntegerParam("component.fg.focus"),
-	  fgdisable = theme->GetIntegerParam("component.fg.disable");
+    fg = theme->GetIntegerParam("component.fg"),
+    fgfocus = theme->GetIntegerParam("component.fg.focus"),
+    fgdisable = theme->GetIntegerParam("component.fg.disable");
   jgui::jsize_t
     size = GetSize();
   int
     x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
-		y = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
-		w = size.width - 2*x,
-		h = size.height - 2*y;
+    y = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
+    w = size.width - 2*x,
+    h = size.height - 2*y;
 
-	if (_image != nullptr) {
-		g->DrawImage(_image, x, y, w, h);
-	} else {
+  if (_image != nullptr) {
+    g->DrawImage(_image, x, y, w, h);
+  } else {
     g->SetColor(Color::Black);
     g->FillRectangle(x, y, w, h);
   }

@@ -29,135 +29,135 @@
 namespace jshared {
 
 NamedSemaphore::NamedSemaphore(std::string name):
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jshared::NamedSemaphore");
-	
-	int fd;
+  jcommon::Object::SetClassName("jshared::NamedSemaphore");
+  
+  int fd;
 
-	fd = open(name.c_str(), O_RDWR, 0666);
+  fd = open(name.c_str(), O_RDWR, 0666);
 
-	if (fd < 0) {
-		throw jexception::SemaphoreException("Cannot open the semaphore resource file");
-	}
+  if (fd < 0) {
+    throw jexception::SemaphoreException("Cannot open the semaphore resource file");
+  }
 
-	_handler = (struct jnamedsemaphore_t *) mmap(nullptr, sizeof(struct jnamedsemaphore_t), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+  _handler = (struct jnamedsemaphore_t *) mmap(nullptr, sizeof(struct jnamedsemaphore_t), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 
-	close (fd);
+  close (fd);
 }
 
 NamedSemaphore::NamedSemaphore(std::string name, int access):
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jshared::NamedSemaphore");
-	
-	pthread_mutexattr_t psharedm;
-	pthread_condattr_t psharedc;
-	int fd;
+  jcommon::Object::SetClassName("jshared::NamedSemaphore");
+  
+  pthread_mutexattr_t psharedm;
+  pthread_condattr_t psharedc;
+  int fd;
 
-	fd = open(name.c_str(), O_RDWR | O_CREAT | O_EXCL, access);
+  fd = open(name.c_str(), O_RDWR | O_CREAT | O_EXCL, access);
 
-	if (fd < 0) {
-		throw jexception::SemaphoreException("Cannot create a semaphore resource file");
-	}
+  if (fd < 0) {
+    throw jexception::SemaphoreException("Cannot create a semaphore resource file");
+  }
 
-	if (ftruncate(fd, sizeof(struct jnamedsemaphore_t)) != 0) {
-		throw jexception::SemaphoreException("Semaphore resource file truncate error");
-	}
+  if (ftruncate(fd, sizeof(struct jnamedsemaphore_t)) != 0) {
+    throw jexception::SemaphoreException("Semaphore resource file truncate error");
+  }
 
-	pthread_mutexattr_init(&psharedm);
-	pthread_mutexattr_setpshared(&psharedm, PTHREAD_PROCESS_SHARED);
-	pthread_condattr_init(&psharedc);
-	pthread_condattr_setpshared(&psharedc, PTHREAD_PROCESS_SHARED);
+  pthread_mutexattr_init(&psharedm);
+  pthread_mutexattr_setpshared(&psharedm, PTHREAD_PROCESS_SHARED);
+  pthread_condattr_init(&psharedc);
+  pthread_condattr_setpshared(&psharedc, PTHREAD_PROCESS_SHARED);
 
-	_handler = (struct jnamedsemaphore_t *)mmap(nullptr, sizeof(struct jnamedsemaphore_t), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+  _handler = (struct jnamedsemaphore_t *)mmap(nullptr, sizeof(struct jnamedsemaphore_t), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 
-	close (fd);
+  close (fd);
 
-	pthread_mutex_init(&_handler->lock, &psharedm);
-	pthread_cond_init(&_handler->nonzero, &psharedc);
+  pthread_mutex_init(&_handler->lock, &psharedm);
+  pthread_cond_init(&_handler->nonzero, &psharedc);
 
-	_handler->count = 0;
+  _handler->count = 0;
 }
 
 NamedSemaphore::~NamedSemaphore()
 {
-	Release();
+  Release();
 }
 
 void NamedSemaphore::NamedSemaphore::Wait()
 {
-	pthread_mutex_lock(&_handler->lock);
-	
-	while (_handler->count == 0) {
-		pthread_cond_wait(&_handler->nonzero, &_handler->lock);
-	}
+  pthread_mutex_lock(&_handler->lock);
+  
+  while (_handler->count == 0) {
+    pthread_cond_wait(&_handler->nonzero, &_handler->lock);
+  }
 
-	_handler->size--;
-	_handler->count--;
-	
-	pthread_mutex_unlock(&_handler->lock);
+  _handler->size--;
+  _handler->count--;
+  
+  pthread_mutex_unlock(&_handler->lock);
 }
 
 void NamedSemaphore::Wait(uint64_t time_)
 {
-	struct timespec t;
-	int result = 0;
+  struct timespec t;
+  int result = 0;
 
-	clock_gettime(CLOCK_REALTIME, &t);
+  clock_gettime(CLOCK_REALTIME, &t);
 
-	t.tv_sec += (int64_t)(time_/1000000LL);
-	t.tv_nsec += (int64_t)((time_%1000000LL)*1000LL);
+  t.tv_sec += (int64_t)(time_/1000000LL);
+  t.tv_nsec += (int64_t)((time_%1000000LL)*1000LL);
 
-	pthread_mutex_lock(&_handler->lock);
+  pthread_mutex_lock(&_handler->lock);
 
-	result = pthread_cond_timedwait(&_handler->nonzero, &_handler->lock, &t);
+  result = pthread_cond_timedwait(&_handler->nonzero, &_handler->lock, &t);
 
-	pthread_mutex_unlock(&_handler->lock);
+  pthread_mutex_unlock(&_handler->lock);
 
-	if (result == ETIMEDOUT) {
-		throw jexception::SemaphoreTimeoutException("Semaphore wait timeout");
-	} else if (result < 0) {
-		throw jexception::SemaphoreException("Semaphore wait failed");
-	}
+  if (result == ETIMEDOUT) {
+    throw jexception::SemaphoreTimeoutException("Semaphore wait timeout");
+  } else if (result < 0) {
+    throw jexception::SemaphoreException("Semaphore wait failed");
+  }
 }
 
 void NamedSemaphore::NamedSemaphore::Notify()
 {
-	pthread_mutex_lock(&_handler->lock);
+  pthread_mutex_lock(&_handler->lock);
 
-	_handler->size++;
+  _handler->size++;
 
-	if (_handler->count == 0) {
-		if (pthread_cond_signal(&_handler->nonzero) != 0) {
-			throw jexception::SemaphoreException("Condition notify error");
-		}
-	}
+  if (_handler->count == 0) {
+    if (pthread_cond_signal(&_handler->nonzero) != 0) {
+      throw jexception::SemaphoreException("Condition notify error");
+    }
+  }
 
-	_handler->count++;
+  _handler->count++;
 
-	pthread_mutex_unlock(&_handler->lock);
+  pthread_mutex_unlock(&_handler->lock);
 }
 
 void NamedSemaphore::NamedSemaphore::NotifyAll()
 {
-	pthread_mutex_lock(&_handler->lock);
+  pthread_mutex_lock(&_handler->lock);
 
-	if (_handler->size < 0) {
-		_handler->count = -_handler->size;
-		_handler->size = 0;
-	}
+  if (_handler->size < 0) {
+    _handler->count = -_handler->size;
+    _handler->size = 0;
+  }
 
-	if (pthread_cond_broadcast(&_handler->nonzero) != 0) {
-		throw jexception::SemaphoreException("Condition notify all error");
-	}
+  if (pthread_cond_broadcast(&_handler->nonzero) != 0) {
+    throw jexception::SemaphoreException("Condition notify all error");
+  }
 
-	pthread_mutex_unlock(&_handler->lock);
+  pthread_mutex_unlock(&_handler->lock);
 }
 
 void NamedSemaphore::Release() 
 {
-	munmap((void *)_handler, sizeof(struct jnamedsemaphore_t));
+  munmap((void *)_handler, sizeof(struct jnamedsemaphore_t));
 }
 
 }

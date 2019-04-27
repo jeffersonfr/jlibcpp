@@ -23,16 +23,16 @@
 namespace jio {
 
 DataInputStream::DataInputStream(InputStream *is):
-	jio::InputStream(),
-	jio::BufferReader()
+  jio::InputStream(),
+  jio::BufferReader()
 {
-	jcommon::Object::SetClassName("jio::DataInputStream");
-		
-	if ((void *)is == nullptr) {
-		throw jexception::IOException("Null pointer exception");
-	}
+  jcommon::Object::SetClassName("jio::DataInputStream");
+    
+  if ((void *)is == nullptr) {
+    throw jexception::IOException("Null pointer exception");
+  }
 
-	_stream = is;
+  _stream = is;
 }
 
 DataInputStream::~DataInputStream()
@@ -41,145 +41,145 @@ DataInputStream::~DataInputStream()
 
 bool DataInputStream::IsEmpty()
 {
-	return _stream->IsEmpty();
+  return _stream->IsEmpty();
 }
 
 int64_t DataInputStream::Available()
 {
-	return _stream->Available();
+  return _stream->Available();
 }
 
 int64_t DataInputStream::GetSize()
 {
-	return _stream->GetSize();
+  return _stream->GetSize();
 }
 
 int64_t DataInputStream::GetPosition()
 {
-	return _stream->GetPosition();
+  return _stream->GetPosition();
 }
 
 int64_t DataInputStream::Read()
 {
-	return _stream->Read();
+  return _stream->Read();
 }
 
 int64_t DataInputStream::Read(char *data, int64_t size)
 {
-	return _stream->Read(data, size);
+  return _stream->Read(data, size);
 }
 
 void DataInputStream::VerifyData()
 {
-	if (_buffer.Available() > 0) {
-		return;
-	}
+  if (_buffer.Available() > 0) {
+    return;
+  }
 
-	_buffer.Clear();
-	_buffer.Reset();
+  _buffer.Clear();
+  _buffer.Reset();
 
-	char buffer[4096];
-	int64_t size = 4096;
+  char buffer[4096];
+  int64_t size = 4096;
 
-	size = _stream->Read(buffer, size);
+  size = _stream->Read(buffer, size);
 
-	if (size > 0) {
-		PushData(buffer, size);
-	}
+  if (size > 0) {
+    PushData(buffer, size);
+  }
 }
 
 std::string DataInputStream::Read(int64_t size)
 {
-	return _stream->Read(size);
+  return _stream->Read(size);
 }
 
 bool DataInputStream::ReadBoolean()
 {
-	VerifyData();
+  VerifyData();
 
-	return BufferReader::ReadBoolean();
+  return BufferReader::ReadBoolean();
 }
 
 uint8_t DataInputStream::ReadByte()
 {
-	VerifyData();
+  VerifyData();
 
-	return BufferReader::ReadByte();
+  return BufferReader::ReadByte();
 }
 
 uint16_t DataInputStream::ReadShort()
 {
-	VerifyData();
+  VerifyData();
 
-	return BufferReader::ReadShort();
+  return BufferReader::ReadShort();
 }
 
 uint32_t DataInputStream::ReadInteger()
 {
-	VerifyData();
+  VerifyData();
 
-	return BufferReader::ReadInteger();
+  return BufferReader::ReadInteger();
 }
 
 uint64_t DataInputStream::ReadLong()
 {
-	VerifyData();
+  VerifyData();
 
-	return BufferReader::ReadLong();
+  return BufferReader::ReadLong();
 }
 
 float DataInputStream::ReadFloat()
 {
-	VerifyData();
+  VerifyData();
 
-	return BufferReader::ReadFloat();
+  return BufferReader::ReadFloat();
 }
 
 double DataInputStream::ReadDouble()
 {
-	VerifyData();
+  VerifyData();
 
-	return BufferReader::ReadDouble();
+  return BufferReader::ReadDouble();
 }
 
 std::string DataInputStream::ReadString()
 {
-	VerifyData();
+  VerifyData();
 
-	return BufferReader::ReadString();
+  return BufferReader::ReadString();
 }
 
 char * DataInputStream::ReadRaw(int64_t *size)
 {
-	VerifyData();
+  VerifyData();
 
-	return BufferReader::ReadRaw(size);
+  return BufferReader::ReadRaw(size);
 }
 
 void DataInputStream::Skip(int64_t skip)
 {
-	_stream->Skip(skip);
+  _stream->Skip(skip);
 }
 
 void DataInputStream::Reset()
 {
-	_buffer.Reset();
-	_stream->Reset();
+  _buffer.Reset();
+  _stream->Reset();
 }
 
 bool DataInputStream::IsClosed()
 {
-	return _stream->IsClosed();
+  return _stream->IsClosed();
 }
 
 void DataInputStream::Close()
 {
-	_stream->Close();
+  _stream->Close();
 }
 
 int64_t DataInputStream::GetReadedBytes()
 {
-	return _stream->GetReadedBytes();
+  return _stream->GetReadedBytes();
 }
 
 }

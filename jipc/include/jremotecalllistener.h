@@ -32,25 +32,25 @@ namespace jipc {
  */
 class RemoteCallListener : public virtual jcommon::Object {
 
-	protected:
-		/**
-		 * \Constructor.
-		 *
-		 */
-		RemoteCallListener();
+  protected:
+    /**
+     * \Constructor.
+     *
+     */
+    RemoteCallListener();
 
-	public:
-		/**
-		 * \brief Destructor.
-		 *
-		 */
-		virtual ~RemoteCallListener();
+  public:
+    /**
+     * \brief Destructor.
+     *
+     */
+    virtual ~RemoteCallListener();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Response * ProcessCall(Method *method);
+    /**
+     * \brief
+     *
+     */
+    virtual Response * ProcessCall(Method *method);
 
 };
 

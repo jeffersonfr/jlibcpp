@@ -31,21 +31,21 @@ namespace jcommon {
  */
 class Calendar : public virtual jcommon::Object{
 
-	private:
-		/** \brief Days */
-		int _day;
-		/** \brief Months */
-		int _month;
-		/** \brief Years */
-		int _year;
-		
+  private:
+    /** \brief Days */
+    int _day;
+    /** \brief Months */
+    int _month;
+    /** \brief Years */
+    int _year;
+    
     /**
      * \brief
      *
      */
-		bool is_bissexto(int ano);
-		
-	public:
+    bool is_bissexto(int ano);
+    
+  public:
     /**
      * \brief
      *

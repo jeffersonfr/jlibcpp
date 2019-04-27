@@ -24,19 +24,19 @@ namespace jexception {
 MemoryException::MemoryException():
   jexception::RuntimeException()
 {
-	jcommon::Object::SetClassName("jexception::MemoryException");
+  jcommon::Object::SetClassName("jexception::MemoryException");
 }
 
 MemoryException::MemoryException(std::string reason_):
   jexception::RuntimeException(reason_)
 {
-	jcommon::Object::SetClassName("jexception::MemoryException");
+  jcommon::Object::SetClassName("jexception::MemoryException");
 }
 
 MemoryException::MemoryException(jexception::Exception *exception, std::string reason_):
   jexception::RuntimeException(exception, reason_)
 {
-	jcommon::Object::SetClassName("jexception::MemoryException");
+  jcommon::Object::SetClassName("jexception::MemoryException");
 }
 
 MemoryException::~MemoryException() throw()

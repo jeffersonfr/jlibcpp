@@ -31,34 +31,34 @@ namespace jsecurity {
  */
 class Group : public virtual jcommon::Object {
 
-	private:
-		/** \brief */
-		std::string _name;
-		
-	public:
-		/**
-		 * \brief
-		 * 
-		 */
-		Group(std::string name);
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual ~Group();
+  private:
+    /** \brief */
+    std::string _name;
+    
+  public:
+    /**
+     * \brief
+     * 
+     */
+    Group(std::string name);
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual ~Group();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual int GetID();
+    /**
+     * \brief
+     * 
+     */
+    virtual int GetID();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual std::string GetName();
+    /**
+     * \brief
+     * 
+     */
+    virtual std::string GetName();
     
 };
 

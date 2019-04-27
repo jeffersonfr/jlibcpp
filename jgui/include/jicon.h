@@ -32,68 +32,68 @@ namespace jgui{
  */
 class Icon : public jgui::Component {
 
-	private:
-		/** \brief */
-		jgui::Image *_image;
-		/** \brief */
-		jhorizontal_align_t _halign;
-		/** \brief */
-		jvertical_align_t _valign;
+  private:
+    /** \brief */
+    jgui::Image *_image;
+    /** \brief */
+    jhorizontal_align_t _halign;
+    /** \brief */
+    jvertical_align_t _valign;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		Icon(jgui::Image *image, int x = 0, int y = 0, int width = 0, int height = 0);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~Icon();
+  public:
+    /**
+     * \brief
+     *
+     */
+    Icon(jgui::Image *image, int x = 0, int y = 0, int width = 0, int height = 0);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~Icon();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetImage(jgui::Image *image);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetImage(jgui::Image *image);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jgui::Image * GetImage();
+    /**
+     * \brief
+     *
+     */
+    virtual jgui::Image * GetImage();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetHorizontalAlign(jhorizontal_align_t align);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jhorizontal_align_t GetHorizontalAlign();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetVerticalAlign(jvertical_align_t align);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jvertical_align_t GetVerticalAlign();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Paint(Graphics *g);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetHorizontalAlign(jhorizontal_align_t align);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual jhorizontal_align_t GetHorizontalAlign();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetVerticalAlign(jvertical_align_t align);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual jvertical_align_t GetVerticalAlign();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Paint(Graphics *g);
 
 };
 

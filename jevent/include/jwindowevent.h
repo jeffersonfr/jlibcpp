@@ -29,14 +29,14 @@ namespace jevent {
  *
  */
 enum jwindowevent_type_t {
-	JWET_CLOSING,
-	JWET_CLOSED,
-	JWET_OPENED,
-	JWET_RESIZED,
-	JWET_MOVED,
-	JWET_PAINTED,
-	JWET_ENTERED,
-	JWET_LEAVED
+  JWET_CLOSING,
+  JWET_CLOSED,
+  JWET_OPENED,
+  JWET_RESIZED,
+  JWET_MOVED,
+  JWET_PAINTED,
+  JWET_ENTERED,
+  JWET_LEAVED
 };
 
 /**
@@ -46,29 +46,29 @@ enum jwindowevent_type_t {
  */
 class WindowEvent : public jevent::EventObject {
 
-	private:
-		/** \brief */
-		jwindowevent_type_t _type;
+  private:
+    /** \brief */
+    jwindowevent_type_t _type;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		WindowEvent(void *source, jwindowevent_type_t type);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~WindowEvent();
+  public:
+    /**
+     * \brief
+     *
+     */
+    WindowEvent(void *source, jwindowevent_type_t type);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~WindowEvent();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jwindowevent_type_t GetType();
-			
+    /**
+     * \brief
+     *
+     */
+    virtual jwindowevent_type_t GetType();
+      
 };
 
 }

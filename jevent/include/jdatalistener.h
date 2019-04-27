@@ -32,26 +32,26 @@ namespace jevent {
  */
 class DataListener : public jevent::Listener {
 
-	protected:
-		/**
-		 * \brief
-		 *
-		 */
-		DataListener();
+  protected:
+    /**
+     * \brief
+     *
+     */
+    DataListener();
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~DataListener();
+  public:
+    /**
+     * \brief
+     *
+     */
+    virtual ~DataListener();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void DataChanged(jevent::DataEvent *event);
-		
+    /**
+     * \brief
+     *
+     */
+    virtual void DataChanged(jevent::DataEvent *event);
+    
 };
 
 }

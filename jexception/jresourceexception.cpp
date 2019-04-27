@@ -22,21 +22,21 @@
 namespace jexception {
 
 ResourceException::ResourceException():
-	jexception::RuntimeException()
+  jexception::RuntimeException()
 {
-	jcommon::Object::SetClassName("jexception::ResourceException");
+  jcommon::Object::SetClassName("jexception::ResourceException");
 }
 
 ResourceException::ResourceException(std::string reason_):
-	jexception::RuntimeException(reason_)
+  jexception::RuntimeException(reason_)
 {
-	jcommon::Object::SetClassName("jexception::ResourceException");
+  jcommon::Object::SetClassName("jexception::ResourceException");
 }
 
 ResourceException::ResourceException(jexception::Exception *exception, std::string reason_):
-	jexception::RuntimeException(exception, reason_)
+  jexception::RuntimeException(exception, reason_)
 {
-	jcommon::Object::SetClassName("jexception::ResourceException");
+  jcommon::Object::SetClassName("jexception::ResourceException");
 }
 
 ResourceException::~ResourceException() throw()

@@ -32,57 +32,57 @@ namespace jsecurity {
  */
 class AccessControl : public virtual jcommon::Object {
 
-	private:
+  private:
 
-		
-	public:
-		/**
-		 * \brief
-		 * 
-		 */
-		AccessControl();
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual ~AccessControl();
+    
+  public:
+    /**
+     * \brief
+     * 
+     */
+    AccessControl();
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual ~AccessControl();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual User * GetUser();
+    /**
+     * \brief
+     * 
+     */
+    virtual User * GetUser();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual Group * GetGroup();
+    /**
+     * \brief
+     * 
+     */
+    virtual Group * GetGroup();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual User * GetOther();
+    /**
+     * \brief
+     * 
+     */
+    virtual User * GetOther();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void SetUser(User *id);
+    /**
+     * \brief
+     * 
+     */
+    virtual void SetUser(User *id);
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void SetGroup(Group *id);
+    /**
+     * \brief
+     * 
+     */
+    virtual void SetGroup(Group *id);
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void SetOther(User *id);
+    /**
+     * \brief
+     * 
+     */
+    virtual void SetOther(User *id);
     
 };
 

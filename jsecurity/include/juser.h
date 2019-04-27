@@ -33,60 +33,60 @@ class Group;
  */
 class User : public virtual jcommon::Object {
 
-	private:
-		/** \brief */
-		std::string _name;
-		/** \brief */
-		std::vector<Group *> _groups;
-		
-	public:
-		/**
-		 * \brief
-		 * 
-		 */
-		User(std::string name);
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual ~User();
+  private:
+    /** \brief */
+    std::string _name;
+    /** \brief */
+    std::vector<Group *> _groups;
+    
+  public:
+    /**
+     * \brief
+     * 
+     */
+    User(std::string name);
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual ~User();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual int GetID();
+    /**
+     * \brief
+     * 
+     */
+    virtual int GetID();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void AddGroup(Group *group);
+    /**
+     * \brief
+     * 
+     */
+    virtual void AddGroup(Group *group);
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void RemoveGroup(Group *group);
+    /**
+     * \brief
+     * 
+     */
+    virtual void RemoveGroup(Group *group);
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual const std::vector<Group *> & GetGroups();
+    /**
+     * \brief
+     * 
+     */
+    virtual const std::vector<Group *> & GetGroups();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual std::string GetName();
+    /**
+     * \brief
+     * 
+     */
+    virtual std::string GetName();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual std::string GetAddress();
+    /**
+     * \brief
+     * 
+     */
+    virtual std::string GetAddress();
     
 };
 

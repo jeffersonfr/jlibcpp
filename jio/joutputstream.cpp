@@ -25,7 +25,7 @@ OutputStream::OutputStream()
 {
     jcommon::Object::SetClassName("jio::OutputStream");
 
-	_blocked = true;
+  _blocked = true;
 }
 
 OutputStream::~OutputStream()
@@ -34,22 +34,22 @@ OutputStream::~OutputStream()
 
 void OutputStream::SetBlocking(bool block_)
 {
-	_blocked = block_;
+  _blocked = block_;
 }
 
 bool OutputStream::IsBlocking()
 {
-	return _blocked;
+  return _blocked;
 }
 
 bool OutputStream::IsClosed()
 {
-	return _is_closed;
+  return _is_closed;
 }
 
 int64_t OutputStream::Write(std::string str)
 {
-	return Write((char *)str.c_str(), str.size());
+  return Write((char *)str.c_str(), str.size());
 }
 
 bool OutputStream::IsEmpty()

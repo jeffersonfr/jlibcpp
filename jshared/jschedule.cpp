@@ -27,15 +27,15 @@
 namespace jshared {
 
 Schedule::Schedule(pid_t pid_):
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jshared::Schedule");
-	
-	_pid = pid_;
+  jcommon::Object::SetClassName("jshared::Schedule");
+  
+  _pid = pid_;
 
-	if (pid_ < 1) {
-		_pid = getpid();
-	}
+  if (pid_ < 1) {
+    _pid = getpid();
+  }
 }
 
 Schedule::~Schedule()
@@ -44,215 +44,215 @@ Schedule::~Schedule()
 
 void Schedule::SetSchedulerParameter(const jschedule_param_t *param_)
 {
-	struct sched_param param;
+  struct sched_param param;
 
-	param.sched_priority = param_->priority;
-	
-	int r = sched_setparam(_pid, &param);
+  param.sched_priority = param_->priority;
+  
+  int r = sched_setparam(_pid, &param);
 
-	if (r < 0) {
-		if (errno == EPERM) {
-			throw jexception::ProcessException("Process does not have appropriate privileges");
-		} else {
-			throw jexception::ProcessException("Schedule parameter exception");
-		}
-	}
+  if (r < 0) {
+    if (errno == EPERM) {
+      throw jexception::ProcessException("Process does not have appropriate privileges");
+    } else {
+      throw jexception::ProcessException("Schedule parameter exception");
+    }
+  }
 }
 
 void Schedule::GetSchedulerParameter(jschedule_param_t *param_)
 {
-	struct sched_param param;
+  struct sched_param param;
 
-	param.sched_priority = param_->priority;
-	
-	int r = sched_getparam(_pid, &param);
+  param.sched_priority = param_->priority;
+  
+  int r = sched_getparam(_pid, &param);
 
-	if (r < 0) {
-		if (errno == EPERM) {
-			throw jexception::ProcessException("Process does not have appropriate privileges");
-		} else {
-			throw jexception::ProcessException("Schedule parameter exception");
-		}
-	}
+  if (r < 0) {
+    if (errno == EPERM) {
+      throw jexception::ProcessException("Process does not have appropriate privileges");
+    } else {
+      throw jexception::ProcessException("Schedule parameter exception");
+    }
+  }
 
-	param_->priority = param.sched_priority;
+  param_->priority = param.sched_priority;
 }
 
 void Schedule::SetScheduler(jschedule_type_t type_, const jschedule_param_t *param_)
 {
-	struct sched_param param;
+  struct sched_param param;
 
-	param.sched_priority = param_->priority;
+  param.sched_priority = param_->priority;
 
-	int type = 0;
+  int type = 0;
 
-	if (type_ == PRIORITY_PROCESS) {
-		type = PRIO_PROCESS;
-	} else if (type_ == PRIORITY_GROUP) {
-		type = PRIO_PGRP;
-	} else if (type_ == PRIORITY_USER) {
-		type = PRIO_USER;
-	}
+  if (type_ == PRIORITY_PROCESS) {
+    type = PRIO_PROCESS;
+  } else if (type_ == PRIORITY_GROUP) {
+    type = PRIO_PGRP;
+  } else if (type_ == PRIORITY_USER) {
+    type = PRIO_USER;
+  }
 
-	int r = sched_setscheduler(_pid, type, &param);
+  int r = sched_setscheduler(_pid, type, &param);
 
-	if (r < 0) {
-		if (errno == EPERM) {
-			throw jexception::ProcessException("Process does not have appropriate privileges");
-		} else {
-			throw jexception::ProcessException("Schedule parameter exception");
-		}
-	}
+  if (r < 0) {
+    if (errno == EPERM) {
+      throw jexception::ProcessException("Process does not have appropriate privileges");
+    } else {
+      throw jexception::ProcessException("Schedule parameter exception");
+    }
+  }
 }
 
 jschedule_policy_t Schedule::GetScheduler()
 {
-	int r = sched_getscheduler(_pid);
+  int r = sched_getscheduler(_pid);
 
-	if (r < 0) {
-		if (errno == EPERM) {
-			throw jexception::ProcessException("Process does not have appropriate privileges");
-		} else {
-			throw jexception::ProcessException("Schedule parameter exception");
-		}
-	}
+  if (r < 0) {
+    if (errno == EPERM) {
+      throw jexception::ProcessException("Process does not have appropriate privileges");
+    } else {
+      throw jexception::ProcessException("Schedule parameter exception");
+    }
+  }
 
-	if (r == SCHED_FIFO) {
-		return JSP_FIFO;
-	} else if (r == SCHED_RR) {
-		return JSP_ROUND_ROBIN;
-	} else {
-		return JSP_OTHER;
-	}
+  if (r == SCHED_FIFO) {
+    return JSP_FIFO;
+  } else if (r == SCHED_RR) {
+    return JSP_ROUND_ROBIN;
+  } else {
+    return JSP_OTHER;
+  }
 }
 
 int Schedule::GetMaximumPriority()
 {
-	int r = sched_get_priority_max(GetScheduler());
+  int r = sched_get_priority_max(GetScheduler());
 
-	if (r < 0) {
-		throw jexception::ProcessException("Getting maximum priority failed");
-	}
+  if (r < 0) {
+    throw jexception::ProcessException("Getting maximum priority failed");
+  }
 
-	return r;
+  return r;
 }
 
 int Schedule::GetMinimumPriority()
 {
-	int r = sched_get_priority_min(GetScheduler());
+  int r = sched_get_priority_min(GetScheduler());
 
-	if (r < 0) {
-		throw jexception::ProcessException("Getting minimum priority failed");
-	}
+  if (r < 0) {
+    throw jexception::ProcessException("Getting minimum priority failed");
+  }
 
-	return r;
+  return r;
 }
 
 void Schedule::SetScheduleAffinity(uint64_t mask)
 {
-	int r = sched_setaffinity(_pid, 1, (cpu_set_t *)&mask);
+  int r = sched_setaffinity(_pid, 1, (cpu_set_t *)&mask);
 
-	if (r < 0) {
-		if (errno == EPERM) {
-			throw jexception::ProcessException("Process does not have appropriate privileges");
-		} else if (errno == EINVAL) {
-			throw jexception::ProcessException("Mask contains no processors that are physically on the system");
-		} else {
-			throw jexception::ProcessException("Set schedule affinity failed");
-		}
-	}
+  if (r < 0) {
+    if (errno == EPERM) {
+      throw jexception::ProcessException("Process does not have appropriate privileges");
+    } else if (errno == EINVAL) {
+      throw jexception::ProcessException("Mask contains no processors that are physically on the system");
+    } else {
+      throw jexception::ProcessException("Set schedule affinity failed");
+    }
+  }
 }
 
 uint64_t Schedule::GetScheduleAffinity()
 {
-	uint64_t mask;
-	
-	int r = sched_setaffinity(_pid, 1, (cpu_set_t *)&mask);
+  uint64_t mask;
+  
+  int r = sched_setaffinity(_pid, 1, (cpu_set_t *)&mask);
 
-	if (r < 0) {
-		if (errno == EPERM) {
-			throw jexception::ProcessException("Process does not have appropriate privileges");
-		} else if (errno == EINVAL) {
-			throw jexception::ProcessException("Mask contains no processors that are physically on the system");
-		} else {
-			throw jexception::ProcessException("Set schedule affinity failed");
-		}
-	}
+  if (r < 0) {
+    if (errno == EPERM) {
+      throw jexception::ProcessException("Process does not have appropriate privileges");
+    } else if (errno == EINVAL) {
+      throw jexception::ProcessException("Mask contains no processors that are physically on the system");
+    } else {
+      throw jexception::ProcessException("Set schedule affinity failed");
+    }
+  }
 
-	return (uint64_t)mask;
+  return (uint64_t)mask;
 }
 
 void Schedule::YieldProcess()
 {
-	int r = sched_yield();
+  int r = sched_yield();
 
-	if (r < 0) {
-		throw jexception::ProcessException("Yield failed");
-	}
+  if (r < 0) {
+    throw jexception::ProcessException("Yield failed");
+  }
 }
 
 void Schedule::IncreaseNice()
 {
-	int r = nice(-1);
+  int r = nice(-1);
 
-	if (r < 0) {
-		throw jexception::ProcessException("Only root may specify the priority");
-	}
+  if (r < 0) {
+    throw jexception::ProcessException("Only root may specify the priority");
+  }
 }
 
 void Schedule::DecreaseNice()
 {
-	int r = nice(1);
+  int r = nice(1);
 
-	if (r < 0) {
-		throw jexception::ProcessException("Only root may specify the priority");
-	}
+  if (r < 0) {
+    throw jexception::ProcessException("Only root may specify the priority");
+  }
 }
 
 void Schedule::SetPriority(int n, jschedule_type_t type_)
 {
-	if (n < GetMinimumPriority() || n > GetMaximumPriority()) {
-		throw jexception::ProcessException("Range of priority error");
-	}
+  if (n < GetMinimumPriority() || n > GetMaximumPriority()) {
+    throw jexception::ProcessException("Range of priority error");
+  }
 
-	int type = 0;
+  int type = 0;
 
-	if (type_ == PRIORITY_PROCESS) {
-		type = PRIO_PROCESS;
-	} else if (type_ == PRIORITY_GROUP) {
-		type = PRIO_PGRP;
-	} else if (type_ == PRIORITY_USER) {
-		type = PRIO_USER;
-	}
+  if (type_ == PRIORITY_PROCESS) {
+    type = PRIO_PROCESS;
+  } else if (type_ == PRIORITY_GROUP) {
+    type = PRIO_PGRP;
+  } else if (type_ == PRIORITY_USER) {
+    type = PRIO_USER;
+  }
 
-	// valores de prioridade baixos aumentam a preferencia do escalonador
-	setpriority(type, 0, -n);
+  // valores de prioridade baixos aumentam a preferencia do escalonador
+  setpriority(type, 0, -n);
 }
 
 int Schedule::GetPriority(jschedule_type_t type_)
 {
-	int type = 0;
+  int type = 0;
 
-	if (type_ == PRIORITY_PROCESS) {
-		type = PRIO_PROCESS;
-	} else if (type_ == PRIORITY_GROUP) {
-		type = PRIO_PGRP;
-	} else if (type_ == PRIORITY_USER) {
-		type = PRIO_USER;
-	}
+  if (type_ == PRIORITY_PROCESS) {
+    type = PRIO_PROCESS;
+  } else if (type_ == PRIORITY_GROUP) {
+    type = PRIO_PGRP;
+  } else if (type_ == PRIORITY_USER) {
+    type = PRIO_USER;
+  }
 
-	// valores de prioridade altos diminuem a preferencia do escalonador
-	int r = getpriority(type, 0);
+  // valores de prioridade altos diminuem a preferencia do escalonador
+  int r = getpriority(type, 0);
 
-	if (r < 0) {
-		if (errno == EACCES) {
-			throw jexception::ProcessException("A non super-user attempted to lower a process priority");
-		} else {
-			throw jexception::ProcessException("Get current priority error");
-		}
-	}
+  if (r < 0) {
+    if (errno == EACCES) {
+      throw jexception::ProcessException("A non super-user attempted to lower a process priority");
+    } else {
+      throw jexception::ProcessException("Get current priority error");
+    }
+  }
 
-	return r;
+  return r;
 }
 
 }

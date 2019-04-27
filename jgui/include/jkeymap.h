@@ -32,27 +32,27 @@ namespace jgui {
  */
 class KeyMap : public jcommon::Object {
 
-	private:
+  private:
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		KeyMap();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~KeyMap();
+  public:
+    /**
+     * \brief
+     *
+     */
+    KeyMap();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~KeyMap();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool HasKey(jevent::jkeyevent_symbol_t key);
-		
+    /**
+     * \brief
+     *
+     */
+    virtual bool HasKey(jevent::jkeyevent_symbol_t key);
+    
 };
 
 }

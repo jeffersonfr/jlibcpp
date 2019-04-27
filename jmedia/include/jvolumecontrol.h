@@ -31,42 +31,42 @@ namespace jmedia {
  */
 class VolumeControl : public Control {
 
-	public:
-		/**
-		 * \brief 
-		 *
-		 */
-		VolumeControl();
+  public:
+    /**
+     * \brief 
+     *
+     */
+    VolumeControl();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~VolumeControl();
+    /**
+     * \brief
+     *
+     */
+    virtual ~VolumeControl();
 
-		/**
-		 * \brief 
-		 *
-		 */
-		virtual int GetLevel();
+    /**
+     * \brief 
+     *
+     */
+    virtual int GetLevel();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetLevel(int level);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetLevel(int level);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsMute();
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsMute();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetMute(bool b);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetMute(bool b);
 
 };
 

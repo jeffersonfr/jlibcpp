@@ -33,114 +33,114 @@ namespace jgui{
  */
 class BufferedImage : public virtual jgui::Image {
 
-	protected:
-		/** \brief */
-		Graphics *_graphics;
-		/** \brief */
+  protected:
+    /** \brief */
+    Graphics *_graphics;
+    /** \brief */
     std::mutex _mutex;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		BufferedImage(jpixelformat_t pixelformat, int width, int height);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		BufferedImage(cairo_t *cairo_context);
+  public:
+    /**
+     * \brief
+     *
+     */
+    BufferedImage(jpixelformat_t pixelformat, int width, int height);
+    
+    /**
+     * \brief
+     *
+     */
+    BufferedImage(cairo_t *cairo_context);
 
-		/**
-		 * \brief
-		 *
-		 */
-		BufferedImage(std::string file);
+    /**
+     * \brief
+     *
+     */
+    BufferedImage(std::string file);
 
-		/**
-		 * \brief
-		 *
-		 */
-		BufferedImage(jio::InputStream *stream);
+    /**
+     * \brief
+     *
+     */
+    BufferedImage(jio::InputStream *stream);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~BufferedImage();
+    /**
+     * \brief
+     *
+     */
+    virtual ~BufferedImage();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Graphics * GetGraphics();
+    /**
+     * \brief
+     *
+     */
+    virtual Graphics * GetGraphics();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Image * Flip(jflip_flags_t mode);
-		
-		/**
-		 * \brief
-		 *
-		 */
+    /**
+     * \brief
+     *
+     */
+    virtual Image * Flip(jflip_flags_t mode);
+    
+    /**
+     * \brief
+     *
+     */
     virtual Image * Shear(float dx, float dy);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Image * Rotate(double radians, bool resize = true);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Image * Scale(int wp, int hp);
+    /**
+     * \brief
+     *
+     */
+    virtual Image * Rotate(double radians, bool resize = true);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual Image * Scale(int wp, int hp);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Image * Crop(int xp, int yp, int wp, int hp);
+    /**
+     * \brief
+     *
+     */
+    virtual Image * Crop(int xp, int yp, int wp, int hp);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Image * Blend(double alpha);
+    /**
+     * \brief
+     *
+     */
+    virtual Image * Blend(double alpha);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Image * Colorize(Color color);
+    /**
+     * \brief
+     *
+     */
+    virtual Image * Colorize(Color color);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void GetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual uint8_t * LockData();
-	
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void UnlockData();
-	
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jcommon::Object * Clone();
+    /**
+     * \brief
+     *
+     */
+    virtual void GetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual uint8_t * LockData();
+  
+    /**
+     * \brief
+     *
+     */
+    virtual void UnlockData();
+  
+    /**
+     * \brief
+     *
+     */
+    virtual jcommon::Object * Clone();
 
 };
 

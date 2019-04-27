@@ -22,19 +22,19 @@
 namespace jexception {
 
 TimeoutException::TimeoutException():
-	jexception::RuntimeException()
+  jexception::RuntimeException()
 {
   jcommon::Object::SetClassName("jexception::TimeoutException");
 }
 
 TimeoutException::TimeoutException(std::string reason_):
-	jexception::RuntimeException(reason_)
+  jexception::RuntimeException(reason_)
 {
   jcommon::Object::SetClassName("jexception::TimeoutException");
 }
 
 TimeoutException::TimeoutException(jexception::Exception *exception, std::string reason_):
-	jexception::RuntimeException(exception, reason_)
+  jexception::RuntimeException(exception, reason_)
 {
   jcommon::Object::SetClassName("jexception::TimeoutException");
 }

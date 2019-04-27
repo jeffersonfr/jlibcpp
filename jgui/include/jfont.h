@@ -24,19 +24,19 @@
 
 #include <cairo-ft.h>
 
-#define DEFAULT_FONT_SIZE			16
+#define DEFAULT_FONT_SIZE      16
 
 namespace jgui {
 
 enum jfont_attributes_t {
-	JFA_NORMAL	= 0x00,
-	JFA_BOLD		= 0x01,
-	JFA_ITALIC	= 0x02
+  JFA_NORMAL  = 0x00,
+  JFA_BOLD    = 0x01,
+  JFA_ITALIC  = 0x02
 };
 
 enum jfont_encoding_t {
-	JFE_UTF8,
-	JFE_ISO_8859_1
+  JFE_UTF8,
+  JFE_ISO_8859_1
 };
 
 /**
@@ -46,184 +46,184 @@ enum jfont_encoding_t {
  */
 class Font : public virtual jcommon::Object {
 
-	private:
-		/** \brief */
-		cairo_font_face_t *_font;
-		/** \brief */
-		cairo_surface_t *_surface_ref;
-		/** \brief */
-		cairo_t *_context_ref;
-		/** \brief */
-		cairo_scaled_font_t *_scaled_font;
-		/** \brief */
-		cairo_font_options_t *_options;
-		/** \brief */
-		int _leading;
-		/** \brief */
-		int _ascender;
-		/** \brief */
-		int _descender;
-		/** \brief */
-		int _max_advance_width;
-		/** \brief */
-		int _max_advance_height;
-		/** \brief */
-		bool _is_builtin;
-		/** \brief */
-		int _widths[256];
-		/** \brief */
-		std::string _name;
-		/** \brief */
-		int _size;
-		/** \brief */
-		jfont_attributes_t _attributes;
-		/** \brief */
-		jfont_encoding_t _encoding;
+  private:
+    /** \brief */
+    cairo_font_face_t *_font;
+    /** \brief */
+    cairo_surface_t *_surface_ref;
+    /** \brief */
+    cairo_t *_context_ref;
+    /** \brief */
+    cairo_scaled_font_t *_scaled_font;
+    /** \brief */
+    cairo_font_options_t *_options;
+    /** \brief */
+    int _leading;
+    /** \brief */
+    int _ascender;
+    /** \brief */
+    int _descender;
+    /** \brief */
+    int _max_advance_width;
+    /** \brief */
+    int _max_advance_height;
+    /** \brief */
+    bool _is_builtin;
+    /** \brief */
+    int _widths[256];
+    /** \brief */
+    std::string _name;
+    /** \brief */
+    int _size;
+    /** \brief */
+    jfont_attributes_t _attributes;
+    /** \brief */
+    jfont_encoding_t _encoding;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		Font(std::string name, jfont_attributes_t attributes, int size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~Font();
+  public:
+    /**
+     * \brief
+     *
+     */
+    Font(std::string name, jfont_attributes_t attributes, int size);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~Font();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void ApplyContext(void *ctx);
+    /**
+     * \brief
+     *
+     */
+    virtual void ApplyContext(void *ctx);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual cairo_scaled_font_t * GetScaledFont();
+    /**
+     * \brief
+     *
+     */
+    virtual cairo_scaled_font_t * GetScaledFont();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jfont_attributes_t GetAttributes();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetEncoding(jfont_encoding_t encoding);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jfont_encoding_t GetEncoding();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string GetName();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetSize();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetAscender();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetDescender();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetMaxAdvanceWidth();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetMaxAdvanceHeight();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetLeading();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetStringWidth(std::string text);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jregion_t GetStringExtends(std::string text);
+    /**
+     * \brief
+     *
+     */
+    virtual jfont_attributes_t GetAttributes();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetEncoding(jfont_encoding_t encoding);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual jfont_encoding_t GetEncoding();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual std::string GetName();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int GetSize();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int GetAscender();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int GetDescender();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int GetMaxAdvanceWidth();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int GetMaxAdvanceHeight();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int GetLeading();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int GetStringWidth(std::string text);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual jregion_t GetStringExtends(std::string text);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jregion_t GetGlyphExtends(int symbol);
+    /**
+     * \brief
+     *
+     */
+    virtual jregion_t GetGlyphExtends(int symbol);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void GetStringBreak(std::vector<std::string> *lines, std::string text, int wp, int hp, bool justify = true);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string TruncateString(std::string text, std::string extension, int width);
-	
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool CanDisplay(int ch);
+    /**
+     * \brief
+     *
+     */
+    virtual void GetStringBreak(std::vector<std::string> *lines, std::string text, int wp, int hp, bool justify = true);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual std::string TruncateString(std::string text, std::string extension, int width);
+  
+    /**
+     * \brief
+     *
+     */
+    virtual bool CanDisplay(int ch);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetCharWidth(char ch);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual const int * GetCharWidths();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Release();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Restore();
+    /**
+     * \brief
+     *
+     */
+    virtual int GetCharWidth(char ch);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual const int * GetCharWidths();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Release();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Restore();
 
 };
 

@@ -22,28 +22,28 @@
 namespace jmedia {
 
 VideoSizeControl::VideoSizeControl():
-	Control("video.size")
+  Control("video.size")
 {
-	jcommon::Object::SetClassName("jmedia::VideoSizeControl");
+  jcommon::Object::SetClassName("jmedia::VideoSizeControl");
 }
-		
+    
 VideoSizeControl::~VideoSizeControl()
 {
 }
 
 void VideoSizeControl::SetSize(jgui::jsize_t t)
 {
-	SetSize(t.width, t.height);
+  SetSize(t.width, t.height);
 }
 
 void VideoSizeControl::SetSource(jgui::jregion_t t)
 {
-	SetSource(t.x, t.y, t.width, t.height);
+  SetSource(t.x, t.y, t.width, t.height);
 }
 
 void VideoSizeControl::SetDestination(jgui::jregion_t t)
 {
-	SetDestination(t.x, t.y, t.width, t.height);
+  SetDestination(t.x, t.y, t.width, t.height);
 }
 
 void VideoSizeControl::SetSize(int w, int h)
@@ -60,36 +60,36 @@ void VideoSizeControl::SetDestination(int x, int y, int w, int h)
 
 jgui::jsize_t VideoSizeControl::GetSize()
 {
-	jgui::jsize_t t;
+  jgui::jsize_t t;
 
-	t.width = 0;
-	t.height = 0;
+  t.width = 0;
+  t.height = 0;
 
-	return t;
+  return t;
 }
 
 jgui::jregion_t VideoSizeControl::GetSource()
 {
-	jgui::jregion_t t;
+  jgui::jregion_t t;
 
-	t.x = 0;
-	t.y = 0;
-	t.width = 0;
-	t.height = 0;
+  t.x = 0;
+  t.y = 0;
+  t.width = 0;
+  t.height = 0;
 
-	return t;
+  return t;
 }
 
 jgui::jregion_t VideoSizeControl::GetDestination()
 {
-	jgui::jregion_t t;
+  jgui::jregion_t t;
 
-	t.x = 0;
-	t.y = 0;
-	t.width = 0;
-	t.height = 0;
+  t.x = 0;
+  t.y = 0;
+  t.width = 0;
+  t.height = 0;
 
-	return t;
+  return t;
 }
 
 }

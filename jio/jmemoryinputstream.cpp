@@ -25,17 +25,17 @@
 namespace jio {
 
 MemoryInputStream::MemoryInputStream(const uint8_t *data, int64_t size):
-	jio::InputStream()
+  jio::InputStream()
 {
-	jcommon::Object::SetClassName("jio::MemoryInputStream");
+  jcommon::Object::SetClassName("jio::MemoryInputStream");
 
-	if ((void *)data == nullptr) {
-		throw jexception::RuntimeException("Null pointer exception");
-	}
+  if ((void *)data == nullptr) {
+    throw jexception::RuntimeException("Null pointer exception");
+  }
 
-	_buffer = (char *)data;
-	_buffer_size = size;
-	_buffer_index = 0;
+  _buffer = (char *)data;
+  _buffer_size = size;
+  _buffer_index = 0;
 }
 
 MemoryInputStream::~MemoryInputStream()
@@ -44,66 +44,66 @@ MemoryInputStream::~MemoryInputStream()
 
 bool MemoryInputStream::IsEmpty()
 {
-	return _buffer_size == _buffer_index;
+  return _buffer_size == _buffer_index;
 }
 
 int64_t MemoryInputStream::Available()
 {
-	return _buffer_size - _buffer_index;
+  return _buffer_size - _buffer_index;
 }
 
 int64_t MemoryInputStream::GetSize()
 {
-	return _buffer_size;
+  return _buffer_size;
 }
 
 int64_t MemoryInputStream::GetPosition()
 {
-	return _buffer_index;
+  return _buffer_index;
 }
 
 int64_t MemoryInputStream::Read()
 {
-	if (IsEmpty() == true) {
-		return -1LL;
-	}
+  if (IsEmpty() == true) {
+    return -1LL;
+  }
 
-	return _buffer[_buffer_index++];;
+  return _buffer[_buffer_index++];;
 }
 
 int64_t MemoryInputStream::Read(char *data, int64_t size)
 {
-	if ((void *)data == nullptr) {
-		return -1LL;
-	}
+  if ((void *)data == nullptr) {
+    return -1LL;
+  }
 
-	if (IsEmpty() == true) {
-		return -1LL;
-	}
+  if (IsEmpty() == true) {
+    return -1LL;
+  }
 
-	if (size > Available()) {
-		size = Available();
-	}
+  if (size > Available()) {
+    size = Available();
+  }
 
-	memcpy(data, _buffer + _buffer_index, (size_t)size);
+  memcpy(data, _buffer + _buffer_index, (size_t)size);
 
-	_buffer_index = _buffer_index + size;
+  _buffer_index = _buffer_index + size;
 
-	return size;
+  return size;
 }
 
 void MemoryInputStream::Skip(int64_t skip)
 {
-	_buffer_index += skip;
+  _buffer_index += skip;
 
-	if (_buffer_index > Available()) {
-		_buffer_index = Available();
-	}
+  if (_buffer_index > Available()) {
+    _buffer_index = Available();
+  }
 }
 
 void MemoryInputStream::Reset()
 {
-	_buffer_index = 0;
+  _buffer_index = 0;
 }
 
 void MemoryInputStream::Close()
@@ -112,7 +112,7 @@ void MemoryInputStream::Close()
 
 int64_t MemoryInputStream::GetReadedBytes()
 {
-	return _buffer_index;
+  return _buffer_index;
 }
 
 }

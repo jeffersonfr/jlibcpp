@@ -32,44 +32,44 @@ namespace jevent {
  */
 class MouseListener : public jevent::Listener {
 
-	private:
+  private:
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		MouseListener();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~MouseListener();
+  public:
+    /**
+     * \brief
+     *
+     */
+    MouseListener();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~MouseListener();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MousePressed(MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MouseReleased(MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MouseMoved(MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MouseWheel(MouseEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual bool MousePressed(MouseEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool MouseReleased(MouseEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool MouseMoved(MouseEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool MouseWheel(MouseEvent *event);
 
 };
 

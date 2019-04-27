@@ -22,9 +22,9 @@
 namespace jsecurity {
 
 SecurityManager::SecurityManager():
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jsecurity::SecurityManager");
+  jcommon::Object::SetClassName("jsecurity::SecurityManager");
 }
 
 SecurityManager::~SecurityManager()
@@ -33,9 +33,9 @@ SecurityManager::~SecurityManager()
 
 SecurityManager * SecurityManager::GetInstance()
 {
-	// TODO::
+  // TODO::
 
-	return nullptr;
+  return nullptr;
 }
 
 void SecurityManager::GetAllUsers()
@@ -44,7 +44,7 @@ void SecurityManager::GetAllUsers()
 
 User * SecurityManager::GetUser(std::string id)
 {
-	return nullptr;
+  return nullptr;
 }
 
 void SecurityManager::GetAllGroups()
@@ -61,7 +61,7 @@ void SecurityManager::GetGoupsFromUser(std::string id)
 
 AccessControl * SecurityManager::GetDefaultAccessControl()
 {
-	return nullptr;
+  return nullptr;
 }
 
 void SecurityManager::Update(User id)

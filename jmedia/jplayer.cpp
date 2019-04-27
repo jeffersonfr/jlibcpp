@@ -26,32 +26,32 @@
 namespace jmedia {
 
 Player::Player():
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jmedia::Player");
+  jcommon::Object::SetClassName("jmedia::Player");
 
-	_media_info.title = "";
-	_media_info.author = "";
-	_media_info.album = "";
-	_media_info.genre = "";
-	_media_info.comments = "";
-	_media_info.date = "";
+  _media_info.title = "";
+  _media_info.author = "";
+  _media_info.album = "";
+  _media_info.genre = "";
+  _media_info.comments = "";
+  _media_info.date = "";
 }
 
 Player::~Player()
 {
-	while (_controls.size() > 0) {
-		Control *control = (*_controls.begin());
+  while (_controls.size() > 0) {
+    Control *control = (*_controls.begin());
 
-		_controls.erase(_controls.begin());
+    _controls.erase(_controls.begin());
 
-		delete control;
-	}
+    delete control;
+  }
 }
 
 jmedia_info_t Player::GetMediaInfo()
 {
-	return _media_info;
+  return _media_info;
 }
 
 void Player::Play()
@@ -80,12 +80,12 @@ void Player::SetCurrentTime(uint64_t i)
 
 uint64_t Player::GetCurrentTime()
 {
-	return -1LL;
+  return -1LL;
 }
 
 uint64_t Player::GetMediaTime()
 {
-	return -1LL;
+  return -1LL;
 }
 
 void Player::SetLoop(bool b)
@@ -94,12 +94,12 @@ void Player::SetLoop(bool b)
 
 bool Player::IsLoop()
 {
-	return false;
+  return false;
 }
 
 double Player::GetDecodeRate()
 {
-	return 0.0;
+  return 0.0;
 }
 
 void Player::SetDecodeRate(double rate)
@@ -108,135 +108,135 @@ void Player::SetDecodeRate(double rate)
 
 const std::vector<Control *> & Player::GetControls()
 {
-	return _controls;
+  return _controls;
 }
 
 jgui::Component * Player::GetVisualComponent()
 {
-	return nullptr;
+  return nullptr;
 }
 
 Control * Player::GetControl(std::string id)
 {
-	for (std::vector<Control *>::iterator i=_controls.begin(); i!=_controls.end(); i++) {
-		Control *control = (*i);
+  for (std::vector<Control *>::iterator i=_controls.begin(); i!=_controls.end(); i++) {
+    Control *control = (*i);
 
-		if (control->GetID() == id) {
-			return control;
-		}
-	}
+    if (control->GetID() == id) {
+      return control;
+    }
+  }
 
-	return nullptr;
+  return nullptr;
 }
 
 void Player::RegisterPlayerListener(jevent::PlayerListener *listener)
 {
-	if (listener == nullptr) {
-		return;
-	}
+  if (listener == nullptr) {
+    return;
+  }
 
-	if (std::find(_player_listeners.begin(), _player_listeners.end(), listener) == _player_listeners.end()) {
-		_player_listeners.push_back(listener);
-	}
+  if (std::find(_player_listeners.begin(), _player_listeners.end(), listener) == _player_listeners.end()) {
+    _player_listeners.push_back(listener);
+  }
 }
 
 void Player::RemovePlayerListener(jevent::PlayerListener *listener)
 {
-	if (listener == nullptr) {
-		return;
-	}
+  if (listener == nullptr) {
+    return;
+  }
 
   _player_listeners.erase(std::remove(_player_listeners.begin(), _player_listeners.end(), listener), _player_listeners.end());
 }
 
 const std::vector<jevent::PlayerListener *> & Player::GetPlayerListeners()
 {
-	return _player_listeners;
+  return _player_listeners;
 }
 
 void Player::DispatchPlayerEvent(jevent::PlayerEvent *event)
 {
-	if (event == nullptr) {
-		return;
-	}
+  if (event == nullptr) {
+    return;
+  }
 
-	int k = 0,
-			size = (int)_player_listeners.size();
+  int k = 0,
+      size = (int)_player_listeners.size();
 
-	while (k++ < (int)_player_listeners.size()) {
-		jevent::PlayerListener *listener = _player_listeners[k-1];
+  while (k++ < (int)_player_listeners.size()) {
+    jevent::PlayerListener *listener = _player_listeners[k-1];
 
-		if (event->GetType() == jevent::JPE_STARTED) {
-			listener->MediaStarted(event);
-		} else if (event->GetType() == jevent::JPE_PAUSED) {
-			listener->MediaPaused(event);
-		} else if (event->GetType() == jevent::JPE_RESUMED) {
-			listener->MediaResumed(event);
-		} else if (event->GetType() == jevent::JPE_STOPPED) {
-			listener->MediaStopped(event);
-		} else if (event->GetType() == jevent::JPE_FINISHED) {
-			listener->MediaFinished(event);
-		}
+    if (event->GetType() == jevent::JPE_STARTED) {
+      listener->MediaStarted(event);
+    } else if (event->GetType() == jevent::JPE_PAUSED) {
+      listener->MediaPaused(event);
+    } else if (event->GetType() == jevent::JPE_RESUMED) {
+      listener->MediaResumed(event);
+    } else if (event->GetType() == jevent::JPE_STOPPED) {
+      listener->MediaStopped(event);
+    } else if (event->GetType() == jevent::JPE_FINISHED) {
+      listener->MediaFinished(event);
+    }
 
-		if (size != (int)_player_listeners.size()) {
-			size = (int)_player_listeners.size();
+    if (size != (int)_player_listeners.size()) {
+      size = (int)_player_listeners.size();
 
-			k--;
-		}
-	}
+      k--;
+    }
+  }
 
-	delete event;
+  delete event;
 }
 
 void Player::RegisterFrameGrabberListener(jevent::FrameGrabberListener *listener)
 {
-	if (listener == nullptr) {
-		return;
-	}
+  if (listener == nullptr) {
+    return;
+  }
 
-	if (std::find(_frame_listeners.begin(), _frame_listeners.end(), listener) == _frame_listeners.end()) {
-		_frame_listeners.push_back(listener);
-	}
+  if (std::find(_frame_listeners.begin(), _frame_listeners.end(), listener) == _frame_listeners.end()) {
+    _frame_listeners.push_back(listener);
+  }
 }
 
 void Player::RemoveFrameGrabberListener(jevent::FrameGrabberListener *listener)
 {
-	if (listener == nullptr) {
-		return;
-	}
+  if (listener == nullptr) {
+    return;
+  }
 
   _frame_listeners.erase(std::remove(_frame_listeners.begin(), _frame_listeners.end(), listener), _frame_listeners.end());
 }
 
 const std::vector<jevent::FrameGrabberListener *> & Player::GetFrameGrabberListeners()
 {
-	return _frame_listeners;
+  return _frame_listeners;
 }
 
 void Player::DispatchFrameGrabberEvent(jevent::FrameGrabberEvent *event)
 {
-	if (event == nullptr) {
-		return;
-	}
+  if (event == nullptr) {
+    return;
+  }
 
-	int k = 0,
-			size = (int)_frame_listeners.size();
+  int k = 0,
+      size = (int)_frame_listeners.size();
 
-	while (k++ < (int)_frame_listeners.size()) {
-		jevent::FrameGrabberListener *listener = _frame_listeners[k-1];
+  while (k++ < (int)_frame_listeners.size()) {
+    jevent::FrameGrabberListener *listener = _frame_listeners[k-1];
 
-		if (event->GetType() == jevent::JFE_GRABBED) {
-			listener->FrameGrabbed(event);
-		}
+    if (event->GetType() == jevent::JFE_GRABBED) {
+      listener->FrameGrabbed(event);
+    }
 
-		if (size != (int)_frame_listeners.size()) {
-			size = (int)_frame_listeners.size();
+    if (size != (int)_frame_listeners.size()) {
+      size = (int)_frame_listeners.size();
 
-			k--;
-		}
-	}
+      k--;
+    }
+  }
 
-	delete event;
+  delete event;
 }
 
 }

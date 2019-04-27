@@ -29,10 +29,10 @@ namespace jmedia {
  *
  */
 enum jaspect_ratio_t {
-	LAR_1x1,
-	LAR_3x2,
-	LAR_4x3,
-	LAR_16x9
+  LAR_1x1,
+  LAR_3x2,
+  LAR_4x3,
+  LAR_16x9
 };
 
 /** 
@@ -45,11 +45,11 @@ enum jaspect_ratio_t {
  * content_mode_full: Indica que o vídeo deve ser esticado, porém de forma não-linear (as bordas podem ser mais esticadas que a parte central)
  * */
 enum jvideo_mode_t {
-	LVM_ZOOM,
-	LVM_BOX,
-	LVM_PANSCAN,
-	LVM_FULL,
-	LVM_FULL_NONLINEAR
+  LVM_ZOOM,
+  LVM_BOX,
+  LVM_PANSCAN,
+  LVM_FULL,
+  LVM_FULL_NONLINEAR
 };
 
 /** 
@@ -57,20 +57,20 @@ enum jvideo_mode_t {
  *
  */
 enum jsd_video_format_t {
-	LSVF_NTSC,
-	LSVF_NTSC_JAPAN,
-	LSVF_PAL_M,
-	LSVF_PAL_N,
-	LSVF_PAL_NC,
-	LSVF_PAL_B,
-	LSVF_PAL_B1,
-	LSVF_PAL_D,
-	LSVF_PAL_D1,
-	LSVF_PAL_G,
-	LSVF_PAL_H,
-	LSVF_PAL_K,
-	LSVF_PAL_I,
-	LSVF_SECAM
+  LSVF_NTSC,
+  LSVF_NTSC_JAPAN,
+  LSVF_PAL_M,
+  LSVF_PAL_N,
+  LSVF_PAL_NC,
+  LSVF_PAL_B,
+  LSVF_PAL_B1,
+  LSVF_PAL_D,
+  LSVF_PAL_D1,
+  LSVF_PAL_G,
+  LSVF_PAL_H,
+  LSVF_PAL_K,
+  LSVF_PAL_I,
+  LSVF_SECAM
 };
 
 /** 
@@ -78,11 +78,11 @@ enum jsd_video_format_t {
  *
  */
 enum jhd_video_format_t {
-	LHVF_480p,
-	LHVF_576p,
-	LHVF_720p,
-	LHVF_1080i,
-	LHVF_1080p
+  LHVF_480p,
+  LHVF_576p,
+  LHVF_720p,
+  LHVF_1080i,
+  LHVF_1080p
 };
 
 /**
@@ -92,88 +92,88 @@ enum jhd_video_format_t {
  */
 class VideoFormatControl : public Control {
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		VideoFormatControl();
+  public:
+    /**
+     * \brief
+     *
+     */
+    VideoFormatControl();
 
-		/**
-		 * \brief Destructor.
-		 *
-		 */
-		virtual ~VideoFormatControl();
+    /**
+     * \brief Destructor.
+     *
+     */
+    virtual ~VideoFormatControl();
 
-		/**
-		 * \brief Define media's aspect ratio.
-		 *
-		 * \param t
-		 */
-		virtual void SetAspectRatio(jaspect_ratio_t t);
+    /**
+     * \brief Define media's aspect ratio.
+     *
+     * \param t
+     */
+    virtual void SetAspectRatio(jaspect_ratio_t t);
 
-		/**
-		 * \brief Define media's aspect ratio.
-		 *
-		 * \param t
-		 */
-		virtual void SetFramesPerSecond(double fps);
+    /**
+     * \brief Define media's aspect ratio.
+     *
+     * \param t
+     */
+    virtual void SetFramesPerSecond(double fps);
 
-		/**
-		 * \brief Define the video mode. The final result will depend from content mode and aspect ratio.
-		 *
-		 * \param t
-		 */
-		virtual void SetContentMode(jvideo_mode_t t);
+    /**
+     * \brief Define the video mode. The final result will depend from content mode and aspect ratio.
+     *
+     * \param t
+     */
+    virtual void SetContentMode(jvideo_mode_t t);
 
-		/**
-		 * \brief Define the high definition format of media.
-		 *
-		 * \param t
-		 */
-		virtual void SetVideoFormatHD(jhd_video_format_t vf);
+    /**
+     * \brief Define the high definition format of media.
+     *
+     * \param t
+     */
+    virtual void SetVideoFormatHD(jhd_video_format_t vf);
 
-		/**
-		 * \brief Define the standard definition format of media.
-		 *
-		 * \param t
-		 */
-		virtual void SetVideoFormatSD(jsd_video_format_t vf);
+    /**
+     * \brief Define the standard definition format of media.
+     *
+     * \param t
+     */
+    virtual void SetVideoFormatSD(jsd_video_format_t vf);
 
-		/**
-		 * \brief Returns the aspect ratio.
-		 *
-		 * \return 
-		 */
-		virtual jaspect_ratio_t GetAspectRatio();
+    /**
+     * \brief Returns the aspect ratio.
+     *
+     * \return 
+     */
+    virtual jaspect_ratio_t GetAspectRatio();
 
-		/**
-		 * \brief Returns the frame rate.
-		 *
-		 * \return 
-		 */
-		virtual double GetFramesPerSecond();
+    /**
+     * \brief Returns the frame rate.
+     *
+     * \return 
+     */
+    virtual double GetFramesPerSecond();
 
-		/**
-		 * \brief Returns the content mode.
-		 *
-		 * \return 
-		 */
-		virtual jvideo_mode_t GetContentMode();
+    /**
+     * \brief Returns the content mode.
+     *
+     * \return 
+     */
+    virtual jvideo_mode_t GetContentMode();
 
-		/**
-		 * \brief Returns high definition format.
-		 *
-		 * \return 
-		 */
-		virtual jhd_video_format_t GetVideoFormatHD();
+    /**
+     * \brief Returns high definition format.
+     *
+     * \return 
+     */
+    virtual jhd_video_format_t GetVideoFormatHD();
 
-		/**
-		 * \brief Returns standard definition format.
-		 *
-		 * \return 
-		 */
-		virtual jsd_video_format_t GetVideoFormatSD();
+    /**
+     * \brief Returns standard definition format.
+     *
+     * \return 
+     */
+    virtual jsd_video_format_t GetVideoFormatSD();
 
 };
 

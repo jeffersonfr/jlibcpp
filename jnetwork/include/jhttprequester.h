@@ -36,20 +36,20 @@ namespace jnetwork {
  */
 class HTTPRequester {
 
-	private:
+  private:
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		HTTPRequester();
+  public:
+    /**
+     * \brief
+     *
+     */
+    HTTPRequester();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~HTTPRequester();
+    /**
+     * \brief
+     *
+     */
+    virtual ~HTTPRequester();
 
 };
 

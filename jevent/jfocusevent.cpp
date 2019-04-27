@@ -22,9 +22,9 @@
 namespace jevent {
 
 FocusEvent::FocusEvent(void *source, jfocusevent_type_t type):
-	jevent::EventObject(source)
+  jevent::EventObject(source)
 {
-	jcommon::Object::SetClassName("jevent::FocusEvent");
+  jcommon::Object::SetClassName("jevent::FocusEvent");
 }
 
 FocusEvent::~FocusEvent()
@@ -33,7 +33,7 @@ FocusEvent::~FocusEvent()
 
 jfocusevent_type_t FocusEvent::GetType()
 {
-	return _type;
+  return _type;
 }
 
 }

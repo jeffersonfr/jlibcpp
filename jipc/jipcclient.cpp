@@ -23,9 +23,9 @@
 namespace jipc {
 
 IPCClient::IPCClient():
-	jcommon::Object()
+  jcommon::Object()
 {
-	_call_timeout = -1;
+  _call_timeout = -1;
 }
 
 IPCClient::~IPCClient()
@@ -34,12 +34,12 @@ IPCClient::~IPCClient()
 
 void IPCClient::CallMethod(Method *method, Response **response)
 {
-	throw jexception::IPCException("IPCClient:: CallMethod wasn't implemented");
+  throw jexception::IPCException("IPCClient:: CallMethod wasn't implemented");
 }
 
 void IPCClient::SetRequestTimeout(int timeout)
 {
-	_call_timeout = timeout;
+  _call_timeout = timeout;
 }
 
 }

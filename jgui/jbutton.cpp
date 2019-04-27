@@ -26,31 +26,31 @@
 namespace jgui {
 
 Button::Button(std::string text, int x, int y, int width, int height):
-	Component(x, y, width, height)
+  Component(x, y, width, height)
 {
-	jcommon::Object::SetClassName("jgui::Button");
+  jcommon::Object::SetClassName("jgui::Button");
 
-	_halign = JHA_CENTER;
-	_valign = JVA_CENTER;
+  _halign = JHA_CENTER;
+  _valign = JVA_CENTER;
 
-	_text = text;
+  _text = text;
   _image = nullptr;
 
-	SetFocusable(true);
+  SetFocusable(true);
 }
 
 Button::Button(std::string text, jgui::Image *image, int x, int y, int width, int height):
-	Component(x, y, width, height)
+  Component(x, y, width, height)
 {
-	jcommon::Object::SetClassName("jgui::Button");
+  jcommon::Object::SetClassName("jgui::Button");
 
-	_halign = JHA_CENTER;
-	_valign = JVA_CENTER;
+  _halign = JHA_CENTER;
+  _valign = JVA_CENTER;
 
-	_text = text;
+  _text = text;
   _image = image;
 
-	SetFocusable(true);
+  SetFocusable(true);
 }
 
 Button::~Button()
@@ -63,7 +63,7 @@ Button::~Button()
 
 void Button::SetText(std::string text)
 {
-	_text = text;
+  _text = text;
 
   Repaint();
 }
@@ -87,122 +87,122 @@ jgui::Image * Button::GetImage()
 
 std::string Button::GetText()
 {
-	return _text;
+  return _text;
 }
 
 void Button::SetHorizontalAlign(jhorizontal_align_t align)
 {
-	if (_halign != align) {
-		_halign = align;
+  if (_halign != align) {
+    _halign = align;
 
-		Repaint();
-	}
+    Repaint();
+  }
 }
 
 jhorizontal_align_t Button::GetHorizontalAlign()
 {
-	return _halign;
+  return _halign;
 }
 
 void Button::SetVerticalAlign(jvertical_align_t align)
 {
-	if (_valign != align) {
-		_valign = align;
+  if (_valign != align) {
+    _valign = align;
 
-		Repaint();
-	}
+    Repaint();
+  }
 }
 
 jvertical_align_t Button::GetVerticalAlign()
 {
-	return _valign;
+  return _valign;
 }
 
 bool Button::KeyPressed(jevent::KeyEvent *event)
 {
-	if (Component::KeyPressed(event) == true) {
-		return true;
-	}
+  if (Component::KeyPressed(event) == true) {
+    return true;
+  }
 
-	bool catched = false;
+  bool catched = false;
 
-	if (event->GetSymbol() == jevent::JKS_ENTER) {
-		DispatchActionEvent(new jevent::ActionEvent(this));
+  if (event->GetSymbol() == jevent::JKS_ENTER) {
+    DispatchActionEvent(new jevent::ActionEvent(this));
 
-		catched = true;
-	}
+    catched = true;
+  }
 
-	return catched;
+  return catched;
 }
 
 bool Button::MousePressed(jevent::MouseEvent *event)
 {
-	if (Component::MousePressed(event) == true) {
-		return true;
-	}
+  if (Component::MousePressed(event) == true) {
+    return true;
+  }
 
-	if (event->GetButton() == jevent::JMB_BUTTON1) {
-		DispatchActionEvent(new jevent::ActionEvent(this));
+  if (event->GetButton() == jevent::JMB_BUTTON1) {
+    DispatchActionEvent(new jevent::ActionEvent(this));
 
-		return true;
-	}
+    return true;
+  }
 
-	return false;
+  return false;
 }
 
 bool Button::MouseReleased(jevent::MouseEvent *event)
 {
-	if (Component::MouseReleased(event) == true) {
-		return true;
-	}
+  if (Component::MouseReleased(event) == true) {
+    return true;
+  }
 
-	return false;
+  return false;
 }
 
 bool Button::MouseMoved(jevent::MouseEvent *event)
 {
-	if (Component::MouseMoved(event) == true) {
-		return true;
-	}
+  if (Component::MouseMoved(event) == true) {
+    return true;
+  }
 
-	return false;
+  return false;
 }
 
 bool Button::MouseWheel(jevent::MouseEvent *event)
 {
-	if (Component::MouseWheel(event) == true) {
-		return true;
-	}
+  if (Component::MouseWheel(event) == true) {
+    return true;
+  }
 
-	return false;
+  return false;
 }
 
 void Button::Paint(Graphics *g)
 {
-	JDEBUG(JINFO, "paint\n");
+  JDEBUG(JINFO, "paint\n");
 
-	Component::Paint(g);
+  Component::Paint(g);
 
-	Theme *theme = GetTheme();
+  Theme *theme = GetTheme();
   
   if (theme == nullptr) {
     return;
   }
 
-	Font 
+  Font 
     *font = theme->GetFont("component.font");
-	Color 
+  Color 
     bg = theme->GetIntegerParam("component.bg"),
-	  fg = theme->GetIntegerParam("component.fg"),
-	  fgfocus = theme->GetIntegerParam("component.fg.focus"),
-	  fgdisable = theme->GetIntegerParam("component.fg.disable");
+    fg = theme->GetIntegerParam("component.fg"),
+    fgfocus = theme->GetIntegerParam("component.fg.focus"),
+    fgdisable = theme->GetIntegerParam("component.fg.disable");
   jgui::jsize_t
     size = GetSize();
   int
     x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
-		y = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
-		w = size.width - 2*x,
-		h = size.height - 2*y;
+    y = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
+    w = size.width - 2*x,
+    h = size.height - 2*y;
 
   if (_image != nullptr) {
     jgui::jsize_t
@@ -213,73 +213,73 @@ void Button::Paint(Graphics *g)
     g->DrawImage(_image, 8, 8);
   }
 
-	if (font != nullptr) {
-		g->SetFont(font);
+  if (font != nullptr) {
+    g->SetFont(font);
 
-		if (IsEnabled() == true) {
-			if (HasFocus() == true) {
-				g->SetColor(fgfocus);
-			} else {
-				g->SetColor(fg);
-			}
-		} else {
-			g->SetColor(fgdisable);
-		}
+    if (IsEnabled() == true) {
+      if (HasFocus() == true) {
+        g->SetColor(fgfocus);
+      } else {
+        g->SetColor(fg);
+      }
+    } else {
+      g->SetColor(fgdisable);
+    }
 
     std::string text = font->TruncateString(GetText(), "...", w);
 
-		g->DrawString(text, x, y, w, h, _halign, _valign);
-	}
+    g->DrawString(text, x, y, w, h, _halign, _valign);
+  }
 }
 
 void Button::RegisterActionListener(jevent::ActionListener *listener)
 {
-	if (listener == nullptr) {
-		return;
-	}
+  if (listener == nullptr) {
+    return;
+  }
 
- 	std::lock_guard<std::mutex> guard(_action_listener_mutex);
+   std::lock_guard<std::mutex> guard(_action_listener_mutex);
 
-	if (std::find(_action_listeners.begin(), _action_listeners.end(), listener) == _action_listeners.end()) {
-		_action_listeners.push_back(listener);
-	}
+  if (std::find(_action_listeners.begin(), _action_listeners.end(), listener) == _action_listeners.end()) {
+    _action_listeners.push_back(listener);
+  }
 }
 
 void Button::RemoveActionListener(jevent::ActionListener *listener)
 {
-	if (listener == nullptr) {
-		return;
-	}
+  if (listener == nullptr) {
+    return;
+  }
 
- 	std::lock_guard<std::mutex> guard(_action_listener_mutex);
+   std::lock_guard<std::mutex> guard(_action_listener_mutex);
 
   _action_listeners.erase(std::remove(_action_listeners.begin(), _action_listeners.end(), listener), _action_listeners.end());
 }
 
 void Button::DispatchActionEvent(jevent::ActionEvent *event)
 {
-	if (event == nullptr) {
-		return;
-	}
+  if (event == nullptr) {
+    return;
+  }
 
-	_action_listener_mutex.lock();
+  _action_listener_mutex.lock();
 
-	std::vector<jevent::ActionListener *> listeners = _action_listeners;
+  std::vector<jevent::ActionListener *> listeners = _action_listeners;
 
-	_action_listener_mutex.unlock();
+  _action_listener_mutex.unlock();
 
-	for (std::vector<jevent::ActionListener *>::iterator i=listeners.begin(); i!=listeners.end() && event->IsConsumed() == false; i++) {
-		jevent::ActionListener *listener = (*i);
+  for (std::vector<jevent::ActionListener *>::iterator i=listeners.begin(); i!=listeners.end() && event->IsConsumed() == false; i++) {
+    jevent::ActionListener *listener = (*i);
 
-		listener->ActionPerformed(event);
-	}
+    listener->ActionPerformed(event);
+  }
 
-	delete event;
+  delete event;
 }
 
 const std::vector<jevent::ActionListener *> & Button::GetActionListeners()
 {
-	return _action_listeners;
+  return _action_listeners;
 }
 
 }

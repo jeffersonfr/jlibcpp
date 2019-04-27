@@ -62,9 +62,9 @@ namespace jmedia {
 std::map<jplayer_hints_t, bool> PlayerManager::_hints;
 
 PlayerManager::PlayerManager():
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jmedia::PlayerManager");
+  jcommon::Object::SetClassName("jmedia::PlayerManager");
 }
 
 PlayerManager::~PlayerManager()
@@ -73,103 +73,103 @@ PlayerManager::~PlayerManager()
 
 Player * PlayerManager::CreatePlayer(std::string url_)
 {
-	if (_hints.size() == 0) {
-		_hints[JPH_CACHING] = false;
-		_hints[JPH_LIGHTWEIGHT] = true;
-		_hints[JPH_SECURITY] = false;
-		_hints[JPH_PLUGINS] = false;
-	}
+  if (_hints.size() == 0) {
+    _hints[JPH_CACHING] = false;
+    _hints[JPH_LIGHTWEIGHT] = true;
+    _hints[JPH_SECURITY] = false;
+    _hints[JPH_PLUGINS] = false;
+  }
 
-	jnetwork::URL url(url_);
+  jnetwork::URL url(url_);
 
 #if defined(V4L2_MEDIA)
-	try {
-		if (strncasecmp(url.GetProtocol().c_str(), "v4l", 3) == 0) {
-			return new V4L2LightPlayer(url.GetPath());
-		}
-	} catch (jexception::Exception &e) {
+  try {
+    if (strncasecmp(url.GetProtocol().c_str(), "v4l", 3) == 0) {
+      return new V4L2LightPlayer(url.GetPath());
+    }
+  } catch (jexception::Exception &e) {
     // INFO:: only this module usr v4l
     return nullptr;
-	}
+  }
 #endif
 
 #if defined(MIXER_MEDIA)
-	try {
+  try {
     if (strcasecmp(url.GetProtocol().c_str(), "mixer") == 0) {
-		  return new MixerLightPlayer(url_);
+      return new MixerLightPlayer(url_);
     }
-	} catch (jexception::Exception &e) {
+  } catch (jexception::Exception &e) {
     // INFO:: only this module can mixer
     return nullptr;
-	}
+  }
 #endif
 
 #if defined(ALSA_MEDIA)
-	try {
-		return new AlsaLightPlayer(url_);
-	} catch (jexception::Exception &e) {
-	}
+  try {
+    return new AlsaLightPlayer(url_);
+  } catch (jexception::Exception &e) {
+  }
 #endif
 
 #if defined(IMAGE_LIST_MEDIA)
-	try {
-		return new ImageListLightPlayer(url_);
-	} catch (jexception::Exception &e) {
-	}
+  try {
+    return new ImageListLightPlayer(url_);
+  } catch (jexception::Exception &e) {
+  }
 #endif
 
 #if defined(GIF_MEDIA)
-	try {
-		return new GIFLightPlayer(url_);
-	} catch (jexception::Exception &e) {
-	}
+  try {
+    return new GIFLightPlayer(url_);
+  } catch (jexception::Exception &e) {
+  }
 #endif
 
 #if defined(LIBVLC_MEDIA)
-	try {
-		return new LibVLCLightPlayer(url_);
-	} catch (jexception::Exception &e) {
-	}
+  try {
+    return new LibVLCLightPlayer(url_);
+  } catch (jexception::Exception &e) {
+  }
 #endif
 
 #if defined(LIBAV_MEDIA)
-	try {
-		return new LibAVLightPlayer(url_);
-	} catch (jexception::Exception &e) {
-	}
+  try {
+    return new LibAVLightPlayer(url_);
+  } catch (jexception::Exception &e) {
+  }
 #endif
-	
+  
 #if defined(LIBXINE_MEDIA)
-	try {
-		return new LibXineLightPlayer(url_);
-	} catch (jexception::Exception &e) {
-	}
+  try {
+    return new LibXineLightPlayer(url_);
+  } catch (jexception::Exception &e) {
+  }
 #endif
 
 #if defined(LIBGSTREAMER_MEDIA)
-	try {
-		return new GStreamerLightPlayer(url_);
-	} catch (jexception::Exception &e) {
-	}
+  try {
+    return new GStreamerLightPlayer(url_);
+  } catch (jexception::Exception &e) {
+  }
 #endif
 
-	return nullptr;
+  return nullptr;
 }
-		
+    
 void PlayerManager::SetHint(jplayer_hints_t hint, bool value)
 {
-	_hints[hint] = value;
+  _hints[hint] = value;
 }
 
 bool PlayerManager::GetHint(jplayer_hints_t hint)
 {
-	std::map<jplayer_hints_t, bool>::iterator i = _hints.find(hint);
+  std::map<jplayer_hints_t, bool>::iterator i = _hints.find(hint);
 
-	if (i != _hints.end()) {
-		return i->second;
-	}
+  if (i != _hints.end()) {
+    return i->second;
+  }
 
-	return false;
+  return false;
 }
 
 }

@@ -35,37 +35,37 @@ namespace jcommon {
  */
 class Properties : public virtual jcommon::ParamMapper {
 
-	private:
-		/** \brief */
-		std::string _filename;
-		/** \brief */
-		std::mutex _mutex;
-		
-	public:
-		/**
-		 * \brief Construtor default.
-		 *
-		 */
-		Properties(std::string filename);
+  private:
+    /** \brief */
+    std::string _filename;
+    /** \brief */
+    std::mutex _mutex;
+    
+  public:
+    /**
+     * \brief Construtor default.
+     *
+     */
+    Properties(std::string filename);
 
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~Properties();
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~Properties();
 
-		/**
-		 * \brief
-		 *
-		 */
-		void Load();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void Save();
-	
+    /**
+     * \brief
+     *
+     */
+    void Load();
+    
+    /**
+     * \brief
+     *
+     */
+    void Save();
+  
 };
 
 }

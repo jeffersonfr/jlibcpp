@@ -29,7 +29,7 @@ namespace jevent {
  *
  */
 enum jframe_event_t {
-	JFE_GRABBED
+  JFE_GRABBED
 };
 
 /**
@@ -39,28 +39,28 @@ enum jframe_event_t {
  */
 class FrameGrabberEvent : public jevent::EventObject {
 
-	private:
-		/** \brief */
-		jframe_event_t _type;
+  private:
+    /** \brief */
+    jframe_event_t _type;
 
-	public:
-		/**
-		 * \brief 
-		 *
-		 */
-		FrameGrabberEvent(void *source, jframe_event_t type);
+  public:
+    /**
+     * \brief 
+     *
+     */
+    FrameGrabberEvent(void *source, jframe_event_t type);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~FrameGrabberEvent();
+    /**
+     * \brief
+     *
+     */
+    virtual ~FrameGrabberEvent();
 
-		/**
-		 * \brief
-		 *
-		 */
-		jframe_event_t GetType();
+    /**
+     * \brief
+     *
+     */
+    jframe_event_t GetType();
 
 };
 

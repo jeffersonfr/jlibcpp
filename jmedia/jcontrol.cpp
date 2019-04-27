@@ -22,11 +22,11 @@
 namespace jmedia {
 
 Control::Control(std::string id):
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jmedia::Control");
+  jcommon::Object::SetClassName("jmedia::Control");
 
-	_id = id;
+  _id = id;
 }
 
 Control::~Control()
@@ -35,7 +35,7 @@ Control::~Control()
 
 std::string Control::GetID()
 {
-	return _id;
+  return _id;
 }
 
 }

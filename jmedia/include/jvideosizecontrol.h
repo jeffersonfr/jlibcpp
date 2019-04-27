@@ -32,72 +32,72 @@ namespace jmedia {
  */
 class VideoSizeControl : public Control {
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		VideoSizeControl();
+  public:
+    /**
+     * \brief
+     *
+     */
+    VideoSizeControl();
 
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~VideoSizeControl();
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~VideoSizeControl();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetSize(jgui::jsize_t t);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetSize(jgui::jsize_t t);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetSource(jgui::jregion_t t);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetSource(jgui::jregion_t t);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetDestination(jgui::jregion_t t);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetDestination(jgui::jregion_t t);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetSize(int width, int height);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetSize(int width, int height);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetSource(int x, int y, int width, int height);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetSource(int x, int y, int width, int height);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetDestination(int x, int y, int width, int height);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetDestination(int x, int y, int width, int height);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jgui::jsize_t GetSize();
+    /**
+     * \brief
+     *
+     */
+    virtual jgui::jsize_t GetSize();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jgui::jregion_t GetSource();
+    /**
+     * \brief
+     *
+     */
+    virtual jgui::jregion_t GetSource();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jgui::jregion_t GetDestination();
+    /**
+     * \brief
+     *
+     */
+    virtual jgui::jregion_t GetDestination();
 
 };
 

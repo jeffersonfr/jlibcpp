@@ -18,191 +18,209 @@
 #   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 #**************************************************************************
 ifeq ($(findstring libvlc, $(ENABLE_VIDEO)), libvlc)
-	CCFLAGS		+= \
-		 -Ijmedia/binds/libvlc/include \
-		 -Ijgui/binds/generic/include \
-		 `pkg-config --cflags libvlc cairo` \
 
-	LDFLAGS		+= \
-		 `pkg-config --libs libvlc alsa cairo` \
+  CCFLAGS += \
+    -Ijmedia/binds/libvlc/include \
+    -Ijgui/binds/generic/include \
+    `pkg-config --cflags libvlc cairo` \
 
-	DEFINES		+= \
-		 -DLIBVLC_MEDIA \
+  LDFLAGS += \
+    `pkg-config --libs libvlc alsa cairo` \
 
-	REQUIRES	+= \
+  DEFINES += \
+    -DLIBVLC_MEDIA \
 
-	OBJS_libvlc	+= \
-		 libvlclightplayer.o\
+  REQUIRES += \
 
-	OBJS_jmedia	+= $(addprefix binds/libvlc/,$(OBJS_libvlc))
+  OBJS_libvlc += \
+    libvlclightplayer.o\
+
+  OBJS_jmedia += \
+    $(addprefix binds/libvlc/,$(OBJS_libvlc))
 
 endif
 
 ifeq ($(findstring libav, $(ENABLE_VIDEO)), libav)
-	CCFLAGS		+= \
-		 -Ijmedia/binds/libav/include \
-		 -Ijgui/binds/generic/include \
 
-	LDFLAGS		+= \
-		 `pkg-config --libs libavcodec libavdevice libavfilter libavresample` \
+  CCFLAGS += \
+    -Ijmedia/binds/libav/include \
+    -Ijgui/binds/generic/include \
 
-	DEFINES		+= \
-		 -DLIBAV_MEDIA \
+  LDFLAGS += \
+    `pkg-config --libs libavcodec libavdevice libavfilter libavresample` \
 
-	REQUIRES	+= \
+  DEFINES += \
+    -DLIBAV_MEDIA \
 
-	OBJS_libav	+= \
-		 libavplay.o\
-		 libavlightplayer.o\
+  REQUIRES += \
 
-	OBJS_jmedia	+= $(addprefix binds/libav/,$(OBJS_libav))
+  OBJS_libav += \
+    libavplay.o\
+    libavlightplayer.o\
+
+  OBJS_jmedia += \
+    $(addprefix binds/libav/,$(OBJS_libav))
 
 endif
 
 ifeq ($(findstring libxine, $(ENABLE_VIDEO)), libxine)
-	CCFLAGS		+= \
-		 -Ijmedia/binds/libxine/include \
-		 -Ijgui/binds/generic/include \
-		 `pkg-config --cflags libxine` \
 
-	LDFLAGS		+= \
-		 `pkg-config --libs libxine` \
+  CCFLAGS += \
+    -Ijmedia/binds/libxine/include \
+    -Ijgui/binds/generic/include \
+    `pkg-config --cflags libxine` \
 
-	DEFINES		+= \
-		 -DLIBXINE_MEDIA \
+  LDFLAGS += \
+    `pkg-config --libs libxine` \
 
-	REQUIRES	+= \
+  DEFINES += \
+    -DLIBXINE_MEDIA \
 
-	OBJS_libxine	+= \
-		 libxinelightplayer.o\
+  REQUIRES += \
 
-	OBJS_jmedia	+= $(addprefix binds/libxine/,$(OBJS_libxine))
+  OBJS_libxine += \
+    libxinelightplayer.o\
+
+  OBJS_jmedia += \
+    $(addprefix binds/libxine/,$(OBJS_libxine))
 
 endif
 
 ifeq ($(findstring v4l2, $(ENABLE_VIDEO)), v4l2)
-	CCFLAGS		+= \
-		 -Ijmedia/binds/v4l2/include \
-		 -Ijgui/binds/generic/include \
 
-	LDFLAGS		+= \
+  CCFLAGS += \
+    -Ijmedia/binds/v4l2/include \
+    -Ijgui/binds/generic/include \
 
-	DEFINES		+= \
-		 -DV4L2_MEDIA \
+  LDFLAGS += \
 
-	REQUIRES	+= \
+  DEFINES += \
+    -DV4L2_MEDIA \
 
-	OBJS_v4l2	+= \
-		 videocontrol.o\
-		 videograbber.o\
-		 v4l2lightplayer.o\
+  REQUIRES += \
 
-	OBJS_jmedia	+= $(addprefix binds/v4l2/,$(OBJS_v4l2))
+  OBJS_v4l2  += \
+    videocontrol.o\
+    videograbber.o\
+    v4l2lightplayer.o\
+
+  OBJS_jmedia += \
+    $(addprefix binds/v4l2/,$(OBJS_v4l2))
 
 endif
 
 ifeq ($(findstring gif, $(ENABLE_VIDEO)), gif)
-	CCFLAGS		+= \
-		 -Ijmedia/binds/gif/include \
-		 -Ijgui/binds/generic/include \
-		 `pkg-config --cflags cairo` \
 
-	LDFLAGS		+= \
-		 `pkg-config --cflags cairo` \
+  CCFLAGS += \
+    -Ijmedia/binds/gif/include \
+    -Ijgui/binds/generic/include \
+    `pkg-config --cflags cairo` \
 
-	DEFINES		+= \
-		 -DGIF_MEDIA \
+  LDFLAGS += \
+    `pkg-config --cflags cairo` \
 
-	REQUIRES	+= \
+  DEFINES += \
+    -DGIF_MEDIA \
 
-	OBJS_gif += \
-		 giflightplayer.o\
+  REQUIRES += \
 
-	OBJS_jmedia	+= $(addprefix binds/gif/,$(OBJS_gif))
+  OBJS_gif += \
+    giflightplayer.o\
+
+  OBJS_jmedia += \
+    $(addprefix binds/gif/,$(OBJS_gif))
 
 endif
 
 ifeq ($(findstring ilist, $(ENABLE_VIDEO)), ilist)
-	CCFLAGS		+= \
-		 -Ijmedia/binds/ilist/include \
-		 -Ijgui/binds/generic/include \
-		 `pkg-config --cflags cairo` \
 
-	LDFLAGS		+= \
-		 `pkg-config --cflags cairo` \
+  CCFLAGS += \
+    -Ijmedia/binds/ilist/include \
+    -Ijgui/binds/generic/include \
+    `pkg-config --cflags cairo` \
 
-	DEFINES		+= \
-		 -DIMAGE_LIST_MEDIA \
+  LDFLAGS += \
+    `pkg-config --cflags cairo` \
 
-	REQUIRES	+= \
+  DEFINES += \
+    -DIMAGE_LIST_MEDIA \
 
-	OBJS_ilist += \
-		 ilistlightplayer.o\
+  REQUIRES += \
 
-	OBJS_jmedia	+= $(addprefix binds/ilist/,$(OBJS_ilist))
+  OBJS_ilist += \
+    ilistlightplayer.o\
+
+  OBJS_jmedia += \
+    $(addprefix binds/ilist/,$(OBJS_ilist))
 
 endif
 
 ifeq ($(findstring alsa, $(ENABLE_VIDEO)), alsa)
-	CCFLAGS		+= \
-		 -Ijmedia/binds/alsa/include \
-		 -Ijgui/binds/generic/include \
-		 `pkg-config --cflags alsa cairo` \
 
-	LDFLAGS		+= \
-		 `pkg-config --libs alsa cairo` \
+  CCFLAGS += \
+    -Ijmedia/binds/alsa/include \
+    -Ijgui/binds/generic/include \
+    `pkg-config --cflags alsa cairo` \
 
-	DEFINES		+= \
-		 -DALSA_MEDIA \
+  LDFLAGS += \
+    `pkg-config --libs alsa cairo` \
 
-	REQUIRES	+= \
+  DEFINES += \
+    -DALSA_MEDIA \
 
-	OBJS_alsa += \
-		 alsalightplayer.o\
+  REQUIRES += \
 
-	OBJS_jmedia	+= $(addprefix binds/alsa/,$(OBJS_alsa))
+  OBJS_alsa += \
+    alsalightplayer.o\
+
+  OBJS_jmedia += \
+    $(addprefix binds/alsa/,$(OBJS_alsa))
 
 endif
 
 ifeq ($(findstring mixer, $(ENABLE_VIDEO)), mixer)
-	CCFLAGS		+= \
-		 -Ijmedia/binds/mixer/include \
-		 -Ijgui/binds/generic/include \
-		 `pkg-config --cflags sdl2 alsa` \
 
-	LDFLAGS		+= \
-		 `pkg-config --libs sdl2 alsa` \
+  CCFLAGS += \
+    -Ijmedia/binds/mixer/include \
+    -Ijgui/binds/generic/include \
+    `pkg-config --cflags sdl2 alsa` \
 
-	DEFINES		+= \
-		 -DMIXER_MEDIA \
+  LDFLAGS += \
+    `pkg-config --libs sdl2 alsa` \
 
-	REQUIRES	+= \
+  DEFINES += \
+    -DMIXER_MEDIA \
 
-	OBJS_mixer += \
-		 mixerlightplayer.o\
+  REQUIRES += \
 
-	OBJS_jmedia	+= $(addprefix binds/mixer/,$(OBJS_mixer))
+  OBJS_mixer += \
+     mixerlightplayer.o\
+
+  OBJS_jmedia += \
+    $(addprefix binds/mixer/,$(OBJS_mixer))
 
 endif
 
 ifeq ($(findstring gstreamer, $(ENABLE_VIDEO)), gstreamer)
-	CCFLAGS		+= \
-		 -Ijmedia/binds/gstreamer/include \
-		 -Ijgui/binds/generic/include \
-		 `pkg-config --cflags cairo glib-2.0 gstreamer-1.0 gstreamer-app-1.0 gstreamer-video-1.0`
 
-	LDFLAGS		+= \
-		 `pkg-config --libs alsa cairo glib-2.0 gstreamer-1.0 gstreamer-app-1.0 gstreamer-video-1.0`
+  CCFLAGS += \
+    -Ijmedia/binds/gstreamer/include \
+    -Ijgui/binds/generic/include \
+    `pkg-config --cflags cairo glib-2.0 gstreamer-1.0 gstreamer-app-1.0 gstreamer-video-1.0`
 
-	DEFINES		+= \
-		 -DLIBGSTREAMER_MEDIA \
+  LDFLAGS += \
+    `pkg-config --libs alsa cairo glib-2.0 gstreamer-1.0 gstreamer-app-1.0 gstreamer-video-1.0`
 
-	REQUIRES	+= \
+  DEFINES += \
+    -DLIBGSTREAMER_MEDIA \
 
-	OBJS_gstreamer	+= \
-		 gstreamerlightplayer.o\
+  REQUIRES += \
 
-	OBJS_jmedia	+= $(addprefix binds/gstreamer/,$(OBJS_gstreamer))
+  OBJS_gstreamer += \
+    gstreamerlightplayer.o\
+
+  OBJS_jmedia += \
+    $(addprefix binds/gstreamer/,$(OBJS_gstreamer))
 
 endif
 

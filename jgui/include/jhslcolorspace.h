@@ -30,57 +30,57 @@ namespace jgui {
  * \author Jeff Ferr
  */
 class HSLColorSpace : public virtual jcommon::Object {
-	
-	private:
-		/** \brief */
-		int *_lum_red_lookup;
-		/** \brief */
-		int *_lum_green_lookup;
-		/** \brief */
-		int *_lum_blue_lookup;
-		/** \brief */
-		int *_final_red_lookup;
-		/** \brief */
-		int *_final_green_lookup;
-		/** \brief */
-		int *_final_blue_lookup;
-		/** \brief */
-		double _hue;
-		/** \brief */
-		double _saturation;
-		/** \brief */
-		double _lightness;
+  
+  private:
+    /** \brief */
+    int *_lum_red_lookup;
+    /** \brief */
+    int *_lum_green_lookup;
+    /** \brief */
+    int *_lum_blue_lookup;
+    /** \brief */
+    int *_final_red_lookup;
+    /** \brief */
+    int *_final_green_lookup;
+    /** \brief */
+    int *_final_blue_lookup;
+    /** \brief */
+    double _hue;
+    /** \brief */
+    double _saturation;
+    /** \brief */
+    double _lightness;
 
-	private:
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Initialize();
+  private:
+    /**
+     * \brief
+     *
+     */
+    virtual void Initialize();
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		HSLColorSpace(int hue, int saturation, int lightness);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		HSLColorSpace(double hue, double saturation, double lightness);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~HSLColorSpace();
+  public:
+    /**
+     * \brief
+     *
+     */
+    HSLColorSpace(int hue, int saturation, int lightness);
+    
+    /**
+     * \brief
+     *
+     */
+    HSLColorSpace(double hue, double saturation, double lightness);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~HSLColorSpace();
 
-		/**
-		 * \brief
-		 *
-		 */
+    /**
+     * \brief
+     *
+     */
     virtual void GetRGB(int *red, int *green, int *blue);
 
 };

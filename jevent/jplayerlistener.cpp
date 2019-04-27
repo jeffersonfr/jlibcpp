@@ -22,9 +22,9 @@
 namespace jevent {
 
 PlayerListener::PlayerListener():
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jevent::PlayerListener");
+  jcommon::Object::SetClassName("jevent::PlayerListener");
 }
 
 PlayerListener::~PlayerListener()

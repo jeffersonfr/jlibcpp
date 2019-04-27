@@ -31,85 +31,85 @@ namespace jio {
  */
 class BitOutputStream : public jio::OutputStream {
 
-	private:
-    	OutputStream *stream;
-	    bool haveByte;
-	    bool show;
-    	int bitCount;
-	    int currentByte;
-		
-	public:
-		/**
-		 * \brief
-		 * 
-		 */
-		BitOutputStream(std::string filename);
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		BitOutputStream(OutputStream *os);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~BitOutputStream();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsEmpty();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t Available();
-
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual int64_t Write(int b);
-
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual int64_t Write(const char *, int64_t size);
+  private:
+      OutputStream *stream;
+      bool haveByte;
+      bool show;
+      int bitCount;
+      int currentByte;
     
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual int64_t Flush();
+  public:
+    /**
+     * \brief
+     * 
+     */
+    BitOutputStream(std::string filename);
+    
+    /**
+     * \brief
+     * 
+     */
+    BitOutputStream(OutputStream *os);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~BitOutputStream();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Close();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void WriteBit(int bit);
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsEmpty();
 
-		/**
-		 * \brief
-		 *
-		 */
-		void WriteBits(int bits, int num);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t GetSentBytes();
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t Available();
+
+    /**
+     * \brief
+     * 
+     */
+    virtual int64_t Write(int b);
+
+    /**
+     * \brief
+     * 
+     */
+    virtual int64_t Write(const char *, int64_t size);
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual int64_t Flush();
+
+    /**
+     * \brief
+     *
+     */
+    virtual void Close();
+    
+    /**
+     * \brief
+     *
+     */
+    void WriteBit(int bit);
+
+    /**
+     * \brief
+     *
+     */
+    void WriteBits(int bits, int num);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t GetSentBytes();
 
 };
 

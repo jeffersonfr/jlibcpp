@@ -22,11 +22,11 @@
 namespace jevent {
 
 ComponentEvent::ComponentEvent(void *source, jcomponentevent_type_t type):
-	jevent::EventObject(source)
+  jevent::EventObject(source)
 {
-	jcommon::Object::SetClassName("jevent::ComponentEvent");
+  jcommon::Object::SetClassName("jevent::ComponentEvent");
 
-	_type = type;
+  _type = type;
 }
 
 ComponentEvent::~ComponentEvent()
@@ -35,7 +35,7 @@ ComponentEvent::~ComponentEvent()
 
 jcomponentevent_type_t ComponentEvent::GetType()
 {
-	return _type;
+  return _type;
 }
 
 }

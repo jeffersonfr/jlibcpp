@@ -33,42 +33,42 @@ namespace jcommon {
  */
 static char * IntToStr(int64_t value, char *result, int radix) 
 {
-	if (radix < 2 || radix > 36) { 
-		*result = '\0'; 
-		
-		return result; 
-	}
+  if (radix < 2 || radix > 36) { 
+    *result = '\0'; 
+    
+    return result; 
+  }
 
-	int64_t tmp_value;
-	char *ptr = result, 
-		*ptr1 = result, 
-		tmp_char;
+  int64_t tmp_value;
+  char *ptr = result, 
+    *ptr1 = result, 
+    tmp_char;
 
-	do {
-		tmp_value = value;
-		value /= radix;
-		*ptr++ = "zyxwvutsrqponmlkjihgfedcba9876543210123456789abcdefghijklmnopqrstuvwxyz" [35 + (tmp_value - value * radix)];
-	} while ( value );
+  do {
+    tmp_value = value;
+    value /= radix;
+    *ptr++ = "zyxwvutsrqponmlkjihgfedcba9876543210123456789abcdefghijklmnopqrstuvwxyz" [35 + (tmp_value - value * radix)];
+  } while ( value );
 
-	if (tmp_value < 0) {
-		*ptr++ = '-';
-	}
+  if (tmp_value < 0) {
+    *ptr++ = '-';
+  }
 
-	*ptr-- = '\0';
+  *ptr-- = '\0';
 
-	while(ptr1 < ptr) {
-		tmp_char = *ptr;
-		*ptr--= *ptr1;
-		*ptr1++ = tmp_char;
-	}
+  while(ptr1 < ptr) {
+    tmp_char = *ptr;
+    *ptr--= *ptr1;
+    *ptr1++ = tmp_char;
+  }
 
-	return result;
+  return result;
 }
 
 Types::Types():
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jcommon::Types");
+  jcommon::Object::SetClassName("jcommon::Types");
 }
 
 Types::~Types()
@@ -77,90 +77,90 @@ Types::~Types()
 
 int Types::StringToInteger(std::string s, int radix)
 {
-	if (radix < 2 || radix > 32) {
-		throw jexception::OutOfBoundsException("Bounds of radix exception");
-	}
-	
-	return (int)strtol(s.c_str(), nullptr, radix);
+  if (radix < 2 || radix > 32) {
+    throw jexception::OutOfBoundsException("Bounds of radix exception");
+  }
+  
+  return (int)strtol(s.c_str(), nullptr, radix);
 }
 
 std::string Types::IntegerToString(int i, int radix)
 {
-	if (radix < 2 || radix > 32) {
-		throw jexception::OutOfBoundsException("Bounds of radix exception");
-	}
-	
-	char tmp[32];
+  if (radix < 2 || radix > 32) {
+    throw jexception::OutOfBoundsException("Bounds of radix exception");
+  }
+  
+  char tmp[32];
 
-	return std::string(IntToStr((int64_t)i, tmp, radix));
+  return std::string(IntToStr((int64_t)i, tmp, radix));
 }
 
 int64_t Types::StringToLong(std::string s, int radix)
 {
-	if (radix < 2 || radix > 32) {
-		throw jexception::OutOfBoundsException("Bounds of radix exception");
-	}
-	
-	return (int64_t)strtoll(s.c_str(), nullptr, radix);
+  if (radix < 2 || radix > 32) {
+    throw jexception::OutOfBoundsException("Bounds of radix exception");
+  }
+  
+  return (int64_t)strtoll(s.c_str(), nullptr, radix);
 }
 
 std::string Types::LongToString(int64_t i, int radix)
 {
-	if (radix < 2 || radix > 32) {
-		throw jexception::OutOfBoundsException("Bounds of radix exception");
-	}
-	
-	char tmp[32];
+  if (radix < 2 || radix > 32) {
+    throw jexception::OutOfBoundsException("Bounds of radix exception");
+  }
+  
+  char tmp[32];
 
-	return std::string(IntToStr((int64_t)i, tmp, radix));
+  return std::string(IntToStr((int64_t)i, tmp, radix));
 }
 
 float Types::StringToFloat(std::string s)
 {
-	return strtof(s.c_str(), nullptr);
+  return strtof(s.c_str(), nullptr);
 }
 
 std::string Types::FloatToString(float i, int radix)
 {
-	if (radix != 8 && radix != 10 && radix != 16) {
-		throw jexception::OutOfBoundsException("Bounds of radix exception");
-	}
-	
-	std::ostringstream o;
+  if (radix != 8 && radix != 10 && radix != 16) {
+    throw jexception::OutOfBoundsException("Bounds of radix exception");
+  }
+  
+  std::ostringstream o;
 
-	if (radix == 8) {
-		o << std::oct << i << std::flush;
-	} else if (radix == 10) {
-		o << std::dec << i << std::flush;
-	} else if (radix == 16) {
-		o << std::hex << i << std::flush;
-	}
+  if (radix == 8) {
+    o << std::oct << i << std::flush;
+  } else if (radix == 10) {
+    o << std::dec << i << std::flush;
+  } else if (radix == 16) {
+    o << std::hex << i << std::flush;
+  }
 
-	return o.str();
+  return o.str();
 }
 
 double Types::StringToDouble(std::string s)
 {
-	return strtod(s.c_str(), nullptr);
+  return strtod(s.c_str(), nullptr);
 }
 
 std::string Types::DoubleToString(double i, int radix)
 {
-	if (radix != 8 && radix != 10 && radix != 16) {
-		throw jexception::OutOfBoundsException("Bounds of radix exception");
-	}
-	
-	std::ostringstream o;
+  if (radix != 8 && radix != 10 && radix != 16) {
+    throw jexception::OutOfBoundsException("Bounds of radix exception");
+  }
+  
+  std::ostringstream o;
 
-	if (radix == 8) {
-		o << std::oct << i << std::flush;
-	} else if (radix == 10) {
-		o << std::dec << i << std::flush;
-	} else if (radix == 16) {
-		o << std::hex << i << std::flush;
-	}
+  if (radix == 8) {
+    o << std::oct << i << std::flush;
+  } else if (radix == 10) {
+    o << std::dec << i << std::flush;
+  } else if (radix == 16) {
+    o << std::hex << i << std::flush;
+  }
 
-	return o.str();
+  return o.str();
 }
 
 }

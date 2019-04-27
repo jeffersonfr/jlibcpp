@@ -22,21 +22,21 @@
 namespace jexception {
 
 ControlException::ControlException():
-	jexception::RuntimeException()
+  jexception::RuntimeException()
 {
-	jcommon::Object::SetClassName("jexception::ControlException");
+  jcommon::Object::SetClassName("jexception::ControlException");
 }
 
 ControlException::ControlException(std::string reason_):
-	jexception::RuntimeException(reason_)
+  jexception::RuntimeException(reason_)
 {
-	jcommon::Object::SetClassName("jexception::ControlException");
+  jcommon::Object::SetClassName("jexception::ControlException");
 }
 
 ControlException::ControlException(jexception::Exception *exception, std::string reason_):
-	jexception::RuntimeException(exception, reason_)
+  jexception::RuntimeException(exception, reason_)
 {
-	jcommon::Object::SetClassName("jexception::ControlException");
+  jcommon::Object::SetClassName("jexception::ControlException");
 }
 
 ControlException::~ControlException() throw ()

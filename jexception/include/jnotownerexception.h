@@ -31,52 +31,52 @@ namespace jexception {
  */
 class NotOwnerException : public jexception::RuntimeException {
 
-	private:
+  private:
 
-	public:
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		NotOwnerException();
+  public:
+    /**
+     * \brief Construtor.
+     *
+     */
+    NotOwnerException();
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		NotOwnerException(std::string);
+    /**
+     * \brief Construtor.
+     *
+     */
+    NotOwnerException(std::string);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		NotOwnerException(jexception::Exception *exception, std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    NotOwnerException(jexception::Exception *exception, std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> NotOwnerException(const std::string &fmt, T ...vs):
       Exception(fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::NotOwnerException");
     }
-		
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> NotOwnerException(Exception *exception, const std::string &fmt, T ...vs):
       Exception(exception, fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::NotOwnerException");
     }
-		
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~NotOwnerException() throw();
+    
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~NotOwnerException() throw();
 
 };
 

@@ -24,14 +24,14 @@
 namespace jgui {
 
 Animation::Animation(int x, int y, int width, int height):
- 	Component(x, y, width, height)
+   Component(x, y, width, height)
 {
-	SetClassName("jgui::Animation");
+  SetClassName("jgui::Animation");
 
-	_index = 0;
-	_running = false;
+  _index = 0;
+  _running = false;
 
-	SetInterval(500);
+  SetInterval(500);
 }
 
 Animation::~Animation()
@@ -41,20 +41,20 @@ Animation::~Animation()
 
 void Animation::Start()
 {
- 	std::lock_guard<std::mutex> guard(_animation_mutex);
+   std::lock_guard<std::mutex> guard(_animation_mutex);
 
   if (_running == true) {
     return;
   }
 
-	_running = true;
+  _running = true;
 
   _thread = std::thread(&Animation::Run, this);
 }
 
 void Animation::Stop()
 {
- 	std::lock_guard<std::mutex> guard(_animation_mutex);
+   std::lock_guard<std::mutex> guard(_animation_mutex);
 
   if (_running == false) {
     return;
@@ -70,28 +70,28 @@ void Animation::Stop()
 
 void Animation::SetInterval(int i)
 {
-	_interval = i;
+  _interval = i;
 }
 
 void Animation::AddImage(jgui::Image *image)
 {
- 	std::lock_guard<std::mutex> guard(_animation_mutex);
+   std::lock_guard<std::mutex> guard(_animation_mutex);
 
-	_images.push_back(image);
+  _images.push_back(image);
 }
 
 void Animation::RemoveImage(jgui::Image *image)
 {
- 	std::lock_guard<std::mutex> guard(_animation_mutex);
+   std::lock_guard<std::mutex> guard(_animation_mutex);
 
   _images.erase(std::remove(_images.begin(), _images.end(), image), _images.end());
 }
 
 void Animation::RemoveAll()
 {
- 	std::lock_guard<std::mutex> guard(_animation_mutex);
+   std::lock_guard<std::mutex> guard(_animation_mutex);
 
-	_images.clear();
+  _images.clear();
 }
 
 const std::vector<jgui::Image *> & Animation::GetImages()
@@ -101,11 +101,11 @@ const std::vector<jgui::Image *> & Animation::GetImages()
 
 void Animation::Paint(Graphics *g)
 {
-	// JDEBUG(JINFO, "paint\n");
+  // JDEBUG(JINFO, "paint\n");
 
-	Component::Paint(g);
+  Component::Paint(g);
 
-	Theme *theme = GetTheme();
+  Theme *theme = GetTheme();
 
   if (theme == nullptr) {
     return;
@@ -113,36 +113,36 @@ void Animation::Paint(Graphics *g)
 
   jgui::jsize_t
     size = GetSize();
-	int 
+  int 
     x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
-		y = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
-		w = size.width - 2*x,
-		h = size.height - 2*y;
+    y = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
+    w = size.width - 2*x,
+    h = size.height - 2*y;
 
-	if (_images.size() != 0) {
-		Image *image = _images[_index];
+  if (_images.size() != 0) {
+    Image *image = _images[_index];
 
-		g->DrawImage(image, x, y, w, h);
-	}
+    g->DrawImage(image, x, y, w, h);
+  }
 }
 
 void Animation::Run()
 {
-	while (_running == true) {
-		Repaint();
+  while (_running == true) {
+    Repaint();
 
-		if (_running == false) {
-			return;
-		}
+    if (_running == false) {
+      return;
+    }
 
-		_index++;
+    _index++;
 
-		if (_index >= (int)_images.size()) {
-			_index = 0;
-		}
+    if (_index >= (int)_images.size()) {
+      _index = 0;
+    }
 
     std::this_thread::sleep_for(std::chrono::milliseconds(_interval));
-	}
+  }
 }
 
 }

@@ -17,7 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef	J_SLIDER_H
+#ifndef  J_SLIDER_H
 #define J_SLIDER_H
 
 #include "jgui/jslidercomponent.h"
@@ -31,80 +31,80 @@ namespace jgui {
  */
 class Slider : public jgui::SliderComponent {
 
-	private:
-		/** \brief */
-		int _stone_size;
-		/** \brief */
-		bool _pressed;
-		/** \brief */
-		bool _inverted;
+  private:
+    /** \brief */
+    int _stone_size;
+    /** \brief */
+    bool _pressed;
+    /** \brief */
+    bool _inverted;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		Slider(int x = 0, int y = 0, int width = DEFAULT_COMPONENT_WIDTH, int height = DEFAULT_COMPONENT_HEIGHT);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~Slider();
+  public:
+    /**
+     * \brief
+     *
+     */
+    Slider(int x = 0, int y = 0, int width = DEFAULT_COMPONENT_WIDTH, int height = DEFAULT_COMPONENT_HEIGHT);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~Slider();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetStoneSize();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetStoneSize(int size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetInverted(bool b);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool KeyPressed(jevent::KeyEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual int GetStoneSize();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetStoneSize(int size);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetInverted(bool b);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool KeyPressed(jevent::KeyEvent *event);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MousePressed(jevent::MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MouseReleased(jevent::MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MouseMoved(jevent::MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MouseWheel(jevent::MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Paint(Graphics *g);
+    /**
+     * \brief
+     *
+     */
+    virtual bool MousePressed(jevent::MouseEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool MouseReleased(jevent::MouseEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool MouseMoved(jevent::MouseEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool MouseWheel(jevent::MouseEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Paint(Graphics *g);
 
 };
 

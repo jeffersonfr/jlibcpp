@@ -37,148 +37,148 @@ class ActionEvent;
  */
 class Button : public Component {
 
-	protected:
-		/** \brief */
-		std::vector<jevent::ActionListener *> _action_listeners;
-		/** \brief */
-		std::mutex _action_listener_mutex;
-		/** \brief */
+  protected:
+    /** \brief */
+    std::vector<jevent::ActionListener *> _action_listeners;
+    /** \brief */
+    std::mutex _action_listener_mutex;
+    /** \brief */
     jgui::Image *_image;
-		/** \brief */
+    /** \brief */
     jgui::jhorizontal_align_t _halign;
-		/** \brief */
+    /** \brief */
     jgui::jvertical_align_t _valign;
-		/** \brief */
-		std::string _text;
-		/** \brief */
-		bool _is_pressed;
+    /** \brief */
+    std::string _text;
+    /** \brief */
+    bool _is_pressed;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		Button(std::string label, int x = 0, int y = 0, int width = DEFAULT_COMPONENT_WIDTH, int height = DEFAULT_COMPONENT_HEIGHT);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		Button(std::string label, jgui::Image *image, int x = 0, int y = 0, int width = DEFAULT_COMPONENT_WIDTH, int height = DEFAULT_COMPONENT_HEIGHT);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~Button();
+  public:
+    /**
+     * \brief
+     *
+     */
+    Button(std::string label, int x = 0, int y = 0, int width = DEFAULT_COMPONENT_WIDTH, int height = DEFAULT_COMPONENT_HEIGHT);
+    
+    /**
+     * \brief
+     *
+     */
+    Button(std::string label, jgui::Image *image, int x = 0, int y = 0, int width = DEFAULT_COMPONENT_WIDTH, int height = DEFAULT_COMPONENT_HEIGHT);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~Button();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetText(std::string text);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetImage(jgui::Image *image);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jgui::Image * GetImage();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string GetText();
+    /**
+     * \brief
+     *
+     */
+    virtual void SetText(std::string text);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetImage(jgui::Image *image);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual jgui::Image * GetImage();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual std::string GetText();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetHorizontalAlign(jhorizontal_align_t align);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jhorizontal_align_t GetHorizontalAlign();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetVerticalAlign(jvertical_align_t align);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jvertical_align_t GetVerticalAlign();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Paint(Graphics *g);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool KeyPressed(jevent::KeyEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetHorizontalAlign(jhorizontal_align_t align);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual jhorizontal_align_t GetHorizontalAlign();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetVerticalAlign(jvertical_align_t align);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual jvertical_align_t GetVerticalAlign();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Paint(Graphics *g);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool KeyPressed(jevent::KeyEvent *event);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MousePressed(jevent::MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MouseReleased(jevent::MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MouseMoved(jevent::MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MouseWheel(jevent::MouseEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual bool MousePressed(jevent::MouseEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool MouseReleased(jevent::MouseEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool MouseMoved(jevent::MouseEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool MouseWheel(jevent::MouseEvent *event);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RegisterActionListener(jevent::ActionListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveActionListener(jevent::ActionListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void DispatchActionEvent(jevent::ActionEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual const std::vector<jevent::ActionListener *> & GetActionListeners();
+    /**
+     * \brief
+     *
+     */
+    virtual void RegisterActionListener(jevent::ActionListener *listener);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void RemoveActionListener(jevent::ActionListener *listener);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void DispatchActionEvent(jevent::ActionEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual const std::vector<jevent::ActionListener *> & GetActionListeners();
 
 };
 

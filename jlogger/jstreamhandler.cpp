@@ -22,9 +22,9 @@
 namespace jlogger {
 
 StreamHandler::StreamHandler():
-	jlogger::LoggerHandler()
+  jlogger::LoggerHandler()
 {
-	jcommon::Object::SetClassName("jlogger::StreamHandler");
+  jcommon::Object::SetClassName("jlogger::StreamHandler");
 }
 
 StreamHandler::~StreamHandler()

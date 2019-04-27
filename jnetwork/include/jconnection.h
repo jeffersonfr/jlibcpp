@@ -25,8 +25,8 @@
 
 #include <sys/socket.h>
 
-#define SOCK_RD_BUFFER_SIZE	65535
-#define SOCK_WR_BUFFER_SIZE	4096
+#define SOCK_RD_BUFFER_SIZE  65535
+#define SOCK_WR_BUFFER_SIZE  4096
 
 namespace jnetwork {
 
@@ -35,13 +35,13 @@ namespace jnetwork {
  * 
  */
 enum jconnection_type_t {
-	JCT_UNKNOWN,
-	JCT_TCP,
-	JCT_UDP,
-	JCT_MCAST,
-	JCT_RTP,
-	JCT_RAW,
-	JCT_LOCAL
+  JCT_UNKNOWN,
+  JCT_TCP,
+  JCT_UDP,
+  JCT_MCAST,
+  JCT_RTP,
+  JCT_RAW,
+  JCT_LOCAL
 };
 
 /**
@@ -51,105 +51,105 @@ enum jconnection_type_t {
  */
 class Connection : public virtual jcommon::Object {
 
-	friend class SocketOptions;
-	friend class DatagramSocket;
-	friend class Socket;
-	friend class RTPSocket;
-	friend class MulticastSocket;
-	friend class RawSocket;
-	friend class SocketInputStream;
-	friend class SocketOutputStream;
-	friend class SSLSocketInputStream;
-	friend class SSLSocketOutputStream;
-	
-	protected:
-		/** \brief */
-		jconnection_type_t _type;
-		/** \brief */
-		int _fd;
-		/** \brief */
-		bool _is_closed;
+  friend class SocketOptions;
+  friend class DatagramSocket;
+  friend class Socket;
+  friend class RTPSocket;
+  friend class MulticastSocket;
+  friend class RawSocket;
+  friend class SocketInputStream;
+  friend class SocketOutputStream;
+  friend class SSLSocketInputStream;
+  friend class SSLSocketOutputStream;
+  
+  protected:
+    /** \brief */
+    jconnection_type_t _type;
+    /** \brief */
+    int _fd;
+    /** \brief */
+    bool _is_closed;
 
-		/**
-		 * \brief
-		 *
-		 */
-		Connection(jconnection_type_t type);
+    /**
+     * \brief
+     *
+     */
+    Connection(jconnection_type_t type);
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jconnection_type_t GetType();
+  public:
+    /**
+     * \brief
+     *
+     */
+    virtual jconnection_type_t GetType();
 
-		/**
-		 * \brief Send bytes to a destination.
-		 *
-		 */
-		virtual int Send(const char *b_, int size_, bool block_ = true) = 0;
+    /**
+     * \brief Send bytes to a destination.
+     *
+     */
+    virtual int Send(const char *b_, int size_, bool block_ = true) = 0;
 
-		/**
-		 * \brief Send bytes to a destination.
-		 *
-		 */
-		virtual int Send(const char *b_, int size_, int time_) = 0;
+    /**
+     * \brief Send bytes to a destination.
+     *
+     */
+    virtual int Send(const char *b_, int size_, int time_) = 0;
 
-		/**
-		 * \brief Receive bytes from a source.
-		 *
-		 * \return the number of bytes received, or 0 if the peer has shutdown.
-		 *
-		 * \exception SocketException an error occurred.
-		 *
-		 */
-		virtual int Receive(char *data_, int data_length_, bool block_ = true) = 0;
+    /**
+     * \brief Receive bytes from a source.
+     *
+     * \return the number of bytes received, or 0 if the peer has shutdown.
+     *
+     * \exception SocketException an error occurred.
+     *
+     */
+    virtual int Receive(char *data_, int data_length_, bool block_ = true) = 0;
 
-		/**
-		 * \brief Receive bytes from a source.
-		 *
-		 * \return the number of bytes received, or 0 if the peer has shutdown.
-		 *
-		 * \exception SocketException an error occurred.
-		 *
-		 */
-		virtual int Receive(char *data_, int data_length_, int time_) = 0;
+    /**
+     * \brief Receive bytes from a source.
+     *
+     * \return the number of bytes received, or 0 if the peer has shutdown.
+     *
+     * \exception SocketException an error occurred.
+     *
+     */
+    virtual int Receive(char *data_, int data_length_, int time_) = 0;
 
-		/**
-		 * \brief 
-		 *
-		 */
-		virtual bool IsClosed();
+    /**
+     * \brief 
+     *
+     */
+    virtual bool IsClosed();
 
-		/**
-		 * \brief Close the socket.
-		 *
-		 */
-		virtual void Close() = 0;
+    /**
+     * \brief Close the socket.
+     *
+     */
+    virtual void Close() = 0;
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jio::InputStream * GetInputStream() = 0;
+    /**
+     * \brief
+     *
+     */
+    virtual jio::InputStream * GetInputStream() = 0;
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jio::OutputStream * GetOutputStream() = 0;
+    /**
+     * \brief
+     *
+     */
+    virtual jio::OutputStream * GetOutputStream() = 0;
 
-		/**
-		 * \brief Get the bytes sent to a destination.
-		 *
-		 */
-		virtual int64_t GetSentBytes() = 0;
+    /**
+     * \brief Get the bytes sent to a destination.
+     *
+     */
+    virtual int64_t GetSentBytes() = 0;
 
-		/**
-		 * \brief Get de bytes received from a source.
-		 *
-		 */
-		virtual int64_t GetReadedBytes() = 0;
+    /**
+     * \brief Get de bytes received from a source.
+     *
+     */
+    virtual int64_t GetReadedBytes() = 0;
 
 
 };

@@ -103,41 +103,41 @@ class Audio : public virtual jcommon::Object {
  */
 class AudioMixerControl : public Control {
 
-	public:
-		/**
-		 * \brief 
-		 *
-		 */
-		AudioMixerControl();
+  public:
+    /**
+     * \brief 
+     *
+     */
+    AudioMixerControl();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~AudioMixerControl();
+    /**
+     * \brief
+     *
+     */
+    virtual ~AudioMixerControl();
 
-		/**
-		 * \brief
-		 *
-		 */
+    /**
+     * \brief
+     *
+     */
     virtual Audio * CreateAudio(std::string filename);
 
-		/**
-		 * \brief
-		 *
-		 */
+    /**
+     * \brief
+     *
+     */
     virtual Audio * CreateAudio(jio::InputStream *stream, jaudio_format_t format, int frequency, int channels);
 
-		/**
-		 * \brief
-		 *
-		 */
+    /**
+     * \brief
+     *
+     */
     virtual void StartSound(Audio *audio);
 
-		/**
-		 * \brief
-		 *
-		 */
+    /**
+     * \brief
+     *
+     */
     virtual void StopSound(Audio *audio);
 
 };

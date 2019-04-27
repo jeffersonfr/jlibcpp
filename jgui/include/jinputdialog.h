@@ -41,64 +41,64 @@ namespace jgui {
  */
 class InputDialog : public jgui::Dialog, public jevent::ActionListener {
 
-	private:
-		/** \brief */
-		TextField *_field;
-		/** \brief */
-		Label *_label;
-		/** \brief */
-		Button *_ok;
-		/** \brief */
-		Button *_cancel;
+  private:
+    /** \brief */
+    TextField *_field;
+    /** \brief */
+    Label *_label;
+    /** \brief */
+    Button *_ok;
+    /** \brief */
+    Button *_cancel;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		InputDialog(Container *parent, std::string title, std::string warn);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~InputDialog();
+  public:
+    /**
+     * \brief
+     *
+     */
+    InputDialog(Container *parent, std::string title, std::string warn);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~InputDialog();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string GetText();
+    /**
+     * \brief
+     *
+     */
+    virtual std::string GetText();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetHorizontalAlign(jhorizontal_align_t align);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetHorizontalAlign(jhorizontal_align_t align);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jhorizontal_align_t GetHorizontalAlign();
+    /**
+     * \brief
+     *
+     */
+    virtual jhorizontal_align_t GetHorizontalAlign();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetVerticalAlign(jvertical_align_t align);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetVerticalAlign(jvertical_align_t align);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jvertical_align_t GetVerticalAlign();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void ActionPerformed(jevent::ActionEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual jvertical_align_t GetVerticalAlign();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void ActionPerformed(jevent::ActionEvent *event);
 
 };
 

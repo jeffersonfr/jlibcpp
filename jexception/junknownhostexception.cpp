@@ -22,19 +22,19 @@
 namespace jexception {
 
 UnknownHostException::UnknownHostException():
-	jexception::RuntimeException()
+  jexception::RuntimeException()
 {
   jcommon::Object::SetClassName("jexception::UnknownException");
 }
 
 UnknownHostException::UnknownHostException(std::string reason_):
-	jexception::RuntimeException(reason_)
+  jexception::RuntimeException(reason_)
 {
   jcommon::Object::SetClassName("jexception::UnknownException");
 }
 
 UnknownHostException::UnknownHostException(jexception::Exception *exception, std::string reason_):
-	jexception::RuntimeException(exception, reason_)
+  jexception::RuntimeException(exception, reason_)
 {
   jcommon::Object::SetClassName("jexception::UnknownException");
 }

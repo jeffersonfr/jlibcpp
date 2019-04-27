@@ -37,32 +37,32 @@ namespace jlogger {
 */
 class FileHandler : public jlogger::StreamHandler {
 
-	private:
-		/** \brief */
-		jio::File *_file;
-		/** \brief */
-		struct stat _stat;
-		/** \brief */
-		std::mutex _mutex;
+  private:
+    /** \brief */
+    jio::File *_file;
+    /** \brief */
+    struct stat _stat;
+    /** \brief */
+    std::mutex _mutex;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		FileHandler(std::string filename_);
+  public:
+    /**
+     * \brief
+     *
+     */
+    FileHandler(std::string filename_);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~FileHandler();
+    /**
+     * \brief
+     *
+     */
+    virtual ~FileHandler();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void WriteRecord(LogRecord *);
+    /**
+     * \brief
+     *
+     */
+    virtual void WriteRecord(LogRecord *);
 
 };
 

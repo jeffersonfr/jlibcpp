@@ -41,8 +41,8 @@ namespace jgui {
  *
  */
 enum jfilechooser_type_t {
-	JFCT_OPEN_FILE_DIALOG,
-	JFCT_SAVE_FILE_DIALOG
+  JFCT_OPEN_FILE_DIALOG,
+  JFCT_SAVE_FILE_DIALOG
 };
 
 /**
@@ -50,9 +50,9 @@ enum jfilechooser_type_t {
  *
  */
 enum jfilechooser_filter_t {
-	JFCF_FILE_ONLY,
-	JFCF_DIRECTORY_ONLY,
-	JFCF_FILE_AND_DIRECTORY
+  JFCF_FILE_ONLY,
+  JFCF_DIRECTORY_ONLY,
+  JFCF_FILE_AND_DIRECTORY
 };
 
 /**
@@ -62,118 +62,118 @@ enum jfilechooser_filter_t {
  */
 class FileChooserDialog : public jgui::Dialog, public jevent::SelectListener {
 
-	private:
-		/** \brief */
-		std::vector<std::string> _extensions;
-		/** \brief */
-		jgui::Label *_label;
-		/** \brief */
-		jgui::ListBox *_list;
-		/** \brief */
-		jgui::TextField *_file;
-		/** \brief */
+  private:
+    /** \brief */
+    std::vector<std::string> _extensions;
+    /** \brief */
+    jgui::Label *_label;
+    /** \brief */
+    jgui::ListBox *_list;
+    /** \brief */
+    jgui::TextField *_file;
+    /** \brief */
     jgui::Image *_image_file;
-		/** \brief */
+    /** \brief */
     jgui::Image *_image_folder;
-		/** \brief */
-		std::string _base_dir;
-		/** \brief */
-		std::string _current_dir;
-		/** \brief */
-		jfilechooser_type_t _type;
-		/** \brief */
-		jfilechooser_filter_t _filter;
-		/** \brief */
-		bool _has_parent;
-		/** \brief */
-		bool _extension_ignorecase;
+    /** \brief */
+    std::string _base_dir;
+    /** \brief */
+    std::string _current_dir;
+    /** \brief */
+    jfilechooser_type_t _type;
+    /** \brief */
+    jfilechooser_filter_t _filter;
+    /** \brief */
+    bool _has_parent;
+    /** \brief */
+    bool _extension_ignorecase;
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool ShowFiles(std::string current_dir);
+    /**
+     * \brief
+     *
+     */
+    virtual bool ShowFiles(std::string current_dir);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool ListFiles(std::string dirPath, std::vector<std::string> *files);
+    /**
+     * \brief
+     *
+     */
+    virtual bool ListFiles(std::string dirPath, std::vector<std::string> *files);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsDirectory(std::string path);
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsDirectory(std::string path);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsFile(std::string path);
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsFile(std::string path);
 
-	public:
+  public:
 
-		/**
-		 * \brief
-		 *
-		 */
-		FileChooserDialog(Container *parent, std::string title, std::string directory, jfilechooser_type_t type = JFCT_OPEN_FILE_DIALOG);
+    /**
+     * \brief
+     *
+     */
+    FileChooserDialog(Container *parent, std::string title, std::string directory, jfilechooser_type_t type = JFCT_OPEN_FILE_DIALOG);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~FileChooserDialog();
+    /**
+     * \brief
+     *
+     */
+    virtual ~FileChooserDialog();
 
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string GetName();
+    /**
+     * \brief
+     *
+     */
+    virtual std::string GetName();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string GetFile();
+    /**
+     * \brief
+     *
+     */
+    virtual std::string GetFile();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string GetCurrentDirectory();
+    /**
+     * \brief
+     *
+     */
+    virtual std::string GetCurrentDirectory();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetCurrentDirectory(std::string directory);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetCurrentDirectory(std::string directory);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void AddExtension(std::string ext);
+    /**
+     * \brief
+     *
+     */
+    virtual void AddExtension(std::string ext);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetExtensionIgnoreCase(bool b);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetExtensionIgnoreCase(bool b);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetFilter(jfilechooser_filter_t filter);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetFilter(jfilechooser_filter_t filter);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void ItemSelected(jevent::SelectEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual void ItemSelected(jevent::SelectEvent *event);
 
 };
 

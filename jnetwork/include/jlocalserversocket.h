@@ -38,64 +38,64 @@ class Socket;
  */
 class LocalServerSocket : public jcommon::Object {
 
-	private:
-		/** \brief Local socket. */
-		sockaddr_un _address;
-		/** \brief */
-		std::string _file;
-		/** \brief */
-		int _fd;
-		/** \brief */
-		bool _is_closed;
+  private:
+    /** \brief Local socket. */
+    sockaddr_un _address;
+    /** \brief */
+    std::string _file;
+    /** \brief */
+    int _fd;
+    /** \brief */
+    bool _is_closed;
 
-		/**
-		 * \brief
-		 *
-		 */
-		void CreateSocket();
+    /**
+     * \brief
+     *
+     */
+    void CreateSocket();
 
-		/**
-		 * \brief
-		 *
-		 */
-		void BindSocket();
+    /**
+     * \brief
+     *
+     */
+    void BindSocket();
 
-		/**
-		 * \brief
-		 *
-		 */
-		void ListenSocket(int);
+    /**
+     * \brief
+     *
+     */
+    void ListenSocket(int);
 
-	public:
-		/**
-		 * \brief Constructor.
-		 *
-		 */
-		LocalServerSocket(std::string file, int backlog = 5);
+  public:
+    /**
+     * \brief Constructor.
+     *
+     */
+    LocalServerSocket(std::string file, int backlog = 5);
 
-		/**
-		 * \brief Destructor virtual.
-		 *
-		 */
-		virtual ~LocalServerSocket();
+    /**
+     * \brief Destructor virtual.
+     *
+     */
+    virtual ~LocalServerSocket();
 
-		/**
-		 * \brief Get the local port.
-		 *
-		 */
-		std::string GetServerFile();
+    /**
+     * \brief Get the local port.
+     *
+     */
+    std::string GetServerFile();
 
-		/**
-		 * \brief Accept a new socket.
-		 *
-		 */
-		LocalSocket * Accept();
+    /**
+     * \brief Accept a new socket.
+     *
+     */
+    LocalSocket * Accept();
 
-		/**
-		 * \brief Close the server socket.
-		 *
-		 */
-		void Close();
+    /**
+     * \brief Close the server socket.
+     *
+     */
+    void Close();
 
 };
 

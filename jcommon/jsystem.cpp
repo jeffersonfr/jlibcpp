@@ -40,8 +40,8 @@
 #define CLOCK_TICK_RATE 1193180
 #endif
 
-#define DEFAULT_FREQ       440 	// Middle A
-#define DEFAULT_DELAY      100	// milliseconds
+#define DEFAULT_FREQ       440   // Middle A
+#define DEFAULT_DELAY      100  // milliseconds
 
 namespace jcommon {
 
@@ -51,47 +51,47 @@ static bool _keyboard;
 
 static void cooked()
 {
-	tcsetattr(0, TCSANOW, &g_old_kbd_mode);		
+  tcsetattr(0, TCSANOW, &g_old_kbd_mode);    
     
-	if(console > 0) {
-		ioctl(console, KIOCSOUND, 0);
-		close(console);
-	}
+  if(console > 0) {
+    ioctl(console, KIOCSOUND, 0);
+    close(console);
+  }
 }
 
 System::~System()
 {
-	cooked();
+  cooked();
 }
 
 void System::Beep(int freq, int delay)
 {
-	if (freq == 0) {
-		return;
-	}
+  if (freq == 0) {
+    return;
+  }
 
-	if (freq < 0) {
-		freq = DEFAULT_FREQ;
-	}
+  if (freq < 0) {
+    freq = DEFAULT_FREQ;
+  }
 
-	if (delay < 0) {
-		delay = DEFAULT_DELAY;
-	}
-	
-	if ((console = open("/dev/console", O_WRONLY)) == -1) {
-		return;
-	}
+  if (delay < 0) {
+    delay = DEFAULT_DELAY;
+  }
+  
+  if ((console = open("/dev/console", O_WRONLY)) == -1) {
+    return;
+  }
 
-	if (ioctl(console, KIOCSOUND, (int)(CLOCK_TICK_RATE/freq)) < 0) {
-		return;
-	}
+  if (ioctl(console, KIOCSOUND, (int)(CLOCK_TICK_RATE/freq)) < 0) {
+    return;
+  }
 
   std::this_thread::sleep_for(std::chrono::milliseconds(delay));
 
-	ioctl(console, KIOCSOUND, 0);
-	close(console);
-	
-	console = -1;
+  ioctl(console, KIOCSOUND, 0);
+  close(console);
+  
+  console = -1;
 }
 
 std::string System::GetCurrentUserName()
@@ -100,316 +100,316 @@ std::string System::GetCurrentUserName()
 
     pw = getpwuid(0);
 
-	if (pw != nullptr) {
-		// WARNNING:: free pointer
-	    return pw->pw_name;
-	}
+  if (pw != nullptr) {
+    // WARNNING:: free pointer
+      return pw->pw_name;
+  }
 
-	return "";
+  return "";
 }
 
 void System::Exit(int i)
 {
-	exit(i);
+  exit(i);
 }
 
 void System::Abort()
 {
-	abort();
+  abort();
 }
 
 int System::GetUserID()
 {
-	return (int)getuid();
+  return (int)getuid();
 }
 
 int System::GetProcessID()
 {
-	return (int)getuid();
+  return (int)getuid();
 }
 
 std::string System::GetResourceDirectory()
 {
-	return _DATA_PREFIX;
+  return _DATA_PREFIX;
 }
 
 std::string System::GetHomeDirectory()
 {
-	struct passwd *pw;
+  struct passwd *pw;
 
-	pw = getpwuid(0);
+  pw = getpwuid(0);
 
-	if (pw != nullptr) {
-		return pw->pw_dir;
-	}
+  if (pw != nullptr) {
+    return pw->pw_dir;
+  }
 
-	return "";
+  return "";
 }
 
 std::string System::GetCurrentDirectory()
 {
-	char path[65536];
-	
-	if (getcwd(path, 65536) == nullptr) {
-		throw jexception::RuntimeException(strerror(errno));
-	}
+  char path[65536];
+  
+  if (getcwd(path, 65536) == nullptr) {
+    throw jexception::RuntimeException(strerror(errno));
+  }
 
-	return path;
+  return path;
 }
 
 std::string System::GetEnviromentVariable(std::string key_, std::string default_)
 {
-	// CHANGE:: man environ 
-	
-	char *var = getenv(key_.c_str());
+  // CHANGE:: man environ 
+  
+  char *var = getenv(key_.c_str());
 
-	if (var == nullptr) {
-		return default_;
-	}
-	
-	return var;
+  if (var == nullptr) {
+    return default_;
+  }
+  
+  return var;
 }
 
 void System::UnsetEnviromentVariable(std::string key_)
 {
-	unsetenv(key_.c_str());
+  unsetenv(key_.c_str());
 }
 
 bool System::SetEnviromentVariable(std::string key_, std::string value_, bool overwrite_)
 {
-	return !setenv(key_.c_str(), value_.c_str(), overwrite_);
+  return !setenv(key_.c_str(), value_.c_str(), overwrite_);
 }
 
 int System::GetLastErrorCode()
 {
-	return errno;
+  return errno;
 }
 
 std::string System::GetLastErrorMessage()
 {
-	return strerror(GetLastErrorCode());
+  return strerror(GetLastErrorCode());
 }
 
 void System::EnableKeyboardBuffer(bool b)
 {
-	struct termios new_kbd_mode;
- 	static char init;
-	
-	if (init == false) {
-		init = true;
-		tcgetattr(0, &g_old_kbd_mode);
-		atexit(cooked); // when we exit, go back to normal, "cooked" mode 
-	}
-	
-	// put keyboard (stdin, actually) in raw, unbuffered mode 
-	memcpy(&new_kbd_mode, &g_old_kbd_mode, sizeof(struct termios));
+  struct termios new_kbd_mode;
+   static char init;
+  
+  if (init == false) {
+    init = true;
+    tcgetattr(0, &g_old_kbd_mode);
+    atexit(cooked); // when we exit, go back to normal, "cooked" mode 
+  }
+  
+  // put keyboard (stdin, actually) in raw, unbuffered mode 
+  memcpy(&new_kbd_mode, &g_old_kbd_mode, sizeof(struct termios));
 
-	if (b == true) {
-		new_kbd_mode.c_lflag |= (ICANON | ECHO);
-		new_kbd_mode.c_cc[VTIME] = 0;
-		new_kbd_mode.c_cc[VMIN] = 1;
-		tcsetattr(0, TCSANOW, &new_kbd_mode);
-	} else {
-		new_kbd_mode.c_lflag &= ~(ICANON | ECHO);
-		new_kbd_mode.c_cc[VTIME] = 0;
-		new_kbd_mode.c_cc[VMIN] = 1;
-		tcsetattr(0, TCSANOW, &new_kbd_mode);
-	}
-	
-	_keyboard = b;
+  if (b == true) {
+    new_kbd_mode.c_lflag |= (ICANON | ECHO);
+    new_kbd_mode.c_cc[VTIME] = 0;
+    new_kbd_mode.c_cc[VMIN] = 1;
+    tcsetattr(0, TCSANOW, &new_kbd_mode);
+  } else {
+    new_kbd_mode.c_lflag &= ~(ICANON | ECHO);
+    new_kbd_mode.c_cc[VTIME] = 0;
+    new_kbd_mode.c_cc[VMIN] = 1;
+    tcsetattr(0, TCSANOW, &new_kbd_mode);
+  }
+  
+  _keyboard = b;
 }
 
 void System::EnableEcho(bool b)
 {
-	struct termios new_kbd_mode;
- 	static char init;
-	
-	if (init == false) {
-		init = true;
-		tcgetattr(0, &g_old_kbd_mode);
-		atexit(cooked); // when we exit, go back to normal, "cooked" mode 
-	}
-	
-	// put keyboard (stdin, actually) in raw, unbuffered mode 
-	memcpy(&new_kbd_mode, &g_old_kbd_mode, sizeof(struct termios));
+  struct termios new_kbd_mode;
+   static char init;
+  
+  if (init == false) {
+    init = true;
+    tcgetattr(0, &g_old_kbd_mode);
+    atexit(cooked); // when we exit, go back to normal, "cooked" mode 
+  }
+  
+  // put keyboard (stdin, actually) in raw, unbuffered mode 
+  memcpy(&new_kbd_mode, &g_old_kbd_mode, sizeof(struct termios));
 
-	if (b == true) {
-		new_kbd_mode.c_lflag |= ECHO;
-		tcsetattr(0, TCSANOW, &new_kbd_mode);
-	} else {
-		new_kbd_mode.c_lflag &= ~ECHO;
-		tcsetattr(0, TCSANOW, &new_kbd_mode);
-	}
-	
-	_keyboard = b;
+  if (b == true) {
+    new_kbd_mode.c_lflag |= ECHO;
+    tcsetattr(0, TCSANOW, &new_kbd_mode);
+  } else {
+    new_kbd_mode.c_lflag &= ~ECHO;
+    tcsetattr(0, TCSANOW, &new_kbd_mode);
+  }
+  
+  _keyboard = b;
 }
 
 int System::KbHit(void)
 {
-	struct timeval timeout;
-	fd_set read_handles;
-	int status;
-	
-	/* check stdin (fd 0) for activity */
-	FD_ZERO(&read_handles);
-	FD_SET(0, &read_handles);
-	
-	timeout.tv_sec = timeout.tv_usec = 0;
-	status = select(0 + 1, &read_handles, nullptr, nullptr, &timeout);
-	
-	if(status < 0) {
-		throw jexception::RuntimeException("select() failed in kbhit()");
-	}
+  struct timeval timeout;
+  fd_set read_handles;
+  int status;
+  
+  /* check stdin (fd 0) for activity */
+  FD_ZERO(&read_handles);
+  FD_SET(0, &read_handles);
+  
+  timeout.tv_sec = timeout.tv_usec = 0;
+  status = select(0 + 1, &read_handles, nullptr, nullptr, &timeout);
+  
+  if(status < 0) {
+    throw jexception::RuntimeException("select() failed in kbhit()");
+  }
 
-	return status;
+  return status;
 }
 
 int System::Getch(void)
 {
-	uint8_t temp;
-	
-	/* stdin = fd 0 */
-	if(read(0, &temp, 1) != 1) {
-		return 0;
-	}
+  uint8_t temp;
+  
+  /* stdin = fd 0 */
+  if(read(0, &temp, 1) != 1) {
+    return 0;
+  }
 
-	return temp;
+  return temp;
 }
 
 void System::ChangeWorkingDirectory(std::string dir)
 {
-	if (chdir(dir.c_str()) != 0) {
-		throw jexception::RuntimeException("Change working directory exception");
-	}
+  if (chdir(dir.c_str()) != 0) {
+    throw jexception::RuntimeException("Change working directory exception");
+  }
 }
 
 std::string System::GetProcessName()
 {
-	std::ostringstream o;
-	pid_t pid = getpid();
-	
-	o << "/proc/" << pid << "/execname";
+  std::ostringstream o;
+  pid_t pid = getpid();
+  
+  o << "/proc/" << pid << "/execname";
 
-	return o.str();
+  return o.str();
 }
 
 std::string System::GetUserName()
 {
-	passwd *pw = getpwuid(geteuid());
+  passwd *pw = getpwuid(geteuid());
 
-	if (!pw) {
-		throw jexception::SystemException("getpwuid error");
-	}
+  if (!pw) {
+    throw jexception::SystemException("getpwuid error");
+  }
 
-	return pw->pw_name;
+  return pw->pw_name;
 }
 
 std::string System::GetHostName()
 {
-	struct utsname uts;
+  struct utsname uts;
 
-	uname(&uts);
+  uname(&uts);
 
-	return uts.nodename;
+  return uts.nodename;
 }
 
 std::string System::GetHostArchitecture()
 {
-	struct utsname uts;
+  struct utsname uts;
 
-	uname(&uts);
-	
-	return uts.machine;
+  uname(&uts);
+  
+  return uts.machine;
 }
 
 std::string System::GetOSName()
 {
-	struct utsname uts;
+  struct utsname uts;
 
-	uname(&uts);
+  uname(&uts);
 
-	return uts.sysname;
+  return uts.sysname;
 }
 
 std::string System::GetOSVersion()
 {
-	struct utsname uts;
+  struct utsname uts;
 
-	uname(&uts);
-	
-	return uts.release;
+  uname(&uts);
+  
+  return uts.release;
 }
 
 std::string System::GetTempDirectory()
 {
-	std::string buf;
-	
-	buf = GetEnviromentVariable("TMPDIR", "nono");
+  std::string buf;
+  
+  buf = GetEnviromentVariable("TMPDIR", "nono");
 
-	if (buf != "nono") {
-		return buf;
-	}
+  if (buf != "nono") {
+    return buf;
+  }
 
-	buf = GetEnviromentVariable("TMPDIR", "nono");
-	
-	if (buf != "nono") {
-		return buf;
-	}
+  buf = GetEnviromentVariable("TMPDIR", "nono");
+  
+  if (buf != "nono") {
+    return buf;
+  }
 
-	return "/tmp";
+  return "/tmp";
 }
 
 uint64_t System::GetDiskFreeSpace()
 {
-	struct statfs buf;
+  struct statfs buf;
 
-	if(::statfs("/", &buf) != 0) {
-		return 0LL;
-	}
+  if(::statfs("/", &buf) != 0) {
+    return 0LL;
+  }
 
-	return (uint64_t)(buf.f_bavail) * 1024LL;
+  return (uint64_t)(buf.f_bavail) * 1024LL;
 }
 
 int System::GetProcessorCount()
 {
-	return sysconf(_SC_NPROCESSORS_CONF);
+  return sysconf(_SC_NPROCESSORS_CONF);
 
-	/*
-	int nprocs = sysconf(_SC_NPROCESSORS_ONLN);
+  /*
+  int nprocs = sysconf(_SC_NPROCESSORS_ONLN);
 
   if (nprocs < 1) {
-		return -1;
-	}
+    return -1;
+  }
   
-	nprocs_max = sysconf(_SC_NPROCESSORS_CONF);
+  nprocs_max = sysconf(_SC_NPROCESSORS_CONF);
   
-	if (nprocs_max < 1) {
-		return -1;
+  if (nprocs_max < 1) {
+    return -1;
   }
 
   printf ("%ld of %ld processors online\n",nprocs, nprocs_max);
-	*/
+  */
 }
 
 int System::ResetSystem()
 {
-	return kill(1, SIGINT);
+  return kill(1, SIGINT);
 }
 
 int System::ShutdownSystem()
 {
-	return kill(1, SIGUSR2);
+  return kill(1, SIGUSR2);
 }
 
 void System::Logout()
 {
-	// TODO:: logout
+  // TODO:: logout
 }
 
 void System::ResetProgram(std::string program, char **argv, char **envp)
 {
-	execve(program.c_str(), argv, envp);
+  execve(program.c_str(), argv, envp);
 }
-		
+    
 }
 

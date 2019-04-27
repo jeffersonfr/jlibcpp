@@ -23,9 +23,9 @@
 namespace jgui {
 
 EventManager::EventManager(jgui::Window *window):
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jgui::EventManager");
+  jcommon::Object::SetClassName("jgui::EventManager");
 
   _click_delay = 200; // milliseconds
   _alive = true;
@@ -98,14 +98,14 @@ void EventManager::ProcessEvents()
 
     jevent::EventObject *unknown = nullptr;
 
-	  _mutex.lock();
+    _mutex.lock();
 
     unknown = _events.front();
 
     _events.erase(_events.begin());
 
     _mutex.unlock();
-	
+  
     if (dynamic_cast<jevent::KeyEvent *>(unknown) != nullptr) {
       jevent::KeyEvent *event = dynamic_cast<jevent::KeyEvent *>(unknown);
       jevent::KeyListener *listener = dynamic_cast<jevent::KeyListener *>(_window);

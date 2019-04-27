@@ -22,9 +22,9 @@
 namespace jevent {
 
 ActionListener::ActionListener():
-	jevent::Listener()
+  jevent::Listener()
 {
-	jcommon::Object::SetClassName("jevent::ActionEvent");
+  jcommon::Object::SetClassName("jevent::ActionEvent");
 }
 
 ActionListener::~ActionListener()

@@ -41,11 +41,11 @@ namespace jgui {
  *
  */
 enum jkeyboard_type_t {
-	JKT_QWERTY,
-	JKT_ALPHA_NUMERIC,
-	JKT_NUMERIC,
-	JKT_PHONE,
-	JKT_INTERNET
+  JKT_QWERTY,
+  JKT_ALPHA_NUMERIC,
+  JKT_NUMERIC,
+  JKT_PHONE,
+  JKT_INTERNET
 };
 
 class TextArea;
@@ -57,111 +57,111 @@ class TextArea;
  */
 class KeyboardDialog : public jgui::Dialog, public jevent::ActionListener {
 
-	private:
-		/** \brief */
-		std::vector<jevent::KeyListener *> _key_listeners;
-		/** \brief */
+  private:
+    /** \brief */
+    std::vector<jevent::KeyListener *> _key_listeners;
+    /** \brief */
     std::mutex _key_listeners_mutex;
-		/** \brief */
-		TextArea *_display;
-		/** \brief */
-		std::string _text;
-		/** \brief */
-		int _state;
-		/** \brief */
-		bool _shift_pressed;
-		/** \brief */
-		bool _input_locked;
-		/** \brief */
-		bool _is_password;
-		/** \brief */
-		jkeyboard_type_t _type;
+    /** \brief */
+    TextArea *_display;
+    /** \brief */
+    std::string _text;
+    /** \brief */
+    int _state;
+    /** \brief */
+    bool _shift_pressed;
+    /** \brief */
+    bool _input_locked;
+    /** \brief */
+    bool _is_password;
+    /** \brief */
+    jkeyboard_type_t _type;
 
-	private:
-		/**
-		 * \brief
-		 *
-		 */
-		void BuildQWERTYKeyboard();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void BuildAlphaNumericKeyboard();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void BuildNumericKeyboard();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void BuildPhoneKeyboard();
+  private:
+    /**
+     * \brief
+     *
+     */
+    void BuildQWERTYKeyboard();
+    
+    /**
+     * \brief
+     *
+     */
+    void BuildAlphaNumericKeyboard();
+    
+    /**
+     * \brief
+     *
+     */
+    void BuildNumericKeyboard();
+    
+    /**
+     * \brief
+     *
+     */
+    void BuildPhoneKeyboard();
 
-		/**
-		 * \brief
-		 *
-		 */
-		void BuildInternetKeyboard();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void ProcessCaps(Button *button);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void ActionPerformed(jevent::ActionEvent *event);
-		
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		KeyboardDialog(Container *parent, jkeyboard_type_t type, bool text_visible = true, bool is_password = false);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~KeyboardDialog();
+    /**
+     * \brief
+     *
+     */
+    void BuildInternetKeyboard();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void ProcessCaps(Button *button);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void ActionPerformed(jevent::ActionEvent *event);
+    
+  public:
+    /**
+     * \brief
+     *
+     */
+    KeyboardDialog(Container *parent, jkeyboard_type_t type, bool text_visible = true, bool is_password = false);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~KeyboardDialog();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jgui::TextComponent * GetTextComponent();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::vector<jevent::KeyListener *> & GetKeyListeners();
+    /**
+     * \brief
+     *
+     */
+    virtual jgui::TextComponent * GetTextComponent();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual std::vector<jevent::KeyListener *> & GetKeyListeners();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RegisterKeyListener(jevent::KeyListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveKeyListener(jevent::KeyListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void DispatchKeyEvent(jevent::KeyEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual void RegisterKeyListener(jevent::KeyListener *listener);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void RemoveKeyListener(jevent::KeyListener *listener);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void DispatchKeyEvent(jevent::KeyEvent *event);
 
 };
 

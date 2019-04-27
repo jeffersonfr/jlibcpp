@@ -22,9 +22,9 @@
 namespace jsecurity {
 
 AccessControl::AccessControl():
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jsecurity::AccessControl");
+  jcommon::Object::SetClassName("jsecurity::AccessControl");
 }
 
 AccessControl::~AccessControl()
@@ -33,17 +33,17 @@ AccessControl::~AccessControl()
 
 User * AccessControl::GetUser()
 {
-	return nullptr;
+  return nullptr;
 }
 
 Group * AccessControl::GetGroup()
 {
-	return nullptr;
+  return nullptr;
 }
 
 User * AccessControl::GetOther()
 {
-	return nullptr;
+  return nullptr;
 }
 
 void AccessControl::SetUser(User *id)

@@ -25,9 +25,9 @@
 namespace jcommon {
 
 DynamicLink::DynamicLink():
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jcommon::DynamicLink");
+  jcommon::Object::SetClassName("jcommon::DynamicLink");
 }
 
 DynamicLink::~DynamicLink()
@@ -36,35 +36,35 @@ DynamicLink::~DynamicLink()
 
 void DynamicLink::Load(std::string lib, jlink_flags_t mode)
 {
-	int m = 0;
+  int m = 0;
 
-	if (mode == JLF_NOW) {
-		m = RTLD_NOW;
-	} else if (mode == JLF_LAZY) {
-		m = RTLD_LAZY;
-	} else if (mode == JLF_LOCAL) {
-		m = RTLD_LOCAL;
-	} else if (mode == JLF_GLOBAL) {
-		m = RTLD_GLOBAL;
-	}
+  if (mode == JLF_NOW) {
+    m = RTLD_NOW;
+  } else if (mode == JLF_LAZY) {
+    m = RTLD_LAZY;
+  } else if (mode == JLF_LOCAL) {
+    m = RTLD_LOCAL;
+  } else if (mode == JLF_GLOBAL) {
+    m = RTLD_GLOBAL;
+  }
 
-	_handle = dlopen(lib.c_str(), m);
+  _handle = dlopen(lib.c_str(), m);
 
-	if (_handle == nullptr) {
-		throw jexception::RuntimeException(dlerror());
-	}
-	
-	dlerror();
+  if (_handle == nullptr) {
+    throw jexception::RuntimeException(dlerror());
+  }
+  
+  dlerror();
 }
 
 void * DynamicLink::FindSymbol(std::string symbol)
 {
-	return dlsym(_handle, symbol.c_str());
+  return dlsym(_handle, symbol.c_str());
 }
 
 void DynamicLink::Unload()
 {
-	dlclose(_handle);
+  dlclose(_handle);
 }
 
 void DynamicLink::ListSymbols(std::string, std::string)
@@ -73,7 +73,7 @@ void DynamicLink::ListSymbols(std::string, std::string)
 
 std::string DynamicLink::GetDependencies()
 {
-	return "";
+  return "";
 }
 
 void DynamicLink::ListLibraries()

@@ -31,30 +31,30 @@ namespace jipc {
  */
 class RemoteIPCClient : public IPCClient {
 
-	private:
-		/** \brief */
-		std::string _host;
-		/** \brief */
-		int _port;
+  private:
+    /** \brief */
+    std::string _host;
+    /** \brief */
+    int _port;
 
-	public:
-		/**
-		 * \Constructor.
-		 *
-		 */
-		RemoteIPCClient(std::string host, int port);
+  public:
+    /**
+     * \Constructor.
+     *
+     */
+    RemoteIPCClient(std::string host, int port);
 
-		/**
-		 * \brief Destructor.
-		 *
-		 */
-		virtual ~RemoteIPCClient();
+    /**
+     * \brief Destructor.
+     *
+     */
+    virtual ~RemoteIPCClient();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void CallMethod(Method *method, Response **response);
+    /**
+     * \brief
+     *
+     */
+    virtual void CallMethod(Method *method, Response **response);
 
 };
 

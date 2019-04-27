@@ -29,10 +29,10 @@
 namespace jipc {
 
 RemoteIPCClient::RemoteIPCClient(std::string host, int port):
-	IPCClient()
+  IPCClient()
 {
-	_host = host;
-	_port = port;
+  _host = host;
+  _port = port;
 }
 
 RemoteIPCClient::~RemoteIPCClient()
@@ -41,70 +41,70 @@ RemoteIPCClient::~RemoteIPCClient()
 
 void RemoteIPCClient::CallMethod(Method *method, Response **response)
 {
-	if (method == nullptr) {
-		throw jexception::NullPointerException("Method cannot be null");
-	}
+  if (method == nullptr) {
+    throw jexception::NullPointerException("Method cannot be null");
+  }
 
-	try {
-		jnetwork::Socket client(_host, _port, _call_timeout);
+  try {
+    jnetwork::Socket client(_host, _port, _call_timeout);
 
-		std::string encoded = method->Encode();
-		const char *buffer = encoded.c_str();
-		int length = encoded.size();
-		int r = 0,
-				index = 0,
-				size = 1500;
+    std::string encoded = method->Encode();
+    const char *buffer = encoded.c_str();
+    int length = encoded.size();
+    int r = 0,
+        index = 0,
+        size = 1500;
 
-		try {
-			while (length > 0) {
-				if (size > length) {
-					size = length;
-				}
+    try {
+      while (length > 0) {
+        if (size > length) {
+          size = length;
+        }
 
-				r = client.Send(buffer+index, size, _call_timeout);
+        r = client.Send(buffer+index, size, _call_timeout);
 
-				if (r <= 0) {
-					break;
-				}
+        if (r <= 0) {
+          break;
+        }
 
-				length = length - r;
-				index = index + r;
-			}
-		} catch (jexception::IOException &e) {
-			throw jexception::IPCException(&e, "Connection broken");
-		}
+        length = length - r;
+        index = index + r;
+      }
+    } catch (jexception::IOException &e) {
+      throw jexception::IPCException(&e, "Connection broken");
+    }
 
-		uint8_t rbuffer[65535];
+    uint8_t rbuffer[65535];
 
-		index = 0;
+    index = 0;
 
-		try {
-			while ((r = client.Receive((char *)rbuffer+index, size, _call_timeout)) > 0) {
-				index = index + r;
+    try {
+      while ((r = client.Receive((char *)rbuffer+index, size, _call_timeout)) > 0) {
+        index = index + r;
 
-				if (r < size) {
-					break;
-				}
-			}
+        if (r < size) {
+          break;
+        }
+      }
 
-			rbuffer[index] = 0;
-		} catch (jexception::IOException &) {
-		}
+      rbuffer[index] = 0;
+    } catch (jexception::IOException &) {
+    }
 
-		Response *local = (*response);
+    Response *local = (*response);
 
-		if (local == nullptr) {
-			local = new Response();
-		}
+    if (local == nullptr) {
+      local = new Response();
+    }
 
-		local->Initialize((uint8_t *)rbuffer, index);
+    local->Initialize((uint8_t *)rbuffer, index);
 
-		(*response) = local;
-	} catch (jexception::ConnectionTimeoutException &e) {
-		throw jexception::TimeoutException(&e, "Connection timeout exception");
-	} catch (jexception::Exception &e) {
-		throw jexception::IPCException(&e, "Connection error");
-	}
+    (*response) = local;
+  } catch (jexception::ConnectionTimeoutException &e) {
+    throw jexception::TimeoutException(&e, "Connection timeout exception");
+  } catch (jexception::Exception &e) {
+    throw jexception::IPCException(&e, "Connection error");
+  }
 }
 
 }

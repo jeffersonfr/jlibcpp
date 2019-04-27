@@ -23,41 +23,41 @@
 namespace jgui {
 
 Panel::Panel(int x, int y, int width, int height):
-	Container(x, y, width, height)
+  Container(x, y, width, height)
 {
-	jcommon::Object::SetClassName("jgui::Panel");
-	
+  jcommon::Object::SetClassName("jgui::Panel");
+  
   jgui::jinsets_t
     insets;
 
-	insets.left = 8;
-	insets.right = 8;
-	insets.top = 64;
-	insets.bottom = 8;
+  insets.left = 8;
+  insets.right = 8;
+  insets.top = 64;
+  insets.bottom = 8;
 
   SetInsets(insets);
-	SetFocusable(true);
-	SetBackgroundVisible(true);
+  SetFocusable(true);
+  SetBackgroundVisible(true);
 }
 
 Panel::Panel(std::string title, int x, int y, int width, int height):
-	Container(x, y, width, height)
+  Container(x, y, width, height)
 {
-	jcommon::Object::SetClassName("jgui::Panel");
-	
-	_title = title;
+  jcommon::Object::SetClassName("jgui::Panel");
+  
+  _title = title;
 
   jgui::jinsets_t
     insets;
 
-	insets.left = 8;
-	insets.right = 8;
-	insets.top = 64;
-	insets.bottom = 8;
+  insets.left = 8;
+  insets.right = 8;
+  insets.top = 64;
+  insets.bottom = 8;
 
   SetInsets(insets);
-	SetFocusable(true);
-	SetBackgroundVisible(true);
+  SetFocusable(true);
+  SetBackgroundVisible(true);
 }
 
 Panel::~Panel()
@@ -66,66 +66,66 @@ Panel::~Panel()
 
 void Panel::SetTitle(std::string title)
 {
-	_title = title;
+  _title = title;
 }
 
 std::string Panel::GetTitle()
 {
-	return _title;
+  return _title;
 }
-		
+    
 void Panel::Paint(Graphics *g)
 {
-	JDEBUG(JINFO, "paint\n");
+  JDEBUG(JINFO, "paint\n");
 
-	Container::Paint(g);
+  Container::Paint(g);
 }
 
 void Panel::PaintGlassPane(Graphics *g)
 {
-	Theme *theme = GetTheme();
+  Theme *theme = GetTheme();
 
   if (theme == nullptr) {
     return;
   }
 
-	jgui::Font 
+  jgui::Font 
     *font = theme->GetFont("window.font");
   jgui::Color 
     bg = theme->GetIntegerParam("window.bg"),
-	  fg = theme->GetIntegerParam("window.fg"),
-	  scroll = theme->GetIntegerParam("window.scroll");
+    fg = theme->GetIntegerParam("window.fg"),
+    scroll = theme->GetIntegerParam("window.scroll");
   jgui::jsize_t
     size = GetSize();
-	jinsets_t 
+  jinsets_t 
     insets = GetInsets();
-	int 
+  int 
     bs = theme->GetIntegerParam("window.border.size");
 
-	if (_title != "") {
-		g->SetGradientStop(0.0, bg);
-		g->SetGradientStop(1.0, scroll);
-		g->FillLinearGradient(bs, bs, size.width - 2*bs, insets.top - 2*bs, 0, 0, 0, insets.top - 2*bs);
-		g->ResetGradientStop();
+  if (_title != "") {
+    g->SetGradientStop(0.0, bg);
+    g->SetGradientStop(1.0, scroll);
+    g->FillLinearGradient(bs, bs, size.width - 2*bs, insets.top - 2*bs, 0, 0, 0, insets.top - 2*bs);
+    g->ResetGradientStop();
 
-		if (font != nullptr) {
-			int y = (insets.top-font->GetSize())/2;
+    if (font != nullptr) {
+      int y = (insets.top-font->GetSize())/2;
 
-			if (y < 0) {
-				y = 0;
-			}
+      if (y < 0) {
+        y = 0;
+      }
 
-			std::string text = _title;
-			
-			// if (_wrap == false) {
-				text = font->TruncateString(text, "...", (size.width-insets.left-insets.right));
-			// }
+      std::string text = _title;
+      
+      // if (_wrap == false) {
+        text = font->TruncateString(text, "...", (size.width-insets.left-insets.right));
+      // }
 
-			g->SetFont(font);
-			g->SetColor(fg);
-			g->DrawString(text, insets.left+(size.width-insets.left-insets.right-font->GetStringWidth(text))/2, y);
-		}
-	}
+      g->SetFont(font);
+      g->SetColor(fg);
+      g->DrawString(text, insets.left+(size.width-insets.left-insets.right-font->GetStringWidth(text))/2, y);
+    }
+  }
 }
 
 }

@@ -26,55 +26,55 @@ namespace jmedia {
 
 class ColorConversion : public virtual jcommon::Object {
 
-	private:
-		/**
-		 * \brief
-		 *
-		 */
-		ColorConversion();
+  private:
+    /**
+     * \brief
+     *
+     */
+    ColorConversion();
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~ColorConversion();
+  public:
+    /**
+     * \brief
+     *
+     */
+    virtual ~ColorConversion();
 
-		/**
-		 * \brief
-		 *
-		 */
-		static void GetRGB32FromGray(uint8_t **gray_array, uint32_t **rgb32_array, int width, int height);
+    /**
+     * \brief
+     *
+     */
+    static void GetRGB32FromGray(uint8_t **gray_array, uint32_t **rgb32_array, int width, int height);
 
-		/**
-		 * \brief
-		 *
-		 */
-		static void GetRGB32FromPalette(uint8_t **color_array, uint32_t **palette_array, uint32_t **rgb32_array, int width, int height);
+    /**
+     * \brief
+     *
+     */
+    static void GetRGB32FromPalette(uint8_t **color_array, uint32_t **palette_array, uint32_t **rgb32_array, int width, int height);
 
-		/**
-		 * \brief
-		 *
-		 */
-		static void GetRGB32FromRGB16(uint8_t **rgb24_array, uint32_t **rgb32_array, int width, int height);
+    /**
+     * \brief
+     *
+     */
+    static void GetRGB32FromRGB16(uint8_t **rgb24_array, uint32_t **rgb32_array, int width, int height);
 
-		/**
-		 * \brief
-		 *
-		 */
-		static void GetRGB32FromRGB24(uint8_t **rgb24_array, uint32_t **rgb32_array, int width, int height);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		static void GetRGB32FromYV12(uint8_t **y_array, uint8_t **u_array, uint8_t **v_array, uint32_t **rgb32_array, int width, int height);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		static void GetRGB32FromYUYV(uint8_t **yuv_array, uint32_t **rgb32_array, int width, int height);
+    /**
+     * \brief
+     *
+     */
+    static void GetRGB32FromRGB24(uint8_t **rgb24_array, uint32_t **rgb32_array, int width, int height);
+    
+    /**
+     * \brief
+     *
+     */
+    static void GetRGB32FromYV12(uint8_t **y_array, uint8_t **u_array, uint8_t **v_array, uint32_t **rgb32_array, int width, int height);
+    
+    /**
+     * \brief
+     *
+     */
+    static void GetRGB32FromYUYV(uint8_t **yuv_array, uint32_t **rgb32_array, int width, int height);
 
 };
 

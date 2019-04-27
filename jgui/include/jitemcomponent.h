@@ -17,7 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef	J_ITEMCOMPONENT_H
+#ifndef  J_ITEMCOMPONENT_H
 #define J_ITEMCOMPONENT_H
 
 #include "jgui/jcomponent.h"
@@ -33,190 +33,190 @@ namespace jgui {
  *
  */
 enum jitem_type_t {
-	JIT_EMPTY,
-	JIT_TEXT,
-	JIT_IMAGE,
-	JIT_CHECK
+  JIT_EMPTY,
+  JIT_TEXT,
+  JIT_IMAGE,
+  JIT_CHECK
 };
 
 class Item : public virtual jcommon::Object {
 
-	private:
-		/** \brief */
-		std::vector<Item *> _childs;
-		/** \brief */
-		std::string _value;
-		/** \brief */
+  private:
+    /** \brief */
+    std::vector<Item *> _childs;
+    /** \brief */
+    std::string _value;
+    /** \brief */
     jgui::Image *_image;
-		/** \brief */
-		jitem_type_t _type;
-		/** \brief */
-		jhorizontal_align_t _halign;
-		/** \brief */
-		jvertical_align_t _valign;
-		/** \brief */
-		bool _is_checked;
-		/** \brief */
-		bool _is_visible;
-		/** \brief */
-		bool _is_enabled;
+    /** \brief */
+    jitem_type_t _type;
+    /** \brief */
+    jhorizontal_align_t _halign;
+    /** \brief */
+    jvertical_align_t _valign;
+    /** \brief */
+    bool _is_checked;
+    /** \brief */
+    bool _is_visible;
+    /** \brief */
+    bool _is_enabled;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		Item();
+  public:
+    /**
+     * \brief
+     *
+     */
+    Item();
 
-		/**
-		 * \brief
-		 *
-		 */
-		Item(std::string value);
+    /**
+     * \brief
+     *
+     */
+    Item(std::string value);
 
-		/**
-		 * \brief
-		 *
-		 */
-		Item(std::string value, jgui::Image *image);
+    /**
+     * \brief
+     *
+     */
+    Item(std::string value, jgui::Image *image);
 
-		/**
-		 * \brief
-		 *
-		 */
-		Item(std::string value, bool checked);
+    /**
+     * \brief
+     *
+     */
+    Item(std::string value, bool checked);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~Item();
+    /**
+     * \brief
+     *
+     */
+    virtual ~Item();
 
-		/**
-		 * \brief Clone object.
-		 *
-		 */
-		virtual jcommon::Object * Clone();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual const std::vector<Item *> & GetChilds();
+    /**
+     * \brief Clone object.
+     *
+     */
+    virtual jcommon::Object * Clone();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual const std::vector<Item *> & GetChilds();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetHorizontalAlign(jhorizontal_align_t align);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetHorizontalAlign(jhorizontal_align_t align);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jhorizontal_align_t GetHorizontalAlign();
+    /**
+     * \brief
+     *
+     */
+    virtual jhorizontal_align_t GetHorizontalAlign();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetVerticalAlign(jvertical_align_t align);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetVerticalAlign(jvertical_align_t align);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jvertical_align_t GetVerticalAlign();
+    /**
+     * \brief
+     *
+     */
+    virtual jvertical_align_t GetVerticalAlign();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetEnabled(bool b);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetEnabled(bool b);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsEnabled();
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsEnabled();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetVisible(bool b);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetVisible(bool b);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsVisible();
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsVisible();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsSelected();
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsSelected();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetSelected(bool b);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetSelected(bool b);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void AddChild(Item *item);
+    /**
+     * \brief
+     *
+     */
+    virtual void AddChild(Item *item);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void AddChild(Item *item, int index);
+    /**
+     * \brief
+     *
+     */
+    virtual void AddChild(Item *item, int index);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void AddChilds(std::vector<Item *> &items);
+    /**
+     * \brief
+     *
+     */
+    virtual void AddChilds(std::vector<Item *> &items);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveChild(int index);
+    /**
+     * \brief
+     *
+     */
+    virtual void RemoveChild(int index);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveChild(Item *item);
+    /**
+     * \brief
+     *
+     */
+    virtual void RemoveChild(Item *item);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetChildsSize();
+    /**
+     * \brief
+     *
+     */
+    virtual int GetChildsSize();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string GetValue();
+    /**
+     * \brief
+     *
+     */
+    virtual std::string GetValue();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jgui::Image * GetImage();
+    /**
+     * \brief
+     *
+     */
+    virtual jgui::Image * GetImage();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jitem_type_t GetType();
+    /**
+     * \brief
+     *
+     */
+    virtual jitem_type_t GetType();
 
 };
 
@@ -227,165 +227,165 @@ class Item : public virtual jcommon::Object {
  */
 class ItemComponent : public virtual jcommon::Object {
 
-	protected:
-		/** \brief */
-		std::vector<jevent::SelectListener *> _select_listeners;
-		/** \brief */
-		std::mutex _itemcomponent_mutex;
-		/** \brief */
-		std::mutex _select_listener_mutex;
-		/** \brief */
-		std::vector<Item *> _items;
-		/** \brief */
-		std::vector<Item *> _internal;
-		/** \brief */
-		std::string _text;
-		/** \brief */
-		int _index;
-		/** \brief */
-		bool _loop;
+  protected:
+    /** \brief */
+    std::vector<jevent::SelectListener *> _select_listeners;
+    /** \brief */
+    std::mutex _itemcomponent_mutex;
+    /** \brief */
+    std::mutex _select_listener_mutex;
+    /** \brief */
+    std::vector<Item *> _items;
+    /** \brief */
+    std::vector<Item *> _internal;
+    /** \brief */
+    std::string _text;
+    /** \brief */
+    int _index;
+    /** \brief */
+    bool _loop;
 
-	protected:
-		void AddInternalItem(Item *item);
+  protected:
+    void AddInternalItem(Item *item);
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		ItemComponent();
+  public:
+    /**
+     * \brief
+     *
+     */
+    ItemComponent();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~ItemComponent();
+    /**
+     * \brief
+     *
+     */
+    virtual ~ItemComponent();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetItemsSize();
+    /**
+     * \brief
+     *
+     */
+    virtual int GetItemsSize();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetLoop(bool loop);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetLoop(bool loop);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetCurrentIndex(int i);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetCurrentIndex(int i);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void AddEmptyItem();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void AddTextItem(std::string text);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void AddImageItem(std::string text, jgui::Image *image);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void AddCheckedItem(std::string text, bool checked);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void AddItem(Item *item);
+    /**
+     * \brief
+     *
+     */
+    virtual void AddEmptyItem();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void AddTextItem(std::string text);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void AddImageItem(std::string text, jgui::Image *image);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void AddCheckedItem(std::string text, bool checked);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void AddItem(Item *item);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void AddItem(Item *item, int index);
+    /**
+     * \brief
+     *
+     */
+    virtual void AddItem(Item *item, int index);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void AddItems(std::vector<Item *> &items);
+    /**
+     * \brief
+     *
+     */
+    virtual void AddItems(std::vector<Item *> &items);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveItem(Item *item);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveItem(int index);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveItems();
+    /**
+     * \brief
+     *
+     */
+    virtual void RemoveItem(Item *item);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void RemoveItem(int index);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void RemoveItems();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Item * GetItem(int index);
-	
-		/**
-		 * \brief
-		 *
-		 */
-		virtual const std::vector<Item *> & GetItems();
-	
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Item * GetCurrentItem();
+    /**
+     * \brief
+     *
+     */
+    virtual Item * GetItem(int index);
+  
+    /**
+     * \brief
+     *
+     */
+    virtual const std::vector<Item *> & GetItems();
+  
+    /**
+     * \brief
+     *
+     */
+    virtual Item * GetCurrentItem();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetCurrentIndex();
+    /**
+     * \brief
+     *
+     */
+    virtual int GetCurrentIndex();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RegisterSelectListener(jevent::SelectListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveSelectListener(jevent::SelectListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void DispatchSelectEvent(jevent::SelectEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual const std::vector<jevent::SelectListener *> & GetSelectListeners();
+    /**
+     * \brief
+     *
+     */
+    virtual void RegisterSelectListener(jevent::SelectListener *listener);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void RemoveSelectListener(jevent::SelectListener *listener);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void DispatchSelectEvent(jevent::SelectEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual const std::vector<jevent::SelectListener *> & GetSelectListeners();
 
 };
 

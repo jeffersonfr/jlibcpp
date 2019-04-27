@@ -24,19 +24,19 @@ namespace jexception {
 OutOfBoundsException::OutOfBoundsException():
   RuntimeException()
 {
-	jcommon::Object::SetClassName("jexception::OutOfBoundsException");
+  jcommon::Object::SetClassName("jexception::OutOfBoundsException");
 }
 
 OutOfBoundsException::OutOfBoundsException(std::string reason_):
   RuntimeException(reason_)
 {
-	jcommon::Object::SetClassName("jexception::OutOfBoundsException");
+  jcommon::Object::SetClassName("jexception::OutOfBoundsException");
 }
 
 OutOfBoundsException::OutOfBoundsException(Exception *exception, std::string reason_):
   RuntimeException(exception, reason_)
 {
-	jcommon::Object::SetClassName("jexception::OutOfBoundsException");
+  jcommon::Object::SetClassName("jexception::OutOfBoundsException");
 }
 
 OutOfBoundsException::~OutOfBoundsException() throw()

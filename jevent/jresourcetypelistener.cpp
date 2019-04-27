@@ -22,7 +22,7 @@
 namespace jevent {
 
 ResourceTypeListener::ResourceTypeListener():
-	jevent::Listener()
+  jevent::Listener()
 {
 }
 

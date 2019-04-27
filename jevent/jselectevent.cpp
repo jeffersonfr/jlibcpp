@@ -22,12 +22,12 @@
 namespace jevent {
 
 SelectEvent::SelectEvent(void *source, int index, jselectevent_type_t type):
-	jevent::EventObject(source)
+  jevent::EventObject(source)
 {
-	jcommon::Object::SetClassName("jevent::SelectEvent");
+  jcommon::Object::SetClassName("jevent::SelectEvent");
 
-	_index = index;
-	_type = type;
+  _index = index;
+  _type = type;
 }
 
 SelectEvent::~SelectEvent()
@@ -36,12 +36,12 @@ SelectEvent::~SelectEvent()
 
 int SelectEvent::GetIndex()
 {
-	return _index;
+  return _index;
 }
 
 jselectevent_type_t SelectEvent::GetType()
 {
-	return _type;
+  return _type;
 }
 
 }

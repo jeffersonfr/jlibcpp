@@ -22,21 +22,21 @@
 namespace jexception {
 
 BadCastException::BadCastException():
-	RuntimeException(), std::bad_cast()
+  RuntimeException(), std::bad_cast()
 {
-	jcommon::Object::SetClassName("jexception::BadCastException");
+  jcommon::Object::SetClassName("jexception::BadCastException");
 }
 
 BadCastException::BadCastException(std::string reason_):
-	RuntimeException(reason_)
+  RuntimeException(reason_)
 {
-	jcommon::Object::SetClassName("jexception::BadCastException");
+  jcommon::Object::SetClassName("jexception::BadCastException");
 }
 
 BadCastException::BadCastException(Exception *exception, std::string reason_):
-	RuntimeException(exception, reason_)
+  RuntimeException(exception, reason_)
 {
-	jcommon::Object::SetClassName("jexception::BadCastException");
+  jcommon::Object::SetClassName("jexception::BadCastException");
 }
 
 BadCastException::~BadCastException() throw()

@@ -22,9 +22,9 @@
 namespace jgui {
 
 KeyMap::KeyMap():
- 	jcommon::Object()
+   jcommon::Object()
 {
-	SetClassName("jgui::KeyMap");
+  SetClassName("jgui::KeyMap");
 }
 
 KeyMap::~KeyMap()
@@ -33,7 +33,7 @@ KeyMap::~KeyMap()
 
 bool KeyMap::HasKey(jevent::jkeyevent_symbol_t key)
 {
-	return true;
+  return true;
 }
 
 }

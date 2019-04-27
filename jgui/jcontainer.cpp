@@ -30,129 +30,129 @@
 namespace jgui {
 
 Container::Container(int x, int y, int width, int height):
-	jgui::Component(x, y, width, height)
+  jgui::Component(x, y, width, height)
 {
-	jcommon::Object::SetClassName("jgui::Container");
+  jcommon::Object::SetClassName("jgui::Container");
 
-	_default_layout = new BorderLayout();
+  _default_layout = new BorderLayout();
 
-	_layout = _default_layout;
+  _layout = _default_layout;
 
-	_is_focus_cycle_root = false;
-	_orientation = JCO_LEFT_TO_RIGHT;
-	_is_enabled = true;
-	_is_visible = true;
-	_optimized_paint = false;
+  _is_focus_cycle_root = false;
+  _orientation = JCO_LEFT_TO_RIGHT;
+  _is_enabled = true;
+  _is_visible = true;
+  _optimized_paint = false;
 
-	_insets.left = 0;
-	_insets.right = 0;
-	_insets.top = 0;
-	_insets.bottom = 0;
+  _insets.left = 0;
+  _insets.right = 0;
+  _insets.top = 0;
+  _insets.bottom = 0;
 
-	SetBackgroundVisible(false);
+  SetBackgroundVisible(false);
 }
 
 Container::~Container()
 {
-	if (_default_layout != nullptr) {
-		delete _default_layout;
-		_default_layout = nullptr;
-	}
+  if (_default_layout != nullptr) {
+    delete _default_layout;
+    _default_layout = nullptr;
+  }
 }
 
 bool Container::MoveScrollTowards(Component *next, jevent::jkeyevent_symbol_t symbol)
 {
-	if (IsScrollable()) {
-		Component 
+  if (IsScrollable()) {
+    Component 
       *current = GetFocusOwner();
-		jpoint_t 
+    jpoint_t 
       slocation = GetScrollLocation();
-		jsize_t 
+    jsize_t 
       size = GetSize(),
       scroll_dimension = GetScrollDimension();
-		int 
+    int 
       x = slocation.x,
-			y = slocation.y,
-			w = size.width,
-			h = size.height;
-		bool 
+      y = slocation.y,
+      w = size.width,
+      h = size.height;
+    bool 
       edge = false,
-			currentLarge = false,
-			scrollOutOfBounds = false;
+      currentLarge = false,
+      scrollOutOfBounds = false;
 
-		if (symbol == jevent::JKS_CURSOR_UP) {
-				y = slocation.y - _scroll_major_increment;
-				// edge = (position == 0);
-				currentLarge = (scroll_dimension.height > size.height);
-				scrollOutOfBounds = y < 0;
-				if(scrollOutOfBounds){
-					y = 0;
-				}
-		} else if (symbol == jevent::JKS_CURSOR_DOWN) {
-				y = slocation.y + _scroll_major_increment;
-				// edge = (position == f.getFocusCount() - 1);
-				currentLarge = (scroll_dimension.height > size.height);
-				scrollOutOfBounds = y > (scroll_dimension.height - size.height);
-				if(scrollOutOfBounds){
-					y = scroll_dimension.height - size.height;
-				}
-		} else if (symbol == jevent::JKS_CURSOR_RIGHT) {
-				x = slocation.x + _scroll_major_increment;
-				// edge = (position == f.getFocusCount() - 1);
-				currentLarge = (scroll_dimension.width > size.width);
-				scrollOutOfBounds = x > (scroll_dimension.width - size.width);
-				if(scrollOutOfBounds){
-					x = scroll_dimension.width - size.width;
-				}
-		} else if (symbol == jevent::JKS_CURSOR_LEFT) {
-				x = slocation.x - _scroll_major_increment;
-				// edge = (position == 0);
-				currentLarge = (scroll_dimension.width > size.width);
-				scrollOutOfBounds = x < 0;
-				if(scrollOutOfBounds){
-					x = 0;
-				}
-		}
-		
-		//if the Form doesn't contain a focusable Component simply move the viewport by pixels
-		if (next == nullptr || next == this){
-			ScrollToVisibleArea(x, y, w, h, this);
+    if (symbol == jevent::JKS_CURSOR_UP) {
+        y = slocation.y - _scroll_major_increment;
+        // edge = (position == 0);
+        currentLarge = (scroll_dimension.height > size.height);
+        scrollOutOfBounds = y < 0;
+        if(scrollOutOfBounds){
+          y = 0;
+        }
+    } else if (symbol == jevent::JKS_CURSOR_DOWN) {
+        y = slocation.y + _scroll_major_increment;
+        // edge = (position == f.getFocusCount() - 1);
+        currentLarge = (scroll_dimension.height > size.height);
+        scrollOutOfBounds = y > (scroll_dimension.height - size.height);
+        if(scrollOutOfBounds){
+          y = scroll_dimension.height - size.height;
+        }
+    } else if (symbol == jevent::JKS_CURSOR_RIGHT) {
+        x = slocation.x + _scroll_major_increment;
+        // edge = (position == f.getFocusCount() - 1);
+        currentLarge = (scroll_dimension.width > size.width);
+        scrollOutOfBounds = x > (scroll_dimension.width - size.width);
+        if(scrollOutOfBounds){
+          x = scroll_dimension.width - size.width;
+        }
+    } else if (symbol == jevent::JKS_CURSOR_LEFT) {
+        x = slocation.x - _scroll_major_increment;
+        // edge = (position == 0);
+        currentLarge = (scroll_dimension.width > size.width);
+        scrollOutOfBounds = x < 0;
+        if(scrollOutOfBounds){
+          x = 0;
+        }
+    }
+    
+    //if the Form doesn't contain a focusable Component simply move the viewport by pixels
+    if (next == nullptr || next == this){
+      ScrollToVisibleArea(x, y, w, h, this);
 
-			return false;
-		}
+      return false;
+    }
 
     jgui::jpoint_t 
       al = GetAbsoluteLocation(),
       nl = next->GetAbsoluteLocation();
     jgui::jsize_t
       ns = next->GetSize();
-		bool 
+    bool 
       nextIntersects = Contains(next) == true && Intersects(al.x, al.y, ns.width, ns.height, al.x + x, al.y + y, w, h);
 
-		if ((nextIntersects && !currentLarge && !edge) || 
-				Rectangle::Contains(al.x + slocation.x, al.y + slocation.y, w, h, nl.x, nl.y, ns.width, ns.height)) {
-			//scrollComponentToVisible(next);
-		} else {
-			if (!scrollOutOfBounds) {
+    if ((nextIntersects && !currentLarge && !edge) || 
+        Rectangle::Contains(al.x + slocation.x, al.y + slocation.y, w, h, nl.x, nl.y, ns.width, ns.height)) {
+      //scrollComponentToVisible(next);
+    } else {
+      if (!scrollOutOfBounds) {
         jgui::jpoint_t 
           cl = current->GetAbsoluteLocation();
         jgui::jsize_t
           cs = current->GetSize();
 
-				ScrollToVisibleArea(x, y, w, h, this);
+        ScrollToVisibleArea(x, y, w, h, this);
 
-				// if after moving the scroll the current focus is out of the view port and the next focus is in the view port move the focus
-				if (nextIntersects == false || 
-						Rectangle::Intersects(cl.x, cl.y, cs.width, cs.height, al.x + x, al.y + y, w, h) != 0) {
-					return false;
-				}
-			} else {
-				//scrollComponentToVisible(next);
-			}
-		}
-	}
+        // if after moving the scroll the current focus is out of the view port and the next focus is in the view port move the focus
+        if (nextIntersects == false || 
+            Rectangle::Intersects(cl.x, cl.y, cs.width, cs.height, al.x + x, al.y + y, w, h) != 0) {
+          return false;
+        }
+      } else {
+        //scrollComponentToVisible(next);
+      }
+    }
+  }
 
-	return true;
+  return true;
 }
 
 void Container::InternalAddDialog(Dialog *dialog)
@@ -187,11 +187,11 @@ jsize_t Container::GetScrollDimension()
 {
   jgui::Theme 
     *theme = GetTheme();
-	int 
+  int 
     p1x = 0,
-		p2x = 0,
+    p2x = 0,
     p1y = 0,
-		p2y = 0;
+    p2y = 0;
   int 
     ss = 0,
     sg = 0;
@@ -204,7 +204,7 @@ jsize_t Container::GetScrollDimension()
   jgui::jsize_t
     size = GetSize();
 
-	for (std::vector<Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
+  for (std::vector<Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
     jgui::Component 
       *cmp = (*i);
     jgui::jpoint_t 
@@ -212,145 +212,145 @@ jsize_t Container::GetScrollDimension()
     jgui::jsize_t 
       cs = cmp->GetSize();
 
-		if (p1x > cl.x) {
-			p1x = cl.x;
-		}
+    if (p1x > cl.x) {
+      p1x = cl.x;
+    }
 
-		if (p2x < (cl.x + cs.width)) {
-			p2x = cl.x + cs.width;
-		}
-		
-		if (p1y > cl.y) {
-			p1y = cl.y;
-		}
+    if (p2x < (cl.x + cs.width)) {
+      p2x = cl.x + cs.width;
+    }
+    
+    if (p1y > cl.y) {
+      p1y = cl.y;
+    }
 
-		if (p2y < (cl.y + cs.height)) {
-			p2y = cl.y + cs.height;
-		}
-	}
-	
-	if (p1x < 0) {
-		if (p2x < size.width) {
-			p2x = size.width;
-		}
-	}
+    if (p2y < (cl.y + cs.height)) {
+      p2y = cl.y + cs.height;
+    }
+  }
+  
+  if (p1x < 0) {
+    if (p2x < size.width) {
+      p2x = size.width;
+    }
+  }
 
-	if (p1y < 0) {
-		if (p2y < size.height) {
-			p2y = size.height;
-		}
-	}
+  if (p1y < 0) {
+    if (p2y < size.height) {
+      p2y = size.height;
+    }
+  }
 
   jgui::jsize_t
     scroll_dimension;
 
-	scroll_dimension.width = p2x - p1x;
-	scroll_dimension.height = p2y - p1y;
+  scroll_dimension.width = p2x - p1x;
+  scroll_dimension.height = p2y - p1y;
 
-	if ((scroll_dimension.width > size.width)) {
-		scroll_dimension.height = scroll_dimension.height + ss + sg;
+  if ((scroll_dimension.width > size.width)) {
+    scroll_dimension.height = scroll_dimension.height + ss + sg;
 
-		if ((scroll_dimension.height > size.height)) {
-			scroll_dimension.width = scroll_dimension.width + ss + sg;
-		}
-	} else if ((scroll_dimension.height > size.height)) {
-		scroll_dimension.width = scroll_dimension.width + ss + sg;
-	
-		if ((scroll_dimension.width > size.width)) {
-			scroll_dimension.height = scroll_dimension.height + ss + sg;
-		}
-	}
+    if ((scroll_dimension.height > size.height)) {
+      scroll_dimension.width = scroll_dimension.width + ss + sg;
+    }
+  } else if ((scroll_dimension.height > size.height)) {
+    scroll_dimension.width = scroll_dimension.width + ss + sg;
+  
+    if ((scroll_dimension.width > size.width)) {
+      scroll_dimension.height = scroll_dimension.height + ss + sg;
+    }
+  }
 
   return scroll_dimension;
 }
 
 Component * Container::GetTargetComponent(Container *target, int x, int y, int *dx, int *dy)
 {
-	jpoint_t slocation = GetScrollLocation();
-	int scrollx = (IsScrollableX() == true)?slocation.x:0,
-			scrolly = (IsScrollableY() == true)?slocation.y:0;
+  jpoint_t slocation = GetScrollLocation();
+  int scrollx = (IsScrollableX() == true)?slocation.x:0,
+      scrolly = (IsScrollableY() == true)?slocation.y:0;
 
-	if ((void *)dx != nullptr) {
-		*dx = x;
-	}
+  if ((void *)dx != nullptr) {
+    *dx = x;
+  }
 
-	if ((void *)dy != nullptr) {
-		*dy = y;
-	}
+  if ((void *)dy != nullptr) {
+    *dy = y;
+  }
 
-	for (std::vector<jgui::Component *>::const_reverse_iterator i=target->GetComponents().rbegin(); i!=target->GetComponents().rend(); i++) {
-		Component *c = (*i);
-	
-		if (c->IsVisible() == true) {
-			if (c->Intersect(x+scrollx, y+scrolly) == true) {
+  for (std::vector<jgui::Component *>::const_reverse_iterator i=target->GetComponents().rbegin(); i!=target->GetComponents().rend(); i++) {
+    Component *c = (*i);
+  
+    if (c->IsVisible() == true) {
+      if (c->Intersect(x+scrollx, y+scrolly) == true) {
         jgui::jpoint_t cl = c->GetLocation();
 
-				if ((void *)dx != nullptr) {
-					*dx = x - cl.x;
-				}
+        if ((void *)dx != nullptr) {
+          *dx = x - cl.x;
+        }
 
-				if ((void *)dy != nullptr) {
-					*dy = y - cl.y;
-				}
+        if ((void *)dy != nullptr) {
+          *dy = y - cl.y;
+        }
 
-				return c;
-			}
-		}
-	}
+        return c;
+      }
+    }
+  }
 
-	return target;
+  return target;
 }
 
 void Container::SetOptimizedPaint(bool b)
 {
-	_optimized_paint = b;
+  _optimized_paint = b;
 }
 
 void Container::SetLayout(jgui::Layout *layout)
 {
-	if (layout == nullptr) {
-		return;
-	}
+  if (layout == nullptr) {
+    return;
+  }
 
-	_layout = layout;
+  _layout = layout;
 }
 
 const jgui::Layout * Container::GetDefaultLayout()
 {
-	return _default_layout;
+  return _default_layout;
 }
 
 jgui::Layout * Container::GetLayout()
 {
-	return _layout;
+  return _layout;
 }
 
 void Container::DoLayout()
 {
-	if (_layout != nullptr) {
-		SetIgnoreRepaint(true);
+  if (_layout != nullptr) {
+    SetIgnoreRepaint(true);
 
-		_layout->DoLayout(this);
+    _layout->DoLayout(this);
 
-		for (std::vector<Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
-			Container *container = dynamic_cast<jgui::Container *>(*i);
-			
-			if (container != nullptr) {
-				container->DoLayout();
-			}
-		}
-		
-		SetIgnoreRepaint(false);
-	}
+    for (std::vector<Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
+      Container *container = dynamic_cast<jgui::Container *>(*i);
+      
+      if (container != nullptr) {
+        container->DoLayout();
+      }
+    }
+    
+    SetIgnoreRepaint(false);
+  }
 }
 
 void Container::Pack(bool fit)
 {
-	Component 
+  Component 
     *c = nullptr;
-	jinsets_t 
+  jinsets_t 
     insets = GetInsets();
-	int 
+  int 
     min_x = insets.left,
     min_y = insets.top,
     max_w = 0,
@@ -360,61 +360,61 @@ void Container::Pack(bool fit)
 
   DoLayout();
 
-	if (fit == true) {
-		for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
-			c = (*i);
+  if (fit == true) {
+    for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
+      c = (*i);
 
       jgui::jpoint_t cl = c->GetLocation();
 
-			if (cl.x < min_x) {
-				min_x = cl.x;
-			}
+      if (cl.x < min_x) {
+        min_x = cl.x;
+      }
 
-			if (cl.y < min_y) {
-				min_y = cl.y;
-			}
-		}
+      if (cl.y < min_y) {
+        min_y = cl.y;
+      }
+    }
 
-		min_x = insets.left - min_x;
-		min_y = insets.top - min_y;
+    min_x = insets.left - min_x;
+    min_y = insets.top - min_y;
 
-		for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
-			c = (*i);
+    for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
+      c = (*i);
 
       jgui::jpoint_t cl = c->GetLocation();
 
-			c->SetLocation(cl.x + min_x, cl.y + min_y);
-		}
-	}
+      c->SetLocation(cl.x + min_x, cl.y + min_y);
+    }
+  }
 
-	for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
-		c = (*i);
+  for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
+    c = (*i);
 
     jgui::jpoint_t cl = c->GetLocation();
     jgui::jsize_t cs = c->GetSize();
 
-		if (max_w < (cl.x + cs.width)) {
-			max_w = cl.x + cs.width;
-		}
+    if (max_w < (cl.x + cs.width)) {
+      max_w = cl.x + cs.width;
+    }
 
-		if (max_h < (cl.y + cs.height)) {
-			max_h = cl.y + cs.height;
-		}
-	}
+    if (max_h < (cl.y + cs.height)) {
+      max_h = cl.y + cs.height;
+    }
+  }
 
   _container_mutex.unlock();
 
-	SetSize(max_w + insets.right, max_h + insets.bottom);
+  SetSize(max_w + insets.right, max_h + insets.bottom);
 }
 
 jinsets_t Container::GetInsets()
 {
-	return _insets;
+  return _insets;
 }
 
 void Container::SetInsets(jinsets_t insets)
 {
-	_insets = insets;
+  _insets = insets;
   
   SetPreferredSize(GetSize());
 }
@@ -425,10 +425,10 @@ void Container::PaintGlassPane(Graphics *g)
 
 void Container::PaintBackground(Graphics *g)
 {
-	if (_is_background_visible == false) {
-		return;
-	}
-	
+  if (_is_background_visible == false) {
+    return;
+  }
+  
   jgui::Theme 
     *theme = GetTheme();
 
@@ -438,35 +438,35 @@ void Container::PaintBackground(Graphics *g)
 
   jgui::Color 
     bg = theme->GetIntegerParam("container.bg"),
-	  bgfocus = theme->GetIntegerParam("container.bg.focus"),
-	  bgdisable = theme->GetIntegerParam("container.bg.disable");
+    bgfocus = theme->GetIntegerParam("container.bg.focus"),
+    bgdisable = theme->GetIntegerParam("container.bg.disable");
   jgui::jsize_t
     size = GetSize();
-	jcomponent_border_t 
+  jcomponent_border_t 
     bordertype = (jcomponent_border_t)theme->GetIntegerParam("container.border.style");
   int
     x = theme->GetIntegerParam("container.hgap") + theme->GetIntegerParam("container.border.size"),
-		y = theme->GetIntegerParam("container.vgap") + theme->GetIntegerParam("container.border.size"),
-		w = size.width - 2*x,
-		h = size.height - 2*y;
+    y = theme->GetIntegerParam("container.vgap") + theme->GetIntegerParam("container.border.size"),
+    w = size.width - 2*x,
+    h = size.height - 2*y;
 
-	if (IsEnabled() == true) {
-		if (HasFocus() == true) {
-			g->SetColor(bgfocus);
-		} else {
-			g->SetColor(bg);
-		}
-	} else {
-		g->SetColor(bgdisable);
-	}
+  if (IsEnabled() == true) {
+    if (HasFocus() == true) {
+      g->SetColor(bgfocus);
+    } else {
+      g->SetColor(bg);
+    }
+  } else {
+    g->SetColor(bgdisable);
+  }
 
-	if (bordertype == JCB_ROUND) {
-		g->FillRoundRectangle(x, y, w, h);
-	} else if (bordertype == JCB_BEVEL) {
-		g->FillBevelRectangle(x, y, w, h);
-	} else {
-		g->FillRectangle(x, y, w, h);
-	}
+  if (bordertype == JCB_ROUND) {
+    g->FillRoundRectangle(x, y, w, h);
+  } else if (bordertype == JCB_BEVEL) {
+    g->FillBevelRectangle(x, y, w, h);
+  } else {
+    g->FillRectangle(x, y, w, h);
+  }
 }
 
 void Container::PaintBorders(Graphics *g)
@@ -478,317 +478,317 @@ void Container::PaintBorders(Graphics *g)
     return;
   }
 
-	jcomponent_border_t 
+  jcomponent_border_t 
     bordertype = (jcomponent_border_t)theme->GetIntegerParam("container.border.style");
 
-	if (bordertype == JCB_EMPTY) {
-		return;
-	}
+  if (bordertype == JCB_EMPTY) {
+    return;
+  }
 
   jgui::Color
     color,
     border = theme->GetIntegerParam("container.border"),
-	  borderfocus = theme->GetIntegerParam("container.border.focus"),
-	  borderdisable = theme->GetIntegerParam("container.border.disable");
+    borderfocus = theme->GetIntegerParam("container.border.focus"),
+    borderdisable = theme->GetIntegerParam("container.border.disable");
   jgui::jsize_t
     size = GetSize();
-	int 
+  int 
     bs = theme->GetIntegerParam("container.border.size");
-	int 
+  int 
     xp = 0, 
-		yp = 0,
-		wp = size.width,
-		hp = size.height;
-	int 
+    yp = 0,
+    wp = size.width,
+    hp = size.height;
+  int 
     step = 0x20;
 
-	if (IsEnabled() == true) {
-		if (HasFocus() == true) {
-			color = borderfocus;
-		} else {
-			color = border;
-		}
-	} else {
-		color = borderdisable;
-	}
+  if (IsEnabled() == true) {
+    if (HasFocus() == true) {
+      color = borderfocus;
+    } else {
+      color = border;
+    }
+  } else {
+    color = borderdisable;
+  }
 
-	int 
+  int 
     dr = color.GetRed(),
-		dg = color.GetGreen(),
-		db = color.GetBlue(),
-		da = color.GetAlpha();
-	jpen_t 
+    dg = color.GetGreen(),
+    db = color.GetBlue(),
+    da = color.GetAlpha();
+  jpen_t 
     pen = g->GetPen();
-	int 
+  int 
     width = pen.width;
 
-	if (bordertype == JCB_LINE) {
-		g->SetColor(dr, dg, db, da);
-		pen.width = -bs;
-		g->SetPen(pen);
-		g->DrawRectangle(xp, yp, wp, hp);
-	} else if (bordertype == JCB_BEVEL) {
-		g->SetColor(dr, dg, db, da);
-		pen.width = -bs;
-		g->SetPen(pen);
-		g->DrawBevelRectangle(xp, yp, wp, hp);
-	} else if (bordertype == JCB_ROUND) {
-		g->SetColor(dr, dg, db, da);
-		pen.width = -bs;
-		g->SetPen(pen);
-		g->DrawRoundRectangle(xp, yp, wp, hp);
-	} else if (bordertype == JCB_RAISED_GRADIENT) {
-		for (int i=0; i<bs && i<wp && i<hp; i++) {
-			g->SetColor(dr+step*(bs-i), dg+step*(bs-i), db+step*(bs-i));
-			g->DrawLine(xp+i, yp+i, xp+wp-i, yp+i); //cima
-			g->SetColor(dr-step*(bs-i), dg-step*(bs-i), db-step*(bs-i));
-			g->DrawLine(xp+i, yp+hp-i, xp+wp-i, yp+hp-i); //baixo
-		}
+  if (bordertype == JCB_LINE) {
+    g->SetColor(dr, dg, db, da);
+    pen.width = -bs;
+    g->SetPen(pen);
+    g->DrawRectangle(xp, yp, wp, hp);
+  } else if (bordertype == JCB_BEVEL) {
+    g->SetColor(dr, dg, db, da);
+    pen.width = -bs;
+    g->SetPen(pen);
+    g->DrawBevelRectangle(xp, yp, wp, hp);
+  } else if (bordertype == JCB_ROUND) {
+    g->SetColor(dr, dg, db, da);
+    pen.width = -bs;
+    g->SetPen(pen);
+    g->DrawRoundRectangle(xp, yp, wp, hp);
+  } else if (bordertype == JCB_RAISED_GRADIENT) {
+    for (int i=0; i<bs && i<wp && i<hp; i++) {
+      g->SetColor(dr+step*(bs-i), dg+step*(bs-i), db+step*(bs-i));
+      g->DrawLine(xp+i, yp+i, xp+wp-i, yp+i); //cima
+      g->SetColor(dr-step*(bs-i), dg-step*(bs-i), db-step*(bs-i));
+      g->DrawLine(xp+i, yp+hp-i, xp+wp-i, yp+hp-i); //baixo
+    }
 
-		for (int i=0; i<bs && i<wp && i<hp; i++) {
-			g->SetColor(dr+step*(bs-i), dg+step*(bs-i), db+step*(bs-i));
-			g->DrawLine(xp+i, yp+i, xp+i, yp+hp-i); //esquerda
-			g->SetColor(dr-step*(bs-i), dg-step*(bs-i), db-step*(bs-i));
-			g->DrawLine(xp+wp-i, yp+i, xp+wp-i, yp+hp-i); //direita
-		}
-	} else if (bordertype == JCB_LOWERED_GRADIENT) {
-		for (int i=0; i<bs && i<wp && i<hp; i++) {
-			g->SetColor(dr-step*(bs-i), dg-step*(bs-i), db-step*(bs-i));
-			g->DrawLine(xp+i, yp+i, xp+wp-i, yp+i); //cima
-			g->SetColor(dr+step*(bs-i), dg+step*(bs-i), db+step*(bs-i));
-			g->DrawLine(xp+i, yp+hp-i, xp+wp-i, yp+hp-i); //baixo
-		}
+    for (int i=0; i<bs && i<wp && i<hp; i++) {
+      g->SetColor(dr+step*(bs-i), dg+step*(bs-i), db+step*(bs-i));
+      g->DrawLine(xp+i, yp+i, xp+i, yp+hp-i); //esquerda
+      g->SetColor(dr-step*(bs-i), dg-step*(bs-i), db-step*(bs-i));
+      g->DrawLine(xp+wp-i, yp+i, xp+wp-i, yp+hp-i); //direita
+    }
+  } else if (bordertype == JCB_LOWERED_GRADIENT) {
+    for (int i=0; i<bs && i<wp && i<hp; i++) {
+      g->SetColor(dr-step*(bs-i), dg-step*(bs-i), db-step*(bs-i));
+      g->DrawLine(xp+i, yp+i, xp+wp-i, yp+i); //cima
+      g->SetColor(dr+step*(bs-i), dg+step*(bs-i), db+step*(bs-i));
+      g->DrawLine(xp+i, yp+hp-i, xp+wp-i, yp+hp-i); //baixo
+    }
 
-		for (int i=0; i<bs && i<wp && i<hp; i++) {
-			g->SetColor(dr-step*(bs-i), dg-step*(bs-i), db-step*(bs-i));
-			g->DrawLine(xp+i, yp+i, xp+i, yp+hp-i); //esquerda
-			g->SetColor(dr+step*(bs-i), dg+step*(bs-i), db+step*(bs-i));
-			g->DrawLine(xp+wp-i, yp+i, xp+wp-i, yp+hp-i); //direita
-		}
-	} else if (bordertype == JCB_RAISED_BEVEL) {
-		for (int i=0; i<bs && i<wp && i<hp; i++) {
-			g->SetColor(dr+step, dg+step, db+step);
-			g->DrawLine(xp+i, yp+i, xp+wp-i, yp+i); //cima
-			g->SetColor(dr-step, dg-step, db-step);
-			g->DrawLine(xp+i, yp+hp-i, xp+wp-i, yp+hp-i); //baixo
-		}
+    for (int i=0; i<bs && i<wp && i<hp; i++) {
+      g->SetColor(dr-step*(bs-i), dg-step*(bs-i), db-step*(bs-i));
+      g->DrawLine(xp+i, yp+i, xp+i, yp+hp-i); //esquerda
+      g->SetColor(dr+step*(bs-i), dg+step*(bs-i), db+step*(bs-i));
+      g->DrawLine(xp+wp-i, yp+i, xp+wp-i, yp+hp-i); //direita
+    }
+  } else if (bordertype == JCB_RAISED_BEVEL) {
+    for (int i=0; i<bs && i<wp && i<hp; i++) {
+      g->SetColor(dr+step, dg+step, db+step);
+      g->DrawLine(xp+i, yp+i, xp+wp-i, yp+i); //cima
+      g->SetColor(dr-step, dg-step, db-step);
+      g->DrawLine(xp+i, yp+hp-i, xp+wp-i, yp+hp-i); //baixo
+    }
 
-		for (int i=0; i<bs && i<wp && i<hp; i++) {
-			g->SetColor(dr+step, dg+step, db+step);
-			g->DrawLine(xp+i, yp+i, xp+i, yp+hp-i); //esquerda
-			g->SetColor(dr-step, dg-step, db-step);
-			g->DrawLine(xp+wp-i, yp+i, xp+wp-i, yp+hp-i); //direita
-		}
-	} else if (bordertype == JCB_LOWERED_BEVEL) {
-		for (int i=0; i<bs && i<wp && i<hp; i++) {
-			g->SetColor(dr-step, dg-step, db-step);
-			g->DrawLine(xp+i, yp+i, xp+wp-i, yp+i); //cima
-			g->SetColor(dr+step, dg+step, db+step);
-			g->DrawLine(xp+i, yp+hp-i, xp+wp-i, yp+hp-i); //baixo
-		}
+    for (int i=0; i<bs && i<wp && i<hp; i++) {
+      g->SetColor(dr+step, dg+step, db+step);
+      g->DrawLine(xp+i, yp+i, xp+i, yp+hp-i); //esquerda
+      g->SetColor(dr-step, dg-step, db-step);
+      g->DrawLine(xp+wp-i, yp+i, xp+wp-i, yp+hp-i); //direita
+    }
+  } else if (bordertype == JCB_LOWERED_BEVEL) {
+    for (int i=0; i<bs && i<wp && i<hp; i++) {
+      g->SetColor(dr-step, dg-step, db-step);
+      g->DrawLine(xp+i, yp+i, xp+wp-i, yp+i); //cima
+      g->SetColor(dr+step, dg+step, db+step);
+      g->DrawLine(xp+i, yp+hp-i, xp+wp-i, yp+hp-i); //baixo
+    }
 
-		for (int i=0; i<bs && i<wp && i<hp; i++) {
-			g->SetColor(dr-step, dg-step, db-step);
-			g->DrawLine(xp+i, yp+i, xp+i, yp+hp-i); //esquerda
-			g->SetColor(dr+step, dg+step, db+step);
-			g->DrawLine(xp+wp-i, yp+i, xp+wp-i, yp+hp-i); //direita
-		}
-	} else if (bordertype == JCB_RAISED_ETCHED) {
-		g->SetColor(dr+step, dg+step, db+step, da);
-		pen.width = -bs;
-		g->SetPen(pen);
-		g->DrawRectangle(xp, yp, wp, hp);
-		
-		g->SetColor(dr-step, dg-step, db-step, da);
-		pen.width = -bs/2;
-		g->SetPen(pen);
-		g->DrawRectangle(xp, yp, wp-bs/2, hp-bs/2);
-	} else if (bordertype == JCB_LOWERED_ETCHED) {
-		g->SetColor(dr-step, dg-step, db-step, da);
-		pen.width = -bs;
-		g->SetPen(pen);
-		g->DrawRectangle(xp, yp, wp, hp);
-		
-		g->SetColor(dr+step, dg+step, db+step, da);
-		pen.width = -bs/2;
-		g->DrawRectangle(xp, yp, wp-bs/2, hp-bs/2);
-	}
+    for (int i=0; i<bs && i<wp && i<hp; i++) {
+      g->SetColor(dr-step, dg-step, db-step);
+      g->DrawLine(xp+i, yp+i, xp+i, yp+hp-i); //esquerda
+      g->SetColor(dr+step, dg+step, db+step);
+      g->DrawLine(xp+wp-i, yp+i, xp+wp-i, yp+hp-i); //direita
+    }
+  } else if (bordertype == JCB_RAISED_ETCHED) {
+    g->SetColor(dr+step, dg+step, db+step, da);
+    pen.width = -bs;
+    g->SetPen(pen);
+    g->DrawRectangle(xp, yp, wp, hp);
+    
+    g->SetColor(dr-step, dg-step, db-step, da);
+    pen.width = -bs/2;
+    g->SetPen(pen);
+    g->DrawRectangle(xp, yp, wp-bs/2, hp-bs/2);
+  } else if (bordertype == JCB_LOWERED_ETCHED) {
+    g->SetColor(dr-step, dg-step, db-step, da);
+    pen.width = -bs;
+    g->SetPen(pen);
+    g->DrawRectangle(xp, yp, wp, hp);
+    
+    g->SetColor(dr+step, dg+step, db+step, da);
+    pen.width = -bs/2;
+    g->DrawRectangle(xp, yp, wp-bs/2, hp-bs/2);
+  }
 
-	pen.width = width;
-	g->SetPen(pen);
+  pen.width = width;
+  g->SetPen(pen);
 
-	if (_is_enabled == false) {
-		g->SetColor(0x00, 0x00, 0x00, 0x80);
-		g->FillRectangle(0, 0, size.width, size.height);
-	}
+  if (_is_enabled == false) {
+    g->SetColor(0x00, 0x00, 0x00, 0x80);
+    g->FillRectangle(0, 0, size.width, size.height);
+  }
 }
 
 void Container::Paint(Graphics *g)
 {
-	// JDEBUG(JINFO, "paint\n");
+  // JDEBUG(JINFO, "paint\n");
 
   // std::lock_guard<std::mutex> guard(_container_mutex);
 
-	jpoint_t 
+  jpoint_t 
     slocation = GetScrollLocation();
-	jregion_t 
+  jregion_t 
     clip = g->GetClip();
 
-	Component::Paint(g);
+  Component::Paint(g);
 
-	if (IsBackgroundVisible() == true) {
-		g->Reset(); 
+  if (IsBackgroundVisible() == true) {
+    g->Reset(); 
 
-		PaintBackground(g);
-	}
+    PaintBackground(g);
+  }
 
-	for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
-		Component *c = (*i);
+  for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
+    Component *c = (*i);
 
-		if (c->IsVisible() == true) {
-			// TODO:: considera	r o scroll de um component
+    if (c->IsVisible() == true) {
+      // TODO:: considera  r o scroll de um component
       jgui::jpoint_t 
         cl = c->GetLocation();
       jgui::jsize_t 
         cs = c->GetSize();
-			int 
+      int 
         cx = cl.x - slocation.x,
-				cy = cl.y - slocation.y,
-				cw = cs.width,
-				ch = cs.height;
-			bool 
+        cy = cl.y - slocation.y,
+        cw = cs.width,
+        ch = cs.height;
+      bool 
         flag = (dynamic_cast<jgui::Container *>(c) != nullptr);
 
-			if (cw > 0 && ch > 0) {
-				g->Translate(cx, cy);
-				g->ClipRect(0, 0, cw - 1, ch - 1);
-	
-				if (flag == false && c->IsBackgroundVisible() == true) {
-					g->Reset(); 
-					c->PaintBackground(g);
-				}
+      if (cw > 0 && ch > 0) {
+        g->Translate(cx, cy);
+        g->ClipRect(0, 0, cw - 1, ch - 1);
+  
+        if (flag == false && c->IsBackgroundVisible() == true) {
+          g->Reset(); 
+          c->PaintBackground(g);
+        }
 
-				g->Reset(); 
-				c->Paint(g);
-				
-				if (flag == false && c->IsScrollVisible() == true) {
-					g->Reset(); 
-					c->PaintScrollbars(g);
-				}
+        g->Reset(); 
+        c->Paint(g);
+        
+        if (flag == false && c->IsScrollVisible() == true) {
+          g->Reset(); 
+          c->PaintScrollbars(g);
+        }
 
-				if (flag == false) {
-					g->Reset(); 
-					c->PaintBorders(g);
-				}
-				
-				g->Translate(-cx, -cy);
-				g->SetClip(clip.x, clip.y, clip.width, clip.height);
-			}
-		}
-	}
-				
-	g->SetClip(clip.x, clip.y, clip.width, clip.height);
+        if (flag == false) {
+          g->Reset(); 
+          c->PaintBorders(g);
+        }
+        
+        g->Translate(-cx, -cy);
+        g->SetClip(clip.x, clip.y, clip.width, clip.height);
+      }
+    }
+  }
+        
+  g->SetClip(clip.x, clip.y, clip.width, clip.height);
 
-	if (IsScrollVisible() == true) {
-		g->Reset(); 
-		PaintScrollbars(g);
-	}
+  if (IsScrollVisible() == true) {
+    g->Reset(); 
+    PaintScrollbars(g);
+  }
 
   // INFO:: paint dialogs over the container
-	g->SetClip(clip.x, clip.y, clip.width, clip.height);
+  g->SetClip(clip.x, clip.y, clip.width, clip.height);
 
   _dialogs_mutex.lock();
 
-	for (std::vector<jgui::Dialog *>::iterator i=_dialogs.begin(); i!=_dialogs.end(); i++) {
-		Dialog *c = (*i);
+  for (std::vector<jgui::Dialog *>::iterator i=_dialogs.begin(); i!=_dialogs.end(); i++) {
+    Dialog *c = (*i);
 
-		if (c->IsVisible() == true) {
+    if (c->IsVisible() == true) {
       jgui::jpoint_t 
         cl = c->GetLocation();
       jgui::jsize_t 
         cs = c->GetSize();
-			int 
+      int 
         cx = cl.x - slocation.x,
-				cy = cl.y - slocation.y,
-				cw = cs.width,
-				ch = cs.height;
+        cy = cl.y - slocation.y,
+        cw = cs.width,
+        ch = cs.height;
 
-			if (cw > 0 && ch > 0) {
-				g->Translate(cx, cy);
-				g->ClipRect(0, 0, cw - 1, ch - 1);
-	
-				g->Reset(); 
-				c->Paint(g);
-				
-				g->Translate(-cx, -cy);
-				g->SetClip(clip.x, clip.y, clip.width, clip.height);
-			}
-		}
-	}
+      if (cw > 0 && ch > 0) {
+        g->Translate(cx, cy);
+        g->ClipRect(0, 0, cw - 1, ch - 1);
+  
+        g->Reset(); 
+        c->Paint(g);
+        
+        g->Translate(-cx, -cy);
+        g->SetClip(clip.x, clip.y, clip.width, clip.height);
+      }
+    }
+  }
   
   _dialogs_mutex.unlock();
 
-	g->Reset(); 
-	PaintBorders(g);
+  g->Reset(); 
+  PaintBorders(g);
 
-	g->Reset(); 
-	PaintGlassPane(g);
+  g->Reset(); 
+  PaintGlassPane(g);
 }
 
 void Container::Repaint(Component *cmp)
 {
-	if (IsIgnoreRepaint() == true || IsVisible() == false) {
-		return;
-	}
+  if (IsIgnoreRepaint() == true || IsVisible() == false) {
+    return;
+  }
 
   Container *parent = GetParent();
 
   if (parent != nullptr) {
-	  parent->Repaint((cmp == nullptr)?this:cmp);
+    parent->Repaint((cmp == nullptr)?this:cmp);
   }
 
-	Component::DispatchComponentEvent(new jevent::ComponentEvent(this, jevent::JCET_ONPAINT));
+  Component::DispatchComponentEvent(new jevent::ComponentEvent(this, jevent::JCET_ONPAINT));
 }
 
 void Container::Add(Component *c, int index)
 {
-	if (index < 0 || index > GetComponentCount()) {
-		throw jexception::OutOfBoundsException("Index out of range");
-	}
+  if (index < 0 || index > GetComponentCount()) {
+    throw jexception::OutOfBoundsException("Index out of range");
+  }
 
-	if (c == nullptr) {
-		throw jexception::NullPointerException("The component must be valid");
-	}
+  if (c == nullptr) {
+    throw jexception::NullPointerException("The component must be valid");
+  }
 
-	if (dynamic_cast<jgui::Container *>(c) == this) {
-		throw jexception::RuntimeException("Adding own container");
-	}
+  if (dynamic_cast<jgui::Container *>(c) == this) {
+    throw jexception::RuntimeException("Adding own container");
+  }
 
-	if (dynamic_cast<jgui::Dialog *>(c) != nullptr) {
-		throw jexception::InvalidArgumentException("Unable to add dialog directly");
-	}
+  if (dynamic_cast<jgui::Dialog *>(c) != nullptr) {
+    throw jexception::InvalidArgumentException("Unable to add dialog directly");
+  }
 
   _container_mutex.lock();
 
-	if (std::find(_components.begin(), _components.end(), c) == _components.end()) {
-		_components.insert(_components.begin()+index, c);
+  if (std::find(_components.begin(), _components.end(), c) == _components.end()) {
+    _components.insert(_components.begin()+index, c);
 
-		Container *container = dynamic_cast<jgui::Container *>(c);
-		
-		if (container != nullptr) {
-			jgui::Component *focus = container->GetFocusOwner();
+    Container *container = dynamic_cast<jgui::Container *>(c);
+    
+    if (container != nullptr) {
+      jgui::Component *focus = container->GetFocusOwner();
 
-			c->SetParent(this);
+      c->SetParent(this);
 
-			if ((void *)focus != nullptr) {
-				RequestComponentFocus(focus);
-			}
-		} else {
-			c->SetParent(this);
-		}
+      if ((void *)focus != nullptr) {
+        RequestComponentFocus(focus);
+      }
+    } else {
+      c->SetParent(this);
+    }
 
-		DispatchContainerEvent(new jevent::ContainerEvent(c, jevent::JCET_COMPONENT_ADDED));
-	}
+    DispatchContainerEvent(new jevent::ContainerEvent(c, jevent::JCET_COMPONENT_ADDED));
+  }
 
   _container_mutex.unlock();
 
@@ -799,110 +799,110 @@ void Container::Add(Component *c, int index)
 
 void Container::Add(Component *c)
 {
-	Add(c, GetComponentCount());
+  Add(c, GetComponentCount());
 }
 
 void Container::Add(Component *c, GridBagConstraints *constraints)
 {
-	Add(c, GetComponentCount());
+  Add(c, GetComponentCount());
 
-	if (_layout != nullptr) {
-		GridBagLayout *layout = dynamic_cast<jgui::GridBagLayout *>(_layout);
+  if (_layout != nullptr) {
+    GridBagLayout *layout = dynamic_cast<jgui::GridBagLayout *>(_layout);
 
-		if (layout != nullptr) {
-			layout->AddLayoutComponent(c, constraints);
-		}
-	}
-	
-	DispatchContainerEvent(new jevent::ContainerEvent(c, jevent::JCET_COMPONENT_ADDED));
+    if (layout != nullptr) {
+      layout->AddLayoutComponent(c, constraints);
+    }
+  }
+  
+  DispatchContainerEvent(new jevent::ContainerEvent(c, jevent::JCET_COMPONENT_ADDED));
 }
 
 void Container::Add(jgui::Component *c, std::string id)
 {
-	Add(c, GetComponentCount());
+  Add(c, GetComponentCount());
 
-	if (_layout != nullptr) {
-		CardLayout *layout = dynamic_cast<jgui::CardLayout *>(_layout);
+  if (_layout != nullptr) {
+    CardLayout *layout = dynamic_cast<jgui::CardLayout *>(_layout);
 
-		if (layout != nullptr) {
-			layout->AddLayoutComponent(id, c);
-		}
-	}
+    if (layout != nullptr) {
+      layout->AddLayoutComponent(id, c);
+    }
+  }
 
-	DispatchContainerEvent(new jevent::ContainerEvent(c, jevent::JCET_COMPONENT_ADDED));
+  DispatchContainerEvent(new jevent::ContainerEvent(c, jevent::JCET_COMPONENT_ADDED));
 }
 
 void Container::Add(jgui::Component *c, jborderlayout_align_t align)
 {
-	Add(c, GetComponentCount());
+  Add(c, GetComponentCount());
 
-	if (_layout != nullptr) {
-		BorderLayout *layout = dynamic_cast<jgui::BorderLayout *>(_layout);
+  if (_layout != nullptr) {
+    BorderLayout *layout = dynamic_cast<jgui::BorderLayout *>(_layout);
 
-		if (layout != nullptr) {
-			layout->AddLayoutComponent(c, align);
-		}
-	}
-	
-	DispatchContainerEvent(new jevent::ContainerEvent(c, jevent::JCET_COMPONENT_ADDED));
+    if (layout != nullptr) {
+      layout->AddLayoutComponent(c, align);
+    }
+  }
+  
+  DispatchContainerEvent(new jevent::ContainerEvent(c, jevent::JCET_COMPONENT_ADDED));
 }
 
 void Container::Remove(jgui::Component *c)
 {
-	if (c == nullptr) {
-		return;
-	}
+  if (c == nullptr) {
+    return;
+  }
 
-	// INFO:: se o componente em foco pertencer ao container remover o foco
-	jgui::Container *container = dynamic_cast<jgui::Container *>(c);
+  // INFO:: se o componente em foco pertencer ao container remover o foco
+  jgui::Container *container = dynamic_cast<jgui::Container *>(c);
 
-	if (container != nullptr) {
-		jgui::Component *focus = GetFocusOwner();
+  if (container != nullptr) {
+    jgui::Component *focus = GetFocusOwner();
 
-		if ((void *)focus != nullptr) {
-			Container *parent = focus->GetParent();
+    if ((void *)focus != nullptr) {
+      Container *parent = focus->GetParent();
 
-			while ((void *)parent != nullptr) {
-				if (parent == container) {
-					focus->ReleaseFocus();
+      while ((void *)parent != nullptr) {
+        if (parent == container) {
+          focus->ReleaseFocus();
 
-					break;
-				}
+          break;
+        }
 
-				if (parent->GetParent() == nullptr) {
-					break;
-				}
+        if (parent->GetParent() == nullptr) {
+          break;
+        }
 
-				parent = parent->GetParent();
-			}
-		}
-	} else {
-		c->ReleaseFocus();
-	}
+        parent = parent->GetParent();
+      }
+    }
+  } else {
+    c->ReleaseFocus();
+  }
 
-	if (_layout != nullptr) {
-		jgui::BorderLayout *layout = dynamic_cast<jgui::BorderLayout *>(_layout);
-		
-		if (layout != nullptr) {
-			layout->RemoveLayoutComponent(c);
-		}
-	}
+  if (_layout != nullptr) {
+    jgui::BorderLayout *layout = dynamic_cast<jgui::BorderLayout *>(_layout);
+    
+    if (layout != nullptr) {
+      layout->RemoveLayoutComponent(c);
+    }
+  }
 
   _container_mutex.lock();
 
-	for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
-		if (c == (*i)) {
-			c->SetParent(nullptr);
+  for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
+    if (c == (*i)) {
+      c->SetParent(nullptr);
 
-			i = _components.erase(i);
+      i = _components.erase(i);
 
       if (i == _components.end()) {
         break;
       }
 
-			DispatchContainerEvent(new jevent::ContainerEvent(c, jevent::JCET_COMPONENT_REMOVED));
-		}
-	}
+      DispatchContainerEvent(new jevent::ContainerEvent(c, jevent::JCET_COMPONENT_REMOVED));
+    }
+  }
   
   _container_mutex.unlock();
     
@@ -913,27 +913,27 @@ void Container::Remove(jgui::Component *c)
 
 void Container::RemoveAll()
 {
-	jgui::Component *focus = GetFocusOwner();
+  jgui::Component *focus = GetFocusOwner();
 
-	if ((void *)focus != nullptr) {
-		Container *parent = focus->GetParent();
+  if ((void *)focus != nullptr) {
+    Container *parent = focus->GetParent();
 
-		while ((void *)parent != nullptr) {
-			if (parent == this) {
-				focus->ReleaseFocus();
+    while ((void *)parent != nullptr) {
+      if (parent == this) {
+        focus->ReleaseFocus();
 
-				break;
-			}
+        break;
+      }
 
-			if (parent->GetParent() == nullptr) {
-				break;
-			}
+      if (parent->GetParent() == nullptr) {
+        break;
+      }
 
-			parent = parent->GetParent();
-		}
-	}
+      parent = parent->GetParent();
+    }
+  }
 
- 	_container_mutex.lock();
+   _container_mutex.lock();
 
   for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
     jgui::Component *c = (*i);
@@ -945,7 +945,7 @@ void Container::RemoveAll()
 
   _components.clear();
 
- 	_container_mutex.unlock();
+   _container_mutex.unlock();
 
   SetPreferredSize(GetSize());
 
@@ -954,34 +954,34 @@ void Container::RemoveAll()
 
 bool Container::Contains(Component *cmp)
 {
-	std::vector<Component *> components;
+  std::vector<Component *> components;
 
-	GetInternalComponents(this, &components);
+  GetInternalComponents(this, &components);
 
-	for (std::vector<Component *>::iterator i=components.begin(); i!=components.end(); i++) {
-		if (cmp == (*i)) {
-			return true;
-		}
-	}
+  for (std::vector<Component *>::iterator i=components.begin(); i!=components.end(); i++) {
+    if (cmp == (*i)) {
+      return true;
+    }
+  }
 
-	return false;
+  return false;
 }
 
 int Container::GetComponentCount()
 {
- 	std::lock_guard<std::mutex> guard(_container_mutex);
+   std::lock_guard<std::mutex> guard(_container_mutex);
 
-	return _components.size();
+  return _components.size();
 }
 
 const std::vector<Component *> & Container::GetComponents()
 {
-	return _components;
+  return _components;
 }
 
 Component * Container::GetComponentAt(int x, int y)
 {
-	return GetTargetComponent(this, x, y, nullptr, nullptr);
+  return GetTargetComponent(this, x, y, nullptr, nullptr);
 }
 
 jgui::Component * Container::GetFocusOwner()
@@ -997,9 +997,9 @@ jgui::Component * Container::GetFocusOwner()
 
 void Container::RequestComponentFocus(jgui::Component *c)
 {
-	if (c == nullptr or c->IsFocusable() == false) {
-		return;
-	}
+  if (c == nullptr or c->IsFocusable() == false) {
+    return;
+  }
 
   Container *parent = GetParent();
 
@@ -1010,9 +1010,9 @@ void Container::RequestComponentFocus(jgui::Component *c)
 
 void Container::ReleaseComponentFocus(jgui::Component *c)
 {
-	if (c == nullptr or c->IsFocusable() == false) {
-		return;
-	}
+  if (c == nullptr or c->IsFocusable() == false) {
+    return;
+  }
 
   Container *parent = GetParent();
 
@@ -1023,9 +1023,9 @@ void Container::ReleaseComponentFocus(jgui::Component *c)
 
 bool Container::KeyPressed(jevent::KeyEvent *event)
 {
-	if (Component::KeyPressed(event) == true) {
-		return true;
-	}
+  if (Component::KeyPressed(event) == true) {
+    return true;
+  }
 
   // INFO:: process dialogs first
   for (std::vector<Dialog *>::iterator i=_dialogs.begin(); i!=_dialogs.end(); i++) {
@@ -1034,26 +1034,26 @@ bool Container::KeyPressed(jevent::KeyEvent *event)
     }
   }
 
-	Component *current = GetFocusOwner();
+  Component *current = GetFocusOwner();
 
-	if (current != nullptr && current != this) {
-		if (current->KeyPressed(event) == true) {
-			return true;
-		}
-		
-		if (current->ProcessNavigation(event) == true) {
-			return true;
-		}
-	}
+  if (current != nullptr && current != this) {
+    if (current->KeyPressed(event) == true) {
+      return true;
+    }
+    
+    if (current->ProcessNavigation(event) == true) {
+      return true;
+    }
+  }
 
-	return false;
+  return false;
 }
 
 bool Container::KeyReleased(jevent::KeyEvent *event)
 {
-	if (Component::KeyReleased(event) == true) {
-		return true;
-	}
+  if (Component::KeyReleased(event) == true) {
+    return true;
+  }
 
   // INFO:: process dialogs first
   for (std::vector<Dialog *>::iterator i=_dialogs.begin(); i!=_dialogs.end(); i++) {
@@ -1067,9 +1067,9 @@ bool Container::KeyReleased(jevent::KeyEvent *event)
 
 bool Container::KeyTyped(jevent::KeyEvent *event)
 {
-	if (Component::KeyTyped(event) == true) {
-		return true;
-	}
+  if (Component::KeyTyped(event) == true) {
+    return true;
+  }
 
   // INFO:: process dialogs first
   for (std::vector<Dialog *>::iterator i=_dialogs.begin(); i!=_dialogs.end(); i++) {
@@ -1083,11 +1083,11 @@ bool Container::KeyTyped(jevent::KeyEvent *event)
 
 bool Container::MousePressed(jevent::MouseEvent *event)
 {
-	if (Component::MousePressed(event) == true) {
-		return true;
-	}
+  if (Component::MousePressed(event) == true) {
+    return true;
+  }
 
-	jpoint_t 
+  jpoint_t 
     elocation = event->GetLocation();
 
   // INFO:: process dialogs first
@@ -1108,29 +1108,29 @@ bool Container::MousePressed(jevent::MouseEvent *event)
 
   int
     dx,
-		dy;
+    dy;
 
-	Component *c = GetTargetComponent(this, elocation.x, elocation.y, &dx, &dy);
+  Component *c = GetTargetComponent(this, elocation.x, elocation.y, &dx, &dy);
 
-	if (c != nullptr && c != this) {
+  if (c != nullptr && c != this) {
     jgui::jpoint_t 
       slocation = GetScrollLocation();
-		jevent::MouseEvent 
+    jevent::MouseEvent 
       event1 = *event;
 
-		event1.SetLocation(dx + slocation.x, dy + slocation.y);
+    event1.SetLocation(dx + slocation.x, dy + slocation.y);
 
-		return c->MousePressed(&event1);
-	}
+    return c->MousePressed(&event1);
+  }
 
-	return false;
+  return false;
 }
 
 bool Container::MouseReleased(jevent::MouseEvent *event)
 {
-	if (Component::MouseReleased(event) == true) {
-		return true;
-	}
+  if (Component::MouseReleased(event) == true) {
+    return true;
+  }
 
   // INFO:: process dialogs first
   for (std::vector<Dialog *>::iterator i=_dialogs.begin(); i!=_dialogs.end(); i++) {
@@ -1141,31 +1141,31 @@ bool Container::MouseReleased(jevent::MouseEvent *event)
 
   jgui::jpoint_t
     elocation = event->GetLocation();
-	int 
+  int 
     dx,
-		dy;
+    dy;
 
-	Component *c = GetTargetComponent(this, elocation.x, elocation.y, &dx, &dy);
+  Component *c = GetTargetComponent(this, elocation.x, elocation.y, &dx, &dy);
 
-	if (c != nullptr && c != this) {
+  if (c != nullptr && c != this) {
     jgui::jpoint_t 
       slocation = GetScrollLocation();
-		jevent::MouseEvent 
+    jevent::MouseEvent 
       event1 = *event;
 
-		event1.SetLocation(dx + slocation.x, dy + slocation.y);
+    event1.SetLocation(dx + slocation.x, dy + slocation.y);
 
-		return c->MouseReleased(&event1);
-	}
+    return c->MouseReleased(&event1);
+  }
 
-	return false;
+  return false;
 }
 
 bool Container::MouseMoved(jevent::MouseEvent *event)
 {
-	if (Component::MouseMoved(event) == true) {
-		return true;
-	}
+  if (Component::MouseMoved(event) == true) {
+    return true;
+  }
 
   // INFO:: process dialogs first
   for (std::vector<Dialog *>::iterator i=_dialogs.begin(); i!=_dialogs.end(); i++) {
@@ -1176,31 +1176,31 @@ bool Container::MouseMoved(jevent::MouseEvent *event)
 
   jgui::jpoint_t
     elocation = event->GetLocation();
-	int 
-	  dx,
-	  dy;
+  int 
+    dx,
+    dy;
 
-	Component *c = GetTargetComponent(this, elocation.x, elocation.y, &dx, &dy);
+  Component *c = GetTargetComponent(this, elocation.x, elocation.y, &dx, &dy);
 
-	if (c != nullptr && c != this) {
+  if (c != nullptr && c != this) {
     jgui::jpoint_t 
       slocation = GetScrollLocation();
-		jevent::MouseEvent 
+    jevent::MouseEvent 
       event1 = *event;
 
-		event1.SetLocation(dx + slocation.x, dy + slocation.y);
+    event1.SetLocation(dx + slocation.x, dy + slocation.y);
 
-		return c->MouseMoved(&event1);
-	}
+    return c->MouseMoved(&event1);
+  }
 
-	return false;
+  return false;
 }
 
 bool Container::MouseWheel(jevent::MouseEvent *event)
 {
-	if (Component::MouseWheel(event) == true) {
-		return true;
-	}
+  if (Component::MouseWheel(event) == true) {
+    return true;
+  }
 
   // INFO:: process dialogs first
   for (std::vector<Dialog *>::iterator i=_dialogs.begin(); i!=_dialogs.end(); i++) {
@@ -1212,153 +1212,153 @@ bool Container::MouseWheel(jevent::MouseEvent *event)
   jgui::jpoint_t
     elocation = event->GetLocation();
   int
-	  dx,
-		dy;
+    dx,
+    dy;
 
-	Component *c = GetTargetComponent(this, elocation.x, elocation.y, &dx, &dy);
+  Component *c = GetTargetComponent(this, elocation.x, elocation.y, &dx, &dy);
 
-	if (c != nullptr && c != this) {
+  if (c != nullptr && c != this) {
     jgui::jpoint_t 
       slocation = GetScrollLocation();
     jevent::MouseEvent 
       event1 = *event;
 
-		event1.SetLocation(dx + slocation.x, dy + slocation.y);
+    event1.SetLocation(dx + slocation.x, dy + slocation.y);
 
-		return c->MouseWheel(&event1);
-	}
+    return c->MouseWheel(&event1);
+  }
 
-	return false;
+  return false;
 }
 
 void Container::RaiseComponentToTop(Component *c)
 {
-	bool b = false;
+  bool b = false;
 
- 	std::lock_guard<std::mutex> guard(_container_mutex);
+   std::lock_guard<std::mutex> guard(_container_mutex);
 
-	for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
-		if (c == (*i)) {
-			i = _components.erase(i);
+  for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
+    if (c == (*i)) {
+      i = _components.erase(i);
 
       if (i == _components.end()) {
         break;
       }
 
-			b = true;
-		}
-	}
-	
-	if (b == true) {
-		_components.push_back(c);
-	}
+      b = true;
+    }
+  }
+  
+  if (b == true) {
+    _components.push_back(c);
+  }
 }
 
 void Container::LowerComponentToBottom(Component *c)
 {
-	bool b = false;
+  bool b = false;
 
- 	std::lock_guard<std::mutex> guard(_container_mutex);
+   std::lock_guard<std::mutex> guard(_container_mutex);
 
-	for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
-		if (c == (*i)) {
-			i = _components.erase(i);
+  for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
+    if (c == (*i)) {
+      i = _components.erase(i);
 
       if (i == _components.end()) {
         break;
       }
 
-			b = true;
-		}
-	}
-	
-	if (b == true) {
-		_components.insert(_components.begin(), c);
-	}
+      b = true;
+    }
+  }
+  
+  if (b == true) {
+    _components.insert(_components.begin(), c);
+  }
 }
 
 void Container::PutComponentATop(Component *c, Component *c1)
 {
- 	std::lock_guard<std::mutex> guard(_container_mutex);
+   std::lock_guard<std::mutex> guard(_container_mutex);
 
-	std::vector<jgui::Component *>::iterator 
+  std::vector<jgui::Component *>::iterator 
     i = std::find(_components.begin(), _components.end(), c1);
 
-	if (i == _components.end()) {
-		return;
-	}
+  if (i == _components.end()) {
+    return;
+  }
 
-	_components.insert(i + 1, c);
+  _components.insert(i + 1, c);
 }
 
 void Container::PutComponentBelow(Component *c, Component *c1)
 {
- 	std::lock_guard<std::mutex> guard(_container_mutex);
+   std::lock_guard<std::mutex> guard(_container_mutex);
 
-	std::vector<jgui::Component *>::iterator 
+  std::vector<jgui::Component *>::iterator 
     i = std::find(_components.begin(), _components.end(), c1);
 
-	if (i == _components.end()) {
-		return;
-	}
+  if (i == _components.end()) {
+    return;
+  }
 
-	_components.insert(i, c);
+  _components.insert(i, c);
 }
 
 void Container::RegisterContainerListener(jevent::ContainerListener *listener)
 {
-	if (listener == nullptr) {
-		return;
-	}
+  if (listener == nullptr) {
+    return;
+  }
 
- 	std::lock_guard<std::mutex> guard(_container_listener_mutex);
+   std::lock_guard<std::mutex> guard(_container_listener_mutex);
 
-	if (std::find(_container_listeners.begin(), _container_listeners.end(), listener) == _container_listeners.end()) {
-		_container_listeners.push_back(listener);
-	}
+  if (std::find(_container_listeners.begin(), _container_listeners.end(), listener) == _container_listeners.end()) {
+    _container_listeners.push_back(listener);
+  }
 }
 
 void Container::RemoveContainerListener(jevent::ContainerListener *listener)
 {
-	if (listener == nullptr) {
-		return;
-	}
+  if (listener == nullptr) {
+    return;
+  }
 
- 	std::lock_guard<std::mutex> guard(_container_listener_mutex);
+   std::lock_guard<std::mutex> guard(_container_listener_mutex);
 
   _container_listeners.erase(std::remove(_container_listeners.begin(), _container_listeners.end(), listener), _container_listeners.end());
 }
 
 void Container::DispatchContainerEvent(jevent::ContainerEvent *event)
 {
-	if (event == nullptr) {
-		return;
-	}
+  if (event == nullptr) {
+    return;
+  }
 
-	std::vector<jevent::ContainerListener *> listeners;
-	
-	_container_listener_mutex.lock();
+  std::vector<jevent::ContainerListener *> listeners;
+  
+  _container_listener_mutex.lock();
 
-	listeners = _container_listeners;
+  listeners = _container_listeners;
 
-	_container_listener_mutex.unlock();
+  _container_listener_mutex.unlock();
 
-	for (std::vector<jevent::ContainerListener *>::iterator i=listeners.begin(); i!=listeners.end() && event->IsConsumed() == false; i++) {
-		jevent::ContainerListener *listener = (*i);
+  for (std::vector<jevent::ContainerListener *>::iterator i=listeners.begin(); i!=listeners.end() && event->IsConsumed() == false; i++) {
+    jevent::ContainerListener *listener = (*i);
 
-		if (event->GetType() == jevent::JCET_COMPONENT_ADDED) {
-			listener->ComponentAdded(event);
-		} else if (event->GetType() == jevent::JCET_COMPONENT_ADDED) {
-			listener->ComponentRemoved(event);
-		}
-	}
+    if (event->GetType() == jevent::JCET_COMPONENT_ADDED) {
+      listener->ComponentAdded(event);
+    } else if (event->GetType() == jevent::JCET_COMPONENT_ADDED) {
+      listener->ComponentRemoved(event);
+    }
+  }
 
-	delete event;
+  delete event;
 }
 
 const std::vector<jevent::ContainerListener *> & Container::GetContainerListeners()
 {
-	return _container_listeners;
+  return _container_listeners;
 }
 
 }

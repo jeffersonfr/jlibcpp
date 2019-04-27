@@ -18,248 +18,266 @@
 #   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 #**************************************************************************
 ifeq ($(findstring bmp, $(ENABLE_IMAGE)), bmp)
-	CCFLAGS		+= \
 
-	LDFLAGS		+= \
+  CCFLAGS += \
 
-	DEFINES		+= \
-		 -DBMP_IMAGE \
+  LDFLAGS += \
 
-	OBJS_jgui	+= \
-     providers/imageprovider_bmp.o \
+  DEFINES += \
+    -DBMP_IMAGE \
+
+  OBJS_jgui += \
+    providers/imageprovider_bmp.o \
 
 endif
 
 ifeq ($(findstring gif, $(ENABLE_IMAGE)), gif)
-	CCFLAGS		+= \
 
-	LDFLAGS		+= \
+  CCFLAGS += \
 
-	DEFINES		+= \
-		 -DGIF_IMAGE \
+  LDFLAGS += \
 
-	OBJS_jgui	+= \
-		 providers/imageprovider_gif.o \
+  DEFINES += \
+    -DGIF_IMAGE \
+
+  OBJS_jgui += \
+    providers/imageprovider_gif.o \
 
 endif
 
 ifeq ($(findstring ico, $(ENABLE_IMAGE)), ico)
-	CCFLAGS		+= \
 
-	LDFLAGS		+= \
+  CCFLAGS += \
 
-	DEFINES		+= \
-		 -DICO_IMAGE \
+  LDFLAGS += \
 
-	OBJS_jgui	+= \
-		 providers/imageprovider_ico.o \
+  DEFINES += \
+    -DICO_IMAGE \
+
+  OBJS_jgui += \
+    providers/imageprovider_ico.o \
 
 endif
 
 ifeq ($(findstring jpg, $(ENABLE_IMAGE)), jpg)
-	CCFLAGS		+= \
 
-	LDFLAGS		+= \
+  CCFLAGS += \
+
+  LDFLAGS += \
      -ljpeg \
 
-	DEFINES		+= \
-		 -DJPG_IMAGE \
+  DEFINES += \
+    -DJPG_IMAGE \
 
-	OBJS_jgui	+= \
-		 providers/imageprovider_jpg.o \
+  OBJS_jgui += \
+    providers/imageprovider_jpg.o \
 
 endif
 
 ifeq ($(findstring pcx, $(ENABLE_IMAGE)), pcx)
-	CCFLAGS		+= \
 
-	LDFLAGS		+= \
+  CCFLAGS += \
 
-	DEFINES		+= \
-		 -DPCX_IMAGE \
+  LDFLAGS += \
 
-	OBJS_jgui	+= \
-		 providers/imageprovider_pcx.o \
+  DEFINES += \
+    -DPCX_IMAGE \
+
+  OBJS_jgui += \
+    providers/imageprovider_pcx.o \
 
 endif
 
 ifeq ($(findstring png, $(ENABLE_IMAGE)), png)
-	CCFLAGS		+= \
 
-	LDFLAGS		+= \
+  CCFLAGS += \
 
-	DEFINES		+= \
-		 -DPNG_IMAGE \
+  LDFLAGS += \
 
-	OBJS_jgui	+= \
-		 providers/imageprovider_png.o \
+  DEFINES += \
+    -DPNG_IMAGE \
+
+  OBJS_jgui += \
+    providers/imageprovider_png.o \
 
 endif
 
 ifeq ($(findstring ppm, $(ENABLE_IMAGE)), ppm)
-	CCFLAGS		+= \
 
-	LDFLAGS		+= \
+  CCFLAGS += \
 
-	DEFINES		+= \
-		 -DPPM_IMAGE \
+  LDFLAGS += \
 
-	OBJS_jgui	+= \
-		 providers/imageprovider_ppm.o \
+  DEFINES += \
+    -DPPM_IMAGE \
+
+  OBJS_jgui += \
+    providers/imageprovider_ppm.o \
 
 endif
 
 ifeq ($(findstring tga, $(ENABLE_IMAGE)), tga)
-	CCFLAGS		+= \
 
-	LDFLAGS		+= \
+  CCFLAGS += \
 
-	DEFINES		+= \
-		 -DTGA_IMAGE \
+  LDFLAGS += \
 
-	OBJS_jgui	+= \
-		 providers/imageprovider_tga.o \
+  DEFINES += \
+    -DTGA_IMAGE \
+
+  OBJS_jgui += \
+    providers/imageprovider_tga.o \
 
 endif
 
 ifeq ($(findstring xbm, $(ENABLE_IMAGE)), xbm)
-	CCFLAGS		+= \
 
-	LDFLAGS		+= \
+  CCFLAGS += \
 
-	DEFINES		+= \
-		 -DXBM_IMAGE \
+  LDFLAGS += \
 
-	OBJS_jgui	+= \
-		 providers/imageprovider_xbm.o \
+  DEFINES += \
+    -DXBM_IMAGE \
+
+  OBJS_jgui += \
+    providers/imageprovider_xbm.o \
 
 endif
 
 ifeq ($(findstring xpm, $(ENABLE_IMAGE)), xpm)
-	CCFLAGS		+= \
 
-	LDFLAGS		+= \
+  CCFLAGS += \
 
-	DEFINES		+= \
-		 -DXPM_IMAGE \
+  LDFLAGS += \
 
-	OBJS_jgui	+= \
-		 providers/imageprovider_xpm.o \
+  DEFINES += \
+    -DXPM_IMAGE \
+
+  OBJS_jgui += \
+    providers/imageprovider_xpm.o \
 
 endif
 
 ifeq ($(findstring heif, $(ENABLE_IMAGE)), heif)
-	CCFLAGS		+= \
-	   `pkg-config --cflags libheif` \
 
-	LDFLAGS		+= \
+  CCFLAGS += \
+     `pkg-config --cflags libheif` \
+
+  LDFLAGS += \
      `pkg-config --libs libheif` \
 
-	DEFINES		+= \
-		 -DHEIF_IMAGE \
+  DEFINES += \
+    -DHEIF_IMAGE \
 
-	OBJS_jgui	+= \
-		 providers/imageprovider_heif.o \
+  OBJS_jgui += \
+    providers/imageprovider_heif.o \
 
 endif
 
 ifeq ($(findstring webp, $(ENABLE_IMAGE)), webp)
-	CCFLAGS		+= \
-	   `pkg-config --cflags libwebp` \
 
-	LDFLAGS		+= \
-     `pkg-config --libs libwebp` \
+  CCFLAGS += \
+    `pkg-config --cflags libwebp` \
 
-	DEFINES		+= \
-		 -DWEBP_IMAGE \
+  LDFLAGS += \
+    `pkg-config --libs libwebp` \
 
-	OBJS_jgui	+= \
-		 providers/imageprovider_webp.o \
+  DEFINES += \
+    -DWEBP_IMAGE \
+
+  OBJS_jgui += \
+    providers/imageprovider_webp.o \
 
 endif
 
 ifeq ($(findstring jp2000, $(ENABLE_IMAGE)), jp2000)
-	CCFLAGS		+= \
 
-	LDFLAGS		+= \
-     -ljasper \
+  CCFLAGS += \
 
-	DEFINES		+= \
-		 -DJP2000_IMAGE \
+  LDFLAGS += \
+    -ljasper \
 
-	OBJS_jgui	+= \
-		 providers/imageprovider_jp2000.o \
+  DEFINES += \
+    -DJP2000_IMAGE \
+
+  OBJS_jgui += \
+    providers/imageprovider_jp2000.o \
 
 endif
 
 ifeq ($(findstring svg, $(ENABLE_IMAGE)), svg)
-	CCFLAGS		+= \
-     `pkg-config --cflags librsvg-2.0` \
 
-	LDFLAGS		+= \
-     `pkg-config --libs librsvg-2.0` \
+  CCFLAGS += \
+    `pkg-config --cflags librsvg-2.0` \
 
-	DEFINES		+= \
-		 -DSVG_IMAGE \
+  LDFLAGS += \
+    `pkg-config --libs librsvg-2.0` \
 
-	OBJS_jgui	+= \
-		 providers/imageprovider_svg.o \
+  DEFINES += \
+    -DSVG_IMAGE \
+
+  OBJS_jgui += \
+    providers/imageprovider_svg.o \
 
 endif
 
 ifeq ($(findstring tif, $(ENABLE_IMAGE)), tif)
-	CCFLAGS		+= \
 
-	LDFLAGS		+= \
-     -ltiffxx \
+  CCFLAGS += \
 
-	DEFINES		+= \
-		 -DTIF_IMAGE \
+  LDFLAGS += \
+    -ltiffxx \
 
-	OBJS_jgui	+= \
-		 providers/imageprovider_tif.o \
+  DEFINES += \
+    -DTIF_IMAGE \
+
+  OBJS_jgui += \
+    providers/imageprovider_tif.o \
 
 endif
 
 ifeq ($(findstring bpg, $(ENABLE_IMAGE)), bpg)
-	CCFLAGS		+= \
 
-	LDFLAGS		+= \
-     /usr/local/lib/libbpg.a \
+  CCFLAGS += \
 
-	DEFINES		+= \
-		 -DBPG_IMAGE \
+  LDFLAGS += \
+    /usr/local/lib/libbpg.a \
 
-	OBJS_jgui	+= \
-		 providers/imageprovider_bpg.o \
+  DEFINES += \
+    -DBPG_IMAGE \
+
+  OBJS_jgui += \
+    providers/imageprovider_bpg.o \
 
 endif
 
 ifeq ($(findstring flif, $(ENABLE_IMAGE)), flif)
-	CCFLAGS		+= \
-		-I/opt/FLIF/src \
 
-	LDFLAGS		+= \
-		-lflif \
+  CCFLAGS += \
+    -I/opt/FLIF/src \
 
-	DEFINES		+= \
-		 -DFLIF_IMAGE \
+  LDFLAGS += \
+    -lflif \
 
-	OBJS_jgui	+= \
-		 providers/imageprovider_flif.o \
+  DEFINES += \
+    -DFLIF_IMAGE \
+
+  OBJS_jgui += \
+    providers/imageprovider_flif.o \
 
 endif
 
 ifeq ($(findstring mjpeg, $(ENABLE_IMAGE)), mjpeg)
-	CCFLAGS		+= \
 
-	LDFLAGS		+= \
+  CCFLAGS += \
 
-	DEFINES		+= \
-		 -DMJPEG_IMAGE \
+  LDFLAGS += \
 
-	OBJS_jgui	+= \
-		 providers/imageprovider_mjpeg.o \
+  DEFINES += \
+    -DMJPEG_IMAGE \
+
+  OBJS_jgui += \
+    providers/imageprovider_mjpeg.o \
 
 endif
 

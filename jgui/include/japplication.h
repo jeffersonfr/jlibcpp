@@ -34,75 +34,75 @@ namespace jgui {
  */
 class Application : public jcommon::Object {
 
-	private:
+  private:
 
-	protected:
-		/**
-		 * \brief
-		 *
-		 */
-		Application();
-	
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void InternalInit(int argc = 0, char **argv = nullptr);
+  protected:
+    /**
+     * \brief
+     *
+     */
+    Application();
+  
+    /**
+     * \brief
+     *
+     */
+    virtual void InternalInit(int argc = 0, char **argv = nullptr);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void InternalLoop();
+    /**
+     * \brief
+     *
+     */
+    virtual void InternalLoop();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void InternalQuit();
+    /**
+     * \brief
+     *
+     */
+    virtual void InternalQuit();
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~Application();
+  public:
+    /**
+     * \brief
+     *
+     */
+    virtual ~Application();
 
-		/**
-		 * \brief
-		 *
-		 */
-		static void Init(int argc = 0, char **argv = nullptr);
+    /**
+     * \brief
+     *
+     */
+    static void Init(int argc = 0, char **argv = nullptr);
 
-		/**
-		 * \brief
-		 *
-		 */
-		static void Loop();
+    /**
+     * \brief
+     *
+     */
+    static void Loop();
 
-		/**
-		 * \brief
-		 *
-		 */
-		static void Quit();
+    /**
+     * \brief
+     *
+     */
+    static void Quit();
 
-		/**
-		 * \brief
-		 *
-		 */
-		static jsize_t GetScreenSize();
+    /**
+     * \brief
+     *
+     */
+    static jsize_t GetScreenSize();
 
-		/**
-		 * \brief
-		 *
-		 */
-		static bool IsVerticalSyncEnabled();
+    /**
+     * \brief
+     *
+     */
+    static bool IsVerticalSyncEnabled();
 
-		/**
-		 * \brief
-		 *
-		 */
-		static void SetVerticalSyncEnabled(bool enabled);
+    /**
+     * \brief
+     *
+     */
+    static void SetVerticalSyncEnabled(bool enabled);
 
 };
 

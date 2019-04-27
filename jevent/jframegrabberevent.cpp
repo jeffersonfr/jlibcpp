@@ -22,20 +22,20 @@
 namespace jevent {
 
 FrameGrabberEvent::FrameGrabberEvent(void *source, jframe_event_t type):
-	jevent::EventObject(source)
+  jevent::EventObject(source)
 {
-	jcommon::Object::SetClassName("jevent::FrameGrabberEvent");
+  jcommon::Object::SetClassName("jevent::FrameGrabberEvent");
 
-	_type = type;
+  _type = type;
 }
-		
+    
 FrameGrabberEvent::~FrameGrabberEvent()
 {
 }
 
 jframe_event_t FrameGrabberEvent::GetType()
 {
-	return _type;
+  return _type;
 }
 
 }

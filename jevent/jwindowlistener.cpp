@@ -22,9 +22,9 @@
 namespace jevent {
 
 WindowListener::WindowListener():
-	jevent::Listener()
+  jevent::Listener()
 {
-	jcommon::Object::SetClassName("jevent::WindowListener");
+  jcommon::Object::SetClassName("jevent::WindowListener");
 }
 
 WindowListener::~WindowListener()

@@ -22,21 +22,21 @@
 namespace jexception {
 
 AccessControlException::AccessControlException():
-	jexception::RuntimeException()
+  jexception::RuntimeException()
 {
-	jcommon::Object::SetClassName("jexception::AccessControlException");
+  jcommon::Object::SetClassName("jexception::AccessControlException");
 }
 
 AccessControlException::AccessControlException(std::string reason_):
-	jexception::RuntimeException(reason_)
+  jexception::RuntimeException(reason_)
 {
-	jcommon::Object::SetClassName("jexception::AccessControlException");
+  jcommon::Object::SetClassName("jexception::AccessControlException");
 }
 
 AccessControlException::AccessControlException(jexception::Exception *exception, std::string reason_):
-	jexception::RuntimeException(exception, reason_)
+  jexception::RuntimeException(exception, reason_)
 {
-	jcommon::Object::SetClassName("jexception::AccessControlException");
+  jcommon::Object::SetClassName("jexception::AccessControlException");
 }
 
 AccessControlException::~AccessControlException() throw()

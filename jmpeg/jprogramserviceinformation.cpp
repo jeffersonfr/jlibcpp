@@ -27,7 +27,7 @@ namespace jmpeg {
 ProgramServiceInformation::ProgramServiceInformation(std::shared_ptr<std::string> data):
   jcommon::Object()
 {
-	jcommon::Object::SetClassName("jmpeg::ProgramServiceInformation");
+  jcommon::Object::SetClassName("jmpeg::ProgramServiceInformation");
 
   _data = data;
 }

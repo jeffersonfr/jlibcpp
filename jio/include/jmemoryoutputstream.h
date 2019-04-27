@@ -31,68 +31,68 @@ namespace jio {
  */
 class MemoryOutputStream : public jio::OutputStream {
 
-	private:
-		/** \brief */
-		int64_t _buffer_size;
-		/** \brief */
-		int64_t _buffer_index;
-		/** \brief */
-		char *_buffer;
-		
-	public:
-		/**
-		 * \brief
-		 * 
-		 */
-		MemoryOutputStream(const char *data, int64_t size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~MemoryOutputStream();
-
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual bool IsEmpty();
-
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual int64_t Available();
-
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual int64_t Write(int64_t b);
-
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual int64_t Write(const char *data, int64_t size);
+  private:
+    /** \brief */
+    int64_t _buffer_size;
+    /** \brief */
+    int64_t _buffer_index;
+    /** \brief */
+    char *_buffer;
     
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual int64_t Flush();
+  public:
+    /**
+     * \brief
+     * 
+     */
+    MemoryOutputStream(const char *data, int64_t size);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~MemoryOutputStream();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Close();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t GetSentBytes();
+    /**
+     * \brief
+     * 
+     */
+    virtual bool IsEmpty();
+
+    /**
+     * \brief
+     * 
+     */
+    virtual int64_t Available();
+
+    /**
+     * \brief
+     * 
+     */
+    virtual int64_t Write(int64_t b);
+
+    /**
+     * \brief
+     * 
+     */
+    virtual int64_t Write(const char *data, int64_t size);
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual int64_t Flush();
+
+    /**
+     * \brief
+     *
+     */
+    virtual void Close();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t GetSentBytes();
 
 };
 

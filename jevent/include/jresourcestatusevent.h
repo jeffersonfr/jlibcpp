@@ -25,9 +25,9 @@
 namespace jevent {
 
 enum jresourceevent_status_t {
-	JRS_RELEASED,
-	JRS_RELEASE_FORCED,
-	JRS_RELEASE_REQUESTED
+  JRS_RELEASED,
+  JRS_RELEASE_FORCED,
+  JRS_RELEASE_REQUESTED
 };
 
 /**
@@ -37,28 +37,28 @@ enum jresourceevent_status_t {
  */
 class ResourceStatusEvent : public jevent::EventObject {
 
-	private:
-		/** \brief */
-		jresourceevent_status_t _type;
-		
-	public:
-		/**
-		 * \brief
-		 * 
-		 */
-		ResourceStatusEvent(void *source, jresourceevent_status_t type);
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual ~ResourceStatusEvent();
+  private:
+    /** \brief */
+    jresourceevent_status_t _type;
+    
+  public:
+    /**
+     * \brief
+     * 
+     */
+    ResourceStatusEvent(void *source, jresourceevent_status_t type);
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual ~ResourceStatusEvent();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual jresourceevent_status_t  GetType();
+    /**
+     * \brief
+     * 
+     */
+    virtual jresourceevent_status_t  GetType();
     
 };
 

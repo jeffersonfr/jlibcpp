@@ -36,198 +36,198 @@ namespace jshared {
 class WrapperProcess : public virtual jcommon::Object {
 
     private:
-			/** \brief */
-			pid_t _pid;
-			/** \brief */
-			pid_t chldpid; 
-			/** \brief */
-			int _pchild[2];
-			/** \brief */
-			int _pparent[2];
-			/** \brief */
-			bool _is_running;
+      /** \brief */
+      pid_t _pid;
+      /** \brief */
+      pid_t chldpid; 
+      /** \brief */
+      int _pchild[2];
+      /** \brief */
+      int _pparent[2];
+      /** \brief */
+      bool _is_running;
 
-			/**
-			 * \brief 
-			 *
-			 */
-			int ReadIns(char *b, int size);
+      /**
+       * \brief 
+       *
+       */
+      int ReadIns(char *b, int size);
 
-			/**
-			 * \brief 
-			 *
-			 */
-			void ReadWrite(jwprocess_mode_t m);
+      /**
+       * \brief 
+       *
+       */
+      void ReadWrite(jwprocess_mode_t m);
 
-			/**
-			 * \brief
-			 *
-			 */
-			void MakeHandleGreaterThan2(int fd);
+      /**
+       * \brief
+       *
+       */
+      void MakeHandleGreaterThan2(int fd);
 
-			/**
-			 * \brief 
-			 *
-			 */
-			void ForkChild(const char *prog, char **args);
+      /**
+       * \brief 
+       *
+       */
+      void ForkChild(const char *prog, char **args);
 
-		protected:
+    protected:
 
-			/**
-			 * \brief InputStream parameters
-			 *
-			 */
+      /**
+       * \brief InputStream parameters
+       *
+       */
 
-			/** \brief */
-			char *_rbuffer;
-			/** \brief */
-			int _rbuffer_length;
-			/** \brief */
-			int _rcurrent_index;
-			/** \brief */
-			int _rend_index;
+      /** \brief */
+      char *_rbuffer;
+      /** \brief */
+      int _rbuffer_length;
+      /** \brief */
+      int _rcurrent_index;
+      /** \brief */
+      int _rend_index;
 
-			/**
-			 * \brief
-			 *
-			 */
-			int ReadBuffer(char *data_, int data_length_);
+      /**
+       * \brief
+       *
+       */
+      int ReadBuffer(char *data_, int data_length_);
 
-			/**
-			 * \brief
-			 *
-			 */
-			bool IsReadBufferEmpty();
+      /**
+       * \brief
+       *
+       */
+      bool IsReadBufferEmpty();
 
-			/**
-			 * \brief
-			 *
-			 */
-			int GetReadBufferAvailable();
+      /**
+       * \brief
+       *
+       */
+      int GetReadBufferAvailable();
 
-			/**
-			 * \brief
-			 *
-			 */
-			void ResetReadBuffer();
+      /**
+       * \brief
+       *
+       */
+      void ResetReadBuffer();
 
 
-			/**
-			 * \brief OutputStream parameters
-			 *
-			 */
+      /**
+       * \brief OutputStream parameters
+       *
+       */
 
-			/** \brief */
-			char *_wbuffer;
-			/** \brief */
-			int _wbuffer_length;
-			/** \brief */
-			int _wcurrent_index;
+      /** \brief */
+      char *_wbuffer;
+      /** \brief */
+      int _wbuffer_length;
+      /** \brief */
+      int _wcurrent_index;
 
-			/**
-			 * \brief
-			 *
-			 */
-			int WriteBuffer(const char *data_, int data_length_);
+      /**
+       * \brief
+       *
+       */
+      int WriteBuffer(const char *data_, int data_length_);
 
-			/**
-			 * \brief
-			 *
-			 */
-			bool IsWriteBufferEmpty();
+      /**
+       * \brief
+       *
+       */
+      bool IsWriteBufferEmpty();
 
-			/**
-			 * \brief
-			 *
-			 */
-			int GetWriteBufferAvailable();
+      /**
+       * \brief
+       *
+       */
+      int GetWriteBufferAvailable();
 
-			/**
-			 * \brief
-			 *
-			 */
-			int FlushWriteBuffer();
+      /**
+       * \brief
+       *
+       */
+      int FlushWriteBuffer();
 
-		public:
-			/**
-			 * \brief Constructor.
-			 *
-			 * \param args_ Contem um array de parametros, com o ultimo parametro igual a nullptr
-			 *
-			 */
-			WrapperProcess(std::string prog_, char **args_);
+    public:
+      /**
+       * \brief Constructor.
+       *
+       * \param args_ Contem um array de parametros, com o ultimo parametro igual a nullptr
+       *
+       */
+      WrapperProcess(std::string prog_, char **args_);
 
-			/**
-			 * \brief Constructor.
-			 *
-			 */
-			WrapperProcess(std::string prog_);
+      /**
+       * \brief Constructor.
+       *
+       */
+      WrapperProcess(std::string prog_);
 
-			/**
-			 * \brief Destrutor virtual.
-			 *
-			 */
-			virtual ~WrapperProcess();
+      /**
+       * \brief Destrutor virtual.
+       *
+       */
+      virtual ~WrapperProcess();
 
-			/**
-			 * \brief 
-			 *
-			 */
-			void Flush();
+      /**
+       * \brief 
+       *
+       */
+      void Flush();
 
-			/**
-			 * \brief
-			 *
-			 */
-			int Read(char *buf, int size);
+      /**
+       * \brief
+       *
+       */
+      int Read(char *buf, int size);
 
-			/**
-			 * \brief
-			 *
-			 */
-			int Write(const char *buf, int size);
+      /**
+       * \brief
+       *
+       */
+      int Write(const char *buf, int size);
 
-			/**
-			 * \brief
-			 *
-			 */
-			void Write(std::string s);
+      /**
+       * \brief
+       *
+       */
+      void Write(std::string s);
 
-			/**
-			 * \brief
-			 *
-			 */
-			void WaitAnyData();
+      /**
+       * \brief
+       *
+       */
+      void WaitAnyData();
 
-			/**
-			 * \brief
-			 *
-			 */
-			void WaitAllData();
+      /**
+       * \brief
+       *
+       */
+      void WaitAllData();
 
-			/**
-			 * \brief
-			 *
-			 */
-			jprocess_type_t CreateProcess();
+      /**
+       * \brief
+       *
+       */
+      jprocess_type_t CreateProcess();
 
-			/**
-			 * \brief
-			 *
-			 */
-			void WaitProcess();
+      /**
+       * \brief
+       *
+       */
+      void WaitProcess();
 
-			/**
-			 * \brief
-			 *
-			 */
-			void Interrupt();
+      /**
+       * \brief
+       *
+       */
+      void Interrupt();
 
-			/**
-			 * \brief 
-			 *
-			 */
-			void Release();
+      /**
+       * \brief 
+       *
+       */
+      void Release();
 
 };
 

@@ -29,8 +29,8 @@ namespace jevent {
  *
  */
 enum jcontainerevent_type_t {
-	JCET_COMPONENT_ADDED,
-	JCET_COMPONENT_REMOVED
+  JCET_COMPONENT_ADDED,
+  JCET_COMPONENT_REMOVED
 };
 
 /**
@@ -40,28 +40,28 @@ enum jcontainerevent_type_t {
  */
 class ContainerEvent : public jevent::EventObject {
 
-	private:
-		/** \brief */
-		jcontainerevent_type_t _type;
+  private:
+    /** \brief */
+    jcontainerevent_type_t _type;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		ContainerEvent(void *source, jcontainerevent_type_t type);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~ContainerEvent();
+  public:
+    /**
+     * \brief
+     *
+     */
+    ContainerEvent(void *source, jcontainerevent_type_t type);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~ContainerEvent();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jcontainerevent_type_t GetType();
+    /**
+     * \brief
+     *
+     */
+    virtual jcontainerevent_type_t GetType();
 
 };
 

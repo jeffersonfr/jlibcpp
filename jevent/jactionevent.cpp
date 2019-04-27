@@ -22,9 +22,9 @@
 namespace jevent {
 
 ActionEvent::ActionEvent(void *source):
-	jevent::EventObject(source)
-{	
-	jcommon::Object::SetClassName("jevent::ActionEvent");
+  jevent::EventObject(source)
+{  
+  jcommon::Object::SetClassName("jevent::ActionEvent");
 }
 
 ActionEvent::~ActionEvent()

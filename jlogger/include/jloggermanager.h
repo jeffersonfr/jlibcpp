@@ -35,42 +35,42 @@ namespace jlogger {
 */
 class LoggerManager : public virtual jcommon::Object{
 
-	private:
-		/** \brief */
-		static LoggerManager *_manager;
-		/** \brief */
-		std::vector<Logger *> _loggers; 
+  private:
+    /** \brief */
+    static LoggerManager *_manager;
+    /** \brief */
+    std::vector<Logger *> _loggers; 
 
-		/**
-		 * \brief
-		 * 
-		 */
-		LoggerManager();
+    /**
+     * \brief
+     * 
+     */
+    LoggerManager();
 
-	public:
-		/**
-		 * \brief
-		 * 
-		 */
- 		virtual ~LoggerManager();
+  public:
+    /**
+     * \brief
+     * 
+     */
+     virtual ~LoggerManager();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		static LoggerManager * GetInstance();
+    /**
+     * \brief
+     * 
+     */
+    static LoggerManager * GetInstance();
     
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual Logger * CreateLogger(LoggerHandler *handler_ = nullptr, Formatter *format_ = nullptr, Logger *group_ = nullptr);
+    /**
+     * \brief
+     * 
+     */
+    virtual Logger * CreateLogger(LoggerHandler *handler_ = nullptr, Formatter *format_ = nullptr, Logger *group_ = nullptr);
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void SetOutput(int mask_);
+    /**
+     * \brief
+     * 
+     */
+    virtual void SetOutput(int mask_);
     
 };
 

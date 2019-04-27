@@ -22,9 +22,9 @@
 namespace jcommon {
 
 Observer::Observer():
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jcommon::Observer");
+  jcommon::Object::SetClassName("jcommon::Observer");
 }
 
 Observer::~Observer()

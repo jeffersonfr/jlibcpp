@@ -25,10 +25,10 @@
 namespace jcommon {
 
 enum jlink_flags_t {
-	JLF_NOW,
-	JLF_LAZY,
-	JLF_LOCAL,
-	JLF_GLOBAL
+  JLF_NOW,
+  JLF_LAZY,
+  JLF_LOCAL,
+  JLF_GLOBAL
 };
 
 /**
@@ -38,63 +38,63 @@ enum jlink_flags_t {
  */
 class DynamicLink : public virtual jcommon::Object{
 
-	private:
-		void *_handle;
-		
-	public:
-		/**
-		 * \brief
-		 * 
-		 */
-		DynamicLink();
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual ~DynamicLink();
+  private:
+    void *_handle;
+    
+  public:
+    /**
+     * \brief
+     * 
+     */
+    DynamicLink();
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual ~DynamicLink();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		void Load(std::string lib, jlink_flags_t mode);
+    /**
+     * \brief
+     * 
+     */
+    void Load(std::string lib, jlink_flags_t mode);
 
-	 	/**
-		 * \brief Find specific entry point in specified library. Specify "*" for lib
-		 * to search in all libraries.
-		 */
-		void * FindSymbol(std::string symbol);
-		
-		/**
-		 * \brief Unload a shared library.
-		 * 
-		 */
-		void Unload();
+     /**
+     * \brief Find specific entry point in specified library. Specify "*" for lib
+     * to search in all libraries.
+     */
+    void * FindSymbol(std::string symbol);
+    
+    /**
+     * \brief Unload a shared library.
+     * 
+     */
+    void Unload();
 
-		/**
-		 * \brief
-		 *
-		 */		
-		void ListSymbols(std::string, std::string);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		std::string GetDependencies();
+    /**
+     * \brief
+     *
+     */    
+    void ListSymbols(std::string, std::string);
+    
+    /**
+     * \brief
+     *
+     */
+    std::string GetDependencies();
 
-		/**
-		 * \brief List all loaded shared libraries.
-		 *
-		 */
-		void ListLibraries();
+    /**
+     * \brief List all loaded shared libraries.
+     *
+     */
+    void ListLibraries();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		void Dispatch(std::string f);
+    /**
+     * \brief
+     * 
+     */
+    void Dispatch(std::string f);
     
 };
 

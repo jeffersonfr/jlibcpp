@@ -31,58 +31,58 @@ namespace jio {
  */
 class ObjectOutputStream : public virtual jcommon::Object {
 
-	private:
+  private:
     /** \brief */
     OutputStream *stream;
 
-	public:
-		/**
-		 * \brief
-		 * 
-		 */
-		ObjectOutputStream(OutputStream *os);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~ObjectOutputStream();
+  public:
+    /**
+     * \brief
+     * 
+     */
+    ObjectOutputStream(OutputStream *os);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~ObjectOutputStream();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsEmpty();
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsEmpty();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t Available();
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t Available();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual int64_t Write(Object *object);
+    /**
+     * \brief
+     * 
+     */
+    virtual int64_t Write(Object *object);
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual int64_t Flush();
+    /**
+     * \brief
+     * 
+     */
+    virtual int64_t Flush();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Close();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t GetSentBytes();
+    /**
+     * \brief
+     *
+     */
+    virtual void Close();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t GetSentBytes();
 
 };
 

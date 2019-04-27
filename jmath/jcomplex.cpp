@@ -26,8 +26,8 @@ namespace jmath {
 
 Complex::Complex(double real_, double imaginary_)
 {
-	_real = real_;
-	_imaginary = imaginary_;
+  _real = real_;
+  _imaginary = imaginary_;
 }
 
 Complex::~Complex()
@@ -36,59 +36,59 @@ Complex::~Complex()
 
 double Complex::GetReal()
 {
-	return _real;
+  return _real;
 }
 
 double Complex::GetImaginary()
 {
-	return _imaginary;
+  return _imaginary;
 }
 
 double Complex::GetModule()
 {
-	return Math<double>::Sqrt(_real*_real + _imaginary*_imaginary);
+  return Math<double>::Sqrt(_real*_real + _imaginary*_imaginary);
 }
 
 bool Complex::Equals(Object *o)
 {
-	Complex *c = dynamic_cast<Complex *>(o);
+  Complex *c = dynamic_cast<Complex *>(o);
 
-	return (_real == c->GetReal() && _imaginary == c->GetImaginary());
+  return (_real == c->GetReal() && _imaginary == c->GetImaginary());
 }
 
 int Complex::Compare(Object *o)
 {
-	Complex *c = dynamic_cast<Complex *>(o);
+  Complex *c = dynamic_cast<Complex *>(o);
 
-	if (GetModule() < c->GetModule()) {
-		return -1;
-	} else if (GetModule() > c->GetModule()) {
-		return 1;
-	}
+  if (GetModule() < c->GetModule()) {
+    return -1;
+  } else if (GetModule() > c->GetModule()) {
+    return 1;
+  }
 
-	return 0;
+  return 0;
 }
 
 const Complex & Complex::operator=(Complex &c)
 {
-	_real = c.GetReal();
-	_imaginary = c.GetImaginary();
+  _real = c.GetReal();
+  _imaginary = c.GetImaginary();
 
-	return *this;
+  return *this;
 }
 
 const Complex Complex::operator+(Complex &c)
 {
-	return Complex(_real+c.GetReal(), _imaginary+c.GetImaginary());
+  return Complex(_real+c.GetReal(), _imaginary+c.GetImaginary());
 }
 
 std::string Complex::What()
 {
-	std::ostringstream o;
+  std::ostringstream o;
 
-	o << _real << " + " << _imaginary << "i";
+  o << _real << " + " << _imaginary << "i";
 
-	return o.str();
+  return o.str();
 }
 
 }

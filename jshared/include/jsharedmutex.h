@@ -38,45 +38,45 @@ namespace jshared {
 class SharedMutex : public virtual jcommon::Object {
 
     private:
-			/** \brief */
+      /** \brief */
       MemoryMap *_mmap;
 
-		public:
-			/**
-			 * \brief Constructor.
-			 *
-			 */
-			SharedMutex(MemoryMap *mem);
+    public:
+      /**
+       * \brief Constructor.
+       *
+       */
+      SharedMutex(MemoryMap *mem);
 
-			/**
-			 * \brief Destrutor virtual.
-			 *
-			 */
-			virtual ~SharedMutex();
+      /**
+       * \brief Destrutor virtual.
+       *
+       */
+      virtual ~SharedMutex();
 
-			/**
-			 * \brief
-			 *
-			 */
-			virtual void Lock();
+      /**
+       * \brief
+       *
+       */
+      virtual void Lock();
 
-			/**
-			 * \brief
-			 *
-			 */
-			virtual void Unlock();
+      /**
+       * \brief
+       *
+       */
+      virtual void Unlock();
 
-			/**
-			 * \brief
-			 *
-			 */
-			virtual void LockAll();
+      /**
+       * \brief
+       *
+       */
+      virtual void LockAll();
 
-			/**
-			 * \brief
-			 *
-			 */
-			virtual void UnlockAll();
+      /**
+       * \brief
+       *
+       */
+      virtual void UnlockAll();
 
 };
 

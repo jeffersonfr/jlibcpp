@@ -32,43 +32,43 @@ namespace jio {
  */
 class PipeStream : public jio::InputStream, jio::OutputStream {
 
-	private:
-		/** \brief */
-		int _fds[2];
-		/** \brief */
-		bool _is_open;
+  private:
+    /** \brief */
+    int _fds[2];
+    /** \brief */
+    bool _is_open;
 
-	public:
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		PipeStream(int = 4096);
-		
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~PipeStream();
+  public:
+    /**
+     * \brief Construtor.
+     *
+     */
+    PipeStream(int = 4096);
+    
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~PipeStream();
 
-		/**
-		 * \brief
-		 *
-		 */
-		int64_t Read(char *data_, int64_t length_);
+    /**
+     * \brief
+     *
+     */
+    int64_t Read(char *data_, int64_t length_);
 
-		/**
-		 * \brief
-		 *
-		 */
-		int64_t Write(const char *data_, int64_t length_);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void Close();
-	
+    /**
+     * \brief
+     *
+     */
+    int64_t Write(const char *data_, int64_t length_);
+    
+    /**
+     * \brief
+     *
+     */
+    void Close();
+  
 };
 
 }

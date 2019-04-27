@@ -22,14 +22,14 @@
 namespace jgui {
 
 Image::Image(jpixelformat_t pixelformat, int width, int height):
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jgui::Image");
+  jcommon::Object::SetClassName("jgui::Image");
 
-	_pixelformat = pixelformat;
+  _pixelformat = pixelformat;
   _interpolation_method = JIM_NEAREST;
-	_size.width = width;
-	_size.height = height;
+  _size.width = width;
+  _size.height = height;
 }
 
 Image::~Image()
@@ -38,17 +38,17 @@ Image::~Image()
 
 Graphics * Image::GetGraphics()
 {
-	return nullptr;
+  return nullptr;
 }
 
 jpixelformat_t Image::GetPixelFormat()
 {
-	return _pixelformat;
+  return _pixelformat;
 }
 
 jsize_t Image::GetSize()
 {
-	return _size;
+  return _size;
 }
 
 void Image::SetInterpolationMethod(jinterpolation_method_t method)
@@ -108,7 +108,7 @@ void Image::UnlockData()
 void Image::GetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)
 {
 }
-		
+    
 jcommon::Object * Image::Clone()
 {
   return nullptr;

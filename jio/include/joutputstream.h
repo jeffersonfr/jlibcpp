@@ -31,104 +31,104 @@ namespace jio {
  */
 class OutputStream : public virtual jcommon::Object {
 
-	private:
-		/** \brief */
-		bool _is_closed;
-		
-	protected:
-		/** \brief */
-		bool _blocked;
-		
-	public:
-		/**
-		 * \brief
-		 * 
-		 */
-		OutputStream();
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual ~OutputStream();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetBlocking(bool block_);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsBlocking();
-
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual int64_t Write(std::string);
+  private:
+    /** \brief */
+    bool _is_closed;
     
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsClosed();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsEmpty() = 0;
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t Available() = 0;
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t GetSize() = 0;
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual int64_t Write(int64_t b) = 0;
-
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual int64_t Write(const char *data, int64_t size) = 0;
+  protected:
+    /** \brief */
+    bool _blocked;
     
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual int64_t Flush() = 0;
+  public:
+    /**
+     * \brief
+     * 
+     */
+    OutputStream();
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual ~OutputStream();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Seek(int64_t index) = 0;
+    /**
+     * \brief
+     *
+     */
+    virtual void SetBlocking(bool block_);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Close() = 0;
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t GetSentBytes() = 0;
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsBlocking();
+
+    /**
+     * \brief
+     * 
+     */
+    virtual int64_t Write(std::string);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsClosed();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsEmpty() = 0;
+
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t Available() = 0;
+
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t GetSize() = 0;
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual int64_t Write(int64_t b) = 0;
+
+    /**
+     * \brief
+     * 
+     */
+    virtual int64_t Write(const char *data, int64_t size) = 0;
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual int64_t Flush() = 0;
+
+    /**
+     * \brief
+     *
+     */
+    virtual void Seek(int64_t index) = 0;
+
+    /**
+     * \brief
+     *
+     */
+    virtual void Close() = 0;
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t GetSentBytes() = 0;
 
 };
 

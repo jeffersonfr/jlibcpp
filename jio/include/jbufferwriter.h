@@ -18,7 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #ifndef J_BUFFERWRITER_H
-#define	J_BUFFERWRITER_H
+#define  J_BUFFERWRITER_H
 
 #include "jio/jbuffer.h"
 
@@ -26,88 +26,88 @@ namespace jio {
 
 class BufferWriter : public virtual jcommon::Object {
 
-	private:
-		/** \brief */
-		jio::Buffer _buffer;
+  private:
+    /** \brief */
+    jio::Buffer _buffer;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		BufferWriter();
+  public:
+    /**
+     * \brief
+     *
+     */
+    BufferWriter();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~BufferWriter();
+    /**
+     * \brief
+     *
+     */
+    virtual ~BufferWriter();
 
-		/**
-		 * \brief
-		 *
-		 */
-		std::string GetData();
+    /**
+     * \brief
+     *
+     */
+    std::string GetData();
 
-		/**
-		 * \brief
-		 *
-		 */
-		void WriteBoolean(bool value);
+    /**
+     * \brief
+     *
+     */
+    void WriteBoolean(bool value);
 
-		/**
-		 * \brief
-		 *
-		 */
-		void WriteByte(uint8_t value);
+    /**
+     * \brief
+     *
+     */
+    void WriteByte(uint8_t value);
 
-		/**
-		 * \brief
-		 *
-		 */
-		void WriteShort(uint16_t value);
+    /**
+     * \brief
+     *
+     */
+    void WriteShort(uint16_t value);
 
-		/**
-		 * \brief
-		 *
-		 */
-		void WriteInteger(uint32_t value);
+    /**
+     * \brief
+     *
+     */
+    void WriteInteger(uint32_t value);
 
-		/**
-		 * \brief
-		 *
-		 */
-		void WriteLong(uint64_t value);
+    /**
+     * \brief
+     *
+     */
+    void WriteLong(uint64_t value);
 
-		/**
-		 * \brief
-		 *
-		 */
-		void WriteFloat(float value);
+    /**
+     * \brief
+     *
+     */
+    void WriteFloat(float value);
 
-		/**
-		 * \brief
-		 *
-		 */
-		void WriteDouble(double value);
+    /**
+     * \brief
+     *
+     */
+    void WriteDouble(double value);
 
-		/**
-		 * \brief
-		 *
-		 */
-		void WriteString(std::string value);
+    /**
+     * \brief
+     *
+     */
+    void WriteString(std::string value);
 
-		/**
-		 * \brief
-		 *
-		 */
-		void WriteRaw(const char *data, int64_t size);
+    /**
+     * \brief
+     *
+     */
+    void WriteRaw(const char *data, int64_t size);
 
-		/**
-		 * \brief
-		 *
-		 */
-		void Reset();
+    /**
+     * \brief
+     *
+     */
+    void Reset();
 
 };
 

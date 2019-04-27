@@ -31,52 +31,52 @@ namespace jexception {
  */
 class ProcessException : public jexception::RuntimeException {
 
-	private:
+  private:
 
-	public:
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		ProcessException();
+  public:
+    /**
+     * \brief Construtor.
+     *
+     */
+    ProcessException();
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		ProcessException(std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    ProcessException(std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		ProcessException(jexception::Exception *exception, std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    ProcessException(jexception::Exception *exception, std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> ProcessException(const std::string &fmt, T ...vs):
       Exception(fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::ProcessException");
     }
-		
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> ProcessException(Exception *exception, const std::string &fmt, T ...vs):
       Exception(exception, fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::ProcessException");
     }
-		
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~ProcessException() throw();
+    
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~ProcessException() throw();
 
 };
 

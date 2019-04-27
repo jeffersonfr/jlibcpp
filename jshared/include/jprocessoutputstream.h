@@ -34,92 +34,92 @@ class Process;
  */
 class ProcessOutputStream : public jio::OutputStream {
 
-	friend class Process;
-	friend class UnamedPipe;
+  friend class Process;
+  friend class UnamedPipe;
 
-	private:
-		/** \brief */
-		int _fd;
+  private:
+    /** \brief */
+    int _fd;
 
-	private:
-		/**
-		 * \brief
-		 *
-		 */
-		ProcessOutputStream(int fd);
-		
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~ProcessOutputStream();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsEmpty();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t Available();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t GetSize();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t Write(int64_t b);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t Write(const char *data, int64_t size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t Write(std::string);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t Flush();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Seek(int64_t index);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Close();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsClosed();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t GetSentBytes();
+  private:
+    /**
+     * \brief
+     *
+     */
+    ProcessOutputStream(int fd);
+    
+  public:
+    /**
+     * \brief
+     *
+     */
+    virtual ~ProcessOutputStream();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsEmpty();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t Available();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t GetSize();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t Write(int64_t b);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t Write(const char *data, int64_t size);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t Write(std::string);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t Flush();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Seek(int64_t index);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Close();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsClosed();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t GetSentBytes();
 
 };
 

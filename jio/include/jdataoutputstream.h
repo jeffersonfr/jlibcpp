@@ -32,132 +32,132 @@ namespace jio {
  */
 class DataOutputStream : public jio::OutputStream, jio::BufferWriter {
 
-	private:
+  private:
     /** \brief */
-		jio::OutputStream *_stream;
+    jio::OutputStream *_stream;
     /** \brief */
-		jio::BufferWriter _buffer;
-		
-	public:
-		/**
-		 * \brief
-		 * 
-		 */
-		DataOutputStream(OutputStream *os);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~DataOutputStream();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsEmpty();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t Available();
-
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual int64_t GetSize();
-
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual int64_t Write(int64_t b);
-
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual int64_t Write(const char *, int64_t size);
+    jio::BufferWriter _buffer;
     
-		/**
-		 * \brief
-		 *
-		 */
-		void WriteBoolean(bool value);
+  public:
+    /**
+     * \brief
+     * 
+     */
+    DataOutputStream(OutputStream *os);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~DataOutputStream();
 
-		/**
-		 * \brief
-		 *
-		 */
-		void WriteByte(uint8_t value);
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsEmpty();
 
-		/**
-		 * \brief
-		 *
-		 */
-		void WriteShort(uint16_t value);
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t Available();
 
-		/**
-		 * \brief
-		 *
-		 */
-		void WriteInteger(uint32_t value);
+    /**
+     * \brief
+     * 
+     */
+    virtual int64_t GetSize();
 
-		/**
-		 * \brief
-		 *
-		 */
-		void WriteLong(uint64_t value);
+    /**
+     * \brief
+     * 
+     */
+    virtual int64_t Write(int64_t b);
 
-		/**
-		 * \brief
-		 *
-		 */
-		void WriteFloat(float value);
+    /**
+     * \brief
+     * 
+     */
+    virtual int64_t Write(const char *, int64_t size);
+    
+    /**
+     * \brief
+     *
+     */
+    void WriteBoolean(bool value);
 
-		/**
-		 * \brief
-		 *
-		 */
-		void WriteDouble(double value);
+    /**
+     * \brief
+     *
+     */
+    void WriteByte(uint8_t value);
 
-		/**
-		 * \brief
-		 *
-		 */
-		void WriteString(std::string value);
+    /**
+     * \brief
+     *
+     */
+    void WriteShort(uint16_t value);
 
-		/**
-		 * \brief
-		 *
-		 */
-		void WriteRaw(const char *data, int64_t size);
+    /**
+     * \brief
+     *
+     */
+    void WriteInteger(uint32_t value);
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void Seek(int64_t index);
+    /**
+     * \brief
+     *
+     */
+    void WriteLong(uint64_t value);
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual int64_t Flush();
+    /**
+     * \brief
+     *
+     */
+    void WriteFloat(float value);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Close();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t GetSentBytes();
+    /**
+     * \brief
+     *
+     */
+    void WriteDouble(double value);
+
+    /**
+     * \brief
+     *
+     */
+    void WriteString(std::string value);
+
+    /**
+     * \brief
+     *
+     */
+    void WriteRaw(const char *data, int64_t size);
+
+    /**
+     * \brief
+     * 
+     */
+    virtual void Seek(int64_t index);
+
+    /**
+     * \brief
+     * 
+     */
+    virtual int64_t Flush();
+
+    /**
+     * \brief
+     *
+     */
+    virtual void Close();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t GetSentBytes();
 
 };
 

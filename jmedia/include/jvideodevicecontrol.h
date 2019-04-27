@@ -30,19 +30,19 @@ namespace jmedia {
  *
  */
 enum jvideo_control_t {
-	JVC_UNKNOWN,
-	JVC_CONTRAST,
-	JVC_SATURATION,
-	JVC_HUE,
-	JVC_BRIGHTNESS,
-	JVC_SHARPNESS,
-	JVC_GAMMA,
-	JVC_AUTO_EXPOSURE,
-	JVC_AUTO_FOCUS,
-	JVC_HFLIP,
-	JVC_VFLIP,
-	JVC_BACKLIGHT,
-	JVC_ZOOM
+  JVC_UNKNOWN,
+  JVC_CONTRAST,
+  JVC_SATURATION,
+  JVC_HUE,
+  JVC_BRIGHTNESS,
+  JVC_SHARPNESS,
+  JVC_GAMMA,
+  JVC_AUTO_EXPOSURE,
+  JVC_AUTO_FOCUS,
+  JVC_HFLIP,
+  JVC_VFLIP,
+  JVC_BACKLIGHT,
+  JVC_ZOOM
 };
 
 /**
@@ -52,52 +52,52 @@ enum jvideo_control_t {
  */
 class VideoDeviceControl : public Control {
 
-	protected:
-		/** \brief */
-		std::vector<jvideo_control_t> _controls;
+  protected:
+    /** \brief */
+    std::vector<jvideo_control_t> _controls;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		VideoDeviceControl();
+  public:
+    /**
+     * \brief
+     *
+     */
+    VideoDeviceControl();
 
-		/**
-		 * \brief Destructor.
-		 *
-		 */
-		virtual ~VideoDeviceControl();
+    /**
+     * \brief Destructor.
+     *
+     */
+    virtual ~VideoDeviceControl();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual const std::vector<jvideo_control_t> & GetControls();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool HasControl(jvideo_control_t id);
+    /**
+     * \brief
+     *
+     */
+    virtual const std::vector<jvideo_control_t> & GetControls();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool HasControl(jvideo_control_t id);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetValue(jvideo_control_t id);
+    /**
+     * \brief
+     *
+     */
+    virtual int GetValue(jvideo_control_t id);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool SetValue(jvideo_control_t id, int value);
+    /**
+     * \brief
+     *
+     */
+    virtual bool SetValue(jvideo_control_t id, int value);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Reset(jvideo_control_t id);
+    /**
+     * \brief
+     *
+     */
+    virtual void Reset(jvideo_control_t id);
 
 };
 

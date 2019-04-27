@@ -29,9 +29,9 @@ namespace jmpeg {
 class DataStream : public jcommon::Object {
 
   private:
-		/** \brief */
+    /** \brief */
     std::string _data;
-		/** \brief */
+    /** \brief */
     size_t _data_index;
 
   public:

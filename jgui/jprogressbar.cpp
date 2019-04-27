@@ -23,15 +23,15 @@
 namespace jgui {
 
 ProgressBar::ProgressBar(int x, int y, int width, int height, jscroll_orientation_t type):
-   	Component(x, y, width, height)
+     Component(x, y, width, height)
 {
-	jcommon::Object::SetClassName("jgui::ProgressBar");
+  jcommon::Object::SetClassName("jgui::ProgressBar");
 
-	_type = type;
-	_value = 0;
-	_fixe_delta = 10;
-	_delta = _fixe_delta;
-	_stone_size = 32;
+  _type = type;
+  _value = 0;
+  _fixe_delta = 10;
+  _delta = _fixe_delta;
+  _stone_size = 32;
 }
 
 ProgressBar::~ProgressBar()
@@ -40,59 +40,59 @@ ProgressBar::~ProgressBar()
 
 void ProgressBar::SetScrollOrientation(jscroll_orientation_t type)
 {
-	if (_type == type) {
-		return;
-	}
+  if (_type == type) {
+    return;
+  }
 
-	_type = type;
+  _type = type;
 
-	Repaint();
+  Repaint();
 }
 
 jscroll_orientation_t ProgressBar::GetScrollOrientation()
 {
-	return _type;
+  return _type;
 }
 
 int ProgressBar::GetStoneSize()
 {
-	return _stone_size;
+  return _stone_size;
 }
 
 void ProgressBar::SetStoneSize(int size)
 {
-	_stone_size = size;
+  _stone_size = size;
 
-	Repaint();
+  Repaint();
 }
-		
+    
 double ProgressBar::GetValue()
 {
-	return _value;
+  return _value;
 }
 
 void ProgressBar::SetValue(double i)
 {
-	_value = (int)i;
+  _value = (int)i;
 
-	if (_value < 0.0) {
-		_value = 0;
-	}
+  if (_value < 0.0) {
+    _value = 0;
+  }
 
-	if (_value > 100) {
-		_value = 100;
-	}
+  if (_value > 100) {
+    _value = 100;
+  }
 
-	Repaint();
+  Repaint();
 }
 
 void ProgressBar::Paint(Graphics *g)
 {
-	JDEBUG(JINFO, "paint\n");
+  JDEBUG(JINFO, "paint\n");
 
-	Component::Paint(g);
+  Component::Paint(g);
 
-	Theme 
+  Theme 
     *theme = GetTheme();
   
   if (theme == nullptr) {
@@ -103,19 +103,19 @@ void ProgressBar::Paint(Graphics *g)
     *font = theme->GetFont("component.font");
   jgui::Color 
     bg = theme->GetIntegerParam("component.bg"),
-	  fg = theme->GetIntegerParam("component.fg"),
-	  fgfocus = theme->GetIntegerParam("component.fg.focus"),
-	  fgdisable = theme->GetIntegerParam("component.fg.disable"),
-	  scroll = theme->GetIntegerParam("component.scroll");
+    fg = theme->GetIntegerParam("component.fg"),
+    fgfocus = theme->GetIntegerParam("component.fg.focus"),
+    fgdisable = theme->GetIntegerParam("component.fg.disable"),
+    scroll = theme->GetIntegerParam("component.scroll");
   jgui::jsize_t
     size = GetSize();
-	std::string 
+  std::string 
     text;
   int
     x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
-		y = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
-		w = size.width - 2*x,
-		h = size.height - 2*y;
+    y = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
+    w = size.width - 2*x,
+    h = size.height - 2*y;
 
   if (_type == JSO_HORIZONTAL) {
     double 

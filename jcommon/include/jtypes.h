@@ -31,68 +31,68 @@ namespace jcommon {
  */
 class Types : public virtual jcommon::Object{
 
-	private:
-		/**
-		 * \brief
-		 *
-		 */
-		Types();
+  private:
+    /**
+     * \brief
+     *
+     */
+    Types();
 
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~Types();
+  public:
+    /**
+     * \brief
+     *
+     */
+    virtual ~Types();
 
-		/**
-		 * \brief
-		 *
-		 */
-		static int StringToInteger(std::string s, int radix = 10);
+    /**
+     * \brief
+     *
+     */
+    static int StringToInteger(std::string s, int radix = 10);
 
-		/**
-		 * \brief
-		 *
-		 */
-		static std::string IntegerToString(int i, int radix = 10);
+    /**
+     * \brief
+     *
+     */
+    static std::string IntegerToString(int i, int radix = 10);
 
-		/**
-		 * \brief
-		 *
-		 */
-		static int64_t StringToLong(std::string s, int radix = 10);
+    /**
+     * \brief
+     *
+     */
+    static int64_t StringToLong(std::string s, int radix = 10);
 
-		/**
-		 * \brief
-		 *
-		 */
-		static std::string LongToString(int64_t i, int radix = 10);
+    /**
+     * \brief
+     *
+     */
+    static std::string LongToString(int64_t i, int radix = 10);
 
-		/**
-		 * \brief
-		 *
-		 */
-		static float StringToFloat(std::string s);
+    /**
+     * \brief
+     *
+     */
+    static float StringToFloat(std::string s);
 
-		/**
-		 * \brief
-		 *
-		 */
-		static std::string FloatToString(float i, int radix = 10);
+    /**
+     * \brief
+     *
+     */
+    static std::string FloatToString(float i, int radix = 10);
 
-		/**
-		 * \brief
-		 *
-		 */
-		static double StringToDouble(std::string s);
+    /**
+     * \brief
+     *
+     */
+    static double StringToDouble(std::string s);
 
-		/**
-		 * \brief
-		 *
-		 */
-		static std::string DoubleToString(double i, int radix = 10);
+    /**
+     * \brief
+     *
+     */
+    static std::string DoubleToString(double i, int radix = 10);
 
 };
 

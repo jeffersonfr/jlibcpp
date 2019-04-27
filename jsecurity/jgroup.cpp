@@ -22,11 +22,11 @@
 namespace jsecurity {
 
 Group::Group(std::string name):
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jsecurity::Group");
+  jcommon::Object::SetClassName("jsecurity::Group");
 
-	_name = name;
+  _name = name;
 }
 
 Group::~Group()
@@ -35,12 +35,12 @@ Group::~Group()
 
 int Group::GetID()
 {
-	return -1;
+  return -1;
 }
 
 std::string Group::GetName()
 {
-	return _name;
+  return _name;
 }
 
 };

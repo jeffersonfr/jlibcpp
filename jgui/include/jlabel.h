@@ -17,7 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef	J_LABEL_H
+#ifndef  J_LABEL_H
 #define J_LABEL_H
 
 #include "jgui/jcomponent.h"
@@ -34,88 +34,88 @@ class ButtonEvent;
  */
 class Label : public jgui::Component {
 
-	private:
-		/** \brief */
-		std::string _text;
-		/** \brief */
-		jhorizontal_align_t _halign;
-		/** \brief */
-		jvertical_align_t _valign;
-		/** \brief */
-		bool _is_wrap;
+  private:
+    /** \brief */
+    std::string _text;
+    /** \brief */
+    jhorizontal_align_t _halign;
+    /** \brief */
+    jvertical_align_t _valign;
+    /** \brief */
+    bool _is_wrap;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		Label(std::string text, int x = 0, int y = 0, int width = DEFAULT_COMPONENT_WIDTH, int height = DEFAULT_COMPONENT_HEIGHT);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~Label();
+  public:
+    /**
+     * \brief
+     *
+     */
+    Label(std::string text, int x = 0, int y = 0, int width = DEFAULT_COMPONENT_WIDTH, int height = DEFAULT_COMPONENT_HEIGHT);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~Label();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetText(std::string text);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string GetText();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetWrap(bool b);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsWrap();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetHorizontalAlign(jhorizontal_align_t align);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jhorizontal_align_t GetHorizontalAlign();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetVerticalAlign(jvertical_align_t align);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual	jvertical_align_t GetVerticalAlign();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jsize_t GetPreferredSize();
+    /**
+     * \brief
+     *
+     */
+    virtual void SetText(std::string text);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual std::string GetText();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetWrap(bool b);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsWrap();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetHorizontalAlign(jhorizontal_align_t align);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual jhorizontal_align_t GetHorizontalAlign();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetVerticalAlign(jvertical_align_t align);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual  jvertical_align_t GetVerticalAlign();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual jsize_t GetPreferredSize();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Paint(Graphics *g);
+    /**
+     * \brief
+     *
+     */
+    virtual void Paint(Graphics *g);
 
 };
 

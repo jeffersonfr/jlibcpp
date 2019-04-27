@@ -36,78 +36,78 @@ class Socket;
  */
 class ServerSocket : public virtual jcommon::Object {
 
-	private:
-		/** \brief Local socket. */
-		struct sockaddr_in _lsock;
-		/** \brief Remote socket. */
-		struct sockaddr_in _rsock;
-		/** \brief */
-		InetAddress *_local;
-		/** \brief */
-		int _fd;
-		/** \brief */
-		bool _is_closed;
+  private:
+    /** \brief Local socket. */
+    struct sockaddr_in _lsock;
+    /** \brief Remote socket. */
+    struct sockaddr_in _rsock;
+    /** \brief */
+    InetAddress *_local;
+    /** \brief */
+    int _fd;
+    /** \brief */
+    bool _is_closed;
 
-		/**
-		 * \brief
-		 *
-		 */
-		void CreateSocket();
+    /**
+     * \brief
+     *
+     */
+    void CreateSocket();
 
-		/**
-		 * \brief
-		 *
-		 */
-		void BindSocket(InetAddress *, int);
+    /**
+     * \brief
+     *
+     */
+    void BindSocket(InetAddress *, int);
 
-		/**
-		 * \brief
-		 *
-		 */
-		void ListenSocket(int);
+    /**
+     * \brief
+     *
+     */
+    void ListenSocket(int);
 
-	public:
-		/**
-		 * \brief Constructor.
-		 *
-		 */
-		ServerSocket(int port, int backlog = 5, InetAddress * = nullptr);
+  public:
+    /**
+     * \brief Constructor.
+     *
+     */
+    ServerSocket(int port, int backlog = 5, InetAddress * = nullptr);
 
-		/**
-		 * \brief Destructor virtual.
-		 *
-		 */
-		virtual ~ServerSocket();
+    /**
+     * \brief Destructor virtual.
+     *
+     */
+    virtual ~ServerSocket();
 
-		/**
-		 * \brief Accept a new socket.
-		 *
-		 */
-		Socket * Accept();
+    /**
+     * \brief Accept a new socket.
+     *
+     */
+    Socket * Accept();
 
-		/**
-		 * \brief
-		 *
-		 */
-		InetAddress * GetInetAddress();
+    /**
+     * \brief
+     *
+     */
+    InetAddress * GetInetAddress();
 
-		/**
-		 * \brief Get the local port.
-		 *
-		 */
-		int GetLocalPort();
+    /**
+     * \brief Get the local port.
+     *
+     */
+    int GetLocalPort();
 
-		/**
-		 * \brief Close the server socket.
-		 *
-		 */
-		void Close();
+    /**
+     * \brief Close the server socket.
+     *
+     */
+    void Close();
 
-		/**
-		 * \brief 
-		 *
-		 */
-		virtual bool IsClosed();
+    /**
+     * \brief 
+     *
+     */
+    virtual bool IsClosed();
 
 };
 

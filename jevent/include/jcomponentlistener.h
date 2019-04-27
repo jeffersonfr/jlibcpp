@@ -32,61 +32,61 @@ namespace jevent {
  */
 class ComponentListener : public jevent::Listener {
 
-	protected:
-		/**
-		 * \brief
-		 *
-		 */
-		ComponentListener();
+  protected:
+    /**
+     * \brief
+     *
+     */
+    ComponentListener();
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~ComponentListener();
+  public:
+    /**
+     * \brief
+     *
+     */
+    virtual ~ComponentListener();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void OnHide(ComponentEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void OnShow(ComponentEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void OnMove(ComponentEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void OnSize(ComponentEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void OnPaint(ComponentEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual void OnHide(ComponentEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void OnShow(ComponentEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void OnMove(ComponentEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void OnSize(ComponentEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void OnPaint(ComponentEvent *event);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void OnEnter(ComponentEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual void OnEnter(ComponentEvent *event);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void OnLeave(ComponentEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual void OnLeave(ComponentEvent *event);
 
 };
 

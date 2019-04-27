@@ -29,8 +29,8 @@ namespace jevent {
  *
  */
 enum jfocusevent_type_t {
-	JFET_LOST,
-	JFET_GAINED
+  JFET_LOST,
+  JFET_GAINED
 };
 
 /**
@@ -40,28 +40,28 @@ enum jfocusevent_type_t {
  */
 class FocusEvent : public jevent::EventObject {
 
-	private:
-		/** \brief */
-		jfocusevent_type_t _type;
+  private:
+    /** \brief */
+    jfocusevent_type_t _type;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		FocusEvent(void *source, jfocusevent_type_t type);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~FocusEvent();
+  public:
+    /**
+     * \brief
+     *
+     */
+    FocusEvent(void *source, jfocusevent_type_t type);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~FocusEvent();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jfocusevent_type_t GetType();
+    /**
+     * \brief
+     *
+     */
+    virtual jfocusevent_type_t GetType();
 
 };
 

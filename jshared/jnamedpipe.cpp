@@ -29,54 +29,54 @@
 namespace jshared {
 
 NamedPipe::NamedPipe(std::string name, int mode):
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jshared::NamedPipe");
-	
-	_name = name;
-	
-	if ((_fd = open(_name.c_str(), O_RDWR)) < 0) {
-		mkfifo(name.c_str(), mode);
-	
-		if ((_fd = open(_name.c_str(), O_RDWR)) < 0) {
-			throw jexception::IOException("Cannot create named pipe");
-		}
-	}
-	
-	_is_closed = false;
+  jcommon::Object::SetClassName("jshared::NamedPipe");
+  
+  _name = name;
+  
+  if ((_fd = open(_name.c_str(), O_RDWR)) < 0) {
+    mkfifo(name.c_str(), mode);
+  
+    if ((_fd = open(_name.c_str(), O_RDWR)) < 0) {
+      throw jexception::IOException("Cannot create named pipe");
+    }
+  }
+  
+  _is_closed = false;
 }
 
 NamedPipe::~NamedPipe()
 {
-	Close();
+  Close();
 }
 
 int NamedPipe::Receive(char *data_, int length_)
 {
-	if (_is_closed == true) {
-		return 0;
-	}
+  if (_is_closed == true) {
+    return 0;
+  }
 
-	return read(_fd, data_, length_);
+  return read(_fd, data_, length_);
 }
 
 int NamedPipe::Send(const char *data_, int length_)
 {
-	return write(_fd, data_, length_);
+  return write(_fd, data_, length_);
 }
 
 bool NamedPipe::IsClosed()
 {
-	return _is_closed;
+  return _is_closed;
 }
 
 void NamedPipe::Close()
 {
-	if (_is_closed == false) {
-		_is_closed = true;
+  if (_is_closed == false) {
+    _is_closed = true;
 
-		close(_fd);
-	}
+    close(_fd);
+  }
 }
 
 }

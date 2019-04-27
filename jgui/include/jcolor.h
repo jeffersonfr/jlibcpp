@@ -30,8 +30,8 @@ namespace jgui {
  * \author Jeff Ferr
  */
 class Color : public virtual jcommon::Object {
-	
-	public:
+  
+  public:
     enum jcolor_name_t {
       AliceBlue = 0xfff0f8ff,
       AntiqueWhite = 0xfffaebd7,
@@ -183,148 +183,148 @@ class Color : public virtual jcommon::Object {
       Transparent = 0x00000000
     };
 
-	private:
-		/** \brief */
-		int _red;
-		/** \brief */
-		int _green;
-		/** \brief */
-		int _blue;
-		/** \brief */
-		int _alpha;
+  private:
+    /** \brief */
+    int _red;
+    /** \brief */
+    int _green;
+    /** \brief */
+    int _blue;
+    /** \brief */
+    int _alpha;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		Color(std::string name);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		Color(uint32_t color = 0xff000000);
-		
-		/**
-		 * \brief Creates an ARGB color with the specified red, green, blue, and alpha values in the range (0 - 255).
-		 *
-		 */
-		Color(int r, int g, int b, int a = 0xff);
-		
-		/**
-		 * \brief Creates an ARGB color with the specified red, green, blue, and alpha values in the range (0.0 - 1.0).
-		 *
-		 */
-		Color(double r, double g, double b, double a = 1.0);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~Color();
+  public:
+    /**
+     * \brief
+     *
+     */
+    Color(std::string name);
+    
+    /**
+     * \brief
+     *
+     */
+    Color(uint32_t color = 0xff000000);
+    
+    /**
+     * \brief Creates an ARGB color with the specified red, green, blue, and alpha values in the range (0 - 255).
+     *
+     */
+    Color(int r, int g, int b, int a = 0xff);
+    
+    /**
+     * \brief Creates an ARGB color with the specified red, green, blue, and alpha values in the range (0.0 - 1.0).
+     *
+     */
+    Color(double r, double g, double b, double a = 1.0);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~Color();
 
     /**
      * \brief Converts the components of a color, as specified by the HSB model, to an equivalent set of values for the 
-		 * default RGB model. 
+     * default RGB model. 
      * <p>
      * The <code>saturation</code> and <code>brightness</code> components should be doubleing-point values between zero 
-		 * and one (numbers in the range 0.0-1.0).  The <code>hue</code> component can be any doubleing-point number.  The floor 
-		 * of this number is subtracted from it to create a fraction between 0 and 1.  This fractional number is then multiplied 
-		 * by 360 to produce the hue angle in the HSB color model.
+     * and one (numbers in the range 0.0-1.0).  The <code>hue</code> component can be any doubleing-point number.  The floor 
+     * of this number is subtracted from it to create a fraction between 0 and 1.  This fractional number is then multiplied 
+     * by 360 to produce the hue angle in the HSB color model.
      * <p>
      * The integer that is returned by <code>HSBtoRGB</code> encodes the value of a color in bits 0-23 of an integer value 
-		 * that is the same format used by the method {@link #getRGB() <code>getRGB</code>}. This integer can be supplied as an 
-		 * argument to the <code>Color</code> constructor that takes a single integer argument. 
-		 *
+     * that is the same format used by the method {@link #getRGB() <code>getRGB</code>}. This integer can be supplied as an 
+     * argument to the <code>Color</code> constructor that takes a single integer argument. 
+     *
      * \param hue the hue component of the color
      * \param saturation the saturation of the color
      * \param brightness the brightness of the color
-		 *
+     *
      * \return the RGB value of the color with the indicated hue, saturation, and brightness.
      */
     static void HSBtoRGB(double hue, double saturation, double brightness, int *red, int *green, int *blue);
 
     /**
      * Converts the components of a color, as specified by the default RGB model, to an equivalent set of values for hue, saturation, 
-		 * and brightness that are the three components of the HSB model. 
+     * and brightness that are the three components of the HSB model. 
      * <p>
      * If the <code>hsbvals</code> argument is <code>null</code>, then a new array is allocated to return the result. Otherwise, the 
-		 * method returns the array <code>hsbvals</code>, with the values put into that array. 
-		 *
+     * method returns the array <code>hsbvals</code>, with the values put into that array. 
+     *
      * \param r the red component of the color
      * \param g the green component of the color
      * \param b the blue component of the color
-		 *
+     *
      * \return the HSB value of the color with the indicated red, green, blue.
      */
     static void RGBtoHSB(int red, int green, int blue, double *hue, double *saturation, double *brightness);
 
-		/**
-		 * \brief
-		 *
-		 */
-		Color Darker();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		Color Brighter();
+    /**
+     * \brief
+     *
+     */
+    Color Darker();
+    
+    /**
+     * \brief
+     *
+     */
+    Color Brighter();
 
-		/**
-		 * \brief
-		 *
-		 */
-		uint8_t GetRed();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint8_t GetGreen();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint8_t GetBlue();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint8_t GetAlpha();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetRed(int red);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetGreen(int green);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetBlue(int blue);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetAlpha(int alpha);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint32_t GetARGB();
+    /**
+     * \brief
+     *
+     */
+    uint8_t GetRed();
+    
+    /**
+     * \brief
+     *
+     */
+    uint8_t GetGreen();
+    
+    /**
+     * \brief
+     *
+     */
+    uint8_t GetBlue();
+    
+    /**
+     * \brief
+     *
+     */
+    uint8_t GetAlpha();
+    
+    /**
+     * \brief
+     *
+     */
+    void SetRed(int red);
+    
+    /**
+     * \brief
+     *
+     */
+    void SetGreen(int green);
+    
+    /**
+     * \brief
+     *
+     */
+    void SetBlue(int blue);
+    
+    /**
+     * \brief
+     *
+     */
+    void SetAlpha(int alpha);
+    
+    /**
+     * \brief
+     *
+     */
+    uint32_t GetARGB();
 
 };
 

@@ -31,52 +31,52 @@ namespace jgui {
  */
 class Panel : public Container {
 
-	private:
-		/** \brief */
-		std::string _title;
+  private:
+    /** \brief */
+    std::string _title;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		Panel(int x = 0, int y = 0, int width = 0, int height = 0);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		Panel(std::string title, int x = 0, int y = 0, int width = 0, int height = 0);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~Panel();
+  public:
+    /**
+     * \brief
+     *
+     */
+    Panel(int x = 0, int y = 0, int width = 0, int height = 0);
+    
+    /**
+     * \brief
+     *
+     */
+    Panel(std::string title, int x = 0, int y = 0, int width = 0, int height = 0);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~Panel();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetTitle(std::string title);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string GetTitle();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Paint(Graphics *g);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void PaintGlassPane(Graphics *g);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetTitle(std::string title);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual std::string GetTitle();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Paint(Graphics *g);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void PaintGlassPane(Graphics *g);
 
 };
 

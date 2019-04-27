@@ -35,50 +35,50 @@ namespace jshared {
  */
 class NamedPipe : public virtual jcommon::Object {
 
-	private:
-		/** \brief */
-		std::string _name;
-		/** \brief */
-		int _fd;
-		/** \brief */
-		bool _is_closed;
+  private:
+    /** \brief */
+    std::string _name;
+    /** \brief */
+    int _fd;
+    /** \brief */
+    bool _is_closed;
 
-	public:
-		/**
-		 * \brief Constructor.
-		 *
-		 */
-		NamedPipe(std::string name, int mode);
+  public:
+    /**
+     * \brief Constructor.
+     *
+     */
+    NamedPipe(std::string name, int mode);
 
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~NamedPipe();
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~NamedPipe();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int Send(const char *data_, int data_length);
+    /**
+     * \brief
+     *
+     */
+    virtual int Send(const char *data_, int data_length);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int Receive(char *data_, int data_length_);
+    /**
+     * \brief
+     *
+     */
+    virtual int Receive(char *data_, int data_length_);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsClosed();
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsClosed();
 
-		/**
-		 * \brief Close.
-		 *
-		 */
-		virtual void Close();
+    /**
+     * \brief Close.
+     *
+     */
+    virtual void Close();
 
 };
 

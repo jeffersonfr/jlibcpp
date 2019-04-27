@@ -24,19 +24,19 @@ namespace jexception {
 LoggerException::LoggerException():
   jexception::RuntimeException()
 {
-	jcommon::Object::SetClassName("jexception::LoggerException");
+  jcommon::Object::SetClassName("jexception::LoggerException");
 }
 
 LoggerException::LoggerException(std::string reason_):
   jexception::RuntimeException(reason_)
 {
-	jcommon::Object::SetClassName("jexception::LoggerException");
+  jcommon::Object::SetClassName("jexception::LoggerException");
 }
 
 LoggerException::LoggerException(jexception::Exception *exception, std::string reason_):
   jexception::RuntimeException(exception, reason_)
 {
-	jcommon::Object::SetClassName("jexception::LoggerException");
+  jcommon::Object::SetClassName("jexception::LoggerException");
 }
 
 LoggerException::~LoggerException() throw()

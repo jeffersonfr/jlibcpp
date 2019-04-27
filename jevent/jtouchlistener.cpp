@@ -22,9 +22,9 @@
 namespace jevent {
 
 TouchListener::TouchListener():
-	jevent::Listener()
+  jevent::Listener()
 {
-	jcommon::Object::SetClassName("jevent::TouchListener");
+  jcommon::Object::SetClassName("jevent::TouchListener");
 }
 
 TouchListener::~TouchListener() 
@@ -33,22 +33,22 @@ TouchListener::~TouchListener()
 
 bool TouchListener::FingerPressed(TouchEvent *event)
 {
-	return false;
+  return false;
 }
 
 bool TouchListener::FingerReleased(TouchEvent *event)
 {
-	return false;
+  return false;
 }
 
 bool TouchListener::FingerMoved(TouchEvent *event)
 {
-	return false;
+  return false;
 }
 
 bool TouchListener::GesturePerformed(TouchEvent *event)
 {
-	return false;
+  return false;
 }
 
 }

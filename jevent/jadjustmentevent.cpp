@@ -22,12 +22,12 @@
 namespace jevent {
 
 AdjustmentEvent::AdjustmentEvent(void *source, jadjustmentevent_type_t type, double value):
-	jevent::EventObject(source)
+  jevent::EventObject(source)
 {
-	jcommon::Object::SetClassName("jevent::AdjustmentEvent");
-	
-	_type = type;
-	_value = value;
+  jcommon::Object::SetClassName("jevent::AdjustmentEvent");
+  
+  _type = type;
+  _value = value;
 }
 
 AdjustmentEvent::~AdjustmentEvent()
@@ -36,12 +36,12 @@ AdjustmentEvent::~AdjustmentEvent()
 
 double AdjustmentEvent::GetValue()
 {
-	return _value;
+  return _value;
 }
 
 jadjustmentevent_type_t AdjustmentEvent::GetType()
 {
-	return _type;
+  return _type;
 }
 
 }

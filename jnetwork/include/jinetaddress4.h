@@ -38,62 +38,62 @@ class InetAddress6;
  */
 class InetAddress4 : public InetAddress {
 
-	friend class InetAddress6;
+  friend class InetAddress6;
 
-	private:
-		/** \brief Host name. */
-		std::string _host;
-		/** \brief Host ip. */
-		struct in_addr _ip;
+  private:
+    /** \brief Host name. */
+    std::string _host;
+    /** \brief Host ip. */
+    struct in_addr _ip;
 
-		/**
-		 * \brief Constructor private.
-		 *
-		 */
-		InetAddress4(std::string, struct in_addr);
+    /**
+     * \brief Constructor private.
+     *
+     */
+    InetAddress4(std::string, struct in_addr);
 
-	public:
-		/**
-		 * \brief Destructor virtual.
-		 *
-		 */
-		virtual ~InetAddress4();
+  public:
+    /**
+     * \brief Destructor virtual.
+     *
+     */
+    virtual ~InetAddress4();
 
-		/**
-		 * \brief Get adresses by name.
-		 *
-		 */
-		static InetAddress * GetByName(std::string);
+    /**
+     * \brief Get adresses by name.
+     *
+     */
+    static InetAddress * GetByName(std::string);
 
-		/**
-		 * \brief Get all addresses from a host.
-		 *
-		 */
-		static std::vector<InetAddress *> GetAllByName(std::string);
+    /**
+     * \brief Get all addresses from a host.
+     *
+     */
+    static std::vector<InetAddress *> GetAllByName(std::string);
 
-		/**
-		 * \brief Get the local host.
-		 *
-		 */
-		static InetAddress * GetLocalHost();
+    /**
+     * \brief Get the local host.
+     *
+     */
+    static InetAddress * GetLocalHost();
 
-		/**
-		 * \brief Get the host name.
-		 *
-		 */
-		virtual std::string GetHostName();
+    /**
+     * \brief Get the host name.
+     *
+     */
+    virtual std::string GetHostName();
 
-		/**
-		 * \brief Get the host address.
-		 *
-		 */
-		virtual std::string GetHostAddress();
+    /**
+     * \brief Get the host address.
+     *
+     */
+    virtual std::string GetHostAddress();
 
-		/**
-		 * \brief Get the address IPv4.
-		 *
-		 */
-		virtual std::vector<uint32_t> GetAddress();
+    /**
+     * \brief Get the address IPv4.
+     *
+     */
+    virtual std::vector<uint32_t> GetAddress();
 
 };
 

@@ -181,7 +181,7 @@ class LibvlcPlayerComponentImpl : public jgui::Component {
       jgui::jsize_t
         size = GetSize();
 
-      jgui::Image *image = _buffer[(_buffer_index)%2];
+      jgui::Image *image = _buffer[(_buffer_index + 1)%2];
 
       image->LockData();
 
@@ -220,7 +220,7 @@ static void UnlockMediaSurface(void *data, void *id, void *const *p_pixels)
 {
 	LibvlcPlayerComponentImpl *cmp = reinterpret_cast<LibvlcPlayerComponentImpl *>(data);
 
-	jgui::Image *image = cmp->_buffer[(cmp->_buffer_index)%2];
+	jgui::Image *image = cmp->_buffer[(cmp->_buffer_index++)%2];
 
 	image->UnlockData();
 }

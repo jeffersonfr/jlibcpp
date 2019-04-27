@@ -32,28 +32,28 @@ namespace jipc {
  */
 class RemoteIPCServer : public IPCServer {
 
-	private:
-		/** \brief */
-		jnetwork::ServerSocket *_server;
+  private:
+    /** \brief */
+    jnetwork::ServerSocket *_server;
 
-	public:
-		/**
-		 * \Constructor.
-		 *
-		 */
-		RemoteIPCServer(int port);
+  public:
+    /**
+     * \Constructor.
+     *
+     */
+    RemoteIPCServer(int port);
 
-		/**
-		 * \brief Destructor.
-		 *
-		 */
-		virtual ~RemoteIPCServer();
+    /**
+     * \brief Destructor.
+     *
+     */
+    virtual ~RemoteIPCServer();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void WaitCall(RemoteCallListener *listener);
+    /**
+     * \brief
+     *
+     */
+    virtual void WaitCall(RemoteCallListener *listener);
 
 };
 

@@ -33,166 +33,166 @@ namespace jio {
  */
 class Buffer : public virtual jcommon::Object {
 
-	private: 
-		std::stringbuf _buffer;
+  private: 
+    std::stringbuf _buffer;
 
-	public:
-		/**
-		 * \brief Contructor. 
-		 *
-		 */
-		Buffer():
-			jcommon::Object()
-		{
-			jcommon::Object::SetClassName("jcommon::Buffer");
-		}
+  public:
+    /**
+     * \brief Contructor. 
+     *
+     */
+    Buffer():
+      jcommon::Object()
+    {
+      jcommon::Object::SetClassName("jcommon::Buffer");
+    }
 
-		/**
-		 * \brief Contructor. 
-		 *
-		 * \param buffer Replace the internal buffer array.
-		 * \param buffer_size Size of the new buffer array.
-		 */
-		Buffer(const char *buffer, int buffer_size):
-			jcommon::Object()
-		{
-			jcommon::Object::SetClassName("jcommon::Buffer");
+    /**
+     * \brief Contructor. 
+     *
+     * \param buffer Replace the internal buffer array.
+     * \param buffer_size Size of the new buffer array.
+     */
+    Buffer(const char *buffer, int buffer_size):
+      jcommon::Object()
+    {
+      jcommon::Object::SetClassName("jcommon::Buffer");
 
-			_buffer.pubsetbuf((char *)buffer, buffer_size);
-		}
+      _buffer.pubsetbuf((char *)buffer, buffer_size);
+    }
 
-		/**
-		 * \brief Destructor. 
-		 *
-		 */
-		virtual ~Buffer()
-		{
-		}
+    /**
+     * \brief Destructor. 
+     *
+     */
+    virtual ~Buffer()
+    {
+    }
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual bool IsEmpty()
-		{
-			return Available() == 0LL;
-		}
+    /**
+     * \brief
+     * 
+     */
+    virtual bool IsEmpty()
+    {
+      return Available() == 0LL;
+    }
 
-		/**
-		 * \brief 
-		 *
-		 */
-		int64_t Available()
-		{
-			return (int64_t)_buffer.in_avail();
-		}
+    /**
+     * \brief 
+     *
+     */
+    int64_t Available()
+    {
+      return (int64_t)_buffer.in_avail();
+    }
 
-		/**
-		 * \brief 
-		 *
-		 */
-		int64_t GetPosition()
-		{
-			return (int64_t)_buffer.pubseekoff(0, std::ios_base::cur, std::ios_base::in);
-		}
+    /**
+     * \brief 
+     *
+     */
+    int64_t GetPosition()
+    {
+      return (int64_t)_buffer.pubseekoff(0, std::ios_base::cur, std::ios_base::in);
+    }
 
-		/**
-		 * \brief 
-		 *
-		 */
-		int64_t GetSize()
-		{
-			std::streampos i = _buffer.pubseekoff(0, std::ios_base::cur, std::ios_base::in);
-			std::streampos j = _buffer.pubseekoff(0, std::ios_base::end, std::ios_base::in);
+    /**
+     * \brief 
+     *
+     */
+    int64_t GetSize()
+    {
+      std::streampos i = _buffer.pubseekoff(0, std::ios_base::cur, std::ios_base::in);
+      std::streampos j = _buffer.pubseekoff(0, std::ios_base::end, std::ios_base::in);
 
-			_buffer.pubseekpos(i, std::ios_base::in);
+      _buffer.pubseekpos(i, std::ios_base::in);
 
-			return j;
-		}
+      return j;
+    }
 
-		/**
-		 * \brief 
-		 *
-		 */
-		template<typename T> int64_t Get(T *out)
-		{
-			union coercion { 
-				T value; 
-				char data[sizeof(T)];
-			};
+    /**
+     * \brief 
+     *
+     */
+    template<typename T> int64_t Get(T *out)
+    {
+      union coercion { 
+        T value; 
+        char data[sizeof(T)];
+      };
 
-			coercion c;
+      coercion c;
 
-			int64_t s = (int64_t)_buffer.sgetn(c.data, sizeof(T));
+      int64_t s = (int64_t)_buffer.sgetn(c.data, sizeof(T));
 
-			(*out) = c.value;
+      (*out) = c.value;
 
-			return s;
-		}
+      return s;
+    }
 
 
-		/**
-		 * \brief 
-		 *
-		 */
-		template<typename T> int64_t Put(T *in)
-		{	
-			union coercion { 
-				T value; 
-				char data[sizeof(T)];
-			};
+    /**
+     * \brief 
+     *
+     */
+    template<typename T> int64_t Put(T *in)
+    {  
+      union coercion { 
+        T value; 
+        char data[sizeof(T)];
+      };
 
-			coercion c;
+      coercion c;
 
-			c.value = (*in);
+      c.value = (*in);
 
-			return (int64_t)_buffer.sputn(c.data, sizeof(T));
-		}
+      return (int64_t)_buffer.sputn(c.data, sizeof(T));
+    }
 
-		/**
-		 * \brief 
-		 *
-		 */
-		int64_t Get(char *out, int64_t count)
-		{
-			return (int64_t)_buffer.sgetn((char *)out, (size_t)count);
-		}
+    /**
+     * \brief 
+     *
+     */
+    int64_t Get(char *out, int64_t count)
+    {
+      return (int64_t)_buffer.sgetn((char *)out, (size_t)count);
+    }
 
-		/**
-		 * \brief 
-		 *
-		 */
-		int64_t Put(const char *out, int64_t count)
-		{
-			return (int64_t)_buffer.sputn((char *)out, (size_t)count);
-		}
+    /**
+     * \brief 
+     *
+     */
+    int64_t Put(const char *out, int64_t count)
+    {
+      return (int64_t)_buffer.sputn((char *)out, (size_t)count);
+    }
 
-		/**
-		 * \brief 
-		 *
-		 */
-		void Clear()
-		{
-			return _buffer.str("");
-		}
+    /**
+     * \brief 
+     *
+     */
+    void Clear()
+    {
+      return _buffer.str("");
+    }
 
-		/**
-		 * \brief 
-		 *
-		 */
-		void Reset()
-		{
-			_buffer.pubseekpos(0);
-		}
+    /**
+     * \brief 
+     *
+     */
+    void Reset()
+    {
+      _buffer.pubseekpos(0);
+    }
 
-		/**
-		 * \brief 
-		 *
-		 */
-		std::string What()
-		{
-			return _buffer.str();
-		}
+    /**
+     * \brief 
+     *
+     */
+    std::string What()
+    {
+      return _buffer.str();
+    }
 
 };
 

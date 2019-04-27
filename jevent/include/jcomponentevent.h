@@ -29,13 +29,13 @@ namespace jevent {
  *
  */
 enum jcomponentevent_type_t {
-	JCET_ONHIDE,
-	JCET_ONSHOW,
-	JCET_ONMOVE,
-	JCET_ONSIZE,
-	JCET_ONPAINT,
-	JCET_ONENTER,
-	JCET_ONLEAVE
+  JCET_ONHIDE,
+  JCET_ONSHOW,
+  JCET_ONMOVE,
+  JCET_ONSIZE,
+  JCET_ONPAINT,
+  JCET_ONENTER,
+  JCET_ONLEAVE
 };
 
 /**
@@ -45,28 +45,28 @@ enum jcomponentevent_type_t {
  */
 class ComponentEvent : public jevent::EventObject {
 
-	private:
-		/** \brief */
-		jcomponentevent_type_t _type;
+  private:
+    /** \brief */
+    jcomponentevent_type_t _type;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		ComponentEvent(void *source, jcomponentevent_type_t type);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~ComponentEvent();
+  public:
+    /**
+     * \brief
+     *
+     */
+    ComponentEvent(void *source, jcomponentevent_type_t type);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~ComponentEvent();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jcomponentevent_type_t GetType();
+    /**
+     * \brief
+     *
+     */
+    virtual jcomponentevent_type_t GetType();
 
 };
 

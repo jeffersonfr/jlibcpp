@@ -31,28 +31,28 @@ namespace jipc {
  */
 class LocalIPCClient : public IPCClient {
 
-	private:
-		/** \brief */
-		std::string _id;
+  private:
+    /** \brief */
+    std::string _id;
 
-	public:
-		/**
-		 * \Constructor.
-		 *
-		 */
-		LocalIPCClient(std::string id);
+  public:
+    /**
+     * \Constructor.
+     *
+     */
+    LocalIPCClient(std::string id);
 
-		/**
-		 * \brief Destructor.
-		 *
-		 */
-		virtual ~LocalIPCClient();
+    /**
+     * \brief Destructor.
+     *
+     */
+    virtual ~LocalIPCClient();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void CallMethod(Method *method, Response **response);
+    /**
+     * \brief
+     *
+     */
+    virtual void CallMethod(Method *method, Response **response);
 
 };
 

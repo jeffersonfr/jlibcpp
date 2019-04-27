@@ -29,22 +29,22 @@ namespace jmpeg {
 
 class Descriptor : public jcommon::Object {
 
-	protected:
+  protected:
     /** \brief */
     std::shared_ptr<std::string> _data;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		Descriptor(std::shared_ptr<std::string> data);
+  public:
+    /**
+     * \brief
+     *
+     */
+    Descriptor(std::shared_ptr<std::string> data);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~Descriptor();
+    /**
+     * \brief
+     *
+     */
+    virtual ~Descriptor();
  
     /**
      * \brief

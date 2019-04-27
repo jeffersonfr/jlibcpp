@@ -40,76 +40,76 @@
 namespace jnetwork {
 
 NetworkInterface::NetworkInterface(NetworkInterface *parent, std::string name, int index, bool is_virtual):
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jnetwork::NetworkInterface");
+  jcommon::Object::SetClassName("jnetwork::NetworkInterface");
 
-	_parent = parent;
-	_name = name;
-	_index = index;
-	_is_virtual = is_virtual;
+  _parent = parent;
+  _name = name;
+  _index = index;
+  _is_virtual = is_virtual;
 
-	struct ifreq req;
-	int sock;
+  struct ifreq req;
+  int sock;
 
-	if ((sock = socket(PF_INET, SOCK_RAW, IPPROTO_RAW)) < 0) {
-		throw jexception::ConnectionException("Cannot access network interface");
-	}
-	
-	req.ifr_ifindex = _index;
+  if ((sock = socket(PF_INET, SOCK_RAW, IPPROTO_RAW)) < 0) {
+    throw jexception::ConnectionException("Cannot access network interface");
+  }
+  
+  req.ifr_ifindex = _index;
 
-	// mac address
-	strncpy(req.ifr_name, _name.c_str(), 16);
-	if (ioctl(sock, SIOCGIFHWADDR, &req) >= 0) {
-		uint8_t *hwaddr = (uint8_t *)req.ifr_hwaddr.sa_data;
+  // mac address
+  strncpy(req.ifr_name, _name.c_str(), 16);
+  if (ioctl(sock, SIOCGIFHWADDR, &req) >= 0) {
+    uint8_t *hwaddr = (uint8_t *)req.ifr_hwaddr.sa_data;
 
-		for (int i=0; i<6; i++) {
-			_hwaddress.push_back(hwaddr[i]);
-		}
-	}
-		
-	// set or get MTU	(usa ifr_name)
-	strncpy(req.ifr_name, _name.c_str(), 16);
-	if (ioctl(sock, SIOCGIFMTU, &req) >= 0) {
-		_mtu = req.ifr_mtu;
-	}
+    for (int i=0; i<6; i++) {
+      _hwaddress.push_back(hwaddr[i]);
+    }
+  }
+    
+  // set or get MTU  (usa ifr_name)
+  strncpy(req.ifr_name, _name.c_str(), 16);
+  if (ioctl(sock, SIOCGIFMTU, &req) >= 0) {
+    _mtu = req.ifr_mtu;
+  }
 
-	// CHANGE:: set or get queue (usa ifr_name)
-	strncpy(req.ifr_name, _name.c_str(), 16);
-	if (ioctl(sock, SIOCGIFTXQLEN, &req) >= 0) {
-		// int queue_length = req.ifr_qlen;
-	}
+  // CHANGE:: set or get queue (usa ifr_name)
+  strncpy(req.ifr_name, _name.c_str(), 16);
+  if (ioctl(sock, SIOCGIFTXQLEN, &req) >= 0) {
+    // int queue_length = req.ifr_qlen;
+  }
 
-	// CHANGE:: set or get metric (usa ifr_name)
-	strncpy(req.ifr_name, _name.c_str(), 16);
-	if (ioctl(sock, SIOCGIFMETRIC, &req) >= 0) {
-		_metric = req.ifr_metric;
-	}
+  // CHANGE:: set or get metric (usa ifr_name)
+  strncpy(req.ifr_name, _name.c_str(), 16);
+  if (ioctl(sock, SIOCGIFMETRIC, &req) >= 0) {
+    _metric = req.ifr_metric;
+  }
 
-	// CHANGE:: set or get map (usa ifr_name)
-	strncpy(req.ifr_name, _name.c_str(), 16);
-	if (ioctl(sock, SIOCGIFMAP, &req) >= 0) {
-		_dma = req.ifr_map.dma;
-		// int port = req.ifr_map.port;
-		_irq = req.ifr_map.irq;
-		// int base_addr = req.ifr_map.base_addr;
-	}
+  // CHANGE:: set or get map (usa ifr_name)
+  strncpy(req.ifr_name, _name.c_str(), 16);
+  if (ioctl(sock, SIOCGIFMAP, &req) >= 0) {
+    _dma = req.ifr_map.dma;
+    // int port = req.ifr_map.port;
+    _irq = req.ifr_map.irq;
+    // int base_addr = req.ifr_map.base_addr;
+  }
 
-	// CHANGE:: set or get Flags	(usa ifr_name)
-	strncpy(req.ifr_name, _name.c_str(), 16);
-	if (ioctl(sock, SIOCGIFFLAGS, &req) >= 0) {
-		_flags = req.ifr_flags;
-	}
+  // CHANGE:: set or get Flags  (usa ifr_name)
+  strncpy(req.ifr_name, _name.c_str(), 16);
+  if (ioctl(sock, SIOCGIFFLAGS, &req) >= 0) {
+    _flags = req.ifr_flags;
+  }
 
-	close(sock);
+  close(sock);
 }
 
 NetworkInterface::~NetworkInterface()
 {
-	while (_childs.size() > 0) {
-		NetworkInterface *i = (*_childs.begin());
+  while (_childs.size() > 0) {
+    NetworkInterface *i = (*_childs.begin());
 
-		_childs.erase(_childs.begin());
+    _childs.erase(_childs.begin());
 
     std::vector<InetAddress *> masks = i->GetNetworkMasks();
 
@@ -141,343 +141,343 @@ NetworkInterface::~NetworkInterface()
       delete addr;
     }
 
-		delete i;
-	}
+    delete i;
+  }
 }
 
 void NetworkInterface::AddNetworkMask(InetAddress *addr)
 {
-	if ((void *)addr != nullptr) {
-		_masks.push_back(addr);
-	}
+  if ((void *)addr != nullptr) {
+    _masks.push_back(addr);
+  }
 }
 
 void NetworkInterface::AddInetAddress(InetAddress *addr)
 {
-	if ((void *)addr != nullptr) {
-		_addresses.push_back(addr);
-	}
+  if ((void *)addr != nullptr) {
+    _addresses.push_back(addr);
+  }
 }
 
 void NetworkInterface::AddBroadcastAddress(InetAddress *addr)
 {
-	if ((void *)addr != nullptr) {
-		_broadcast_addresses.push_back(addr);
-	}
+  if ((void *)addr != nullptr) {
+    _broadcast_addresses.push_back(addr);
+  }
 }
 
 void NetworkInterface::AddSubInterface(NetworkInterface *i)
 {
-	if ((void *)i != nullptr) {
-		_childs.push_back(i);
-	}
+  if ((void *)i != nullptr) {
+    _childs.push_back(i);
+  }
 }
 
 NetworkInterface * NetworkInterface::GetByInetAddress(InetAddress *addr)
 {
-	// TODO:: recuperar pelo ip ??
-	
-	return nullptr;
+  // TODO:: recuperar pelo ip ??
+  
+  return nullptr;
 }
 
 NetworkInterface * NetworkInterface::GetByName(std::string name)
 {
-	std::vector<NetworkInterface *> interfaces = GetNetworkInterfaces();
+  std::vector<NetworkInterface *> interfaces = GetNetworkInterfaces();
 
-	for (std::vector<NetworkInterface *>::iterator i=interfaces.begin(); i!=interfaces.end(); i++) {
-		if ((*i)->GetDisplayName() == name || (*i)->GetName() == name) {
-			return (*i);
-		}
-	}
+  for (std::vector<NetworkInterface *>::iterator i=interfaces.begin(); i!=interfaces.end(); i++) {
+    if ((*i)->GetDisplayName() == name || (*i)->GetName() == name) {
+      return (*i);
+    }
+  }
 
-	return nullptr;
+  return nullptr;
 }
 
 std::vector<NetworkInterface *> NetworkInterface::GetNetworkInterfaces()
 {
-	std::vector<NetworkInterface *> interfaces;
+  std::vector<NetworkInterface *> interfaces;
 
-	struct ifaddrs 
+  struct ifaddrs 
     *ifa = nullptr,
-		*ifEntry = nullptr;
-	char 
+    *ifEntry = nullptr;
+  char 
     addrBuffer[INET6_ADDRSTRLEN],
-		maskBuffer[INET6_ADDRSTRLEN],
-		broadcastBuffer[INET6_ADDRSTRLEN];
-		// p2pBuffer[INET6_ADDRSTRLEN];
+    maskBuffer[INET6_ADDRSTRLEN],
+    broadcastBuffer[INET6_ADDRSTRLEN];
+    // p2pBuffer[INET6_ADDRSTRLEN];
 
-	if (getifaddrs(&ifa) == 0) {
-		std::map<std::string, NetworkInterface *> minterfaces;
+  if (getifaddrs(&ifa) == 0) {
+    std::map<std::string, NetworkInterface *> minterfaces;
 
-		int index = 0;
+    int index = 0;
 
-		for(ifEntry=ifa; ifEntry!=nullptr; ifEntry=ifEntry->ifa_next, index++) {
-			if(ifEntry->ifa_addr->sa_data == nullptr) {
-				continue;
-			}
+    for(ifEntry=ifa; ifEntry!=nullptr; ifEntry=ifEntry->ifa_next, index++) {
+      if(ifEntry->ifa_addr->sa_data == nullptr) {
+        continue;
+      }
 
-			const char 
+      const char 
         *addr = nullptr,
-				*mask = nullptr,
-				*broadcast = nullptr;
-				// *p2p = nullptr;
-			void 
+        *mask = nullptr,
+        *broadcast = nullptr;
+        // *p2p = nullptr;
+      void 
         *addrPtr = nullptr,
-				*maskPtr = nullptr,
-				*broadcastPtr = nullptr;
-				// *p2pPtr = nullptr;
+        *maskPtr = nullptr,
+        *broadcastPtr = nullptr;
+        // *p2pPtr = nullptr;
 
-			if (ifEntry->ifa_addr->sa_family == AF_INET || ifEntry->ifa_addr->sa_family == PF_INET) {
-				addrPtr = &((struct sockaddr_in *)ifEntry->ifa_addr)->sin_addr;
-				maskPtr = &((struct sockaddr_in *)ifEntry->ifa_netmask)->sin_addr;
+      if (ifEntry->ifa_addr->sa_family == AF_INET || ifEntry->ifa_addr->sa_family == PF_INET) {
+        addrPtr = &((struct sockaddr_in *)ifEntry->ifa_addr)->sin_addr;
+        maskPtr = &((struct sockaddr_in *)ifEntry->ifa_netmask)->sin_addr;
 
-				if (ifEntry->ifa_flags & IFF_BROADCAST && ifEntry->ifa_broadaddr != nullptr) {
-			 		broadcastPtr = &((struct sockaddr_in *)ifEntry->ifa_broadaddr)->sin_addr;
-				}
+        if (ifEntry->ifa_flags & IFF_BROADCAST && ifEntry->ifa_broadaddr != nullptr) {
+           broadcastPtr = &((struct sockaddr_in *)ifEntry->ifa_broadaddr)->sin_addr;
+        }
 
-				if (ifEntry->ifa_flags & IFF_POINTOPOINT && ifEntry->ifa_broadaddr != nullptr) {
-					// p2pPtr = &((struct sockaddr_in *)ifEntry->ifa_dstaddr)->sin_addr;
-				}
-			
-				addr = inet_ntop(ifEntry->ifa_addr->sa_family, addrPtr, addrBuffer, sizeof(addrBuffer));
-				mask = inet_ntop(ifEntry->ifa_addr->sa_family, maskPtr, maskBuffer, sizeof(maskBuffer));
+        if (ifEntry->ifa_flags & IFF_POINTOPOINT && ifEntry->ifa_broadaddr != nullptr) {
+          // p2pPtr = &((struct sockaddr_in *)ifEntry->ifa_dstaddr)->sin_addr;
+        }
+      
+        addr = inet_ntop(ifEntry->ifa_addr->sa_family, addrPtr, addrBuffer, sizeof(addrBuffer));
+        mask = inet_ntop(ifEntry->ifa_addr->sa_family, maskPtr, maskBuffer, sizeof(maskBuffer));
 
-				if (ifEntry->ifa_flags & IFF_BROADCAST && ifEntry->ifa_broadaddr != nullptr) {
-					broadcast = inet_ntop(ifEntry->ifa_addr->sa_family, broadcastPtr, broadcastBuffer, sizeof(broadcastBuffer));
-				}
+        if (ifEntry->ifa_flags & IFF_BROADCAST && ifEntry->ifa_broadaddr != nullptr) {
+          broadcast = inet_ntop(ifEntry->ifa_addr->sa_family, broadcastPtr, broadcastBuffer, sizeof(broadcastBuffer));
+        }
 
-				if (ifEntry->ifa_flags & IFF_POINTOPOINT && ifEntry->ifa_broadaddr != nullptr) {
-					// p2p = inet_ntop(ifEntry->ifa_addr->sa_family, p2pPtr, p2pBuffer, sizeof(p2pBuffer));
-				}
-			
-				jcommon::StringTokenizer token(ifEntry->ifa_name, ":", jcommon::JTT_STRING, false);
+        if (ifEntry->ifa_flags & IFF_POINTOPOINT && ifEntry->ifa_broadaddr != nullptr) {
+          // p2p = inet_ntop(ifEntry->ifa_addr->sa_family, p2pPtr, p2pBuffer, sizeof(p2pBuffer));
+        }
+      
+        jcommon::StringTokenizer token(ifEntry->ifa_name, ":", jcommon::JTT_STRING, false);
 
-				std::map<std::string, NetworkInterface *>::iterator it = minterfaces.find(token.GetToken(0));
-				NetworkInterface *parent = nullptr;
-				
-				// TODO:: consertar... quando chegar um tipo eth0:1
+        std::map<std::string, NetworkInterface *>::iterator it = minterfaces.find(token.GetToken(0));
+        NetworkInterface *parent = nullptr;
+        
+        // TODO:: consertar... quando chegar um tipo eth0:1
 
-				if (it != minterfaces.end()) {
-					parent = it->second;
-				} else {
-					parent = new NetworkInterface(nullptr, ifEntry->ifa_name, interfaces.size(), false);
+        if (it != minterfaces.end()) {
+          parent = it->second;
+        } else {
+          parent = new NetworkInterface(nullptr, ifEntry->ifa_name, interfaces.size(), false);
 
-					interfaces.push_back(parent);
-					minterfaces[ifEntry->ifa_name] = parent;
-				}
+          interfaces.push_back(parent);
+          minterfaces[ifEntry->ifa_name] = parent;
+        }
 
-				if (token.GetSize() == 1) {
-					parent->AddNetworkMask(InetAddress4::GetByName(mask));
-					parent->AddInetAddress(InetAddress4::GetByName(addr));
+        if (token.GetSize() == 1) {
+          parent->AddNetworkMask(InetAddress4::GetByName(mask));
+          parent->AddInetAddress(InetAddress4::GetByName(addr));
 
-					if (broadcast == nullptr) {
-						broadcast = addr;
-					}
+          if (broadcast == nullptr) {
+            broadcast = addr;
+          }
 
-					parent->AddBroadcastAddress(InetAddress4::GetByName(broadcast));
-				} else {
-					parent->AddSubInterface(new NetworkInterface(parent, ifEntry->ifa_name, interfaces.size(), true));
-				}
-			} else if (ifEntry->ifa_addr->sa_family == AF_INET6 || ifEntry->ifa_addr->sa_family == PF_INET6) {
-				addrPtr = &((struct sockaddr_in6 *)ifEntry->ifa_addr)->sin6_addr;
-				maskPtr = &((struct sockaddr_in6 *)ifEntry->ifa_netmask)->sin6_addr;
-				
-				if (ifEntry->ifa_flags & IFF_BROADCAST && ifEntry->ifa_broadaddr != nullptr) {
-					broadcastPtr = &((struct sockaddr_in6 *)ifEntry->ifa_broadaddr)->sin6_addr;
-				}
-				
-				if (ifEntry->ifa_flags & IFF_POINTOPOINT && ifEntry->ifa_broadaddr != nullptr) {
-					// p2pPtr = &((struct sockaddr_in6 *)ifEntry->ifa_dstaddr)->sin6_addr;
-				}
-				
-				addr = inet_ntop(ifEntry->ifa_addr->sa_family, addrPtr, addrBuffer, sizeof(addrBuffer));
-				mask = inet_ntop(ifEntry->ifa_addr->sa_family, maskPtr, maskBuffer, sizeof(maskBuffer));
+          parent->AddBroadcastAddress(InetAddress4::GetByName(broadcast));
+        } else {
+          parent->AddSubInterface(new NetworkInterface(parent, ifEntry->ifa_name, interfaces.size(), true));
+        }
+      } else if (ifEntry->ifa_addr->sa_family == AF_INET6 || ifEntry->ifa_addr->sa_family == PF_INET6) {
+        addrPtr = &((struct sockaddr_in6 *)ifEntry->ifa_addr)->sin6_addr;
+        maskPtr = &((struct sockaddr_in6 *)ifEntry->ifa_netmask)->sin6_addr;
+        
+        if (ifEntry->ifa_flags & IFF_BROADCAST && ifEntry->ifa_broadaddr != nullptr) {
+          broadcastPtr = &((struct sockaddr_in6 *)ifEntry->ifa_broadaddr)->sin6_addr;
+        }
+        
+        if (ifEntry->ifa_flags & IFF_POINTOPOINT && ifEntry->ifa_broadaddr != nullptr) {
+          // p2pPtr = &((struct sockaddr_in6 *)ifEntry->ifa_dstaddr)->sin6_addr;
+        }
+        
+        addr = inet_ntop(ifEntry->ifa_addr->sa_family, addrPtr, addrBuffer, sizeof(addrBuffer));
+        mask = inet_ntop(ifEntry->ifa_addr->sa_family, maskPtr, maskBuffer, sizeof(maskBuffer));
 
-				if (ifEntry->ifa_flags & IFF_BROADCAST && ifEntry->ifa_broadaddr != nullptr) {
-					broadcast = inet_ntop(ifEntry->ifa_addr->sa_family, broadcastPtr, broadcastBuffer, sizeof(broadcastBuffer));
-				}
+        if (ifEntry->ifa_flags & IFF_BROADCAST && ifEntry->ifa_broadaddr != nullptr) {
+          broadcast = inet_ntop(ifEntry->ifa_addr->sa_family, broadcastPtr, broadcastBuffer, sizeof(broadcastBuffer));
+        }
 
-				if (ifEntry->ifa_flags & IFF_POINTOPOINT && ifEntry->ifa_broadaddr != nullptr) {
-					// p2p = inet_ntop(ifEntry->ifa_addr->sa_family, p2pPtr, p2pBuffer, sizeof(p2pBuffer));
-				}
-				
-				jcommon::StringTokenizer token(ifEntry->ifa_name, ":", jcommon::JTT_STRING, false);
+        if (ifEntry->ifa_flags & IFF_POINTOPOINT && ifEntry->ifa_broadaddr != nullptr) {
+          // p2p = inet_ntop(ifEntry->ifa_addr->sa_family, p2pPtr, p2pBuffer, sizeof(p2pBuffer));
+        }
+        
+        jcommon::StringTokenizer token(ifEntry->ifa_name, ":", jcommon::JTT_STRING, false);
 
-				std::map<std::string, NetworkInterface *>::iterator it = minterfaces.find(token.GetToken(0));
-				NetworkInterface *parent = nullptr;
-				
-				if (it != minterfaces.end()) {
-					parent = it->second;
-				} else {
-					parent = new NetworkInterface(nullptr, ifEntry->ifa_name, interfaces.size(), false);
+        std::map<std::string, NetworkInterface *>::iterator it = minterfaces.find(token.GetToken(0));
+        NetworkInterface *parent = nullptr;
+        
+        if (it != minterfaces.end()) {
+          parent = it->second;
+        } else {
+          parent = new NetworkInterface(nullptr, ifEntry->ifa_name, interfaces.size(), false);
 
-					interfaces.push_back(parent);
-					minterfaces[ifEntry->ifa_name] = parent;
-				}
+          interfaces.push_back(parent);
+          minterfaces[ifEntry->ifa_name] = parent;
+        }
 
-				if (token.GetSize() == 1) {
-					parent->AddNetworkMask(InetAddress6::GetByName(mask));
-					parent->AddInetAddress(InetAddress6::GetByName(addr));
+        if (token.GetSize() == 1) {
+          parent->AddNetworkMask(InetAddress6::GetByName(mask));
+          parent->AddInetAddress(InetAddress6::GetByName(addr));
 
-					if (broadcast == nullptr) {
-						broadcast = addr;
-					}
+          if (broadcast == nullptr) {
+            broadcast = addr;
+          }
 
-					parent->AddBroadcastAddress(InetAddress6::GetByName(broadcast));
-				} else {
-					parent->AddSubInterface(new NetworkInterface(parent, ifEntry->ifa_name, interfaces.size(), true));
-				}
-				
-				// p2p = nullptr;
-			} else if (ifEntry->ifa_addr->sa_family == AF_PACKET || ifEntry->ifa_addr->sa_family == PF_PACKET) {
-				NetworkInterface *parent = new NetworkInterface(nullptr, ifEntry->ifa_name, index, false);
+          parent->AddBroadcastAddress(InetAddress6::GetByName(broadcast));
+        } else {
+          parent->AddSubInterface(new NetworkInterface(parent, ifEntry->ifa_name, interfaces.size(), true));
+        }
+        
+        // p2p = nullptr;
+      } else if (ifEntry->ifa_addr->sa_family == AF_PACKET || ifEntry->ifa_addr->sa_family == PF_PACKET) {
+        NetworkInterface *parent = new NetworkInterface(nullptr, ifEntry->ifa_name, index, false);
 
-				interfaces.push_back(parent);
+        interfaces.push_back(parent);
 
-				minterfaces[ifEntry->ifa_name] = parent;
+        minterfaces[ifEntry->ifa_name] = parent;
 
-				if ((ifEntry->ifa_flags & IFF_UP) == 0) {
-					parent->AddNetworkMask(InetAddress4::GetByName("0.0.0.0"));
-				}
-			}
-		}
-	}
+        if ((ifEntry->ifa_flags & IFF_UP) == 0) {
+          parent->AddNetworkMask(InetAddress4::GetByName("0.0.0.0"));
+        }
+      }
+    }
+  }
 
-	freeifaddrs(ifa);
+  freeifaddrs(ifa);
 
-	return interfaces;
+  return interfaces;
 }
 
 std::string NetworkInterface::GetDisplayName()
 {
-	return _name;
+  return _name;
 }
 
 const std::vector<uint8_t> & NetworkInterface::GetHardwareAddress()
 {
-	return _hwaddress;
+  return _hwaddress;
 }
 
 const std::vector<InetAddress *> & NetworkInterface::GetNetworkMasks()
 {
-	return _masks;
+  return _masks;
 }
 
 const std::vector<InetAddress *> & NetworkInterface::GetInetAddresses()
 {
-	return _addresses;
+  return _addresses;
 }
 
 const std::vector<InetAddress *> & NetworkInterface::GetBroadcastAddresses()
 {
-	return _broadcast_addresses;
+  return _broadcast_addresses;
 }
 
 int NetworkInterface::GetDMA()
 {
-	return _dma;
+  return _dma;
 }
 
 int NetworkInterface::GetIRQ()
 {
-	return _irq;
+  return _irq;
 }
 
 int NetworkInterface::GetMetric()
 {
-	return _metric;
+  return _metric;
 }
 
 int NetworkInterface::GetMTU()
 {
-	return _mtu;
+  return _mtu;
 }
 
 std::string NetworkInterface::GetName()
 {
-	return _name;
+  return _name;
 }
 
 int NetworkInterface::GetIndex()
 {
-	return _index;
+  return _index;
 }
 
 NetworkInterface * NetworkInterface::GetParent()
 {
-	return _parent;
+  return _parent;
 }
 
 const std::vector<NetworkInterface *> & NetworkInterface::GetSubInterfaces()
 {
-	return _childs;
+  return _childs;
 }
 
 bool NetworkInterface::IsLoopback()
 {
-	return (_flags & IFF_LOOPBACK);
+  return (_flags & IFF_LOOPBACK);
 }
 
 bool NetworkInterface::IsPointToPoint()
 {
-	return (_flags & IFF_POINTOPOINT);
+  return (_flags & IFF_POINTOPOINT);
 }
 
 bool NetworkInterface::IsUp()
 {
-	return (_flags & IFF_UP);
+  return (_flags & IFF_UP);
 }
 
 bool NetworkInterface::IsVirtual()
 {
-	return _is_virtual;
+  return _is_virtual;
 }
 
 bool NetworkInterface::SupportsMulticast()
 {
-	return (_flags & IFF_MULTICAST);
+  return (_flags & IFF_MULTICAST);
 }
 
 std::string NetworkInterface::What()
-{	
-	std::ostringstream o;
-	std::string flags, 
-		link = "Ethernet";
-	char mac[255];
+{  
+  std::ostringstream o;
+  std::string flags, 
+    link = "Ethernet";
+  char mac[255];
 
-	sprintf(mac, "%02x:%02x:%02x:%02x:%02x:%02x", _hwaddress[0], _hwaddress[1], _hwaddress[2], _hwaddress[3], _hwaddress[4], _hwaddress[5]);
+  sprintf(mac, "%02x:%02x:%02x:%02x:%02x:%02x", _hwaddress[0], _hwaddress[1], _hwaddress[2], _hwaddress[3], _hwaddress[4], _hwaddress[5]);
 
-	if (IsUp() == true) {
-		flags += "UP ";
-	}
+  if (IsUp() == true) {
+    flags += "UP ";
+  }
 
-	if (IsLoopback() == true) {
-		flags += "LOOPBACK ";
-		link = "Local Loopback";
-	}
+  if (IsLoopback() == true) {
+    flags += "LOOPBACK ";
+    link = "Local Loopback";
+  }
 
-	if (IsPointToPoint() == true) {
-		flags += "POINTOPOINT ";
-	}
+  if (IsPointToPoint() == true) {
+    flags += "POINTOPOINT ";
+  }
 
-	if (IsVirtual() == true) {
-		flags += "VIRTUAL ";
-	}
+  if (IsVirtual() == true) {
+    flags += "VIRTUAL ";
+  }
 
-	if (SupportsMulticast() == true) {
-		flags += "MULTICAST ";
-	}
+  if (SupportsMulticast() == true) {
+    flags += "MULTICAST ";
+  }
 
-	o << GetDisplayName() << "\tlink encap: " << link << " hardware address: " << mac << std::endl;
+  o << GetDisplayName() << "\tlink encap: " << link << " hardware address: " << mac << std::endl;
 
-	for (int i=0; i<(int)_addresses.size(); i++) {
-		o << "\tinet address: " << _addresses[i]->GetHostAddress() << " broadcast: " << _broadcast_addresses[i]->GetHostAddress() << " netmask: " << _masks[i]->GetHostAddress() << std::endl;
-	}
+  for (int i=0; i<(int)_addresses.size(); i++) {
+    o << "\tinet address: " << _addresses[i]->GetHostAddress() << " broadcast: " << _broadcast_addresses[i]->GetHostAddress() << " netmask: " << _masks[i]->GetHostAddress() << std::endl;
+  }
 
-	o << "\t" << flags << " mtu: " << _mtu << " metric: " << _metric << std::endl;
-	o << "\tirq: 0x" << std::hex << std::setw(2) << std::setfill('0') << _irq << " dma: 0x" << std::setw(8) << _dma << std::endl;
+  o << "\t" << flags << " mtu: " << _mtu << " metric: " << _metric << std::endl;
+  o << "\tirq: 0x" << std::hex << std::setw(2) << std::setfill('0') << _irq << " dma: 0x" << std::setw(8) << _dma << std::endl;
 
-	return o.str();
+  return o.str();
 }
 
 }

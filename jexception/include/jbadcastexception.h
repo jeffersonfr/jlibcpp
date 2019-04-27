@@ -33,52 +33,52 @@ namespace jexception {
  */
 class BadCastException : public jexception::RuntimeException, std::bad_cast {
 
-	private:
+  private:
 
-	public:
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		BadCastException();
+  public:
+    /**
+     * \brief Construtor.
+     *
+     */
+    BadCastException();
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		BadCastException(std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    BadCastException(std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		BadCastException(Exception *exception, std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    BadCastException(Exception *exception, std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> BadCastException(const std::string &fmt, T ...vs):
       Exception(fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::BadCastException");
     }
-		
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> BadCastException(Exception *exception, const std::string &fmt, T ...vs):
       Exception(exception, fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::BadCastException");
     }
-		
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~BadCastException() throw();
+    
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~BadCastException() throw();
 
 };
 

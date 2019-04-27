@@ -22,9 +22,9 @@
 namespace jevent {
 
 ToggleListener::ToggleListener():
-	jevent::Listener()
+  jevent::Listener()
 {
-	jcommon::Object::SetClassName("jevent::ToggleListener");
+  jcommon::Object::SetClassName("jevent::ToggleListener");
 }
 
 ToggleListener::~ToggleListener()

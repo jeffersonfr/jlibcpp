@@ -31,52 +31,52 @@ namespace jexception {
  */
 class OutOfMemoryException : public jexception::RuntimeException {
 
-	private:
+  private:
 
-	public:
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		OutOfMemoryException();
+  public:
+    /**
+     * \brief Construtor.
+     *
+     */
+    OutOfMemoryException();
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		OutOfMemoryException(std::string);
+    /**
+     * \brief Construtor.
+     *
+     */
+    OutOfMemoryException(std::string);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		OutOfMemoryException(Exception *exception, std::string);
+    /**
+     * \brief Construtor.
+     *
+     */
+    OutOfMemoryException(Exception *exception, std::string);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> OutOfMemoryException(const std::string &fmt, T ...vs):
       Exception(fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::OutOfMemoryException");
     }
-		
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> OutOfMemoryException(Exception *exception, const std::string &fmt, T ...vs):
       Exception(exception, fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::OutOfMemoryException");
     }
-		
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~OutOfMemoryException() throw();
+    
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~OutOfMemoryException() throw();
 
 };
 

@@ -26,9 +26,9 @@ namespace jlogger {
 LoggerManager *LoggerManager::_manager = nullptr;
 
 LoggerManager::LoggerManager():
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jlogger::LoggerManager");
+  jcommon::Object::SetClassName("jlogger::LoggerManager");
 }
 
 LoggerManager::~LoggerManager()
@@ -37,38 +37,38 @@ LoggerManager::~LoggerManager()
 
 LoggerManager * LoggerManager::GetInstance()
 {
-	if (_manager == nullptr) {
-		_manager = new LoggerManager();
-	}
+  if (_manager == nullptr) {
+    _manager = new LoggerManager();
+  }
 
-	return _manager;
+  return _manager;
 }
  
 Logger * LoggerManager::CreateLogger(LoggerHandler *handler_, Formatter *format_, Logger *group_)
 {
-	LoggerHandler *h;
-	Formatter *f;
+  LoggerHandler *h;
+  Formatter *f;
     
-	h = handler_;
-	f = format_;
+  h = handler_;
+  f = format_;
     
-	if (h == nullptr) {
-		h = new ConsoleHandler();
-	}
+  if (h == nullptr) {
+    h = new ConsoleHandler();
+  }
    
-	if (f == nullptr) {
-		f = new SimpleFormatter();
-	}
+  if (f == nullptr) {
+    f = new SimpleFormatter();
+  }
    
-	Logger *l = new Logger(h, f);
+  Logger *l = new Logger(h, f);
    
-	if (group_ != nullptr) {
-		group_->AddLogger(l);
-	}
-	
-	_loggers.push_back(l);
+  if (group_ != nullptr) {
+    group_->AddLogger(l);
+  }
+  
+  _loggers.push_back(l);
    
-	return l;
+  return l;
 }
 
 void LoggerManager::SetOutput(int mask_)

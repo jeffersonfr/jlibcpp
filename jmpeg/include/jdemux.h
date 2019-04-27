@@ -39,124 +39,124 @@ enum jdemux_type_t {
 
 class Demux : public jcommon::Object {
 
-	protected:
-		/** \brief */
-		std::vector<jevent::DemuxListener *> _demux_listeners;
-		/** \brief */
+  protected:
+    /** \brief */
+    std::vector<jevent::DemuxListener *> _demux_listeners;
+    /** \brief */
     std::chrono::steady_clock::time_point _timepoint;
-		/** \brief */
+    /** \brief */
     std::chrono::milliseconds _timeout;
-		/** \brief */
+    /** \brief */
     std::string _id;
-		/** \brief */
-		int _pid;
-		/** \brief */
+    /** \brief */
+    int _pid;
+    /** \brief */
     jdemux_type_t _type;
 
   protected:
-		/**
-		 * \brief
-		 *
-		 */
-		Demux(jdemux_type_t type);
+    /**
+     * \brief
+     *
+     */
+    Demux(jdemux_type_t type);
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~Demux();
+  public:
+    /**
+     * \brief
+     *
+     */
+    virtual ~Demux();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetID(std::string id);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Start();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Stop();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetTimeout(std::chrono::milliseconds ms);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetID(std::string id);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Start();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Stop();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetTimeout(std::chrono::milliseconds ms);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::chrono::milliseconds GetTimeout();
+    /**
+     * \brief
+     *
+     */
+    virtual std::chrono::milliseconds GetTimeout();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::chrono::steady_clock::time_point GetTimePoint();
+    /**
+     * \brief
+     *
+     */
+    virtual std::chrono::steady_clock::time_point GetTimePoint();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void UpdateTimePoint();
+    /**
+     * \brief
+     *
+     */
+    virtual void UpdateTimePoint();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string GetID();
+    /**
+     * \brief
+     *
+     */
+    virtual std::string GetID();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jdemux_type_t GetType();
+    /**
+     * \brief
+     *
+     */
+    virtual jdemux_type_t GetType();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetPID(int pid);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetPID();
+    /**
+     * \brief
+     *
+     */
+    virtual void SetPID(int pid);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int GetPID();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool Append(const char *data, int data_length);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RegisterDemuxListener(jevent::DemuxListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveDemuxListener(jevent::DemuxListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void DispatchDemuxEvent(jevent::DemuxEvent *event);
-		
+    /**
+     * \brief
+     *
+     */
+    virtual bool Append(const char *data, int data_length);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void RegisterDemuxListener(jevent::DemuxListener *listener);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void RemoveDemuxListener(jevent::DemuxListener *listener);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void DispatchDemuxEvent(jevent::DemuxEvent *event);
+    
 };
 
 }

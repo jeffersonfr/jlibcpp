@@ -31,26 +31,26 @@ namespace jlogger {
 */
 class LoggerHandler : public virtual jcommon::Object {
 
-	private:
-		
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		LoggerHandler();
+  private:
+    
+  public:
+    /**
+     * \brief
+     *
+     */
+    LoggerHandler();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~LoggerHandler();
+    /**
+     * \brief
+     *
+     */
+    virtual ~LoggerHandler();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void WriteRecord(LogRecord *) = 0;
+    /**
+     * \brief
+     *
+     */
+    virtual void WriteRecord(LogRecord *) = 0;
 };
 
 }

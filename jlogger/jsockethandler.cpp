@@ -28,76 +28,76 @@
 namespace jlogger {
 
 SocketHandler::SocketHandler(int port, int limit):
-	jlogger::StreamHandler()//, jthread::Thread()
+  jlogger::StreamHandler()//, jthread::Thread()
 {
-	jlogger::StreamHandler::SetClassName("jlogger::SocketHandler");
+  jlogger::StreamHandler::SetClassName("jlogger::SocketHandler");
 
-	 _server = new jnetwork::ServerSocket(port);
+   _server = new jnetwork::ServerSocket(port);
 
-	if (limit < 1) {
-		_limit = 1;
-	} else {
-		_limit = limit;
-	}
-	
-	_thread = new std::thread(&SocketHandler::Run, this);
+  if (limit < 1) {
+    _limit = 1;
+  } else {
+    _limit = limit;
+  }
+  
+  _thread = new std::thread(&SocketHandler::Run, this);
 }
 
 SocketHandler::~SocketHandler()
 {
-	_thread->join();
+  _thread->join();
 
-	delete _thread;
-	_thread = nullptr;
+  delete _thread;
+  _thread = nullptr;
 }
 
 void SocketHandler::WriteRecord(LogRecord *record_)
 {
-	std::string type;
-	
-	time_t curtime = time(nullptr);
-	char *loctime = asctime(localtime (&curtime));
-	
-	std::ostringstream log, date;
-		
-	if (loctime != nullptr) {
-		loctime[strlen(loctime)-1] = '\0';
-	
-		date << " [" << (loctime + 4) << "]  ";
-	}
-	
-	_mutex.lock();
-	
-	log << record_->GetRecord() << std::flush;
+  std::string type;
+  
+  time_t curtime = time(nullptr);
+  char *loctime = asctime(localtime (&curtime));
+  
+  std::ostringstream log, date;
+    
+  if (loctime != nullptr) {
+    loctime[strlen(loctime)-1] = '\0';
+  
+    date << " [" << (loctime + 4) << "]  ";
+  }
+  
+  _mutex.lock();
+  
+  log << record_->GetRecord() << std::flush;
 
-	_logs.push_back(log.str());
+  _logs.push_back(log.str());
 
-	if (_logs.size() > _limit) {
-		_logs.pop_front();
-	}
-	
-	_mutex.unlock();
+  if (_logs.size() > _limit) {
+    _logs.pop_front();
+  }
+  
+  _mutex.unlock();
 }
 
 void SocketHandler::Run()
 {
-	std::deque<std::string>::iterator i;
-	jnetwork::Socket *socket;
-		
-	while (true) {
-		try {
-			socket = _server->Accept();
+  std::deque<std::string>::iterator i;
+  jnetwork::Socket *socket;
+    
+  while (true) {
+    try {
+      socket = _server->Accept();
 
-			for (i=_logs.begin(); i!=_logs.end(); i++) {
-				socket->Send((*i).c_str(), (*i).size());
-			}
-			
-			socket->Close();
+      for (i=_logs.begin(); i!=_logs.end(); i++) {
+        socket->Send((*i).c_str(), (*i).size());
+      }
+      
+      socket->Close();
 
-			delete socket;
-		} catch (...) {
-		}
-	}
+      delete socket;
+    } catch (...) {
+    }
+  }
 }
 
 }

@@ -32,27 +32,27 @@ namespace jevent {
  */
 class DataEvent : public jevent::EventObject {
 
-	private:
-		jcommon::ParamMapper *_params;
+  private:
+    jcommon::ParamMapper *_params;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		DataEvent(void *source, jcommon::ParamMapper *params);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~DataEvent();
+  public:
+    /**
+     * \brief
+     *
+     */
+    DataEvent(void *source, jcommon::ParamMapper *params);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~DataEvent();
 
-		/**
-		 * \brief
-		 *
-		 */
-		jcommon::ParamMapper * GetData();
+    /**
+     * \brief
+     *
+     */
+    jcommon::ParamMapper * GetData();
 };
 
 }

@@ -31,27 +31,27 @@ namespace jcommon {
  */
 class Observer : public virtual jcommon::Object{
 
-	private:
-		
-	public:
-		/**
-		* \brief
-		*
-		*/
-		Observer();
-		
-		/**
-		* \brief
-		*
-		*/
-		virtual ~Observer();
+  private:
+    
+  public:
+    /**
+    * \brief
+    *
+    */
+    Observer();
+    
+    /**
+    * \brief
+    *
+    */
+    virtual ~Observer();
 
-		/**
-		* \brief
-		*
-		*/
-		virtual void Update(void *);
-		
+    /**
+    * \brief
+    *
+    */
+    virtual void Update(void *);
+    
 };
 
 }

@@ -33,35 +33,35 @@ namespace jdevice {
 */
 class Memory : public jdevice::Device {
 
-	private:
-		/** \brief */
-		struct sysinfo info;
+  private:
+    /** \brief */
+    struct sysinfo info;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		Memory();
+  public:
+    /**
+     * \brief
+     *
+     */
+    Memory();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual ~Memory();
+    /**
+     * \brief
+     * 
+     */
+    virtual ~Memory();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void Builder();
+    /**
+     * \brief
+     * 
+     */
+    virtual void Builder();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string What();
-		
+    /**
+     * \brief
+     *
+     */
+    virtual std::string What();
+    
 };
 
 }

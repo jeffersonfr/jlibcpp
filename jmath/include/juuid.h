@@ -29,10 +29,10 @@
 namespace jmath {
 
 enum juuid_type_t {
-	JUT_NORMAL,
-	JUT_RANDOM,
-	JUT_TIME,
-	JUT_SYNC
+  JUT_NORMAL,
+  JUT_RANDOM,
+  JUT_TIME,
+  JUT_SYNC
 };
 
 /**
@@ -43,64 +43,64 @@ enum juuid_type_t {
  */
 class UUID : public virtual jcommon::Object {
 
-	private:
-		/** \brief */
-		uuid_t _uuid;
-		
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		UUID(juuid_type_t type);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		UUID(std::string uuid);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~UUID();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::time_t GetTime();
+  private:
+    /** \brief */
+    uuid_t _uuid;
+    
+  public:
+    /**
+     * \brief
+     *
+     */
+    UUID(juuid_type_t type);
+    
+    /**
+     * \brief
+     *
+     */
+    UUID(std::string uuid);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~UUID();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual std::time_t GetTime();
 
-		/**
-		 * \brief Clone object.
-		 *
-		 */
-		virtual Object * Clone();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool Equals(Object *o);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Copy(Object *o);
+    /**
+     * \brief Clone object.
+     *
+     */
+    virtual Object * Clone();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool Equals(Object *o);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Copy(Object *o);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int Compare(Object *o);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string What();
+    /**
+     * \brief
+     *
+     */
+    virtual int Compare(Object *o);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual std::string What();
 
 };
 

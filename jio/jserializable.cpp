@@ -22,9 +22,9 @@
 namespace jio {
 
 Serializable::Serializable():
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jio::Serializable");
+  jcommon::Object::SetClassName("jio::Serializable");
 }
 
 Serializable::~Serializable()
@@ -33,7 +33,7 @@ Serializable::~Serializable()
 
 std::string Serializable::SerializeObject()
 {
-	return "";
+  return "";
 }
 
 void Serializable::AssemblyObject(std::string object)

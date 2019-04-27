@@ -31,80 +31,80 @@ namespace jio {
  */
 class ObjectInputStream : public virtual jcommon::Object {
 
-	private:
+  private:
     /** \brief */
-		InputStream *stream;
-		
-	public:
-		/**
-		 * \brief
-		 */
-		ObjectInputStream(InputStream *is);
-		
-		/**
-		 * \brief
-		 */
-		virtual ~ObjectInputStream();
+    InputStream *stream;
+    
+  public:
+    /**
+     * \brief
+     */
+    ObjectInputStream(InputStream *is);
+    
+    /**
+     * \brief
+     */
+    virtual ~ObjectInputStream();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual bool IsEmpty();
+    /**
+     * \brief
+     * 
+     */
+    virtual bool IsEmpty();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual int64_t Available();
+    /**
+     * \brief
+     * 
+     */
+    virtual int64_t Available();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t GetSize();
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t GetSize();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t GetPosition();
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual Object * Read();
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t GetPosition();
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual Object * Read();
 
-		/**
-		 * \brief Salto relativo.
-		 *
-		 */
-		virtual void Skip(int64_t skip);
+    /**
+     * \brief Salto relativo.
+     *
+     */
+    virtual void Skip(int64_t skip);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Reset();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Close();
+    /**
+     * \brief
+     *
+     */
+    virtual void Reset();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Close();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t GetReadedBytes();
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t GetReadedBytes();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jcommon::Object * CreateObject(std::string id);
+    /**
+     * \brief
+     *
+     */
+    virtual jcommon::Object * CreateObject(std::string id);
 
 };
 

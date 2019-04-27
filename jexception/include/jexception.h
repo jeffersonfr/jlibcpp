@@ -35,48 +35,48 @@ namespace jexception {
  */
 class Exception : public virtual jcommon::Object, std::exception {
 
-	private:
-		/** \brief */
-		std::vector<Exception *> _exceptions;
-	
+  private:
+    /** \brief */
+    std::vector<Exception *> _exceptions;
+  
   protected:
-		/** \brief */
-		std::string _reason;
+    /** \brief */
+    std::string _reason;
 
-	public:
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		Exception();
+  public:
+    /**
+     * \brief Construtor.
+     *
+     */
+    Exception();
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		Exception(std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    Exception(std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		Exception(Exception *exception, std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    Exception(Exception *exception, std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> Exception(const std::string &fmt, T ...vs)
     {
       jcommon::Object::SetClassName("jexception::Exception");
 
       _reason = jcommon::StringUtils::Format(fmt, vs...);
     }
-		
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> Exception(Exception *exception, const std::string &fmt, T ...vs):
       Exception(fmt, vs...)
     {
@@ -86,54 +86,54 @@ class Exception : public virtual jcommon::Object, std::exception {
         _exceptions.push_back(dynamic_cast<Exception *>(exception->Clone()));
       }
     }
-		
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~Exception() throw();
+    
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~Exception() throw();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string GetMessage();
+    /**
+     * \brief
+     *
+     */
+    virtual std::string GetMessage();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Exception * GetCause();
+    /**
+     * \brief
+     *
+     */
+    virtual Exception * GetCause();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual const std::vector<Exception *> & GetStackTrace();
+    /**
+     * \brief
+     *
+     */
+    virtual const std::vector<Exception *> & GetStackTrace();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetStackTrace(const std::vector<Exception *> *stack);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetStackTrace(const std::vector<Exception *> *stack);
 
-		/**
-		 * \brief
-		 *
-		 */
-		void PrintStackTrace();
+    /**
+     * \brief
+     *
+     */
+    void PrintStackTrace();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jcommon::Object * Clone();
+    /**
+     * \brief
+     *
+     */
+    virtual jcommon::Object * Clone();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string What();
+    /**
+     * \brief
+     *
+     */
+    virtual std::string What();
 };
 
 }

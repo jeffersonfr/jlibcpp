@@ -17,7 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef	J_SLIDERCOMPONENT_H
+#ifndef  J_SLIDERCOMPONENT_H
 #define J_SLIDERCOMPONENT_H
 
 #include "jgui/jcomponent.h"
@@ -28,8 +28,8 @@
 namespace jgui {
 
 enum jscroll_orientation_t {
-	JSO_HORIZONTAL,
-	JSO_VERTICAL
+  JSO_HORIZONTAL,
+  JSO_VERTICAL
 };
 
 /**
@@ -39,140 +39,140 @@ enum jscroll_orientation_t {
  */
 class SliderComponent : public jgui::Component {
 
-	protected:
-		/** \brief */
-		std::vector<jevent::AdjustmentListener *> _adjustment_listeners;
-		/** \brief */
-		std::mutex _adjustment_listener_mutex;
-		/** \brief */
-		int _index;
-		/** \brief */
-		int _value;
-		/** \brief */
-		int _minimum;
-		/** \brief */
-		int _maximum;
-		/** \brief */
-		int _minimum_tick;
-		/** \brief */
-		int _maximum_tick;
-		/** \brief */
-		jscroll_orientation_t _type;
+  protected:
+    /** \brief */
+    std::vector<jevent::AdjustmentListener *> _adjustment_listeners;
+    /** \brief */
+    std::mutex _adjustment_listener_mutex;
+    /** \brief */
+    int _index;
+    /** \brief */
+    int _value;
+    /** \brief */
+    int _minimum;
+    /** \brief */
+    int _maximum;
+    /** \brief */
+    int _minimum_tick;
+    /** \brief */
+    int _maximum_tick;
+    /** \brief */
+    jscroll_orientation_t _type;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		SliderComponent(int x, int y, int width, int height);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~SliderComponent();
+  public:
+    /**
+     * \brief
+     *
+     */
+    SliderComponent(int x, int y, int width, int height);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~SliderComponent();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jscroll_orientation_t GetScrollOrientation();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetScrollOrientation(jscroll_orientation_t type);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetValue();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetValue(int i);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetRange(int minimum, int maximum);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetMinimum();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetMaximum();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetMinimum(int i);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetMaximum(int i);
+    /**
+     * \brief
+     *
+     */
+    virtual jscroll_orientation_t GetScrollOrientation();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetScrollOrientation(jscroll_orientation_t type);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int GetValue();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetValue(int i);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetRange(int minimum, int maximum);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int GetMinimum();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int GetMaximum();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetMinimum(int i);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetMaximum(int i);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetMinorTickSpacing();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetMajorTickSpacing();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetMinorTickSpacing(int i);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetMajorTickSpacing(int i);
+    /**
+     * \brief
+     *
+     */
+    virtual int GetMinorTickSpacing();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int GetMajorTickSpacing();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetMinorTickSpacing(int i);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetMajorTickSpacing(int i);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RegisterAdjustmentListener(jevent::AdjustmentListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveAdjustmentListener(jevent::AdjustmentListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void DispatchAdjustmentEvent(jevent::AdjustmentEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual const std::vector<jevent::AdjustmentListener *> & GetAdjustmentListeners();
+    /**
+     * \brief
+     *
+     */
+    virtual void RegisterAdjustmentListener(jevent::AdjustmentListener *listener);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void RemoveAdjustmentListener(jevent::AdjustmentListener *listener);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void DispatchAdjustmentEvent(jevent::AdjustmentEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual const std::vector<jevent::AdjustmentListener *> & GetAdjustmentListeners();
 };
 
 }

@@ -22,11 +22,11 @@
 namespace jevent {
 
 TextEvent::TextEvent(void *source, std::string text):
-	jevent::EventObject(source)
+  jevent::EventObject(source)
 {
-	jcommon::Object::SetClassName("jevent::TextEvent");
+  jcommon::Object::SetClassName("jevent::TextEvent");
 
-	_text = text;
+  _text = text;
 }
 
 TextEvent::~TextEvent()
@@ -35,7 +35,7 @@ TextEvent::~TextEvent()
 
 std::string TextEvent::GetText()
 {
-	return _text;
+  return _text;
 }
 
 }

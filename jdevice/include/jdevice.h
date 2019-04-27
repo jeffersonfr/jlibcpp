@@ -27,24 +27,24 @@
 namespace jsystem{
 
 enum jdevice_type_t {
-	HOST_BRIDGE,
-	PCI_BRIDGE,
-	ISA_BRIDGE,
-	IDE_INTERFACE,
-	MULTIMEDIA_AUDIO_CONTROLLER,
-	USB_CONTROLLER,
-	ETHERNET_CONTROLLER,
-	RAID_BUS_CONTROLLER,
-	INPUT_DEVICE_CONTROLLER,
-	FIREWIRE,
-	DISPLAY_CONTROLLER
+  HOST_BRIDGE,
+  PCI_BRIDGE,
+  ISA_BRIDGE,
+  IDE_INTERFACE,
+  MULTIMEDIA_AUDIO_CONTROLLER,
+  USB_CONTROLLER,
+  ETHERNET_CONTROLLER,
+  RAID_BUS_CONTROLLER,
+  INPUT_DEVICE_CONTROLLER,
+  FIREWIRE,
+  DISPLAY_CONTROLLER
 };
 
 enum jdevice_status_t {
-	DEVICE_ACTIVE,
-	DEVICE_INATIVE
+  DEVICE_ACTIVE,
+  DEVICE_INATIVE
 };
-	
+  
 /**
  * \brief
  *
@@ -52,62 +52,62 @@ enum jdevice_status_t {
 */
 class Device : public::Object {
 
-	friend class DeviceBuilder;
+  friend class DeviceBuilder;
 
-	private:
-		/** \brief */
-		std::map<int, std::string> _name;
-		/** \brief */
-		std::map<int, jdevice_type_t> _type;
-		/** \brief */
-		std::map<int, jdevice_status_t> _status;
-		/** \brief */
-		int _number_of_devices;
-		
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		Device();
+  private:
+    /** \brief */
+    std::map<int, std::string> _name;
+    /** \brief */
+    std::map<int, jdevice_type_t> _type;
+    /** \brief */
+    std::map<int, jdevice_status_t> _status;
+    /** \brief */
+    int _number_of_devices;
+    
+  public:
+    /**
+     * \brief
+     *
+     */
+    Device();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual ~Device();
+    /**
+     * \brief
+     * 
+     */
+    virtual ~Device();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void Builder() = 0;
+    /**
+     * \brief
+     * 
+     */
+    virtual void Builder() = 0;
 
-		/**
-		 * \brief
-		 *
-		 */
-		std::string GetName(int index);
+    /**
+     * \brief
+     *
+     */
+    std::string GetName(int index);
 
-		/**
-		 * \brief
-		 *
-		 */
-		jdevice_status_t GetStatus(int index);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		jdevice_type_t GetType(int index);
+    /**
+     * \brief
+     *
+     */
+    jdevice_status_t GetStatus(int index);
+    
+    /**
+     * \brief
+     *
+     */
+    jdevice_type_t GetType(int index);
 
-		/**
-		 * \brief
-		 *
-		 */
-		int GetNumberOfDevices();
-		
-		
+    /**
+     * \brief
+     *
+     */
+    int GetNumberOfDevices();
+    
+    
 };
 
 }

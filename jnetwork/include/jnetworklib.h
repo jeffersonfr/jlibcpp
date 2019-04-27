@@ -24,33 +24,33 @@
 #include <vector>
 
 enum jaddress_family_t {
-	JAF_UNKNOWN,
-	JAF_INET,
-	JAF_INET6,
-	JAF_NETBIOS
+  JAF_UNKNOWN,
+  JAF_INET,
+  JAF_INET6,
+  JAF_NETBIOS
 };
 
 enum jaddress_type_t {
-	JAT_UNKNOW,
-	JAT_STREAM,
-	JAT_DGRAM,
-	JAT_RAW,
-	JAT_RDM,
-	JAT_SEQPACKET
+  JAT_UNKNOW,
+  JAT_STREAM,
+  JAT_DGRAM,
+  JAT_RAW,
+  JAT_RDM,
+  JAT_SEQPACKET
 };
 
 enum jaddress_protocol_t {
-	JAP_UNKNOWN,
-	JAP_TCP,
-	JAP_UDP
+  JAP_UNKNOWN,
+  JAP_TCP,
+  JAP_UDP
 };
 
 struct jaddress_info_t {
-	jaddress_family_t family;
-	jaddress_type_t type;
-	jaddress_protocol_t protocol;
-	std::string name;
-	std::string address;
+  jaddress_family_t family;
+  jaddress_type_t type;
+  jaddress_protocol_t protocol;
+  std::string name;
+  std::string address;
 };
 
 void InitializeSocketLibrary();

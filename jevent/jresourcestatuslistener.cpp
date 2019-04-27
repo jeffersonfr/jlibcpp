@@ -22,7 +22,7 @@
 namespace jevent {
 
 ResourceStatusListener::ResourceStatusListener():
-	jevent::Listener()
+  jevent::Listener()
 {
 }
 
@@ -40,7 +40,7 @@ void ResourceStatusListener::ReleaseForced(ResourceStatusEvent *event)
 
 bool ResourceStatusListener::ReleaseRequested(ResourceStatusEvent *event)
 {
-	return false;
+  return false;
 }
 
 }

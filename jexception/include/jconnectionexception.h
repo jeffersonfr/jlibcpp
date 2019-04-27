@@ -31,52 +31,52 @@ namespace jexception {
  */
 class ConnectionException : public jexception::RuntimeException {
 
-	private:
+  private:
 
-	public:
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		ConnectionException();
+  public:
+    /**
+     * \brief Construtor.
+     *
+     */
+    ConnectionException();
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		ConnectionException(std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    ConnectionException(std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		ConnectionException(jexception::Exception *exception, std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    ConnectionException(jexception::Exception *exception, std::string reason);
  
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> ConnectionException(const std::string &fmt, T ...vs):
       Exception(fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::ConnectionException");
     }
-		
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> ConnectionException(Exception *exception, const std::string &fmt, T ...vs):
       Exception(exception, fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::ConnectionException");
     }
-		
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~ConnectionException() throw();
+    
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~ConnectionException() throw();
 
 };
 

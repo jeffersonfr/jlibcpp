@@ -22,38 +22,38 @@
 namespace jevent {
 
 DemuxEvent::DemuxEvent(void *source, jdemuxevent_type_t type, const char *data, int data_length, int pid):
-	jevent::EventObject(source)
+  jevent::EventObject(source)
 {
-	jcommon::Object::SetClassName("jevent::DemuxEvent");
-	
-	_type = type;
-	_data = data;
-	_data_length = data_length;
-	_pid = pid;
+  jcommon::Object::SetClassName("jevent::DemuxEvent");
+  
+  _type = type;
+  _data = data;
+  _data_length = data_length;
+  _pid = pid;
 }
-		
+    
 DemuxEvent::~DemuxEvent()
 {
 }
 
 jdemuxevent_type_t DemuxEvent::GetType()
 {
-	return _type;
+  return _type;
 }
 
 const char * DemuxEvent::GetData()
 {
-	return _data;
+  return _data;
 }
 
 int DemuxEvent::GetLength()
 {
-	return _data_length;
+  return _data_length;
 }
 
 int DemuxEvent::GetPID()
 {
-	return _pid;
+  return _pid;
 }
 
 }

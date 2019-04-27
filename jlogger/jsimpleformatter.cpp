@@ -26,9 +26,9 @@
 namespace jlogger {
 
 SimpleFormatter::SimpleFormatter():
-	jlogger::Formatter()
+  jlogger::Formatter()
 {
-	jcommon::Object::SetClassName("jlogger::SimpleFormatter");
+  jcommon::Object::SetClassName("jlogger::SimpleFormatter");
 }
 
 SimpleFormatter::~SimpleFormatter()
@@ -37,42 +37,42 @@ SimpleFormatter::~SimpleFormatter()
 
 void SimpleFormatter::Transform(LogRecord *log)
 {
-	if (log == nullptr) {
-		return;
-	}
-	
-	std::string type;
-	
-	time_t curtime = time(nullptr);
-	char *loctime = asctime(localtime (&curtime));
-	
-	std::ostringstream date,
-						format;
-		
-	if (loctime != nullptr) {
-		loctime[strlen(loctime)-1] = '\0';
-	
-		date << " [" << (loctime + 4) << "]  ";
-	}
-	
-	if (log->GetType() == JRT_INFO) {
-		format << "LOG_INFO" << date.str() << log->GetRecord() << std::flush << std::endl;
-	} else if (log->GetType() == JRT_WARNNING) {
-		format << "LOG_WARNNING" << date.str() << log->GetRecord() << std::flush << std::endl;
-	} else if (log->GetType() == JRT_ERROR) {
-		format << "LOG_ERROR" << date.str() << log->GetRecord() << std::flush << std::endl;
-	} else if (log->GetType() == JRT_CRITICAL) {
-		format << "LOG_CRITICAL" << date.str() << log->GetRecord() << std::flush << std::endl;
-	} else if (log->GetType() == JRT_UNKNOWN) {
-		format << "UNKNOWN" << date.str() << log->GetRecord() << std::flush << std::endl;
-	}
+  if (log == nullptr) {
+    return;
+  }
+  
+  std::string type;
+  
+  time_t curtime = time(nullptr);
+  char *loctime = asctime(localtime (&curtime));
+  
+  std::ostringstream date,
+            format;
+    
+  if (loctime != nullptr) {
+    loctime[strlen(loctime)-1] = '\0';
+  
+    date << " [" << (loctime + 4) << "]  ";
+  }
+  
+  if (log->GetType() == JRT_INFO) {
+    format << "LOG_INFO" << date.str() << log->GetRecord() << std::flush << std::endl;
+  } else if (log->GetType() == JRT_WARNNING) {
+    format << "LOG_WARNNING" << date.str() << log->GetRecord() << std::flush << std::endl;
+  } else if (log->GetType() == JRT_ERROR) {
+    format << "LOG_ERROR" << date.str() << log->GetRecord() << std::flush << std::endl;
+  } else if (log->GetType() == JRT_CRITICAL) {
+    format << "LOG_CRITICAL" << date.str() << log->GetRecord() << std::flush << std::endl;
+  } else if (log->GetType() == JRT_UNKNOWN) {
+    format << "UNKNOWN" << date.str() << log->GetRecord() << std::flush << std::endl;
+  }
 
-	log->SetRecord(format.str());
+  log->SetRecord(format.str());
 }
 
 LogRecord * SimpleFormatter::Release()
 {
-	return nullptr;
+  return nullptr;
 }
 
 }

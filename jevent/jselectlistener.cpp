@@ -22,9 +22,9 @@
 namespace jevent {
 
 SelectListener::SelectListener():
-	jevent::Listener()
+  jevent::Listener()
 {
-	jcommon::Object::SetClassName("jevent::SelectListener");
+  jcommon::Object::SetClassName("jevent::SelectListener");
 }
 
 SelectListener::~SelectListener()

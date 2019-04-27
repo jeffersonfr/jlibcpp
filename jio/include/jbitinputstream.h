@@ -32,101 +32,101 @@ namespace jio {
  */
 class BitInputStream : public jio::InputStream {
 
-	private:
-		InputStream *stream;
-		File *file;
-		int64_t currentMask,
-			currentByte;
-		bool haveByte,
-			show;
-		
-	public:
-		/**
-		 * \brief
-		 */
-		BitInputStream(std::string filename);
-		
-		/**
-		 * \brief
-		 */
-		BitInputStream(InputStream *is);
-		
-		/**
-		 * \brief
-		 */
-		virtual ~BitInputStream();
-
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual bool IsEmpty();
-
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual int64_t Available();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t GetSize();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t GetPosition();
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual int64_t Read();
-
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual int64_t Read(char *, int64_t size);
+  private:
+    InputStream *stream;
+    File *file;
+    int64_t currentMask,
+      currentByte;
+    bool haveByte,
+      show;
     
-		/**
-		 * \brief Salto relativo.
-		 *
-		 */
-		virtual void Skip(int64_t skip);
+  public:
+    /**
+     * \brief
+     */
+    BitInputStream(std::string filename);
+    
+    /**
+     * \brief
+     */
+    BitInputStream(InputStream *is);
+    
+    /**
+     * \brief
+     */
+    virtual ~BitInputStream();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Reset();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int ReadBit();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int ReadBits(int num);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Close();
+    /**
+     * \brief
+     * 
+     */
+    virtual bool IsEmpty();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t GetReadedBytes();
+    /**
+     * \brief
+     * 
+     */
+    virtual int64_t Available();
+
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t GetSize();
+
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t GetPosition();
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual int64_t Read();
+
+    /**
+     * \brief
+     * 
+     */
+    virtual int64_t Read(char *, int64_t size);
+    
+    /**
+     * \brief Salto relativo.
+     *
+     */
+    virtual void Skip(int64_t skip);
+
+    /**
+     * \brief
+     *
+     */
+    virtual void Reset();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int ReadBit();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int ReadBits(int num);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Close();
+
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t GetReadedBytes();
 
 };
 

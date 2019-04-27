@@ -22,11 +22,11 @@
 namespace jevent {
 
 DataEvent::DataEvent(void *source, jcommon::ParamMapper *params):
-	jevent::EventObject(source)
-{	
-	jcommon::Object::SetClassName("jevent::DataEvent");
+  jevent::EventObject(source)
+{  
+  jcommon::Object::SetClassName("jevent::DataEvent");
 
-	_params = params;
+  _params = params;
 }
 
 DataEvent::~DataEvent()
@@ -35,7 +35,7 @@ DataEvent::~DataEvent()
 
 jcommon::ParamMapper * DataEvent::GetData()
 {
-	return _params;
+  return _params;
 }
 
 }

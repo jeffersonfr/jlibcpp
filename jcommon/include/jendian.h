@@ -31,55 +31,55 @@ namespace jcommon {
  */
 class Endian : public virtual jcommon::Object {
 
-	private:
-		/**
-		 * \brief
-		 *
-		 */
-		Endian();
+  private:
+    /**
+     * \brief
+     *
+     */
+    Endian();
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~Endian();
+  public:
+    /**
+     * \brief
+     *
+     */
+    virtual ~Endian();
 
-		/**
-		 * \brief
-		 *
-		 */
-		static uint16_t HostToNetwork16(uint16_t host16);
+    /**
+     * \brief
+     *
+     */
+    static uint16_t HostToNetwork16(uint16_t host16);
 
-		/**
-		 * \brief
-		 *
-		 */
-		static uint32_t HostToNetwork32(uint32_t host32);
+    /**
+     * \brief
+     *
+     */
+    static uint32_t HostToNetwork32(uint32_t host32);
 
-		/**
-		 * \brief
-		 *
-		 */
-		static uint64_t HostToNetwork64(uint64_t host64);
+    /**
+     * \brief
+     *
+     */
+    static uint64_t HostToNetwork64(uint64_t host64);
 
-		/**
-		 * \brief
-		 *
-		 */
-		static uint16_t NetworkToHost16(uint16_t net16);
+    /**
+     * \brief
+     *
+     */
+    static uint16_t NetworkToHost16(uint16_t net16);
 
-		/**
-		 * \brief
-		 *
-		 */
-		static uint32_t NetworkToHost32(uint32_t net32);
+    /**
+     * \brief
+     *
+     */
+    static uint32_t NetworkToHost32(uint32_t net32);
 
-		/**
-		 * \brief
-		 *
-		 */
-		static uint64_t NetworkToHost64(uint64_t net64);
+    /**
+     * \brief
+     *
+     */
+    static uint64_t NetworkToHost64(uint64_t net64);
 
 };
 

@@ -24,19 +24,19 @@ namespace jexception {
 ConnectionInterruptedException::ConnectionInterruptedException():
   jexception::InterruptedException()
 {
-	jcommon::Object::SetClassName("jexception::ConnectionInterruptedException");
+  jcommon::Object::SetClassName("jexception::ConnectionInterruptedException");
 }
 
 ConnectionInterruptedException::ConnectionInterruptedException(std::string reason_):
   jexception::InterruptedException(reason_)
 {
-	jcommon::Object::SetClassName("jexception::ConnectionInterruptedException");
+  jcommon::Object::SetClassName("jexception::ConnectionInterruptedException");
 }
 
 ConnectionInterruptedException::ConnectionInterruptedException(jexception::Exception *exception, std::string reason_):
   jexception::InterruptedException(exception, reason_)
 {
-	jcommon::Object::SetClassName("jexception::ConnectionInterruptedException");
+  jcommon::Object::SetClassName("jexception::ConnectionInterruptedException");
 }
 
 ConnectionInterruptedException::~ConnectionInterruptedException() throw()

@@ -25,9 +25,9 @@
 namespace jnetwork {
 
 InetAddress::InetAddress():
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jnetwork::InetAddress");
+  jcommon::Object::SetClassName("jnetwork::InetAddress");
 }
 
 InetAddress::~InetAddress()
@@ -36,42 +36,42 @@ InetAddress::~InetAddress()
 
 bool InetAddress::IsReachable(std::string host)
 {
-	struct addrinfo *result = nullptr;
-	struct addrinfo hints;
+  struct addrinfo *result = nullptr;
+  struct addrinfo hints;
 
-	bzero(&hints, sizeof(hints));
+  bzero(&hints, sizeof(hints));
 
-	hints.ai_family = AF_UNSPEC;
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_protocol = IPPROTO_TCP;
-	hints.ai_flags = AI_PASSIVE;
-	hints.ai_protocol = 0;
-	hints.ai_canonname = nullptr;
-	hints.ai_addr = nullptr;
-	hints.ai_next = nullptr;
+  hints.ai_family = AF_UNSPEC;
+  hints.ai_socktype = SOCK_STREAM;
+  hints.ai_protocol = IPPROTO_TCP;
+  hints.ai_flags = AI_PASSIVE;
+  hints.ai_protocol = 0;
+  hints.ai_canonname = nullptr;
+  hints.ai_addr = nullptr;
+  hints.ai_next = nullptr;
 
-	if (getaddrinfo(host.c_str(), "echo", &hints, &result) != 0) {
-		return false;
-	}
+  if (getaddrinfo(host.c_str(), "echo", &hints, &result) != 0) {
+    return false;
+  }
 
-	return true;
+  return true;
 }
 
 std::string InetAddress::GetHostName()
 {
-	return "";
+  return "";
 }
 
 std::string InetAddress::GetHostAddress()
 {
-	return "";
+  return "";
 }
 
 std::vector<uint32_t> InetAddress::GetAddress()
 {
-	std::vector<uint32_t> addr;
+  std::vector<uint32_t> addr;
 
-	return addr;
+  return addr;
 }
 
 }

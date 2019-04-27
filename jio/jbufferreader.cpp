@@ -25,14 +25,14 @@ namespace jio {
 
 BufferReader::BufferReader() 
 {
-	jcommon::Object::SetClassName("jio::BufferReader");
+  jcommon::Object::SetClassName("jio::BufferReader");
 }
 
 BufferReader::BufferReader(char *data, int64_t size) 
 {
-	jcommon::Object::SetClassName("jio::BufferReader");
+  jcommon::Object::SetClassName("jio::BufferReader");
 
-	_buffer.Put(data, size);
+  _buffer.Put(data, size);
 }
 
 BufferReader::~BufferReader() 
@@ -41,113 +41,113 @@ BufferReader::~BufferReader()
 
 void BufferReader::PushData(char *data, int64_t size)
 {
-	_buffer.Put(data, size);
+  _buffer.Put(data, size);
 }
 
 bool BufferReader::ReadBoolean() 
 {
-	bool byte;
+  bool byte;
 
-	_buffer.Get(&byte);
+  _buffer.Get(&byte);
 
-	return byte;
+  return byte;
 }
 
 uint8_t BufferReader::ReadByte()
 {
-	bool byte;
+  bool byte;
 
-	_buffer.Get(&byte);
+  _buffer.Get(&byte);
 
-	return byte;
+  return byte;
 }
 
 uint16_t BufferReader::ReadShort() 
 {
-	uint16_t n;
+  uint16_t n;
 
-	_buffer.Get(&n);
+  _buffer.Get(&n);
 
-	return n;
+  return n;
 }
 
 uint32_t BufferReader::ReadInteger() 
 {
-	uint32_t n;
+  uint32_t n;
 
-	_buffer.Get(&n);
+  _buffer.Get(&n);
 
-	return n;
+  return n;
 }
 
 uint64_t BufferReader::ReadLong() 
 {
-	uint64_t n;
+  uint64_t n;
 
-	_buffer.Get(&n);
+  _buffer.Get(&n);
 
-	return n;
+  return n;
 }
 
 float BufferReader::ReadFloat() 
 {
-	float n;
+  float n;
 
-	_buffer.Get(&n);
+  _buffer.Get(&n);
 
-	return n;
+  return n;
 }
 
 double BufferReader::ReadDouble() 
 {
-	double n;
+  double n;
 
-	_buffer.Get(&n);
+  _buffer.Get(&n);
 
-	return n;
+  return n;
 }
 
 std::string BufferReader::ReadString() 
 {
-	uint32_t sz = ReadInteger();
+  uint32_t sz = ReadInteger();
 
-	if (sz <= 0){
-		return "";
-	}
+  if (sz <= 0){
+    return "";
+  }
 
-	char *psz_str = new char[sz];
+  char *psz_str = new char[sz];
 
-	_buffer.Get(psz_str, sz);
+  _buffer.Get(psz_str, sz);
 
-	std::string str = std::string(psz_str, sz);
+  std::string str = std::string(psz_str, sz);
 
-	delete [] psz_str;
+  delete [] psz_str;
 
-	return str;
+  return str;
 }
 
 char * BufferReader::ReadRaw(int64_t *size) 
 {
-	uint32_t sz = ReadInteger();
+  uint32_t sz = ReadInteger();
 
-	if (sz <= 0) {
-		(*size) = 0;
+  if (sz <= 0) {
+    (*size) = 0;
 
-		return nullptr;
-	}
+    return nullptr;
+  }
 
-	char *data = new char[sz];
+  char *data = new char[sz];
 
-	_buffer.Get(data, sz);
+  _buffer.Get(data, sz);
 
-	(*size) = sz;
+  (*size) = sz;
 
-	return data;
+  return data;
 }
 
 void BufferReader::Reset()
 {
-	_buffer.Reset();
+  _buffer.Reset();
 }
 
 }

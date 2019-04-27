@@ -33,75 +33,75 @@ namespace jsecurity {
  */
 class SecurityManager : public virtual jcommon::Object {
 
-	private:
+  private:
 
-		
-	public:
-		/**
-		 * \brief
-		 * 
-		 */
-		SecurityManager();
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual ~SecurityManager();
-
-		/**
-		 * \brief
-		 * 
-		 */
-		static SecurityManager * GetInstance();
     
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void GetAllUsers();
+  public:
+    /**
+     * \brief
+     * 
+     */
+    SecurityManager();
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual ~SecurityManager();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual User * GetUser(std::string id);
+    /**
+     * \brief
+     * 
+     */
+    static SecurityManager * GetInstance();
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual void GetAllUsers();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void GetAllGroups();
+    /**
+     * \brief
+     * 
+     */
+    virtual User * GetUser(std::string id);
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void GetGoupsFromUser(int id);
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void GetGoupsFromUser(std::string id);
+    /**
+     * \brief
+     * 
+     */
+    virtual void GetAllGroups();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual AccessControl * GetDefaultAccessControl();
+    /**
+     * \brief
+     * 
+     */
+    virtual void GetGoupsFromUser(int id);
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual void GetGoupsFromUser(std::string id);
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void Update(User id);
+    /**
+     * \brief
+     * 
+     */
+    virtual AccessControl * GetDefaultAccessControl();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void Update(Group id);
+    /**
+     * \brief
+     * 
+     */
+    virtual void Update(User id);
+
+    /**
+     * \brief
+     * 
+     */
+    virtual void Update(Group id);
 
 };
 

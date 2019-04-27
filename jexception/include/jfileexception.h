@@ -31,52 +31,52 @@ namespace jexception {
  */
 class FileException : public jexception::IOException {
 
-	private:
+  private:
 
-	public:
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		FileException();
+  public:
+    /**
+     * \brief Construtor.
+     *
+     */
+    FileException();
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		FileException(std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    FileException(std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		FileException(jexception::Exception *exception, std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    FileException(jexception::Exception *exception, std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> FileException(const std::string &fmt, T ...vs):
       Exception(fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::FileException");
     }
-		
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> FileException(Exception *exception, const std::string &fmt, T ...vs):
       Exception(exception, fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::FileException");
     }
-		
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~FileException() throw();
+    
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~FileException() throw();
 
 };
 

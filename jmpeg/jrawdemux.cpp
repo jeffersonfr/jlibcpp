@@ -22,13 +22,13 @@
 namespace jmpeg {
 
 RawDemux::RawDemux():
-	Demux(JDT_RAW)
+  Demux(JDT_RAW)
 {
-	jcommon::Object::SetClassName("jmpeg::RawDemux");
+  jcommon::Object::SetClassName("jmpeg::RawDemux");
 
   _packet_size = 188; // INFO:: DVB standard
 }
-		
+    
 RawDemux::~RawDemux()
 {
 }
@@ -49,7 +49,7 @@ bool RawDemux::Append(const char *data, int data_length)
     return false;
   }
 
-	return true;
+  return true;
 }
 
 }

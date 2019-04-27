@@ -34,445 +34,445 @@ namespace jnetwork {
 int DatagramSocket6::_used_port = 1024;
 
 DatagramSocket6::DatagramSocket6(std::string host_, int port_, bool stream_, int timeout_, int rbuf_, int wbuf_):
-	jnetwork::Connection(JCT_UDP)
+  jnetwork::Connection(JCT_UDP)
 {
-	jcommon::Object::SetClassName("jnetwork::DatagramSocket6");
-	
-	_stream = stream_;
-	_address = nullptr;
-	_is = nullptr;
-	_os = nullptr;
-	_is_closed = true;
-	_timeout = timeout_;
-	
-	_address = InetAddress6::GetByName(host_);
+  jcommon::Object::SetClassName("jnetwork::DatagramSocket6");
+  
+  _stream = stream_;
+  _address = nullptr;
+  _is = nullptr;
+  _os = nullptr;
+  _is_closed = true;
+  _timeout = timeout_;
+  
+  _address = InetAddress6::GetByName(host_);
 
-	CreateSocket();
-	ConnectSocket(_address, port_);
-	InitStream(rbuf_, wbuf_);
+  CreateSocket();
+  ConnectSocket(_address, port_);
+  InitStream(rbuf_, wbuf_);
 
-	_sent_bytes = 0;
-	_receive_bytes = 0;
+  _sent_bytes = 0;
+  _receive_bytes = 0;
 }
 
 DatagramSocket6::DatagramSocket6(int port_, bool stream_, int timeout_, int rbuf_, int wbuf_):
-	jnetwork::Connection(JCT_UDP)
+  jnetwork::Connection(JCT_UDP)
 {
-	jcommon::Object::SetClassName("jnetwork::DatagramSocket6");
+  jcommon::Object::SetClassName("jnetwork::DatagramSocket6");
 
-	_address = nullptr;
-	_is = nullptr;
-	_os = nullptr;
-	_is_closed = true;
-	_stream = stream_;
-	_timeout = timeout_;
-	_sent_bytes = 0;
-	_receive_bytes = 0;
+  _address = nullptr;
+  _is = nullptr;
+  _os = nullptr;
+  _is_closed = true;
+  _stream = stream_;
+  _timeout = timeout_;
+  _sent_bytes = 0;
+  _receive_bytes = 0;
 
-	_address = InetAddress6::GetByName("127.0.0.1");
+  _address = InetAddress6::GetByName("127.0.0.1");
 
-	CreateSocket();
-	BindSocket(nullptr, port_);
-	InitStream(rbuf_, wbuf_);
+  CreateSocket();
+  BindSocket(nullptr, port_);
+  InitStream(rbuf_, wbuf_);
 }
 
 DatagramSocket6::DatagramSocket6(InetAddress *addr_, int port_, bool stream_, int timeout_, int rbuf_, int wbuf_):
-	jnetwork::Connection(JCT_UDP)
+  jnetwork::Connection(JCT_UDP)
 {
-	jcommon::Object::SetClassName("jnetwork::DatagramSocket6");
+  jcommon::Object::SetClassName("jnetwork::DatagramSocket6");
 
-	_address = addr_;
-	_is = nullptr;
-	_os = nullptr;
-	_is_closed = true;
-	_stream = stream_;
-	_timeout = timeout_;
-	_sent_bytes = 0;
-	_receive_bytes = 0;
+  _address = addr_;
+  _is = nullptr;
+  _os = nullptr;
+  _is_closed = true;
+  _stream = stream_;
+  _timeout = timeout_;
+  _sent_bytes = 0;
+  _receive_bytes = 0;
 
-	CreateSocket();
-	BindSocket(_address, port_);
-	InitStream(rbuf_, wbuf_);
+  CreateSocket();
+  BindSocket(_address, port_);
+  InitStream(rbuf_, wbuf_);
 }
 
 DatagramSocket6::~DatagramSocket6()
 {
-	try {
-		Close();
-	} catch (...) {
-	}
+  try {
+    Close();
+  } catch (...) {
+  }
 
-	if ((void *)_address != nullptr) {
-		delete _address;
-	}
+  if ((void *)_address != nullptr) {
+    delete _address;
+  }
 
-	if ((void *)_is != nullptr) {
-		delete _is;
-	}
+  if ((void *)_is != nullptr) {
+    delete _is;
+  }
 
-	if ((void *)_os != nullptr) {
-		delete _os;
-	}
+  if ((void *)_os != nullptr) {
+    delete _os;
+  }
 }
 
 /** Private */
 
 void DatagramSocket6::CreateSocket()
 {
-	if ((_fd = ::socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0) {
-		throw jexception::ConnectionException("Socket handling error");
-	}
+  if ((_fd = ::socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0) {
+    throw jexception::ConnectionException("Socket handling error");
+  }
 
-	_is_closed = false;
+  _is_closed = false;
 }
 
 void DatagramSocket6::BindSocket(InetAddress *local_addr_, int local_port_)
 {
-	int opt = 1;
+  int opt = 1;
 
-	memset(&_lsock, 0, sizeof(_lsock));
+  memset(&_lsock, 0, sizeof(_lsock));
    
-	_lsock.sin6_family = AF_INET6;
-	_lsock.sin6_flowinfo = 0;
-	
-	if (local_addr_ == nullptr) {
-		_lsock.sin6_addr = in6addr_any;
-	} else {
-		_local = dynamic_cast<InetAddress6 *>(local_addr_);
+  _lsock.sin6_family = AF_INET6;
+  _lsock.sin6_flowinfo = 0;
+  
+  if (local_addr_ == nullptr) {
+    _lsock.sin6_addr = in6addr_any;
+  } else {
+    _local = dynamic_cast<InetAddress6 *>(local_addr_);
 
-		memcpy(&(_lsock.sin6_addr), &(_local->_ip), sizeof(_local->_ip));
-	}
+    memcpy(&(_lsock.sin6_addr), &(_local->_ip), sizeof(_local->_ip));
+  }
 
-	_lsock.sin6_scope_id = 0;
+  _lsock.sin6_scope_id = 0;
    
-	if(local_port_ > 0) {
-		_lsock.sin6_port = htons(local_port_);
-	} else {
-		_lsock.sin6_port = htons(-1);
-	}
+  if(local_port_ > 0) {
+    _lsock.sin6_port = htons(local_port_);
+  } else {
+    _lsock.sin6_port = htons(-1);
+  }
 
-	setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, (void *)&opt, sizeof(opt));
+  setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, (void *)&opt, sizeof(opt));
 
-	if (::bind(_fd, (struct sockaddr *)&_lsock, sizeof(_lsock)) < 0) {
-		Close();
+  if (::bind(_fd, (struct sockaddr *)&_lsock, sizeof(_lsock)) < 0) {
+    Close();
 
-		throw jexception::ConnectionException("Binding error");
-	}
+    throw jexception::ConnectionException("Binding error");
+  }
 }
 
 void DatagramSocket6::ConnectSocket(InetAddress *addr_, int port_)
 {
-	_address = addr_;
-	
-	memset(&_server_sock, 0, sizeof(_server_sock));
-	
-	_lsock.sin6_family = AF_INET6;
-	_lsock.sin6_flowinfo = 0;
-	_lsock.sin6_scope_id = 0;
-	_lsock.sin6_port = htons(port_);
-	
-	if(_address == nullptr) {
-		_lsock.sin6_addr = in6addr_any;
-	} else {
-		inet_pton(AF_INET6, _address->GetHostAddress().c_str(), &(_lsock.sin6_addr));
-	}
+  _address = addr_;
+  
+  memset(&_server_sock, 0, sizeof(_server_sock));
+  
+  _lsock.sin6_family = AF_INET6;
+  _lsock.sin6_flowinfo = 0;
+  _lsock.sin6_scope_id = 0;
+  _lsock.sin6_port = htons(port_);
+  
+  if(_address == nullptr) {
+    _lsock.sin6_addr = in6addr_any;
+  } else {
+    inet_pton(AF_INET6, _address->GetHostAddress().c_str(), &(_lsock.sin6_addr));
+  }
 
-	int r;
-	
-	if (_stream == true) {
-		if (_timeout > 0) {
-			long arg;
+  int r;
+  
+  if (_stream == true) {
+    if (_timeout > 0) {
+      long arg;
 
-			if( (arg = fcntl(_fd, F_GETFL, nullptr)) < 0) { 
-				throw jexception::ConnectionException("Cannont set non blocking socket");
-			}
+      if( (arg = fcntl(_fd, F_GETFL, nullptr)) < 0) { 
+        throw jexception::ConnectionException("Cannont set non blocking socket");
+      }
 
-			arg |= O_NONBLOCK; 
+      arg |= O_NONBLOCK; 
 
-			if( fcntl(_fd, F_SETFL, arg) < 0) { 
-				throw jexception::ConnectionException("Cannont set non blocking socket");
-			} 
+      if( fcntl(_fd, F_SETFL, arg) < 0) { 
+        throw jexception::ConnectionException("Cannont set non blocking socket");
+      } 
 
-			r = connect(_fd, (struct sockaddr *)&_server_sock, sizeof(_server_sock));
+      r = connect(_fd, (struct sockaddr *)&_server_sock, sizeof(_server_sock));
 
-			if (r < 0) {
-				if (errno == EINPROGRESS) { 
-					// EINPROGRESS in connect() - selecting
-					do { 
-						struct timeval tv; 
-						fd_set wset;
+      if (r < 0) {
+        if (errno == EINPROGRESS) { 
+          // EINPROGRESS in connect() - selecting
+          do { 
+            struct timeval tv; 
+            fd_set wset;
 
-						tv.tv_sec = _timeout/1000;
-						tv.tv_usec = (_timeout%1000)*1000;
+            tv.tv_sec = _timeout/1000;
+            tv.tv_usec = (_timeout%1000)*1000;
 
-						FD_ZERO(&wset); 
-						FD_SET(_fd, &wset); 
+            FD_ZERO(&wset); 
+            FD_SET(_fd, &wset); 
 
-						r = select(_fd+1, nullptr, &wset, nullptr, &tv); 
+            r = select(_fd+1, nullptr, &wset, nullptr, &tv); 
 
-						if (r < 0 && errno != EINTR) { 
-							throw jexception::ConnectionException("Connection error");
-						} else if (r > 0) { 
-							socklen_t len = sizeof(int); 
-							int val; 
+            if (r < 0 && errno != EINTR) { 
+              throw jexception::ConnectionException("Connection error");
+            } else if (r > 0) { 
+              socklen_t len = sizeof(int); 
+              int val; 
 
-							if (getsockopt(_fd, SOL_SOCKET, SO_ERROR, (void*)(&val), &len) < 0) { 
-								throw jexception::ConnectionException("Unknown error in getsockopt()");
-							} 
+              if (getsockopt(_fd, SOL_SOCKET, SO_ERROR, (void*)(&val), &len) < 0) { 
+                throw jexception::ConnectionException("Unknown error in getsockopt()");
+              } 
 
-							if (val) { 
-								throw jexception::ConnectionException("Error in delayed connection");
-							}
+              if (val) { 
+                throw jexception::ConnectionException("Error in delayed connection");
+              }
 
-							break; 
-						} else { 
-							throw jexception::ConnectionException("Socket connection timeout exception");
-						} 
-					} while (true); 
-				} else { 
-					throw jexception::ConnectionException("Unknown error");
-				} 
-			}
-		} else {
-			r = connect(_fd, (struct sockaddr *)&_server_sock, sizeof(_server_sock));
-		}
+              break; 
+            } else { 
+              throw jexception::ConnectionException("Socket connection timeout exception");
+            } 
+          } while (true); 
+        } else { 
+          throw jexception::ConnectionException("Unknown error");
+        } 
+      }
+    } else {
+      r = connect(_fd, (struct sockaddr *)&_server_sock, sizeof(_server_sock));
+    }
 
-		if (r < 0) {
-			throw jexception::ConnectionException("Connection error");
-		}
-	}
+    if (r < 0) {
+      throw jexception::ConnectionException("Connection error");
+    }
+  }
 }
 
 void DatagramSocket6::InitStream(int rbuf_, int wbuf_)
 {
-	if (_stream == false) {
-		_is = new SocketInputStream((Connection *)this, (struct sockaddr *)&_server_sock, rbuf_);
-		_os = new SocketOutputStream((Connection *)this, (struct sockaddr *)&_server_sock, wbuf_);
-	} else {
-		_is = new SocketInputStream((Connection *)this, rbuf_);
-		_os = new SocketOutputStream((Connection *)this, wbuf_);
-	}
+  if (_stream == false) {
+    _is = new SocketInputStream((Connection *)this, (struct sockaddr *)&_server_sock, rbuf_);
+    _os = new SocketOutputStream((Connection *)this, (struct sockaddr *)&_server_sock, wbuf_);
+  } else {
+    _is = new SocketInputStream((Connection *)this, rbuf_);
+    _os = new SocketOutputStream((Connection *)this, wbuf_);
+  }
 }
 
 /** End */
 
 jio::InputStream * DatagramSocket6::GetInputStream()
 {
-	return (jio::InputStream *)_is;
+  return (jio::InputStream *)_is;
 }
 
 jio::OutputStream * DatagramSocket6::GetOutputStream()
 {
-	return (jio::OutputStream *)_os;
+  return (jio::OutputStream *)_os;
 }
 
 int DatagramSocket6::Receive(char *data_, int size_, int time_)
 {
-	if (_is_closed == true) {
-		throw jexception::ConnectionException("Connection closed exception");
-	}
-	
-	struct pollfd ufds[1];
+  if (_is_closed == true) {
+    throw jexception::ConnectionException("Connection closed exception");
+  }
+  
+  struct pollfd ufds[1];
 
-	ufds[0].fd = _fd;
-	ufds[0].events = POLLIN | POLLRDBAND;
+  ufds[0].fd = _fd;
+  ufds[0].events = POLLIN | POLLRDBAND;
 
-	int rv = poll(ufds, 1, time_);
+  int rv = poll(ufds, 1, time_);
 
-	if (rv == -1) {
-		throw jexception::ConnectionException("Invalid receive parameters exception");
-	} else if (rv == 0) {
-		throw jexception::ConnectionTimeoutException("Socket input timeout error");
-	} else {
-	    if ((ufds[0].revents & POLLIN) || (ufds[0].revents & POLLRDBAND)) {
-			return DatagramSocket6::Receive(data_, size_, true);
-	    }
-	}
+  if (rv == -1) {
+    throw jexception::ConnectionException("Invalid receive parameters exception");
+  } else if (rv == 0) {
+    throw jexception::ConnectionTimeoutException("Socket input timeout error");
+  } else {
+      if ((ufds[0].revents & POLLIN) || (ufds[0].revents & POLLRDBAND)) {
+      return DatagramSocket6::Receive(data_, size_, true);
+      }
+  }
 
-	return -1;
+  return -1;
 }
 
 int DatagramSocket6::Receive(char *data_, int size_, bool block_)
 {
-	if (_is_closed == true) {
-		throw jexception::ConnectionException("Connection closed exception");
-	}
-	
-	int n,
-		flags = 0,
-		length = sizeof(_server_sock);
+  if (_is_closed == true) {
+    throw jexception::ConnectionException("Connection closed exception");
+  }
+  
+  int n,
+    flags = 0,
+    length = sizeof(_server_sock);
 
-	if (block_ == false) {
-		flags = MSG_DONTWAIT;
-	}
+  if (block_ == false) {
+    flags = MSG_DONTWAIT;
+  }
 
-	n = ::recvfrom(_fd, data_, size_, flags, (struct sockaddr *)&_server_sock, (socklen_t *)&length);
-	
-	if (n < 0) {
-		if (errno == EAGAIN || errno == EWOULDBLOCK) {
-			if (block_ == true) {
-				throw jexception::ConnectionTimeoutException("Socket input timeout error");
-			}
-		}
-			
-		throw jexception::IOException("Socket input error");
-	} else if (n == 0) {
-		if (block_ == true) {
-			Close();
+  n = ::recvfrom(_fd, data_, size_, flags, (struct sockaddr *)&_server_sock, (socklen_t *)&length);
+  
+  if (n < 0) {
+    if (errno == EAGAIN || errno == EWOULDBLOCK) {
+      if (block_ == true) {
+        throw jexception::ConnectionTimeoutException("Socket input timeout error");
+      }
+    }
+      
+    throw jexception::IOException("Socket input error");
+  } else if (n == 0) {
+    if (block_ == true) {
+      Close();
 
-			throw jexception::IOException("Peer has shutdown");
-		}
-	}
+      throw jexception::IOException("Peer has shutdown");
+    }
+  }
 
-	/*
-	if (n < 0) {
-		if (errno == EAGAIN || errno == EWOULDBLOCK) {
-			if (block_ == true) {
-				throw jexception::ConnectionTimeoutException("Socket input timeout error");
-			} else {
-				// INFO:: non-blocking socket, no data read
-				n = 0;
-			}
-		} else {
-			throw jexception::IOException("Socket input error");
-		}
-	} else if (n == 0) {
-		Close();
+  /*
+  if (n < 0) {
+    if (errno == EAGAIN || errno == EWOULDBLOCK) {
+      if (block_ == true) {
+        throw jexception::ConnectionTimeoutException("Socket input timeout error");
+      } else {
+        // INFO:: non-blocking socket, no data read
+        n = 0;
+      }
+    } else {
+      throw jexception::IOException("Socket input error");
+    }
+  } else if (n == 0) {
+    Close();
 
-		throw jexception::IOException("Broken pipe exception");
-	}
-	*/
+    throw jexception::IOException("Broken pipe exception");
+  }
+  */
 
-	_receive_bytes += n;
+  _receive_bytes += n;
 
-	return n;
+  return n;
 }
 
 int DatagramSocket6::Send(const char *data_, int size_, int time_)
 {
-	if (_is_closed == true) {
-		throw jexception::ConnectionException("Connection closed exception");
-	}
-	
-	struct pollfd ufds[1];
+  if (_is_closed == true) {
+    throw jexception::ConnectionException("Connection closed exception");
+  }
+  
+  struct pollfd ufds[1];
 
-	ufds[0].fd = _fd;
-	ufds[0].events = POLLOUT | POLLWRBAND;
+  ufds[0].fd = _fd;
+  ufds[0].events = POLLOUT | POLLWRBAND;
 
-	int rv = poll(ufds, 1, time_);
+  int rv = poll(ufds, 1, time_);
 
-	if (rv == -1) {
-		throw jexception::ConnectionException("Invalid send parameters exception");
-	} else if (rv == 0) {
-		throw jexception::ConnectionTimeoutException("Socket output timeout error");
-	} else {
-	    if ((ufds[0].revents & POLLOUT) || (ufds[0].revents & POLLWRBAND)) {
-			return DatagramSocket6::Send(data_, size_);
-	    }
-	}
+  if (rv == -1) {
+    throw jexception::ConnectionException("Invalid send parameters exception");
+  } else if (rv == 0) {
+    throw jexception::ConnectionTimeoutException("Socket output timeout error");
+  } else {
+      if ((ufds[0].revents & POLLOUT) || (ufds[0].revents & POLLWRBAND)) {
+      return DatagramSocket6::Send(data_, size_);
+      }
+  }
 
-	return -1;
+  return -1;
 }
 
 int DatagramSocket6::Send(const char *data_, int size_, bool block_)
 {
-	if (_is_closed == true) {
-		throw jexception::ConnectionException("Connection closed exception");
-	}
-	
-	int n,
-	   	flags = 0;
+  if (_is_closed == true) {
+    throw jexception::ConnectionException("Connection closed exception");
+  }
+  
+  int n,
+       flags = 0;
 
-	if (block_ == false) {
-		flags = MSG_NOSIGNAL | MSG_DONTWAIT;
-	}
+  if (block_ == false) {
+    flags = MSG_NOSIGNAL | MSG_DONTWAIT;
+  }
 
-	if (_stream == true) {	
-		n = ::send(_fd, data_, size_, flags);
-	} else {
-		n = ::sendto(_fd, data_, size_, flags, (struct sockaddr *)&_server_sock, sizeof(_server_sock));
-	}
+  if (_stream == true) {  
+    n = ::send(_fd, data_, size_, flags);
+  } else {
+    n = ::sendto(_fd, data_, size_, flags, (struct sockaddr *)&_server_sock, sizeof(_server_sock));
+  }
 
-	if (n < 0) {
-		if (errno == EAGAIN || errno == EWOULDBLOCK) {
-			if (block_ == true) {
-				throw jexception::ConnectionTimeoutException("Socket output timeout error");
-			}
-				
-			throw jexception::ConnectionException("Socket output exception");
-			
-			/*
-			if (block_ == true) {
-				throw jexception::ConnectionTimeoutException("Socket output timeout error");
-			} else {
-				// INFO:: non-blocking socket, no data read
-				n = 0;
-			}
-			*/
-		} else if (errno == EPIPE || errno == ECONNRESET) {
-			Close();
+  if (n < 0) {
+    if (errno == EAGAIN || errno == EWOULDBLOCK) {
+      if (block_ == true) {
+        throw jexception::ConnectionTimeoutException("Socket output timeout error");
+      }
+        
+      throw jexception::ConnectionException("Socket output exception");
+      
+      /*
+      if (block_ == true) {
+        throw jexception::ConnectionTimeoutException("Socket output timeout error");
+      } else {
+        // INFO:: non-blocking socket, no data read
+        n = 0;
+      }
+      */
+    } else if (errno == EPIPE || errno == ECONNRESET) {
+      Close();
 
-			throw jexception::ConnectionException("Broken pipe exception");
-		} else {
-			throw jexception::ConnectionTimeoutException("Socket output timeout error");
-		}
-	}
+      throw jexception::ConnectionException("Broken pipe exception");
+    } else {
+      throw jexception::ConnectionTimeoutException("Socket output timeout error");
+    }
+  }
 
-	_sent_bytes += n;
-	
-	return n;
+  _sent_bytes += n;
+  
+  return n;
 }
 
 void DatagramSocket6::Close()
 {
-	if (_is_closed == true) {
-		return;
-	}
+  if (_is_closed == true) {
+    return;
+  }
 
-	if (close(_fd) != 0) {
-		throw jexception::ConnectionException("Unknown close exception");
-	}
-	
-	_is_closed = true;
+  if (close(_fd) != 0) {
+    throw jexception::ConnectionException("Unknown close exception");
+  }
+  
+  _is_closed = true;
 }
 
 InetAddress * DatagramSocket6::GetInetAddress()
 {
-	return _address;
+  return _address;
 }
 
 int DatagramSocket6::GetLocalPort()
 {
-	return ntohs(_lsock.sin6_port);
+  return ntohs(_lsock.sin6_port);
 }
 
 int DatagramSocket6::GetPort()
 {
-	return ntohs(_server_sock.sin6_port);
+  return ntohs(_server_sock.sin6_port);
 }
 
 int64_t DatagramSocket6::GetSentBytes()
 {
-	return _sent_bytes + _os->GetSentBytes();
+  return _sent_bytes + _os->GetSentBytes();
 }
 
 int64_t DatagramSocket6::GetReadedBytes()
 {
-	return _receive_bytes + _is->GetReadedBytes();
+  return _receive_bytes + _is->GetReadedBytes();
 }
 
 SocketOptions * DatagramSocket6::GetSocketOptions()
 {
-	return new SocketOptions(_fd, JCT_UDP);
+  return new SocketOptions(_fd, JCT_UDP);
 }
 
 std::string DatagramSocket6::What()
 {
-	char port[20];
+  char port[20];
    
-	sprintf(port, "%u", GetPort());
+  sprintf(port, "%u", GetPort());
 
-	return GetInetAddress()->GetHostName() + ":" + port;
+  return GetInetAddress()->GetHostName() + ":" + port;
 }
 
 }

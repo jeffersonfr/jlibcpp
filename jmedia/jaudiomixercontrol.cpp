@@ -24,7 +24,7 @@ namespace jmedia {
 Audio::Audio():
   jcommon::Object()
 {
-	jcommon::Object::SetClassName("jmedia::Audio");
+  jcommon::Object::SetClassName("jmedia::Audio");
 }
 
 Audio::~Audio()
@@ -51,11 +51,11 @@ void Audio::SetVolume(float volume)
 
 
 AudioMixerControl::AudioMixerControl():
-	Control("audio.mixer")
+  Control("audio.mixer")
 {
-	jcommon::Object::SetClassName("jmedia::AudioMixerControl");
+  jcommon::Object::SetClassName("jmedia::AudioMixerControl");
 }
-		
+    
 AudioMixerControl::~AudioMixerControl()
 {
 }

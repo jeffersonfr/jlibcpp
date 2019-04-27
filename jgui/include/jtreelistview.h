@@ -32,199 +32,199 @@ namespace jgui {
  */
 class TreeListView : public jgui::Component, public jgui::ItemComponent {
 
-	private:
-		std::map<Item *, bool> _expanded_items;
-		/** \brief */
-		int _item_size;
-		/** \brief */
-		int _item_gap;
-		/** \brief */
-		int _selected_index;
-		/** \brief */
-		bool _pressed;
+  private:
+    std::map<Item *, bool> _expanded_items;
+    /** \brief */
+    int _item_size;
+    /** \brief */
+    int _item_gap;
+    /** \brief */
+    int _selected_index;
+    /** \brief */
+    bool _pressed;
 
-	private:
-		/**
-		 * \brief
-		 *
-		 */
-		void IncrementLines(int lines);
+  private:
+    /**
+     * \brief
+     *
+     */
+    void IncrementLines(int lines);
 
-		/**
-		 * \brief
-		 *
-		 */
-		void DecrementLines(int lines);
+    /**
+     * \brief
+     *
+     */
+    void DecrementLines(int lines);
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		TreeListView(int x = 0, int y = 0, int width = 0, int height = 0);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~TreeListView();
+  public:
+    /**
+     * \brief
+     *
+     */
+    TreeListView(int x = 0, int y = 0, int width = 0, int height = 0);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~TreeListView();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetItemGap();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetItemGap(int gap);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void AddEmptyItem();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void AddTextItem(std::string text);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void AddImageItem(std::string text, jgui::Image *image);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void AddCheckedItem(std::string text, bool checked);
+    /**
+     * \brief
+     *
+     */
+    virtual int GetItemGap();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetItemGap(int gap);
+    
+    /**
+     * \brief
+     *
+     */
+    void AddEmptyItem();
+    
+    /**
+     * \brief
+     *
+     */
+    void AddTextItem(std::string text);
+    
+    /**
+     * \brief
+     *
+     */
+    void AddImageItem(std::string text, jgui::Image *image);
+    
+    /**
+     * \brief
+     *
+     */
+    void AddCheckedItem(std::string text, bool checked);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsSelected(int i);
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsSelected(int i);
 
-		/**
-		 * \brief Invert current selection state from item. Use with IsSelected() to avoid
-		 * unexpected states.
-		 *
-		 */
-		virtual void SetSelected(int i);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Select(int i);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Deselect(int i);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetSelectedIndex();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetItemSize();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetItemSize(int size);
+    /**
+     * \brief Invert current selection state from item. Use with IsSelected() to avoid
+     * unexpected states.
+     *
+     */
+    virtual void SetSelected(int i);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Select(int i);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Deselect(int i);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int GetSelectedIndex();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int GetItemSize();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetItemSize(int size);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetCurrentIndex(int i);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Expand(Item *item);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetCurrentIndex(int i);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Expand(Item *item);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Collapse(Item *item);
+    /**
+     * \brief
+     *
+     */
+    virtual void Collapse(Item *item);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsExpanded(Item *item);
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsExpanded(Item *item);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void ExpandAll(Item *item);
+    /**
+     * \brief
+     *
+     */
+    virtual void ExpandAll(Item *item);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void CollapseAll(Item *item);
+    /**
+     * \brief
+     *
+     */
+    virtual void CollapseAll(Item *item);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jsize_t GetScrollDimension();
+    /**
+     * \brief
+     *
+     */
+    virtual jsize_t GetScrollDimension();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool KeyPressed(jevent::KeyEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual bool KeyPressed(jevent::KeyEvent *event);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MousePressed(jevent::MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MouseReleased(jevent::MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MouseMoved(jevent::MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MouseWheel(jevent::MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Paint(Graphics *g);
+    /**
+     * \brief
+     *
+     */
+    virtual bool MousePressed(jevent::MouseEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool MouseReleased(jevent::MouseEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool MouseMoved(jevent::MouseEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool MouseWheel(jevent::MouseEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Paint(Graphics *g);
 
 };
 

@@ -32,155 +32,155 @@ namespace jio {
  */
 class DataInputStream : public jio::InputStream, public jio::BufferReader {
 
-	private:
+  private:
     /** \brief */
-		InputStream *_stream;
-		
-	protected:
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void VerifyData();
-
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		DataInputStream(InputStream *is);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~DataInputStream();
-
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual bool IsEmpty();
-
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual int64_t Available();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t GetSize();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t GetPosition();
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual int64_t Read();
-
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual int64_t Read(char *data, int64_t size);
+    InputStream *_stream;
     
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual std::string Read(int64_t size);
+  protected:
+    /**
+     * \brief
+     *
+     */
+    virtual void VerifyData();
+
+  public:
+    /**
+     * \brief
+     *
+     */
+    DataInputStream(InputStream *is);
     
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool ReadBoolean();
+    /**
+     * \brief
+     *
+     */
+    virtual ~DataInputStream();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual uint8_t ReadByte();
+    /**
+     * \brief
+     * 
+     */
+    virtual bool IsEmpty();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual uint16_t ReadShort();
+    /**
+     * \brief
+     * 
+     */
+    virtual int64_t Available();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual uint32_t ReadInteger();
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t GetSize();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual uint64_t ReadLong();
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t GetPosition();
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual int64_t Read();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual float ReadFloat();
+    /**
+     * \brief
+     * 
+     */
+    virtual int64_t Read(char *data, int64_t size);
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual std::string Read(int64_t size);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool ReadBoolean();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual double ReadDouble();
+    /**
+     * \brief
+     *
+     */
+    virtual uint8_t ReadByte();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string ReadString();
+    /**
+     * \brief
+     *
+     */
+    virtual uint16_t ReadShort();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual char * ReadRaw(int64_t *size);
+    /**
+     * \brief
+     *
+     */
+    virtual uint32_t ReadInteger();
 
-		/**
-		 * \brief Salto relativo.
-		 *
-		 */
-		virtual void Skip(int64_t skip);
+    /**
+     * \brief
+     *
+     */
+    virtual uint64_t ReadLong();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Reset();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsClosed();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Close();
+    /**
+     * \brief
+     *
+     */
+    virtual float ReadFloat();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t GetReadedBytes();
+    /**
+     * \brief
+     *
+     */
+    virtual double ReadDouble();
+
+    /**
+     * \brief
+     *
+     */
+    virtual std::string ReadString();
+
+    /**
+     * \brief
+     *
+     */
+    virtual char * ReadRaw(int64_t *size);
+
+    /**
+     * \brief Salto relativo.
+     *
+     */
+    virtual void Skip(int64_t skip);
+
+    /**
+     * \brief
+     *
+     */
+    virtual void Reset();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsClosed();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Close();
+
+    /**
+     * \brief
+     *
+     */
+    virtual int64_t GetReadedBytes();
 
 };
 

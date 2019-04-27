@@ -28,8 +28,8 @@
 namespace jgui {
 
 struct jcardlayout_map_t {
-	std::string name;
-	Component *component;
+  std::string name;
+  Component *component;
 };
 
 class Container;
@@ -41,124 +41,124 @@ class Container;
  */
 class CardLayout : public Layout {
 
-	private:
-		/** \brief */
-		std::vector<struct jcardlayout_map_t> vector;
-		/** \brief */
-		int _hgap;
-		/** \brief */
-		int _vgap;
-		/** \brief */
-		int _current_card;
+  private:
+    /** \brief */
+    std::vector<struct jcardlayout_map_t> vector;
+    /** \brief */
+    int _hgap;
+    /** \brief */
+    int _vgap;
+    /** \brief */
+    int _current_card;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		CardLayout(int hgap = 10, int vgap = 10);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~CardLayout();
+  public:
+    /**
+     * \brief
+     *
+     */
+    CardLayout(int hgap = 10, int vgap = 10);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~CardLayout();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetHGap();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetVGap();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetHGap(int hgap);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetVGap(int vgap);
+    /**
+     * \brief
+     *
+     */
+    virtual int GetHGap();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int GetVGap();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetHGap(int hgap);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetVGap(int vgap);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void AddLayoutComponent(std::string name, Component *comp);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveLayoutComponent(Component *comp);
+    /**
+     * \brief
+     *
+     */
+    virtual void AddLayoutComponent(std::string name, Component *comp);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void RemoveLayoutComponent(Component *comp);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void CheckLayout(Container *parent);
-	
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void First(Container *parent);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Next(Container *parent);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Previous(Container *parent);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Last(Container *parent);
+    /**
+     * \brief
+     *
+     */
+    virtual void CheckLayout(Container *parent);
+  
+    /**
+     * \brief
+     *
+     */
+    virtual void First(Container *parent);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Next(Container *parent);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Previous(Container *parent);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Last(Container *parent);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void ShowDefaultComponent(Container *parent);
+    /**
+     * \brief
+     *
+     */
+    virtual void ShowDefaultComponent(Container *parent);
 
-		/**
-		 * \brief
-		 *
-		 */
+    /**
+     * \brief
+     *
+     */
     virtual jsize_t GetMinimumLayoutSize(Container *parent);
-		
-		/**
-		 * \brief
-		 *
-		 */
+    
+    /**
+     * \brief
+     *
+     */
     virtual jsize_t GetMaximumLayoutSize(Container *parent);
-		
-		/**
-		 * \brief
-		 *
-		 */
+    
+    /**
+     * \brief
+     *
+     */
     virtual jsize_t GetPreferredLayoutSize(Container *parent);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void DoLayout(Container *parent);
+    /**
+     * \brief
+     *
+     */
+    virtual void DoLayout(Container *parent);
 
 };
 

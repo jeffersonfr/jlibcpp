@@ -331,7 +331,7 @@ int64_t Random::PoissonInteger(double mean)
    int64_t n;
    if (mean <= 0) return 0;
    if (mean < 25) {
-	  double expmean = Math<double>::Exp(-mean);
+    double expmean = Math<double>::Exp(-mean);
       double pir = 1;
       n = -1;
       while(1) {
@@ -345,7 +345,7 @@ int64_t Random::PoissonInteger(double mean)
    else if (mean < 1E9) {
       double em, t, y;
       double sq, alxm, g;
-	  double pi = jmath::Math<double>::PI;
+    double pi = jmath::Math<double>::PI;
 
       sq = Math<double>::Sqrt(2.0*mean);
       alxm = Math<double>::Log(mean);
@@ -366,7 +366,7 @@ int64_t Random::PoissonInteger(double mean)
    else {
       // use Gaussian approximation vor very large values
       n = (int64_t)(Gaussian(0,1)*Math<double>::Sqrt(mean) + mean +0.5);
-	  
+    
       return n;
    }
 
@@ -384,7 +384,7 @@ double Random::PoissonDouble(double mean)
    int64_t n;
    if (mean <= 0) return 0;
    if (mean < 25) {
-	  double expmean = Math<double>::Exp(-mean);
+    double expmean = Math<double>::Exp(-mean);
       double pir = 1;
       n = -1;
       while(1) {
@@ -467,19 +467,19 @@ double Random::RandomDouble(int64_t)
 
    seed *= 69069;
    
-	 int64_t jy = (seed&kMASK24); // Set lower 8 bits to zero to assure exact float
+   int64_t jy = (seed&kMASK24); // Set lower 8 bits to zero to assure exact float
    
-	 if (jy) {
-		 return kCONS*jy;
-	 }
+   if (jy) {
+     return kCONS*jy;
+   }
 #else
    const double kCONS = 4.6566128730774E-10; // (1/pow(2,31))
    
-	 _seed = (1103515245 * _seed + 12345) & 0x7fffffffUL;
+   _seed = (1103515245 * _seed + 12345) & 0x7fffffffUL;
 
    if (_seed) {
-		 return  kCONS*_seed;
-	 }
+     return  kCONS*_seed;
+   }
 #endif
    
    return RandomDouble();
@@ -496,9 +496,9 @@ void Random::RandomArray(int64_t n, double *array)
    while (i<n) {
       _seed = (1103515245 * _seed + 12345) & 0x7fffffffUL;
      
-			if (_seed) {
-				array[i] = kCONS*_seed; i++;
-			}
+      if (_seed) {
+        array[i] = kCONS*_seed; i++;
+      }
    }
 }
 
@@ -516,8 +516,8 @@ void Random::RandomArray(int64_t n, float *array)
       // jy = (seed & 0x7fffff00);  // Set lower 8 bits to zero to assure exact float
 
       if (_seed) {
-				array[i] = float(kCONS*_seed); i++;
-			}
+        array[i] = float(kCONS*_seed); i++;
+      }
    }
 }
 
@@ -548,8 +548,8 @@ void Random::Sphere(double *x, double *y, double *z, double r)
    //          which uses less random numbers than the CERNLIB RN23DIM algorithm
 
    double a = 0,
-		  b = 0,
-		  r2 = 1;
+      b = 0,
+      r2 = 1;
    
    while (r2 > 0.25) {
       a  = RandomDouble() - 0.5;

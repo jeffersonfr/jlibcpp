@@ -31,52 +31,52 @@ namespace jexception {
  */
 class OverflowException : public jexception::RuntimeException {
 
-	private:
+  private:
 
-	public:
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		OverflowException();
+  public:
+    /**
+     * \brief Construtor.
+     *
+     */
+    OverflowException();
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		OverflowException(std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    OverflowException(std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		OverflowException(Exception *exception, std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    OverflowException(Exception *exception, std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> OverflowException(const std::string &fmt, T ...vs):
       Exception(fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::OverflowException");
     }
-		
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> OverflowException(Exception *exception, const std::string &fmt, T ...vs):
       Exception(exception, fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::OverflowException");
     }
-		
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~OverflowException() throw();
+    
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~OverflowException() throw();
 
 };
 

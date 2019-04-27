@@ -32,31 +32,31 @@ namespace jevent {
  */
 class FocusListener : public jevent::Listener {
 
-	protected:
-		/**
-		 * \brief
-		 *
-		 */
-		FocusListener();
+  protected:
+    /**
+     * \brief
+     *
+     */
+    FocusListener();
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~FocusListener();
+  public:
+    /**
+     * \brief
+     *
+     */
+    virtual ~FocusListener();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void FocusGained(FocusEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void FocusLost(FocusEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual void FocusGained(FocusEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void FocusLost(FocusEvent *event);
 
 };
 

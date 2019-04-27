@@ -22,11 +22,11 @@
 namespace jevent {
 
 ContainerEvent::ContainerEvent(void *source, jcontainerevent_type_t type):
-	jevent::EventObject(source)
+  jevent::EventObject(source)
 {
-	jcommon::Object::SetClassName("jevent::ContainerEvent");
+  jcommon::Object::SetClassName("jevent::ContainerEvent");
 
-	_type = type;
+  _type = type;
 }
 
 ContainerEvent::~ContainerEvent()
@@ -35,7 +35,7 @@ ContainerEvent::~ContainerEvent()
 
 jcontainerevent_type_t ContainerEvent::GetType()
 {
-	return _type;
+  return _type;
 }
 
 }

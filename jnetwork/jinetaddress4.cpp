@@ -25,12 +25,12 @@
 namespace jnetwork {
 
 InetAddress4::InetAddress4(std::string name_, struct in_addr ip_):
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jnetwork::InetAddress4");
-	
-	_host = name_;
-	_ip = ip_;
+  jcommon::Object::SetClassName("jnetwork::InetAddress4");
+  
+  _host = name_;
+  _ip = ip_;
 }
 
 InetAddress4::~InetAddress4()
@@ -41,89 +41,89 @@ InetAddress4::~InetAddress4()
 
 InetAddress * InetAddress4::GetByName(std::string host_)
 {
-	struct hostent *h = gethostbyname(host_.c_str());
+  struct hostent *h = gethostbyname(host_.c_str());
     
-	if (h == nullptr) {
-		throw jexception::UnknownHostException("Host \"" + host_ + "\" not found");
+  if (h == nullptr) {
+    throw jexception::UnknownHostException("Host \"" + host_ + "\" not found");
   }
    
-	InetAddress *addr = new InetAddress4(host_, *(in_addr *)h->h_addr_list[0]);
+  InetAddress *addr = new InetAddress4(host_, *(in_addr *)h->h_addr_list[0]);
 
-	// free(h);
+  // free(h);
 
-	return addr;
+  return addr;
 }
 
 std::vector<InetAddress *> InetAddress4::GetAllByName(std::string host_)
 {
-	std::vector<InetAddress *> vip;
+  std::vector<InetAddress *> vip;
 
-	struct hostent *aux = nullptr;
-	in_addr ip;
+  struct hostent *aux = nullptr;
+  in_addr ip;
 
-	if (inet_aton(host_.c_str(), &ip) == 0) {
-		aux = gethostbyname(host_.c_str());
-	} else {
-		aux = gethostbyaddr(&ip, sizeof(ip), PF_INET);
-	}
+  if (inet_aton(host_.c_str(), &ip) == 0) {
+    aux = gethostbyname(host_.c_str());
+  } else {
+    aux = gethostbyaddr(&ip, sizeof(ip), PF_INET);
+  }
 
-	if (aux == nullptr) {
-		throw jexception::UnknownHostException("Host \"" + host_ + "\" not found");
-	} else {
-		struct hostent *aux2;
+  if (aux == nullptr) {
+    throw jexception::UnknownHostException("Host \"" + host_ + "\" not found");
+  } else {
+    struct hostent *aux2;
 
-		for(int i=0; aux->h_addr_list[i] != nullptr; ++i) {
-			aux2 = gethostbyaddr(aux->h_addr_list[i], sizeof(aux->h_addr_list[i]),PF_INET);
-			
-			if ((void *)aux2 != nullptr) {
-				vip.push_back(new InetAddress4(aux2->h_name, *(in_addr *)aux2->h_addr_list[0]));
-			}
-		}
-	}
+    for(int i=0; aux->h_addr_list[i] != nullptr; ++i) {
+      aux2 = gethostbyaddr(aux->h_addr_list[i], sizeof(aux->h_addr_list[i]),PF_INET);
+      
+      if ((void *)aux2 != nullptr) {
+        vip.push_back(new InetAddress4(aux2->h_name, *(in_addr *)aux2->h_addr_list[0]));
+      }
+    }
+  }
 
-	return vip;
+  return vip;
 }
 
 InetAddress * InetAddress4::GetLocalHost()
 {
-	char localName[255+1];
+  char localName[255+1];
 
-	gethostname(localName, 255);
-	
-	try {
-		return GetByName(localName);
-	} catch (jexception::UnknownHostException &) {
-		try {
-			return GetByName("127.0.0.1");
-		} catch (jexception::UnknownHostException &e) {
-			throw e;
-		}
-	}
+  gethostname(localName, 255);
+  
+  try {
+    return GetByName(localName);
+  } catch (jexception::UnknownHostException &) {
+    try {
+      return GetByName("127.0.0.1");
+    } catch (jexception::UnknownHostException &e) {
+      throw e;
+    }
+  }
 }
 
 /** End */
 
 std::string InetAddress4::GetHostName()
 {
-	return _host;
+  return _host;
 }
 
 std::string InetAddress4::GetHostAddress()
 {
-	return inet_ntoa(_ip);
+  return inet_ntoa(_ip);
 }
 
 std::vector<uint32_t> InetAddress4::GetAddress()
 {
-	std::vector<uint32_t> addr;
-	int size = sizeof(in_addr)/sizeof(uint8_t);
-	uint8_t *ip = (uint8_t *)&_ip;
-	
-	for (int i=0; i<size; ++i) {
-		addr.push_back(ip[i]);
-	}
-	
-	return addr;
+  std::vector<uint32_t> addr;
+  int size = sizeof(in_addr)/sizeof(uint8_t);
+  uint8_t *ip = (uint8_t *)&_ip;
+  
+  for (int i=0; i<size; ++i) {
+    addr.push_back(ip[i]);
+  }
+  
+  return addr;
 }
 
 }

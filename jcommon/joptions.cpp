@@ -24,12 +24,12 @@
 namespace jcommon {
 
 Options::Options(int argc, char **argv):
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jcommon::Options");
+  jcommon::Object::SetClassName("jcommon::Options");
 
-	_argc = argc;
-	_argv = argv;
+  _argc = argc;
+  _argv = argv;
 }
 
 Options::~Options()
@@ -38,54 +38,54 @@ Options::~Options()
 
 void Options::SetOptions(std::string options)
 {
-	if (_argc < 2) {
-		return;
-	}
+  if (_argc < 2) {
+    return;
+  }
 
-	if ((void *)_argv == nullptr) {
-		return;
-	}
+  if ((void *)_argv == nullptr) {
+    return;
+  }
 
-	int opt;
+  int opt;
 
-	_is_default = false;
+  _is_default = false;
 
-	while ((opt = getopt(_argc, _argv, options.c_str())) != EOF) {
-		if (opt != '?' && opt != ':') {
-			if ((void *)optarg != nullptr) {
-		 		_tags[opt] = optarg;
-			} else {
-		 		_tags[opt] = "";
-			}
-		}
-	}
+  while ((opt = getopt(_argc, _argv, options.c_str())) != EOF) {
+    if (opt != '?' && opt != ':') {
+      if ((void *)optarg != nullptr) {
+         _tags[opt] = optarg;
+      } else {
+         _tags[opt] = "";
+      }
+    }
+  }
 }
 
 bool Options::ExistsOption(std::string key)
 {
-	if (key.empty() == true) {
-		return false;
-	}
+  if (key.empty() == true) {
+    return false;
+  }
 
-	return _tags.find((int)key[0]) != _tags.end();
+  return _tags.find((int)key[0]) != _tags.end();
 }
 
 bool Options::ExistsArgument(std::string key)
 {
-	if (key.empty() == true) {
-		return false;
-	}
+  if (key.empty() == true) {
+    return false;
+  }
 
-	return _tags[key[0]] != "";
+  return _tags[key[0]] != "";
 }
 
 std::string Options::GetArgument(std::string key)
 {
-	if (key.empty() == true) {
-		return "";
-	}
+  if (key.empty() == true) {
+    return "";
+  }
 
-	return _tags[key[0]];
+  return _tags[key[0]];
 }
 
 }

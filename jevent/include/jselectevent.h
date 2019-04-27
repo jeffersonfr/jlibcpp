@@ -29,11 +29,11 @@ namespace jevent {
  *
  */
 enum jselectevent_type_t {
-	JSET_LEFT,
-	JSET_RIGHT,
-	JSET_UP,
-	JSET_DOWN,
-	JSET_ACTION
+  JSET_LEFT,
+  JSET_RIGHT,
+  JSET_UP,
+  JSET_DOWN,
+  JSET_ACTION
 };
 
 /**
@@ -43,36 +43,36 @@ enum jselectevent_type_t {
  */
 class SelectEvent : public jevent::EventObject {
 
-	private:
-		/** \brief */
-		jselectevent_type_t _type;
-		/** \brief */
-		int _index;
+  private:
+    /** \brief */
+    jselectevent_type_t _type;
+    /** \brief */
+    int _index;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		SelectEvent(void *source, int index, jselectevent_type_t type);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~SelectEvent();
+  public:
+    /**
+     * \brief
+     *
+     */
+    SelectEvent(void *source, int index, jselectevent_type_t type);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~SelectEvent();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetIndex();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jselectevent_type_t GetType();
+    /**
+     * \brief
+     *
+     */
+    virtual int GetIndex();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual jselectevent_type_t GetType();
 
 };
 

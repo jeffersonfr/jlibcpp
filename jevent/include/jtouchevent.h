@@ -30,11 +30,11 @@ namespace jevent {
  *
  */
 enum jtouchevent_type_t {
-	JTT_UNKNOWN,
-	JTT_FINGER_MOTION,
-	JTT_FINGER_UP,
-	JTT_FINGER_DOWN,
-	JTT_GESTURE
+  JTT_UNKNOWN,
+  JTT_FINGER_MOTION,
+  JTT_FINGER_UP,
+  JTT_FINGER_DOWN,
+  JTT_GESTURE
 };
 
 /**
@@ -44,90 +44,90 @@ enum jtouchevent_type_t {
  */
 class TouchEvent : public jevent::EventObject {
 
-	private:
+  private:
     /** \brief */
     jgui::jpoint_t _location;
     /** \brief */
     jgui::jpoint_t _distance;
     /** \brief */
-		double _pressure;
+    double _pressure;
     /** \brief */
-		double _delta;
+    double _delta;
     /** \brief */
-		double _radians;
+    double _radians;
     /** \brief */
-		int _finger_index;
+    int _finger_index;
     /** \brief */
-		int _fingers;
+    int _fingers;
     /** \brief */
-		jtouchevent_type_t _type;
+    jtouchevent_type_t _type;
 
-	public:
-		/**
-		 * \brief Touch event;
-		 *
-		 */
-		TouchEvent(void *source, jtouchevent_type_t type, jgui::jpoint_t location, jgui::jpoint_t distance, double pressure, int finger_index);
-		
-		/**
-		 * \brief Gesture event;
-		 *
-		 */
-		TouchEvent(void *source, jtouchevent_type_t type, jgui::jpoint_t distance, double radians, double delta, int fingers);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~TouchEvent();
+  public:
+    /**
+     * \brief Touch event;
+     *
+     */
+    TouchEvent(void *source, jtouchevent_type_t type, jgui::jpoint_t location, jgui::jpoint_t distance, double pressure, int finger_index);
+    
+    /**
+     * \brief Gesture event;
+     *
+     */
+    TouchEvent(void *source, jtouchevent_type_t type, jgui::jpoint_t distance, double radians, double delta, int fingers);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~TouchEvent();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jtouchevent_type_t GetType();
+    /**
+     * \brief
+     *
+     */
+    virtual jtouchevent_type_t GetType();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetFingerIndex();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jgui::jpoint_t GetLocation();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jgui::jpoint_t GetDistance();
+    /**
+     * \brief
+     *
+     */
+    virtual int GetFingerIndex();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual jgui::jpoint_t GetLocation();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual jgui::jpoint_t GetDistance();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual double GetPressure();
+    /**
+     * \brief
+     *
+     */
+    virtual double GetPressure();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual double GetAngle();
+    /**
+     * \brief
+     *
+     */
+    virtual double GetAngle();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual double GetDelta();
+    /**
+     * \brief
+     *
+     */
+    virtual double GetDelta();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual double GetFingers();
+    /**
+     * \brief
+     *
+     */
+    virtual double GetFingers();
 
 };
 

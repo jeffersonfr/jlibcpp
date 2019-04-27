@@ -31,27 +31,27 @@ namespace jevent {
  */
 class ToggleEvent : public jevent::EventObject {
 
-	private:
-		/** \brief */
-		bool _selected;
+  private:
+    /** \brief */
+    bool _selected;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		ToggleEvent(void *source, bool selected);
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~ToggleEvent();
+  public:
+    /**
+     * \brief
+     *
+     */
+    ToggleEvent(void *source, bool selected);
+    /**
+     * \brief
+     *
+     */
+    virtual ~ToggleEvent();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsSelected();
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsSelected();
 
 };
 

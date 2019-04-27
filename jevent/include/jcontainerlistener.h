@@ -32,31 +32,31 @@ namespace jevent {
  */
 class ContainerListener : public jevent::Listener {
 
-	protected:
-		/**
-		 * \brief
-		 *
-		 */
-		ContainerListener();
+  protected:
+    /**
+     * \brief
+     *
+     */
+    ContainerListener();
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~ContainerListener();
+  public:
+    /**
+     * \brief
+     *
+     */
+    virtual ~ContainerListener();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void ComponentAdded(ContainerEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void ComponentRemoved(ContainerEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual void ComponentAdded(ContainerEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void ComponentRemoved(ContainerEvent *event);
 
 };
 

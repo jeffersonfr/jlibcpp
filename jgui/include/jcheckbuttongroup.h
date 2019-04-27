@@ -35,49 +35,49 @@ namespace jgui {
  */
 class CheckButtonGroup : public jevent::ToggleListener {
 
-	private:
+  private:
     /** \brief */
-		std::vector<CheckButton *> _buttons;
+    std::vector<CheckButton *> _buttons;
     /** \brief */
-		std::mutex _group_mutex;
+    std::mutex _group_mutex;
 
-	protected:
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void StateChanged(jevent::ToggleEvent *event);
+  protected:
+    /**
+     * \brief
+     *
+     */
+    virtual void StateChanged(jevent::ToggleEvent *event);
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		CheckButtonGroup();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~CheckButtonGroup();
+  public:
+    /**
+     * \brief
+     *
+     */
+    CheckButtonGroup();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~CheckButtonGroup();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Add(CheckButton *button);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Remove(CheckButton *button);
+    /**
+     * \brief
+     *
+     */
+    virtual void Add(CheckButton *button);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Remove(CheckButton *button);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual CheckButton * GetSelected();
+    /**
+     * \brief
+     *
+     */
+    virtual CheckButton * GetSelected();
 
 };
 

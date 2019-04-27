@@ -22,9 +22,9 @@
 namespace jevent {
 
 ContainerListener::ContainerListener():
-	jevent::Listener()
+  jevent::Listener()
 {
-	jcommon::Object::SetClassName("jevent::ContainerListener");
+  jcommon::Object::SetClassName("jevent::ContainerListener");
 }
 
 ContainerListener::~ContainerListener()

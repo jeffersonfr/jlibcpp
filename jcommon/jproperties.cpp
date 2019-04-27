@@ -27,9 +27,9 @@
 namespace jcommon {
 
 Properties::Properties(std::string filename):
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jcommon::Properties");
+  jcommon::Object::SetClassName("jcommon::Properties");
 
   _filename = filename;
 }
@@ -48,29 +48,29 @@ void Properties::Load()
     throw jexception::IOException(jcommon::StringUtils::Format("Unable to load properties at '%s'", _filename.c_str()));
   }
 
-	std::string line;
+  std::string line;
 
-	while (std::getline(file, line)) {
-		line = jcommon::StringUtils::Trim(line);
+  while (std::getline(file, line)) {
+    line = jcommon::StringUtils::Trim(line);
 
-		if (line.find("#") == 0) {
-			// INFO:: comments
-		} else {
-			std::string::size_type r1 = line.find("=");
-			std::string::size_type r2 = line.find("#");
+    if (line.find("#") == 0) {
+      // INFO:: comments
+    } else {
+      std::string::size_type r1 = line.find("=");
+      std::string::size_type r2 = line.find("#");
 
-			if (line.size() > 0 && r1 != std::string::npos && (r2 == std::string::npos || (r2 != std::string::npos && r1 < r2))) {
-				std::string key = jcommon::StringUtils::Trim(line.substr(0, r1));
-				std::string value = jcommon::StringUtils::Trim(line.substr(r1 + 1));
+      if (line.size() > 0 && r1 != std::string::npos && (r2 == std::string::npos || (r2 != std::string::npos && r1 < r2))) {
+        std::string key = jcommon::StringUtils::Trim(line.substr(0, r1));
+        std::string value = jcommon::StringUtils::Trim(line.substr(r1 + 1));
 
-				SetTextParam(key, value);
-			} else {
-				// INFO:: comments
-			}
-		}
-	}
+        SetTextParam(key, value);
+      } else {
+        // INFO:: comments
+      }
+    }
+  }
 
-	file.close();
+  file.close();
 }
 
 void Properties::Save()

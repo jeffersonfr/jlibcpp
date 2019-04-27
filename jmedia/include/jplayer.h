@@ -30,12 +30,12 @@
 namespace jmedia {
 
 struct jmedia_info_t {
-	std::string title;
-	std::string author;
-	std::string album;
-	std::string genre;
-	std::string comments;
-	std::string date;
+  std::string title;
+  std::string author;
+  std::string album;
+  std::string genre;
+  std::string comments;
+  std::string date;
 };
 
 /**
@@ -45,188 +45,188 @@ struct jmedia_info_t {
  */
 class Player : public virtual jcommon::Object {
 
-	protected:
-		/** \brief */
-		std::vector<jevent::PlayerListener *> _player_listeners;
-		/** \brief */
-		std::vector<jevent::FrameGrabberListener *> _frame_listeners;
-		/** \brief */
-		std::vector<Control *> _controls;
-		/** \brief */
-		jmedia_info_t _media_info;
+  protected:
+    /** \brief */
+    std::vector<jevent::PlayerListener *> _player_listeners;
+    /** \brief */
+    std::vector<jevent::FrameGrabberListener *> _frame_listeners;
+    /** \brief */
+    std::vector<Control *> _controls;
+    /** \brief */
+    jmedia_info_t _media_info;
 
-	protected:
-		/**
-		 * \brief
-		 *
-		 */
-		Player();
+  protected:
+    /**
+     * \brief
+     *
+     */
+    Player();
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~Player();
+  public:
+    /**
+     * \brief
+     *
+     */
+    virtual ~Player();
 
-		/**
-		 * \brief Starts media decode.
-		 *
-		 */
-		virtual void Play();
+    /**
+     * \brief Starts media decode.
+     *
+     */
+    virtual void Play();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jmedia_info_t GetMediaInfo();
+    /**
+     * \brief
+     *
+     */
+    virtual jmedia_info_t GetMediaInfo();
 
-		/**
-		 * \brief Pause media decode.
-		 *
-		 */
-		virtual void Pause();
+    /**
+     * \brief Pause media decode.
+     *
+     */
+    virtual void Pause();
 
-		/**
-		 * \brief Stops media decode.
-		 *
-		 */
-		virtual void Stop();
+    /**
+     * \brief Stops media decode.
+     *
+     */
+    virtual void Stop();
 
-		/**
-		 * \brief Resume media decode.
-		 *
-		 */
-		virtual void Resume();
+    /**
+     * \brief Resume media decode.
+     *
+     */
+    virtual void Resume();
 
-		/**
-		 * \brief Release resources associated with this player.
-		 *
-		 */
-		virtual void Close();
+    /**
+     * \brief Release resources associated with this player.
+     *
+     */
+    virtual void Close();
 
-		/**
-		 * \brief Seeks media forward or back.
-		 *
-		 */
-		virtual void SetCurrentTime(uint64_t time);
+    /**
+     * \brief Seeks media forward or back.
+     *
+     */
+    virtual void SetCurrentTime(uint64_t time);
 
-		/**
-		 * \brief Gets current media time.
-		 *
-		 */
-		virtual uint64_t GetCurrentTime();
+    /**
+     * \brief Gets current media time.
+     *
+     */
+    virtual uint64_t GetCurrentTime();
 
-		/**
-		 * \brief Gets full media time.
-		 *
-		 */
-		virtual uint64_t GetMediaTime();
+    /**
+     * \brief Gets full media time.
+     *
+     */
+    virtual uint64_t GetMediaTime();
 
-		/**
-		 * \brief Set loop mode.
-		 *
-		 * \param b
-		 */
-		virtual void SetLoop(bool b);
+    /**
+     * \brief Set loop mode.
+     *
+     * \param b
+     */
+    virtual void SetLoop(bool b);
 
-		/**
-		 * \brief 
-		 *
-		 */
-		virtual bool IsLoop();
-		
-		/**
-		 * \brief Set a decode rate to this player.
-		 *
-		 * \param rate
-		 *
-		 */
-		virtual double GetDecodeRate();
+    /**
+     * \brief 
+     *
+     */
+    virtual bool IsLoop();
+    
+    /**
+     * \brief Set a decode rate to this player.
+     *
+     * \param rate
+     *
+     */
+    virtual double GetDecodeRate();
 
-		/**
-		 * \brief Set a decode rate to this player.
-		 *
-		 * \param rate
-		 *
-		 */
-		virtual void SetDecodeRate(double rate);
+    /**
+     * \brief Set a decode rate to this player.
+     *
+     * \param rate
+     *
+     */
+    virtual void SetDecodeRate(double rate);
 
-		/**
-		 * \brief Returns a list with all controls associated with this player.
-		 *
-		 * \return controls
-		 */
-		virtual const std::vector<Control *> & GetControls();
+    /**
+     * \brief Returns a list with all controls associated with this player.
+     *
+     * \return controls
+     */
+    virtual const std::vector<Control *> & GetControls();
 
-		/**
-		 * \brief Return a specific control related with the type.
-		 *
-		 * \return
-		 */
-		virtual Control * GetControl(std::string id);
+    /**
+     * \brief Return a specific control related with the type.
+     *
+     * \return
+     */
+    virtual Control * GetControl(std::string id);
 
-		/**
-		 * \brief Return a specific control related with the type.
-		 *
-		 * \return
-		 */
-		virtual jgui::Component * GetVisualComponent();
+    /**
+     * \brief Return a specific control related with the type.
+     *
+     * \return
+     */
+    virtual jgui::Component * GetVisualComponent();
 
-		/**
-		 * \brief Registry a listener.
-		 *
-		 * \param listener
-		 */
-		virtual void RegisterPlayerListener(jevent::PlayerListener *listener);
+    /**
+     * \brief Registry a listener.
+     *
+     * \param listener
+     */
+    virtual void RegisterPlayerListener(jevent::PlayerListener *listener);
 
-		/**
-		 * \brief Remove a listener.
-		 *
-		 * \param listener
-		 */
-		virtual void RemovePlayerListener(jevent::PlayerListener *listener);
+    /**
+     * \brief Remove a listener.
+     *
+     * \param listener
+     */
+    virtual void RemovePlayerListener(jevent::PlayerListener *listener);
 
-		/**
-		 * \brief Remove a listener.
-		 *
-		 * \param listener
-		 */
-		virtual const std::vector<jevent::PlayerListener *> & GetPlayerListeners();
+    /**
+     * \brief Remove a listener.
+     *
+     * \param listener
+     */
+    virtual const std::vector<jevent::PlayerListener *> & GetPlayerListeners();
 
-		/*
-		 * \brief
-		 *
-		 */
-		virtual void DispatchPlayerEvent(jevent::PlayerEvent *event);
-		
-		/**
-		 * \brief Registry a listener.
-		 *
-		 * \param listener
-		 */
-		virtual void RegisterFrameGrabberListener(jevent::FrameGrabberListener *listener);
+    /*
+     * \brief
+     *
+     */
+    virtual void DispatchPlayerEvent(jevent::PlayerEvent *event);
+    
+    /**
+     * \brief Registry a listener.
+     *
+     * \param listener
+     */
+    virtual void RegisterFrameGrabberListener(jevent::FrameGrabberListener *listener);
 
-		/**
-		 * \brief Remove a listener.
-		 *
-		 * \param listener
-		 */
-		virtual void RemoveFrameGrabberListener(jevent::FrameGrabberListener *listener);
+    /**
+     * \brief Remove a listener.
+     *
+     * \param listener
+     */
+    virtual void RemoveFrameGrabberListener(jevent::FrameGrabberListener *listener);
 
-		/**
-		 * \brief Remove a listener.
-		 *
-		 * \param listener
-		 */
-		virtual const std::vector<jevent::FrameGrabberListener *> & GetFrameGrabberListeners();
+    /**
+     * \brief Remove a listener.
+     *
+     * \param listener
+     */
+    virtual const std::vector<jevent::FrameGrabberListener *> & GetFrameGrabberListeners();
 
-		/*
-		 * \brief
-		 *
-		 */
-		virtual void DispatchFrameGrabberEvent(jevent::FrameGrabberEvent *event);
-		
+    /*
+     * \brief
+     *
+     */
+    virtual void DispatchFrameGrabberEvent(jevent::FrameGrabberEvent *event);
+    
 };
 
 }

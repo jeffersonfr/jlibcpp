@@ -27,16 +27,16 @@
 namespace jmpeg {
 
 Demux::Demux(jdemux_type_t type):
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jmpeg::Demux");
+  jcommon::Object::SetClassName("jmpeg::Demux");
 
   _type = type;
-	_timeout = std::chrono::milliseconds(2000);
+  _timeout = std::chrono::milliseconds(2000);
 
   UpdateTimePoint();
 }
-		
+    
 Demux::~Demux()
 {
 }
@@ -48,12 +48,12 @@ void Demux::SetID(std::string id)
 
 void Demux::Start()
 {
-	DemuxManager::GetInstance()->AddDemux(this);
+  DemuxManager::GetInstance()->AddDemux(this);
 }
 
 void Demux::Stop()
 {
-	DemuxManager::GetInstance()->RemoveDemux(this);
+  DemuxManager::GetInstance()->RemoveDemux(this);
 }
 
 std::string Demux::GetID()
@@ -63,7 +63,7 @@ std::string Demux::GetID()
 
 jdemux_type_t Demux::GetType()
 {
-	return _type;
+  return _type;
 }
 
 void Demux::SetTimeout(std::chrono::milliseconds ms)
@@ -88,12 +88,12 @@ void Demux::UpdateTimePoint()
 
 void Demux::SetPID(int pid)
 {
-	_pid = pid;
+  _pid = pid;
 }
 
 int Demux::GetPID()
 {
-	return _pid;
+  return _pid;
 }
 
 bool Demux::Append(const char *data, int data_length)
@@ -103,50 +103,50 @@ bool Demux::Append(const char *data, int data_length)
 
 void Demux::RegisterDemuxListener(jevent::DemuxListener *listener)
 {
-	if (listener == nullptr) {
-		return;
-	}
+  if (listener == nullptr) {
+    return;
+  }
 
-	if (std::find(_demux_listeners.begin(), _demux_listeners.end(), listener) == _demux_listeners.end()) {
-		_demux_listeners.push_back(listener);
-	}
+  if (std::find(_demux_listeners.begin(), _demux_listeners.end(), listener) == _demux_listeners.end()) {
+    _demux_listeners.push_back(listener);
+  }
 }
 
 void Demux::RemoveDemuxListener(jevent::DemuxListener *listener)
 {
-	if (listener == nullptr) {
-		return;
-	}
+  if (listener == nullptr) {
+    return;
+  }
 
   _demux_listeners.erase(std::remove(_demux_listeners.begin(), _demux_listeners.end(), listener), _demux_listeners.end());
 }
 
 void Demux::DispatchDemuxEvent(jevent::DemuxEvent *event)
 {
-	if (event == nullptr) {
-		return;
-	}
+  if (event == nullptr) {
+    return;
+  }
 
-	int k = 0,
-			size = (int)_demux_listeners.size();
+  int k = 0,
+      size = (int)_demux_listeners.size();
 
-	while (k++ < (int)_demux_listeners.size() && event->IsConsumed() == false) {
-		jevent::DemuxListener *listener = _demux_listeners[k-1];
+  while (k++ < (int)_demux_listeners.size() && event->IsConsumed() == false) {
+    jevent::DemuxListener *listener = _demux_listeners[k-1];
 
-		if (event->GetType() == jevent::JDET_DATA_ARRIVED) {
-			listener->DataArrived(event);
-		} else if (event->GetType() == jevent::JDET_DATA_NOT_FOUND) {
-			listener->DataNotFound(event);
-		}
+    if (event->GetType() == jevent::JDET_DATA_ARRIVED) {
+      listener->DataArrived(event);
+    } else if (event->GetType() == jevent::JDET_DATA_NOT_FOUND) {
+      listener->DataNotFound(event);
+    }
 
-		if (size != (int)_demux_listeners.size()) {
-			size = (int)_demux_listeners.size();
+    if (size != (int)_demux_listeners.size()) {
+      size = (int)_demux_listeners.size();
 
-			k--;
-		}
-	}
+      k--;
+    }
+  }
 
-	delete event;
+  delete event;
 }
 
 }

@@ -34,116 +34,116 @@ namespace jcommon {
  */
 class Object{
 
-	private:
-		/** \brief */
-		std::string _classname;
-		/** \brief */
-		std::string _namespace;
-		/** \brief */
-		std::vector<std::string> _parents;
-		
-	public:
-		/**
-		 * \brief
-		 * 
-		 */
-		Object();
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual ~Object();
+  private:
+    /** \brief */
+    std::string _classname;
+    /** \brief */
+    std::string _namespace;
+    /** \brief */
+    std::vector<std::string> _parents;
+    
+  public:
+    /**
+     * \brief
+     * 
+     */
+    Object();
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual ~Object();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void AddParent(std::string parent);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual const std::vector<std::string> & GetParents();
+    /**
+     * \brief
+     * 
+     */
+    virtual void AddParent(std::string parent);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual const std::vector<std::string> & GetParents();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetClassName(std::string name);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetNameSpace(std::string name);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetClassName(std::string name);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetNameSpace(std::string name);
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual std::string GetNameSpace();
+    /**
+     * \brief
+     * 
+     */
+    virtual std::string GetNameSpace();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual std::string GetClassName();
+    /**
+     * \brief
+     * 
+     */
+    virtual std::string GetClassName();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual std::string GetFullClassName();
+    /**
+     * \brief
+     * 
+     */
+    virtual std::string GetFullClassName();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual bool InstanceOf(std::string);
+    /**
+     * \brief
+     * 
+     */
+    virtual bool InstanceOf(std::string);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool InstanceOf(Object *o);
-		
-		/**
-		 * \brief Clone object.
-		 *
-		 */
-		virtual Object * Clone();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool Equals(Object *o);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Copy(Object *o);
+    /**
+     * \brief
+     *
+     */
+    virtual bool InstanceOf(Object *o);
+    
+    /**
+     * \brief Clone object.
+     *
+     */
+    virtual Object * Clone();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool Equals(Object *o);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Copy(Object *o);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int Compare(Object *o);
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual uint64_t Hash();
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual std::string What();
+    /**
+     * \brief
+     *
+     */
+    virtual int Compare(Object *o);
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual uint64_t Hash();
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual std::string What();
 };
 
 }

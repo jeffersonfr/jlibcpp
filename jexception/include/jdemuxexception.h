@@ -31,52 +31,52 @@ namespace jexception {
  */
 class DemuxException : public jexception::RuntimeException {
 
-	private:
+  private:
 
-	public:
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		DemuxException();
+  public:
+    /**
+     * \brief Construtor.
+     *
+     */
+    DemuxException();
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		DemuxException(std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    DemuxException(std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		DemuxException(jexception::Exception *exception, std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    DemuxException(jexception::Exception *exception, std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> DemuxException(const std::string &fmt, T ...vs):
       Exception(fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::DemuxException");
     }
-		
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> DemuxException(Exception *exception, const std::string &fmt, T ...vs):
       Exception(exception, fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::DemuxException");
     }
-		
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~DemuxException() throw();
+    
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~DemuxException() throw();
 
 };
 

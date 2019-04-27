@@ -22,9 +22,9 @@
 namespace jevent {
 
 DataListener::DataListener():
-	jevent::Listener()
+  jevent::Listener()
 {
-	jcommon::Object::SetClassName("jevent::DataListener");
+  jcommon::Object::SetClassName("jevent::DataListener");
 }
 
 DataListener::~DataListener()

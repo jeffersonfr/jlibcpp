@@ -31,52 +31,52 @@ namespace jexception {
  */
 class IPCException : public jexception::RuntimeException {
 
-	private:
+  private:
 
-	public:
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		IPCException();
+  public:
+    /**
+     * \brief Construtor.
+     *
+     */
+    IPCException();
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		IPCException(std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    IPCException(std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		IPCException(jexception::Exception *exception, std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    IPCException(jexception::Exception *exception, std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> IPCException(const std::string &fmt, T ...vs):
       Exception(fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::IPCException");
     }
-		
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> IPCException(Exception *exception, const std::string &fmt, T ...vs):
       Exception(exception, fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::IPCException");
     }
-		
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~IPCException() throw();
+    
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~IPCException() throw();
 
 };
 

@@ -33,129 +33,129 @@ namespace jcommon {
  */
 class ParamMapper : public virtual jcommon::Object{
 
-	private:
-		std::map<std::string, std::string> _params;
+  private:
+    std::map<std::string, std::string> _params;
 
-	public:
-		/**
-		 * \Constructor.
-		 *
-		 */
-		ParamMapper();
+  public:
+    /**
+     * \Constructor.
+     *
+     */
+    ParamMapper();
 
-		/**
-		 * \brief Destructor.
-		 *
-		 */
-		virtual ~ParamMapper();
+    /**
+     * \brief Destructor.
+     *
+     */
+    virtual ~ParamMapper();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual const std::map<std::string, std::string> & GetParameters();
+    /**
+     * \brief
+     *
+     */
+    virtual const std::map<std::string, std::string> & GetParameters();
 
-		/**
-		 * \brief 
-		 *
-		 */
-		virtual std::string GetTextParam(std::string key, std::string value = "");
+    /**
+     * \brief 
+     *
+     */
+    virtual std::string GetTextParam(std::string key, std::string value = "");
 
-		/**
-		 * \brief 
-		 *
-		 */
-		virtual bool GetBooleanParam(std::string key, bool value = false);
+    /**
+     * \brief 
+     *
+     */
+    virtual bool GetBooleanParam(std::string key, bool value = false);
 
-		/**
-		 * \brief 
-		 *
-		 */
-		virtual int64_t GetIntegerParam(std::string key, int64_t value = 0LL);
+    /**
+     * \brief 
+     *
+     */
+    virtual int64_t GetIntegerParam(std::string key, int64_t value = 0LL);
 
-		/**
-		 * \brief 
-		 *
-		 */
-		virtual double GetDecimalParam(std::string key, double value = 0.0);
+    /**
+     * \brief 
+     *
+     */
+    virtual double GetDecimalParam(std::string key, double value = 0.0);
 
-		/**
-		 * \brief 
-		 *
-		 */
-		virtual std::string GetArrayParam(std::string key, std::string value = "");
+    /**
+     * \brief 
+     *
+     */
+    virtual std::string GetArrayParam(std::string key, std::string value = "");
 
-		/**
-		 * \brief 
-		 *
-		 */
-		virtual std::string GetParamByIndex(int index);
+    /**
+     * \brief 
+     *
+     */
+    virtual std::string GetParamByIndex(int index);
 
-		/**
-		 * \brief 
-		 *
-		 */
-		virtual void SetTextParam(std::string key, std::string value);
+    /**
+     * \brief 
+     *
+     */
+    virtual void SetTextParam(std::string key, std::string value);
 
-		/**
-		 * \brief 
-		 *
-		 */
-		virtual void SetBooleanParam(std::string key, bool value);
+    /**
+     * \brief 
+     *
+     */
+    virtual void SetBooleanParam(std::string key, bool value);
 
-		/**
-		 * \brief 
-		 *
-		 */
-		virtual void SetIntegerParam(std::string key, int64_t value);
+    /**
+     * \brief 
+     *
+     */
+    virtual void SetIntegerParam(std::string key, int64_t value);
 
-		/**
-		 * \brief 
-		 *
-		 */
-		virtual void SetDecimalParam(std::string key, double value);
+    /**
+     * \brief 
+     *
+     */
+    virtual void SetDecimalParam(std::string key, double value);
 
-		/**
-		 * \brief 
-		 *
-		 */
-		virtual void SetArrayParam(std::string key, uint8_t *value, uint64_t value_size);
+    /**
+     * \brief 
+     *
+     */
+    virtual void SetArrayParam(std::string key, uint8_t *value, uint64_t value_size);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetParamByIndex(int index, std::string value);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetParamByIndex(int index, std::string value);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveParamByID(std::string id);
+    /**
+     * \brief
+     *
+     */
+    virtual void RemoveParamByID(std::string id);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveParamByIndex(int index);
+    /**
+     * \brief
+     *
+     */
+    virtual void RemoveParamByIndex(int index);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Object * Clone();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool Equals(Object *);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Copy(Object *o);
+    /**
+     * \brief
+     *
+     */
+    virtual Object * Clone();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool Equals(Object *);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Copy(Object *o);
 
 };
 

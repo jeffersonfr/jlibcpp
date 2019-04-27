@@ -24,19 +24,19 @@ namespace jexception {
 PipeException::PipeException():
   jexception::RuntimeException()
 {
-	jcommon::Object::SetClassName("jexception::PipeException");
+  jcommon::Object::SetClassName("jexception::PipeException");
 }
 
 PipeException::PipeException(std::string reason_):
   jexception::RuntimeException(reason_)
 {
-	jcommon::Object::SetClassName("jexception::PipeException");
+  jcommon::Object::SetClassName("jexception::PipeException");
 }
 
 PipeException::PipeException(jexception::Exception *exception, std::string reason_):
   jexception::RuntimeException(exception, reason_)
 {
-	jcommon::Object::SetClassName("jexception::PipeException");
+  jcommon::Object::SetClassName("jexception::PipeException");
 }
 
 PipeException::~PipeException() throw()

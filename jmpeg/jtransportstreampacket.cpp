@@ -27,7 +27,7 @@ namespace jmpeg {
 AdaptationField::AdaptationField(std::shared_ptr<std::string> data):
   jcommon::Object()
 {
-	jcommon::Object::SetClassName("jmpeg::AdaptationField");
+  jcommon::Object::SetClassName("jmpeg::AdaptationField");
 
   _data = data;
 }
@@ -116,7 +116,7 @@ int AdaptationField::GetAdaptationFieldExtensionFlag()
 TransportStreamPacket::TransportStreamPacket(std::shared_ptr<std::string> data):
   jcommon::Object()
 {
-	jcommon::Object::SetClassName("jmpeg::TransportStreamPacket");
+  jcommon::Object::SetClassName("jmpeg::TransportStreamPacket");
   
   if (data->size() != TS_PACKET_LENGTH) {
     throw jexception::InvalidArgumentException("Packets must have 188 bytes");

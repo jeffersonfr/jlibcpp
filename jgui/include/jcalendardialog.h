@@ -34,10 +34,10 @@ namespace jgui {
  *
  */
 struct jcalendar_warnning_t {
-	jgui::Theme *theme;
-	int day;
-	int month;
-	int year;
+  jgui::Theme *theme;
+  int day;
+  int month;
+  int year;
 };
 
 /**
@@ -47,136 +47,136 @@ struct jcalendar_warnning_t {
  */
 class CalendarDialog : public jgui::Dialog, public jevent::ActionListener, public jevent::SelectListener {
 
-	private:
-		/** \brief */
-		std::vector<jcalendar_warnning_t> _warnning_days;
-		/** \brief */
-		std::vector<Button *> _buttons;
-		/** \brief */
-		jgui::Theme _week_day_theme;
-		/** \brief */
-		jgui::Theme _selected_theme;
-		/** \brief */
-		Label *_ldom;
-		/** \brief */
-		Label *_lseg;
-		/** \brief */
-		Label *_lter;
-		/** \brief */
-		Label *_lqua;
-		/** \brief */
-		Label *_lqui;
-		/** \brief */
-		Label *_lsex;
-		/** \brief */
-		Label *_lsab;
-		/** \brief */
-		Spin *_syear;
-		/** \brief */
-		Spin *_smonth;
-		/** \brief */
-		std::string _text;
-		/** \brief */
-		int _state;
-		/** \brief */
-		int _select_day;
-		/** \brief */
-		int _select_month;
-		/** \brief */
-		int _select_year;
-		/** \brief */
-		bool started;
-		/** \brief */
-		bool _show_text;
-		/** \brief */
-		bool _response;
+  private:
+    /** \brief */
+    std::vector<jcalendar_warnning_t> _warnning_days;
+    /** \brief */
+    std::vector<Button *> _buttons;
+    /** \brief */
+    jgui::Theme _week_day_theme;
+    /** \brief */
+    jgui::Theme _selected_theme;
+    /** \brief */
+    Label *_ldom;
+    /** \brief */
+    Label *_lseg;
+    /** \brief */
+    Label *_lter;
+    /** \brief */
+    Label *_lqua;
+    /** \brief */
+    Label *_lqui;
+    /** \brief */
+    Label *_lsex;
+    /** \brief */
+    Label *_lsab;
+    /** \brief */
+    Spin *_syear;
+    /** \brief */
+    Spin *_smonth;
+    /** \brief */
+    std::string _text;
+    /** \brief */
+    int _state;
+    /** \brief */
+    int _select_day;
+    /** \brief */
+    int _select_month;
+    /** \brief */
+    int _select_year;
+    /** \brief */
+    bool started;
+    /** \brief */
+    bool _show_text;
+    /** \brief */
+    bool _response;
 
-	private:
-		/**
-		 * \brief
-		 *
-		 */
-		void BuildCalendar();
+  private:
+    /**
+     * \brief
+     *
+     */
+    void BuildCalendar();
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		CalendarDialog(Container *parent);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~CalendarDialog();
+  public:
+    /**
+     * \brief
+     *
+     */
+    CalendarDialog(Container *parent);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~CalendarDialog();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetDay(int d);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetMonth(int m);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetYear(int y);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetDay(int d);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetMonth(int m);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetYear(int y);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetDay();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetMonth();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetYear();
+    /**
+     * \brief
+     *
+     */
+    virtual int GetDay();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int GetMonth();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual int GetYear();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void AddWarnning(jgui::Theme *theme, int day, int month, int year);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveWarnning(jcalendar_warnning_t t);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveAll();
+    /**
+     * \brief
+     *
+     */
+    virtual void AddWarnning(jgui::Theme *theme, int day, int month, int year);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void RemoveWarnning(jcalendar_warnning_t t);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void RemoveAll();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void ActionPerformed(jevent::ActionEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void ItemChanged(jevent::SelectEvent *event);
-		
+    /**
+     * \brief
+     *
+     */
+    virtual void ActionPerformed(jevent::ActionEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void ItemChanged(jevent::SelectEvent *event);
+    
 };
 
 }

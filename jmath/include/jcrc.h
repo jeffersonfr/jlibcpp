@@ -31,44 +31,44 @@ namespace jmath {
  */
 class CRC : public virtual jcommon::Object {
 
-	private:
-		/**
-		 * \brief
-		 *
-		 */
-		CRC();
-		
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~CRC();
+  private:
+    /**
+     * \brief
+     *
+     */
+    CRC();
+    
+  public:
+    /**
+     * \brief
+     *
+     */
+    virtual ~CRC();
 
-		/**
-		 * \brief
-		 *
-		 */
-		static uint8_t Calculate8(const uint8_t *begin, int count);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		static uint16_t Calculate16(const uint8_t *begin, int count);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		static uint32_t Calculate32(const uint8_t *begin, int count);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		static uint64_t Calculate64(const uint8_t *begin, int count);
-		
+    /**
+     * \brief
+     *
+     */
+    static uint8_t Calculate8(const uint8_t *begin, int count);
+    
+    /**
+     * \brief
+     *
+     */
+    static uint16_t Calculate16(const uint8_t *begin, int count);
+    
+    /**
+     * \brief
+     *
+     */
+    static uint32_t Calculate32(const uint8_t *begin, int count);
+    
+    /**
+     * \brief
+     *
+     */
+    static uint64_t Calculate64(const uint8_t *begin, int count);
+    
 };
 
 }

@@ -36,59 +36,59 @@ Response::~Response()
 
 void Response::Initialize(uint8_t *buffer, int size)
 {
-	if (size <= 0) {
-		return;
-	}
+  if (size <= 0) {
+    return;
+  }
 
-	std::string str = (const char *)buffer;
+  std::string str = (const char *)buffer;
 
-	// INFO:: <id=value>[,<id=param>]*
-	jcommon::StringTokenizer tokens(str, ";", jcommon::JTT_STRING);
+  // INFO:: <id=value>[,<id=param>]*
+  jcommon::StringTokenizer tokens(str, ";", jcommon::JTT_STRING);
 
-	jmath::Base64 base64;
+  jmath::Base64 base64;
 
-	for (int i=0; i<tokens.GetSize(); i++) {
-		jcommon::StringTokenizer param(tokens.GetToken(i), ":", jcommon::JTT_STRING);
+  for (int i=0; i<tokens.GetSize(); i++) {
+    jcommon::StringTokenizer param(tokens.GetToken(i), ":", jcommon::JTT_STRING);
 
-		if (param.GetSize() > 1) {
-			char *value = base64.Decode((uint8_t *)param.GetToken(1).c_str(), param.GetToken(1).size());
+    if (param.GetSize() > 1) {
+      char *value = base64.Decode((uint8_t *)param.GetToken(1).c_str(), param.GetToken(1).size());
 
-			if (value == nullptr) {
-				value = (char *)"";
-			}
+      if (value == nullptr) {
+        value = (char *)"";
+      }
 
-			SetTextParam(param.GetToken(0), value);
-		}
-	}
+      SetTextParam(param.GetToken(0), value);
+    }
+  }
 }
 
 std::string Response::Encode()
 {
-	jmath::Base64 base64;
-	std::ostringstream o;
+  jmath::Base64 base64;
+  std::ostringstream o;
 
-	for (std::map<std::string, std::string>::const_iterator i=GetParameters().begin(); i!=GetParameters().end(); i++) {
-		char *value = base64.Encode((uint8_t *)i->second.c_str(), i->second.size());
+  for (std::map<std::string, std::string>::const_iterator i=GetParameters().begin(); i!=GetParameters().end(); i++) {
+    char *value = base64.Encode((uint8_t *)i->second.c_str(), i->second.size());
 
-		if (value == nullptr) {
-			value = (char *)"";
-		}
+    if (value == nullptr) {
+      value = (char *)"";
+    }
 
-		o << i->first << ":" << value << ";";
-	}
+    o << i->first << ":" << value << ";";
+  }
 
-	return o.str();
+  return o.str();
 }
 
 std::string Response::What()
 {
-	std::ostringstream o;
+  std::ostringstream o;
 
-	for (std::map<std::string, std::string>::const_iterator i=GetParameters().begin(); i!=GetParameters().end(); i++) {
-		o << i->first << ":" << i->second << ";";
-	}
+  for (std::map<std::string, std::string>::const_iterator i=GetParameters().begin(); i!=GetParameters().end(); i++) {
+    o << i->first << ":" << i->second << ";";
+  }
 
-	return o.str();
+  return o.str();
 }
 
 }

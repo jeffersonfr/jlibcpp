@@ -25,17 +25,17 @@
 namespace jio {
 
 MemoryOutputStream::MemoryOutputStream(const char *data, int64_t size):
-	jio::OutputStream()
+  jio::OutputStream()
 {
-	jcommon::Object::SetClassName("jio::MemoryOutputStream");
-	
-	if ((void *)data == nullptr) {
-		throw jexception::RuntimeException("Null pointer exception");
-	}
+  jcommon::Object::SetClassName("jio::MemoryOutputStream");
+  
+  if ((void *)data == nullptr) {
+    throw jexception::RuntimeException("Null pointer exception");
+  }
 
-	_buffer = (char *)data;
-	_buffer_size = size;
-	_buffer_index = 0;
+  _buffer = (char *)data;
+  _buffer_size = size;
+  _buffer_index = 0;
 }
 
 MemoryOutputStream::~MemoryOutputStream()
@@ -44,55 +44,55 @@ MemoryOutputStream::~MemoryOutputStream()
 
 bool MemoryOutputStream::IsEmpty()
 {
-	return Available() == 0LL;
+  return Available() == 0LL;
 }
 
 int64_t MemoryOutputStream::Available()
 {
-	return (int64_t)(_buffer_size - _buffer_index);
+  return (int64_t)(_buffer_size - _buffer_index);
 }
 
 int64_t MemoryOutputStream::Write(int64_t b)
 {
-	if (IsEmpty() == true) {
-		return 0LL;
-	}
+  if (IsEmpty() == true) {
+    return 0LL;
+  }
 
-	_buffer[_buffer_index++] = (uint8_t)b;
+  _buffer[_buffer_index++] = (uint8_t)b;
 
-	return 1LL;
+  return 1LL;
 }
 
 int64_t MemoryOutputStream::Write(const char *data, int64_t size)
 {
-	if (IsEmpty() == true) {
-		return 0LL;
-	}
+  if (IsEmpty() == true) {
+    return 0LL;
+  }
 
-	if (size > Available()) {
-		size = Available();
-	}
+  if (size > Available()) {
+    size = Available();
+  }
 
-	memcpy((uint8_t*)(_buffer + _buffer_index), data, (uint32_t)size);
+  memcpy((uint8_t*)(_buffer + _buffer_index), data, (uint32_t)size);
 
-	_buffer_index = _buffer_index + size;
+  _buffer_index = _buffer_index + size;
 
-	return size;
+  return size;
 }
 
 int64_t MemoryOutputStream::Flush()
 {
-	return 0LL;
+  return 0LL;
 }
 
 void MemoryOutputStream::Close()
 {
-	// DO:: nothing
+  // DO:: nothing
 }
 
 int64_t MemoryOutputStream::GetSentBytes()
 {
-	return _buffer_index;
+  return _buffer_index;
 }
 
 }

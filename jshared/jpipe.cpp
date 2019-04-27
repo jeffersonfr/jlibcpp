@@ -24,53 +24,53 @@
 namespace jshared {
 
 Pipe::Pipe(int size_, int perms_):
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jshared::Pipe");
-		
-	_is_closed = false;
+  jcommon::Object::SetClassName("jshared::Pipe");
+    
+  _is_closed = false;
 
-	if (pipe(_pipe) < 0) {
-		_is_closed = true;
-	}
+  if (pipe(_pipe) < 0) {
+    _is_closed = true;
+  }
 }
 
 Pipe::~Pipe()
 {
-	Close();
+  Close();
 }
 
 int Pipe::Receive(char *data_, int length_)
 {
-	if (_is_closed == true) {
-		return 0;
-	}
+  if (_is_closed == true) {
+    return 0;
+  }
 
-	return read(_pipe[0], data_, length_);
+  return read(_pipe[0], data_, length_);
 }
 
 int Pipe::Send(const char *data_, int length_)
 {
-	if (_is_closed == true) {
-		return 0;
-	}
+  if (_is_closed == true) {
+    return 0;
+  }
 
-	return write(_pipe[1], data_, length_);
+  return write(_pipe[1], data_, length_);
 }
 
 bool Pipe::IsClosed()
 {
-	return _is_closed;
+  return _is_closed;
 }
 
 void Pipe::Close()
 {
-	if (_is_closed == false) {
-		_is_closed = true;
+  if (_is_closed == false) {
+    _is_closed = true;
 
-		close(_pipe[0]);
-		close(_pipe[1]);
-	}
+    close(_pipe[0]);
+    close(_pipe[1]);
+  }
 }
 
 }

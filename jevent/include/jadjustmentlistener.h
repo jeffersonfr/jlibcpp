@@ -32,25 +32,25 @@ namespace jevent {
  */
 class AdjustmentListener : public jevent::Listener{
 
-	protected:
-		/**
-		 * \brief
-		 *
-		 */
-		AdjustmentListener();
+  protected:
+    /**
+     * \brief
+     *
+     */
+    AdjustmentListener();
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~AdjustmentListener();
+  public:
+    /**
+     * \brief
+     *
+     */
+    virtual ~AdjustmentListener();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void AdjustmentValueChanged(AdjustmentEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual void AdjustmentValueChanged(AdjustmentEvent *event);
 
 };
 

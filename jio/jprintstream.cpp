@@ -24,13 +24,13 @@ namespace jio {
 
 PrintStream::PrintStream(OutputStream *stream)
 {
-	jcommon::Object::SetClassName("jio::PrintStream");
+  jcommon::Object::SetClassName("jio::PrintStream");
 
-	if (stream == nullptr) {
-		throw jexception::NullPointerException("PrintStream cannot process null stream");
-	}
+  if (stream == nullptr) {
+    throw jexception::NullPointerException("PrintStream cannot process null stream");
+  }
 
-	_stream = stream;
+  _stream = stream;
 }
 
 PrintStream::~PrintStream()
@@ -39,17 +39,17 @@ PrintStream::~PrintStream()
 
 void PrintStream::Flush()
 {
-	_stream->Flush();
+  _stream->Flush();
 }
 
 int64_t PrintStream::Write(char c)
 {
-	return Write((char *)&c, 1);
+  return Write((char *)&c, 1);
 }
 
 int64_t PrintStream::Write(const char *data, int64_t size)
 {
-	return _stream->Write(data, size);
+  return _stream->Write(data, size);
 }
 
 }

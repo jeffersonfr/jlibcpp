@@ -31,52 +31,52 @@ namespace jexception {
  */
 class TimeoutException : public jexception::RuntimeException {
 
-	private:
+  private:
 
-	public:
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		TimeoutException();
+  public:
+    /**
+     * \brief Construtor.
+     *
+     */
+    TimeoutException();
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		TimeoutException(std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    TimeoutException(std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		TimeoutException(jexception::Exception *exception, std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    TimeoutException(jexception::Exception *exception, std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> TimeoutException(const std::string &fmt, T ...vs):
       Exception(fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::TimeoutException");
     }
-		
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> TimeoutException(Exception *exception, const std::string &fmt, T ...vs):
       Exception(exception, fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::TimeoutException");
     }
-		
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~TimeoutException() throw();
+    
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~TimeoutException() throw();
 
 };
 

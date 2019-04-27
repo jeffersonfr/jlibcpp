@@ -28,8 +28,8 @@
 namespace jgui {
 
 enum jcheckbox_type_t {
-	JCBT_CHECK,
-	JCBT_RADIO
+  JCBT_CHECK,
+  JCBT_RADIO
 };
 
 /**
@@ -39,170 +39,170 @@ enum jcheckbox_type_t {
  */
 class CheckButton : public Component {
 
-	private:
-		/** \brief */
-		std::vector<jevent::ToggleListener *> _check_listeners;
-		/** \brief */
-		std::mutex _check_listener_mutex;
-		/** \brief */
-		std::string _text;
-		/** \brief */
-		jcheckbox_type_t _type;
-		/** \brief */
-		jhorizontal_align_t _halign;
-		/** \brief */
-		jvertical_align_t _valign;
-		/** \brief */
-		bool _checked;
-		/** \brief */
-		bool _just_check;
-		/** \brief */
-		bool _is_wrap;
+  private:
+    /** \brief */
+    std::vector<jevent::ToggleListener *> _check_listeners;
+    /** \brief */
+    std::mutex _check_listener_mutex;
+    /** \brief */
+    std::string _text;
+    /** \brief */
+    jcheckbox_type_t _type;
+    /** \brief */
+    jhorizontal_align_t _halign;
+    /** \brief */
+    jvertical_align_t _valign;
+    /** \brief */
+    bool _checked;
+    /** \brief */
+    bool _just_check;
+    /** \brief */
+    bool _is_wrap;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		CheckButton(jcheckbox_type_t type, std::string text, int x = 0, int y = 0, int width = DEFAULT_COMPONENT_WIDTH, int height = DEFAULT_COMPONENT_HEIGHT);
-	
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~CheckButton();
+  public:
+    /**
+     * \brief
+     *
+     */
+    CheckButton(jcheckbox_type_t type, std::string text, int x = 0, int y = 0, int width = DEFAULT_COMPONENT_WIDTH, int height = DEFAULT_COMPONENT_HEIGHT);
+  
+    /**
+     * \brief
+     *
+     */
+    virtual ~CheckButton();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetWrap(bool b);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsWrap();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetText(std::string text);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetWrap(bool b);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsWrap();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetText(std::string text);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string GetText();
+    /**
+     * \brief
+     *
+     */
+    virtual std::string GetText();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetType(jcheckbox_type_t type);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jcheckbox_type_t GetType();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsSelected();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetSelected(bool b);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetType(jcheckbox_type_t type);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual jcheckbox_type_t GetType();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsSelected();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetSelected(bool b);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetHorizontalAlign(jhorizontal_align_t align);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jhorizontal_align_t GetHorizontalAlign();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetVerticalAlign(jvertical_align_t align);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jvertical_align_t GetVerticalAlign();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Paint(Graphics *g);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool KeyPressed(jevent::KeyEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetHorizontalAlign(jhorizontal_align_t align);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual jhorizontal_align_t GetHorizontalAlign();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetVerticalAlign(jvertical_align_t align);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual jvertical_align_t GetVerticalAlign();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Paint(Graphics *g);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool KeyPressed(jevent::KeyEvent *event);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MousePressed(jevent::MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MouseReleased(jevent::MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MouseMoved(jevent::MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MouseWheel(jevent::MouseEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual bool MousePressed(jevent::MouseEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool MouseReleased(jevent::MouseEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool MouseMoved(jevent::MouseEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool MouseWheel(jevent::MouseEvent *event);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RegisterToggleListener(jevent::ToggleListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveToggleListener(jevent::ToggleListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void DispatchToggleEvent(jevent::ToggleEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual const std::vector<jevent::ToggleListener *> & GetToggleListeners();
+    /**
+     * \brief
+     *
+     */
+    virtual void RegisterToggleListener(jevent::ToggleListener *listener);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void RemoveToggleListener(jevent::ToggleListener *listener);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void DispatchToggleEvent(jevent::ToggleEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual const std::vector<jevent::ToggleListener *> & GetToggleListeners();
 
 };
 

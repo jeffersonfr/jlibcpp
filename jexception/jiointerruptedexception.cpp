@@ -24,19 +24,19 @@ namespace jexception {
 IOInterruptedException::IOInterruptedException():
   jexception::InterruptedException()
 {
-	jcommon::Object::SetClassName("jexception::IOInterruptedException");
+  jcommon::Object::SetClassName("jexception::IOInterruptedException");
 }
 
 IOInterruptedException::IOInterruptedException(std::string reason_):
   jexception::InterruptedException(reason_)
 {
-	jcommon::Object::SetClassName("jexception::IOInterruptedException");
+  jcommon::Object::SetClassName("jexception::IOInterruptedException");
 }
 
 IOInterruptedException::IOInterruptedException(jexception::Exception *exception, std::string reason_):
   jexception::InterruptedException(exception, reason_)
 {
-	jcommon::Object::SetClassName("jexception::IOInterruptedException");
+  jcommon::Object::SetClassName("jexception::IOInterruptedException");
 }
 
 IOInterruptedException::~IOInterruptedException() throw()

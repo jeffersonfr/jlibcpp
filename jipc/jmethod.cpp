@@ -30,7 +30,7 @@ namespace jipc {
 
 Method::Method(std::string name)
 {
-	_name = name;
+  _name = name;
 }
 
 Method::~Method()
@@ -39,77 +39,77 @@ Method::~Method()
 
 void Method::Initialize(uint8_t *buffer, int size)
 {
-	if (size <= 0) {
-		return;
-	}
+  if (size <= 0) {
+    return;
+  }
 
-	std::string str = (const char *)buffer;
+  std::string str = (const char *)buffer;
 
-	// INFO:: <method>:[<id=value>[;<id=param>]*
-	jcommon::StringTokenizer tokens(str, ";", jcommon::JTT_STRING);
+  // INFO:: <method>:[<id=value>[;<id=param>]*
+  jcommon::StringTokenizer tokens(str, ";", jcommon::JTT_STRING);
 
-	if (tokens.GetSize() > 0) {
-		_name = tokens.GetToken(0);
-	}
+  if (tokens.GetSize() > 0) {
+    _name = tokens.GetToken(0);
+  }
 
-	jmath::Base64 base64;
+  jmath::Base64 base64;
 
-	for (int i=1; i<tokens.GetSize(); i++) {
-		jcommon::StringTokenizer param(tokens.GetToken(i), ":", jcommon::JTT_STRING);
+  for (int i=1; i<tokens.GetSize(); i++) {
+    jcommon::StringTokenizer param(tokens.GetToken(i), ":", jcommon::JTT_STRING);
 
-		if (param.GetSize() > 1) {
-			char *value = base64.Decode((uint8_t *)param.GetToken(1).c_str(), param.GetToken(1).size());
+    if (param.GetSize() > 1) {
+      char *value = base64.Decode((uint8_t *)param.GetToken(1).c_str(), param.GetToken(1).size());
 
-			if (value == nullptr) {
-				value = (char *)"";
-			}
+      if (value == nullptr) {
+        value = (char *)"";
+      }
 
-			SetTextParam(param.GetToken(0), value);
-		}
-	}
+      SetTextParam(param.GetToken(0), value);
+    }
+  }
 }
 
 std::string Method::GetName()
 {
-	return _name;
+  return _name;
 }
 
 void Method::SetName(std::string name)
 {
-	_name = name;
+  _name = name;
 }
 
 std::string Method::Encode()
 {
-	jmath::Base64 base64;
-	std::ostringstream o;
+  jmath::Base64 base64;
+  std::ostringstream o;
 
-	o << _name << ";";
+  o << _name << ";";
 
-	for (std::map<std::string, std::string>::const_iterator i=GetParameters().begin(); i!=GetParameters().end(); i++) {
-		char *value = base64.Encode((uint8_t *)i->second.c_str(), i->second.size());
+  for (std::map<std::string, std::string>::const_iterator i=GetParameters().begin(); i!=GetParameters().end(); i++) {
+    char *value = base64.Encode((uint8_t *)i->second.c_str(), i->second.size());
 
-		if (value == nullptr) {
-			value = (char *)"";
-		}
+    if (value == nullptr) {
+      value = (char *)"";
+    }
 
-		o << i->first << ":" << value << ";";
-	}
+    o << i->first << ":" << value << ";";
+  }
 
-	return o.str();
+  return o.str();
 }
 
 std::string Method::What()
 {
-	std::ostringstream o;
+  std::ostringstream o;
 
-	o << _name << ";";
+  o << _name << ";";
 
-	for (std::map<std::string, std::string>::const_iterator i=GetParameters().begin(); i!=GetParameters().end(); i++) {
-		o << i->first << ":" << i->second << ";";
-	}
+  for (std::map<std::string, std::string>::const_iterator i=GetParameters().begin(); i!=GetParameters().end(); i++) {
+    o << i->first << ":" << i->second << ";";
+  }
 
-	return o.str();
+  return o.str();
 }
 
 }

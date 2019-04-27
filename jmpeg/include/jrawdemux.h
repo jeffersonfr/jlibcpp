@@ -30,37 +30,37 @@ class RawDemux : public jmpeg::Demux {
     /** \bried */
     int _packet_size;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		RawDemux();
+  public:
+    /**
+     * \brief
+     *
+     */
+    RawDemux();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~RawDemux();
+    /**
+     * \brief
+     *
+     */
+    virtual ~RawDemux();
 
-		/**
-		 * \brief
-		 *
-		 */
+    /**
+     * \brief
+     *
+     */
     virtual void SetPacketSize(int packet_size);
 
-		/**
-		 * \brief
-		 *
-		 */
+    /**
+     * \brief
+     *
+     */
     virtual int GetPacketSize();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool Append(const char *data, int data_length);
-		
+    /**
+     * \brief
+     *
+     */
+    virtual bool Append(const char *data, int data_length);
+    
 };
 
 }

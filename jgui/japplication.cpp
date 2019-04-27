@@ -33,9 +33,9 @@ static std::mutex g_application_mutex;
 static std::mutex g_application_event_mutex;
 
 Application::Application():
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jgui::Application");
+  jcommon::Object::SetClassName("jgui::Application");
 }
 
 Application::~Application()
@@ -60,19 +60,19 @@ void Application::Init(int argc, char **argv)
 {
   std::lock_guard<std::mutex> guard(g_application_mutex);
 
-	if (_instance == nullptr) {
-	  try {
+  if (_instance == nullptr) {
+    try {
 #ifdef JGUI_UI
-			_instance = new NativeApplication();
+      _instance = new NativeApplication();
 #endif
 
       if (_instance != nullptr) {
         _instance->InternalInit(argc, argv);
       }
-		} catch (jexception::NullPointerException &e) {
-    	throw jexception::RuntimeException("Application cannot be initialized: " + e.What());
-		}
-	}
+    } catch (jexception::NullPointerException &e) {
+      throw jexception::RuntimeException("Application cannot be initialized: " + e.What());
+    }
+  }
         
   if (_instance == nullptr) {
     throw jexception::NullPointerException("No graphic engine avaiable !");
@@ -83,65 +83,65 @@ void Application::Loop()
 {
   g_application_mutex.lock();
 
-	if (_instance == nullptr) {
+  if (_instance == nullptr) {
     throw jexception::RuntimeException("Application was not initialized");
-	}
+  }
 
   g_application_mutex.unlock();
 
-	_instance->InternalLoop();
+  _instance->InternalLoop();
 }
 
 void Application::Quit()
 {
   g_application_mutex.lock();
 
-	if (_instance == nullptr) {
+  if (_instance == nullptr) {
     throw jexception::RuntimeException("Application was not initialized");
-	}
+  }
 
   g_application_mutex.unlock();
 
-	_instance->InternalQuit();
+  _instance->InternalQuit();
 }
 
 jsize_t Application::GetScreenSize()
 {
   g_application_mutex.lock();
 
-	if (_instance == nullptr) {
+  if (_instance == nullptr) {
     throw jexception::RuntimeException("Application was not initialized");
-	}
+  }
 
   g_application_mutex.unlock();
 
-	return _instance->GetScreenSize();
+  return _instance->GetScreenSize();
 }
 
 void Application::SetVerticalSyncEnabled(bool enabled)
 {
   g_application_mutex.lock();
 
-	if (_instance == nullptr) {
+  if (_instance == nullptr) {
     throw jexception::RuntimeException("Application was not initialized");
-	}
+  }
 
   g_application_mutex.unlock();
 
-	_instance->SetVerticalSyncEnabled(enabled);
+  _instance->SetVerticalSyncEnabled(enabled);
 }
 
 bool Application::IsVerticalSyncEnabled()
 {
   g_application_mutex.lock();
 
-	if (_instance == nullptr) {
+  if (_instance == nullptr) {
     throw jexception::RuntimeException("Application was not initialized");
-	}
+  }
 
   g_application_mutex.unlock();
 
-	return _instance->IsVerticalSyncEnabled();
+  return _instance->IsVerticalSyncEnabled();
 }
 
 }

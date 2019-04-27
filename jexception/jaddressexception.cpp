@@ -22,21 +22,21 @@
 namespace jexception {
 
 AddressException::AddressException():
-	RuntimeException()
+  RuntimeException()
 {
-	jcommon::Object::SetClassName("jexception::AddressException");
+  jcommon::Object::SetClassName("jexception::AddressException");
 }
 
 AddressException::AddressException(std::string reason_):
-	RuntimeException(reason_)
+  RuntimeException(reason_)
 {
-	jcommon::Object::SetClassName("jexception::AddressException");
+  jcommon::Object::SetClassName("jexception::AddressException");
 }
 
 AddressException::AddressException(Exception *exception, std::string reason_):
-	RuntimeException(exception, reason_)
+  RuntimeException(exception, reason_)
 {
-	jcommon::Object::SetClassName("jexception::AddressException");
+  jcommon::Object::SetClassName("jexception::AddressException");
 }
 
 AddressException::~AddressException() throw()

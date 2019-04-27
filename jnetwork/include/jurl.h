@@ -36,164 +36,164 @@ namespace jnetwork {
  */
 class URL : public virtual jcommon::Object {
 
-	protected:
-		/** \brief */
-		std::string _url;
-		/** \brief */
-		std::string	_protocol;
-		/** \brief */
-		std::string	_host;
-		/** \brief */
-		std::string	_params;
-		/** \brief */
-		std::string	_file;
-		/** \brief */
-		std::string	_reference;
-		/** \brief */
-		std::string	_query;
-		/** \brief */
-		std::string	_path;
-		/** \brief */
-		int _port;
+  protected:
+    /** \brief */
+    std::string _url;
+    /** \brief */
+    std::string  _protocol;
+    /** \brief */
+    std::string  _host;
+    /** \brief */
+    std::string  _params;
+    /** \brief */
+    std::string  _file;
+    /** \brief */
+    std::string  _reference;
+    /** \brief */
+    std::string  _query;
+    /** \brief */
+    std::string  _path;
+    /** \brief */
+    int _port;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		URL(std::string url_);
+  public:
+    /**
+     * \brief
+     *
+     */
+    URL(std::string url_);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~URL();
+    /**
+     * \brief
+     *
+     */
+    virtual ~URL();
 
-		/**
-		 * \brief
-		 *
-		 */
-		static std::string Encode(std::string);
+    /**
+     * \brief
+     *
+     */
+    static std::string Encode(std::string);
 
-		/**
-		 * \brief
-		 *
-		 */
-		static std::string Decode(std::string);
+    /**
+     * \brief
+     *
+     */
+    static std::string Decode(std::string);
 
-		/**
-		 * \brief
-		 *
-		 */
-		static std::string Encode(std::string, std::string);
+    /**
+     * \brief
+     *
+     */
+    static std::string Encode(std::string, std::string);
 
-		/**
-		 * \brief
-		 *
-		 */
-		static std::string Decode(std::string, std::string);
+    /**
+     * \brief
+     *
+     */
+    static std::string Decode(std::string, std::string);
 
-		/**
-		 * \brief
-		 *
-		 */
-		std::string GetHost();
+    /**
+     * \brief
+     *
+     */
+    std::string GetHost();
 
-		/**
-		 * \brief
-		 *
-		 */
-		int GetPort();
+    /**
+     * \brief
+     *
+     */
+    int GetPort();
 
-		/**
-		 * \brief
-		 *
-		 */
-		std::string GetProtocol();
+    /**
+     * \brief
+     *
+     */
+    std::string GetProtocol();
 
-		/**
-		 * \brief
-		 *
-		 */
-		std::string GetParameters();
+    /**
+     * \brief
+     *
+     */
+    std::string GetParameters();
 
-		/**
-		 * \brief
-		 *
-		 */
-		std::string GetReference();
+    /**
+     * \brief
+     *
+     */
+    std::string GetReference();
 
-		/**
-		 * \brief
-		 *
-		 */
-		std::string GetFile();
+    /**
+     * \brief
+     *
+     */
+    std::string GetFile();
 
-		/**
-		 * \brief
-		 *
-		 */
-		std::string GetQuery();
+    /**
+     * \brief
+     *
+     */
+    std::string GetQuery();
 
-		/**
-		 * \brief
-		 *
-		 */
-		std::string GetPath();
+    /**
+     * \brief
+     *
+     */
+    std::string GetPath();
 
-		/**
-		 * \brief
-		 *
-		 */
-		void SetHost(std::string s);
+    /**
+     * \brief
+     *
+     */
+    void SetHost(std::string s);
 
-		/**
-		 * \brief
-		 *
-		 */
-		void SetPort(int p);
+    /**
+     * \brief
+     *
+     */
+    void SetPort(int p);
 
-		/**
-		 * \brief
-		 *
-		 */
-		void SetProtocol(std::string s);
+    /**
+     * \brief
+     *
+     */
+    void SetProtocol(std::string s);
 
-		/**
-		 * \brief
-		 *
-		 */
-		void SetParameters(std::string s);
+    /**
+     * \brief
+     *
+     */
+    void SetParameters(std::string s);
 
-		/**
-		 * \brief
-		 *
-		 */
-		void SetFile(std::string s);
+    /**
+     * \brief
+     *
+     */
+    void SetFile(std::string s);
 
-		/**
-		 * \brief
-		 *
-		 */
-		void SetPath(std::string s);
+    /**
+     * \brief
+     *
+     */
+    void SetPath(std::string s);
 
-		/**
-		 * \brief
-		 *
-		 */
-		void SetQuery(std::string s);
+    /**
+     * \brief
+     *
+     */
+    void SetQuery(std::string s);
 
-		/**
-		 * \brief
-		 *
-		 */
-		void SetReference(std::string s);
+    /**
+     * \brief
+     *
+     */
+    void SetReference(std::string s);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string What();
+    /**
+     * \brief
+     *
+     */
+    virtual std::string What();
 };
 
 }

@@ -24,19 +24,19 @@ namespace jexception {
 ProcessException::ProcessException():
   jexception::RuntimeException()
 {
-	jcommon::Object::SetClassName("jexception::ProcessException");
+  jcommon::Object::SetClassName("jexception::ProcessException");
 }
 
 ProcessException::ProcessException(std::string reason_):
   jexception::RuntimeException(reason_)
 {
-	jcommon::Object::SetClassName("jexception::ProcessException");
+  jcommon::Object::SetClassName("jexception::ProcessException");
 }
 
 ProcessException::ProcessException(jexception::Exception *exception, std::string reason_):
   jexception::RuntimeException(exception, reason_)
 {
-	jcommon::Object::SetClassName("jexception::ProcessException");
+  jcommon::Object::SetClassName("jexception::ProcessException");
 }
 
 ProcessException::~ProcessException() throw()

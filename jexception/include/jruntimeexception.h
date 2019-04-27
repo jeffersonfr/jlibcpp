@@ -31,58 +31,58 @@ namespace jexception {
  */
 class RuntimeException : public jexception::Exception, public std::runtime_error {
 
-	private:
+  private:
 
-	public:
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		RuntimeException();
+  public:
+    /**
+     * \brief Construtor.
+     *
+     */
+    RuntimeException();
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		RuntimeException(std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    RuntimeException(std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		RuntimeException(jexception::Exception *exception, std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    RuntimeException(jexception::Exception *exception, std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> RuntimeException(const std::string &fmt, T ...vs):
       Exception(fmt, vs...), std::runtime_error(_reason)
     {
       jcommon::Object::SetClassName("jexception::RuntimeException");
     }
-		
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> RuntimeException(Exception *exception, const std::string &fmt, T ...vs):
       Exception(exception, fmt, vs...), std::runtime_error(_reason)
     {
       jcommon::Object::SetClassName("jexception::RuntimeException");
     }
-		
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~RuntimeException() throw();
+    
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~RuntimeException() throw();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string What();
+    /**
+     * \brief
+     *
+     */
+    virtual std::string What();
 
 };
 

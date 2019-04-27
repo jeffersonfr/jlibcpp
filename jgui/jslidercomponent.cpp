@@ -25,18 +25,18 @@
 namespace jgui {
 
 SliderComponent::SliderComponent(int x, int y, int width, int height):
-   	Component(x, y, width, height)
+     Component(x, y, width, height)
 {
-	jcommon::Object::SetClassName("jgui::SliderComponent");
+  jcommon::Object::SetClassName("jgui::SliderComponent");
 
-	_index = 0;
-	_value = 0;
-	_minimum = 0;
-	_maximum = 100;
-	_minimum_tick = 1;
-	_maximum_tick = 10;
-	_type = JSO_HORIZONTAL;
-	// _type = JSO_VERTICAL;
+  _index = 0;
+  _value = 0;
+  _minimum = 0;
+  _maximum = 100;
+  _minimum_tick = 1;
+  _maximum_tick = 10;
+  _type = JSO_HORIZONTAL;
+  // _type = JSO_VERTICAL;
 }
 
 SliderComponent::~SliderComponent()
@@ -45,151 +45,151 @@ SliderComponent::~SliderComponent()
 
 void SliderComponent::SetScrollOrientation(jscroll_orientation_t type)
 {
-	if (_type == type) {
-		return;
-	}
+  if (_type == type) {
+    return;
+  }
 
-	_type = type;
+  _type = type;
 
-	Repaint();
+  Repaint();
 }
 
 jscroll_orientation_t SliderComponent::GetScrollOrientation()
 {
-	return _type;
+  return _type;
 }
 
 int SliderComponent::GetValue()
 {
-	return _value;
+  return _value;
 }
 
 void SliderComponent::SetValue(int i)
 {
-	if (_value == i) {
-		return;
-	}
+  if (_value == i) {
+    return;
+  }
 
-	if (i < _minimum) {
-		i = _minimum;
-	}
+  if (i < _minimum) {
+    i = _minimum;
+  }
 
-	if (i > _maximum) {
-		i = _maximum;
-	}
-		
-	int diff = i-_value;
+  if (i > _maximum) {
+    i = _maximum;
+  }
+    
+  int diff = i-_value;
 
-	_value = i;
+  _value = i;
 
-	if (diff > _minimum_tick) {
-		DispatchAdjustmentEvent(new jevent::AdjustmentEvent(this, jevent::JAET_BLOCK_INCREMENT, _value));
-	} else if (diff < -_minimum_tick) {
-		DispatchAdjustmentEvent(new jevent::AdjustmentEvent(this, jevent::JAET_BLOCK_DECREMENT, _value));
-	} else if (diff > 0 && diff <= _minimum_tick) {
-		DispatchAdjustmentEvent(new jevent::AdjustmentEvent(this, jevent::JAET_UNIT_INCREMENT, _value));
-	} else if (diff < 0 && diff >= -_minimum_tick) {
-		DispatchAdjustmentEvent(new jevent::AdjustmentEvent(this, jevent::JAET_UNIT_DECREMENT, _value));
-	}
+  if (diff > _minimum_tick) {
+    DispatchAdjustmentEvent(new jevent::AdjustmentEvent(this, jevent::JAET_BLOCK_INCREMENT, _value));
+  } else if (diff < -_minimum_tick) {
+    DispatchAdjustmentEvent(new jevent::AdjustmentEvent(this, jevent::JAET_BLOCK_DECREMENT, _value));
+  } else if (diff > 0 && diff <= _minimum_tick) {
+    DispatchAdjustmentEvent(new jevent::AdjustmentEvent(this, jevent::JAET_UNIT_INCREMENT, _value));
+  } else if (diff < 0 && diff >= -_minimum_tick) {
+    DispatchAdjustmentEvent(new jevent::AdjustmentEvent(this, jevent::JAET_UNIT_DECREMENT, _value));
+  }
 
-	Repaint();
+  Repaint();
 }
 
 
 void SliderComponent::SetRange(int minimum, int maximum)
 {
-	_minimum = minimum;
-	_maximum = maximum;
+  _minimum = minimum;
+  _maximum = maximum;
 }
 
 int SliderComponent::GetMinimum()
 {
-	return _minimum;
+  return _minimum;
 }
 
 int SliderComponent::GetMaximum()
 {
-	return _maximum;
+  return _maximum;
 }
 
 void SliderComponent::SetMinimum(int i)
 {
-	_minimum = i;
+  _minimum = i;
 }
 
 void SliderComponent::SetMaximum(int i)
 {
-	_maximum = i;
+  _maximum = i;
 }
 
 int SliderComponent::GetMinorTickSpacing()
 {
-	return _minimum_tick;
+  return _minimum_tick;
 }
 
 int SliderComponent::GetMajorTickSpacing()
 {
-	return _maximum_tick;
+  return _maximum_tick;
 }
 
 void SliderComponent::SetMinorTickSpacing(int i)
 {
-	_minimum_tick = i;
+  _minimum_tick = i;
 }
 
 void SliderComponent::SetMajorTickSpacing(int i)
 {
-	_maximum_tick = i;
+  _maximum_tick = i;
 }
 
 void SliderComponent::RegisterAdjustmentListener(jevent::AdjustmentListener *listener)
 {
-	if (listener == nullptr) {
-		return;
-	}
+  if (listener == nullptr) {
+    return;
+  }
 
- 	std::lock_guard<std::mutex> guard(_adjustment_listener_mutex);
+   std::lock_guard<std::mutex> guard(_adjustment_listener_mutex);
 
-	if (std::find(_adjustment_listeners.begin(), _adjustment_listeners.end(), listener) == _adjustment_listeners.end()) {
-		_adjustment_listeners.push_back(listener);
-	}
+  if (std::find(_adjustment_listeners.begin(), _adjustment_listeners.end(), listener) == _adjustment_listeners.end()) {
+    _adjustment_listeners.push_back(listener);
+  }
 }
 
 void SliderComponent::RemoveAdjustmentListener(jevent::AdjustmentListener *listener)
 {
-	if (listener == nullptr) {
-		return;
-	}
+  if (listener == nullptr) {
+    return;
+  }
 
- 	std::lock_guard<std::mutex> guard(_adjustment_listener_mutex);
+   std::lock_guard<std::mutex> guard(_adjustment_listener_mutex);
 
   _adjustment_listeners.erase(std::remove(_adjustment_listeners.begin(), _adjustment_listeners.end(), listener), _adjustment_listeners.end());
 }
 
 void SliderComponent::DispatchAdjustmentEvent(jevent::AdjustmentEvent *event)
 {
-	if (event == nullptr) {
-		return;
-	}
+  if (event == nullptr) {
+    return;
+  }
 
-	_adjustment_listener_mutex.lock();
+  _adjustment_listener_mutex.lock();
 
-	std::vector<jevent::AdjustmentListener *> listeners = _adjustment_listeners;
+  std::vector<jevent::AdjustmentListener *> listeners = _adjustment_listeners;
 
-	_adjustment_listener_mutex.unlock();
+  _adjustment_listener_mutex.unlock();
 
-	for (std::vector<jevent::AdjustmentListener *>::iterator i=listeners.begin(); i!=listeners.end() && event->IsConsumed() == false; i++) {
-		jevent::AdjustmentListener *listener = (*i);
+  for (std::vector<jevent::AdjustmentListener *>::iterator i=listeners.begin(); i!=listeners.end() && event->IsConsumed() == false; i++) {
+    jevent::AdjustmentListener *listener = (*i);
 
-		listener->AdjustmentValueChanged(event);
-	}
+    listener->AdjustmentValueChanged(event);
+  }
 
-	delete event;
+  delete event;
 }
 
 const std::vector<jevent::AdjustmentListener *> & SliderComponent::GetAdjustmentListeners()
 {
-	return _adjustment_listeners;
+  return _adjustment_listeners;
 }
 
 }

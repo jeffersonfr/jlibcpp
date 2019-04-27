@@ -22,33 +22,33 @@
 namespace jmedia {
 
 VideoDeviceControl::VideoDeviceControl():
-	Control("video.device")
+  Control("video.device")
 {
-	jcommon::Object::SetClassName("jmedia::VideoDeviceControl");
+  jcommon::Object::SetClassName("jmedia::VideoDeviceControl");
 }
-		
+    
 VideoDeviceControl::~VideoDeviceControl()
 {
 }
 
 const std::vector<jvideo_control_t> & VideoDeviceControl::GetControls()
 {
-	return _controls;
+  return _controls;
 }
 
 bool VideoDeviceControl::HasControl(jvideo_control_t id)
 {
-	return false;
+  return false;
 }
 
 int VideoDeviceControl::GetValue(jvideo_control_t id)
 {
-	return -1;
+  return -1;
 }
 
 bool VideoDeviceControl::SetValue(jvideo_control_t id, int value)
 {
-	return false;
+  return false;
 }
 
 void VideoDeviceControl::Reset(jvideo_control_t id)

@@ -35,102 +35,102 @@ namespace jgui {
  */
 class TabbedPane : public jgui::Container {
 
-	private:
-		/** \brief */
-		std::vector<jevent::SelectListener *> _select_listeners;
-		/** \brief */
-		std::mutex _pane_mutex;
+  private:
+    /** \brief */
+    std::vector<jevent::SelectListener *> _select_listeners;
+    /** \brief */
+    std::mutex _pane_mutex;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		TabbedPane(int x = 0, int y = 0, int width = 0, int height = 0);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~TabbedPane();
+  public:
+    /**
+     * \brief
+     *
+     */
+    TabbedPane(int x = 0, int y = 0, int width = 0, int height = 0);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~TabbedPane();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetCurrentTab();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void AddTab(std::string title, jgui::Image *image, jgui::Component *component, int index = -1);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveTab(int index);
+    /**
+     * \brief
+     *
+     */
+    virtual int GetCurrentTab();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void AddTab(std::string title, jgui::Image *image, jgui::Component *component, int index = -1);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void RemoveTab(int index);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jgui::Component * GetTabComponentAt(int index);
+    /**
+     * \brief
+     *
+     */
+    virtual jgui::Component * GetTabComponentAt(int index);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetTabTitle(int index, std::string title);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetTabTitle(int index, std::string title);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string GetTabTitle(int index);
+    /**
+     * \brief
+     *
+     */
+    virtual std::string GetTabTitle(int index);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetTabCount();
+    /**
+     * \brief
+     *
+     */
+    virtual int GetTabCount();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetPaddind(int left, int top, int right, int bottom);
+    /**
+     * \brief
+     *
+     */
+    virtual void SetPaddind(int left, int top, int right, int bottom);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int IndexOfComponent(jgui::Component *cmp);
+    /**
+     * \brief
+     *
+     */
+    virtual int IndexOfComponent(jgui::Component *cmp);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RegisterTabsListener(jevent::SelectListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveTabsListener(jevent::SelectListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void DispatchTabsEvent(jevent::SelectEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual const std::vector<jevent::SelectListener *> & GetTabsListeners();
+    /**
+     * \brief
+     *
+     */
+    virtual void RegisterTabsListener(jevent::SelectListener *listener);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void RemoveTabsListener(jevent::SelectListener *listener);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void DispatchTabsEvent(jevent::SelectEvent *event);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual const std::vector<jevent::SelectListener *> & GetTabsListeners();
 
 };
 

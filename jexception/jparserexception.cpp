@@ -22,21 +22,21 @@
 namespace jexception {
 
 ParserException::ParserException():
-	RuntimeException()
+  RuntimeException()
 {
-	jcommon::Object::SetClassName("jexception::ParserException");
+  jcommon::Object::SetClassName("jexception::ParserException");
 }
 
 ParserException::ParserException(std::string reason_):
-	RuntimeException(reason_)
+  RuntimeException(reason_)
 {
-	jcommon::Object::SetClassName("jexception::ParserException");
+  jcommon::Object::SetClassName("jexception::ParserException");
 }
 
 ParserException::ParserException(jexception::Exception *exception, std::string reason_):
-	RuntimeException(exception, reason_)
+  RuntimeException(exception, reason_)
 {
-	jcommon::Object::SetClassName("jexception::ParserException");
+  jcommon::Object::SetClassName("jexception::ParserException");
 }
 
 ParserException::~ParserException() throw()

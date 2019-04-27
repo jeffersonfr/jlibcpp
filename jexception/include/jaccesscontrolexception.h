@@ -31,52 +31,52 @@ namespace jexception {
  */
 class AccessControlException : public jexception::SecurityException {
 
-	private:
+  private:
 
-	public:
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		AccessControlException();
+  public:
+    /**
+     * \brief Construtor.
+     *
+     */
+    AccessControlException();
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		AccessControlException(std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    AccessControlException(std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> AccessControlException(const std::string &fmt, T ...vs):
       Exception(fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::AccessControlException");
     }
-		
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> AccessControlException(Exception *exception, const std::string &fmt, T ...vs):
       Exception(exception, fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::AccessControlException");
     }
-		
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		AccessControlException(jexception::Exception *exception, std::string reason);
+    
+    /**
+     * \brief Construtor.
+     *
+     */
+    AccessControlException(jexception::Exception *exception, std::string reason);
 
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~AccessControlException() throw();
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~AccessControlException() throw();
 
 };
 

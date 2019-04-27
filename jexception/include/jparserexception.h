@@ -31,52 +31,52 @@ namespace jexception {
  */
 class ParserException : public jexception::RuntimeException {
 
-	private:
+  private:
 
-	public:
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		ParserException();
+  public:
+    /**
+     * \brief Construtor.
+     *
+     */
+    ParserException();
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		ParserException(std::string);
+    /**
+     * \brief Construtor.
+     *
+     */
+    ParserException(std::string);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		ParserException(jexception::Exception *exception, std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    ParserException(jexception::Exception *exception, std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> ParserException(const std::string &fmt, T ...vs):
       Exception(fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::ParserException");
     }
-		
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> ParserException(Exception *exception, const std::string &fmt, T ...vs):
       Exception(exception, fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::ParserException");
     }
-		
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~ParserException() throw();
+    
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~ParserException() throw();
 
 };
 

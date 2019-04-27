@@ -22,9 +22,9 @@
 namespace jevent {
 
 DemuxListener::DemuxListener():
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jevent::DemuxListener");
+  jcommon::Object::SetClassName("jevent::DemuxListener");
 }
 
 DemuxListener::~DemuxListener()

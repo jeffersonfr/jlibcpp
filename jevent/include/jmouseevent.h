@@ -30,11 +30,11 @@ namespace jevent {
  *
  */
 enum jmouseevent_type_t {
-	JMT_UNKNOWN,
-	JMT_PRESSED,
-	JMT_RELEASED,
-	JMT_MOVED,
-	JMT_ROTATED
+  JMT_UNKNOWN,
+  JMT_PRESSED,
+  JMT_RELEASED,
+  JMT_MOVED,
+  JMT_ROTATED
 };
 
 /**
@@ -42,11 +42,11 @@ enum jmouseevent_type_t {
  *
  */
 enum jmouseevent_button_t {
-	JMB_NONE    = 0x00,
-	JMB_BUTTON1 = 0x01,
-	JMB_BUTTON2 = 0x02,
-	JMB_BUTTON3 = 0x04,
-	JMB_WHEEL		= 0x08
+  JMB_NONE    = 0x00,
+  JMB_BUTTON1 = 0x01,
+  JMB_BUTTON2 = 0x02,
+  JMB_BUTTON3 = 0x04,
+  JMB_WHEEL    = 0x08
 };
 
 /**
@@ -56,73 +56,73 @@ enum jmouseevent_button_t {
  */
 class MouseEvent : public jevent::EventObject {
 
-	private:
-		/** \brief */
+  private:
+    /** \brief */
     jgui::jpoint_t _location;
-		/** \brief */
-		jmouseevent_button_t _button;
-		/** \brief */
-		jmouseevent_button_t _buttons;
-		/** \brief */
-		jmouseevent_type_t _type;
-		/** \brief */
-		int _click_count;
+    /** \brief */
+    jmouseevent_button_t _button;
+    /** \brief */
+    jmouseevent_button_t _buttons;
+    /** \brief */
+    jmouseevent_type_t _type;
+    /** \brief */
+    int _click_count;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		MouseEvent(void *source, jmouseevent_type_t type, jmouseevent_button_t button, jmouseevent_button_t buttons, int click_count, int x, int y);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~MouseEvent();
+  public:
+    /**
+     * \brief
+     *
+     */
+    MouseEvent(void *source, jmouseevent_type_t type, jmouseevent_button_t button, jmouseevent_button_t buttons, int click_count, int x, int y);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~MouseEvent();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jmouseevent_type_t GetType();
+    /**
+     * \brief
+     *
+     */
+    virtual jmouseevent_type_t GetType();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetClickCount();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jmouseevent_button_t GetButton();
+    /**
+     * \brief
+     *
+     */
+    virtual int GetClickCount();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual jmouseevent_button_t GetButton();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jmouseevent_button_t GetButtons();
+    /**
+     * \brief
+     *
+     */
+    virtual jmouseevent_button_t GetButtons();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jgui::jpoint_t GetLocation();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetLocation(int x, int y);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetLocation(jgui::jpoint_t location);
-		
+    /**
+     * \brief
+     *
+     */
+    virtual jgui::jpoint_t GetLocation();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetLocation(int x, int y);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetLocation(jgui::jpoint_t location);
+    
 };
 
 }

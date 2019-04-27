@@ -32,115 +32,115 @@ class Demux;
 
 class DemuxManager : public jcommon::Object {
 
-	friend class Demux;
+  friend class Demux;
 
-	protected:
-		/** \brief */
-		static DemuxManager *_instance;
+  protected:
+    /** \brief */
+    static DemuxManager *_instance;
 
-		/** \brief */
+    /** \brief */
     std::map<int, int> _pid_report;
-		/** \brief */
-		std::vector<Demux *> _demuxes;
-		/** \brief */
-		std::vector<Demux *> _sync_demuxes;
-		/** \brief */
-		std::thread _thread;
-		/** \brief */
-		std::mutex _demux_mutex;
-		/** \brief */
-		std::mutex _demux_sync_mutex;
-		/** \brief */
-		jio::InputStream *_source;
-		/** \brief */
-		bool _is_running;
+    /** \brief */
+    std::vector<Demux *> _demuxes;
+    /** \brief */
+    std::vector<Demux *> _sync_demuxes;
+    /** \brief */
+    std::thread _thread;
+    /** \brief */
+    std::mutex _demux_mutex;
+    /** \brief */
+    std::mutex _demux_sync_mutex;
+    /** \brief */
+    jio::InputStream *_source;
+    /** \brief */
+    bool _is_running;
 
-	protected:
-		/**
-		 * \brief
-		 *
-		 */
+  protected:
+    /**
+     * \brief
+     *
+     */
     virtual void ProcessRaw(const char *data, const int length);
 
-		/**
-		 * \brief
-		 *
-		 */
+    /**
+     * \brief
+     *
+     */
     virtual void ProcessPSI(const char *data, const int length);
 
-		/**
-		 * \brief
-		 *
-		 */
+    /**
+     * \brief
+     *
+     */
     virtual void ProcessPES(const char *data, const int length);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void AddDemux(Demux *demux);
+    /**
+     * \brief
+     *
+     */
+    virtual void AddDemux(Demux *demux);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveDemux(Demux *demux);
+    /**
+     * \brief
+     *
+     */
+    virtual void RemoveDemux(Demux *demux);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Run();
-		
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		DemuxManager();
+    /**
+     * \brief
+     *
+     */
+    virtual void Run();
+    
+  public:
+    /**
+     * \brief
+     *
+     */
+    DemuxManager();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~DemuxManager();
+    /**
+     * \brief
+     *
+     */
+    virtual ~DemuxManager();
 
-		/**
-		 * \brief
-		 *
-		 */
-		static DemuxManager * GetInstance();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetInputStream(jio::InputStream *is);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Start();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Stop();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void WaitSync();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::map<int, int> GetPidReport();
-		
+    /**
+     * \brief
+     *
+     */
+    static DemuxManager * GetInstance();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetInputStream(jio::InputStream *is);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Start();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void Stop();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void WaitSync();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual std::map<int, int> GetPidReport();
+    
 };
 
 }

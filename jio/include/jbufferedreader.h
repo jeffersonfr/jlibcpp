@@ -31,61 +31,61 @@ namespace jio {
  */
 class BufferedReader : public virtual jcommon::Object {
 
-	private:
-		/** \brief */
-		InputStream *_stream;
-		/** \brief */
-		char *_buffer;
-		/** \brief */
-		int64_t _buffer_size;
-		/** \brief */
-		int64_t _buffer_index;
-		/** \brief */
-		bool _is_eof;
-		
-	public:
-		/**
-		 * \brief
-		 * 
-		 */
-		BufferedReader(InputStream *stream_);
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual ~BufferedReader();
-
-		/**
-		 * \brief
-		 * 
-		 */
-		bool IsEOF();
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		int64_t Available();
-
-		/**
-		 * \brief
-		 * 
-		 */
-		int64_t Read();
-
-		/**
-		 * \brief
-		 * 
-		 */
-		int64_t Read(char *, int64_t size);
+  private:
+    /** \brief */
+    InputStream *_stream;
+    /** \brief */
+    char *_buffer;
+    /** \brief */
+    int64_t _buffer_size;
+    /** \brief */
+    int64_t _buffer_index;
+    /** \brief */
+    bool _is_eof;
     
-		/**
-		 * \brief
-		 * 
-		 */
-		std::string ReadLine(std::string delim = "\n");
-	
+  public:
+    /**
+     * \brief
+     * 
+     */
+    BufferedReader(InputStream *stream_);
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual ~BufferedReader();
+
+    /**
+     * \brief
+     * 
+     */
+    bool IsEOF();
+    
+    /**
+     * \brief
+     * 
+     */
+    int64_t Available();
+
+    /**
+     * \brief
+     * 
+     */
+    int64_t Read();
+
+    /**
+     * \brief
+     * 
+     */
+    int64_t Read(char *, int64_t size);
+    
+    /**
+     * \brief
+     * 
+     */
+    std::string ReadLine(std::string delim = "\n");
+  
 };
 
 }

@@ -32,25 +32,25 @@ namespace jevent {
  */
 class ActionListener : public jevent::Listener {
 
-	protected:
-		/**
-		 * \brief
-		 *
-		 */
-		ActionListener();
+  protected:
+    /**
+     * \brief
+     *
+     */
+    ActionListener();
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~ActionListener();
+  public:
+    /**
+     * \brief
+     *
+     */
+    virtual ~ActionListener();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void ActionPerformed(ActionEvent *event);
+    /**
+     * \brief
+     *
+     */
+    virtual void ActionPerformed(ActionEvent *event);
 
 };
 

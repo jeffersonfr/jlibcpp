@@ -27,95 +27,95 @@
 namespace jnetwork {
 
 LocalServerSocket::LocalServerSocket(std::string file, int backlog_):
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jnetwork::ServerSocket");
-	
-	_file = file;
-	_is_closed = false;
+  jcommon::Object::SetClassName("jnetwork::ServerSocket");
+  
+  _file = file;
+  _is_closed = false;
 
-	CreateSocket();
-	BindSocket();
-	ListenSocket(backlog_);
+  CreateSocket();
+  BindSocket();
+  ListenSocket(backlog_);
 }
 
 LocalServerSocket::~LocalServerSocket()
 {
-	try {
-		Close();
-	} catch (...) {
-	}
+  try {
+    Close();
+  } catch (...) {
+  }
 }
 
 /** Private */
 
 void LocalServerSocket::CreateSocket()
 {
-	_fd = socket (PF_UNIX, SOCK_STREAM, PF_UNSPEC);
+  _fd = socket (PF_UNIX, SOCK_STREAM, PF_UNSPEC);
 
-	if (_fd < 0) {
-		throw jexception::ConnectionException("ServerSocket handling error");
-	}
+  if (_fd < 0) {
+    throw jexception::ConnectionException("ServerSocket handling error");
+  }
 }
 
 void LocalServerSocket::BindSocket()
 {
-	int length = sizeof(_address.sun_path)-1;
+  int length = sizeof(_address.sun_path)-1;
 
-	unlink(_file.c_str());
+  unlink(_file.c_str());
 
-	_address.sun_family = AF_UNIX;
-	strncpy(_address.sun_path, _file.c_str(), length);
-	
-	int address_length = sizeof(_address.sun_family) + strnlen(_address.sun_path, length);
+  _address.sun_family = AF_UNIX;
+  strncpy(_address.sun_path, _file.c_str(), length);
+  
+  int address_length = sizeof(_address.sun_family) + strnlen(_address.sun_path, length);
 
-	if (bind(_fd, (struct sockaddr *) &_address, address_length) != 0) {
-		throw jexception::ConnectionException("ServerBinding error");
-	}
+  if (bind(_fd, (struct sockaddr *) &_address, address_length) != 0) {
+    throw jexception::ConnectionException("ServerBinding error");
+  }
 }
 
 void LocalServerSocket::ListenSocket(int backlog_)
 {
-	if (::listen(_fd, backlog_) < 0) {
-		throw jexception::ConnectionException("ServerListen error");
-	}
+  if (::listen(_fd, backlog_) < 0) {
+    throw jexception::ConnectionException("ServerListen error");
+  }
 }
 
 /** End */
 
 LocalSocket * LocalServerSocket::Accept()
 {
-	struct sockaddr_un address;
-	int handler,
-			length = sizeof(_address.sun_path)-1;
-	socklen_t address_length = strnlen(_file.c_str(), length);
-	
-	address.sun_family = AF_UNIX;
-	strncpy(address.sun_path, _file.c_str(), length);
-	
-	if ((handler = ::accept(_fd, (struct sockaddr *)&address, &address_length)) < 0) {
-		throw jexception::ConnectionException("ServerSocket accept exception");
-	}
+  struct sockaddr_un address;
+  int handler,
+      length = sizeof(_address.sun_path)-1;
+  socklen_t address_length = strnlen(_file.c_str(), length);
+  
+  address.sun_family = AF_UNIX;
+  strncpy(address.sun_path, _file.c_str(), length);
+  
+  if ((handler = ::accept(_fd, (struct sockaddr *)&address, &address_length)) < 0) {
+    throw jexception::ConnectionException("ServerSocket accept exception");
+  }
 
-	return new LocalSocket(handler, _file);
+  return new LocalSocket(handler, _file);
 }
 
 std::string LocalServerSocket::GetServerFile()
 {
-	return _file;
+  return _file;
 }
 
 void LocalServerSocket::Close()
 {
-	if (_is_closed == false) {
-		_is_closed = true;
+  if (_is_closed == false) {
+    _is_closed = true;
 
-		if (close(_fd) != 0) {
-			throw jexception::ConnectionException("Unknown close exception");
-		}
-	}
-	
-	unlink(_file.c_str());
+    if (close(_fd) != 0) {
+      throw jexception::ConnectionException("Unknown close exception");
+    }
+  }
+  
+  unlink(_file.c_str());
 }
 
 }

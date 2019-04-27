@@ -31,52 +31,52 @@ namespace jexception {
  */
 class ResourceException : public jexception::RuntimeException {
 
-	private:
+  private:
 
-	public:
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		ResourceException();
+  public:
+    /**
+     * \brief Construtor.
+     *
+     */
+    ResourceException();
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		ResourceException(std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    ResourceException(std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		ResourceException(jexception::Exception *exception, std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    ResourceException(jexception::Exception *exception, std::string reason);
 
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> ResourceException(const std::string &fmt, T ...vs):
       Exception(fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::ResourceException");
     }
-		
-		/**
-		 * \brief Construtor.
-		 *
-		 */
+    
+    /**
+     * \brief Construtor.
+     *
+     */
     template <typename... T> ResourceException(Exception *exception, const std::string &fmt, T ...vs):
       Exception(exception, fmt, vs...)
     {
       jcommon::Object::SetClassName("jexception::ResourceException");
     }
-		
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~ResourceException() throw();
+    
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~ResourceException() throw();
 
 };
 

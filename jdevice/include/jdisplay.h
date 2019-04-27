@@ -31,26 +31,26 @@ namespace jdevice {
 */
 class Display : public jdevice::Device {
 
-	private:
+  private:
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		Display();
+  public:
+    /**
+     * \brief
+     *
+     */
+    Display();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual ~Display();
+    /**
+     * \brief
+     * 
+     */
+    virtual ~Display();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void Builder();
+    /**
+     * \brief
+     * 
+     */
+    virtual void Builder();
 
 };
 

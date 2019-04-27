@@ -31,21 +31,21 @@ namespace jsecurity {
  */
 class FileAccessControl : public AccessControl {
 
-	private:
+  private:
 
-		
-	public:
-		/**
-		 * \brief
-		 * 
-		 */
-		FileAccessControl();
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual ~FileAccessControl();
+    
+  public:
+    /**
+     * \brief
+     * 
+     */
+    FileAccessControl();
+    
+    /**
+     * \brief
+     * 
+     */
+    virtual ~FileAccessControl();
 
 };
 

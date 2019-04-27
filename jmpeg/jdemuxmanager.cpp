@@ -28,73 +28,73 @@ namespace jmpeg {
 DemuxManager * DemuxManager::_instance = nullptr;
 
 DemuxManager::DemuxManager():
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jmpeg::DemuxManager");
+  jcommon::Object::SetClassName("jmpeg::DemuxManager");
 
-	_source = nullptr;
-	_is_running = false;
+  _source = nullptr;
+  _is_running = false;
 }
-		
+    
 DemuxManager::~DemuxManager()
 {
 }
 
 DemuxManager * DemuxManager::GetInstance()
 {
-	if (_instance == nullptr) {
-		_instance = new DemuxManager();
-	}
+  if (_instance == nullptr) {
+    _instance = new DemuxManager();
+  }
 
-	return _instance;
+  return _instance;
 }
 
 void DemuxManager::AddDemux(Demux *demux)
 {
-	if (demux == nullptr) {
-		return;
-	}
+  if (demux == nullptr) {
+    return;
+  }
 
-	_demux_mutex.lock();
+  _demux_mutex.lock();
 
-	if (std::find(_sync_demuxes.begin(), _sync_demuxes.end(), demux) == _sync_demuxes.end()) {
-		_sync_demuxes.push_back(demux);
-	}
-	
-	_demux_mutex.unlock();
+  if (std::find(_sync_demuxes.begin(), _sync_demuxes.end(), demux) == _sync_demuxes.end()) {
+    _sync_demuxes.push_back(demux);
+  }
+  
+  _demux_mutex.unlock();
 }
 
 void DemuxManager::RemoveDemux(Demux *demux)
 {
-	if (demux == nullptr) {
-		return;
-	}
+  if (demux == nullptr) {
+    return;
+  }
 
-	_demux_mutex.lock();
+  _demux_mutex.lock();
 
   _sync_demuxes.erase(std::remove(_sync_demuxes.begin(), _sync_demuxes.end(), demux), _sync_demuxes.end());
-	
-	_demux_mutex.unlock();
+  
+  _demux_mutex.unlock();
 }
 
 void DemuxManager::SetInputStream(jio::InputStream *is)
 {
-	_demux_mutex.lock();
+  _demux_mutex.lock();
 
-	_source = is;
+  _source = is;
 
-	_demux_mutex.unlock();
+  _demux_mutex.unlock();
 }
 
 void DemuxManager::Start()
 {
-	if (_is_running == true) {
-		return;
-	}
+  if (_is_running == true) {
+    return;
+  }
 
-	_is_running = true;
-	
-	_thread = std::thread(&DemuxManager::Run, this);
+  _is_running = true;
+  
+  _thread = std::thread(&DemuxManager::Run, this);
 
   // INFO:: grant some time to starts the thread
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -102,11 +102,11 @@ void DemuxManager::Start()
 
 void DemuxManager::Stop()
 {
-	if (_is_running == true) {
-		_is_running = false;
+  if (_is_running == true) {
+    _is_running = false;
 
-		_thread.join();
-	}
+    _thread.join();
+  }
 }
 
 void DemuxManager::WaitSync()
@@ -387,18 +387,18 @@ void DemuxManager::ProcessPES(const char *data, const int length)
 
 std::map<int, int> DemuxManager::GetPidReport()
 {
- 	std::lock_guard<std::mutex> guard(_demux_mutex);
+   std::lock_guard<std::mutex> guard(_demux_mutex);
 
   return _pid_report;
 }
 
 void DemuxManager::Run()
 {
- 	std::lock_guard<std::mutex> guard(_demux_sync_mutex);
+   std::lock_guard<std::mutex> guard(_demux_sync_mutex);
 
-	if (_source == nullptr) {
-		return;
-	}
+  if (_source == nullptr) {
+    return;
+  }
 
   struct jstream_counter_t {
     int continuity_counter;
@@ -407,28 +407,28 @@ void DemuxManager::Run()
 
   std::map<int, struct jstream_counter_t> counter;
 
-	while (_is_running) {
-		_demux_mutex.lock();
+  while (_is_running) {
+    _demux_mutex.lock();
 
-		_demuxes = _sync_demuxes;
-	
-		_demux_mutex.unlock();
+    _demuxes = _sync_demuxes;
+  
+    _demux_mutex.unlock();
 
-		char packet[TS_PACKET_LENGTH];
-		int length = TS_PACKET_LENGTH;
+    char packet[TS_PACKET_LENGTH];
+    int length = TS_PACKET_LENGTH;
 
-		if (_source->Read(packet, length) != length) {
-			break;
-		}
+    if (_source->Read(packet, length) != length) {
+      break;
+    }
 
-		// INFO:: processing transport stream
-		const char *data = packet;
+    // INFO:: processing transport stream
+    const char *data = packet;
 
-		int sync_byte = TS_G8(data);
+    int sync_byte = TS_G8(data);
 
-		if (sync_byte != TS_SYNC_BYTE) {
-			continue;
-		}
+    if (sync_byte != TS_SYNC_BYTE) {
+      continue;
+    }
 
     ProcessRaw(data, TS_PACKET_LENGTH);
 
@@ -441,15 +441,15 @@ void DemuxManager::Run()
     int contains_payload = TS_GM8(data + 3, 3, 1);
     int continuity_counter = TS_GM8(data + 3, 4, 4);
 
-		_demux_mutex.lock();
+    _demux_mutex.lock();
 
     if (_pid_report.find(pid) == _pid_report.end()) {
-		  _pid_report[pid] = 1;
+      _pid_report[pid] = 1;
     }
 
-		_pid_report[pid] += 1;
-	
-		_demux_mutex.unlock();
+    _pid_report[pid] += 1;
+  
+    _demux_mutex.unlock();
 
     if (transport_error_indicator == 1) {
       return;
@@ -484,9 +484,9 @@ void DemuxManager::Run()
       ProcessPSI(data, TS_PACKET_LENGTH);
       ProcessPES(data, TS_PACKET_LENGTH);
     }
-	}
+  }
 
-	_is_running = false;
+  _is_running = false;
 }
 
 }

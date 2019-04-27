@@ -27,11 +27,11 @@
 namespace jmpeg {
 
 PESDemux::PESDemux():
-	jmpeg::Demux(JDT_PES)
+  jmpeg::Demux(JDT_PES)
 {
-	jcommon::Object::SetClassName("jmpeg::PESDemux");
+  jcommon::Object::SetClassName("jmpeg::PESDemux");
 }
-		
+    
 PESDemux::~PESDemux()
 {
 }

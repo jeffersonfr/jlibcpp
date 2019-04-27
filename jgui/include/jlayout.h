@@ -33,50 +33,50 @@ class Container;
  */
 class Layout : public virtual jcommon::Object {
 
-	private:
+  private:
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		Layout();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~Layout();
+  public:
+    /**
+     * \brief
+     *
+     */
+    Layout();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~Layout();
 
-		/**
-		 * \brief
-		 *
-		 */
-		static Layout * GetDefaultLayout();
-		
-		/**
-		 * \brief
-		 *
-		 */
+    /**
+     * \brief
+     *
+     */
+    static Layout * GetDefaultLayout();
+    
+    /**
+     * \brief
+     *
+     */
     virtual jsize_t GetMinimumLayoutSize(Container *parent);
-		
-		/**
-		 * \brief
-		 *
-		 */
+    
+    /**
+     * \brief
+     *
+     */
     virtual jsize_t GetMaximumLayoutSize(Container *parent);
-		
-		/**
-		 * \brief
-		 *
-		 */
+    
+    /**
+     * \brief
+     *
+     */
     virtual jsize_t GetPreferredLayoutSize(Container *parent);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void DoLayout(Container *parent);
+    /**
+     * \brief
+     *
+     */
+    virtual void DoLayout(Container *parent);
 
 };
 

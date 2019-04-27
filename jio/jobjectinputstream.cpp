@@ -26,15 +26,15 @@
 namespace jio {
 
 ObjectInputStream::ObjectInputStream(InputStream *is):
-	jcommon::Object()
+  jcommon::Object()
 {
-	jcommon::Object::SetClassName("jio::ObjectInputStream");
-	
-	if ((void *)is == nullptr) {
-		throw jexception::IOException("Null pointer exception");
-	}
+  jcommon::Object::SetClassName("jio::ObjectInputStream");
+  
+  if ((void *)is == nullptr) {
+    throw jexception::IOException("Null pointer exception");
+  }
 
-	stream = is;
+  stream = is;
 }
 
 ObjectInputStream::~ObjectInputStream()
@@ -43,107 +43,107 @@ ObjectInputStream::~ObjectInputStream()
 
 bool ObjectInputStream::IsEmpty()
 {
-	return Available() == 0;
+  return Available() == 0;
 }
 
 int64_t ObjectInputStream::Available()
 {
-	if (stream != nullptr) {
-		return stream->Available();
-	}
+  if (stream != nullptr) {
+    return stream->Available();
+  }
 
-	return 0LL;
+  return 0LL;
 }
 
 int64_t ObjectInputStream::GetSize()
 {
-	if (stream != nullptr) {
-		return stream->GetSize();
-	}
+  if (stream != nullptr) {
+    return stream->GetSize();
+  }
 
-	return 0LL;
+  return 0LL;
 }
 
 int64_t ObjectInputStream::GetPosition()
 {
-	return 0LL;
+  return 0LL;
 }
 
 jcommon::Object * ObjectInputStream::Read()
 {
-	// TODO::
-	// - read all bytes from file (currently is limited in 65536)
-	if (stream == nullptr) {
-		return nullptr;
-	}
+  // TODO::
+  // - read all bytes from file (currently is limited in 65536)
+  if (stream == nullptr) {
+    return nullptr;
+  }
 
-	jcommon::Object *object = nullptr;
-	std::string description;
-	char *ptr,
-		 tmp[65536];
+  jcommon::Object *object = nullptr;
+  std::string description;
+  char *ptr,
+     tmp[65536];
 
-	if (stream->Read(tmp, 65536) <= 0) {
-		return nullptr;
-	}
+  if (stream->Read(tmp, 65536) <= 0) {
+    return nullptr;
+  }
 
-	ptr = strchr(tmp+2, '\"');
+  ptr = strchr(tmp+2, '\"');
 
-	if (ptr != nullptr) {
-		*ptr = '\0';
-		*(ptr+strlen(ptr+1)) = '\0';
+  if (ptr != nullptr) {
+    *ptr = '\0';
+    *(ptr+strlen(ptr+1)) = '\0';
 
-		description = (ptr+3);
-	} else {
-		ptr = (char *)"";
-	}
-	
-	object = CreateObject((tmp+2));
+    description = (ptr+3);
+  } else {
+    ptr = (char *)"";
+  }
+  
+  object = CreateObject((tmp+2));
 
-	if (object != nullptr) {
-		if (object->InstanceOf("jio::Serializable") == true) {
-			dynamic_cast<jio::Serializable *>(object)->AssemblyObject(description);
-		} else {
-			delete object;
-			object = nullptr;
-		}
-	}
+  if (object != nullptr) {
+    if (object->InstanceOf("jio::Serializable") == true) {
+      dynamic_cast<jio::Serializable *>(object)->AssemblyObject(description);
+    } else {
+      delete object;
+      object = nullptr;
+    }
+  }
 
-	return object;
+  return object;
 }
 
 void ObjectInputStream::Skip(int64_t skip)
 {
-	if (stream != nullptr) {
-		stream->Skip(skip);
-	}
+  if (stream != nullptr) {
+    stream->Skip(skip);
+  }
 }
 
 void ObjectInputStream::Reset()
 {
-	if (stream != nullptr) {
-		stream->Reset();
-	}
+  if (stream != nullptr) {
+    stream->Reset();
+  }
 }
 
 void ObjectInputStream::Close()
 {
-	if (stream != nullptr) {
-		stream->Close();
-	}
+  if (stream != nullptr) {
+    stream->Close();
+  }
 }
 
 int64_t ObjectInputStream::GetReadedBytes()
 {
-	if (stream != nullptr) {
-		return stream->GetReadedBytes();
-	}
+  if (stream != nullptr) {
+    return stream->GetReadedBytes();
+  }
 
-	return 0LL;
+  return 0LL;
 }
 
 jcommon::Object * ObjectInputStream::CreateObject(std::string id)
 {
-	return nullptr;
+  return nullptr;
 }
 
 }

@@ -22,9 +22,9 @@
 namespace jevent {
 
 TextListener::TextListener():
-	jevent::Listener()
+  jevent::Listener()
 {
-	jcommon::Object::SetClassName("jevent::TextListener");
+  jcommon::Object::SetClassName("jevent::TextListener");
 }
 
 TextListener::~TextListener()

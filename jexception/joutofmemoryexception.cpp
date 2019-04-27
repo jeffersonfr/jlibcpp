@@ -24,19 +24,19 @@ namespace jexception {
 OutOfMemoryException::OutOfMemoryException():
   RuntimeException()
 {
-	jcommon::Object::SetClassName("jexception::OutOfMemoryException");
+  jcommon::Object::SetClassName("jexception::OutOfMemoryException");
 }
 
 OutOfMemoryException::OutOfMemoryException(std::string reason_):
   RuntimeException(reason_)
 {
-	jcommon::Object::SetClassName("jexception::OutOfMemoryException");
+  jcommon::Object::SetClassName("jexception::OutOfMemoryException");
 }
 
 OutOfMemoryException::OutOfMemoryException(Exception *exception, std::string reason_):
   RuntimeException(exception, reason_)
 {
-	jcommon::Object::SetClassName("jexception::OutOfMemoryException");
+  jcommon::Object::SetClassName("jexception::OutOfMemoryException");
 }
 
 OutOfMemoryException::~OutOfMemoryException() throw()

@@ -22,21 +22,21 @@
 namespace jexception {
 
 MediaException::MediaException():
-	jexception::RuntimeException()
+  jexception::RuntimeException()
 {
-	jcommon::Object::SetClassName("jexception::MediaException");
+  jcommon::Object::SetClassName("jexception::MediaException");
 }
 
 MediaException::MediaException(std::string reason_):
-	jexception::RuntimeException(reason_)
+  jexception::RuntimeException(reason_)
 {
-	jcommon::Object::SetClassName("jexception::MediaException");
+  jcommon::Object::SetClassName("jexception::MediaException");
 }
 
 MediaException::MediaException(jexception::Exception *exception, std::string reason_):
-	jexception::RuntimeException(exception, reason_)
+  jexception::RuntimeException(exception, reason_)
 {
-	jcommon::Object::SetClassName("jexception::MediaException");
+  jcommon::Object::SetClassName("jexception::MediaException");
 }
 
 MediaException::~MediaException() throw ()

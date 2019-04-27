@@ -31,33 +31,33 @@ namespace jlogger {
 */
 class SimpleFormatter : public jlogger::Formatter {
 
-	private:
-	
-	
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		SimpleFormatter();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~SimpleFormatter();
+  private:
+  
+  
+  public:
+    /**
+     * \brief
+     *
+     */
+    SimpleFormatter();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual ~SimpleFormatter();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Transform(LogRecord *);
+    /**
+     * \brief
+     *
+     */
+    virtual void Transform(LogRecord *);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual LogRecord * Release();
+    /**
+     * \brief
+     *
+     */
+    virtual LogRecord * Release();
 
 };
 

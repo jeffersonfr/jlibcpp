@@ -32,32 +32,32 @@ namespace jipc {
  */
 class SecureIPCClient : public IPCClient {
 
-	private:
-		/** \brief */
-		jnetwork::SSLContext *_ctx;
-		/** \brief */
-		std::string _host;
-		/** \brief */
-		int _port;
+  private:
+    /** \brief */
+    jnetwork::SSLContext *_ctx;
+    /** \brief */
+    std::string _host;
+    /** \brief */
+    int _port;
 
-	public:
-		/**
-		 * \Constructor.
-		 *
-		 */
-		SecureIPCClient(jnetwork::SSLContext *ctx, std::string host, int port);
+  public:
+    /**
+     * \Constructor.
+     *
+     */
+    SecureIPCClient(jnetwork::SSLContext *ctx, std::string host, int port);
 
-		/**
-		 * \brief Destructor.
-		 *
-		 */
-		virtual ~SecureIPCClient();
+    /**
+     * \brief Destructor.
+     *
+     */
+    virtual ~SecureIPCClient();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void CallMethod(Method *method, Response **response);
+    /**
+     * \brief
+     *
+     */
+    virtual void CallMethod(Method *method, Response **response);
 
 };
 

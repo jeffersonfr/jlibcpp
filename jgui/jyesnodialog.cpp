@@ -23,32 +23,32 @@
 namespace jgui {
 
 YesNoDialog::YesNoDialog(Container *parent, std::string title, std::string msg):
-	jgui::Dialog(parent, title, 0, 0, 560, 280)
+  jgui::Dialog(parent, title, 0, 0, 560, 280)
 {
-	jcommon::Object::SetClassName("jgui::YesNoDialog");
+  jcommon::Object::SetClassName("jgui::YesNoDialog");
 
   jgui::jsize_t
     size = GetSize();
-	jgui::jinsets_t 
+  jgui::jinsets_t 
     insets = GetInsets();
 
-	_label = new Label(msg, insets.left, insets.top, size.width - insets.left - insets.right, 180);
+  _label = new Label(msg, insets.left, insets.top, size.width - insets.left - insets.right, 180);
 
-	_label->SetWrap(true);
-	_label->SetHorizontalAlign(JHA_JUSTIFY);
-	_label->SetVerticalAlign(JVA_TOP);
+  _label->SetWrap(true);
+  _label->SetHorizontalAlign(JHA_JUSTIFY);
+  _label->SetVerticalAlign(JVA_TOP);
 
-	_no = new Button("No", size.width - insets.right - DEFAULT_COMPONENT_WIDTH, insets.top + 180 + 8, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
-	_yes = new Button("Yes", size.width - insets.right - 2*DEFAULT_COMPONENT_WIDTH - 8, insets.top + 180 + 8, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
-	
-	_yes->RegisterActionListener(this);
-	_no->RegisterActionListener(this);
-	
-	Add(_label);
-	Add(_yes);
-	Add(_no);
+  _no = new Button("No", size.width - insets.right - DEFAULT_COMPONENT_WIDTH, insets.top + 180 + 8, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
+  _yes = new Button("Yes", size.width - insets.right - 2*DEFAULT_COMPONENT_WIDTH - 8, insets.top + 180 + 8, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
+  
+  _yes->RegisterActionListener(this);
+  _no->RegisterActionListener(this);
+  
+  Add(_label);
+  Add(_yes);
+  Add(_no);
 
-	_no->RequestFocus();
+  _no->RequestFocus();
   
   Pack(false);
 }
@@ -73,37 +73,37 @@ YesNoDialog::~YesNoDialog()
 
 void YesNoDialog::SetHorizontalAlign(jhorizontal_align_t align)
 {
-	_label->SetHorizontalAlign(align);
+  _label->SetHorizontalAlign(align);
 }
 
 jhorizontal_align_t YesNoDialog::GetHorizontalAlign()
 {
-	return _label->GetHorizontalAlign();
+  return _label->GetHorizontalAlign();
 }
 
 void YesNoDialog::SetVerticalAlign(jvertical_align_t align)
 {
-	_label->SetVerticalAlign(align);
+  _label->SetVerticalAlign(align);
 }
 
 jvertical_align_t YesNoDialog::GetVerticalAlign()
 {
-	return _label->GetVerticalAlign();
+  return _label->GetVerticalAlign();
 }
 
 void YesNoDialog::ActionPerformed(jevent::ActionEvent *event)
 {
-	std::string response = "no";
+  std::string response = "no";
 
-	if (GetFocusOwner() == _yes) {
-		response = "yes";
-	}
-		
-	GetParams()->SetTextParam("response", response);
+  if (GetFocusOwner() == _yes) {
+    response = "yes";
+  }
+    
+  GetParams()->SetTextParam("response", response);
 
-	DispatchDataEvent(new jevent::DataEvent(this, GetParams()));
+  DispatchDataEvent(new jevent::DataEvent(this, GetParams()));
 
-	Close();
+  Close();
 }
 
 }
