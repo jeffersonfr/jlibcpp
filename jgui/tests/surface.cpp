@@ -101,9 +101,11 @@ class Surface : public jgui::Window {
     {
       jgui::jpoint_t
         location = event->GetLocation();
+      jgui::jsize_t
+	      size = GetSize();
 
-      newmousex = location.x + GRID_A;
-      newmousey = location.y + GRID_B;
+      newmousex = location.x*(800.0f/size.width);
+      newmousey = location.y*(600.0f/size.height);
 
       return true;
     }
