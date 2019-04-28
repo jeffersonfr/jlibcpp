@@ -58,12 +58,10 @@ ENABLE_SANITIZE ?= no
 ENABLE_GRAPHICS ?= sdl2
 
 # {bmp, gif, ico, jpg, pcx, png, ppm, tga, xbm, xpm, heif, webp, jp2000, svg, tif, bpg, mjpeg, flif}
-ENABLE_IMAGE ?= bmp, gif, ico, jpg, pcx, png, ppm, tga, xbm, xpm
-#ENABLE_IMAGE ?= bmp, gif, ico, jpg, pcx, png, ppm, tga, xbm, xpm, heif, webp, jp2000, svg, tif, mjpeg, flif
+ENABLE_IMAGE ?= bmp, gif, ico, jpg, pcx, png, ppm, tga, xbm, xpm, heif, webp, jp2000, svg, tif, mjpeg, flif
 
 # {gif, ilist, v4l2, alsa, mixer, libvlc, libav, libxine, gstreamer}
-ENABLE_VIDEO ?= gif, ilist, v4l2, alsa, mixer, libvlc, libav, libxine
-#ENABLE_VIDEO ?= gif, ilist, v4l2, alsa, mixer, libvlc, libav, libxine, gstreamer
+ENABLE_VIDEO ?= gif, ilist, v4l2, alsa, mixer, libvlc, libav, libxine, gstreamer
 
 DEFINES = \
   -D_REENTRANT \

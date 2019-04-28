@@ -63,3 +63,9 @@ R: try to remove "bpg" from ENABLE_IMAGE and then "make all install"
 
 5. run gtk3 with root
 R: gksu ./app
+
+6. problems to link nanax
+R: add the following line to nana/CMakeFile.txt
+
+  set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -fPIC")
+
