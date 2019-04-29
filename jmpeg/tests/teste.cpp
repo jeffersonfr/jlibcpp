@@ -3301,6 +3301,24 @@ class PSIParser : public jevent::DemuxListener {
         std::string language = std::string(ptr + 6, 3);
 
         printf("\t\t:: stream content:[0x%01x], content type:[0x%01x], component tag::[0x%01x], stream type::[0x%01x], group tag::[0x%01x], multilanguage::[0x%01x], component flag::[0x%01x], quality flag::[0x%01x], sampling rate::[0x%01x], language::[%s]\n", stream_content, content_type, component_tag, stream_type, group_tag, multilanguage_flag, component_flag, quality_indicator, sampling_rate, language.c_str());
+      } else if (descriptor_tag == 0xc8) { // video decode control descriptor
+        int still_picture_flag = TS_GM8(ptr + 0, 0, 1);
+        int sequence_end_code_flag = TS_GM8(ptr + 0, 1, 1);
+        int video_encode_format = TS_GM8(ptr + 0, 2, 4);
+        
+        std::string video_encode = "unknown";
+
+        if (video_encode_format == 0x001) {
+          video_encode = "1080i";
+        } else if (video_encode_format == 0x010) {
+          video_encode = "720i";
+        } else if (video_encode_format == 0x011) {
+          video_encode = "480p";
+        } else if (video_encode_format == 0x100) {
+          video_encode = "480i";
+        }
+
+        printf("\t\t:: still picture flag:[0x%01x], sequence end code flag:[0x%01x], video encode format::[0x%02x/%s]\n", still_picture_flag, sequence_end_code_flag, video_encode_format, video_encode.c_str());
       } else if (descriptor_tag == 0xc7) { // data content descriptor [ABNTNBR 15608-3/15610-1]
         int data_component_id = TS_G16(ptr + 0);
         int entry_component = TS_G8(ptr + 2);
