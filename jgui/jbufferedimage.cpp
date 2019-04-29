@@ -394,7 +394,7 @@ BufferedImage::BufferedImage(cairo_t *cairo_context):
   } else if (format == CAIRO_FORMAT_RGB16_565) {
     _pixelformat = jgui::JPF_RGB16;
   } else {
-    throw jexception::RuntimeException("Invalid pixel format");
+    _pixelformat = jgui::JPF_UNKNOWN;
   }
   
   _size.width = cairo_image_surface_get_width(surface);

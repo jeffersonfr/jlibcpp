@@ -89,6 +89,7 @@ ifeq ($(ENABLE_GRAPHICS), xlib)
     -DXLIB_UI \
 
   REQUIRES += \
+    x11 \
 
   OBJS_gfx += \
     xlibapplication.o\
@@ -111,6 +112,7 @@ ifeq ($(ENABLE_GRAPHICS), xcb)
     -DXCB_UI \
 
   REQUIRES += \
+    xcb \
 
   OBJS_gfx += \
     xcbapplication.o\
@@ -134,6 +136,7 @@ ifeq ($(ENABLE_GRAPHICS), gtk3)
     -DGTK3_UI \
 
   REQUIRES += \
+    gtk+-3.0 \
 
   OBJS_gfx += \
     gtk3application.o\
@@ -157,6 +160,9 @@ ifeq ($(ENABLE_GRAPHICS), allegro5)
     -DALLEGRO5_UI \
 
   REQUIRES += \
+    allegro-5 \
+    allegro_video-5 \
+    allegro_main-5 \
 
   OBJS_gfx += \
     allegro5application.o\
@@ -181,6 +187,8 @@ ifeq ($(ENABLE_GRAPHICS), gl)
     -DGL_UI \
 
   REQUIRES += \
+    gl \
+    glu \
 
   OBJS_gfx += \
     glapplication.o\
@@ -230,6 +238,8 @@ ifeq ($(ENABLE_GRAPHICS), vdpau)
     -DVDPAU_UI \
 
   REQUIRES += \
+    x11 \
+    vdpau \
 
   OBJS_gfx += \
     vdpauapplication.o\
@@ -252,6 +262,7 @@ ifeq ($(ENABLE_GRAPHICS), vnc)
     -DVNC_UI \
 
   REQUIRES += \
+    libvncserver \
 
   OBJS_gfx += \
     vncapplication.o\
@@ -275,6 +286,7 @@ ifeq ($(ENABLE_GRAPHICS), directfb)
     -DDIRECTFB_UI \
 
   REQUIRES += \
+    directfb \
 
   OBJS_gfx += \
     directfbapplication.o\
@@ -311,10 +323,7 @@ ifeq ($(ENABLE_GRAPHICS), egl)
     -I/opt/vc/include \
 
   LDFLAGS += \
-    `pkg-config --libs xcb` \
-    `pkg-config --libs x11-xcb` \
-    `pkg-config --libs egl` \
-    `pkg-config --libs glesv2` \
+    `pkg-config --libs xcb x11-xcb egl glesv2` \
     -lGLU -lGL\
     -ljpeg \
     -L/opt/vc/lib \
@@ -326,6 +335,10 @@ ifeq ($(ENABLE_GRAPHICS), egl)
     -DEGL_UI \
 
   REQUIRES += \
+    xcb \
+    x11-xcb \
+    egl \
+    glesv2 \
 
   OBJS_gfx += \
     eglapplication.o\
@@ -485,6 +498,7 @@ ifeq ($(ENABLE_GRAPHICS), drm)
 		 -DDRM_UI \
 
 	REQUIRES	+= \
+    libdrm \
 
 	OBJS_gfx	+= \
 		 drmapplication.o\
