@@ -51,7 +51,7 @@
 #define TS_PAT_TIMEOUT  2000
 #define TS_BAT_TIMEOUT  4000
 #define TS_CAT_TIMEOUT  4000
-#define TS_TSDT_TIMEOUT  4000
+#define TS_TSDT_TIMEOUT 4000
 #define TS_PMT_TIMEOUT  4000
 #define TS_NIT_TIMEOUT  4000
 #define TS_SDT_TIMEOUT  2000
@@ -1330,6 +1330,7 @@ class SIData : public SI {
       std::map<int, bool> blocks;
       std::shared_ptr<std::string> data;
       int id;
+      int carousel;
       int size;
       int version;
       int block_size;
@@ -1366,19 +1367,6 @@ class SIData : public SI {
     bool operator==(std::shared_ptr<SIData> param)
     {
       return (DownloadID() == param->DownloadID());
-    }
-
-    static std::string GetObjectKeyAsText(int module, std::string key)
-    {
-      std::ostringstream o;
-
-      o << std::hex << std::setw(16) << std::setfill('0') << module << ".";
-
-      for (int i=0; i<(int)key.size(); i++) {
-        o << std::hex << std::setw(2) << std::setfill('0') << (int)(key[i] & 0xff);
-      }
-
-      return o.str();
     }
 
     std::shared_ptr<struct object_info_t> GetObjectByKey(std::string key)
@@ -1443,6 +1431,20 @@ class SIData : public SI {
 
     virtual ~SIData()
     {
+    }
+
+    static std::string GetObjectKeyAsText(int carousel, int module, std::string key)
+    {
+      std::ostringstream o;
+
+      o << std::hex << std::setw(16) << std::setfill('0') << carousel << ".";
+      o << std::hex << std::setw(16) << std::setfill('0') << module << ".";
+
+      for (int i=0; i<(int)key.size(); i++) {
+        o << std::hex << std::setw(2) << std::setfill('0') << (int)(key[i] & 0xff);
+      }
+
+      return o.str();
     }
 
     static std::shared_ptr<struct ior_info_t> ProcessIOR(const char *ptr)
@@ -1559,7 +1561,7 @@ class SIData : public SI {
             ptr = ptr + 5 + component_data_length;
           }
 
-          ior->object_key = SIData::GetObjectKeyAsText(module_id, object_key);
+          ior->object_key = SIData::GetObjectKeyAsText(carousel_id, module_id, object_key);
         } else if (profile_info == "TAG_LITE_OPTIONS") { // TR 101 202: Table 4.7
           // int profile_data_byte_order = TS_G8(ptr + 0);
           int component_count = TS_G8(ptr + 1);
@@ -1643,7 +1645,7 @@ class SIData : public SI {
       _download_id = param;
     }
 
-    void Module(int module_id, int module_size, int module_version, int block_size)
+    void Module(int carousel_id, int module_id, int module_size, int module_version, int block_size)
     {
       std::lock_guard<std::mutex> lock(_mutex);
 
@@ -1664,6 +1666,7 @@ class SIData : public SI {
       std::shared_ptr<struct module_info_t> info = std::make_shared<struct module_info_t>();
 
       info->id = module_id;
+      info->carousel = carousel_id;
       info->size = module_size;
       info->version = info->version;
       info->block_size = block_size;
@@ -1683,48 +1686,41 @@ class SIData : public SI {
       _modules.push_back(info);
     }
 
-    void ModuleBlock(int module_id, int module_version, int block_number, std::shared_ptr<std::string> data)
+    void ModuleBlock(int carousel_id, int module_id, int module_version, int block_number, std::shared_ptr<std::string> data)
     {
       std::lock_guard<std::mutex> lock(_mutex);
 
       for (std::vector<std::shared_ptr<struct module_info_t>>::iterator i=_modules.begin(); i!=_modules.end(); i++) {
         std::shared_ptr<struct module_info_t> module = (*i);
 
-        if (module->id == module_id) {
-          std::map<int, bool>::iterator j = module->blocks.find(block_number);
+        if (module->carousel == carousel_id) {
+          if (module->id == module_id) {
+            std::map<int, bool>::iterator j = module->blocks.find(block_number);
 
-          if (j != module->blocks.end() and j->second == false) { // and module->version == module_version) { // TODO:: update module->size when module version was different
-            int offset = module->block_size*block_number;
+            if (j != module->blocks.end() and j->second == false) { // and module->version == module_version) { // TODO:: update module->size when module version was different
+              int offset = module->block_size*block_number;
 
-            try {
-              module->data->replace(
-                  module->data->begin() + offset, module->data->begin() + offset + data->size(), data->begin(), data->end());
-            } catch (std::out_of_range &e) {
-              printf("SIData::ModuleBlock<error>:: replace out of range\n");
-            }
+              try {
+                module->data->replace(
+                    module->data->begin() + offset, module->data->begin() + offset + data->size(), data->begin(), data->end());
+              } catch (std::out_of_range &e) {
+                printf("SIData::ModuleBlock<error>:: replace out of range\n");
+              }
 
-            module->blocks[block_number] = true;
-            module->complete = true;
+              module->blocks[block_number] = true;
+              module->complete = true;
 
-            for (int j=0; j<(int)module->blocks.size(); j++) {
-              if (module->blocks[j] == false) {
-                module->complete = false;
+              for (int j=0; j<(int)module->blocks.size(); j++) {
+                if (module->blocks[j] == false) {
+                  module->complete = false;
 
-                break;
+                  break;
+                }
               }
             }
+
+            break;
           }
-
-          break;
-        }
-      }
-      
-      for (std::vector<std::shared_ptr<struct module_info_t>>::iterator i=_modules.begin(); i!=_modules.end(); i++) {
-        std::shared_ptr<struct module_info_t> module = (*i);
-
-        if (module->id == module_id) {
-
-          break;
         }
       }
     }
@@ -1925,7 +1921,7 @@ class SIData : public SI {
             break;
           }
 
-          object_key = GetObjectKeyAsText(module->id, object_key);
+          object_key = GetObjectKeyAsText(module->carousel, module->id, object_key);
 
           // INFO:: creating object reference
           std::shared_ptr<struct object_info_t> object = std::make_shared<struct object_info_t>();
@@ -2849,7 +2845,7 @@ class PSIParser : public jevent::DemuxListener {
           count = count + 5 + name_length;
 
           break; // we can get more than one app name ='[
-        }  
+        } 
       } else if (descriptor_tag == 0x02) { // transport protocol descriptor
         int protocol_id = TS_G16(ptr + 0);
         int transpor_protocol_label = TS_G8(ptr + 2);
@@ -2873,7 +2869,7 @@ class PSIParser : public jevent::DemuxListener {
 
             // TODO:: initialize dsmcc here
           }
-        }  
+        } 
       } else if (descriptor_tag == 0x03 || descriptor_tag == 0x06) {  // gingaj application descriptor, gingancl application descriptor
         int count = 0;
 
@@ -2898,7 +2894,7 @@ class PSIParser : public jevent::DemuxListener {
         int count = 0;
 
         while (count < descriptor_length) {
-          uint32_t oid = TS_G32(ptr + 0);  
+          uint32_t oid = TS_G32(ptr + 0); 
           int aid = TS_G16(ptr + 4);
           int application_priority = TS_G8(ptr + 6);
 
@@ -3688,8 +3684,8 @@ class PSIParser : public jevent::DemuxListener {
       StopDemux("pat");
 
       // INFO::
-      //   start SDT to get the service name
-      //   start TDT/TOT to get the current time
+      //  start SDT to get the service name
+      //  start TDT/TOT to get the current time
       StartPSIDemux("bat", TS_BAT_PID, TS_BAT_TABLE_ID, TS_BAT_TIMEOUT);
       StartPSIDemux("cat", TS_CAT_PID, TS_CAT_TABLE_ID, TS_CAT_TIMEOUT);
       StartPSIDemux("tsdt", TS_TSDT_PID, TS_TSDT_TABLE_ID, TS_TSDT_TIMEOUT);
@@ -3706,7 +3702,7 @@ class PSIParser : public jevent::DemuxListener {
       StartPSIDemux("cdt", TS_CDT_PID, TS_CDT_TABLE_ID, 5000); // common data table
 
       int nit_pid = TS_NIT_PID;
-      int count = ((section_length - 5)/4 - 1); // last 4 bytes are CRC  
+      int count = ((section_length - 5)/4 - 1); // last 4 bytes are CRC 
 
       ptr = ptr + 8;
 
@@ -4498,7 +4494,7 @@ class PSIParser : public jevent::DemuxListener {
       ptr = ptr + 2;
 
       while (application_loop_count < application_loop_length) {
-        uint32_t oid = TS_G32(ptr + 0);  
+        uint32_t oid = TS_G32(ptr + 0); 
         int aid = TS_G16(ptr + 4);
         int application_control_code = TS_G8(ptr + 6);
         std::string control_code = "Reserved to the future";
@@ -5109,7 +5105,7 @@ class PSIParser : public jevent::DemuxListener {
           int module_version = TS_G8(ptr + 6);
           // int module_info_length = TS_G8(ptr + 7);
 
-          param->Module(module_id, module_size, module_version, block_size);
+          param->Module(download_id, module_id, module_size, module_version, block_size);
 
           printf("DSMCC:DownloadInfoIndication<DII>: module id:[0x%04x], module size:[%d], module version:[0x%02x]\n", module_id, module_size, module_version);
 
@@ -5298,7 +5294,7 @@ class PSIParser : public jevent::DemuxListener {
           return;
         }
         
-        SIFacade::GetInstance()->Data()->ModuleBlock(module_id, module_version, block_number, std::make_shared<std::string>(ptr, message_length - adaptation_length - 6));
+        SIFacade::GetInstance()->Data()->ModuleBlock(download_id, module_id, module_version, block_number, std::make_shared<std::string>(ptr, message_length - adaptation_length - 6));
       } else if (message_id == 0x1004) { // DownloadDataRequest (DDR)
         int module_id = TS_G16(ptr + 0);
         int block_number = TS_G16(ptr + 2);
