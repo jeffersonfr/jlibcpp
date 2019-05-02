@@ -189,7 +189,9 @@ class PacMan : public jgui::Window {
 		_theme.SetIntegerParam("window.bg", 0xff000000);
 
 		// SetDefaultExitEnabled(false);
-		SetSize(scrsize+4, scrsize+nrofblocks+blocksize+10);
+		SetSize(scrsize + 4, scrsize + nrofblocks + blocksize + 10);
+		
+    Init();
 	}
 	
 	virtual ~PacMan()
@@ -369,6 +371,22 @@ class PacMan : public jgui::Window {
 		return true;
 	}
 
+  void Framerate(int fps)
+  {
+    static auto begin = std::chrono::steady_clock::now();
+    static int index = 0;
+
+    std::chrono::time_point<std::chrono::steady_clock> timestamp = begin + std::chrono::milliseconds(index++*(1000/fps));
+    std::chrono::time_point<std::chrono::steady_clock> current = std::chrono::steady_clock::now();
+    std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - current);
+
+    if (diff.count() < 0) {
+      return;
+    }
+
+    std::this_thread::sleep_for(diff);
+  }
+
 	virtual void Paint(jgui::Graphics *g)
 	{
 		Window::Paint(g);
@@ -402,6 +420,10 @@ class PacMan : public jgui::Window {
 		}
 
 		g->DrawImage(ii, 2, 2);
+
+    Framerate(25);
+
+    Repaint();
 	}
 
 	void DoAnim()
@@ -780,16 +802,6 @@ class PacMan : public jgui::Window {
 		}
 	}
 
-	virtual void ShowApp()
-	{
-		Init();
-
-		do {
-			Repaint();
-
-      std::this_thread::sleep_for(std::chrono::milliseconds(10));
-		} while (flag && IsHidden() == false);
-	}
 };
 
 int main(int argc, char **argv)

@@ -116,6 +116,22 @@ class Main : public jgui::Window {
 			return k;
 		}
 
+    void Framerate(int fps)
+    {
+      static auto begin = std::chrono::steady_clock::now();
+      static int index = 0;
+
+      std::chrono::time_point<std::chrono::steady_clock> timestamp = begin + std::chrono::milliseconds(index++*(1000/fps));
+      std::chrono::time_point<std::chrono::steady_clock> current = std::chrono::steady_clock::now();
+      std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - current);
+
+      if (diff.count() < 0) {
+        return;
+      }
+
+      std::this_thread::sleep_for(diff);
+    }
+
 		virtual void ShowApp()
 		{
       jgui::jsize_t
@@ -124,7 +140,7 @@ class Main : public jgui::Window {
         scrumble = 0;
 
 			// for (int j=0; j<1000; j++) {
-			for (int j=0; _active != false; j++) {
+			for (int j=0; _active != false and IsHidden() == false; j++) {
 				double 
           r = 10,
 					// vmax = 100,
@@ -282,13 +298,9 @@ class Main : public jgui::Window {
 					}
 				}
 
+        Framerate(25);
+
 				Repaint();
-
-				if (IsHidden() == true) {
-					return;
-				}
-
-        std::this_thread::sleep_for(std::chrono::milliseconds((100)));
 			}
 		}
 

@@ -661,6 +661,22 @@ class BitMaskTeste : public jgui::Window {
 			return true;
 		}
 
+    void Framerate(int fps)
+    {
+      static auto begin = std::chrono::steady_clock::now();
+      static int index = 0;
+
+      std::chrono::time_point<std::chrono::steady_clock> timestamp = begin + std::chrono::milliseconds(index++*(1000/fps));
+      std::chrono::time_point<std::chrono::steady_clock> current = std::chrono::steady_clock::now();
+      std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - current);
+
+      if (diff.count() < 0) {
+        return;
+      }
+
+      std::this_thread::sleep_for(diff);
+    }
+
 		virtual void Paint(jgui::Graphics *g)
 		{
 			jgui::Window::Paint(g);
@@ -690,30 +706,10 @@ class BitMaskTeste : public jgui::Window {
 			bmbg->DrawTo(g, _insets.left, _insets.top);
 			bmbg->BlitXor(bmpacman, _pacman_location.x, _pacman_location.y, 0*size.width/2, index*size.height/3, size.width/2, size.height/3);
 			*/
-		}
 
-		void ShowApp()
-		{
-			// INFO:: 15 frames per second
-			uint64_t ref_time = 1000000000LL/15LL;
+      Framerate(25);
 
-			do {
-				struct timespec t1, t2;
-
-				clock_gettime(CLOCK_REALTIME, &t1);
-
-				Repaint();
-
-				clock_gettime(CLOCK_REALTIME, &t2);
-
-				uint64_t diff = (t2.tv_sec - t1.tv_sec) * 1000000000LL + (t2.tv_nsec - t1.tv_nsec);
-
-				if (diff < ref_time) {
-					diff = ref_time - diff;
-
-          std::this_thread::sleep_for(std::chrono::microseconds(diff/1000));
-				}
-			} while (IsHidden() == false);
+      Repaint();
 		}
 
 };

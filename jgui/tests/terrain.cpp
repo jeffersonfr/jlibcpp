@@ -23,11 +23,13 @@
 #include "jmath/jmath.h"
 
 #include <iostream>
+#include <mutex>
 
 class Terrain : public jgui::Window {
 
 	private:
     jgui::Image *_buffer;
+    std::mutex _mutex;
 
 	public:
 		Terrain():
@@ -40,17 +42,35 @@ class Terrain : public jgui::Window {
 		{
 		}
 
+    void Framerate(int fps)
+    {
+      static auto begin = std::chrono::steady_clock::now();
+      static int index = 0;
+
+      std::chrono::time_point<std::chrono::steady_clock> timestamp = begin + std::chrono::milliseconds(index++*(1000/fps));
+      std::chrono::time_point<std::chrono::steady_clock> current = std::chrono::steady_clock::now();
+      std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - current);
+
+      if (diff.count() < 0) {
+        return;
+      }
+
+      std::this_thread::sleep_for(diff);
+    }
+
 		virtual void ShowApp() 
 		{
       jgui::Graphics
         *g = _buffer->GetGraphics();
 
 			do {
-        for (float t=1; t<60; t+=0.3) {
+        for (float t=1; t<60 and IsHidden() == false; t+=0.3) {
           g->Clear();
 
-          for (int y1=0; y1<24; y1++) {
-            for (int x1=0; x1<24; x1++) {
+          _mutex.lock();
+
+          for (int y1=0; y1<24 and IsHidden() == false; y1++) {
+            for (int x1=0; x1<24 and IsHidden() == false; x1++) {
               int x = (12*(24 - x1)) + (12*y1);
               int y = (-6*(24 - x1)) + (6*y1) + 300;
               float d = powf(powf(10 - x1, 2.0) + powf(10 - y1, 2.0), 0.5);
@@ -101,28 +121,28 @@ class Terrain : public jgui::Window {
 
               g->SetColor(150, 150, 0);
               g->FillPolygon(0, 0, p, 4);
-
-              if (IsHidden() == true) {
-                goto _exit;
-              }
             }
           }
 
-          Repaint();
+          _mutex.unlock();
 
-          std::this_thread::sleep_for(std::chrono::milliseconds(25));
+          Framerate(25);
+          
+          Repaint();
         }
 			} while (IsHidden() == false);
       
-_exit:{
       delete _buffer;
       _buffer = nullptr;
-      }
 		}
 
 		void Paint(jgui::Graphics *g) 
 		{
+      _mutex.lock();
+
       g->DrawImage(_buffer, 0, 0);
+      
+      _mutex.unlock();
     }
 
 };

@@ -168,6 +168,22 @@ class Breakout : public jgui::Window {
 		}
 		*/
 
+    void Framerate(int fps)
+    {
+      static auto begin = std::chrono::steady_clock::now();
+      static int index = 0;
+
+      std::chrono::time_point<std::chrono::steady_clock> timestamp = begin + std::chrono::milliseconds(index++*(1000/fps));
+      std::chrono::time_point<std::chrono::steady_clock> current = std::chrono::steady_clock::now();
+      std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - current);
+
+      if (diff.count() < 0) {
+        return;
+      }
+
+      std::this_thread::sleep_for(diff);
+    }
+
 		virtual void Paint(jgui::Graphics *g)
 		{
       jgui::jsize_t
@@ -193,6 +209,10 @@ class Breakout : public jgui::Window {
 			}
 
 			g->DrawImage(off, 0, 0);
+
+      Framerate(25);
+
+      Repaint();
 		}
 
 
@@ -446,15 +466,6 @@ class Breakout : public jgui::Window {
 					}
 				}
 			}
-		}
-
-		virtual void ShowApp()
-		{
-      do {
-				Repaint();
-				
-        std::this_thread::sleep_for(std::chrono::milliseconds((10)));
-      } while (IsHidden() == false);
 		}
 
 };

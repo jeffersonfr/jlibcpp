@@ -404,14 +404,21 @@ class CAD : public jgui::Window {
 			return true;
 		}
 
-		virtual void ShowApp() 
-		{
-			do {
-				Repaint();
+    void Framerate(int fps)
+    {
+      static auto begin = std::chrono::steady_clock::now();
+      static int index = 0;
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(25));
-			} while (IsHidden() == false);
-		}
+      std::chrono::time_point<std::chrono::steady_clock> timestamp = begin + std::chrono::milliseconds(index++*(1000/fps));
+      std::chrono::time_point<std::chrono::steady_clock> current = std::chrono::steady_clock::now();
+      std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - current);
+
+      if (diff.count() < 0) {
+        return;
+      }
+
+      std::this_thread::sleep_for(diff);
+    }
 
 		virtual void Paint(jgui::Graphics *g)
 		{
@@ -468,6 +475,10 @@ class CAD : public jgui::Window {
 
       g->SetFont(GetTheme()->GetFont("window.font"));
       g->DrawString("X:[" + std::to_string(vCursor.x) + "], Y:[" + std::to_string(vCursor.y) + "]", 10, 10);
+
+      Framerate(25);
+
+      Repaint();
     }
 
 };

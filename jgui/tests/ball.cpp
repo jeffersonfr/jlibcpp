@@ -243,6 +243,10 @@ class BallDrop : public jgui::Window {
 				rackheight[i] = 0;
 				rackdel[i] = 0;
 			}
+			
+      for (std::vector<Ball *>::iterator i=_balls.begin(); i!=_balls.end(); i++) {
+				(*i)->SetImage(ball);
+			}
 		}
 
 		virtual ~BallDrop()
@@ -262,24 +266,28 @@ class BallDrop : public jgui::Window {
       delete ball;
 		}
 
-		virtual void ShowApp() 
-		{
-			for (std::vector<Ball *>::iterator i=_balls.begin(); i!=_balls.end(); i++) {
-				(*i)->SetImage(ball);
-			}
+    void Framerate(int fps)
+    {
+      static auto begin = std::chrono::steady_clock::now();
+      static int index = 0;
 
-			do {
-				UpdateBalls();
-				Repaint();
+      std::chrono::time_point<std::chrono::steady_clock> timestamp = begin + std::chrono::milliseconds(index++*(1000/fps));
+      std::chrono::time_point<std::chrono::steady_clock> current = std::chrono::steady_clock::now();
+      std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - current);
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-			} while (IsHidden() == false);
-		}
+      if (diff.count() < 0) {
+        return;
+      }
+
+      std::this_thread::sleep_for(diff);
+    }
 
 		void Paint(jgui::Graphics *g) 
 		{
       jgui::jsize_t
         size = GetSize();
+
+			UpdateBalls();
 
 			// Create the background image if necessary
 			if ((backImage == nullptr) || (size.width != backDimension.width) || (size.height != backDimension.height) ) {
@@ -312,6 +320,10 @@ class BallDrop : public jgui::Window {
 			}
 
 			g->DrawImage(offImage, 0, 0);
+
+       Framerate(25);
+
+			Repaint();
 		}
 
 		void PaintBackground(jgui::Graphics *g) {

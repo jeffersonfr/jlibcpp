@@ -19,34 +19,20 @@
  ***************************************************************************/
 #include "jgui/japplication.h"
 #include "jgui/jwindow.h"
-#include "jgui/jbufferedimage.h"
-#include "jmath/jmath.h"
 
 #include <iostream>
 
-class Graph : public jgui::Window {
+class TV : public jgui::Window {
 
 	private:
-    std::vector< std::map<std::string, float> > 
-      nodes;
 
 	public:
-		Graph():
-			jgui::Window(0, 0, 600, 600), nodes(100)
+		TV():
+			jgui::Window(0, 0, 320, 240)
 		{
-      jgui::jsize_t
-        size = GetSize();
-        
-      for (int i=0; i<(int)nodes.size(); i++) {
-        nodes[i]["x"]   = random()%size.height;
-        nodes[i]["y"]   = random()%size.width;
-        nodes[i]["vx"]  = random()%3 - 1;
-        nodes[i]["vy"]  = random()%3 - 1;
-        nodes[i]["clr"] = 0xff000000 | random()%0xff000000;
-      }
 		}
 
-		virtual ~Graph()
+		virtual ~TV()
 		{
 		}
 
@@ -68,46 +54,34 @@ class Graph : public jgui::Window {
 
 		void Paint(jgui::Graphics *g) 
 		{
+      static int seed = 0x12345;
+      
       jgui::jsize_t
         size = GetSize();
-        
-      g->Clear();
+      int
+        length = size.width*size.height;
+      uint32_t
+        buffer[length];
+      uint32_t 
+        *ptr = buffer;
 
-      for (int x=0; x<(int)nodes.size(); x++) {
-        nodes[x]["x"] = nodes[x]["x"] + nodes[x]["vx"];
-        nodes[x]["y"] = nodes[x]["y"] + nodes[x]["vy"];
+      for (int i=0; i<length; i++) {
+        int noise;
+        int carry;
 
-        if (nodes[x]["x"] > size.width) {
-          nodes[x]["x"] = 0;
-        } else if (nodes[x]["x"] < 0) {
-          nodes[x]["x"] = size.width;
-        }
+        noise = seed;
+        noise >>= 3;
+        noise ^= seed;
+        carry = noise & 1;
+        noise >>= 1;
+        seed >>= 1;
+        seed |= (carry << 30);
+        noise &= 0xff;
 
-        if (nodes[x]["y"] > size.height) {
-          nodes[x]["y"] = 0;
-        } else if (nodes[x]["y"] < 0) {
-            nodes[x]["y"] = size.height;
-        }
-        
-        g->SetColor(nodes[x]["clr"]);
-
-        g->FillCircle(nodes[x]["x"], nodes[x]["y"], 3);
+        *ptr++ = 0xff000000 | (noise << 16) | (noise << 8) | noise;
       }
 
-      for (int i=0; i<(int)nodes.size(); i++) {
-        for (int j=i+1; j<(int)nodes.size(); j++) {
-          float dx = nodes[j]["x"] - nodes[i]["x"];
-          float dy = nodes[j]["y"] - nodes[i]["y"];
-          float dist = sqrt((dx*dx)+(dy*dy));
-
-          if (dist < nodes.size()) {
-            g->SetColor(nodes[i]["clr"]);
-
-            g->DrawLine(nodes[i]["x"] , nodes[i]["y"], nodes[j]["x"], nodes[j]["y"]);
-          }
-
-        }
-      }
+      g->SetRGBArray(buffer, 0, 0, size.width, size.height);
 
       Framerate(25);
 
@@ -120,13 +94,12 @@ int main(int argc, char **argv)
 {
 	jgui::Application::Init(argc, argv);
 
-	Graph app;
+	TV app;
 
-	app.SetTitle("Graph");
+	app.SetTitle("TV");
   app.Exec();
 
 	jgui::Application::Loop();
 
 	return 0;
 }
-

@@ -202,6 +202,8 @@ class Tetris : public jgui::Window {
 			d = GetVisibleBounds();
 
 			SetSize(width+2*barwidth, height+2*barwidth);
+			
+      init();
 		}
 
 		virtual ~Tetris()
@@ -312,6 +314,22 @@ class Tetris : public jgui::Window {
 			return true;
 		}
 
+    void Framerate(int fps)
+    {
+      static auto begin = std::chrono::steady_clock::now();
+      static int index = 0;
+
+      std::chrono::time_point<std::chrono::steady_clock> timestamp = begin + std::chrono::milliseconds(index++*(1000/fps));
+      std::chrono::time_point<std::chrono::steady_clock> current = std::chrono::steady_clock::now();
+      std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - current);
+
+      if (diff.count() < 0) {
+        return;
+      }
+
+      std::this_thread::sleep_for(diff);
+    }
+
 		virtual void Paint(jgui::Graphics *g)
 		{
 			if (goff == nullptr && d.width>0 && d.height>0) {
@@ -335,6 +353,10 @@ class Tetris : public jgui::Window {
 			ShowScore();
 
 			g->DrawImage(ii, 0, 0);
+
+      Framerate(25);
+
+      Repaint();
 		}
 
 		void PlayGame()
@@ -580,18 +602,6 @@ class Tetris : public jgui::Window {
 			goff->DrawString(s,width/2-40,(yblocks+1)*blocksize+10);
 		}
 
-		void ShowApp()
-		{
-			// uint64_t starttime;
-
-			init();
-
-			while (ingame == true && IsHidden() == false) {
-				Repaint();
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
-			}
-		}
 };
 
 int main(int argc, char **argv)

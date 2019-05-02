@@ -109,6 +109,22 @@ class Main : public jgui::Window {
 			delete image;
 		}
 
+    void Framerate(int fps)
+    {
+      static auto begin = std::chrono::steady_clock::now();
+      static int index = 0;
+
+      std::chrono::time_point<std::chrono::steady_clock> timestamp = begin + std::chrono::milliseconds(index++*(1000/fps));
+      std::chrono::time_point<std::chrono::steady_clock> current = std::chrono::steady_clock::now();
+      std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - current);
+
+      if (diff.count() < 0) {
+        return;
+      }
+
+      std::this_thread::sleep_for(diff);
+    }
+
 		virtual void ShowApp() 
 		{
 			jgui::jsize_t
@@ -141,9 +157,9 @@ class Main : public jgui::Window {
 					_has_bullet = false;
 				}
 
-				Repaint();
+        Framerate(25);
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+				Repaint();
 			}
 		}
 
