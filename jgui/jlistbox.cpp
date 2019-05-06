@@ -355,7 +355,7 @@ bool ListBox::MouseWheel(jevent::MouseEvent *event)
   jgui::jpoint_t
     slocation = GetScrollLocation();
 
-  SetScrollLocation(slocation.x, slocation.y + theme->GetIntegerParam("item.size")*event->GetClickCount());
+  SetScrollLocation(slocation.x, slocation.y + theme->GetIntegerParam("item.size")*event->GetClicks());
 
   Repaint();
 

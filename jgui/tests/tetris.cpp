@@ -17,302 +17,92 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+/*
+ *  Original Code from:
+ *
+ * Let's make 16 games in C++: TETRIS
+ *
+ * youtube.com/watch?v=zH_omFPqMO4
+ *
+ */
+
 #include "jgui/japplication.h"
 #include "jgui/jwindow.h"
 #include "jgui/jbufferedimage.h"
 
-#define X_BLOCKS	10
-#define Y_BLOCKS	20
+#include <time.h>
 
-int items[] = {
-	0,0,   -1,0,  0,-1, -1,-1,  // cube, normal
-	0,0,   -1,0,  0,1,  -1,1,   // rotated 90 degrees
-	0,0,   1,0,   0,1,   1,1,   // rotated 180 degrees
-	0,0,   1,0,   0,-1,  1,-1,  // rotated 270 degrees
+const int M = 20;
+const int N = 10;
 
-	0,0,   0,-1,  0,-2, 0,-3,   // straight line
-	0,0,  -1,0,  -2,0, -3,0,
-	0,0,   0,1,   0,2,  0,3, 
-	0,0,   1,0,   2,0,  3,0,
-
-	0,0,   1,0,   0,-1, -1,-1,  // stupid block
-	0,0,   0,-1,  -1,0, -1, 1,
-	0,0,  -1,0,   0,1,  1,1,
-	0,0,   0,1,   1,0,  1,-1,
-
-	0,0,   -1,0,  0,-1,  1,-1,  // stupid block 2
-	0,0,   0,1,   -1,0,  -1,-1,
-	0,0,   1,0,   0,1,   -1,1,
-	0,0,   0,-1,  1,0,   1,1,
-
-	0,0,   1,0,   -1,0,  0,-1,  // another one
-	0,0,   0,1,   0,-1,  -1,0,
-	0,0,   0,1,   -1,0,  1,0,
-	0,0,   1,0,   0,-1,  0,1,
-
-	0,0,   0,-1,  1,-1,  0,1,	// hook one
-	0,0,   -1,0,  -1,-1, 1,0,
-	0,0,   -1,1,  0,1,   0,-1,
-	0,0,   -1,0,  1,0,   1,1,
-
-	0,0,   0,1,  0,-1,  -1,-1,	// hook two
-	0,0,   1,0, -1,0,   -1,1,
-	0,0,   0,-1,  0,1,  1,1,
-	0,0,   -1,0, 1,0,   1,-1
+int figures[7][4] =
+{
+	1,3,5,7, // I
+	2,4,5,7, // Z
+	3,5,4,6, // S
+	3,5,4,7, // T
+	2,3,5,7, // L
+	3,5,7,6, // J
+	2,3,4,5, // O
 };
-
-int checks[] = { 
-	-1,1, 0,1, -1,1,  0,1,      // check cube, normal
-	-1,2, 0,2, -1,2,  0,2,      // check, rotated 90 degrees
-	0,2,  1,2,  0,2,  1,2,      // check, rotated 180 degrees
-	0,1,  1,1,  0,1,  1,1,      // check, rotated 270 degrees
-
-	0,1,  0,1,  0,1,  0,1,
-	0,1, -1,1, -2,1, -3,1,
-	0,4,  0,4,  0,4,  0,4,      // straight line
-	0,1,  1,1,  2,1,  3,1,
-
-	0,1,  -1,0, 1,1,  0,1,		// stupid block one
-	0,1,  -1,2, 0,1, -1,2,
-	0,2,  1,2,  -1,2, 0,2,
-	0,2,  1,1,  0,2,  1,1,
-
-	-1,1,  0,1, 1,0,  1,0,		// stupid block two
-	-1,1,  0,2, 0,2,  -1,1,
-	-1,2,  0,2, 1,1,  1,1,
-	0,1,   1,2,  0,1,  1,2,
-
-	-1,1,  0,1,  1,1, 1,1,		// block three
-	-1,1,  0,2,  0,2, -1,1,
-	-1,1,  0,2,  1,1, 1,1,
-	0,2,   1,1,  0,2, 1,1,
-
-	0,2,   1,0,  1,0, 0,2,		// hook one
-	-1,1,  0,1,  1,1, 1,1,
-	-1,2,  0,2,  0,2, -1,2,
-	-1,1,  0,1,  1,2, 1,2,
-
-	-1,0,  0,2,  0,2, -1,0,		// hook two
-	-1,2,  0,1,  1,1,  1,1,
-	0,2,   1,2,  1,2,  0,2,
-	-1,1,  0,1,  1,1,  1,1
-};
-
-int screendata[X_BLOCKS][Y_BLOCKS];
 
 class Tetris : public jgui::Window {
 
-	public:
-		jgui::Graphics *goff;
-		jgui::Image *ii;
-		jgui::Font *largefont;
-		jgui::Font *smallfont;
-		uint32_t blocks[7];
-		uint32_t textcolor1;
-		uint32_t textcolor2;
-		uint32_t barcolor;
-		uint32_t background;
-		bool ingame;
-		bool showtitle;
-		int	xblocks;
-		int	yblocks;
-		int	blocksize;
-		int	width;
-		int	height;
-		int	maxcolors;
-		int	barwidth;
-		int	score;
-		int	emptyline;
-		int	objectx;
-		int	objecty;
-		int	objectdx;
-		int	objecttype;
-		int	objectcolor;
-		int	objectrotation;
-		int	objectrotationd;
-		int	objectptr;
-		int	checkptr;
-		int	itemcount;
-		int	itemrotlen;
-		int	itemlen;
-		int	count;
-		int	maxcount;
-		int	curcount;
-		int	fast;
-		int	screendelay;
-		int	screencount;
-		jgui::jregion_t d;
+  private:
+    struct jgui::jpoint_t a[4];
+    struct jgui::jpoint_t b[4];
+    jgui::Image *s1;
+    jgui::Image *s2;
+    jgui::Image *s3;
+    int colorNum;
+    int field[M][N];
+    int dx; 
+    int timer;
+    bool rotate;
 
-	public:
+  private:
+    bool check()
+    {
+      for (int i=0;i<4;i++)
+        if (a[i].x<0 || a[i].x>=N || a[i].y>=M) return 0;
+        else if (field[a[i].y][a[i].x]) return 0;
 
+      return 1;
+    };
+
+  public:
 		Tetris():
-			jgui::Window(0, 0, 1920, 1080)
+			jgui::Window(0, 0, 320, 480)
 		{
-			smallfont = new jgui::Font("default", jgui::JFA_NORMAL, 20);
-			largefont = new jgui::Font("default", jgui::JFA_NORMAL, 28);
+      s1 = new jgui::BufferedImage("images/tiles.png");
+      s2 = new jgui::BufferedImage("images/background.png");
+      s3 = new jgui::BufferedImage("images/frame.png");
+    
+      colorNum = 0;
+      rotate = false;
+      dx=0; 
+      timer = 0;
 
-			goff = nullptr;
-			ii = nullptr;
-			largefont = nullptr;
-			smallfont = nullptr;
-			textcolor1 = 0xff6080ff;
-			textcolor2 = 0xffffa040;
-			barcolor = 0xff80ff40;
-			background = 0xff000000;
-			ingame = false;
-			showtitle = true;
-			xblocks = X_BLOCKS;
-			yblocks = Y_BLOCKS;
-			blocksize = 32;
-			width = xblocks*blocksize;
-			height = yblocks*blocksize;
-			maxcolors = 6;
-			barwidth = 8;
-			score = 0;
-			emptyline = 0;
-			objectx = 0;
-			objecty = 0;
-			objectdx = 0;
-			objecttype = 0;
-			objectcolor = 0;
-			objectrotation = 0;
-			objectrotationd = 0;
-			objectptr = 0;
-			checkptr = 0;
-			itemcount = 7;
-			itemrotlen = 8;
-			itemlen = itemrotlen*4;
-			count = 0;
-			maxcount = 5;
-			curcount = 0;
-			fast = false;
-			screendelay = 40;
-			screencount = 40;
+      for (int j=0; j<M; j++) {
+        for (int i=0; i<N; i++) {
+          field[j][i] = 0;
+        }
+      }
 
-			blocks[0] = background;
-			blocks[1] = 0xffff0000;
-			blocks[2] = 0xff00ff00;
-			blocks[3] = 0xff0000ff;
-			blocks[4] = 0xffffff00;
-			blocks[5] = 0xffff00ff;
-			blocks[6] = 0xff00ffff;
+      for (int i=0; i<4; i++) {
+        a[i].x = -1;
+        a[i].y = -1;
 
-			// resize(width+2*barwidth,height+30);
+        b[i] = a[i];
+      }
+    }
 
-			d = GetVisibleBounds();
-
-			SetSize(width+2*barwidth, height+2*barwidth);
-			
-      init();
-		}
-
-		virtual ~Tetris()
-		{
-			delete smallfont;
-			delete largefont;
-
-      delete ii;
-		}
-
-		void init()
-		{
-			ingame = true;
-
-			gameInit();
-		}
-
-		void gameInit()
-		{
-			int i,j;
-
-			for (i=0; i<xblocks; i++) {
-				for (j=0; j<yblocks; j++) {
-					screendata[i][j]=0;
-				}
-			}
-
-			score=0;
-			emptyline=-1;
-
-			newObject();
-			fast=false;
-			curcount=maxcount;
-		}
-
-
-		void newObject()
-		{
-			int i,
-				y;
-
-			fast = false;
-
-			objectx=xblocks/2-1;
-			objectdx=0;
-			objecty=0;
-			objecttype=(int)(0.0+(itemcount * (rand()/(RAND_MAX+1.0))));
-			if (objecttype>=itemcount)
-				objecttype=itemcount-1;
-
-			objectptr=(int)(objecttype*itemlen);
-			checkptr=(int)(objecttype*itemlen);
-
-			objectcolor=(int)(0.0+((maxcolors+1) * (rand()/(RAND_MAX+1.0))));
-			if (objectcolor>maxcolors)
-				objectcolor=maxcolors;
-			objectrotation=0;
-			count=maxcount;
-
-			// check if game has ended
-			for (i=0; i<4; i++)
-			{
-				y=items[objectptr+i*2+1];
-				if (y>=0 && screendata[objectx+items[objectptr+i*2]][y]!=0)
-				{
-					ingame=false;
-					showtitle=true;
-				}
-			}
-		}
-
-		virtual bool KeyPressed(jevent::KeyEvent *event)
-		{
-			if (jgui::Window::KeyPressed(event) == true) {
-				return true;
-			}
-
-			if (ingame) {
-				if (event->GetSymbol() == jevent::JKS_CURSOR_LEFT) {
-					objectdx = -1;
-				} else if (event->GetSymbol() == jevent::JKS_CURSOR_RIGHT) {
-					objectdx = +1;
-				} else if (event->GetSymbol() == jevent::JKS_CURSOR_UP) {
-					objectrotationd = +1;
-				} else if (event->GetSymbol() == jevent::JKS_CURSOR_DOWN) {
-					fast = true;
-				} else if (event->GetSymbol() == jevent::JKS_ESCAPE) {
-					ingame = false;
-				}
-			} else {
-				if (event->GetSymbol() == jevent::JKS_S) {
-					ingame=true;
-					gameInit();
-				}
-			}
-
-			return true;
-		}
-
-		virtual bool KeyReleased(jevent::KeyEvent *event)
-		{
-			if (jgui::Window::KeyReleased(event) == true) {
-				return true;
-			}
-
-			fast = false;
-
-			return true;
-		}
+    virtual ~Tetris()
+    {
+      delete s1;
+      delete s2;
+      delete s3;
+    }
 
     void Framerate(int fps)
     {
@@ -330,291 +120,152 @@ class Tetris : public jgui::Window {
       std::this_thread::sleep_for(diff);
     }
 
-		virtual void Paint(jgui::Graphics *g)
+    bool KeyPressed(jevent::KeyEvent *event)
+    {
+      if (event->GetSymbol() == jevent::JKS_CURSOR_UP) {
+        rotate = true;
+      } else if (event->GetSymbol() == jevent::JKS_CURSOR_LEFT) {
+        dx = -1;
+      } else if (event->GetSymbol() == jevent::JKS_CURSOR_RIGHT) {
+        dx = 1;
+      } else if (event->GetSymbol() == jevent::JKS_CURSOR_DOWN) {
+        timer++;
+      }
+
+      return true;
+    }
+
+    bool KeyReleased(jevent::KeyEvent *event)
+    {
+      if (event->GetSymbol() == jevent::JKS_CURSOR_UP) {
+        rotate = false;
+      } else if (event->GetSymbol() == jevent::JKS_CURSOR_LEFT) {
+        dx = 0;
+      } else if (event->GetSymbol() == jevent::JKS_CURSOR_RIGHT) {
+        dx = 0;
+      } else if (event->GetSymbol() == jevent::JKS_CURSOR_DOWN) {
+        // timer = 0;
+      }
+
+      return true;
+    }
+
+		void Paint(jgui::Graphics *g) 
 		{
-			if (goff == nullptr && d.width>0 && d.height>0) {
-				ii = new jgui::BufferedImage(jgui::JPF_ARGB, d.width, d.height);
+      //// <- Move -> ///
+      for (int i=0; i<4; i++)  { 
+        b[i] = a[i]; 
+        a[i].x += dx; 
+      }
 
-				goff = ii->GetGraphics();
-			}
+      if (!check()) {
+        for (int i=0; i<4; i++) {
+          a[i] = b[i];
+        }
+      }
 
-			if (goff==nullptr || ii==nullptr) {
-				return;
-			}
+      // rotate
+      if (rotate) {
+        jgui::jpoint_t p = a[1]; //center of rotation
 
-			goff->SetColor(background);
-			goff->FillRectangle(0, 0, d.width, d.height);
+        for (int i=0; i<4; i++) {
+          int x = a[i].y - p.y;
+          int y = a[i].x - p.x;
 
-			if (ingame)
-				PlayGame();
-			else
-				ShowIntro();
-			
-			ShowScore();
+          a[i].x = p.x - x;
+          a[i].y = p.y + y;
+        }
 
-			g->DrawImage(ii, 0, 0);
+        if (!check()) {
+          for (int i=0; i<4; i++) {
+            a[i] = b[i];
+          }
+        }
+      }
 
-      Framerate(25);
+      // timer tick
+      if (timer++ > 4) {
+        for (int i=0; i<4; i++) { 
+          b[i] = a[i]; 
+          a[i].y += 1; 
+        }
+
+        if (!check()) {
+          for (int i=0; i<4; i++) {
+            field[b[i].y][b[i].x] = colorNum;
+          }
+
+          colorNum = 1 + rand()%7;
+
+          int n = rand()%7;
+
+          for (int i=0; i<4; i++) {
+            a[i].x = figures[n][i] % 2 + N/2 - 1;
+            a[i].y = figures[n][i] / 2;
+          }
+        }
+
+        timer = 0;
+      }
+
+      // check lines
+      int k = M-1;
+
+      for (int i=M - 1; i>0; i--) {
+        int count = 0;
+
+        for (int j=0; j<N; j++) {
+          if (field[i][j]) {
+            count++;
+          }
+
+          field[k][j] = field[i][j];
+        }
+
+        if (count < N) {
+          k--;
+        }
+      }
+
+      rotate = false;
+      dx = 0;
+
+      // draw
+      g->DrawImage(s2, 0, 0);
+
+      for (int i=0; i<M; i++) {
+        for (int j=0; j<N; j++) {
+          if (field[i][j] == 0) {
+            continue;
+          }
+
+          g->DrawImage(s1, field[i][j]*18, 0, 18, 18, j*18 + 28, i*18 + 31, 18, 18);
+        }
+      }
+
+      for (int i=0; i<4; i++) {
+        g->DrawImage(s1, colorNum*18, 0, 18, 18, a[i].x*18 + 28, a[i].y*18 + 31, 18, 18);
+      }
+      
+      g->DrawImage(s3, 0, 0);
 
       Repaint();
-		}
 
-		void PlayGame()
-		{
-			bool bottomreached = false,
-				 stillscrolling = false;
-
-			if (emptyline<0) {
-				bottomreached=drawObject();
-			} else {
-				scrollDown();
-				stillscrolling=true;
-			}
-			drawBars();
-			drawBlocks();
-			if (stillscrolling || bottomreached) {
-				checkFull();
-			}
-		}
-
-		void ShowIntro()
-		{
-			std::string s;
-
-			drawBars();
-			drawBlocks();
-
-			if (showtitle) {
-				goff->SetFont(largefont);
-				s = "Tetris";
-				goff->SetColor(textcolor1);
-				// goff->DrawString(s, barwidth+(width-largefont->GetStringWidth(s))/2-2, height/2-22);
-				goff->SetColor(0xffffffff);
-				// goff->DrawString(s,barwidth+(width-largefont->GetStringWidth(s)) / 2, height/2 - 20);
-
-				goff->SetFont(smallfont);
-				s = "(c)2001 by Brian Postma";
-				goff->SetColor(textcolor2);
-				// goff->DrawString(s,barwidth+(width-smallfont->GetStringWidth(s))/2 -1,height/2 + 9);
-				goff->SetColor(0xffffffff);
-				// goff->DrawString(s,barwidth+(width-smallfont->GetStringWidth(s))/2,height/2 + 10);
-
-				s = "b.postma@hetnet.nl";
-				goff->SetColor(textcolor2);
-				// goff->DrawString(s,barwidth+(width-smallfont->GetStringWidth(s))/2 -1,height/2 + 29);
-				goff->SetColor(0xffffffff);
-				// goff->DrawString(s,barwidth+(width-smallfont->GetStringWidth(s))/2,height/2 + 30);
-			} else {
-				goff->SetFont(smallfont);
-				s = "'S' to start game";
-				goff->SetColor(textcolor1);
-				// goff->DrawString(s,barwidth+(width-smallfont->GetStringWidth(s))/2 -1,height/2 - 31);
-				goff->SetColor(0xffffffff);
-				// goff->DrawString(s,barwidth+(width-smallfont->GetStringWidth(s))/2,height/2 - 30);
-
-				s = "Use cursor left+right to move";
-				goff->SetColor(textcolor2);
-				// goff->DrawString(s,barwidth+(width-smallfont->GetStringWidth(s))/2 -1,height/2 - 11);
-				goff->SetColor(0xffffffff);
-				// goff->DrawString(s,barwidth+(width-smallfont->GetStringWidth(s))/2,height/2 - 10);
-
-				s = "Use cursor up to rotate";
-				goff->SetColor(textcolor2);
-				// goff->DrawString(s,barwidth+(width-smallfont->GetStringWidth(s))/2 -1,height/2 + 9);
-				goff->SetColor(0xffffffff);
-				// goff->DrawString(s,barwidth+(width-smallfont->GetStringWidth(s))/2,height/2 + 10);
-
-				s="Use cursor down to drop";
-				goff->SetColor(textcolor2);
-				// goff->DrawString(s,barwidth+(width-smallfont->GetStringWidth(s))/2 -1,height/2 + 29);
-				goff->SetColor(0xffffffff);
-				// goff->DrawString(s,barwidth+(width-smallfont->GetStringWidth(s))/2,height/2 + 30);
-			}
-			screencount--;
-			if (screencount<=0) { 
-				screencount=screendelay; showtitle=!showtitle; 
-			}
-		}
-
-		void drawBars()
-		{
-			goff->SetColor(barcolor);
-			goff->FillRectangle(0,0,barwidth,blocksize*yblocks);
-			goff->FillRectangle(barwidth+blocksize*xblocks,0,barwidth,blocksize*yblocks);
-			goff->FillRectangle(0,blocksize*yblocks,xblocks*blocksize+2*barwidth,barwidth);
-		}
-
-		bool drawObject()
-		{
-			int	i;
-			bool	bottomreached=false;
-			int		x,y,checkx,checky;
-
-			// clear old
-			for (i=0; i<4; i++) {
-				x=objectx+items[objectptr+i*2+objectrotation*itemrotlen];
-				y=objecty+items[objectptr+i*2+objectrotation*itemrotlen+1];
-				checkx=objectx+checks[objectptr+i*2+objectrotation*itemrotlen];
-				checky=objecty+checks[objectptr+i*2+objectrotation*itemrotlen+1];
-				if (y>=0)
-					screendata[x][y]=0;
-				if (screendata[checkx][checky]!=0)
-					bottomreached=true;
-
-			}
-
-			if (!bottomreached) {
-				count--;
-				if (count<=0 || fast) {
-					objecty++;
-					count=curcount;
-				}
-				checkRotation();
-				objectdx=0;
-				objectrotationd=0;
-			}
-
-			// draw new
-			for (i=0; i<4; i++) {
-				x=objectx+items[objectptr+i*2+objectrotation*itemrotlen];
-				y=objecty+items[objectptr+i*2+objectrotation*itemrotlen+1];
-
-				if (y>=0)
-					screendata[x][y]=objectcolor;
-				if (y>=(yblocks-1))
-					bottomreached=true;
-			}
-			if (bottomreached) {
-				score++;
-				newObject();
-			}
-			return bottomreached;
-		}
-
-		void checkRotation()
-		{
-			int dummyx,
-				dummyrot,
-				x,
-				y,
-				i;
-			bool cando = true;
-
-			dummyrot=(objectrotation+objectrotationd)%4;
-			dummyx=objectx+objectdx;
-
-			// make sure the part doesn't rotate of the playscreen
-			for (i=0; i<4; i++) {
-				x=dummyx+items[objectptr+i*2+dummyrot*itemrotlen];
-				if (x>=xblocks)
-					dummyx-=(x-xblocks+1);
-				else if (x<0)
-					dummyx-=x;
-			}
-
-			for (i=0; (i<4 && cando); i++) {
-				x=dummyx+items[objectptr+i*2+dummyrot*itemrotlen];
-				y=objecty+items[objectptr+i*2+dummyrot*itemrotlen+1];
-				if (y>=0)
-					cando=cando&&(screendata[x][y]==0);
-				if (y>=yblocks || x<0 || x>=xblocks)
-					cando=false;
-			}
-
-			if (cando) {
-				objectrotation = dummyrot;
-				objectx = dummyx;
-			}
-		}
-
-		void drawBlocks()
-		{
-			int x, y;
-
-			for (x=0; x<xblocks; x++) {
-				for (y=0; y<yblocks; y++) {
-					goff->SetColor(blocks[screendata[x][y]]);
-					goff->DrawRectangle(x*blocksize+barwidth,y*blocksize,blocksize-1,blocksize-1);
-					goff->FillRectangle(x*blocksize+barwidth+3,y*blocksize+3,blocksize-6,blocksize-6);
-				}
-			}
-		}
-
-		void checkFull()
-		{
-			int	x, y;
-			bool found = false;
-
-			for (y=yblocks-1; ( y>=0 && !found); y--) {
-				found = true;
-				for (x=0; x<xblocks; x++) {
-					if (screendata[x][y] == 0)
-						found = false;
-				}
-
-				if (found) {
-					score = score + 10;
-
-					// increase speed when you've got a lot of points
-					if (score > 800) 
-						curcount = 1;
-					else if (score > 600)
-						curcount = 2;
-					else if (score > 400)
-						curcount = 3;
-					else if (score > 200)
-						curcount = 4;
-
-					for (x=0; x<xblocks; x++) {
-						screendata[x][y] = 0;
-					}
-
-					emptyline = y;
-				}
-			}
-		}
-
-		void scrollDown()
-		{
-			int x,y;
-
-			for (y=emptyline; y>0; y--) {
-				for (x=0; x<xblocks; x++) {
-					screendata[x][y]=screendata[x][y-1];
-				}
-			}
-			for (x=0; x<xblocks; x++) {
-				screendata[x][0]=0;
-			}
-			emptyline=-1;
-		}
-
-
-		void ShowScore()
-		{
-			std::string s;
-
-			goff->SetFont(smallfont);
-			goff->SetColor(0xffffffff);
-
-			s="Score: " + score;
-
-			goff->DrawString(s,width/2-40,(yblocks+1)*blocksize+10);
-		}
+      Framerate(25);
+    }
 
 };
 
 int main(int argc, char **argv)
 {
-	jgui::Application::Init(argc, argv);
+  jgui::Application::Init(argc, argv);
 
-	Tetris app;
+  Tetris app;
 
-	app.SetTitle("Tetris");
-	app.Exec();
+  app.SetTitle("Tetris");
+  app.Exec();
 
-	jgui::Application::Loop();
+  jgui::Application::Loop();
 
-	return 0;
+  return 0;
 }
-

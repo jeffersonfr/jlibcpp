@@ -40,13 +40,9 @@ namespace jgui {
 /** \brief */
 static int sg_window = 0;
 /** \brief */
-static std::chrono::time_point<std::chrono::steady_clock> sg_last_keypress;
-/** \brief */
 static int sg_mouse_x = 0;
 /** \brief */
 static int sg_mouse_y = 0;
-/** \brief */
-static int sg_click_count = 0;
 /** \brief */
 static std::string sg_title;
 /** \brief */
@@ -502,7 +498,6 @@ std::map<jevent::jmouseevent_button_t, bool> sg_mouse_button_state;
 void OnMousePress(int button_id, int state, int x, int y)
 {
   jevent::jmouseevent_button_t button = jevent::JMB_NONE;
-  jevent::jmouseevent_button_t buttons = jevent::JMB_NONE;
   jevent::jmouseevent_type_t type = jevent::JMT_UNKNOWN;
   int mouse_z = 0;
 
@@ -532,39 +527,12 @@ void OnMousePress(int button_id, int state, int x, int y)
     sg_mouse_button_state[button] = false;
   }
 
-  sg_click_count = 1;
-
-  if (type == jevent::JMT_PRESSED) {
-    auto current = std::chrono::steady_clock::now();
-
-    if ((std::chrono::duration_cast<std::chrono::milliseconds>(current - sg_last_keypress).count()) < 200L) {
-      sg_click_count = sg_click_count + 1;
-    }
-
-    sg_last_keypress = current;
-
-    mouse_z = sg_click_count;
-  }
-
-  if (sg_mouse_button_state[jevent::JMB_BUTTON1] == true) {
-    buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON1);
-  }
-
-  if (sg_mouse_button_state[jevent::JMB_BUTTON2] == true) {
-    buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON2);
-  }
-
-  if (sg_mouse_button_state[jevent::JMB_BUTTON3] == true) {
-    buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON3);
-  }
-
-  sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, buttons, mouse_z, sg_mouse_x, sg_mouse_y));
+  sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, jevent::JMB_NONE, {sg_mouse_x, sg_mouse_y}, mouse_z));
 }
 
 void OnMouseMove(int x, int y)
 {
   jevent::jmouseevent_button_t button = jevent::JMB_NONE;
-  jevent::jmouseevent_button_t buttons = jevent::JMB_NONE;
   jevent::jmouseevent_type_t type = jevent::JMT_UNKNOWN;
   int mouse_z = 0;
 
@@ -576,19 +544,7 @@ void OnMouseMove(int x, int y)
 
   type = jevent::JMT_MOVED;
 
-  if (sg_mouse_button_state[jevent::JMB_BUTTON1] == true) {
-    buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON1);
-  }
-
-  if (sg_mouse_button_state[jevent::JMB_BUTTON2] == true) {
-    buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON2);
-  }
-
-  if (sg_mouse_button_state[jevent::JMB_BUTTON3] == true) {
-    buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON3);
-  }
-
-  sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, buttons, mouse_z, sg_mouse_x, sg_mouse_y));
+  sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, jevent::JMB_NONE, {sg_mouse_x, sg_mouse_y}, mouse_z));
 }
 
 void OnKeyPressRelease(unsigned char key, int x, int y, bool released)
@@ -779,8 +735,6 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
   sg_window = 0;
 	sg_mouse_x = 0;
 	sg_mouse_y = 0;
-	sg_last_keypress = std::chrono::steady_clock::now();
-	sg_click_count = 1;
 
   glutInitWindowSize(width, height);
   glutInitWindowPosition(x, y);

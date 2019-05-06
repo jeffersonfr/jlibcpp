@@ -54,13 +54,9 @@ static xcb_gcontext_t sg_xcb_context = 0;
 /** \brief */
 static jgui::Image *sg_icon = nullptr;
 /** \brief */
-static std::chrono::time_point<std::chrono::steady_clock> sg_last_keypress;
-/** \brief */
 static int sg_mouse_x = 0;
 /** \brief */
 static int sg_mouse_y = 0;
-/** \brief */
-static int sg_click_count = 0;
 /** \brief */
 static std::string sg_title;
 /** \brief */
@@ -504,7 +500,6 @@ void NativeApplication::InternalLoop()
         xcb_button_press_event_t *e = (xcb_button_press_event_t *)event;
 
         jevent::jmouseevent_button_t button = jevent::JMB_NONE;
-        jevent::jmouseevent_button_t buttons = jevent::JMB_NONE;
         jevent::jmouseevent_type_t type = jevent::JMT_UNKNOWN;
         int mouse_z = 0;
 
@@ -530,38 +525,9 @@ void NativeApplication::InternalLoop()
           } else if (e->detail == 0x03) {
             button = jevent::JMB_BUTTON3;
           }
-
-          sg_click_count = 1;
-
-          if (type == jevent::JMT_PRESSED) {
-            auto current = std::chrono::steady_clock::now();
-            
-            if ((std::chrono::duration_cast<std::chrono::milliseconds>(current - sg_last_keypress).count()) < 200L) {
-              sg_click_count = sg_click_count + 1;
-            }
-
-            sg_last_keypress = current;
-
-            mouse_z = sg_click_count;
-          }
-        // } else if (event.type == SDL_MOUSEWHEEL) {
-        //  type = jevent::JMT_ROTATED;
-        //  mouse_z = event.motion.y;
         }
 
-        if ((e->state & XCB_EVENT_MASK_BUTTON_1_MOTION) != 0) {
-          buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON1);
-        }
-
-        if ((e->state & XCB_EVENT_MASK_BUTTON_2_MOTION) != 0) {
-          buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON2);
-        }
-
-        if ((e->state & XCB_EVENT_MASK_BUTTON_3_MOTION) != 0) {
-          buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON3);
-        }
-
-        sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, buttons, mouse_z, sg_mouse_x, sg_mouse_y));
+        sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, jevent::JMB_NONE, {sg_mouse_x, sg_mouse_y}, mouse_z));
       } else if (id == XCB_CLIENT_MESSAGE) {
         if ((*(xcb_client_message_event_t*)event).data.data32[0] == (*reply2).atom) {
           sg_quitting = true;
@@ -603,8 +569,6 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 	sg_xcb_window = 0;
 	sg_mouse_x = 0;
 	sg_mouse_y = 0;
-	sg_last_keypress = std::chrono::steady_clock::now();
-	sg_click_count = 1;
 
   uint32_t
     mask,

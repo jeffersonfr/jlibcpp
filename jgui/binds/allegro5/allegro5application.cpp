@@ -36,21 +36,15 @@ namespace jgui {
 /** \brief */
 static std::map<int, int> sg_key_modifiers;
 /** \brief */
-static std::map<int, int> sg_mouse_buttons;
-/** \brief */
 static ALLEGRO_DISPLAY *sg_display = nullptr;
 /** \brief */
 static ALLEGRO_BITMAP *sg_surface = nullptr;
 /** \brief */
 static ALLEGRO_MOUSE_CURSOR *sg_jgui_cursor_bitmap = nullptr;
 /** \brief */
-static std::chrono::time_point<std::chrono::steady_clock> sg_last_keypress;
-/** \brief */
 static int sg_mouse_x = 0;
 /** \brief */
 static int sg_mouse_y = 0;
-/** \brief */
-static int sg_click_count = 0;
 /** \brief */
 static Window *sg_jgui_window = nullptr;
 /** \brief */
@@ -547,7 +541,6 @@ void NativeApplication::InternalLoop()
       sg_jgui_window->GetEventManager()->PostEvent(new jevent::KeyEvent(sg_jgui_window, type, mod, jevent::KeyEvent::GetCodeFromSymbol(symbol), symbol));
     } else if (event.type == ALLEGRO_EVENT_MOUSE_AXES || event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN || event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP || event.type == ALLEGRO_EVENT_MOUSE_WARPED) {
       jevent::jmouseevent_button_t button = jevent::JMB_NONE;
-      jevent::jmouseevent_button_t buttons = jevent::JMB_NONE;
       jevent::jmouseevent_type_t type = jevent::JMT_UNKNOWN;
       int mouse_z = 0;
 
@@ -561,20 +554,8 @@ void NativeApplication::InternalLoop()
         type = jevent::JMT_MOVED;
       } else if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN || event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
         if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
-          if (sg_mouse_buttons[event.mouse.button - 1] == true) {
-            continue;
-          }
-
-          sg_mouse_buttons[event.mouse.button - 1] = true;
-
           type = jevent::JMT_PRESSED;
         } else if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
-          if (sg_mouse_buttons[event.mouse.button - 1] == false) {
-            continue;
-          }
-
-          sg_mouse_buttons[event.mouse.button - 1] = false;
-
           type = jevent::JMT_RELEASED;
         }
 
@@ -585,40 +566,12 @@ void NativeApplication::InternalLoop()
         } else if (event.mouse.button == 3) {
           button = jevent::JMB_BUTTON3;
         }
-
-        // sg_click_count = 1;
-
-        if (type == jevent::JMT_PRESSED) {
-          auto current = std::chrono::steady_clock::now();
-
-          if ((std::chrono::duration_cast<std::chrono::milliseconds>(current - sg_last_keypress).count()) < 200L) {
-            sg_click_count = sg_click_count + 1;
-          } else {
-            sg_click_count = 1;
-          }
-
-          sg_last_keypress = current;
-
-          mouse_z = sg_click_count % 200;
-        }
       } else if (event.type == ALLEGRO_EVENT_MOUSE_WARPED) {
         type = jevent::JMT_ROTATED;
         mouse_z = event.mouse.dz;
       }
 
-      if (sg_mouse_buttons[1 - 1] == true) {
-        buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON1);
-      }
-
-      if (sg_mouse_buttons[2 - 1] == true) {
-        buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON2);
-      }
-
-      if (sg_mouse_buttons[3 - 1] == true) {
-        buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON3);
-      }
-
-      sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, buttons, mouse_z, sg_mouse_x, sg_mouse_y));
+      sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, jevent::JMB_NONE, {sg_mouse_x, sg_mouse_y}, mouse_z));
     }
   }
 
@@ -649,8 +602,6 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 	sg_surface = nullptr;
 	sg_mouse_x = 0;
 	sg_mouse_y = 0;
-	sg_last_keypress = std::chrono::steady_clock::now();
-	sg_click_count = 1;
 
   // al_set_new_displaysg_repaint_rate(60);
 	al_set_new_bitmap_flags(ALLEGRO_MEMORY_BITMAP | ALLEGRO_NO_PREMULTIPLIED_ALPHA);

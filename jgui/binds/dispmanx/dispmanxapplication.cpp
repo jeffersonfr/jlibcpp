@@ -86,13 +86,9 @@ static std::map<jcursor_style_t, struct cursor_params_t> sgsg_jgui_cursors;
 /** \brief */
 static layer_t sg_layer;
 /** \brief */
-static std::chrono::time_point<std::chrono::steady_clock> sg_last_keypress;
-/** \brief */
 static int sg_mouse_x;
 /** \brief */
 static int sg_mouse_y;
-/** \brief */
-static int sg_click_count;
 /** \brief */
 static bool sg_cursor_enabled = true;
 /** \brief */
@@ -555,9 +551,10 @@ void NativeApplication::InternalLoop()
   std::lock_guard<std::mutex> lock(sg_loop_mutex);
 
   struct input_event ev;
-  bool shift = false;
-  int mouse_x = 0, mouse_y = 0;
   uint32_t lastsg_mouse_state = 0x00;
+  int mouse_x = 0;
+  int mouse_y = 0;
+  bool shift = false;
   
   int 
     fdk = open("/dev/input/by-path/platform-3f980000.usb-usb-0:1.4:1.0-event-kbd", O_RDONLY);
@@ -663,7 +660,6 @@ void NativeApplication::InternalLoop()
       y = (y < 0)?0:(y > SH)?SH:y;
 
       jevent::jmouseevent_button_t button = jevent::JMB_NONE;
-      jevent::jmouseevent_button_t buttons = jevent::JMB_NONE;
       jevent::jmouseevent_type_t type = jevent::JMT_UNKNOWN;
       int mouse_z = 0;
 
@@ -694,42 +690,7 @@ void NativeApplication::InternalLoop()
 
       lastsg_mouse_state = buttonMask;
 
-      sg_click_count = 1;
-
-      if (type == jevent::JMT_PRESSED) {
-        auto current = std::chrono::steady_clock::now();
-
-        if ((std::chrono::duration_cast<std::chrono::milliseconds>(current - sg_last_keypress).count()) < 200L) {
-          sg_click_count = sg_click_count + 1;
-        }
-
-        sg_last_keypress = current;
-
-        mouse_z = sg_click_count;
-      }
-
-      /*
-      if ((buttonMask & 0x08) || (buttonMask & 0x10)) {
-        type = jevent::JMT_ROTATED;
-        mouse_z = 1;
-      }
-      */
-
-      if (buttonMask & 0x01) {
-        buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON1);
-      }
-
-      if (buttonMask & 0x02) {
-        buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON3);
-      }
-
-      if (buttonMask & 0x04) {
-        buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON2);
-      }
-
-      // SDL_GrabMode SDL_WM_GrabInput(SDL_GrabMode mode); // <SDL_GRAB_ON, SDL_GRAB_OFF>
-
-      sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, buttons, mouse_z, sg_mouse_x + sg_jgui_cursor.hot_x, sg_mouse_y + sg_jgui_cursor.hot_y));
+      sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, jevent::JMB_NONE, {sg_mouse_x + sg_jgui_cursor.hot_x, sg_mouse_y + sg_jgui_cursor.hot_y}, mouse_z));
 
       continue;
     }

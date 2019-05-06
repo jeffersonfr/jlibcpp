@@ -1,5 +1,7 @@
 #include "jgui/jbufferedimage.h"
 
+#include <thread>
+
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
@@ -84,6 +86,22 @@ void cairo_close_x11_surface(cairo_surface_t *sfc)
    XCloseDisplay(dsp);
 }
 
+void Framerate(int fps)
+{
+  static auto begin = std::chrono::steady_clock::now();
+  static int index = 0;
+
+  std::chrono::time_point<std::chrono::steady_clock> timestamp = begin + std::chrono::milliseconds(index++*(1000/fps));
+  std::chrono::time_point<std::chrono::steady_clock> current = std::chrono::steady_clock::now();
+  std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - current);
+
+  if (diff.count() < 0) {
+    return;
+  }
+
+  std::this_thread::sleep_for(diff);
+}
+
 int main(int argc, char **argv)
 {
   int x = 0, y = 0;
@@ -113,6 +131,8 @@ int main(int argc, char **argv)
         running = 0;
         break;
     }
+
+    Framerate(25);
   }
 
   cairo_close_x11_surface(sfc);

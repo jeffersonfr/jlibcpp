@@ -234,7 +234,7 @@ bool Slider::MouseWheel(jevent::MouseEvent *event)
 
   _pressed = false;
 
-  SetValue(GetValue()+_minimum_tick*event->GetClickCount());
+  SetValue(GetValue()+_minimum_tick*event->GetClicks());
 
   return true;
 }

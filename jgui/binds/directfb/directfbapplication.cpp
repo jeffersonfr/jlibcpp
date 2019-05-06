@@ -39,26 +39,22 @@ struct cursor_params_t {
 };
 
 /** \brief */
-std::map<jcursor_style_t, struct cursor_params_t> sg_jgui_cursors;
+static std::map<jcursor_style_t, struct cursor_params_t> sg_jgui_cursors;
 
 /** \brief */
-IDirectFB *sg_directfb;
+static IDirectFB *sg_directfb = nullptr;
 /** \brief */
-IDirectFBDisplayLayer *sg_layer;
+static IDirectFBDisplayLayer *sg_layer = nullptr;
 /** \brief */
-IDirectFBWindow *sg_window;
+static IDirectFBWindow *sg_window = nullptr;
 /** \brief */
-IDirectFBSurface *sg_surface;
+static IDirectFBSurface *sg_surface = nullptr;
 /** \brief */
 static jgui::Image *sg_jgui_icon = nullptr;
-/** \brief */
-static std::chrono::time_point<std::chrono::steady_clock> sg_last_keypress;
 /** \brief */
 static int sg_mouse_x = 0;
 /** \brief */
 static int sg_mouse_y = 0;
-/** \brief */
-static int sg_click_count = 0;
 /** \brief */
 static bool sg_cursor_enabled = true;
 /** \brief */
@@ -628,20 +624,6 @@ void NativeApplication::InternalLoop()
           } else if (event.button == DIBI_MIDDLE) {
             button = jevent::JMB_BUTTON3;
           }
-
-          sg_click_count = 1;
-
-          if (type == jevent::JMT_PRESSED) {
-            auto current = std::chrono::steady_clock::now();
-            
-            if ((std::chrono::duration_cast<std::chrono::milliseconds>(current - sg_last_keypress).count()) < 200L) {
-              sg_click_count = sg_click_count + 1;
-            }
-
-            sg_last_keypress = current;
-
-            mouse_z = sg_click_count;
-          }
         }
 
         if ((event.buttons & DIBM_LEFT) != 0) {
@@ -656,7 +638,7 @@ void NativeApplication::InternalLoop()
           buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON3);
         }
 
-        sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, buttons, mouse_z, sg_mouse_x, sg_mouse_y));
+        sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, buttons, {sg_mouse_x, sg_mouse_y}, mouse_z));
       }
     }
   }
@@ -692,8 +674,6 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 	sg_window = nullptr;
 	sg_mouse_x = 0;
 	sg_mouse_y = 0;
-	sg_last_keypress = std::chrono::steady_clock::now();
-	sg_click_count = 1;
 
 	DFBWindowDescription desc;
 

@@ -321,7 +321,7 @@ class BallDrop : public jgui::Window {
 
 			g->DrawImage(offImage, 0, 0);
 
-       Framerate(25);
+       Framerate(60);
 
 			Repaint();
 		}

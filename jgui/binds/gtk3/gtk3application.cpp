@@ -493,12 +493,7 @@ static gboolean OnKeyPressEvent(GtkWidget *widget, GdkEventKey *event, gpointer 
 
 static gboolean OnMouseMoveEvent(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
 {
-	GdkModifierType	state;
-
-	state = (GdkModifierType)event->state;
-	
   jevent::jmouseevent_button_t button = jevent::JMB_NONE;
-	jevent::jmouseevent_button_t buttons = jevent::JMB_NONE;
 	jevent::jmouseevent_type_t type = jevent::JMT_MOVED;
 
 	int mouse_x = event->x;
@@ -508,31 +503,14 @@ static gboolean OnMouseMoveEvent(GtkWidget *widget, GdkEventMotion *event, gpoin
 	// handle (x,y) motion
 	gdk_event_request_motions(event); // handles is_hint events
 
-  if(state & GDK_BUTTON1_MASK) {
-		buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON1);
-  }
-
-  if(state & GDK_BUTTON2_MASK) {
-		buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON2);
-  }
-
-  if(state & GDK_BUTTON3_MASK) {
-		buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON3);
-  }
-
-  sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, buttons, mouse_z, mouse_x, mouse_y));
+  sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, jevent::JMB_NONE, {mouse_x, mouse_y}, mouse_z));
 
   return TRUE;
 }
 
 static gboolean OnMousePressEvent(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
 {
-	GdkModifierType	state;
-
-	state = (GdkModifierType)event->state;
-	
   jevent::jmouseevent_button_t button = jevent::JMB_NONE;
-	jevent::jmouseevent_button_t buttons = jevent::JMB_NONE;
 	jevent::jmouseevent_type_t type = jevent::JMT_UNKNOWN;
 
 	int mouse_x = event->x; // event->x_root;
@@ -553,27 +531,7 @@ static gboolean OnMousePressEvent(GtkWidget *widget, GdkEventButton *event, gpoi
 		button = jevent::JMB_BUTTON2;
 	}
 
-	if (event->type == GDK_BUTTON_PRESS) {
-		mouse_z = 1;
-	} else if (event->type == GDK_2BUTTON_PRESS) {
-		mouse_z = 2;
-	} else if (event->type == GDK_3BUTTON_PRESS) {
-		mouse_z = 3;
-	}
-
-  if(state & GDK_BUTTON1_MASK) {
-		buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON1);
-  }
-
-  if(state & GDK_BUTTON2_MASK) {
-		buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON2);
-  }
-
-  if(state & GDK_BUTTON3_MASK) {
-		buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON3);
-  }
-
-  sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, buttons, mouse_z, mouse_x, mouse_y));
+  sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, jevent::JMB_NONE, {mouse_x, mouse_y}, mouse_z));
 
   return TRUE;
 }

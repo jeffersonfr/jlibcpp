@@ -3362,6 +3362,63 @@ class PSIParser : public jevent::DemuxListener {
         std::string text(ptr + 4, text_length);
 
         printf("\t\t:: language code:[%s], text:[%s]\n", language_code.c_str(), text.c_str());
+      } else if (descriptor_tag == 0xc9) { // downlod content descriptor [ABNTNBR 15608-3/15610-1]
+        int reboot = TS_GM8(ptr + 0, 0, 1);
+        int add_on = TS_GM8(ptr + 0, 1, 1);
+        int compatibility_flag = TS_GM8(ptr + 0, 2, 1);
+        int module_info_flag = TS_GM8(ptr + 0, 3, 1);
+        int text_info_flag = TS_GM8(ptr + 0, 4, 1);
+        uint32_t component_size = TS_G32(ptr + 1);
+        uint32_t download_id = TS_G32(ptr + 5);
+        uint32_t timeout_value_dii = TS_G32(ptr + 9);
+        int leak_rate = TS_GM32(ptr + 13, 0, 22);
+        int component_tag = TS_G8(ptr + 16);
+
+        printf("\t\t:: reboot:[%d], add on:[%d], compatibiliy flag:[%d], module info flag:[%d], text info flag:[%d], component size:[%u], download id:[0x%08x], timeout value dii:[%d], leak rate:[%u], component tag:[0x%02x]\n", reboot, add_on, compatibility_flag, module_info_flag, text_info_flag, component_size, download_id, timeout_value_dii, leak_rate, component_tag);
+
+        ptr = ptr + 17;
+
+        if (compatibility_flag == 1) {
+          // int descriptor_tag = TS_G8(ptr + 0);
+          int descriptor_length = TS_G8(ptr + 1);
+
+          DumpBytes("compatibility descriptor", ptr + 2, descriptor_length);
+
+          ptr = ptr + descriptor_length + 2;
+        }
+
+        if (module_info_flag == 1) {
+          int number_of_modules = TS_G16(ptr + 0);
+
+          ptr = ptr + 2;
+
+          for (int i=0; i<number_of_modules; i++) {
+            int module_id = TS_G16(ptr + 0);
+            int module_size = TS_G32(ptr + 2);
+            int module_info_length = TS_G8(ptr + 6);
+        
+            printf("\t\t:<module info>: module:[%d], module id:[0x%04x], module size:[0x%08x], module info length:[%d]\n", i, module_id, module_size, module_info_length);
+
+            DumpBytes("module info", ptr + 7, module_info_length);
+
+            ptr = ptr + module_info_length + 7;
+          }
+        }
+
+        int private_data_length = TS_G8(ptr + 0);
+
+        DumpBytes("private data", ptr + 1, private_data_length);
+
+        ptr = ptr + private_data_length + 1;
+
+        if (text_info_flag == 1) {
+          std::string language(ptr + 0, 3);
+          int text_length = TS_G8(ptr + 3);
+
+          printf("\t\t:<text info>: language:[%s]\n", language.c_str());
+
+          DumpBytes("text char", ptr + 4, text_length);
+        }
       } else if (descriptor_tag == 0xcd) { // ts information descriptor [ABNTNBR 15603-2 2007]
         const char *end = ptr + descriptor_length;
 
@@ -4344,12 +4401,12 @@ class PSIParser : public jevent::DemuxListener {
       const char *ptr = event->GetData();
       
       int original_network_id = TS_G16(ptr + 3);
-      int descriptors_length = TS_GM16(ptr + 8, 4, 12);
+      int descriptors_length = TS_GM16(ptr + 7, 4, 12);
       int descriptors_count = 0;
 
       printf("BIT:: original network id:[0x%04x]\n", original_network_id);
 
-      ptr = ptr + 10;
+      ptr = ptr + 9;
 
       while (descriptors_count < descriptors_length) {
         // int descriptor_tag = TS_G8(ptr + 0);
@@ -4403,7 +4460,7 @@ class PSIParser : public jevent::DemuxListener {
       int service_id = TS_G16(ptr + 12);
       int number_of_contents = TS_G8(ptr + 14);
 
-      printf("SDTT:: marker id:[%s], model id:[0x%02x], transport stream id:[0x%04x], original network id:[0x%04x], service id:[0x%04x], number of contents:[%d]\n", Utils::GetMarkerDescription(marker_id).c_str(), model_id, transport_stream_id, original_network_id, service_id, number_of_contents);
+      printf("SDTT:: marker id:[0x%08x/%s], model id:[0x%02x], transport stream id:[0x%04x], original network id:[0x%04x], service id:[0x%04x], number of contents:[%d]\n", marker_id, Utils::GetMarkerDescription(marker_id).c_str(), model_id, transport_stream_id, original_network_id, service_id, number_of_contents);
 
       ptr = ptr + 15;
 
@@ -4421,11 +4478,11 @@ class PSIParser : public jevent::DemuxListener {
 
         ptr = ptr + 8;
 
-        for (int j=0; j<schedule_description_length/8; j++) {
-          int start_time = TS_GM64(ptr + 0, 0, 40);
+        for (int j=0; j<schedule_description_length >> 3; j++) {
+          uint64_t start_time = TS_GM64(ptr + 0, 0, 40);
           int duration = TS_GM64(ptr + 0, 40, 24);
 
-          printf("SDTT:: start time:[%d], duration:[%d]\n", start_time, duration);
+          printf("SDTT:: start time:[%lu], duration:[%d]\n", start_time, duration);
 
           ptr = ptr + 8;
         }
@@ -5689,6 +5746,7 @@ int main(int argc, char **argv)
         id1 == "tot" or
         id1 == "rst" or
         id1 == "pcr" or
+        id1 == "sdtt" or
         id1 == "eit") {
         test.StartPSIDemux(id1, mapper.GetIntegerParam(id1), -1, 3600000);
     } else if (

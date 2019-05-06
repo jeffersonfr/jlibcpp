@@ -38,19 +38,15 @@
 namespace jgui {
 
 /** \brief */
-caca_display_t *dp = nullptr;
+static caca_display_t *dp = nullptr;
 /** \brief */
-cucul_canvas_t *cv = nullptr;
+static cucul_canvas_t *cv = nullptr;
 /** \brief */
-cucul_dither_t *dither = nullptr;
-/** \brief */
-static std::chrono::time_point<std::chrono::steady_clock> sg_last_keypress;
+static cucul_dither_t *dither = nullptr;
 /** \brief */
 static int sg_mouse_x = 0;
 /** \brief */
 static int sg_mouse_y = 0;
-/** \brief */
-static int sg_click_count = 0;
 /** \brief */
 static bool sg_cursor_enabled = true;
 /** \brief */
@@ -431,7 +427,6 @@ void NativeApplication::InternalLoop()
         }
 
         jevent::jmouseevent_button_t button = jevent::JMB_NONE;
-        jevent::jmouseevent_button_t buttons = jevent::JMB_NONE;
         jevent::jmouseevent_type_t type = jevent::JMT_UNKNOWN;
         int mouse_z = 0;
 
@@ -454,38 +449,10 @@ void NativeApplication::InternalLoop()
           button = jevent::JMB_BUTTON3;
         }
 
-        sg_click_count = 1;
+        int dx = (int)(sg_mouse_x*sg_screen.width)/(float)cucul_get_canvas_width(cv);
+        int dy = (int)(sg_mouse_y*sg_screen.height)/(float)cucul_get_canvas_height(cv);
 
-        if (type == jevent::JMT_PRESSED) {
-          auto current = std::chrono::steady_clock::now();
-
-          if ((std::chrono::duration_cast<std::chrono::milliseconds>(current - sg_last_keypress).count()) < 200L) {
-            sg_click_count = sg_click_count + 1;
-          }
-
-          sg_last_keypress = current;
-
-          mouse_z = sg_click_count;
-        }
-
-        if (buttonMask & 0x01) {
-          buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON1);
-        }
-
-        if (buttonMask & 0x02) {
-          buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON2);
-        }
-
-        if (buttonMask & 0x04) {
-          buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON3);
-        }
-
-        float dx = (sg_mouse_x*
-            sg_screen.width)/
-          cucul_get_canvas_width(cv);
-        float dy = (sg_mouse_y*sg_screen.height)/cucul_get_canvas_height(cv);
-
-        sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, buttons, mouse_z, dx, dy));
+        sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, jevent::JMB_NONE, {dx, dy}, mouse_z));
       } else if (mtype == CACA_EVENT_RESIZE) {
           if (dither != nullptr) {
             cucul_free_dither(dither);
@@ -588,8 +555,6 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 
 	sg_mouse_x = 0;
 	sg_mouse_y = 0;
-	sg_last_keypress = std::chrono::steady_clock::now();
-	sg_click_count = 1;
 
   sg_screen.width = width;
   sg_screen.height = height;

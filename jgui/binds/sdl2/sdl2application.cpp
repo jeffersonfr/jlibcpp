@@ -564,10 +564,9 @@ void NativeApplication::InternalLoop()
         } else if (event.type == SDL_MOUSEWHEEL) {
         }
 
-        int mouse_z = 0;
         jevent::jmouseevent_button_t button = jevent::JMB_NONE;
-        jevent::jmouseevent_button_t buttons = jevent::JMB_NONE;
         jevent::jmouseevent_type_t type = jevent::JMT_UNKNOWN;
+        int mouse_z = 0;
 
         sg_mouse_x = event.motion.x;
         sg_mouse_y = event.motion.y;
@@ -591,39 +590,12 @@ void NativeApplication::InternalLoop()
           } else if (event.button.button == SDL_BUTTON_RIGHT) {
             button = jevent::JMB_BUTTON3;
           }
-
-          if (type == jevent::JMT_PRESSED) {
-            mouse_z = event.button.clicks;
-          }
         } else if (event.type == SDL_MOUSEWHEEL) {
           type = jevent::JMT_ROTATED;
           mouse_z = event.wheel.y;
         }
 
-        uint32_t state = SDL_GetMouseState(nullptr, nullptr);
-
-        if ((state & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0) {
-          buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON1);
-        }
-
-        if ((state & SDL_BUTTON(SDL_BUTTON_MIDDLE)) != 0) {
-          buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON2);
-        }
-
-        if ((state & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0) {
-          buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON3);
-        }
-
-        // SDL_GrabMode SDL_WM_GrabInput(SDL_GrabMode mode); // <SDL_GRAB_ON, SDL_GRAB_OFF>
-        /*
-        if (event.type == SDL_MOUSEBUTTONDOWN) {
-          SDL_SetWindowGrab(sg_window, SDL_TRUE);
-        } else if (event.type == SDL_MOUSEBUTTONUP) {
-          SDL_SetWindowGrab(sg_window, SDL_FALSE);
-        }
-        */
-
-        sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, buttons, mouse_z, sg_mouse_x, sg_mouse_y));
+        sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, jevent::JMB_NONE, {sg_mouse_x, sg_mouse_y}, mouse_z));
       } else if(event.type == SDL_QUIT) {
         SDL_HideWindow(sg_window);
 

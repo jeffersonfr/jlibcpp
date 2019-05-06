@@ -36,19 +36,15 @@
 namespace jgui {
 
 /** \brief */
-rfbScreenInfoPtr sg_server;
+static rfbScreenInfoPtr sg_server;
 /** \brief */
 static jgui::Image *sg_jgui_icon = nullptr;
-/** \brief */
-static std::chrono::time_point<std::chrono::steady_clock> sg_last_keypress;
 /** \brief */
 static uint32_t last_mouse_state = 0x00;
 /** \brief */
 static int sg_mouse_x = 0;
 /** \brief */
 static int sg_mouse_y = 0;
-/** \brief */
-static int sg_click_count = 0;
 /** \brief */
 static bool sg_repaint = false;
 /** \brief */
@@ -601,7 +597,6 @@ static void ProcessMouseEvents(int buttonMask, int x, int y, rfbClientPtr cl)
 
   int mouse_z = 0;
   jevent::jmouseevent_button_t button = jevent::JMB_NONE;
-  jevent::jmouseevent_button_t buttons = jevent::JMB_NONE;
   jevent::jmouseevent_type_t type = jevent::JMT_UNKNOWN;
 
   type = jevent::JMT_PRESSED;
@@ -631,40 +626,12 @@ static void ProcessMouseEvents(int buttonMask, int x, int y, rfbClientPtr cl)
 
   last_mouse_state = buttonMask;
 
-  sg_click_count = 1;
-
-  if (type == jevent::JMT_PRESSED) {
-    auto current = std::chrono::steady_clock::now();
-
-    if ((std::chrono::duration_cast<std::chrono::milliseconds>(current - sg_last_keypress).count()) < 200L) {
-      sg_click_count = sg_click_count + 1;
-    }
-
-    sg_last_keypress = current;
-
-    mouse_z = sg_click_count;
-  }
-
   if ((buttonMask & 0x08) || (buttonMask & 0x10)) {
     type = jevent::JMT_ROTATED;
     mouse_z = 1;
   }
 
-  if (buttonMask & 0x01) {
-    buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON1);
-  }
-
-  if (buttonMask & 0x02) {
-    buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON2);
-  }
-
-  if (buttonMask & 0x03) {
-    buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON3);
-  }
-
-  // SDL_GrabMode SDL_WM_GrabInput(SDL_GrabMode mode); // <SDL_GRAB_ON, SDL_GRAB_OFF>
-
-  sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, buttons, mouse_z, sg_mouse_x, sg_mouse_y));
+  sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, jevent::JMB_NONE, {sg_mouse_x, sg_mouse_y}, mouse_z));
 }
 
 NativeWindow::NativeWindow(int x, int y, int width, int height):
@@ -681,8 +648,6 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 	sg_server = nullptr;
 	sg_mouse_x = 0;
 	sg_mouse_y = 0;
-	sg_last_keypress = std::chrono::steady_clock::now();
-	sg_click_count = 1;
 
 	sg_screen.width = width;
 	sg_screen.height = height;

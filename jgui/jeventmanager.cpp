@@ -76,6 +76,16 @@ void EventManager::PostEvent(jevent::EventObject *event)
   _condition.notify_one();
 }
 
+bool EventManager::IsKeyDown(jevent::jkeyevent_symbol_t key)
+{
+  return _key_button_map[key];
+}
+
+bool EventManager::IsButtonDown(jevent::jmouseevent_button_t button)
+{
+  return _mouse_button_map[button];
+}
+
 const std::vector<jevent::EventObject *> & EventManager::GetEvents()
 {
   return _events;
@@ -107,31 +117,70 @@ void EventManager::ProcessEvents()
     _mutex.unlock();
   
     if (dynamic_cast<jevent::KeyEvent *>(unknown) != nullptr) {
-      jevent::KeyEvent *event = dynamic_cast<jevent::KeyEvent *>(unknown);
       jevent::KeyListener *listener = dynamic_cast<jevent::KeyListener *>(_window);
 
       if (listener != nullptr) {
+        jevent::KeyEvent *event = dynamic_cast<jevent::KeyEvent *>(unknown);
+
         if (event->GetType() == jevent::JKT_PRESSED) {
+          _key_button_map[event->GetSymbol()] = true;
+
           listener->KeyPressed(event);
         } else if (event->GetType() == jevent::JKT_RELEASED) {
+          _key_button_map[event->GetSymbol()] = false;
+
           listener->KeyReleased(event);
         } else if (event->GetType() == jevent::JKT_TYPED) {
           listener->KeyTyped(event);
         }
       }
     } else if (dynamic_cast<jevent::MouseEvent *>(unknown) != nullptr) {
-      jevent::MouseEvent *event = dynamic_cast<jevent::MouseEvent *>(unknown);
       jevent::MouseListener *listener = dynamic_cast<jevent::MouseListener *>(_window);
 
       if (listener != nullptr) {
+        jevent::MouseEvent *event = dynamic_cast<jevent::MouseEvent *>(unknown);
+
+        jevent::jmouseevent_button_t buttons = jevent::JMB_NONE;
+        int clicks = 1;
+
         if (event->GetType() == jevent::JMT_PRESSED) {
-          listener->MousePressed(event);
+          static std::map<jevent::jmouseevent_button_t, std::chrono::time_point<std::chrono::steady_clock>> button_timestamp;
+
+          _mouse_button_map[event->GetButton()] = true;
+
+          auto now = std::chrono::steady_clock::now();
+
+          if ((now - button_timestamp[event->GetButton()]) < std::chrono::milliseconds(200)) {
+            clicks = clicks + 1;
+          }
+
+          button_timestamp[event->GetButton()] = now;
         } else if (event->GetType() == jevent::JMT_RELEASED) {
-          listener->MouseReleased(event);
+          _mouse_button_map[event->GetButton()] = false;
+        }
+        
+        if (_mouse_button_map[jevent::JMB_BUTTON1] == true) {
+          buttons = (jevent::jmouseevent_button_t)(buttons | jevent::JMB_BUTTON1);
+        }
+
+        if (_mouse_button_map[jevent::JMB_BUTTON2] == true) {
+          buttons = (jevent::jmouseevent_button_t)(buttons | jevent::JMB_BUTTON2);
+        }
+
+        if (_mouse_button_map[jevent::JMB_BUTTON3] == true) {
+          buttons = (jevent::jmouseevent_button_t)(buttons | jevent::JMB_BUTTON3);
+        }
+
+        jevent::MouseEvent local(event->GetSource(), event->GetType(), event->GetButton(), buttons, event->GetLocation(), clicks);
+
+        if (event->GetType() == jevent::JMT_PRESSED) {
+          listener->MousePressed(&local);
+        } else if (event->GetType() == jevent::JMT_RELEASED) {
+          listener->MouseReleased(&local);
         } else if (event->GetType() == jevent::JMT_MOVED) {
-          listener->MouseMoved(event);
+          listener->MouseMoved(&local);
         } else if (event->GetType() == jevent::JMT_ROTATED) {
-          listener->MouseWheel(event);
+          listener->MouseWheel(&local);
         }
       }
     }

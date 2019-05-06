@@ -20,6 +20,10 @@
 #include "jgui/japplication.h"
 #include "jgui/jwindow.h"
 
+#include <sstream>
+#include <iomanip>
+#include <ctime>
+
 class WatchTeste : public jgui::Window {
 
 	private:
@@ -155,6 +159,17 @@ class WatchTeste : public jgui::Window {
 			// draw second
 			g->DrawLine((int)(xc), (int)(yc), (int)(xc+vs*cos(ts)), (int)(yc+vs*sin(ts)));
 			g->DrawLine((int)(xc), (int)(yc), (int)(xc+hs*cos(ts+M_PI)), (int)(yc+hs*sin(ts+M_PI)));
+
+      std::time_t t = std::time(nullptr);
+      std::tm *lt = std::localtime(&t);
+      std::ostringstream o;
+
+      o << std::setw(2) << std::setfill('0') << lt->tm_mday;
+
+      g->SetFont(GetTheme()->GetFont("component.font"));
+      g->SetColor(jgui::Color::White);
+      g->DrawRectangle(92, 92, 34, 34);
+      g->DrawString(o.str(), 100, 100);
 
       Framerate(1);
 

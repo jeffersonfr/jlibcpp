@@ -66,14 +66,14 @@ class MouseEvent : public jevent::EventObject {
     /** \brief */
     jmouseevent_type_t _type;
     /** \brief */
-    int _click_count;
+    int _clicks;
 
   public:
     /**
      * \brief
      *
      */
-    MouseEvent(void *source, jmouseevent_type_t type, jmouseevent_button_t button, jmouseevent_button_t buttons, int click_count, int x, int y);
+    MouseEvent(void *source, jmouseevent_type_t type, jmouseevent_button_t button, jmouseevent_button_t buttons, jgui::jpoint_t location, int clicks);
     
     /**
      * \brief
@@ -91,7 +91,7 @@ class MouseEvent : public jevent::EventObject {
      * \brief
      *
      */
-    virtual int GetClickCount();
+    virtual int GetClicks();
     
     /**
      * \brief
@@ -110,18 +110,6 @@ class MouseEvent : public jevent::EventObject {
      *
      */
     virtual jgui::jpoint_t GetLocation();
-    
-    /**
-     * \brief
-     *
-     */
-    virtual void SetLocation(int x, int y);
-    
-    /**
-     * \brief
-     *
-     */
-    virtual void SetLocation(jgui::jpoint_t location);
     
 };
 

@@ -1097,9 +1097,7 @@ bool Container::MousePressed(jevent::MouseEvent *event)
     jgui::jpoint_t
       dlocation = dialog->GetLocation();
     jevent::MouseEvent 
-      evt = *event;
-
-    evt.SetLocation(elocation.x - dlocation.x, elocation.y - dlocation.y);
+      evt(event->GetSource(), event->GetType(), event->GetButton(), event->GetButtons(), {elocation.x - dlocation.x, elocation.y - dlocation.y}, event->GetClicks());
 
     if ((*i)->MousePressed(&evt) == true) {
       return true;
@@ -1116,11 +1114,9 @@ bool Container::MousePressed(jevent::MouseEvent *event)
     jgui::jpoint_t 
       slocation = GetScrollLocation();
     jevent::MouseEvent 
-      event1 = *event;
+      evt(event->GetSource(), event->GetType(), event->GetButton(), event->GetButtons(), {dx + slocation.x, dy + slocation.y}, event->GetClicks());
 
-    event1.SetLocation(dx + slocation.x, dy + slocation.y);
-
-    return c->MousePressed(&event1);
+    return c->MousePressed(&evt);
   }
 
   return false;
@@ -1151,11 +1147,9 @@ bool Container::MouseReleased(jevent::MouseEvent *event)
     jgui::jpoint_t 
       slocation = GetScrollLocation();
     jevent::MouseEvent 
-      event1 = *event;
+      evt(event->GetSource(), event->GetType(), event->GetButton(), event->GetButtons(), {dx + slocation.x, dy + slocation.y}, event->GetClicks());
 
-    event1.SetLocation(dx + slocation.x, dy + slocation.y);
-
-    return c->MouseReleased(&event1);
+    return c->MouseReleased(&evt);
   }
 
   return false;
@@ -1186,11 +1180,9 @@ bool Container::MouseMoved(jevent::MouseEvent *event)
     jgui::jpoint_t 
       slocation = GetScrollLocation();
     jevent::MouseEvent 
-      event1 = *event;
+      evt(event->GetSource(), event->GetType(), event->GetButton(), event->GetButtons(), {dx + slocation.x, dy + slocation.y}, event->GetClicks());
 
-    event1.SetLocation(dx + slocation.x, dy + slocation.y);
-
-    return c->MouseMoved(&event1);
+    return c->MouseMoved(&evt);
   }
 
   return false;
@@ -1221,11 +1213,9 @@ bool Container::MouseWheel(jevent::MouseEvent *event)
     jgui::jpoint_t 
       slocation = GetScrollLocation();
     jevent::MouseEvent 
-      event1 = *event;
+      evt(event->GetSource(), event->GetType(), event->GetButton(), event->GetButtons(), {dx + slocation.x, dy + slocation.y}, event->GetClicks());
 
-    event1.SetLocation(dx + slocation.x, dy + slocation.y);
-
-    return c->MouseWheel(&event1);
+    return c->MouseWheel(&evt);
   }
 
   return false;

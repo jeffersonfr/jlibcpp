@@ -106,7 +106,7 @@ class UserEvent {
 			return _button;
 		}
 
-		int GetClickCount()
+		int GetClicks()
 		{
 			return _click_count;
 		}
@@ -335,11 +335,11 @@ class UserWindow: public jgui::Window {
       jgui::jpoint_t
         elocation = event->GetLocation();
 
-			if (event->GetClickCount() == 1) {
-				DispatchUserEvent(new UserEvent(ON_MOUSE_CLICK_EVENT, event->GetButton(), event->GetClickCount(), elocation.x, elocation.y, 0.0, 0.0));
+			if (event->GetClicks() == 1) {
+				DispatchUserEvent(new UserEvent(ON_MOUSE_CLICK_EVENT, event->GetButton(), event->GetClicks(), elocation.x, elocation.y, 0.0, 0.0));
 			}
 
-			DispatchUserEvent(new UserEvent(ON_MOUSE_PRESS_EVENT, event->GetButton(), event->GetClickCount(), elocation.x, elocation.y, 0.0, 0.0));
+			DispatchUserEvent(new UserEvent(ON_MOUSE_PRESS_EVENT, event->GetButton(), event->GetClicks(), elocation.x, elocation.y, 0.0, 0.0));
 
 			return true;
 		}
@@ -349,7 +349,7 @@ class UserWindow: public jgui::Window {
       jgui::jpoint_t
         elocation = event->GetLocation();
 
-			DispatchUserEvent(new UserEvent(ON_MOUSE_RELEASE_EVENT, event->GetButton(), event->GetClickCount(), elocation.x, elocation.y, 0.0, 0.0));
+			DispatchUserEvent(new UserEvent(ON_MOUSE_RELEASE_EVENT, event->GetButton(), event->GetClicks(), elocation.x, elocation.y, 0.0, 0.0));
 
 			return true;
 		}
@@ -364,7 +364,7 @@ class UserWindow: public jgui::Window {
 				vx = (elocation.x - _last_mouse_location.x)/mdiff,
 				vy = (elocation.y - _last_mouse_location.y)/mdiff;
 
-			DispatchUserEvent(new UserEvent(ON_MOUSE_MOVE_EVENT, event->GetButton(), event->GetClickCount(), elocation.x, elocation.y, vx, vy));
+			DispatchUserEvent(new UserEvent(ON_MOUSE_MOVE_EVENT, event->GetButton(), event->GetClicks(), elocation.x, elocation.y, vx, vy));
 
 			_last_mouse_move = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 			_last_mouse_location.x = elocation.x;
@@ -378,7 +378,7 @@ class UserWindow: public jgui::Window {
       jgui::jpoint_t
         elocation = event->GetLocation();
 
-			DispatchUserEvent(new UserEvent(ON_MOUSE_WHEEL_EVENT, event->GetButton(), event->GetClickCount(), elocation.x, elocation.y, 0.0, 0.0));
+			DispatchUserEvent(new UserEvent(ON_MOUSE_WHEEL_EVENT, event->GetButton(), event->GetClicks(), elocation.x, elocation.y, 0.0, 0.0));
 
 			return true;
 		}
@@ -438,7 +438,7 @@ class Test : public UserWindow, public UserEventListener {
 
 		virtual void OnMousePress(UserEvent *event)
 		{
-			std::cout << "OnMousePress: "  << event->GetClickCount() << ", Button: " << event->GetButton() << std::endl;
+			std::cout << "OnMousePress: "  << event->GetClicks() << ", Button: " << event->GetButton() << std::endl;
 
 			int 
         cx = event->GetX(),
@@ -448,7 +448,7 @@ class Test : public UserWindow, public UserEventListener {
 				y = cy-_ball.y;
 
 			if ((x*x+y*y) <= _raio*_raio) {
-				if (event->GetClickCount() == 1) {
+				if (event->GetClicks() == 1) {
 					_pressed = true;
 
 					_ball_diff.x = -x;
@@ -456,7 +456,7 @@ class Test : public UserWindow, public UserEventListener {
 				} else {
 					_pressed = false;
 
-					if (event->GetClickCount() == 2) {
+					if (event->GetClicks() == 2) {
 						_color = (_color == 0)?1:0;
 
 						Repaint();
@@ -512,7 +512,7 @@ class Test : public UserWindow, public UserEventListener {
 
 		virtual void OnMouseWheel(UserEvent *event)
 		{
-			std::cout << "OnMouseWheel: " << event->GetClickCount() << std::endl;
+			std::cout << "OnMouseWheel: " << event->GetClicks() << std::endl;
 		}
 
 		virtual void Paint(jgui::Graphics *g)

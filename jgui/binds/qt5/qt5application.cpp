@@ -35,6 +35,7 @@
 #include <QApplication>
 #include <QPainter>
 #include <QDesktopWidget>
+#include <QScreen>
 
 namespace jgui {
 
@@ -403,31 +404,14 @@ class QTWindowRender : public QDialog {
         */
 
         jevent::jmouseevent_button_t button = jevent::JMB_NONE;
-        jevent::jmouseevent_button_t buttons = jevent::JMB_NONE;
         jevent::jmouseevent_type_t type = jevent::JMT_MOVED;
 
         int mouse_x = e->x();
         int mouse_y = e->y();
         int mouse_z = 0;
 
-        if (e->buttons() & Qt::LeftButton) {
-          buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON1);
-        }
-
-        if (e->buttons() & Qt::MidButton) {
-          buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON2);
-        }
-
-        if (e->buttons() & Qt::RightButton) {
-          buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON3);
-        }
-
-        mouse_z = 1;
-
         if (event->type() == QEvent::MouseButtonDblClick) {
           type = jevent::JMT_PRESSED;
-
-          mouse_z = 2;
         } else if (event->type() == QEvent::MouseButtonPress) {
           type = jevent::JMT_PRESSED;
         } else if (event->type() == QEvent::MouseButtonRelease) {
@@ -442,7 +426,7 @@ class QTWindowRender : public QDialog {
           button = jevent::JMB_BUTTON3;
         }
 
-        sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, buttons, mouse_z, mouse_x, mouse_y));
+        sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, jevent::JMB_NONE, {mouse_x, mouse_y}, mouse_z));
       } else if (event->type() == QEvent::Wheel) {
         QWheelEvent *e = dynamic_cast<QWheelEvent *>(event);
 
@@ -452,24 +436,11 @@ class QTWindowRender : public QDialog {
         */
 
         jevent::jmouseevent_button_t button = jevent::JMB_NONE;
-        jevent::jmouseevent_button_t buttons = jevent::JMB_NONE;
         jevent::jmouseevent_type_t type = jevent::JMT_ROTATED;
 
         int mouse_x = e->x();
         int mouse_y = e->y();
         int mouse_z = 0;
-
-        if (e->buttons() & Qt::LeftButton) {
-          buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON1);
-        }
-
-        if (e->buttons() & Qt::MidButton) {
-          buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON2);
-        }
-
-        if (e->buttons() & Qt::RightButton) {
-          buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON3);
-        }
 
         QPoint degrees = e->angleDelta();
 
@@ -479,7 +450,7 @@ class QTWindowRender : public QDialog {
           mouse_z = -1;
         }
 
-        sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, buttons, mouse_z, mouse_x, mouse_y));
+        sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, jevent::JMB_NONE, {mouse_x, mouse_y}, mouse_z));
       } else if (event->type() == QEvent::WindowActivate) {
           // printf("WindowActivateEvent\n");
       } else if (event->type() == QEvent::WindowDeactivate) {
@@ -581,15 +552,18 @@ NativeApplication::~NativeApplication()
 
 void NativeApplication::InternalInit(int argc, char **argv)
 {
-  int i = argc;
+  static int argc0 = 1;
+  static char *argv0[2] = {
+    (char *)"app", nullptr
+  };
 
-  sg_application = new QApplication(i, argv);
+  sg_application = new QApplication(argc0, argv0);
 
-  QRect 
-    sg_geometry = QApplication::desktop()->screenGeometry();
+  QList<QScreen *> screens = QGuiApplication::screens();
+  QRect geometry = screens.front()->geometry();
 
-	sg_screen.width = sg_geometry.width();
-	sg_screen.height = sg_geometry.height();
+	sg_screen.width = geometry.width();
+	sg_screen.height = geometry.height();
   
   sg_quitting = false;
 }

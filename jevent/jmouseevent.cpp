@@ -21,14 +21,13 @@
 
 namespace jevent {
 
-MouseEvent::MouseEvent(void *source, jmouseevent_type_t type, jmouseevent_button_t button, jmouseevent_button_t buttons, int click_count, int x, int y):
+MouseEvent::MouseEvent(void *source, jmouseevent_type_t type, jmouseevent_button_t button, jmouseevent_button_t buttons, jgui::jpoint_t location, int clicks):
   jevent::EventObject(source)
 {
   jcommon::Object::SetClassName("jevent::MouseEvent");
 
-  _click_count = click_count;
-  _location.x = x;
-  _location.y = y;
+  _clicks = clicks;
+  _location = location;
   _button = button;
   _buttons = buttons;
   _type = type;
@@ -43,9 +42,9 @@ jmouseevent_type_t MouseEvent::GetType()
   return _type;
 }
 
-int MouseEvent::GetClickCount()
+int MouseEvent::GetClicks()
 {
-  return _click_count;
+  return _clicks;
 }
 
 jmouseevent_button_t MouseEvent::GetButton()
@@ -61,17 +60,6 @@ jmouseevent_button_t MouseEvent::GetButtons()
 jgui::jpoint_t MouseEvent::GetLocation()
 {
   return _location;
-}
-
-void MouseEvent::SetLocation(int x, int y)
-{
-  _location.x = x;
-  _location.y = y;
-}
-
-void MouseEvent::SetLocation(jgui::jpoint_t location)
-{
-  _location = location;
 }
 
 }

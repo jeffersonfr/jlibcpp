@@ -354,7 +354,6 @@ static void mouse_input_callback(const nana::arg_mouse &arg)
 {
   int mouse_z = 0;
   jevent::jmouseevent_button_t button = jevent::JMB_NONE;
-  jevent::jmouseevent_button_t buttons = jevent::JMB_NONE;
   jevent::jmouseevent_type_t type = jevent::JMT_UNKNOWN;
 
   sg_mouse_x = arg.pos.x;
@@ -384,25 +383,12 @@ static void mouse_input_callback(const nana::arg_mouse &arg)
     }
   }
 
-  if (arg.left_button == true) {
-    buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON1);
-  }
-
-  if (arg.mid_button == true) {
-    buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON3);
-  }
-
-  if (arg.right_button == true) {
-    buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON2);
-  }
-
-  sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, buttons, mouse_z, sg_mouse_x, sg_mouse_y));
+  sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, jevent::JMB_NONE, {sg_mouse_x, sg_mouse_y}, mouse_z));
 }
 
 static void mouse_wheel_input_callback(const nana::arg_wheel &arg)
 {
   jevent::jmouseevent_button_t button = jevent::JMB_NONE;
-  jevent::jmouseevent_button_t buttons = jevent::JMB_NONE;
   jevent::jmouseevent_type_t type = jevent::JMT_ROTATED;
 
   int mouse_z = 1;
@@ -411,7 +397,7 @@ static void mouse_wheel_input_callback(const nana::arg_wheel &arg)
     mouse_z = -1;
   }
 
-  sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, buttons, mouse_z, sg_mouse_x, sg_mouse_y));
+  sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, jevent::JMB_NONE, {sg_mouse_x, sg_mouse_y}, mouse_z));
 }
 
 static void key_input_callback(const nana::arg_keyboard &arg)

@@ -318,7 +318,7 @@ bool TreeListView::MouseWheel(jevent::MouseEvent *event)
   jgui::jpoint_t
     slocation = GetScrollLocation();
 
-  SetScrollLocation(slocation.x, slocation.y + _item_size*event->GetClickCount());
+  SetScrollLocation(slocation.x, slocation.y + _item_size*event->GetClicks());
 
   return true;
 }

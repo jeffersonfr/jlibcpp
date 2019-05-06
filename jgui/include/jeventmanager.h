@@ -20,7 +20,8 @@
 #ifndef J_EVENTMANAGER_H
 #define J_EVENTMANAGER_H
 
-#include "jevent/jeventobject.h"
+#include "jevent/jkeyevent.h"
+#include "jevent/jmouseevent.h"
 
 #include <vector>
 #include <map>
@@ -58,6 +59,10 @@ class EventManager : public jcommon::Object {
     size_t _click_delay;
     /** \brief */
     bool _alive;
+    /** \brief */
+    std::map<jevent::jkeyevent_symbol_t, bool> _key_button_map;
+    /** \brief */
+    std::map<jevent::jmouseevent_button_t, bool> _mouse_button_map;
 
   protected:
     /**
@@ -108,6 +113,18 @@ class EventManager : public jcommon::Object {
      *
      */
     virtual void PostEvent(jevent::EventObject *event);
+
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsKeyDown(jevent::jkeyevent_symbol_t key);
+
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsButtonDown(jevent::jmouseevent_button_t button);
 
     /**
      * \brief
