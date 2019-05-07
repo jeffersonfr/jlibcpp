@@ -481,8 +481,9 @@ class Test : public UserWindow, public UserEventListener {
 		{
 			jgui::jsize_t
 				size = GetSize();
-			int cx = event->GetX();
-			int cy = event->GetY();
+			int 
+        cx = event->GetX(),
+			  cy = event->GetY();
 
 			std::cout << "OnMouseMove: " << cx << ", " << cy << " [" << event->GetVelocityX() << ", " << event->GetVelocityY() << "]" << std::endl;
 

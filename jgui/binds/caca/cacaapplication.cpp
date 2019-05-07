@@ -436,10 +436,10 @@ void NativeApplication::InternalLoop()
           type = jevent::JMT_RELEASED;
         } else if (mtype == CACA_EVENT_MOUSE_MOTION) {
           type = jevent::JMT_MOVED;
-        }
 
-        sg_mouse_x = CLAMP(x, 0, sg_screen.width - 1);
-        sg_mouse_y = CLAMP(y, 0, sg_screen.height - 1);
+          sg_mouse_x = CLAMP(x, 0, sg_screen.width - 1);
+          sg_mouse_y = CLAMP(y, 0, sg_screen.height - 1);
+        }
 
         if (mbutton == 1) {
           button = jevent::JMB_BUTTON1;

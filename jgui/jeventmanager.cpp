@@ -148,13 +148,11 @@ void EventManager::ProcessEvents()
 
           _mouse_button_map[event->GetButton()] = true;
 
-          auto now = std::chrono::steady_clock::now();
-
-          if ((now - button_timestamp[event->GetButton()]) < std::chrono::milliseconds(200)) {
+          if ((event->GetTimestamp() - button_timestamp[event->GetButton()]) < std::chrono::milliseconds(200)) {
             clicks = clicks + 1;
           }
 
-          button_timestamp[event->GetButton()] = now;
+          button_timestamp[event->GetButton()] = event->GetTimestamp();
         } else if (event->GetType() == jevent::JMT_RELEASED) {
           _mouse_button_map[event->GetButton()] = false;
         }

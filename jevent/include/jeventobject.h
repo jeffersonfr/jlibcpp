@@ -22,6 +22,8 @@
 
 #include "jcommon/jobject.h"
 
+#include <chrono>
+
 namespace jevent {
 
 /**
@@ -32,6 +34,7 @@ namespace jevent {
 class EventObject : public virtual jcommon::Object{
 
   private:
+    std::chrono::time_point<std::chrono::steady_clock> _timestamp;
     /** \brief */
     void *_source;
     /** \brief */
@@ -67,6 +70,18 @@ class EventObject : public virtual jcommon::Object{
      * 
      */
     virtual bool IsConsumed();
+
+    /**
+     * \brief
+     * 
+     */
+    void Reset();
+
+    /**
+     * \brief
+     * 
+     */
+    std::chrono::time_point<std::chrono::steady_clock> GetTimestamp();
 
 };
 

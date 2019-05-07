@@ -1529,7 +1529,8 @@ bool Component::ProcessNavigation(jevent::KeyEvent *event)
 
     if (_is_cyclic_focus == true && next == this) {
       std::vector<Component *> components;
-      int x1 = 0,
+      int 
+        x1 = 0,
         y1 = 0,
         x2 = 0,
         y2 = 0;
@@ -1543,8 +1544,10 @@ bool Component::ProcessNavigation(jevent::KeyEvent *event)
           continue;
         }
 
-        jgui::jpoint_t t = cmp->GetAbsoluteLocation();
-        jgui::jsize_t size = cmp->GetSize();
+        jgui::jpoint_t 
+          t = cmp->GetAbsoluteLocation();
+        jgui::jsize_t 
+          size = cmp->GetSize();
 
         if (x1 > t.x) {
           x1 = t.x;

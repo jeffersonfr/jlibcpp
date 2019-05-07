@@ -26,6 +26,7 @@ EventObject::EventObject(void *source):
 {
   jcommon::Object::SetClassName("jevent::EventObject");
 
+  _timestamp = std::chrono::steady_clock::now();
   _source = source;
   _is_consumed = false;
 }
@@ -47,6 +48,16 @@ void EventObject::Consume()
 bool EventObject::IsConsumed()
 {
   return _is_consumed;
+}
+
+void EventObject::Reset()
+{
+  _is_consumed = false;
+}
+
+std::chrono::time_point<std::chrono::steady_clock> EventObject::GetTimestamp()
+{
+  return _timestamp;
 }
 
 }
