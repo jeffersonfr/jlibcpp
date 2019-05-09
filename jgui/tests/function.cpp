@@ -66,7 +66,7 @@ class Function : public jgui::Window {
 		Function():
 			jgui::Window(0, 0, 720, 480)
 		{
-      _buffer = new jgui::BufferedImage(jgui::JPF_RGB24, 960, 720);
+      _buffer = new jgui::BufferedImage(jgui::JPF_RGB32, 960, 720);
     
       jgui::jsize_t
         size = _buffer->GetSize();
