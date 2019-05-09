@@ -190,7 +190,7 @@ class Breakout : public jgui::Window {
         size = GetSize();
 
 			if (goff == nullptr && size.width > 0 && size.height > 0) {
-				off = new jgui::BufferedImage(jgui::JPF_ARGB, size.width, size.height);
+				off = new jgui::BufferedImage(jgui::JPF_RGB32, size.width, size.height);
 
 				goff = off->GetGraphics();
 			}
@@ -210,7 +210,7 @@ class Breakout : public jgui::Window {
 
 			g->DrawImage(off, 0, 0);
 
-      Framerate(25);
+      Framerate(60);
 
       Repaint();
 		}

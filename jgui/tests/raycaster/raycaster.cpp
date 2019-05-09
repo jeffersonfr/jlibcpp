@@ -203,7 +203,7 @@ class Ray : public jgui::Window, public jevent::PlayerListener {
 
 			_scene = new jgui::BufferedImage(jgui::JPF_RGB32, SCREEN_X, SCREEN_Y);
 			_scene2x = new jgui::BufferedImage(jgui::JPF_RGB32, SCREEN_X*2, SCREEN_Y*2);
-			_map = new jgui::BufferedImage(jgui::JPF_ARGB, MAP_X+2, MAP_Y+2);
+			_map = new jgui::BufferedImage(jgui::JPF_RGB32, MAP_X+2, MAP_Y+2);
 			_candle = new jgui::BufferedImage("images/candle.png");
 			_splash = new jgui::BufferedImage("images/splash.png");
 

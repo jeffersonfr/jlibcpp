@@ -301,7 +301,7 @@ class Main : public jgui::Window {
 			char tmp[255];
 
 			if (foffscreen == nullptr) {
-				foffscreen = new jgui::BufferedImage(jgui::JPF_ARGB, size.width, size.height);
+				foffscreen = new jgui::BufferedImage(jgui::JPF_RGB32, size.width, size.height);
 			
 				jgui::Graphics *goff = foffscreen->GetGraphics();
 

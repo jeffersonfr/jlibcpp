@@ -34,7 +34,7 @@ class GraphicPanel : public jgui::Window {
 	{
 		srand(time(nullptr));
 
-    _buffer = new jgui::BufferedImage(jgui::JPF_ARGB, 1920, 1080);
+    _buffer = new jgui::BufferedImage(jgui::JPF_RGB32, 1920, 1080);
 	}
 
 	virtual ~GraphicPanel()
@@ -163,7 +163,7 @@ class GraphicPanel : public jgui::Window {
 		y = (t.height + sh)/2;
 
 		jgui::Image 
-      *fimage = new jgui::BufferedImage(jgui::JPF_ARGB, 2*sw, sh);
+      *fimage = new jgui::BufferedImage(jgui::JPF_RGB32, 2*sw, sh);
 		jgui::Graphics 
       *gf = fimage->GetGraphics();
 
@@ -673,7 +673,7 @@ class GraphicPanel : public jgui::Window {
 		pimage = new jgui::BufferedImage("images/tux-zombie.png");
 
 		for (int i=0; i<iterations; i++) {
-			jgui::Image *image = new jgui::BufferedImage(jgui::JPF_ARGB, size, size);
+			jgui::Image *image = new jgui::BufferedImage(jgui::JPF_RGB32, size, size);
 
 			image->GetGraphics()->DrawImage(pimage, 0, 0, size, size);
 

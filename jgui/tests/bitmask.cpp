@@ -573,7 +573,7 @@ class BitMask : public jcommon::Object {
 
 		virtual jgui::Image * ConvertToImage()
 		{
-      jgui::Image *image = new jgui::BufferedImage(jgui::JPF_ARGB, _size.width, _size.height);
+      jgui::Image *image = new jgui::BufferedImage(jgui::JPF_RGB32, _size.width, _size.height);
 
       image->GetGraphics()->SetCompositeFlags(jgui::JCF_SRC);
       image->GetGraphics()->SetRGBArray(_data, 0, 0, _size.width, _size.height);

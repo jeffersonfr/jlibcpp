@@ -97,7 +97,7 @@ class Doom : public jgui::Window {
         c1 = size.width/fireSize;
       
       cairo_surface_t 
-        *cairo_surface = cairo_get_target(g->GetCairoContext());
+        *cairo_surface = g->GetCairoSurface();
       uint32_t 
         *pixels = (uint32_t *)cairo_image_surface_get_data(cairo_surface);
 

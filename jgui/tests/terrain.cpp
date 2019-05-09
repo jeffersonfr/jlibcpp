@@ -35,7 +35,7 @@ class Terrain : public jgui::Window {
 		Terrain():
 			jgui::Window(0, 0, 720, 480)
 		{
-      _buffer = new jgui::BufferedImage(jgui::JPF_ARGB, 720, 480);
+      _buffer = new jgui::BufferedImage(jgui::JPF_RGB32, 720, 480);
 		}
 
 		virtual ~Terrain()
@@ -65,9 +65,9 @@ class Terrain : public jgui::Window {
 
 			do {
         for (float t=1; t<60 and IsHidden() == false; t+=0.3) {
-          g->Clear();
-
           _mutex.lock();
+
+          g->Clear();
 
           for (int y1=0; y1<24 and IsHidden() == false; y1++) {
             for (int x1=0; x1<24 and IsHidden() == false; x1++) {

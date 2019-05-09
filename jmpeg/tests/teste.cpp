@@ -3614,12 +3614,19 @@ class PSIParser : public jevent::DemuxListener {
       } else if (descriptor_tag == 0xfd) { // data component descriptor
         int data_component_id = TS_G16(ptr + 0);
 
+        printf("\t\t:: data component id:[0x%04x]\n", data_component_id);
+
+        DumpBytes("additional identification info", ptr + 2, descriptor_length - 2);
+        
+        /*
+        // INFO:: ABNT NBR 15608-3, 22.3.3.3
         // INFO:: STD-B24:2008, volume 1, parte 3, 9.6.1 (additional_arib_caption_info)
         int dmf = TS_GM8(ptr + 1, 0, 4);
         // int reserved = TS_GM8(ptr + 1, 4, 2);
         int timing = TS_GM8(ptr + 1, 6, 2);
 
-        printf("\t\t:: data component id:[0x%04x], dmf:[0x%02x], timing:[0x%02x]\n", data_component_id, dmf, timing);
+        printf("\t\t:: dmf:[0x%02x], timing:[0x%02x]\n", dmf, timing);
+        */
       } else if (descriptor_tag == 0xfe) { // system management descriptor [ABNTNBR 15608-3-2008]
         int system_management_id = TS_G16(ptr + 0);
         int broadcasting_flag = TS_GM8(ptr, 0, 2);

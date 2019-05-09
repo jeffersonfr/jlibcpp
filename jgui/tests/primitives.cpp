@@ -545,7 +545,7 @@ class Primitives : public jgui::Window {
       int sw = f1->GetStringWidth(text);
       int sh = (3*(45+10)+20+shadow)+f4->GetSize()-(0*(45+10)+20+shadow);
 
-      jgui::Image *timage = new jgui::BufferedImage(jgui::JPF_ARGB, sw, sh);
+      jgui::Image *timage = new jgui::BufferedImage(jgui::JPF_RGB32, sw, sh);
       jgui::Graphics *gt = timage->GetGraphics();
 
       gt->SetColor(rcolor);

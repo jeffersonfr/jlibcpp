@@ -33,6 +33,7 @@ class Function : public jgui::Window {
 
 	private:
     jgui::Image *_buffer;
+    std::mutex _mutex;
 
     float cx;
     float cy;
@@ -65,7 +66,7 @@ class Function : public jgui::Window {
 		Function():
 			jgui::Window(0, 0, 720, 480)
 		{
-      _buffer = new jgui::BufferedImage(jgui::JPF_ARGB, 960, 720);
+      _buffer = new jgui::BufferedImage(jgui::JPF_RGB24, 960, 720);
     
       jgui::jsize_t
         size = _buffer->GetSize();
@@ -127,6 +128,8 @@ class Function : public jgui::Window {
         size = _buffer->GetSize();
 
 			do {
+        _mutex.lock();
+
         g->Clear();
 
         for (float x=-15; x<15; x+=0.125) {
@@ -147,6 +150,10 @@ class Function : public jgui::Window {
           }
         }
 
+        _mutex.unlock();
+
+        Repaint();
+
         incremented = incremented + increment * dr;
 
         if (incremented > 5) {
@@ -160,8 +167,6 @@ class Function : public jgui::Window {
         }
 
         Framerate(25);
-
-        Repaint();
       } while (IsHidden() == false);
     }
 
@@ -170,7 +175,11 @@ class Function : public jgui::Window {
       jgui::jsize_t
         size = GetSize();
 
+      _mutex.lock();
+
       g->DrawImage(_buffer, 0, 0, size.width, size.height);
+      
+      _mutex.unlock();
     }
 
 };

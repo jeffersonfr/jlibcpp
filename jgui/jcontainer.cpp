@@ -425,7 +425,7 @@ void Container::PaintGlassPane(Graphics *g)
 
 void Container::PaintBackground(Graphics *g)
 {
-  if (_is_background_visible == false) {
+  if (IsBackgroundVisible() == false) {
     return;
   }
   
@@ -637,8 +637,6 @@ void Container::Paint(Graphics *g)
   Component::Paint(g);
 
   if (IsBackgroundVisible() == true) {
-    g->Reset(); 
-
     PaintBackground(g);
   }
 

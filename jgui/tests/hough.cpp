@@ -176,7 +176,7 @@ class Test : public jgui::Window {
       jgui::jsize_t
         size = _image->GetSize();
 
-      _hough = new jgui::BufferedImage(jgui::JPF_ARGB, size.width, size.height);
+      _hough = new jgui::BufferedImage(jgui::JPF_RGB32, size.width, size.height);
 
 		}
 

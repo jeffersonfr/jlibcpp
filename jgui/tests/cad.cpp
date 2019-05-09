@@ -387,9 +387,9 @@ class CAD : public jgui::Window {
 
 		virtual bool MouseWheel(jevent::MouseEvent *event)
 		{
-      if (event->GetClickCount() > 0) {
+      if (event->GetClicks() > 0) {
         fScale *= 1.1f;
-      } else if (event->GetClickCount() < 0) {
+      } else if (event->GetClicks() < 0) {
         fScale *= 0.9f;
       }
 

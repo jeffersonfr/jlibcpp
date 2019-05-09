@@ -27,6 +27,7 @@
 
 #include <thread>
 #include <mutex>
+#include <atomic>
 
 #include <SDL2/SDL.h>
 
@@ -37,6 +38,8 @@ namespace jgui {
 #endif
 
 /** \brief */
+jgui::Image *sg_back_buffer = nullptr;
+/** \brief */
 static SDL_Window *sg_window = nullptr;
 /** \brief */
 static SDL_Renderer *sg_renderer = nullptr;
@@ -45,7 +48,7 @@ static int sg_mouse_x = 0;
 /** \brief */
 static int sg_mouse_y = 0;
 /** \brief */
-static bool sg_repaint = false;
+static std::atomic<bool> sg_repaint;
 /** \brief */
 static bool sg_quitting = false;
 /** \brief */
@@ -384,49 +387,39 @@ void NativeApplication::InternalPaint()
 
   jregion_t 
     bounds = sg_jgui_window->GetBounds();
-  jgui::Image 
-    *buffer = new jgui::BufferedImage(jgui::JPF_ARGB, bounds.width, bounds.height);
-  jgui::Graphics 
-    *g = buffer->GetGraphics();
-	jpoint_t 
-    t = g->Translate();
 
-	g->Reset();
-	g->Translate(-t.x, -t.y);
-  g->SetClip(0, 0, bounds.width, bounds.height);
+  if (sg_back_buffer != nullptr) {
+    jgui::jsize_t
+      size = sg_back_buffer->GetSize();
+
+    if (size.width != bounds.width or size.height != bounds.height) {
+      delete sg_back_buffer;
+      sg_back_buffer = nullptr;
+    }
+  }
+
+  if (sg_back_buffer == nullptr) {
+    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, bounds.width, bounds.height);
+  }
+
+  jgui::Graphics 
+    *g = sg_back_buffer->GetGraphics();
+
+  g->Reset();
+  g->SetCompositeFlags(jgui::JCF_SRC_OVER);
+
 	sg_jgui_window->DoLayout();
   sg_jgui_window->Paint(g);
-	g->Translate(t.x, t.y);
 
-  cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
+  g->Flush();
 
-  if (cairo_surface == nullptr) {
-    delete buffer;
+  uint32_t *data = (uint32_t *)sg_back_buffer->LockData();
 
-    return;
-  }
-
-  cairo_surface_flush(cairo_surface);
-
-  int dw = cairo_image_surface_get_width(cairo_surface);
-  int dh = cairo_image_surface_get_height(cairo_surface);
-  // int stride = cairo_image_surface_get_stride(cairo_surface);
-
-  uint8_t *data = cairo_image_surface_get_data(cairo_surface);
-
-  if (data == nullptr) {
-    delete buffer;
-
-    return;
-  }
-
-  SDL_Surface *surface = SDL_CreateRGBSurfaceFrom(data, dw, dh, 32, dw*4, 0, 0, 0, 0);
+  SDL_Surface *surface = SDL_CreateRGBSurfaceFrom(data, bounds.width, bounds.height, 32, bounds.width*4, 0, 0, 0, 0);
   SDL_Texture *texture = SDL_CreateTextureFromSurface(sg_renderer, surface);
 
   if (texture == nullptr) {
     SDL_FreeSurface(surface);
-
-    delete buffer;
 
     return;
   }
@@ -453,10 +446,7 @@ void NativeApplication::InternalPaint()
   SDL_DestroyTexture(texture);
   SDL_FreeSurface(surface);
 
-  cairo_surface_destroy(cairo_surface);
-
-  delete buffer;
-  buffer = nullptr;
+  sg_back_buffer->UnlockData();
 
   sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
 }
@@ -468,9 +458,7 @@ void NativeApplication::InternalLoop()
 	SDL_Event event;
 
 	while (sg_quitting == false) {
-    if (sg_repaint == true) {
-      sg_repaint = false;
-
+    if (sg_repaint.exchange(false) == true) {
       InternalPaint();
     }
 
@@ -673,7 +661,7 @@ NativeWindow::~NativeWindow()
 
 void NativeWindow::Repaint(Component *cmp)
 {
-  sg_repaint = true;
+  sg_repaint.store(true);
 }
 
 void NativeWindow::ToggleFullScreen()
@@ -902,28 +890,14 @@ void NativeWindow::SetIcon(jgui::Image *image)
     return;
   }
 
-  cairo_surface_t 
-    *cairo_surface = cairo_get_target(image->GetGraphics()->GetCairoContext());
+  jgui::jsize_t 
+    size = image->GetSize();
+  uint32_t 
+    *data = (uint32_t *)image->LockData();
 
   sg_jgui_icon = image;
 
-  if (cairo_surface == nullptr) {
-    return;
-  }
-
-  cairo_surface_flush(cairo_surface);
-
-  int dw = cairo_image_surface_get_width(cairo_surface);
-  int dh = cairo_image_surface_get_height(cairo_surface);
-  // int stride = cairo_image_surface_get_stride(cairo_surface);
-
-  uint8_t *data = cairo_image_surface_get_data(cairo_surface);
-
-  if (data == nullptr) {
-    return;
-  }
-
-  SDL_Surface *icon = SDL_CreateRGBSurfaceFrom(data, dw, dh, 32, dw*4, 0, 0, 0, 0);
+  SDL_Surface *icon = SDL_CreateRGBSurfaceFrom(data, size.width, size.height, 32, size.width*4, 0, 0, 0, 0);
 
   if (nullptr == icon) {
     return;
@@ -931,6 +905,8 @@ void NativeWindow::SetIcon(jgui::Image *image)
 
   SDL_SetWindowIcon(sg_window, icon);
   SDL_FreeSurface(icon);
+    
+  image->UnlockData();
 }
 
 jgui::Image * NativeWindow::GetIcon()

@@ -224,6 +224,8 @@ class Tree : public jgui::Window {
 
 		void Paint(jgui::Graphics *g) 
 		{
+      jgui::Window::Paint(g);
+
       jgui::jsize_t
         size = GetSize();
       

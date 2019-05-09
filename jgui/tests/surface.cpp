@@ -63,7 +63,7 @@ class Surface : public jgui::Window {
 		Surface():
 			jgui::Window(0, 0, 720, 480)
 		{
-      _buffer = new jgui::BufferedImage(jgui::JPF_ARGB, 800, 600);
+      _buffer = new jgui::BufferedImage(jgui::JPF_RGB32, 800, 600);
     
       nodesize = 2.0f;
       relax = 1.0f;

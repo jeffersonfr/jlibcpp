@@ -294,7 +294,7 @@ class BallDrop : public jgui::Window {
 				jgui::Graphics *backGraphics;
 
 				backDimension = size;
-				backImage = new jgui::BufferedImage(jgui::JPF_ARGB, size.width, size.height);
+				backImage = new jgui::BufferedImage(jgui::JPF_RGB32, size.width, size.height);
 				backGraphics = backImage->GetGraphics();
 
 				// Erase the previous image.
@@ -310,7 +310,7 @@ class BallDrop : public jgui::Window {
 
 			if ( (offImage == nullptr) || (size.width != offDimension.width) || (size.height != offDimension.height) ) {
 				offDimension = size;
-				offImage = new jgui::BufferedImage(jgui::JPF_ARGB, size.width, size.height);
+				offImage = new jgui::BufferedImage(jgui::JPF_RGB32, size.width, size.height);
 			}
 
 			offImage->GetGraphics()->DrawImage(backImage, 0, 0);

@@ -83,18 +83,18 @@ enum jcomposite_flags_t {
   // aA, aB, aR: src alpha, dst alpha, result alpha
   // xA, xB, xR: src color, dst color, result color
   // xaA, xaB: aA*xA, aB*xB
-  JCF_CLEAR       = 1,  // [0, 0]
-  JCF_SRC         = 2,  // [aA, xA]
+  JCF_CLEAR      = 1,  // [0, 0]
+  JCF_SRC        = 2,  // [aA, xA]
   JCF_SRC_OVER   = 3,  // [aA + aB·(1−aA), (xaA + xaB·(1−aA))/aR]
   JCF_SRC_IN     = 4,  // [aA·aB, xA]
-  JCF_SRC_OUT     = 5,  // [aA·(1−aB), xA]
+  JCF_SRC_OUT    = 5,  // [aA·(1−aB), xA]
   JCF_SRC_ATOP   = 6,  // [aB, xaA + xB·(1−aA)]
-  JCF_DST         = 7,  // [aB, xB]
+  JCF_DST        = 7,  // [aB, xB]
   JCF_DST_OVER   = 8,  // [(1−aB)·aA + aB, (xaA·(1−aB) + xaB)/aR]
   JCF_DST_IN     = 9,  // [aA·aB, xB]
-  JCF_DST_OUT     = 10,  // [(1−aA)·aB, xB]
+  JCF_DST_OUT    = 10,  // [(1−aA)·aB, xB]
   JCF_DST_ATOP   = 11,  // [aA, xA·(1−aB) + xaB]
-  JCF_XOR         = 12,  // [aA + aB − 2·aA·aB, (xaA·(1−aB) + xaB·(1−aA))/aR]
+  JCF_XOR        = 12,  // [aA + aB − 2·aA·aB, (xaA·(1−aB) + xaB·(1−aA))/aR]
   JCF_ADD        = 13,  // [min(1, aA+aB), (xaA + xaB)/aR]
   JCF_SATURATE   = 14,  // [min(1, aA+aB), (min(aA, 1−aB)·xA + xaB)/aR]
   // INFO:: Blend Modes
@@ -174,9 +174,9 @@ enum jline_style_t {
  */
 enum jrect_corner_t {
   JRC_TOP_LEFT      = 0x01,
-  JRC_TOP_RIGHT      = 0x02,
+  JRC_TOP_RIGHT     = 0x02,
   JRC_BOTTOM_RIGHT  = 0x04,
-  JRC_BOTTOM_LEFT    = 0x08
+  JRC_BOTTOM_LEFT   = 0x08
 };
 
 /**
@@ -300,6 +300,8 @@ class Graphics : public virtual jcommon::Object {
     /** \brief */
     jpixelformat_t _pixelformat;
     /** \brief */
+    cairo_surface_t *_cairo_surface;
+    /** \brief */
     cairo_t *_cairo_context;
     /** \brief */
     bool _is_vertical_sync_enabled;
@@ -309,7 +311,7 @@ class Graphics : public virtual jcommon::Object {
      * \brief
      *
      */
-    Graphics(cairo_t *cairo_context);
+    Graphics(cairo_surface_t *surface);
 
     /**
      * \brief
@@ -321,7 +323,7 @@ class Graphics : public virtual jcommon::Object {
      * \brief
      *
      */
-    cairo_t * GetCairoContext();
+    cairo_surface_t * GetCairoSurface();
 
     /**
      * \brief
@@ -788,6 +790,12 @@ class Graphics : public virtual jcommon::Object {
      *
      */
     virtual bool IsVerticalSyncEnabled();
+
+    /**
+     * \brief
+     *
+     */
+    virtual void Flush();
 
 };
 

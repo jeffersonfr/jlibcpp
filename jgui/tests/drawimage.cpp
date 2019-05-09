@@ -786,7 +786,7 @@ class BufferedImageTest : public Picture {
 			jgui::jsize_t
 				size = image->GetSize();
 
-			_image = new jgui::BufferedImage(jgui::JPF_ARGB, size.width, size.height);
+			_image = new jgui::BufferedImage(jgui::JPF_RGB32, size.width, size.height);
 
 			_image->GetGraphics()->DrawImage(image, 0, 0);
 
@@ -823,7 +823,7 @@ class RGBImageTest : public Picture {
       delete image;
       image = nullptr;
 
-			_image = new jgui::BufferedImage(jgui::JPF_ARGB, size.width, size.height);
+			_image = new jgui::BufferedImage(jgui::JPF_RGB32, size.width, size.height);
 
       _image->GetGraphics()->SetCompositeFlags(jgui::JCF_SRC);
       _image->GetGraphics()->SetRGBArray(rgb, 0, 0, size.width, size.height);

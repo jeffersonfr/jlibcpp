@@ -695,7 +695,7 @@ class GifPlayerComponentImpl : public jgui::Component {
 			_mutex.lock();
 
 			_surface = cairo_image_surface_create_for_data(
-					(uint8_t *)data, CAIRO_FORMAT_ARGB32, sw, sh, cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, sw));
+					(uint8_t *)data, CAIRO_FORMAT_RGB24, sw, sh, cairo_format_stride_for_width(CAIRO_FORMAT_RGB24, sw));
 
       Repaint();
     }
@@ -711,7 +711,7 @@ class GifPlayerComponentImpl : public jgui::Component {
       jgui::jsize_t
         size = GetSize();
 
-      jgui::BufferedImage image(cairo_create(_surface));
+      jgui::BufferedImage image(_surface);
 
 			_player->DispatchFrameGrabberEvent(new jevent::FrameGrabberEvent(&image, jevent::JFE_GRABBED));
 
@@ -722,6 +722,7 @@ class GifPlayerComponentImpl : public jgui::Component {
       }
 		
       cairo_surface_destroy(_surface);
+
       _surface = nullptr;
 
 			_mutex.unlock();

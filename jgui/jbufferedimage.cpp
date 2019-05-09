@@ -352,55 +352,52 @@ BufferedImage::BufferedImage(jpixelformat_t pixelformat, int width, int height):
   _size.width = width;
   _size.height = height;
 
-  cairo_surface_t 
-    *surface = nullptr;
   cairo_format_t 
     format = CAIRO_FORMAT_INVALID;
 
   if (_pixelformat == JPF_ARGB) {
     format = CAIRO_FORMAT_ARGB32;
   } else if (_pixelformat == JPF_RGB32) {
-    format = CAIRO_FORMAT_ARGB32;
+    format = CAIRO_FORMAT_RGB24;
   } else if (_pixelformat == JPF_RGB24) {
     format = CAIRO_FORMAT_RGB24;
   } else if (_pixelformat == JPF_RGB16) {
     format = CAIRO_FORMAT_RGB16_565;
   }
 
-  surface = cairo_image_surface_create(format, _size.width, _size.height);
+  _cairo_surface = cairo_image_surface_create(format, _size.width, _size.height);
 
-  _graphics = new Graphics(cairo_create(surface));
+  _graphics = new Graphics(_cairo_surface);
 }
 
-BufferedImage::BufferedImage(cairo_t *cairo_context):
+BufferedImage::BufferedImage(cairo_surface_t *surface):
   jgui::Image(jgui::JPF_UNKNOWN, -1, -1)
 {
-  jcommon::Object::SetClassName("jgui::BufferedImage");
-
-  cairo_surface_t 
-    *surface = cairo_get_target(cairo_context);
-
   if (surface == nullptr) {
     throw jexception::RuntimeException("Unable to get target surface from cairo context");
   }
 
+  jcommon::Object::SetClassName("jgui::BufferedImage");
+
+  _cairo_surface = cairo_surface_reference(surface);
+
   cairo_format_t
-    format = cairo_image_surface_get_format(surface);
+    format = cairo_image_surface_get_format(_cairo_surface);
 
   if (format == CAIRO_FORMAT_ARGB32) {
     _pixelformat = jgui::JPF_ARGB;
   } else if (format == CAIRO_FORMAT_RGB24) {
-    _pixelformat = jgui::JPF_RGB24;
+    _pixelformat = jgui::JPF_RGB32;
   } else if (format == CAIRO_FORMAT_RGB16_565) {
     _pixelformat = jgui::JPF_RGB16;
   } else {
     _pixelformat = jgui::JPF_UNKNOWN;
   }
   
-  _size.width = cairo_image_surface_get_width(surface);
-  _size.height = cairo_image_surface_get_height(surface);
+  _size.width = cairo_image_surface_get_width(_cairo_surface);
+  _size.height = cairo_image_surface_get_height(_cairo_surface);
 
-  _graphics = new Graphics(cairo_context);
+  _graphics = new Graphics(_cairo_surface);
 }
 
 BufferedImage::BufferedImage(std::string file):
@@ -441,134 +438,132 @@ BufferedImage::BufferedImage(jio::InputStream *stream):
     count = count + r;
   } while (count < size);
   
-  cairo_surface_t *cairo_surface = create_png_surface_from_data(buffer, count);
+  cairo_surface_t *surface = create_png_surface_from_data(buffer, count);
 
-  if (cairo_surface == nullptr) {
+  if (surface == nullptr) {
 #ifdef JPG_IMAGE
-    cairo_surface = create_jpg_surface_from_data(buffer, count);
+    surface = create_jpg_surface_from_data(buffer, count);
 #endif
   }
 
-  if (cairo_surface == nullptr) {
+  if (surface == nullptr) {
 #ifdef BPG_IMAGE
-    cairo_surface = create_bpg_surface_from_data(buffer, count);
+    surface = create_bpg_surface_from_data(buffer, count);
 #endif
   }
 
-  if (cairo_surface == nullptr) {
+  if (surface == nullptr) {
 #ifdef SVG_IMAGE
-    cairo_surface = create_svg_surface_from_data(buffer, count, -1, -1);
+    surface = create_svg_surface_from_data(buffer, count, -1, -1);
 #endif
   }
 
-  if (cairo_surface == nullptr) {
+  if (surface == nullptr) {
 #ifdef TIF_IMAGE
-    cairo_surface = create_tif_surface_from_data(buffer, count);
+    surface = create_tif_surface_from_data(buffer, count);
 #endif
   }
 
-  if (cairo_surface == nullptr) {
+  if (surface == nullptr) {
 #ifdef JP2000_IMAGE
-    cairo_surface = create_jp2000_surface_from_data(buffer, count);
+    surface = create_jp2000_surface_from_data(buffer, count);
 #endif
   }
 
-  if (cairo_surface == nullptr) {
+  if (surface == nullptr) {
 #ifdef BMP_IMAGE
-    cairo_surface = create_bmp_surface_from_data(buffer, count);
+    surface = create_bmp_surface_from_data(buffer, count);
 #endif
   }
 
-  if (cairo_surface == nullptr) {
+  if (surface == nullptr) {
 #ifdef PPM_IMAGE
-    cairo_surface = create_ppm_surface_from_data(buffer, count);
+    surface = create_ppm_surface_from_data(buffer, count);
 #endif
   }
 
-  if (cairo_surface == nullptr) {
+  if (surface == nullptr) {
 #ifdef HEIF_IMAGE
-    cairo_surface = create_heif_surface_from_data(buffer, count);
+    surface = create_heif_surface_from_data(buffer, count);
 #endif
   }
 
-  if (cairo_surface == nullptr) {
+  if (surface == nullptr) {
 #ifdef FLIF_IMAGE
-    cairo_surface = create_flif_surface_from_data(buffer, count);
+    surface = create_flif_surface_from_data(buffer, count);
 #endif
   }
 
-  if (cairo_surface == nullptr) {
+  if (surface == nullptr) {
 #ifdef WEBP_IMAGE
-    cairo_surface = create_webp_surface_from_data(buffer, count);
+    surface = create_webp_surface_from_data(buffer, count);
 #endif
   }
 
-  if (cairo_surface == nullptr) {
+  if (surface == nullptr) {
 #ifdef GIF_IMAGE
-    cairo_surface = create_gif_surface_from_data(buffer, count);
+    surface = create_gif_surface_from_data(buffer, count);
 #endif
   }
 
-  if (cairo_surface == nullptr) {
+  if (surface == nullptr) {
 #ifdef ICO_IMAGE
-    cairo_surface = create_ico_surface_from_data(buffer, count);
+    surface = create_ico_surface_from_data(buffer, count);
 #endif
   }
 
-  if (cairo_surface == nullptr) {
+  if (surface == nullptr) {
 #ifdef PCX_IMAGE
-    cairo_surface = create_pcx_surface_from_data(buffer, count);
+    surface = create_pcx_surface_from_data(buffer, count);
 #endif
   }
 
-  if (cairo_surface == nullptr) {
+  if (surface == nullptr) {
 #ifdef TGA_IMAGE
-    cairo_surface = create_tga_surface_from_data(buffer, count);
+    surface = create_tga_surface_from_data(buffer, count);
 #endif
   }
 
-  if (cairo_surface == nullptr) {
+  if (surface == nullptr) {
 #ifdef XBM_IMAGE
-    cairo_surface = create_xbm_surface_from_data(buffer, count);
+    surface = create_xbm_surface_from_data(buffer, count);
 #endif
   }
 
-  if (cairo_surface == nullptr) {
+  if (surface == nullptr) {
 #ifdef XPM_IMAGE
-    cairo_surface = create_xpm_surface_from_data(buffer, count);
+    surface = create_xpm_surface_from_data(buffer, count);
 #endif
   }
 
-  if (cairo_surface == nullptr) {
+  if (surface == nullptr) {
 #ifdef MJPEG_IMAGE
-    cairo_surface = create_mjpeg_surface_from_data(buffer, count);
+    surface = create_mjpeg_surface_from_data(buffer, count);
 #endif
   }
 
-  if (cairo_surface == nullptr) {
+  if (surface == nullptr) {
     throw jexception::RuntimeException("Cannot open this image type");
   }
 
+  _cairo_surface = surface;
+
   _pixelformat = JPF_UNKNOWN;
 
-  cairo_format_t format = cairo_image_surface_get_format(cairo_surface);
+  cairo_format_t format = cairo_image_surface_get_format(_cairo_surface);
 
   if (format == CAIRO_FORMAT_ARGB32) {
     _pixelformat = JPF_ARGB;
   } else if (format == CAIRO_FORMAT_RGB24) {
-    _pixelformat = JPF_RGB24;
+    _pixelformat = JPF_RGB32;
   } else if (format == CAIRO_FORMAT_RGB16_565) {
     _pixelformat = JPF_RGB16;
   }
 
-  _size.width = cairo_image_surface_get_width(cairo_surface);
-  _size.height = cairo_image_surface_get_height(cairo_surface);
+  _size.width = cairo_image_surface_get_width(_cairo_surface);
+  _size.height = cairo_image_surface_get_height(_cairo_surface);
 
-  cairo_t *cairo_context = cairo_create(cairo_surface);
-  
-  // cairo_surface_destroy(cairo_surface);
-
-  _graphics = new Graphics(cairo_context);
+  _graphics = new Graphics(_cairo_surface);
 }
 
 BufferedImage::~BufferedImage()
@@ -577,6 +572,8 @@ BufferedImage::~BufferedImage()
     delete _graphics;
     _graphics = nullptr;
   }
+
+  cairo_surface_destroy(_cairo_surface);
 }
 
 Graphics * BufferedImage::GetGraphics()
@@ -586,32 +583,23 @@ Graphics * BufferedImage::GetGraphics()
 
 Image * BufferedImage::Flip(jflip_flags_t mode)
 {
-  cairo_surface_t 
-    *cairo_surface = cairo_get_target(dynamic_cast<Graphics *>(GetGraphics())->GetCairoContext());
-
-  if (cairo_surface == nullptr) {
-    return nullptr;
-  }
-
-  cairo_surface_t 
-    *surface = nullptr;
   cairo_format_t 
     format = CAIRO_FORMAT_INVALID;
 
   if (_pixelformat == JPF_ARGB) {
     format = CAIRO_FORMAT_ARGB32;
   } else if (_pixelformat == JPF_RGB32) {
-    format = CAIRO_FORMAT_ARGB32;
+    format = CAIRO_FORMAT_RGB24;
   } else if (_pixelformat == JPF_RGB24) {
     format = CAIRO_FORMAT_RGB24;
   } else if (_pixelformat == JPF_RGB16) {
     format = CAIRO_FORMAT_RGB16_565;
   }
 
-  surface = cairo_image_surface_create(format, _size.width, _size.height);
-
+  cairo_surface_t 
+    *surface = cairo_image_surface_create(format, _size.width, _size.height);
   cairo_t 
-    *cairo_context = cairo_create(surface);
+    *context = cairo_create(surface);
 
   cairo_matrix_t ms, mt, m;
 
@@ -624,49 +612,45 @@ Image * BufferedImage::Flip(jflip_flags_t mode)
   }
 
   cairo_matrix_multiply(&m, &mt, &ms);
-  cairo_set_matrix(cairo_context, &m);
+  cairo_set_matrix(context, &m);
 
-  cairo_surface_flush(cairo_surface);
-  cairo_set_source_surface(cairo_context, cairo_surface, 0, 0);
-  cairo_paint(cairo_context);
+  cairo_surface_flush(_cairo_surface);
+  cairo_set_source_surface(context, _cairo_surface, 0, 0);
+  cairo_paint(context);
 
-  cairo_destroy(cairo_context);
-  // cairo_surface_destroy(surface);
+  cairo_destroy(context);
+  // TODO:: cairo_surface_destroy(surface);
 
-  return new BufferedImage(cairo_context);
+  jgui::Image *tmp = new BufferedImage(surface);
+
+  cairo_destroy(context);
+
+  return tmp;
 }
 
 Image * BufferedImage::Shear(float dx, float dy)
 {
-  cairo_surface_t *cairo_surface = cairo_get_target(dynamic_cast<Graphics *>(GetGraphics())->GetCairoContext());
-
-  if (cairo_surface == nullptr) {
-    return nullptr;
-  }
-
   int 
     tx = _size.width*fabs(dx),
     ty = _size.height*fabs(dy);
 
-  cairo_surface_t 
-    *surface = nullptr;
   cairo_format_t 
     format = CAIRO_FORMAT_INVALID;
 
   if (_pixelformat == JPF_ARGB) {
     format = CAIRO_FORMAT_ARGB32;
   } else if (_pixelformat == JPF_RGB32) {
-    format = CAIRO_FORMAT_ARGB32;
+    format = CAIRO_FORMAT_RGB24;
   } else if (_pixelformat == JPF_RGB24) {
     format = CAIRO_FORMAT_RGB24;
   } else if (_pixelformat == JPF_RGB16) {
     format = CAIRO_FORMAT_RGB16_565;
   }
 
-  surface = cairo_image_surface_create(format, _size.width + tx, _size.height + ty);
-
+  cairo_surface_t 
+    *surface = cairo_image_surface_create(format, _size.width + tx, _size.height + ty);
   cairo_t 
-    *cairo_context = cairo_create(surface);
+    *context = cairo_create(surface);
 
   cairo_matrix_t m;
 
@@ -676,35 +660,30 @@ Image * BufferedImage::Shear(float dx, float dy)
       0.0f, 0.0f
    );
 
-  cairo_transform(cairo_context, &m);
-  // cairo_set_matrix(cairo_context, &m);
+  cairo_transform(context, &m);
+  // cairo_set_matrix(context, &m);
 
   if (dx < 0.0f) {
-    cairo_translate(cairo_context, tx, 0);
+    cairo_translate(context, tx, 0);
   }
 
   if (dy < 0.0f) {
-    cairo_translate(cairo_context, 0, ty);
+    cairo_translate(context, 0, ty);
   }
 
-  cairo_surface_flush(cairo_surface);
-  cairo_set_source_surface(cairo_context, cairo_surface, 0, 0);
-  cairo_paint(cairo_context);
+  cairo_surface_flush(_cairo_surface);
+  cairo_set_source_surface(context, _cairo_surface, 0, 0);
+  cairo_paint(context);
 
-  return new jgui::BufferedImage(cairo_context);
+  jgui::Image *tmp = new jgui::BufferedImage(surface);
+
+  cairo_destroy(context);
+
+  return tmp;
 }
 
 Image * BufferedImage::Rotate(double radians, bool resize)
 {
-  cairo_t *src_context = dynamic_cast<Graphics *>(GetGraphics())->GetCairoContext();
-  cairo_surface_t *src_surface = cairo_get_target(src_context);
-
-  if (src_surface == nullptr) {
-    return nullptr;
-  }
-
-  cairo_surface_flush(src_surface);
-
   double angle = fmod(radians, 2*M_PI);
 
   int iw = _size.width;
@@ -718,25 +697,24 @@ Image * BufferedImage::Rotate(double radians, bool resize)
     iw = (abs(_size.width*cosTheta) + abs(_size.height*sinTheta))/precision;
     ih = (abs(_size.width*sinTheta) + abs(_size.height*cosTheta))/precision;
     
-    cairo_surface_t 
-      *surface = nullptr;
     cairo_format_t 
       format = CAIRO_FORMAT_INVALID;
 
     if (_pixelformat == JPF_ARGB) {
       format = CAIRO_FORMAT_ARGB32;
     } else if (_pixelformat == JPF_RGB32) {
-      format = CAIRO_FORMAT_ARGB32;
+      format = CAIRO_FORMAT_RGB24;
     } else if (_pixelformat == JPF_RGB24) {
       format = CAIRO_FORMAT_RGB24;
     } else if (_pixelformat == JPF_RGB16) {
       format = CAIRO_FORMAT_RGB16_565;
     }
 
-    surface = cairo_image_surface_create(format, iw, ih);
+    cairo_surface_t 
+      *surface = cairo_image_surface_create(format, iw, ih);
 
     Image 
-      *image = new BufferedImage(cairo_create(surface));
+      *image = new BufferedImage(surface);
 
     if (GetGraphics()->GetAntialias() == JAM_NONE) {
       uint32_t src[_size.width*_size.height];
@@ -748,37 +726,38 @@ Image * BufferedImage::Rotate(double radians, bool resize)
 
       image->GetGraphics()->SetRGBArray(dst, 0, 0, iw, ih);
     } else {
-      cairo_t *dst_context = dynamic_cast<Graphics *>(image->GetGraphics())->GetCairoContext();
+      cairo_t *dst_context = cairo_create(image->GetGraphics()->GetCairoSurface());
 
       cairo_translate(dst_context, iw/2, ih/2);
       cairo_rotate(dst_context, -radians);
       cairo_translate(dst_context, -iw/2, -ih/2);
-      cairo_set_source_surface(dst_context, src_surface, (iw - _size.width)/2, (ih - _size.height)/2);
+      cairo_set_source_surface(dst_context, _cairo_surface, (iw - _size.width)/2, (ih - _size.height)/2);
       cairo_paint(dst_context);
+
+      cairo_destroy(dst_context);
     }
 
     return image;
   }
 
-  cairo_surface_t 
-    *surface = nullptr;
   cairo_format_t 
     format = CAIRO_FORMAT_INVALID;
 
   if (_pixelformat == JPF_ARGB) {
     format = CAIRO_FORMAT_ARGB32;
   } else if (_pixelformat == JPF_RGB32) {
-    format = CAIRO_FORMAT_ARGB32;
+    format = CAIRO_FORMAT_RGB24;
   } else if (_pixelformat == JPF_RGB24) {
     format = CAIRO_FORMAT_RGB24;
   } else if (_pixelformat == JPF_RGB16) {
     format = CAIRO_FORMAT_RGB16_565;
   }
 
-  surface = cairo_image_surface_create(format, iw, ih);
+  cairo_surface_t 
+    *surface = cairo_image_surface_create(format, iw, ih);
 
   Image 
-    *image = new BufferedImage(cairo_create(surface));
+    *image = new BufferedImage(surface);
   
   if (GetGraphics()->GetAntialias() == JAM_NONE) {
     uint32_t src[_size.width*_size.height];
@@ -790,61 +769,62 @@ Image * BufferedImage::Rotate(double radians, bool resize)
 
     image->GetGraphics()->SetRGBArray(dst, 0, 0, iw, ih);
   } else {
-    cairo_t *dst_context = dynamic_cast<Graphics *>(image->GetGraphics())->GetCairoContext();
+    cairo_t *dst_context = cairo_create(image->GetGraphics()->GetCairoSurface());
 
     cairo_translate(dst_context, _size.width/2, _size.height/2);
     cairo_rotate(dst_context, -radians);
     cairo_translate(dst_context, -_size.width/2, -_size.height/2);
-    cairo_set_source_surface(dst_context, src_surface, 0, 0);
+    cairo_set_source_surface(dst_context, _cairo_surface, 0, 0);
     cairo_paint(dst_context);
+
+    cairo_destroy(dst_context);
   }
+
+  cairo_surface_destroy(surface);
 
   return image;
 }
 
 Image * BufferedImage::Scale(int width, int height)
 {
-  cairo_surface_t *cairo_surface = cairo_get_target(dynamic_cast<Graphics *>(GetGraphics())->GetCairoContext());
-
-  if (cairo_surface == nullptr) {
-    return nullptr;
-  }
-
-  cairo_surface_t 
-    *surface = nullptr;
   cairo_format_t 
     format = CAIRO_FORMAT_INVALID;
 
   if (_pixelformat == JPF_ARGB) {
     format = CAIRO_FORMAT_ARGB32;
   } else if (_pixelformat == JPF_RGB32) {
-    format = CAIRO_FORMAT_ARGB32;
+    format = CAIRO_FORMAT_RGB24;
   } else if (_pixelformat == JPF_RGB24) {
     format = CAIRO_FORMAT_RGB24;
   } else if (_pixelformat == JPF_RGB16) {
     format = CAIRO_FORMAT_RGB16_565;
   }
 
-  surface = cairo_image_surface_create(format, width, height);
-
+  cairo_surface_t 
+    *surface = cairo_image_surface_create(format, width, height);
   cairo_t
-    *cairo_context = cairo_create(surface);
+    *context = cairo_create(surface);
   
 #ifdef SVG_IMAGE
-  std::string *data = (std::string *)cairo_surface_get_user_data(cairo_surface, nullptr);
+  std::string *data = (std::string *)cairo_surface_get_user_data(_cairo_surface, nullptr);
 
   if (data != nullptr) {
-    cairo_surface = create_svg_surface_from_data((uint8_t *)data->c_str(), data->size(), width, height);
+    cairo_surface_t *svg_surface = create_svg_surface_from_data((uint8_t *)data->c_str(), data->size(), width, height);
     
-    cairo_set_source_surface(cairo_context, cairo_surface, 0, 0);
-    cairo_paint(cairo_context);
+    cairo_set_source_surface(context, svg_surface, 0, 0);
+    cairo_paint(context);
 
-    return new jgui::BufferedImage(cairo_context);
+    jgui::Image *tmp = new jgui::BufferedImage(surface);
+
+    cairo_surface_destroy(svg_surface);
+    cairo_destroy(context);
+
+    return tmp;
   }
 #endif
 
   jgui::Image
-    *image = new jgui::BufferedImage(cairo_context);
+    *image = new jgui::BufferedImage(surface);
 
   if (GetGraphics()->GetAntialias() == JAM_NONE) {
     jinterpolation_method_t method = GetInterpolationMethod();
@@ -864,60 +844,54 @@ Image * BufferedImage::Scale(int width, int height)
 
     image->GetGraphics()->SetRGBArray(dst, 0, 0, width, height);
   } else {
-    cairo_t *cairo_context = dynamic_cast<Graphics *>(image->GetGraphics())->GetCairoContext();
+    cairo_t *context = cairo_create(image->GetGraphics()->GetCairoSurface());
 
-    cairo_surface_flush(cairo_surface);
-    cairo_scale(cairo_context, (double)width/_size.width, (double)height/_size.height);
-    cairo_set_source_surface(cairo_context, cairo_surface, 0, 0);
-    cairo_paint(cairo_context);
+    cairo_surface_flush(_cairo_surface);
+    cairo_scale(context, (double)width/_size.width, (double)height/_size.height);
+    cairo_set_source_surface(context, _cairo_surface, 0, 0);
+    cairo_paint(context);
+
+    cairo_destroy(context);
   }
+
+  cairo_destroy(context);
 
   return image;
 }
 
 Image * BufferedImage::Crop(int x, int y, int width, int height)
 {
-  cairo_surface_t *cairo_surface = cairo_get_target(dynamic_cast<Graphics *>(GetGraphics())->GetCairoContext());
-
-  if (cairo_surface == nullptr) {
-    return nullptr;
-  }
-
-  cairo_surface_t 
-    *surface = nullptr;
   cairo_format_t 
     format = CAIRO_FORMAT_INVALID;
 
   if (_pixelformat == JPF_ARGB) {
     format = CAIRO_FORMAT_ARGB32;
   } else if (_pixelformat == JPF_RGB32) {
-    format = CAIRO_FORMAT_ARGB32;
+    format = CAIRO_FORMAT_RGB24;
   } else if (_pixelformat == JPF_RGB24) {
     format = CAIRO_FORMAT_RGB24;
   } else if (_pixelformat == JPF_RGB16) {
     format = CAIRO_FORMAT_RGB16_565;
   }
 
-  surface = cairo_image_surface_create(format, width, height);
-
+  cairo_surface_t 
+    *surface = cairo_image_surface_create(format, width, height);
   cairo_t
-    *cairo_context = cairo_create(surface);
+    *context = cairo_create(surface);
 
-  cairo_surface_flush(cairo_surface);
-  cairo_set_source_surface(cairo_context, cairo_surface, -x, -y);
-  cairo_paint(cairo_context);
+  cairo_surface_flush(_cairo_surface);
+  cairo_set_source_surface(context, _cairo_surface, -x, -y);
+  cairo_paint(context);
 
-  return new jgui::BufferedImage(cairo_context);
+  jgui::Image *tmp = new jgui::BufferedImage(surface);
+
+  cairo_destroy(context);
+
+  return tmp;
 }
 
 Image * BufferedImage::Blend(double alpha)
 {
-  cairo_surface_t *cairo_surface = cairo_get_target(dynamic_cast<Graphics *>(GetGraphics())->GetCairoContext());
-
-  if (cairo_surface == nullptr) {
-    return nullptr;
-  }
-
   if (alpha < 0.0) {
     alpha = 0.0;
   }
@@ -926,46 +900,50 @@ Image * BufferedImage::Blend(double alpha)
     alpha = 1.0;
   }
 
-  cairo_surface_t 
-    *surface = nullptr;
   cairo_format_t 
     format = CAIRO_FORMAT_INVALID;
 
   if (_pixelformat == JPF_ARGB) {
     format = CAIRO_FORMAT_ARGB32;
   } else if (_pixelformat == JPF_RGB32) {
-    format = CAIRO_FORMAT_ARGB32;
+    format = CAIRO_FORMAT_RGB24;
   } else if (_pixelformat == JPF_RGB24) {
     format = CAIRO_FORMAT_RGB24;
   } else if (_pixelformat == JPF_RGB16) {
     format = CAIRO_FORMAT_RGB16_565;
   }
 
-  surface = cairo_image_surface_create(format, _size.width, _size.height);
-
+  cairo_surface_t 
+    *surface = cairo_image_surface_create(format, _size.width, _size.height);
   cairo_t
-    *cairo_context = cairo_create(surface);
+    *context = cairo_create(surface);
 
-  cairo_surface_flush(cairo_surface);
-  cairo_set_source_surface(cairo_context, cairo_surface, 0, 0);
-  cairo_paint_with_alpha(cairo_context, alpha);
+  cairo_surface_flush(_cairo_surface);
+  cairo_set_source_surface(context, _cairo_surface, 0, 0);
+  cairo_paint_with_alpha(context, alpha);
 
-  return new jgui::BufferedImage(cairo_context);
+  jgui::Image *tmp = new jgui::BufferedImage(surface);
+
+  cairo_destroy(context);
+
+  return tmp;
 }
 
 Image * BufferedImage::Colorize(Color color)
 {
-  Image *image = (Image *)Blend(1.0);
+  Image 
+    *image = (Image *)Blend(1.0);
 
-  cairo_surface_t *cairo_surface = cairo_get_target(dynamic_cast<Graphics *>(image->GetGraphics())->GetCairoContext());
+  cairo_surface_t 
+    *surface = image->GetGraphics()->GetCairoSurface();
 
-  if (cairo_surface == nullptr) {
+  if (surface == nullptr) {
     delete image;
 
     return nullptr;
   }
 
-  uint8_t *data = cairo_image_surface_get_data(cairo_surface);
+  uint8_t *data = cairo_image_surface_get_data(surface);
 
   if (data == nullptr) {
     delete image;
@@ -973,7 +951,8 @@ Image * BufferedImage::Colorize(Color color)
     return nullptr;
   }
 
-  int stride = cairo_image_surface_get_stride(cairo_surface);
+  int stride = cairo_image_surface_get_stride(surface);
+
   double hue, sat, bri;
 
   jgui::Color::RGBtoHSB(color.GetRed(), color.GetGreen(), color.GetBlue(), &hue, &sat, &bri); 
@@ -1051,35 +1030,21 @@ Image * BufferedImage::Colorize(Color color)
     }
   }
   
-  cairo_surface_mark_dirty(cairo_surface);
+  cairo_surface_mark_dirty(surface);
 
   return image;
 }
 
 uint8_t * BufferedImage::LockData()
 {
-  cairo_surface_t *cairo_surface = cairo_get_target(dynamic_cast<Graphics *>(GetGraphics())->GetCairoContext());
-
-  if (cairo_surface == nullptr) {
-    return nullptr;
-  }
-
   _mutex.lock();
 
-  return cairo_image_surface_get_data(cairo_surface);
+  return cairo_image_surface_get_data(_cairo_surface);
 }
 
 void BufferedImage::UnlockData()
 {
-  cairo_surface_t *cairo_surface = cairo_get_target(dynamic_cast<Graphics *>(GetGraphics())->GetCairoContext());
-
-  if (cairo_surface == nullptr) {
-    _mutex.unlock();
-
-    return;
-  }
-
-  cairo_surface_mark_dirty(cairo_surface);
+  cairo_surface_mark_dirty(_cairo_surface);
     
   _mutex.unlock();
 }
@@ -1095,25 +1060,24 @@ void BufferedImage::GetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)
     
 jcommon::Object * BufferedImage::Clone()
 {
-  cairo_surface_t 
-    *surface = nullptr;
   cairo_format_t 
     format = CAIRO_FORMAT_INVALID;
 
   if (_pixelformat == JPF_ARGB) {
     format = CAIRO_FORMAT_ARGB32;
   } else if (_pixelformat == JPF_RGB32) {
-    format = CAIRO_FORMAT_ARGB32;
+    format = CAIRO_FORMAT_RGB24;
   } else if (_pixelformat == JPF_RGB24) {
     format = CAIRO_FORMAT_RGB24;
   } else if (_pixelformat == JPF_RGB16) {
     format = CAIRO_FORMAT_RGB16_565;
   }
 
-  surface = cairo_image_surface_create(format, _size.width, _size.height);
+  cairo_surface_t 
+    *surface = cairo_image_surface_create(format, _size.width, _size.height);
 
   jgui::Image 
-    *clone = new BufferedImage(cairo_create(surface));
+    *clone = new BufferedImage(surface);
   jgui::Graphics 
     *g = clone->GetGraphics();
   jgui::jcomposite_flags_t 

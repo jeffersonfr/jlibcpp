@@ -109,9 +109,9 @@ int main(int argc, char **argv)
   cairo_surface_t *sfc = cairo_create_x11_surface(&x, &y);
   cairo_t *ctx = cairo_create(sfc);
 
-  jgui::Graphics g(ctx);
-
   while (running == 1) {
+    jgui::Graphics g(sfc);
+
     cairo_push_group(ctx);
 
     int ca = random()%80 + 80;
@@ -135,6 +135,7 @@ int main(int argc, char **argv)
     Framerate(25);
   }
 
+  cairo_destroy(ctx);
   cairo_close_x11_surface(sfc);
 
   return 0;

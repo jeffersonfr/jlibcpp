@@ -131,7 +131,9 @@ class ColorChooser : public jgui::Component {
 				return true;
 			}
 
-			_theme.SetIntegerParam("component.bg", _image->GetGraphics()->GetRGB(elocation.x, elocation.y));
+      jgui::Graphics *g = _image->GetGraphics();
+
+			_theme.SetIntegerParam("component.bg", g->GetRGB(elocation.x, elocation.y));
 
       Repaint();
 

@@ -74,9 +74,9 @@ class Tetris : public jgui::Window {
 		Tetris():
 			jgui::Window(0, 0, 320, 480)
 		{
-      s1 = new jgui::BufferedImage("images/tiles.png");
-      s2 = new jgui::BufferedImage("images/background.png");
-      s3 = new jgui::BufferedImage("images/frame.png");
+      s1 = new jgui::BufferedImage("images/tetris/tiles.png");
+      s2 = new jgui::BufferedImage("images/tetris/background.png");
+      s3 = new jgui::BufferedImage("images/tetris/frame.png");
     
       colorNum = 0;
       rotate = false;

@@ -304,6 +304,7 @@ OBJS_jgui += \
   jnulllayout.o\
   jpanel.o\
   jprogressbar.o\
+  jraster.o\
   jrectangle.o\
   jscrollbar.o\
   jslider.o\

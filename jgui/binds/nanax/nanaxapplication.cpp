@@ -437,18 +437,12 @@ static void paint_callback(const nana::paint::graphics& graph)
   jregion_t 
     bounds = sg_jgui_window->GetBounds();
   jgui::Image 
-    *buffer = new jgui::BufferedImage(jgui::JPF_ARGB, bounds.width, bounds.height);//bounds.width, bounds.height);
+    *buffer = new jgui::BufferedImage(jgui::JPF_RGB24, bounds.width, bounds.height);
   jgui::Graphics 
     *g = buffer->GetGraphics();
-  jpoint_t 
-    t = g->Translate();
 
-  g->Reset();
-  g->Translate(-t.x, -t.y);
-  g->SetClip(0, 0, bounds.width, bounds.height); // bounds.width, bounds.height);
   sg_jgui_window->DoLayout();
   sg_jgui_window->Paint(g);
-  g->Translate(t.x, t.y);
 
   cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
 

@@ -309,7 +309,7 @@ class SOM : public jgui::Window {
 			g->FillRectangle(0, 0, size.width, size.height);
 
 			if ((offscreen == nullptr) || ((imagewidth != w) || (imageheight != h))) {
-				offscreen = new jgui::BufferedImage(jgui::JPF_ARGB, w, h);
+				offscreen = new jgui::BufferedImage(jgui::JPF_RGB32, w, h);
 
 				imagewidth = w;
 				imageheight = h;

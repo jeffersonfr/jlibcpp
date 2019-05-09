@@ -404,18 +404,12 @@ void NativeApplication::InternalPaint()
   jregion_t 
     bounds = sg_jgui_window->GetBounds();
   jgui::Image 
-    *buffer = new jgui::BufferedImage(jgui::JPF_RGB32, bounds.width, bounds.height);
+    *buffer = new jgui::BufferedImage(jgui::JPF_RGB24, bounds.width, bounds.height);
   jgui::Graphics 
     *g = buffer->GetGraphics();
-	jpoint_t 
-    t = g->Translate();
 
-	g->Reset();
-	g->Translate(-t.x, -t.y);
-  g->SetClip(0, 0, bounds.width, bounds.height);
 	sg_jgui_window->DoLayout();
   sg_jgui_window->Paint(g);
-	g->Translate(t.x, t.y);
 
   if (sg_cursor_enabled == true) {
     g->DrawImage(sg_cursor_params.cursor, sg_mouse_x, sg_mouse_y);
