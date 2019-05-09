@@ -27,6 +27,7 @@
 
 #include <thread>
 #include <mutex>
+#include <atomic>
 
 #include <fcntl.h>
 #include <linux/input.h>
@@ -41,6 +42,10 @@ struct cursor_params_t {
   int hot_y;
 };
 
+/** \brief */
+jgui::Image *sg_back_buffer = nullptr;
+/** \brief */
+static std::atomic<bool> sg_repaint;
 /** \brief */
 static std::map<jcursor_style_t, struct cursor_params_t> sg_jgui_cursors;
 /** \brief */
@@ -57,8 +62,6 @@ static int sg_mouse_x = 0;
 static int sg_mouse_y = 0;
 /** \brief */
 static bool sg_cursor_enabled = true;
-/** \brief */
-static bool sg_repaint = false;
 /** \brief */
 static std::mutex sg_loop_mutex;
 /** \brief */
@@ -362,10 +365,26 @@ void NativeApplication::InternalPaint()
 
   jregion_t 
     bounds = sg_jgui_window->GetBounds();
-  jgui::Image 
-    *buffer = new jgui::BufferedImage(jgui::JPF_RGB24, bounds.width, bounds.height);
+
+  if (sg_back_buffer != nullptr) {
+    jgui::jsize_t
+      size = sg_back_buffer->GetSize();
+
+    if (size.width != bounds.width or size.height != bounds.height) {
+      delete sg_back_buffer;
+      sg_back_buffer = nullptr;
+    }
+  }
+
+  if (sg_back_buffer == nullptr) {
+    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, bounds.width, bounds.height);
+  }
+
   jgui::Graphics 
-    *g = buffer->GetGraphics();
+    *g = sg_back_buffer->GetGraphics();
+
+  g->Reset();
+  g->SetCompositeFlags(jgui::JCF_SRC_OVER);
 
 	sg_jgui_window->DoLayout();
   sg_jgui_window->Paint(g);
@@ -374,31 +393,11 @@ void NativeApplication::InternalPaint()
     g->DrawImage(sg_cursor_params.cursor, sg_mouse_x, sg_mouse_y);
   }
 
-  cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
+  g->Flush();
 
-  if (cairo_surface == nullptr) {
-    delete buffer;
-
-    return;
-  }
-
-  cairo_surface_flush(cairo_surface);
-
-  int dw = cairo_image_surface_get_width(cairo_surface);
-  int dh = cairo_image_surface_get_height(cairo_surface);
-  // int stride = cairo_image_surface_get_stride(cairo_surface);
-
-  uint8_t *data = cairo_image_surface_get_data(cairo_surface);
-
-  if (data == nullptr) {
-    delete buffer;
-
-    return;
-  }
-
-	uint8_t *src = data;
+	uint8_t *src = sg_back_buffer->LockData();
 	uint8_t *dst = (uint8_t *)sg_surface;
-	int size = dw*dh;
+	int size = bounds.width*bounds.height;
 
 	for (int i=0; i<size; i++) {
     if (sg_vinfo.bits_per_pixel == 32) { // BGRA
@@ -431,10 +430,7 @@ void NativeApplication::InternalPaint()
     ioctl(sg_handler, FBIO_WAITFORVSYNC, &dummy);
   }
 
-  cairo_surface_destroy(cairo_surface);
-
-  delete buffer;
-  buffer = nullptr;
+	sg_back_buffer->UnlockData();
 
   sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
 }
@@ -472,13 +468,11 @@ void NativeApplication::InternalLoop()
       mouse_y = sg_mouse_y;
 
       if (sg_cursor_enabled == true) {
-        sg_repaint = true;
+        sg_repaint.store(true);
       }
     }
 
-    if (sg_repaint == true) {
-      sg_repaint = false;
-
+    if (sg_repaint.exchange(false) == true) {
       InternalPaint();
     }
 
@@ -642,11 +636,14 @@ NativeWindow::~NativeWindow()
   munmap(sg_surface, sg_vinfo.xres*sg_vinfo.yres*sg_vinfo.bits_per_pixel/8);
 
   close(sg_handler);
+  
+  delete sg_back_buffer;
+  sg_back_buffer = nullptr;
 }
 
 void NativeWindow::Repaint(Component *cmp)
 {
-  sg_repaint = true;
+  sg_repaint.store(true);
 }
 
 void NativeWindow::ToggleFullScreen()

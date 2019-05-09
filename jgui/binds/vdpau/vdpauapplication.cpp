@@ -28,6 +28,7 @@
 
 #include <thread>
 #include <mutex>
+#include <atomic>
 
 #include <X11/Xlib.h>
 #include <X11/cursorfont.h>
@@ -71,6 +72,10 @@ static VdpPresentationQueueBlockUntilSurfaceIdle *PresentationQueueBlockUntilSur
 static Atom sg_wm_delete_message;
 
 /** \brief */
+jgui::Image *sg_back_buffer = nullptr;
+/** \brief */
+static std::atomic<bool> sg_repaint;
+/** \brief */
 static ::Display *sg_display = nullptr;
 /** \brief */
 static ::Window sg_window = 0;
@@ -102,8 +107,6 @@ static bool sg_cursor_enabled = true;
 static bool sg_visible = true;
 /** \brief */
 static jgui::jregion_t sg_previous_bounds;
-/** \brief */
-static bool sg_repaint = false;
 /** \brief */
 static bool sg_quitting = false;
 /** \brief */
@@ -460,41 +463,39 @@ void NativeApplication::InternalPaint()
 
   jregion_t 
     bounds = sg_jgui_window->GetBounds();
-  jgui::Image 
-    *buffer = new jgui::BufferedImage(jgui::JPF_RGB24, bounds.width, bounds.height);
+
+  if (sg_back_buffer != nullptr) {
+    jgui::jsize_t
+      size = sg_back_buffer->GetSize();
+
+    if (size.width != bounds.width or size.height != bounds.height) {
+      delete sg_back_buffer;
+      sg_back_buffer = nullptr;
+    }
+  }
+
+  if (sg_back_buffer == nullptr) {
+    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, bounds.width, bounds.height);
+  }
+
   jgui::Graphics 
-    *g = buffer->GetGraphics();
+    *g = sg_back_buffer->GetGraphics();
+
+  g->Reset();
+  g->SetCompositeFlags(jgui::JCF_SRC_OVER);
 
 	sg_jgui_window->DoLayout();
   sg_jgui_window->Paint(g);
 
-  cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
+  g->Flush();
 
-  if (cairo_surface == nullptr) {
-    delete buffer;
-
-    return;
-  }
-
-  cairo_surface_flush(cairo_surface);
-
-  int dw = cairo_image_surface_get_width(cairo_surface);
-  // int dh = cairo_image_surface_get_height(cairo_surface);
-  // int stride = cairo_image_surface_get_stride(cairo_surface);
-
-  uint8_t *data = cairo_image_surface_get_data(cairo_surface);
-
-  if (data == nullptr) {
-    delete buffer;
-
-    return;
-  }
+  uint8_t *data = sg_back_buffer->LockData();
 
   const void *src[1] = {
     data
   };
   uint32_t pitches[1] = {
-    (uint32_t)dw*4
+    (uint32_t)bounds.width*4
   };
   VdpTime 
     this_time = 0;
@@ -516,8 +517,7 @@ void NativeApplication::InternalPaint()
 
   PresentationQueueDisplay(sg_vdp_queue, sg_vdp_surface, 0, 0, this_time);
 
-  delete buffer;
-  buffer = nullptr;
+  sg_back_buffer->UnlockData();
   
   sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
 }
@@ -543,9 +543,7 @@ void NativeApplication::InternalLoop()
   //   - Discard both duplicated KeyPress and KeyRelease events when EnableKeyRepeat is false
   
 	while (sg_quitting == false) {
-    if (sg_repaint == true) {
-      sg_repaint = false;
-
+    if (sg_repaint.exchange(false) == true) {
       InternalPaint();
     }
 
@@ -907,11 +905,14 @@ NativeWindow::~NativeWindow()
 	XCloseDisplay(sg_display);
 
   sg_window = 0;
+  
+  delete sg_back_buffer;
+  sg_back_buffer = nullptr;
 }
 
 void NativeWindow::Repaint(Component *cmp)
 {
-  sg_repaint = true;
+  sg_repaint.store(true);
 }
 
 void NativeWindow::ToggleFullScreen()

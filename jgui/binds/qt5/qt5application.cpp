@@ -28,6 +28,7 @@
 
 #include <thread>
 #include <mutex>
+#include <atomic>
 #include <iostream>
 
 #include <QDialog>
@@ -39,6 +40,10 @@
 
 namespace jgui {
 
+/** \brief */
+jgui::Image *sg_back_buffer = nullptr;
+/** \brief */
+static std::atomic<bool> sg_repaint;
 /** \brief */
 static QApplication *sg_application = nullptr;
 /** \brief */
@@ -53,8 +58,6 @@ static bool sg_fullscreen = false;
 static bool sg_undecorated = false;
 /** \brief */
 static bool sg_visible = false;
-/** \brief */
-static bool sg_repaint = false;
 /** \brief */
 static bool sg_quitting = false;
 /** \brief */
@@ -489,45 +492,42 @@ class QTWindowRender : public QDialog {
       //   *handler = reinterpret_cast<NativeWindow *>(user_data);
       jregion_t 
         bounds = sg_jgui_window->GetBounds();
-      jgui::Image 
-        *buffer = new jgui::BufferedImage(jgui::JPF_RGB24, bounds.width, bounds.height);
+
+      if (sg_back_buffer != nullptr) {
+        jgui::jsize_t
+          size = sg_back_buffer->GetSize();
+
+        if (size.width != bounds.width or size.height != bounds.height) {
+          delete sg_back_buffer;
+          sg_back_buffer = nullptr;
+        }
+      }
+
+      if (sg_back_buffer == nullptr) {
+        sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, bounds.width, bounds.height);
+      }
+
       jgui::Graphics 
-        *g = buffer->GetGraphics();
+        *g = sg_back_buffer->GetGraphics();
+
+      g->Reset();
+      g->SetCompositeFlags(jgui::JCF_SRC_OVER);
 
       sg_jgui_window->DoLayout();
       sg_jgui_window->Paint(g);
 
-      cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
+      g->Flush();
 
-      if (cairo_surface == nullptr) {
-        delete buffer;
+      uint8_t *data = sg_back_buffer->LockData();
 
-        return;
-      }
-
-      cairo_surface_flush(cairo_surface);
-
-      int dw = cairo_image_surface_get_width(cairo_surface);
-      int dh = cairo_image_surface_get_height(cairo_surface);
-      int stride = cairo_image_surface_get_stride(cairo_surface);
-
-      uint8_t *data = cairo_image_surface_get_data(cairo_surface);
-
-      if (data == nullptr) {
-        delete buffer;
-
-        return;
-      }
-
-      QImage image(data, dw, dh, stride, QImage::Format_RGB32);
+      QImage image(data, bounds.width, bounds.height, bounds.width*4, QImage::Format_RGB32);
       QPixmap pixmap = QPixmap::fromImage(image);
 
       // painter.beginNativePainting();
       painter.drawPixmap(0, 0, pixmap);
       // painter.endNativePainting();
 
-      delete buffer;
-      buffer = nullptr;
+      sg_back_buffer->UnlockData();
 
       sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
     }
@@ -574,9 +574,7 @@ void NativeApplication::InternalLoop()
   // sg_handler->activateWindow();
 
   do {
-    if (sg_repaint == true) {
-      sg_repaint = false;
-
+    if (sg_repaint.exchange(false) == true) {
       sg_handler->repaint();
     }
 
@@ -619,11 +617,14 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 NativeWindow::~NativeWindow()
 {
   QCoreApplication::quit();
+  
+  delete sg_back_buffer;
+  sg_back_buffer = nullptr;
 }
 
 void NativeWindow::Repaint(Component *cmp)
 {
-  sg_repaint = true;
+  sg_repaint.store(true);
 }
 
 void NativeWindow::ToggleFullScreen()

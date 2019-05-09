@@ -40,6 +40,8 @@ namespace jgui {
 /** \brief */
 jgui::Image *sg_back_buffer = nullptr;
 /** \brief */
+static std::atomic<bool> sg_repaint;
+/** \brief */
 static SDL_Window *sg_window = nullptr;
 /** \brief */
 static SDL_Renderer *sg_renderer = nullptr;
@@ -47,8 +49,6 @@ static SDL_Renderer *sg_renderer = nullptr;
 static int sg_mouse_x = 0;
 /** \brief */
 static int sg_mouse_y = 0;
-/** \brief */
-static std::atomic<bool> sg_repaint;
 /** \brief */
 static bool sg_quitting = false;
 /** \brief */
@@ -657,6 +657,9 @@ NativeWindow::~NativeWindow()
   SDL_DestroyRenderer(sg_renderer);
   SDL_DestroyWindow(sg_window);
 	SDL_Quit();
+
+  delete sg_back_buffer;
+  sg_back_buffer = nullptr;
 }
 
 void NativeWindow::Repaint(Component *cmp)

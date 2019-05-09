@@ -27,6 +27,7 @@
 
 #include <thread>
 #include <mutex>
+#include <atomic>
 
 #include "udp-flaschen-taschen.h"
 
@@ -42,6 +43,10 @@
 namespace jgui {
 
 /** \brief */
+jgui::Image *sg_back_buffer = nullptr;
+/** \brief */
+static std::atomic<bool> sg_repaint;
+/** \brief */
 UDPFlaschenTaschen *sg_canvas = nullptr;
 /** \brief */
 static int sg_mouse_x = 0;
@@ -49,8 +54,6 @@ static int sg_mouse_x = 0;
 static int sg_mouse_y = 0;
 /** \brief */
 static bool sg_cursor_enabled = true;
-/** \brief */
-static bool sg_repaint = false;
 /** \brief */
 static std::mutex sg_loop_mutex;
 /** \brief */
@@ -287,41 +290,35 @@ void NativeApplication::InternalPaint()
 
   jregion_t 
     bounds = sg_jgui_window->GetBounds();
-  jgui::Image 
-    *buffer = new jgui::BufferedImage(jgui::JPF_RGB24, bounds.width, bounds.height);
+
+  if (sg_back_buffer != nullptr) {
+    jgui::jsize_t
+      size = sg_back_buffer->GetSize();
+
+    if (size.width != bounds.width or size.height != bounds.height) {
+      delete sg_back_buffer;
+      sg_back_buffer = nullptr;
+    }
+  }
+
+  if (sg_back_buffer == nullptr) {
+    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, bounds.width, bounds.height);
+  }
+
   jgui::Graphics 
-    *g = buffer->GetGraphics();
+    *g = sg_back_buffer->GetGraphics();
+
+  g->Reset();
+  g->SetCompositeFlags(jgui::JCF_SRC_OVER);
 
 	sg_jgui_window->DoLayout();
   sg_jgui_window->Paint(g);
 
-  cairo_surface_t *cairo_surface = nullptr;
+  g->Flush();
 
-  jgui::Image *scale = buffer->Scale(FLASCHEN_DISPLAY_WIDTH, FLASCHEN_DISPLAY_HEIGHT);
+  jgui::Image *scale = sg_back_buffer->Scale(FLASCHEN_DISPLAY_WIDTH, FLASCHEN_DISPLAY_HEIGHT);
 
-  cairo_surface = cairo_get_target(scale->GetGraphics()->GetCairoContext());
-
-  if (cairo_surface == nullptr) {
-    delete scale;
-    delete buffer;
-
-    return;
-  }
-
-  cairo_surface_flush(cairo_surface);
-
-  int dw = cairo_image_surface_get_width(cairo_surface);
-  int dh = cairo_image_surface_get_height(cairo_surface);
-  // int stride = cairo_image_surface_get_stride(cairo_surface);
-
-  uint8_t *data = cairo_image_surface_get_data(cairo_surface);
-
-  if (data == nullptr) {
-    delete scale;
-    delete buffer;
-
-    return;
-  }
+  uint8_t *data = (uint8_t *)scale->LockData();
 
   for (int j=0; j<dh; j++) {
     for (int i=0; i<dw; i++) {
@@ -333,10 +330,9 @@ void NativeApplication::InternalPaint()
 
   sg_canvas->Send();
 
-  cairo_surface_destroy(cairo_surface);
+  scale->UnlockData();
 
   delete scale;
-  delete buffer;
 
   sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
 }
@@ -374,13 +370,11 @@ void NativeApplication::InternalLoop()
       mouse_y = sg_mouse_y;
 
       if (sg_cursor_enabled == true) {
-        sg_repaint = true;
+        sg_repaint.store(true);
       }
     }
 
-    if (sg_repaint == true) {
-      sg_repaint = false;
-
+    if (sg_repaint.exchange(false) == true) {
       InternalPaint();
     }
 
@@ -526,11 +520,14 @@ NativeWindow::~NativeWindow()
 {
   delete sg_canvas;
   sg_canvas = nullptr;
+  
+  delete sg_back_buffer;
+  sg_back_buffer = nullptr;
 }
 
 void NativeWindow::Repaint(Component *cmp)
 {
-  sg_repaint = true;
+  sg_repaint.store(true);
 }
 
 void NativeWindow::ToggleFullScreen()

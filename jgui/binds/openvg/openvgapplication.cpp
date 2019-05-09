@@ -28,6 +28,7 @@
 
 #include <thread>
 #include <mutex>
+#include <atomic>
 
 extern "C" {
 	#include "bcm_host.h"
@@ -58,6 +59,10 @@ struct cursor_params_t {
   int hot_y;
 };
 
+/** \brief */
+jgui::Image *sg_back_buffer = nullptr;
+/** \brief */
+static std::atomic<bool> sg_repaint;
 /** \brief */
 static std::map<jcursor_style_t, struct cursor_params_t> sg_cursors;
 /** \brief */
@@ -90,8 +95,6 @@ static bool sg_resizable = true;
 static bool sg_visible = true;
 /** \brief */
 static std::mutex sg_loop_mutex;
-/** \brief */
-static bool sg_repaint = false;
 /** \brief */
 static bool sg_quitting = false;
 /** \brief */
@@ -403,10 +406,26 @@ void NativeApplication::InternalPaint()
 
   jregion_t 
     bounds = sg_jgui_window->GetBounds();
-  jgui::Image 
-    *buffer = new jgui::BufferedImage(jgui::JPF_RGB24, bounds.width, bounds.height);
+
+  if (sg_back_buffer != nullptr) {
+    jgui::jsize_t
+      size = sg_back_buffer->GetSize();
+
+    if (size.width != bounds.width or size.height != bounds.height) {
+      delete sg_back_buffer;
+      sg_back_buffer = nullptr;
+    }
+  }
+
+  if (sg_back_buffer == nullptr) {
+    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, bounds.width, bounds.height);
+  }
+
   jgui::Graphics 
-    *g = buffer->GetGraphics();
+    *g = sg_back_buffer->GetGraphics();
+
+  g->Reset();
+  g->SetCompositeFlags(jgui::JCF_SRC_OVER);
 
 	sg_jgui_window->DoLayout();
   sg_jgui_window->Paint(g);
@@ -415,27 +434,9 @@ void NativeApplication::InternalPaint()
     g->DrawImage(sg_cursor_params.cursor, sg_mouse_x, sg_mouse_y);
   }
 
-  cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
+  g->Flush();
 
-  if (cairo_surface == nullptr) {
-    delete buffer;
-
-    return;
-  }
-
-  cairo_surface_flush(cairo_surface);
-
-  int dw = cairo_image_surface_get_width(cairo_surface);
-  int dh = cairo_image_surface_get_height(cairo_surface);
-  int stride = cairo_image_surface_get_stride(cairo_surface);
-
-  uint8_t *data = cairo_image_surface_get_data(cairo_surface);
-
-  if (data == nullptr) {
-    delete buffer;
-
-    return;
-  }
+  uint32_t *data = (uint32_t *)sg_back_buffer->LockData();
 
   vgLoadIdentity();
   vgSeti(VG_MATRIX_MODE, VG_MATRIX_IMAGE_USER_TO_SURFACE);
@@ -444,22 +445,22 @@ void NativeApplication::InternalPaint()
   // INFO:: invert the y-axis
   uint32_t 
 	  *r1 = (uint32_t *)data,
-	  *r2 = (uint32_t *)data + (dh - 1)*dw;
+	  *r2 = (uint32_t *)data + (bounds.height - 1)*bounds.width;
 
-  for (int i=0; i<dh/2; i++) {
-	  for (int j=0; j<dw; j++) {
+  for (int i=0; i<bounds.height/2; i++) {
+	  for (int j=0; j<bounds.width; j++) {
 		  uint32_t p = r1[j];
 
 		  r1[j] = r2[j];
 		  r2[j] = p; 
 	  }    
 
-	  r1 = r1 + dw;
-	  r2 = r2 - dw;
+	  r1 = r1 + bounds.width;
+	  r2 = r2 - bounds.width;
   }
 
-  VGImage img = vgCreateImage(VG_sARGB_8888, dw, dh, VG_IMAGE_QUALITY_BETTER);
-  vgImageSubData(img, data, stride, VG_sARGB_8888, 0, 0, dw, dh);
+  VGImage img = vgCreateImage(VG_sARGB_8888, bounds.width, bounds.height, VG_IMAGE_QUALITY_BETTER);
+  vgImageSubData(img, data, stride, VG_sARGB_8888, 0, 0, bounds.width, bounds.height);
   vgDrawImage(img);
   vgDestroyImage(img);
   
@@ -471,8 +472,7 @@ void NativeApplication::InternalPaint()
 
   eglSwapBuffers(sg_egl_display, sg_egl_surface);
 
-  delete buffer;
-  buffer = nullptr;
+  sg_back_buffer->UnlockData();
 
   sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
 }
@@ -510,13 +510,11 @@ void NativeApplication::InternalLoop()
       mouse_y = sg_mouse_y;
 
       if (sg_cursor_enabled == true) {
-        sg_repaint = true;
+        sg_repaint.store(true);
       }
     }
 
-    if (sg_repaint == true) {
-      sg_repaint = false;
-
+    if (sg_repaint.exchange(false) == true) {
       InternalPaint();
     }
 
@@ -707,11 +705,14 @@ NativeWindow::~NativeWindow()
   vc_dispmanx_element_remove(sg_dispman_update, sg_dispman_element);
   vc_dispmanx_update_submit_sync(sg_dispman_update);
   vc_dispmanx_display_close(sg_dispman_display);
+  
+  delete sg_back_buffer;
+  sg_back_buffer = nullptr;
 }
 
 void NativeWindow::Repaint(Component *cmp)
 {
-  sg_repaint = true;
+  sg_repaint.store(true);
 }
 
 void NativeWindow::ToggleFullScreen()

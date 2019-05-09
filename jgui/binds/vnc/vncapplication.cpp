@@ -27,6 +27,7 @@
 
 #include <thread>
 #include <mutex>
+#include <atomic>
 
 #include <rfb/rfb.h>
 #include <X11/keysym.h>
@@ -35,6 +36,10 @@
 
 namespace jgui {
 
+/** \brief */
+jgui::Image *sg_back_buffer = nullptr;
+/** \brief */
+static std::atomic<bool> sg_repaint;
 /** \brief */
 static rfbScreenInfoPtr sg_server;
 /** \brief */
@@ -45,8 +50,6 @@ static uint32_t last_mouse_state = 0x00;
 static int sg_mouse_x = 0;
 /** \brief */
 static int sg_mouse_y = 0;
-/** \brief */
-static bool sg_repaint = false;
 /** \brief */
 static bool sg_quitting = false;
 /** \brief */
@@ -392,38 +395,34 @@ void NativeApplication::InternalPaint()
 
   jregion_t 
     bounds = sg_jgui_window->GetBounds();
-  jgui::Image 
-    *buffer = new jgui::BufferedImage(jgui::JPF_RGB24, bounds.width, bounds.height);
+
+  if (sg_back_buffer != nullptr) {
+    jgui::jsize_t
+      size = sg_back_buffer->GetSize();
+
+    if (size.width != bounds.width or size.height != bounds.height) {
+      delete sg_back_buffer;
+      sg_back_buffer = nullptr;
+    }
+  }
+
+  if (sg_back_buffer == nullptr) {
+    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, bounds.width, bounds.height);
+  }
+
   jgui::Graphics 
-    *g = buffer->GetGraphics();
+    *g = sg_back_buffer->GetGraphics();
+
+  g->Reset();
+  g->SetCompositeFlags(jgui::JCF_SRC_OVER);
 
 	sg_jgui_window->DoLayout();
   sg_jgui_window->Paint(g);
 
-  cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
-
-  if (cairo_surface == nullptr) {
-    delete buffer;
-
-    return;
-  }
-
-  cairo_surface_flush(cairo_surface);
-
-  int dw = cairo_image_surface_get_width(cairo_surface);
-  int dh = cairo_image_surface_get_height(cairo_surface);
-  // int stride = cairo_image_surface_get_stride(cairo_surface);
-
-  uint8_t *data = cairo_image_surface_get_data(cairo_surface);
-
-  if (data == nullptr) {
-    delete buffer;
-
-    return;
-  }
+  g->Flush();
 
 	int size = dw*dh;
-	uint8_t *src = data;
+	uint8_t *src = sg_back_buffer->LockData();
 	uint8_t *dst = (uint8_t *)sg_server->frameBuffer;
 
 	for (int i=0; i<size; i++) {
@@ -440,8 +439,7 @@ void NativeApplication::InternalPaint()
 
   cairo_surface_destroy(cairo_surface);
 
-  delete buffer;
-  buffer = nullptr;
+	sg_back_buffer->UnlockData();
 
   sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
 }
@@ -451,9 +449,7 @@ void NativeApplication::InternalLoop()
   std::lock_guard<std::mutex> lock(sg_loop_mutex);
 
   while (sg_quitting == false and rfbIsActive(sg_server)) {
-    if (sg_repaint == true) {
-      sg_repaint = false;
-
+    if (sg_repaint.exchange(false) == true) {
       InternalPaint();
     }
 
@@ -670,11 +666,14 @@ NativeWindow::~NativeWindow()
   sg_jgui_icon = nullptr;
 
   rfbShutdownServer(sg_server, true);
+  
+  delete sg_back_buffer;
+  sg_back_buffer = nullptr;
 }
 
 void NativeWindow::Repaint(Component *cmp)
 {
-  sg_repaint = true;
+  sg_repaint.store(true);
 }
 
 void NativeWindow::ToggleFullScreen()

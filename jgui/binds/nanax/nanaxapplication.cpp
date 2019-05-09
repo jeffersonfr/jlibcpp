@@ -27,6 +27,7 @@
 
 #include <thread>
 #include <mutex>
+#include <atomic>
 
 #include <nana/gui/wvl.hpp>
 #include <nana/gui.hpp>
@@ -35,6 +36,10 @@
 
 namespace jgui {
 
+/** \brief */
+jgui::Image *sg_back_buffer = nullptr;
+/** \brief */
+static std::atomic<bool> sg_repaint;
 /** \brief */
 static nana::form *fm = nullptr;
 /** \brief */
@@ -436,52 +441,47 @@ static void paint_callback(const nana::paint::graphics& graph)
 
   jregion_t 
     bounds = sg_jgui_window->GetBounds();
-  jgui::Image 
-    *buffer = new jgui::BufferedImage(jgui::JPF_RGB24, bounds.width, bounds.height);
+
+  if (sg_back_buffer != nullptr) {
+    jgui::jsize_t
+      size = sg_back_buffer->GetSize();
+
+    if (size.width != bounds.width or size.height != bounds.height) {
+      delete sg_back_buffer;
+      sg_back_buffer = nullptr;
+    }
+  }
+
+  if (sg_back_buffer == nullptr) {
+    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, bounds.width, bounds.height);
+  }
+
   jgui::Graphics 
-    *g = buffer->GetGraphics();
+    *g = sg_back_buffer->GetGraphics();
+
+  g->Reset();
+  g->SetCompositeFlags(jgui::JCF_SRC_OVER);
 
   sg_jgui_window->DoLayout();
   sg_jgui_window->Paint(g);
 
-  cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
+  g->Flush();
 
-  if (cairo_surface == nullptr) {
-    delete buffer;
-
-    return;
-  }
-
-  cairo_surface_flush(cairo_surface);
-
-  int dw = cairo_image_surface_get_width(cairo_surface);
-  int dh = cairo_image_surface_get_height(cairo_surface);
-  // int stride = cairo_image_surface_get_stride(cairo_surface);
-
-  uint8_t *data = cairo_image_surface_get_data(cairo_surface);
-
-  if (data == nullptr) {
-    delete buffer;
-
-    return;
-  }
+  uint8_t *data = sg_back_buffer->LockData();
 
   nana::paint::pixel_buffer pixbuf{ graph.handle(), nana::rectangle{ graph.size() } };
   // size sz = pixbuf.size();
 
-  for (int i=0; i<dh; i++) {
-    const unsigned char *src = data + i*dw*4;
+  for (int i=0; i<bounds.height; i++) {
+    const uint8_t *src = data + i*bounds.width*4;
 
-    pixbuf.fill_row(i, src, dw*4, 32);
+    pixbuf.fill_row(i, src, bounds.width*4, 32);
   }
 
-  // pixbuf.put((unsigned char *)data, dw, dh, 32, dw*4, false);
+  // pixbuf.put((unsigned char *)data, bounds.width, bounds.height, 32, bounds.width*4, false);
   pixbuf.paste(graph.handle(), {});
 
-  cairo_surface_destroy(cairo_surface);
-
-  delete buffer;
-  buffer = nullptr;
+  sg_back_buffer->UnlockData();
 
   sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
 }
@@ -535,6 +535,9 @@ NativeWindow::~NativeWindow()
 
   delete fm;
   delete dw;
+  
+  delete sg_back_buffer;
+  sg_back_buffer = nullptr;
 }
 
 void NativeWindow::Repaint(Component *cmp)

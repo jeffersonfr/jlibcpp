@@ -28,6 +28,7 @@
 
 #include <thread>
 #include <mutex>
+#include <atomic>
 
 #include <gtk/gtk.h>
 #include <gdk/gdktypes.h>
@@ -35,6 +36,10 @@
 
 namespace jgui {
 
+/** \brief */
+jgui::Image *sg_back_buffer = nullptr;
+/** \brief */
+static std::atomic<bool> sg_repaint;
 /** \brief */
 static GtkApplication *sg_handler = nullptr;
 /** \brief */
@@ -53,8 +58,6 @@ static bool sg_fullscreen = false;
 static bool sgsg_jgui_cursor_enabled = true;
 /** \brief */
 static bool sg_visible = false;
-/** \brief */
-static bool sg_repaint = false;
 /** \brief */
 static bool sg_quitting = false;
 /** \brief */
@@ -412,10 +415,23 @@ static gboolean OnDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
   //   *handler = reinterpret_cast<NativeWindow *>(user_data);
   jregion_t 
     bounds = sg_jgui_window->GetBounds();
-  jgui::Image 
-    *buffer = new jgui::BufferedImage(jgui::JPF_RGB24, bounds.width, bounds.height);
+
+  if (sg_back_buffer != nullptr) {
+    jgui::jsize_t
+      size = sg_back_buffer->GetSize();
+
+    if (size.width != bounds.width or size.height != bounds.height) {
+      delete sg_back_buffer;
+      sg_back_buffer = nullptr;
+    }
+  }
+
+  if (sg_back_buffer == nullptr) {
+    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, bounds.width, bounds.height);
+  }
+
   jgui::Graphics 
-    *g = buffer->GetGraphics();
+    *g = sg_back_buffer->GetGraphics();
 
   /* CHANGE:: use this cairo surface instead
 	int 
@@ -425,24 +441,18 @@ static gboolean OnDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
   cairo_surface_t *surface = gdk_window_create_similar_surface(gtk_widget_getsg_window(widget), CAIRO_CONTENT_COLOR, w, h);
   */
 
+  g->Reset();
+  g->SetCompositeFlags(jgui::JCF_SRC_OVER);
+
 	sg_jgui_window->DoLayout();
   sg_jgui_window->Paint(g);
 
-  cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
-
-  if (cairo_surface == nullptr) {
-    delete buffer;
-
-    return FALSE;
-  }
+  cairo_surface_t *cairo_surface = g->GetCairoSurface();
 
   cairo_surface_flush(cairo_surface);
   cairo_set_source_surface(cr, cairo_surface, 0, 0);
 	cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
   cairo_paint(cr);
-
-  delete buffer;
-  buffer = nullptr;
 
   sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
 
@@ -613,9 +623,7 @@ void NativeApplication::InternalPaint()
 static void PaintThread(NativeApplication *app)
 {
   while (sg_quitting == false) {
-    if (sg_repaint == true) {
-      sg_repaint = false;
-
+    if (sg_repaint.exchange(false) == true) {
       gtk_widget_queue_draw(GTK_WIDGET(sg_widget));
     }
 
@@ -692,11 +700,14 @@ NativeWindow::~NativeWindow()
 
   gtk_window_close((GtkWindow *)sg_window);
   // gtk_main_quit();
+  
+  delete sg_back_buffer;
+  sg_back_buffer = nullptr;
 }
 
 void NativeWindow::Repaint(Component *cmp)
 {
-  sg_repaint = true;
+  sg_repaint.store(true);
 }
 
 void NativeWindow::ToggleFullScreen()

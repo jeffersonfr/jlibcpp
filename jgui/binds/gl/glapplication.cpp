@@ -27,6 +27,7 @@
 
 #include <thread>
 #include <mutex>
+#include <atomic>
 
 #include <GL/gl.h>
 #include <GL/glu.h>
@@ -37,6 +38,10 @@
 
 namespace jgui {
 
+/** \brief */
+jgui::Image *sg_back_buffer = nullptr;
+/** \brief */
+static std::atomic<bool> sg_repaint;
 /** \brief */
 static int sg_window = 0;
 /** \brief */
@@ -51,8 +56,6 @@ static bool sg_visible = true;
 static bool sg_fullscreen = false;
 /** \brief */
 static jgui::jregion_t sg_previous_bounds;
-/** \brief */
-static bool sg_repaint = false;
 /** \brief */
 static bool sg_quitting = false;
 /** \brief */
@@ -411,43 +414,41 @@ void OnDraw()
 
   jregion_t 
     bounds = sg_jgui_window->GetBounds();
-  jgui::Image 
-    *buffer = new jgui::BufferedImage(jgui::JPF_RGB24, bounds.width, bounds.height);
+
+  if (sg_back_buffer != nullptr) {
+    jgui::jsize_t
+      size = sg_back_buffer->GetSize();
+
+    if (size.width != bounds.width or size.height != bounds.height) {
+      delete sg_back_buffer;
+      sg_back_buffer = nullptr;
+    }
+  }
+
+  if (sg_back_buffer == nullptr) {
+    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, bounds.width, bounds.height);
+  }
+
   jgui::Graphics 
-    *g = buffer->GetGraphics();
+    *g = sg_back_buffer->GetGraphics();
+
+  g->Reset();
+  g->SetCompositeFlags(jgui::JCF_SRC_OVER);
 
 	sg_jgui_window->DoLayout();
   sg_jgui_window->Paint(g);
 
-  cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
+  g->Flush();
 
-  if (cairo_surface == nullptr) {
-    delete buffer;
-
-    return;
-  }
-
-  cairo_surface_flush(cairo_surface);
-
-  int dw = cairo_image_surface_get_width(cairo_surface);
-  int dh = cairo_image_surface_get_height(cairo_surface);
-  // int stride = cairo_image_surface_get_stride(cairo_surface);
-
-  uint8_t *data = cairo_image_surface_get_data(cairo_surface);
-
-  if (data == nullptr) {
-    delete buffer;
-
-    return;
-  }
+  uint32_t *data = (uint32_t *)sg_back_buffer->LockData();
 
   // INFO:: invert the y-axis
   uint32_t 
-    *r1 = (uint32_t *)data,
-    *r2 = (uint32_t *)data + (dh - 1)*dw;
+    *r1 = data,
+    *r2 = data + (bounds.height - 1)*bounds.width;
 
-  for (int i=0; i<dh/2; i++) {
-    for (int j=0; j<dw; j++) {
+  for (int i=0; i<bounds.height/2; i++) {
+    for (int j=0; j<bounds.width; j++) {
       uint32_t p = r1[j];
 
       r1[j] = r2[j];
@@ -455,13 +456,13 @@ void OnDraw()
       r2[j] = p;
     }
 
-    r1 = r1 + dw;
-    r2 = r2 - dw;
+    r1 = r1 + bounds.width;
+    r2 = r2 - bounds.width;
 	}
 
   // glClear(GL_COLOR_BUFFER_BIT);
 
-  glDrawPixels(dw, dh, GL_BGRA, GL_UNSIGNED_BYTE, data);
+  glDrawPixels(bounds.width, bounds.height, GL_BGRA, GL_UNSIGNED_BYTE, data);
   
   if (g->IsVerticalSyncEnabled() == false) {
     glFlush();
@@ -471,8 +472,7 @@ void OnDraw()
   
   glutSwapBuffers();
 
-  delete buffer;
-  buffer = nullptr;
+  sg_back_buffer->UnlockData();
 
   sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
 }
@@ -643,9 +643,7 @@ void OnKeyReleaseSpecial(int key, int x, int y)
 
 void OnTimer(int value)
 {
-  if (sg_repaint == true) {
-    sg_repaint = false;
-
+  if (sg_repaint.exchange(false) == true) {
     glutPostRedisplay();
   }
 
@@ -762,12 +760,13 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 
 NativeWindow::~NativeWindow()
 {
-  SetVisible(false);
+  delete sg_back_buffer;
+  sg_back_buffer = nullptr;
 }
 
 void NativeWindow::Repaint(Component *cmp)
 {
-  sg_repaint = true;
+  sg_repaint.store(true);
 }
 
 void NativeWindow::ToggleFullScreen()

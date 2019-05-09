@@ -29,6 +29,7 @@
 
 #include <thread>
 #include <mutex>
+#include <atomic>
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
@@ -37,6 +38,10 @@
 
 namespace jgui {
 
+/** \brief */
+jgui::Image *sg_back_buffer = nullptr;
+/** \brief */
+static std::atomic<bool> sg_repaint;
 /** \brief */
 static sf::RenderWindow *sg_window = nullptr;
 /** \brief */
@@ -67,8 +72,6 @@ static jgui::jsize_t sg_screen = {0, 0};
 static std::mutex sg_loop_mutex;
 /** \brief */
 static jgui::jregion_t sg_previous_bounds;
-/** \brief */
-static bool sg_repaint = false;
 /** \brief */
 static Window *sg_jgui_window = nullptr;
 /** \brief */
@@ -349,47 +352,45 @@ void NativeApplication::InternalPaint()
 
   jregion_t 
     bounds = sg_jgui_window->GetBounds();
-  jgui::Image 
-    *buffer = new jgui::BufferedImage(jgui::JPF_RGB24, bounds.width, bounds.height);
+
+  if (sg_back_buffer != nullptr) {
+    jgui::jsize_t
+      size = sg_back_buffer->GetSize();
+
+    if (size.width != bounds.width or size.height != bounds.height) {
+      delete sg_back_buffer;
+      sg_back_buffer = nullptr;
+    }
+  }
+
+  if (sg_back_buffer == nullptr) {
+    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, bounds.width, bounds.height);
+  }
+
   jgui::Graphics 
-    *g = buffer->GetGraphics();
+    *g = sg_back_buffer->GetGraphics();
+
+  g->Reset();
+  g->SetCompositeFlags(jgui::JCF_SRC_OVER);
 
 	sg_jgui_window->DoLayout();
   sg_jgui_window->Paint(g);
 
-  cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
+  g->Flush();
 
-  if (cairo_surface == nullptr) {
-    delete buffer;
-
-    return;
-  }
-
-  cairo_surface_flush(cairo_surface);
-
-  int dw = cairo_image_surface_get_width(cairo_surface);
-  int dh = cairo_image_surface_get_height(cairo_surface);
-  // int stride = cairo_image_surface_get_stride(cairo_surface);
-
-  uint8_t *data = cairo_image_surface_get_data(cairo_surface);
-
-  if (data == nullptr) {
-    delete buffer;
-
-    return;
-  }
+  uint8_t *data = sg_back_buffer->LockData();
 
 	sf::Texture texture;
 	sf::Sprite sprite;
 
-	texture.create(dw, dh);
+	texture.create(bounds.width, bounds.height);
 	texture.setSmooth(g->GetAntialias() != JAM_NONE);
 
 	sprite.setTexture(texture, false);
   
-  sf::Vector2f targetSize(dw, dh);
+  sf::Vector2f targetSize(bounds.width, bounds.height);
 
-	int size = dw*dh;
+	int size = bounds.width*bounds.height;
 	uint8_t *src = data;
 
 	for (int i=0; i<size; i++) {
@@ -411,8 +412,7 @@ void NativeApplication::InternalPaint()
 	sg_window->draw(sprite);
 	sg_window->display();
 	
-  delete buffer;
-  buffer = nullptr;
+  sg_back_buffer->UnlockData();
 
   sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
 }
@@ -424,9 +424,7 @@ void NativeApplication::InternalLoop()
 	sf::Event event;
   
 	while (sg_quitting == false && sg_window->isOpen() == true) {
-    if (sg_repaint == true) {
-      sg_repaint = false;
-
+    if (sg_repaint.exchange(false) == true) {
       InternalPaint();
     }
 
@@ -597,11 +595,14 @@ NativeWindow::~NativeWindow()
 
   delete sg_window;
   sg_window = nullptr;
+  
+  delete sg_back_buffer;
+  sg_back_buffer = nullptr;
 }
 
 void NativeWindow::Repaint(Component *cmp)
 {
-  sg_repaint = true;
+  sg_repaint.store(true);
 }
 
 void NativeWindow::ToggleFullScreen()

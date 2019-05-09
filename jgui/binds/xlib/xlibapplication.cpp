@@ -28,6 +28,7 @@
 
 #include <thread>
 #include <mutex>
+#include <atomic>
 
 #include <X11/Xlib.h>
 #include <X11/cursorfont.h>
@@ -44,6 +45,10 @@ struct cursor_params_t {
   int hot_y;
 };
 
+/** \brief */
+jgui::Image *sg_back_buffer = nullptr;
+/** \brief */
+static std::atomic<bool> sg_repaint;
 /** \brief */
 static ::Display *sg_display = nullptr;
 /** \brief */
@@ -84,8 +89,6 @@ static jgui::jsize_t sg_screen = {0, 0};
 static jgui::jregion_t sg_previous_bounds;
 /** \brief */
 static Atom sg_wm_delete_message;
-/** \brief */
-static bool sg_repaint = false;
 /** \brief */
 static jcursor_style_t sg_jgui_cursor;
 /** \brief */
@@ -438,35 +441,33 @@ void NativeApplication::InternalPaint()
   
   jregion_t 
     bounds = sg_jgui_window->GetBounds();
-  jgui::Image 
-    *buffer = new jgui::BufferedImage(jgui::JPF_RGB24, bounds.width, bounds.height);
+
+  if (sg_back_buffer != nullptr) {
+    jgui::jsize_t
+      size = sg_back_buffer->GetSize();
+
+    if (size.width != bounds.width or size.height != bounds.height) {
+      delete sg_back_buffer;
+      sg_back_buffer = nullptr;
+    }
+  }
+
+  if (sg_back_buffer == nullptr) {
+    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, bounds.width, bounds.height);
+  }
+
   jgui::Graphics 
-    *g = buffer->GetGraphics();
+    *g = sg_back_buffer->GetGraphics();
+
+  g->Reset();
+  g->SetCompositeFlags(jgui::JCF_SRC_OVER);
 
 	sg_jgui_window->DoLayout();
   sg_jgui_window->Paint(g);
 
-  cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
+  g->Flush();
 
-  if (cairo_surface == nullptr) {
-    delete buffer;
-
-    return;
-  }
-
-  cairo_surface_flush(cairo_surface);
-
-  int dw = cairo_image_surface_get_width(cairo_surface);
-  int dh = cairo_image_surface_get_height(cairo_surface);
-  // int stride = cairo_image_surface_get_stride(cairo_surface);
-
-  uint8_t *data = cairo_image_surface_get_data(cairo_surface);
-
-  if (data == nullptr) {
-    delete buffer;
-
-    return;
-  }
+  uint32_t *data = (uint32_t *)sg_back_buffer->LockData();
 
 	int 
     screen = DefaultScreen(sg_display);
@@ -475,24 +476,22 @@ void NativeApplication::InternalPaint()
 	uint32_t 
     depth = DefaultDepth(sg_display, screen);
 
-	XImage *image = XCreateImage(sg_display, visual, depth, ZPixmap, 0, (char *)data, dw, dh, 32, 0);
+	XImage *image = XCreateImage(sg_display, visual, depth, ZPixmap, 0, (char *)data, bounds.width, bounds.height, 32, 0);
 
 	if (image == nullptr) {
-    delete buffer;
-
 		return;
 	}
 
 	Pixmap 
-    pixmap = XCreatePixmap(sg_display, XRootWindow(sg_display, screen), dw, dh, depth);
+    pixmap = XCreatePixmap(sg_display, XRootWindow(sg_display, screen), bounds.width, bounds.height, depth);
 	GC 
     gc = XCreateGC(sg_display, pixmap, 0, nullptr);
 	
 	// XClearWindow(*(::Window *)_surface);
 	
 	// draw image to pixmap
-	XPutImage(sg_display, pixmap, gc, image, 0, 0, 0, 0, dw, dh);
-	XCopyArea(sg_display, pixmap, sg_window, gc, 0, 0, dw, dh, 0, 0);
+	XPutImage(sg_display, pixmap, gc, image, 0, 0, 0, 0, bounds.width, bounds.height);
+	XCopyArea(sg_display, pixmap, sg_window, gc, 0, 0, bounds.width, bounds.height, 0, 0);
 
 	// XDestroyImage(image);
 	XFreePixmap(sg_display, pixmap);
@@ -506,8 +505,7 @@ void NativeApplication::InternalPaint()
 	  XSync(sg_display, False);
   }
     
-  delete buffer;
-  buffer = nullptr;
+  sg_back_buffer->UnlockData();
   
   sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
 }
@@ -533,9 +531,7 @@ void NativeApplication::InternalLoop()
   //   - Discard both duplicated KeyPress and KeyRelease events when EnableKeyRepeat is false
   
 	while (sg_quitting == false) {
-    if (sg_repaint == true) {
-      sg_repaint = false;
-
+    if (sg_repaint.exchange(false) == true) {
       InternalPaint();
     }
 
@@ -837,11 +833,14 @@ NativeWindow::~NativeWindow()
 	XCloseDisplay(sg_display);
 
   sg_window = 0;
+  
+  delete sg_back_buffer;
+  sg_back_buffer = nullptr;
 }
 
 void NativeWindow::Repaint(Component *cmp)
 {
-  sg_repaint = true;
+  sg_repaint.store(true);
 }
 
 void NativeWindow::ToggleFullScreen()

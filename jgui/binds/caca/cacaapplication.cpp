@@ -27,6 +27,7 @@
 
 #include <thread>
 #include <mutex>
+#include <atomic>
 
 #include <caca.h>
 
@@ -37,6 +38,10 @@
 
 namespace jgui {
 
+/** \brief */
+jgui::Image *sg_back_buffer = nullptr;
+/** \brief */
+static std::atomic<bool> sg_repaint;
 /** \brief */
 static caca_display_t *dp = nullptr;
 /** \brief */
@@ -49,8 +54,6 @@ static int sg_mouse_x = 0;
 static int sg_mouse_y = 0;
 /** \brief */
 static bool sg_cursor_enabled = true;
-/** \brief */
-static bool sg_repaint = false;
 /** \brief */
 static std::mutex sg_loop_mutex;
 /** \brief */
@@ -308,43 +311,38 @@ void NativeApplication::InternalPaint()
 
   jregion_t 
     bounds = sg_jgui_window->GetBounds();
-  jgui::Image 
-    *buffer = new jgui::BufferedImage(jgui::JPF_RGB24, bounds.width, bounds.height);
+
+  if (sg_back_buffer != nullptr) {
+    jgui::jsize_t
+      size = sg_back_buffer->GetSize();
+
+    if (size.width != bounds.width or size.height != bounds.height) {
+      delete sg_back_buffer;
+      sg_back_buffer = nullptr;
+    }
+  }
+
+  if (sg_back_buffer == nullptr) {
+    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, bounds.width, bounds.height);
+  }
+
   jgui::Graphics 
-    *g = buffer->GetGraphics();
+    *g = sg_back_buffer->GetGraphics();
+
+  g->Reset();
+  g->SetCompositeFlags(jgui::JCF_SRC_OVER);
 
 	sg_jgui_window->DoLayout();
   sg_jgui_window->Paint(g);
+  
+  g->Flush();
 
-  cairo_surface_t *cairo_surface = nullptr;
 	int iw = cucul_get_canvas_width(cv);
 	int ih = cucul_get_canvas_height(cv);
 
-  jgui::Image *scale = buffer->Scale(iw, ih);
+  jgui::Image *scale = sg_back_buffer->Scale(iw, ih);
 
-  cairo_surface = cairo_get_target(scale->GetGraphics()->GetCairoContext());
-
-  if (cairo_surface == nullptr) {
-    delete scale;
-    delete buffer;
-
-    return;
-  }
-
-  cairo_surface_flush(cairo_surface);
-
-  int dw = cairo_image_surface_get_width(cairo_surface);
-  int dh = cairo_image_surface_get_height(cairo_surface);
-  // int stride = cairo_image_surface_get_stride(cairo_surface);
-
-  uint8_t *data = cairo_image_surface_get_data(cairo_surface);
-
-  if (data == nullptr) {
-    delete scale;
-    delete buffer;
-
-    return;
-  }
+  uint32_t *data = (uint32_t *)scale->LockData();
 
   if (dither != nullptr) {
     /* 
@@ -365,14 +363,13 @@ void NativeApplication::InternalPaint()
 
     caca_set_dither_algorithm(dither, "none");
     cucul_set_color_ansi(cv, CUCUL_COLOR_DEFAULT, CUCUL_COLOR_BLACK);
-    cucul_dither_bitmap(cv, 0, 0, dw, dh, dither, data);
+    cucul_dither_bitmap(cv, 0, 0, iw, ih, dither, data);
     caca_refresh_display(dp);
   }
 
-  cairo_surface_destroy(cairo_surface);
-
+  scale->UnlockData();
+  
   delete scale;
-  delete buffer;
 
   sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
 }
@@ -395,9 +392,7 @@ void NativeApplication::InternalLoop()
   fcntl(fdk, F_SETFL, O_NONBLOCK);
 
   while (sg_quitting == false) {
-    if (sg_repaint == true) {
-      sg_repaint = false;
-
+    if (sg_repaint.exchange(false) == true) {
       InternalPaint();
     }
 
@@ -569,11 +564,14 @@ NativeWindow::~NativeWindow()
   if (cv != nullptr) {
     cucul_free_canvas(cv);
   }
+  
+  delete sg_back_buffer;
+  sg_back_buffer = nullptr;
 }
 
 void NativeWindow::Repaint(Component *cmp)
 {
-  sg_repaint = true;
+  sg_repaint.store(true);
 }
 
 void NativeWindow::ToggleFullScreen()

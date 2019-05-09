@@ -28,6 +28,7 @@
 
 #include <thread>
 #include <mutex>
+#include <atomic>
 
 #include <xcb/xcb.h>
 #include <xcb/xcb_image.h>
@@ -43,6 +44,10 @@
 
 namespace jgui {
 
+/** \brief */
+jgui::Image *sg_back_buffer = nullptr;
+/** \brief */
+static std::atomic<bool> sg_repaint;
 /** \brief */
 static xcb_connection_t *sg_xcb_connection = nullptr;
 /** \brief */
@@ -79,8 +84,6 @@ static bool sg_quitting = false;
 static jgui::jsize_t sg_screen = {0, 0};
 /** \brief */
 static jgui::jregion_t sg_previous_bounds;
-/** \brief */
-static bool sg_repaint = false;
 /** \brief */
 static jcursor_style_t sg_jgui_cursor;
 /** \brief */
@@ -344,28 +347,39 @@ void NativeApplication::InternalPaint()
   
   jregion_t 
     bounds = sg_jgui_window->GetBounds();
-  jgui::Image 
-    *buffer = new jgui::BufferedImage(jgui::JPF_RGB24, bounds.width, bounds.height);
+
+  if (sg_back_buffer != nullptr) {
+    jgui::jsize_t
+      size = sg_back_buffer->GetSize();
+
+    if (size.width != bounds.width or size.height != bounds.height) {
+      delete sg_back_buffer;
+      sg_back_buffer = nullptr;
+    }
+  }
+
+  if (sg_back_buffer == nullptr) {
+    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, bounds.width, bounds.height);
+  }
+
   jgui::Graphics 
-    *g = buffer->GetGraphics();
+    *g = sg_back_buffer->GetGraphics();
+
+  g->Reset();
+  g->SetCompositeFlags(jgui::JCF_SRC_OVER);
 
 	sg_jgui_window->DoLayout();
   sg_jgui_window->Paint(g);
 
-  cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
+  g->Flush();
 
-  if (cairo_surface == nullptr) {
-    delete buffer;
-
-    return;
-  }
+  cairo_surface_t 
+    *cairo_surface = g->GetCairoSurface();
 
   xcb_visualtype_t 
     *vt = find_visual(sg_xcb_connection, sg_xcb_screen->root_visual);
 
   if (vt == nullptr) {
-    delete buffer;
-
     return;
   }
 
@@ -382,9 +396,6 @@ void NativeApplication::InternalPaint()
   cairo_surface_finish(surface);
 
   xcb_flush(sg_xcb_connection);
-
-  delete buffer;
-  buffer = nullptr;
 
   sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
 }
@@ -422,9 +433,7 @@ void NativeApplication::InternalLoop()
   xcb_change_property(sg_xcb_connection, XCB_PROP_MODE_REPLACE, sg_xcb_window, (*reply).atom, 4, 32, 1, &(*reply2).atom);
 
 	while (sg_quitting == false) {
-    if (sg_repaint == true) {
-      sg_repaint = false;
-
+    if (sg_repaint.exchange(false) == true) {
       InternalPaint();
     }
 
@@ -599,11 +608,14 @@ NativeWindow::~NativeWindow()
 {
   xcb_destroy_window(sg_xcb_connection, sg_xcb_window);
   xcb_disconnect(sg_xcb_connection);
+  
+  delete sg_back_buffer;
+  sg_back_buffer = nullptr;
 }
 
 void NativeWindow::Repaint(Component *cmp)
 {
-  sg_repaint = true;
+  sg_repaint.store(true);
 }
 
 xcb_intern_atom_cookie_t getCookieForAtom(const char *state_name) 
