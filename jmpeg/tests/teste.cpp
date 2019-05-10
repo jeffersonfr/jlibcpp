@@ -1411,7 +1411,7 @@ class SIData : public SI {
                 o << "mv \"" << base_directory << "/" << id << "\" \"" << path << "/" << _names[id].c_str() << "\"";
 
                 if (system(o.str().c_str()) != 0) {
-                  break;
+                  continue;
                 }
               } else if (object->kind == "dir") {
                 ProcessFilesystem(base_directory, current_path + "/" + _names[id].c_str(), id);
@@ -1759,9 +1759,9 @@ class SIData : public SI {
       return true;
     }
 
-    void Save(std::string path)
+    void Save(std::string path, bool force = false)
     {
-      if (IsComplete() == false) {
+      if (force == false && IsComplete() == false) {
         printf("SIData::Save: some modules are not complete\n");
 
         return;
@@ -1781,10 +1781,6 @@ class SIData : public SI {
 
       for (std::vector<std::shared_ptr<struct object_info_t>>::iterator i=_objects.begin(); i!=_objects.end(); i++) {
         std::shared_ptr<struct object_info_t> object = (*i);
-
-        if (object->module->complete == false) {
-          continue;
-        }
 
         if (object->kind == "srg") {
           service_gateway_object_key = object->object_key;
@@ -1888,7 +1884,8 @@ class SIData : public SI {
         std::shared_ptr<struct module_info_t> module = (*i);
 
         if (module->complete == false) {
-          continue;
+          // CHANGE:: parse the name of objects
+          // continue;
         }
 
         // INFO:: module data
@@ -2011,7 +2008,6 @@ class SIData : public SI {
             ptr = ptr + 6;
 
             if (object_kind == 0x73726700) {
-              printf("JJJJJJJJJJJ::1: %s\n", object_key.c_str());
               _names[object_key] = "/";
             }
 
@@ -2205,8 +2201,8 @@ class SIData : public SI {
           std::string id = object->object_key;
 
           if (object->module->id == module->id) {
-            // INFO:: id = <module_id> + "." + <object_key>
-            printf("\t\t[%s]: object key:[%s], object name:[%s]\n", object->kind.c_str(), id.substr(id.find(".") + 1).c_str(), _names[id].c_str());
+            // INFO:: id = <carousel_id> + "." + <module_id> + "." + <object_key>
+            printf("\t\t[%s]: object key:[%s], object name:[%s]\n", object->kind.c_str(), id.substr(id.rfind(".") + 1).c_str(), _names[id].c_str());
           }
         }
       }
@@ -5176,7 +5172,7 @@ class PSIParser : public jevent::DemuxListener {
         if (param->DownloadID() != (uint32_t)-1 and param->DownloadID() != download_id) {
           // TODO:: SIData->Reset() ???
 
-          return;
+          // return;
         }
             
         param->DownloadID(download_id);
@@ -5781,7 +5777,7 @@ int main(int argc, char **argv)
 
   data->Parse();
   data->Print();
-  data->Save("/tmp/data");
+  data->Save("/tmp/data", true);
 
   auto 
     subtitle = SIFacade::GetInstance()->Subtitle();
