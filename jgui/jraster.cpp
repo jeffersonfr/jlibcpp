@@ -556,12 +556,38 @@ void Raster::FillEllipse(jgui::jpoint_t v1, jgui::jsize_t s1)
   */
 }
 
-void Raster::DrawArc(jgui::jpoint_t v1, jgui::jsize_t s1, double arc0, double arc1)
+void Raster::DrawArc(jgui::jpoint_t v1, jgui::jsize_t s1, float arc0, float arc1)
 {
+  int x0 = cos(arc0)*s1.width;
+  int y0 = -sin(arc0)*s1.height;
+
+  for (float i=arc0 + 0.05; i<=arc1; i+=0.05) {
+    int x1 = cos(i)*s1.width;
+    int y1 = -sin(i)*s1.height;
+
+    DrawLine({v1.x + x0, v1.y + y0}, {v1.x + x1, v1.y + y1});
+
+    x0 = x1;
+    y0 = y1;
+  }
 }
 
-void Raster::FillArc(jgui::jpoint_t v1, jgui::jsize_t s1, double arc0, double arc1)
+void Raster::FillArc(jgui::jpoint_t v1, jgui::jsize_t s1, float arc0, float arc1)
 {
+  std::vector<jgui::jpoint_t> points;
+
+  points.push_back({0, 0});
+
+  for (float i=arc0; i<arc1; i+=0.05) {
+    int x = cos(i)*s1.width;
+    int y = -sin(i)*s1.height;
+
+    points.push_back({x, y});
+  }
+    
+  points.push_back({0, 0});
+
+  FillPolygon(v1, points, false);
 }
 
 void FillPolygon0(jgui::Raster *raster, std::vector<jgui::jpoint_t> points, jgui::jpoint_t v1, jgui::jpoint_t v2)

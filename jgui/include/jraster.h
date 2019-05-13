@@ -57,8 +57,8 @@ class Raster {
     void FillCircle(jgui::jpoint_t v1, int size);
     void DrawEllipse(jgui::jpoint_t v1, jgui::jsize_t s1);
     void FillEllipse(jgui::jpoint_t v1, jgui::jsize_t s1);
-    void DrawArc(jgui::jpoint_t v1, jgui::jsize_t s1, double arc0, double arc1);
-    void FillArc(jgui::jpoint_t v1, jgui::jsize_t s1, double arc0, double arc1);
+    void DrawArc(jgui::jpoint_t v1, jgui::jsize_t s1, float arc0, float arc1);
+    void FillArc(jgui::jpoint_t v1, jgui::jsize_t s1, float arc0, float arc1);
     void FillPolygon(jgui::jpoint_t v1, std::vector<jgui::jpoint_t> points, bool holed);
     void DrawGlyph(int glyph, int xp, int yp);
     void DrawString(std::string text, int xp, int yp);
