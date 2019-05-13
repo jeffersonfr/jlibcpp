@@ -576,16 +576,17 @@ void Raster::FillArc(jgui::jpoint_t v1, jgui::jsize_t s1, float arc0, float arc1
 {
   std::vector<jgui::jpoint_t> points;
 
-  points.push_back({0, 0});
-
-  for (float i=arc0; i<arc1; i+=0.05) {
-    int x = cos(i)*s1.width;
-    int y = -sin(i)*s1.height;
-
-    points.push_back({x, y});
+  if ((arc0 + arc1) < 2*M_PI) {
+    points.push_back({0, 0});
   }
-    
-  points.push_back({0, 0});
+
+  for (float i=arc0; i<=arc1; i+=0.05) {
+    points.push_back({cos(i)*s1.width, -sin(i)*s1.height});
+  }
+  
+  if ((arc0 + arc1) < 2*M_PI) {
+    points.push_back({0, 0});
+  }
 
   FillPolygon(v1, points, false);
 }

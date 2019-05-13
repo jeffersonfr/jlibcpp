@@ -492,6 +492,8 @@ class Render3D : public jgui::Window {
       // jgui::jsize_t
       //   size = GetSize();
 
+      g->Clear();
+
       int count, NumUsed = 0;
       Tri3D *current = Triangles;
       Tri3D *first = Triangles;
