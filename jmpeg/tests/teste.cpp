@@ -1389,7 +1389,7 @@ class SIData : public SI {
 
       std::ostringstream o;
         
-      o << "mkdir -p \'" << path << "\'";
+      o << "mkdir -p \"" << path << "\"";
 
       if (system(o.str().c_str()) != 0) {
         printf("SIData::ProcessFilesystem:: unable to create directory [%s]\n", base_directory.c_str());
@@ -1408,11 +1408,9 @@ class SIData : public SI {
               if (object->kind == "fil") {
                 std::ostringstream o;
 
-                o << "mv \'" << base_directory << "/" << id << "\' \'" << path << "/" << _names[id].c_str() << "\'";
+                o << "mv \"" << base_directory << "/" << id << "\" \"" << path << "/" << _names[id].c_str() << "\"";
 
                 if (system(o.str().c_str()) != 0) {
-                  printf("ProcessFileSystem:<error>: %s\n", o.str().c_str());
-
                   continue;
                 }
               } else if (object->kind == "dir") {
@@ -1772,7 +1770,7 @@ class SIData : public SI {
       std::lock_guard<std::mutex> lock(_mutex);
 
       std::string
-        cmd = std::string("rm -rf \'" + path + "\'; mkdir \'" + path + "\'");
+        cmd = std::string("rm -rf \"" + path + "\"; mkdir \"" + path + "\"");
 
       if (system(cmd.c_str()) != 0) {
         return;
@@ -2204,8 +2202,7 @@ class SIData : public SI {
 
           if (object->module->id == module->id) {
             // INFO:: id = <carousel_id> + "." + <module_id> + "." + <object_key>
-            printf("\t\t[%s]: object key:[%s], object name:[%s]\n", object->kind.c_str(), id.c_str(), _names[id].c_str());
-            // printf("\t\t[%s]: object key:[%s], object name:[%s]\n", object->kind.c_str(), id.substr(id.rfind(".") + 1).c_str(), _names[id].c_str());
+            printf("\t\t[%s]: object key:[%s], object name:[%s]\n", object->kind.c_str(), id.substr(id.rfind(".") + 1).c_str(), _names[id].c_str());
           }
         }
       }
@@ -2930,7 +2927,7 @@ class PSIParser : public jevent::DemuxListener {
         }
       } else if (descriptor_tag == 0x0d) { // dii location descriptor
       } else if (descriptor_tag == 0x11) { // ip signalling descriptor
-        uint32_t platform_id = TS_GM32(ptr, 0, 24);
+        int platform_id = TS_GM32(ptr, 0, 24);
 
         printf("\t\t:: ip signaliing:[%d]\n", platform_id);
       // } else if (descriptor_tag == 0xfd) { // data coding descriptor
@@ -3370,7 +3367,7 @@ class PSIParser : public jevent::DemuxListener {
         uint32_t component_size = TS_G32(ptr + 1);
         uint32_t download_id = TS_G32(ptr + 5);
         uint32_t timeout_value_dii = TS_G32(ptr + 9);
-        uint32_t leak_rate = TS_GM32(ptr + 13, 0, 22);
+        int leak_rate = TS_GM32(ptr + 13, 0, 22);
         int component_tag = TS_G8(ptr + 16);
 
         printf("\t\t:: reboot:[%d], add on:[%d], compatibiliy flag:[%d], module info flag:[%d], text info flag:[%d], component size:[%u], download id:[0x%08x], timeout value dii:[%d], leak rate:[%u], component tag:[0x%02x]\n", reboot, add_on, compatibility_flag, module_info_flag, text_info_flag, component_size, download_id, timeout_value_dii, leak_rate, component_tag);
@@ -3393,7 +3390,7 @@ class PSIParser : public jevent::DemuxListener {
 
           for (int i=0; i<number_of_modules; i++) {
             int module_id = TS_G16(ptr + 0);
-            uint32_t module_size = TS_G32(ptr + 2);
+            int module_size = TS_G32(ptr + 2);
             int module_info_length = TS_G8(ptr + 6);
         
             printf("\t\t:<module info>: module:[%d], module id:[0x%04x], module size:[0x%08x], module info length:[%d]\n", i, module_id, module_size, module_info_length);
@@ -4486,9 +4483,9 @@ class PSIParser : public jevent::DemuxListener {
 
         for (int j=0; j<schedule_description_length >> 3; j++) {
           uint64_t start_time = TS_GM64(ptr + 0, 0, 40);
-          uint64_t duration = TS_GM64(ptr + 0, 40, 24);
+          int duration = TS_GM64(ptr + 0, 40, 24);
 
-          printf("SDTT:: start time:[%lu], duration:[%ld]\n", start_time, duration);
+          printf("SDTT:: start time:[%lu], duration:[%d]\n", start_time, duration);
 
           ptr = ptr + 8;
         }
@@ -4914,11 +4911,11 @@ class PSIParser : public jevent::DemuxListener {
           // INFO:: 6-STD B24 v5.2.1 (Data group data/Caption management data)
           printf("Closed Caption:caption managment: language tag:[0x%01x], display mode:[0x%01x], display condition designation:[0x%02x/%s], language code:[%s], format:[0x%01x/%s], character code:[0x%01x/%s], rollup mode:[0x%01x/%s]\n", language_tag, display_mode, display_condition_designation, display_condition_info.c_str(), language_code.c_str(), format, Utils::GetClosedCaptionFormatDescription(format).c_str(), character_code, character_info.c_str(), rollup_mode, rollup_info.c_str());
 
-          uint32_t data_unit_loop_length = TS_GM32(ptr + 5, 0, 24);
+          int data_unit_loop_length = TS_GM32(ptr + 5, 0, 24);
 
           ptr = ptr + 8;
 
-          uint32_t count_data_unit = 0;
+          int count_data_unit = 0;
 
           while (count_data_unit < data_unit_loop_length) {
             int unit_separator = TS_G8(ptr + 0);
@@ -4928,7 +4925,7 @@ class PSIParser : public jevent::DemuxListener {
             }
 
             int data_unit_parameter = TS_G8(ptr + 1);
-            uint32_t data_unit_size = TS_GM32(ptr + 2, 0, 24);
+            int data_unit_size = TS_GM32(ptr + 2, 0, 24);
 
             std::string data_unit_info = "undefined";
 
@@ -4982,11 +4979,11 @@ class PSIParser : public jevent::DemuxListener {
 
         printf("Closed Caption:caption statement: time control mode:[0x%01x/%s], offset time:[0x%01x%08x]\n", time_control_mode, time_control_info.c_str(), uint32_t((offset_time >> 32) & 0x0f), uint32_t(offset_time & 0xffffffff));
 
-        uint32_t data_unit_loop_length = TS_GM32(ptr + 1, 0, 24);
+        int data_unit_loop_length = TS_GM32(ptr + 1, 0, 24);
 
         ptr = ptr + 4;
 
-        uint32_t count_data_unit = 0;
+        int count_data_unit = 0;
 
         while (count_data_unit < data_unit_loop_length) {
           int unit_separator = TS_G8(ptr + 0);
@@ -4996,7 +4993,7 @@ class PSIParser : public jevent::DemuxListener {
           }
 
           int data_unit_parameter = TS_G8(ptr + 1);
-          uint32_t data_unit_size = TS_GM32(ptr + 2, 0, 24);
+          int data_unit_size = TS_GM32(ptr + 2, 0, 24);
 
           std::string data_unit_info = "undefined";
 
@@ -5372,7 +5369,7 @@ class PSIParser : public jevent::DemuxListener {
         }
 
         if (param->DownloadID() != download_id) {
-          // return;
+          return;
         }
         
         SIFacade::GetInstance()->Data()->ModuleBlock(download_id, module_id, module_version, block_number, std::make_shared<std::string>(ptr, message_length - adaptation_length - 6));
@@ -5815,6 +5812,7 @@ int main(int argc, char **argv)
 
   // INFO:: pid report
   std::map<int, int> pid_report = manager->GetPidReport();
+
   int count = 0;
 
   for (std::map<int, int>::iterator i=pid_report.begin(); i!=pid_report.end(); i++) {
