@@ -342,7 +342,7 @@ void TreeListView::Paint(Graphics *g)
     fg = theme->GetIntegerParam("component.fg"),
     fgfocus = theme->GetIntegerParam("component.fg.focus"),
     fgdisable = theme->GetIntegerParam("component.fg.disable");
-  jgui::jsize_t
+  jgui::jsize_t<int>
     size = GetSize();
   int
     hg = theme->GetIntegerParam("component.hgap"),
@@ -397,7 +397,7 @@ void TreeListView::Paint(Graphics *g)
       g->SetColor(theme->GetIntegerParam("item.fg.focus"));
     }
 
-    g->FillRectangle(x, y+(is + ig)*i, w, is);
+    g->FillRectangle({x, y+(is + ig)*i, w, is});
 
     if (_selected_index == i) {
       g->SetColor(theme->GetIntegerParam("item.fg.select"));
@@ -407,7 +407,7 @@ void TreeListView::Paint(Graphics *g)
     } else if (_items[i]->GetType() == JIT_TEXT) {
     } else if (_items[i]->GetType() == JIT_IMAGE) {
       if (_items[i]->GetImage() != nullptr) {
-        g->DrawImage(_items[i]->GetImage(), hg, y + (is + ig)*i, is, is);
+        g->DrawImage(_items[i]->GetImage(), {hg, y + (is + ig)*i, is, is});
       }
     }
 
@@ -430,7 +430,7 @@ void TreeListView::Paint(Graphics *g)
         text = font->TruncateString(text, "...", w - offset);
       // }
 
-      g->DrawString(text, x + offset, y + (is + ig)*i, w - offset, is, _items[i]->GetHorizontalAlign(), _items[i]->GetVerticalAlign());
+      g->DrawString(text, {x + offset, y + (is + ig)*i, w - offset, is}, _items[i]->GetHorizontalAlign(), _items[i]->GetVerticalAlign());
     }
   }
 }
@@ -441,7 +441,7 @@ void TreeListView::IncrementLines(int lines)
     return;
   }
 
-  jgui::jsize_t
+  jgui::jsize_t<int>
     size = GetSize();
   jpoint_t 
     scroll_location = GetScrollLocation();
@@ -480,7 +480,7 @@ void TreeListView::DecrementLines(int lines)
     return;
   }
 
-  jgui::jsize_t
+  jgui::jsize_t<int>
     size = GetSize();
   int 
     old_index = _index;
@@ -516,11 +516,11 @@ void TreeListView::DecrementLines(int lines)
   }
 }
 
-jsize_t TreeListView::GetScrollDimension()
+jsize_t<int> TreeListView::GetScrollDimension()
 {
   Theme *theme = GetTheme();
 
-  jsize_t t {0, 0};
+  jsize_t<int> t {0, 0};
 
   if (theme == nullptr) {
     return t;

@@ -104,12 +104,12 @@ void Dialog::Paint(Graphics *g)
       *font = theme->GetFont("container.font");
   
     if (font != nullptr) {
-      jgui::jsize_t
+      jgui::jsize_t<int>
         size = GetSize();
 
       g->SetFont(font);
       g->SetColor(theme->GetIntegerParam("container.fg"));
-      g->DrawString(_title, 0, 8, size.width, font->GetSize(), jgui::JHA_CENTER, jgui::JVA_CENTER);
+      g->DrawString(_title, {0, 8, size.width, font->GetSize()}, jgui::JHA_CENTER, jgui::JVA_CENTER);
     }
   }
 }

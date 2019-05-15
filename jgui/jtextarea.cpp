@@ -384,7 +384,7 @@ void TextArea::DecrementLines(int lines)
 
   jgui::Font 
     *font = theme->GetFont("component.font");
-  jgui::jsize_t
+  jgui::jsize_t<int>
     size = GetSize();
   int 
     current_length = 0;
@@ -432,7 +432,7 @@ void TextArea::InitRowsString()
     return;
   }
 
-  jgui::jsize_t
+  jgui::jsize_t<int>
     size = GetSize();
   int
     x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
@@ -591,7 +591,7 @@ void TextArea::Paint(Graphics *g)
       g->SetColor(fgdisable);
     }
 
-    g->DrawString(s, x, y+k*fs);
+    g->DrawString(s, jgui::jpoint_t<int>{x, y+k*fs});
 
     if (_caret_visible == true && current_length < (int)s.size() && current_length >= 0) {
       std::string cursor;
@@ -610,7 +610,7 @@ void TextArea::Paint(Graphics *g)
         g->SetColor(_caret_color);
       }
 
-      g->DrawString(cursor, x+current_text_size, y+k*fs);
+      g->DrawString(cursor, jgui::jpoint_t<int>{x+current_text_size, y+k*fs});
 
       current_length = -1;
     }
@@ -668,11 +668,11 @@ int TextArea::GetCurrentRow()
   return _current_row;
 }
 
-jsize_t TextArea::GetScrollDimension()
+jsize_t<int> TextArea::GetScrollDimension()
 {
   Theme *theme = GetTheme();
   
-  jsize_t t {0, 0};
+  jsize_t<int> t {0, 0};
 
   if (theme == nullptr) {
     return t;

@@ -132,7 +132,7 @@ bool ScrollBar::MousePressed(jevent::MouseEvent *event)
 
   jgui::jpoint_t
     elocation = event->GetLocation();
-  jgui::jsize_t
+  jgui::jsize_t<int>
     size = GetSize();
   int
     x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
@@ -228,7 +228,7 @@ bool ScrollBar::MouseMoved(jevent::MouseEvent *event)
 
   jgui::jpoint_t
     elocation = event->GetLocation();
-  jgui::jsize_t
+  jgui::jsize_t<int>
     size = GetSize();
   int
     x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
@@ -295,7 +295,7 @@ void ScrollBar::Paint(Graphics *g)
     fgfocus = theme->GetIntegerParam("component.fg.focus"),
     fgdisable = theme->GetIntegerParam("component.fg.disable"),
     scroll = theme->GetIntegerParam("component.scroll");
-  jgui::jsize_t
+  jgui::jsize_t<int>
     size = GetSize();
   int
     hg = theme->GetIntegerParam("component.hgap"),
@@ -323,10 +323,10 @@ void ScrollBar::Paint(Graphics *g)
       g->SetColor(scroll);
     }
 
-    g->FillRectangle((int)d + arrow_size + x + hg, y, _stone_size, h);
+    g->FillRectangle({(int)d + arrow_size + x + hg, y, _stone_size, h});
 
-    g->FillTriangle(x+w, y+arrow_size, x+w-arrow_size, y, x+w-arrow_size, y+2*arrow_size);
-    g->FillTriangle(x, y+arrow_size, x+arrow_size, y, x+arrow_size, y+2*arrow_size);
+    g->FillTriangle({x+w, y+arrow_size}, {x+w-arrow_size, y}, {x+w-arrow_size, y+2*arrow_size});
+    g->FillTriangle({x, y+arrow_size}, {x+arrow_size, y}, {x+arrow_size, y+2*arrow_size});
   } else if (_type == JSO_VERTICAL) {
     int 
       arrow_size = w/2,
@@ -344,9 +344,9 @@ void ScrollBar::Paint(Graphics *g)
       g->SetColor(scroll);
     }
 
-    g->FillRectangle(x, (int) d + arrow_size + y + vg, w, _stone_size);
-    g->FillTriangle(x, y+arrow_size, x+w/2, y,x+w, y+arrow_size);
-    g->FillTriangle(x, y+h-arrow_size, x+w/2, y+h,x+w, y+h-arrow_size);
+    g->FillRectangle({x, (int) d + arrow_size + y + vg, w, _stone_size});
+    g->FillTriangle({x, y+arrow_size}, {x+w/2, y}, {x+w, y+arrow_size});
+    g->FillTriangle({x, y+h-arrow_size}, {x+w/2, y+h}, {x+w, y+h-arrow_size});
   }
 }
 

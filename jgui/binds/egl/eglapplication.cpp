@@ -138,7 +138,7 @@ static bool sg_quitting = false;
 /** \brief */
 static std::mutex sg_loop_mutex;
 /** \brief */
-static jgui::jsize_t sg_screen = {0, 0};
+static jgui::jsize_t<int> sg_screen = {0, 0};
 /** \brief */
 static jcursor_style_t sg_jgui_cursor = JCS_DEFAULT;
 /** \brief */
@@ -635,12 +635,12 @@ void NativeApplication::InternalInit(int argc, char **argv)
   sg_screen.height = sh;
 
 #define CURSOR_INIT(type, ix, iy, hotx, hoty) 													\
-	t.cursor = new jgui::BufferedImage(JPF_ARGB, w, h);												\
+	t.cursor = new jgui::BufferedImage(JPF_ARGB, {w, h});												\
 																																				\
 	t.hot_x = hotx;																												\
 	t.hot_y = hoty;																												\
 																																				\
-	t.cursor->GetGraphics()->DrawImage(cursors, ix*w, iy*h, w, h, 0, 0);	\
+	t.cursor->GetGraphics()->DrawImage(cursors, {ix*w, iy*h, w, h}, {0, 0});	\
 																																				\
 	sg_jgui_cursors[type] = t;																										\
 
@@ -685,11 +685,11 @@ void NativeApplication::InternalPaint()
 		return;
 	}
 
-  jregion_t 
+  jregion_t<int> 
     bounds = sg_jgui_window->GetBounds();
 
   if (sg_back_buffer != nullptr) {
-    jgui::jsize_t
+    jgui::jsize_t<int>
       size = sg_back_buffer->GetSize();
 
     if (size.width != bounds.width or size.height != bounds.height) {
@@ -699,7 +699,7 @@ void NativeApplication::InternalPaint()
   }
 
   if (sg_back_buffer == nullptr) {
-    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, bounds.width, bounds.height);
+    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, {bounds.width, bounds.height});
   }
 
   jgui::Graphics 
@@ -1282,7 +1282,7 @@ void NativeWindow::ToggleFullScreen()
 
 #else
 
-  static jgui::jregion_t _previous_bounds = {
+  static jgui::jregion_t<int> _previous_bounds = {
 	  0, 0, 0, 0
   };
 
@@ -1369,9 +1369,9 @@ void NativeWindow::SetBounds(int x, int y, int width, int height)
 #endif
 }
 
-jgui::jregion_t NativeWindow::GetBounds()
+jgui::jregion_t<int> NativeWindow::GetBounds()
 {
-	jgui::jregion_t 
+	jgui::jregion_t<int> 
     t = {0, 0, 0, 0};
 
 #ifdef RASPBERRY_PI
@@ -1424,9 +1424,9 @@ void NativeWindow::SetCursorLocation(int x, int y)
 #endif
 }
 
-jpoint_t NativeWindow::GetCursorLocation()
+jpoint_t<int> NativeWindow::GetCursorLocation()
 {
-	jpoint_t t = {
+	jpoint_t<int> t = {
 		.x = 0,
 		.y = 0
 	};
@@ -1564,10 +1564,10 @@ void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 #else
 
 	/*
-	jsize_t t = shape->GetSize();
+	jsize_t<int> t = shape->GetSize();
 	uint32_t data[t.width*t.height];
 	
-	shape->GetGraphics()->GetRGBArray(data, 0, 0, t.width, t.height);
+	shape->GetGraphics()->GetRGBArray(data, {0, 0, t.width, t.height});
 
 	if (data == nullptr) {
 		return;

@@ -122,7 +122,7 @@ void Animation::Paint(Graphics *g)
   if (_images.size() != 0) {
     Image *image = _images[_index];
 
-    g->DrawImage(image, x, y, w, h);
+    g->DrawImage(image, {x, y, w, h});
   }
 }
 

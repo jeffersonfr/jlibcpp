@@ -56,7 +56,7 @@ static ::Window sg_window = 0;
 /** \brief */
 static ::XEvent sg_lastsg_key_release_event;
 /** \brief */
-static jgui::jregion_t sg_visible_bounds;
+static jgui::jregion_t<int> sg_visible_bounds;
 /** \brief */
 static bool sg_key_repeat = false;
 /** \brief */
@@ -84,9 +84,9 @@ static std::mutex sg_loop_mutex;
 /** \brief */
 static bool sg_quitting = false;
 /** \brief */
-static jgui::jsize_t sg_screen = {0, 0};
+static jgui::jsize_t<int> sg_screen = {0, 0};
 /** \brief */
-static jgui::jregion_t sg_previous_bounds;
+static jgui::jregion_t<int> sg_previous_bounds;
 /** \brief */
 static Atom sg_wm_delete_message;
 /** \brief */
@@ -439,11 +439,11 @@ void NativeApplication::InternalPaint()
 
   // OPTIMIZE:: cairo_xlib_surface_create(Display, Drawable, Visual, width, height)
   
-  jregion_t 
+  jregion_t<int> 
     bounds = sg_jgui_window->GetBounds();
 
   if (sg_back_buffer != nullptr) {
-    jgui::jsize_t
+    jgui::jsize_t<int>
       size = sg_back_buffer->GetSize();
 
     if (size.width != bounds.width or size.height != bounds.height) {
@@ -453,7 +453,7 @@ void NativeApplication::InternalPaint()
   }
 
   if (sg_back_buffer == nullptr) {
-    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, bounds.width, bounds.height);
+    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, {bounds.width, bounds.height});
   }
 
   jgui::Graphics 
@@ -989,7 +989,7 @@ void NativeWindow::SetBounds(int x, int y, int width, int height)
 	XMoveResizeWindow(sg_display, sg_window, x, y, width, height);
 }
 
-jgui::jregion_t NativeWindow::GetBounds()
+jgui::jregion_t<int> NativeWindow::GetBounds()
 {
 	return {
     .x = sg_visible_bounds.x,
@@ -1032,9 +1032,9 @@ void NativeWindow::SetCursorLocation(int x, int y)
 	XFlush(sg_display);
 }
 
-jpoint_t NativeWindow::GetCursorLocation()
+jpoint_t<int> NativeWindow::GetCursorLocation()
 {
-	jpoint_t t;
+	jpoint_t<int> t;
 
 	t.x = 0;
 	t.y = 0;
@@ -1143,10 +1143,10 @@ void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 		return;
 	}
 
-	jsize_t t = shape->GetSize();
+	jsize_t<int> t = shape->GetSize();
 	uint32_t data[t.width*t.height];
 	
-	shape->GetGraphics()->GetRGBArray(data, 0, 0, t.width, t.height);
+	shape->GetGraphics()->GetRGBArray(data, {0, 0, t.width, t.height});
 
 	if (data == nullptr) {
 		return;

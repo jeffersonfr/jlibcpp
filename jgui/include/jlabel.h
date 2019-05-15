@@ -109,7 +109,7 @@ class Label : public jgui::Component {
      * \brief
      *
      */
-    virtual jsize_t GetPreferredSize();
+    virtual jsize_t<int> GetPreferredSize();
 
     /**
      * \brief

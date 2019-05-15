@@ -53,7 +53,7 @@ static int sg_mouse_y = 0;
 /** \brief */
 static bool sg_quitting = false;
 /** \brief */
-static jgui::jsize_t sg_screen = {0, 0};
+static jgui::jsize_t<int> sg_screen = {0, 0};
 /** \brief */
 static std::mutex sg_loop_mutex;
 /** \brief */
@@ -393,11 +393,11 @@ void NativeApplication::InternalPaint()
 		return;
 	}
 
-  jregion_t 
+  jregion_t<int> 
     bounds = sg_jgui_window->GetBounds();
 
   if (sg_back_buffer != nullptr) {
-    jgui::jsize_t
+    jgui::jsize_t<int>
       size = sg_back_buffer->GetSize();
 
     if (size.width != bounds.width or size.height != bounds.height) {
@@ -407,7 +407,7 @@ void NativeApplication::InternalPaint()
   }
 
   if (sg_back_buffer == nullptr) {
-    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, bounds.width, bounds.height);
+    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, {bounds.width, bounds.height});
   }
 
   jgui::Graphics 
@@ -726,9 +726,9 @@ void NativeWindow::SetBounds(int x, int y, int width, int height)
 {
 }
 
-jgui::jregion_t NativeWindow::GetBounds()
+jgui::jregion_t<int> NativeWindow::GetBounds()
 {
-	jgui::jregion_t t = {
+	jgui::jregion_t<int> t = {
     .x = 0,
     .y = 0,
     .width = sg_screen.width,
@@ -751,9 +751,9 @@ void NativeWindow::SetCursorLocation(int x, int y)
 {
 }
 
-jpoint_t NativeWindow::GetCursorLocation()
+jpoint_t<int> NativeWindow::GetCursorLocation()
 {
-	jpoint_t p;
+	jpoint_t<int> p;
 
 	p.x = 0;
 	p.y = 0;
@@ -840,10 +840,10 @@ void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 		return;
 	}
 
-	jsize_t t = shape->GetSize();
+	jsize_t<int> t = shape->GetSize();
 	uint32_t data[t.width*t.height];
 
-	shape->GetGraphics()->GetRGBArray(data, 0, 0, t.width, t.height);
+	shape->GetGraphics()->GetRGBArray(data, {0, 0, t.width, t.height});
 
 	if (data == nullptr) {
 		return;

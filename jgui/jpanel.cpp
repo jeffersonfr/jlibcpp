@@ -95,7 +95,7 @@ void Panel::PaintGlassPane(Graphics *g)
     bg = theme->GetIntegerParam("window.bg"),
     fg = theme->GetIntegerParam("window.fg"),
     scroll = theme->GetIntegerParam("window.scroll");
-  jgui::jsize_t
+  jgui::jsize_t<int>
     size = GetSize();
   jinsets_t 
     insets = GetInsets();
@@ -105,7 +105,7 @@ void Panel::PaintGlassPane(Graphics *g)
   if (_title != "") {
     g->SetGradientStop(0.0, bg);
     g->SetGradientStop(1.0, scroll);
-    g->FillLinearGradient(bs, bs, size.width - 2*bs, insets.top - 2*bs, 0, 0, 0, insets.top - 2*bs);
+    g->FillLinearGradient({bs, bs, size.width - 2*bs, insets.top - 2*bs}, {0, 0}, {0, insets.top - 2*bs});
     g->ResetGradientStop();
 
     if (font != nullptr) {
@@ -123,7 +123,7 @@ void Panel::PaintGlassPane(Graphics *g)
 
       g->SetFont(font);
       g->SetColor(fg);
-      g->DrawString(text, insets.left+(size.width-insets.left-insets.right-font->GetStringWidth(text))/2, y);
+      g->DrawString(text, jpoint_t<int>{insets.left + (size.width - insets.left - insets.right - font->GetStringWidth(text))/2, y});
     }
   }
 }

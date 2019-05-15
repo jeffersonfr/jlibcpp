@@ -119,7 +119,7 @@ void Marquee::Paint(Graphics *g)
     fg = theme->GetIntegerParam("component.fg"),
     fgfocus = theme->GetIntegerParam("component.fg.focus"),
     fgdisable = theme->GetIntegerParam("component.fg.disable");
-  jgui::jsize_t
+  jgui::jsize_t<int>
     size = GetSize();
   int
     x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
@@ -170,9 +170,9 @@ void Marquee::Paint(Graphics *g)
       ch = clip.height - cy;
     }
 
-    g->ClipRect(cx, cy, cw - 1, ch - 1);
-    g->DrawString(text, x + _position, y);
-    g->SetClip(clip.x, clip.y, clip.width, clip.height);
+    g->ClipRect({cx, cy, cw - 1, ch - 1});
+    g->DrawString(text, jpoint_t<int>{x + _position, y});
+    g->SetClip({clip.x, clip.y, clip.width, clip.height});
   }
 }
 
@@ -200,7 +200,7 @@ void Marquee::Run()
     return;
   }
 
-  jgui::jsize_t
+  jgui::jsize_t<int>
     size = GetSize();
   int 
     hg = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size");

@@ -45,13 +45,13 @@ class V4l2PlayerComponentImpl : public jgui::Component {
 		/** \brief */
     std::mutex  _mutex;
 		/** \brief */
-		jgui::jregion_t _src;
+		jgui::jregion_t<int> _src;
 		/** \brief */
 		uint32_t **_buffer;
 		/** \brief */
 		int _buffer_index;
 		/** \brief */
-		jgui::jsize_t _frame_size;
+		jgui::jsize_t<int> _frame_size;
 
 	public:
 		V4l2PlayerComponentImpl(Player *player, int x, int y, int w, int h):
@@ -85,7 +85,7 @@ class V4l2PlayerComponentImpl : public jgui::Component {
 			}
 		}
 
-		virtual jgui::jsize_t GetPreferredSize()
+		virtual jgui::jsize_t<int> GetPreferredSize()
 		{
 			return _frame_size;
 		}
@@ -148,7 +148,7 @@ class V4l2PlayerComponentImpl : public jgui::Component {
 		{
 			// jgui::Component::Paint(g);
 
-      jgui::jsize_t
+      jgui::jsize_t<int>
         size = GetSize();
 
 			_mutex.lock();
@@ -169,9 +169,9 @@ class V4l2PlayerComponentImpl : public jgui::Component {
 			cairo_surface_mark_dirty(surface);
 
       if (_src.x == 0 and _src.y == 0 and _src.width == _frame_size.width and _src.height == _frame_size.height) {
-			  g->DrawImage(&image, 0, 0, size.width, size.height);
+			  g->DrawImage(&image, {0, 0, size.width, size.height});
       } else {
-			  g->DrawImage(&image, _src.x, _src.y, _src.width, _src.height, 0, 0, size.width, size.height);
+			  g->DrawImage(&image, {_src.x, _src.y, _src.width, _src.height}, {0, 0, size.width, size.height});
       }
 
 			cairo_surface_destroy(surface);
@@ -245,17 +245,17 @@ class V4l2VideoSizeControlImpl : public VideoSizeControl {
       impl->_mutex.unlock();
 		}
 
-		virtual jgui::jsize_t GetSize()
+		virtual jgui::jsize_t<int> GetSize()
 		{
 			return dynamic_cast<V4l2PlayerComponentImpl *>(_player->_component)->GetPreferredSize();
 		}
 
-		virtual jgui::jregion_t GetSource()
+		virtual jgui::jregion_t<int> GetSource()
 		{
 			return dynamic_cast<V4l2PlayerComponentImpl *>(_player->_component)->_src;
 		}
 
-		virtual jgui::jregion_t GetDestination()
+		virtual jgui::jregion_t<int> GetDestination()
 		{
 			return dynamic_cast<V4l2PlayerComponentImpl *>(_player->_component)->GetVisibleBounds();
 		}
@@ -440,7 +440,7 @@ V4L2LightPlayer::V4L2LightPlayer(jnetwork::URL url):
 
   _grabber = new VideoGrabber(this, _file);
 
-	jgui::jsize_t size;
+	jgui::jsize_t<int> size;
 	
 	size.width = 640;
 	size.height = 480;

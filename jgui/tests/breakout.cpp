@@ -101,7 +101,7 @@ class Breakout : public jgui::Window {
 
 		void GameInit()
 		{
-      jgui::jsize_t
+      jgui::jsize_t<int>
         size = GetSize();
 
 			batpos = (size.width-batwidth)/2;
@@ -186,11 +186,11 @@ class Breakout : public jgui::Window {
 
 		virtual void Paint(jgui::Graphics *g)
 		{
-      jgui::jsize_t
+      jgui::jsize_t<int>
         size = GetSize();
 
 			if (goff == nullptr && size.width > 0 && size.height > 0) {
-				off = new jgui::BufferedImage(jgui::JPF_RGB32, size.width, size.height);
+				off = new jgui::BufferedImage(jgui::JPF_RGB32, size);
 
 				goff = off->GetGraphics();
 			}
@@ -200,7 +200,7 @@ class Breakout : public jgui::Window {
 			}
 
 			goff->SetColor(GetTheme()->GetIntegerParam("window.bg"));
-			goff->FillRectangle(0, 0, size.width, size.height);
+			goff->FillRectangle({0, 0, size.width, size.height});
 
 			if (ingame) {
 				PlayGame();
@@ -208,7 +208,7 @@ class Breakout : public jgui::Window {
 				ShowIntroScreen();
 			}
 
-			g->DrawImage(off, 0, 0);
+			g->DrawImage(off, jgui::jpoint_t<int>{0, 0});
 
       Framerate(60);
 
@@ -236,7 +236,7 @@ class Breakout : public jgui::Window {
 			DrawBricks();
 			ShowScore();
 	
-			goff->SetColor(0x60, 0x80, 0xff, 0xff);
+			goff->SetColor({0x60, 0x80, 0xff, 0xff});
 
 			if (--count <= 0) { 
 				count = screendelay; 
@@ -245,10 +245,12 @@ class Breakout : public jgui::Window {
 			
 			jgui::Theme *theme = GetTheme();
 			jgui::Font *font = theme->GetFont("widget");
-			jgui::jsize_t size = GetSize();
+			jgui::jsize_t<int> size = GetSize();
 
 			if (font != nullptr) {
-				goff->DrawString("Pressione SPACE para iniciar", (size.width - font->GetStringWidth("Pressione SPACE para iniciar"))/2, size.height/2);
+        size.width = size.width - font->GetStringWidth("Pressione SPACE para iniciar");
+
+				goff->DrawString("Pressione SPACE para iniciar", jgui::jpoint_t<int>{size.width/2, size.height/2});
 			}
 		}
 
@@ -264,8 +266,8 @@ class Breakout : public jgui::Window {
 					if (showbrick[j*bricksperline+i]) {
 						nobricks = false;
 
-						goff->SetColor(0xff, j*colordelta, 0xff-j*colordelta, 0xff);
-						goff->FillRectangle(borderwidth+i*(brickwidth+brickspace), startline+j*(brickheight+brickspace), brickwidth, brickheight);
+						goff->SetColor({0xff, j*colordelta, 0xff-j*colordelta, 0xff});
+						goff->FillRectangle({borderwidth+i*(brickwidth+brickspace), startline+j*(brickheight+brickspace), brickwidth, brickheight});
 					}
 				}
 			}
@@ -281,16 +283,16 @@ class Breakout : public jgui::Window {
 
 		void DrawPlayField()
 		{
-      jgui::jsize_t
+      jgui::jsize_t<int>
         size = GetSize();
 
-			goff->SetColor(0xff, 0xff, 0xff, 0xff);
-			goff->FillRectangle(0, 0,size.width, borderwidth);
-			goff->FillRectangle(0, 0,borderwidth, size.height);
-			goff->FillRectangle(size.width-borderwidth, 0, borderwidth, size.height);
-			goff->FillRectangle(0, size.height-borderwidth,size.width, borderwidth);
-			goff->FillRectangle(batpos,size.height-2*borderwidth-scoreheight, batwidth,batheight); // bat
-			goff->FillRectangle(ballx, bally, ballsize, ballsize); // ball
+			goff->SetColor({0xff, 0xff, 0xff, 0xff});
+			goff->FillRectangle({0, 0, size.width, borderwidth});
+			goff->FillRectangle({0, 0, borderwidth, size.height});
+			goff->FillRectangle({size.width-borderwidth, 0, borderwidth, size.height});
+			goff->FillRectangle({0, size.height-borderwidth, size.width, borderwidth});
+			goff->FillRectangle({batpos, size.height-2*borderwidth-scoreheight, batwidth,batheight}); // bat
+			goff->FillRectangle({ballx, bally, ballsize, ballsize}); // ball
 		}
 
 		void ShowScore()
@@ -299,7 +301,7 @@ class Breakout : public jgui::Window {
         *theme = GetTheme();
 			jgui::Font 
         *font = theme->GetFont("widget");
-      jgui::jsize_t
+      jgui::jsize_t<int>
         size = GetSize();
 
 			if (font == nullptr) {
@@ -310,17 +312,17 @@ class Breakout : public jgui::Window {
 
 			goff->SetFont(font);
 
-			goff->SetColor(0xff, 0xff, 0xff, 0xff);
+			goff->SetColor({0xff, 0xff, 0xff, 0xff});
 
 			sprintf(tmp, "Score: %d", player1score); 
-			goff->DrawString(tmp, borderwidth, borderwidth);
+			goff->DrawString(tmp, jgui::jpoint_t<int>{borderwidth, borderwidth});
 			sprintf(tmp, "Balls left: %d", ballsleft); 
-			goff->DrawString(tmp, size.width-borderwidth-font->GetStringWidth(tmp), borderwidth);
+			goff->DrawString(tmp, jgui::jpoint_t<int>{size.width-borderwidth-font->GetStringWidth(tmp), borderwidth});
 		}
 
 		void MoveBall()
 		{
-      jgui::jsize_t
+      jgui::jsize_t<int>
         size = GetSize();
 
 			ballx += balldx;
@@ -368,7 +370,7 @@ class Breakout : public jgui::Window {
 
 		void CheckBat()
 		{
-      jgui::jsize_t
+      jgui::jsize_t<int>
         size = GetSize();
 
 			batpos += batdpos;

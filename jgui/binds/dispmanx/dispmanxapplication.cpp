@@ -101,7 +101,7 @@ static bool sg_quitting = false;
 /** \brief */
 static std::mutex sg_loop_mutex;
 /** \brief */
-static jgui::jsize_t sg_screen = {0, 0};
+static jgui::jsize_t<int> sg_screen = {0, 0};
 /** \brief */
 static Window *sg_jgui_window = nullptr;
 /** \brief */
@@ -425,12 +425,12 @@ void NativeApplication::InternalInit(int argc, char **argv)
 	sg_screen.height = sg_layer.info.height;
 
 #define CURSOR_INIT(type, ix, iy, hotx, hoty) 													\
-	t.cursor = new jgui::BufferedImage(JPF_ARGB, w, h);												\
+	t.cursor = new jgui::BufferedImage(JPF_ARGB, {w, h});												\
 																																				\
 	t.hot_x = hotx;																												\
 	t.hot_y = hoty;																												\
 																																				\
-	t.cursor->GetGraphics()->DrawImage(cursors, ix*w, iy*h, w, h, 0, 0);	\
+	t.cursor->GetGraphics()->DrawImage(cursors, {ix*w, iy*h, w, h}, {0, 0});	\
 																																				\
 	sgsg_jgui_cursors[type] = t;																										\
 
@@ -468,11 +468,11 @@ void NativeApplication::InternalPaint()
 		return;
 	}
 
-  jregion_t 
+  jregion_t<int> 
     bounds = sg_jgui_window->GetBounds();
 
   if (sg_back_buffer != nullptr) {
-    jgui::jsize_t
+    jgui::jsize_t<int>
       size = sg_back_buffer->GetSize();
 
     if (size.width != bounds.width or size.height != bounds.height) {
@@ -482,7 +482,7 @@ void NativeApplication::InternalPaint()
   }
 
   if (sg_back_buffer == nullptr) {
-    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, bounds.width, bounds.height);
+    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, {bounds.width, bounds.height});
   }
 
   jgui::Graphics 
@@ -783,9 +783,9 @@ void NativeWindow::SetBounds(int x, int y, int width, int height)
 {
 }
 
-jgui::jregion_t NativeWindow::GetBounds()
+jgui::jregion_t<int> NativeWindow::GetBounds()
 {
-	jgui::jregion_t t = {
+	jgui::jregion_t<int> t = {
     .x = 0,
     .y = 0,
     .width = SW,
@@ -810,9 +810,9 @@ void NativeWindow::SetCursorLocation(int x, int y)
   sg_mouse_y = (y < 0)?0:(y > sg_screen.height)?sg_screen.height:y;
 }
 
-jpoint_t NativeWindow::GetCursorLocation()
+jpoint_t<int> NativeWindow::GetCursorLocation()
 {
-	jpoint_t p;
+	jpoint_t<int> p;
 
 	p.x = sg_mouse_x;
 	p.y = sg_mouse_y;

@@ -21,15 +21,14 @@
 
 namespace jgui {
 
-Image::Image(jpixelformat_t pixelformat, int width, int height):
+Image::Image(jpixelformat_t pixelformat, jsize_t<int> size):
   jcommon::Object()
 {
   jcommon::Object::SetClassName("jgui::Image");
 
   _pixelformat = pixelformat;
   _interpolation_method = JIM_NEAREST;
-  _size.width = width;
-  _size.height = height;
+  _size = size;
 }
 
 Image::~Image()
@@ -46,7 +45,7 @@ jpixelformat_t Image::GetPixelFormat()
   return _pixelformat;
 }
 
-jsize_t Image::GetSize()
+jsize_t<int> Image::GetSize()
 {
   return _size;
 }
@@ -66,7 +65,7 @@ Image * Image::Flip(jflip_flags_t mode)
   return nullptr;
 }
     
-Image * Image::Shear(float dx, float dy)
+Image * Image::Shear(jsize_t<float> size)
 {
   return nullptr;
 }
@@ -76,12 +75,12 @@ Image * Image::Rotate(double radians, bool resize)
   return nullptr;
 }
 
-Image * Image::Scale(int width, int height)
+Image * Image::Scale(jsize_t<int> size)
 {
   return nullptr;
 }
 
-Image * Image::Crop(int x, int y, int width, int height)
+Image * Image::Crop(jrect_t<int> rect)
 {
   return nullptr;
 }
@@ -105,7 +104,7 @@ void Image::UnlockData()
 {
 }
 
-void Image::GetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)
+void Image::GetRGBArray(uint32_t *rgb, jrect_t<int> rect)
 {
 }
     

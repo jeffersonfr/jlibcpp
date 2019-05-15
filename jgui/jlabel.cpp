@@ -96,12 +96,12 @@ jvertical_align_t Label::GetVerticalAlign()
   return _valign;
 }
 
-jsize_t Label::GetPreferredSize()
+jsize_t<int> Label::GetPreferredSize()
 {
   Theme 
     *theme = GetTheme();
 
-  jsize_t 
+  jsize_t<int> 
     t = {
       0, 0
     };
@@ -112,7 +112,7 @@ jsize_t Label::GetPreferredSize()
 
   jgui::Font 
     *font = theme->GetFont("component.font");
-  jgui::jsize_t
+  jgui::jsize_t<int>
     size = GetSize();
   int
     gx = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
@@ -154,7 +154,7 @@ void Label::Paint(Graphics *g)
     fg = theme->GetIntegerParam("component.fg"),
     fgfocus = theme->GetIntegerParam("component.fg.focus"),
     fgdisable = theme->GetIntegerParam("component.fg.disable");
-  jgui::jsize_t
+  jgui::jsize_t<int>
     size = GetSize();
   int
     x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
@@ -181,7 +181,7 @@ void Label::Paint(Graphics *g)
       text = font->TruncateString(text, "...", w);
     }
 
-    g->DrawString(text, x, y, w, h, _halign, _valign);
+    g->DrawString(text, {x, y, w, h}, _halign, _valign);
   }
 }
 

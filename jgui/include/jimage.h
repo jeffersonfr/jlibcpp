@@ -48,7 +48,7 @@ class Image : public virtual jcommon::Object {
 
   protected:
     /** \brief */
-    struct jsize_t _size;
+    struct jsize_t<int> _size;
     /** \brief */
     jinterpolation_method_t _interpolation_method;
     /** \brief */
@@ -59,7 +59,7 @@ class Image : public virtual jcommon::Object {
      * \brief
      *
      */
-    Image(jpixelformat_t pixelformat, int width, int height);
+    Image(jpixelformat_t pixelformat, jsize_t<int> size);
 
   public:
     /**
@@ -84,7 +84,7 @@ class Image : public virtual jcommon::Object {
      * \brief
      *
      */
-    virtual jsize_t GetSize();
+    virtual jsize_t<int> GetSize();
     
     /**
      * \brief
@@ -108,7 +108,7 @@ class Image : public virtual jcommon::Object {
      * \brief
      *
      */
-    virtual Image * Shear(float dx, float dy);
+    virtual Image * Shear(jsize_t<float> size);
 
     /**
      * \brief
@@ -120,13 +120,13 @@ class Image : public virtual jcommon::Object {
      * \brief
      *
      */
-    virtual Image * Scale(int wp, int hp);
+    virtual Image * Scale(jsize_t<int> size);
 
     /**
      * \brief
      *
      */
-    virtual Image * Crop(int xp, int yp, int wp, int hp);
+    virtual Image * Crop(jrect_t<int> rect);
 
     /**
      * \brief
@@ -144,7 +144,7 @@ class Image : public virtual jcommon::Object {
      * \brief
      *
      */
-    virtual void GetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp);
+    virtual void GetRGBArray(uint32_t *rgb, jrect_t<int> rect);
     
     /**
      * \brief

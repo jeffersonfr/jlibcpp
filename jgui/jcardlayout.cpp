@@ -217,7 +217,7 @@ void CardLayout::Last(Container *parent)
     }
 }
 
-jsize_t CardLayout::GetMinimumLayoutSize(Container *parent)
+jsize_t<int> CardLayout::GetMinimumLayoutSize(Container *parent)
 {
   // WARN:: sync parent
   jinsets_t insets = parent->GetInsets();
@@ -228,7 +228,7 @@ jsize_t CardLayout::GetMinimumLayoutSize(Container *parent)
   for (int i = 0 ; i < ncomponents ; i++) {
     Component *comp = parent->GetComponents()[i];
 
-    jsize_t d = comp->GetMinimumSize();
+    jsize_t<int> d = comp->GetMinimumSize();
 
     if (d.width > w) {
       w = d.width;
@@ -238,19 +238,19 @@ jsize_t CardLayout::GetMinimumLayoutSize(Container *parent)
     }
   }
 
-  jsize_t t = {insets.left + insets.right + w + _hgap*2, insets.top + insets.bottom + h + _vgap*2};
+  jsize_t<int> t = {insets.left + insets.right + w + _hgap*2, insets.top + insets.bottom + h + _vgap*2};
 
   return t;
 }
 
-jsize_t CardLayout::GetMaximumLayoutSize(Container *parent)
+jsize_t<int> CardLayout::GetMaximumLayoutSize(Container *parent)
 {
-  jsize_t t = {INT_MAX, INT_MAX};
+  jsize_t<int> t = {INT_MAX, INT_MAX};
 
   return t;
 }
 
-jsize_t CardLayout::GetPreferredLayoutSize(Container *parent)
+jsize_t<int> CardLayout::GetPreferredLayoutSize(Container *parent)
 {
   // WARN:: sync parent
   jinsets_t insets = parent->GetInsets();
@@ -261,7 +261,7 @@ jsize_t CardLayout::GetPreferredLayoutSize(Container *parent)
   for (int i = 0 ; i < ncomponents ; i++) {
     Component *comp = parent->GetComponents()[i];
 
-    jsize_t d = comp->GetPreferredSize();
+    jsize_t<int> d = comp->GetPreferredSize();
 
     if (d.width > w) {
       w = d.width;
@@ -271,7 +271,7 @@ jsize_t CardLayout::GetPreferredLayoutSize(Container *parent)
     }
   }
 
-  jsize_t t = {insets.left + insets.right + w + _hgap*2, insets.top + insets.bottom + h + _vgap*2};
+  jsize_t<int> t = {insets.left + insets.right + w + _hgap*2, insets.top + insets.bottom + h + _vgap*2};
 
   return t;
 }
@@ -285,7 +285,7 @@ void CardLayout::DoLayout(Container *parent)
   bool currentFound = false;
 
   for (int i = 0 ; i < ncomponents ; i++) {
-    jgui::jsize_t size = parent->GetSize();
+    jgui::jsize_t<int> size = parent->GetSize();
 
     comp = parent->GetComponents()[i];
 

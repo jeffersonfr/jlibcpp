@@ -41,7 +41,7 @@ CoordinateLayout::~CoordinateLayout()
 {
 }
 
-void CoordinateLayout::SetSize(jgui::jsize_t size)
+void CoordinateLayout::SetSize(jgui::jsize_t<int> size)
 {
   _size = size;
 }
@@ -51,7 +51,7 @@ void CoordinateLayout::SetType(jcoordinatelayout_orientation_t type)
   _type = type;
 }
 
-jgui::jsize_t CoordinateLayout::GetSize()
+jgui::jsize_t<int> CoordinateLayout::GetSize()
 {
   return _size;
 }
@@ -61,30 +61,30 @@ jcoordinatelayout_orientation_t CoordinateLayout::GetType()
   return _type;
 }
 
-jsize_t CoordinateLayout::GetMinimumLayoutSize(Container *parent)
+jsize_t<int> CoordinateLayout::GetMinimumLayoutSize(Container *parent)
 {
-  jsize_t t = {0, 0};
+  jsize_t<int> t = {0, 0};
 
   return t;
 }
 
-jsize_t CoordinateLayout::GetMaximumLayoutSize(Container *parent)
+jsize_t<int> CoordinateLayout::GetMaximumLayoutSize(Container *parent)
 {
-  jsize_t t = {INT_MAX, INT_MAX};
+  jsize_t<int> t = {INT_MAX, INT_MAX};
 
   return t;
 }
 
-jsize_t CoordinateLayout::GetPreferredSize(Container *target) 
+jsize_t<int> CoordinateLayout::GetPreferredSize(Container *target) 
 {
   if ((void *)target == nullptr) {
-    jsize_t t = {0, 0};
+    jsize_t<int> t = {0, 0};
 
     return t;
   }
 
   jinsets_t insets = target->GetInsets();
-  jsize_t t = {0, 0};
+  jsize_t<int> t = {0, 0};
 
   int members = target->GetComponentCount();
 
@@ -92,7 +92,7 @@ jsize_t CoordinateLayout::GetPreferredSize(Container *target)
     Component *cmp = target->GetComponents()[i];
 
     jpoint_t point = cmp->GetLocation();
-    jsize_t size = cmp->GetSize();
+    jsize_t<int> size = cmp->GetSize();
 
     t.width = jmath::Math<int>::Max(t.width, point.x+size.width+(insets.left+insets.right));
     t.height = jmath::Math<int>::Max(t.height, point.y+size.height+(insets.top+insets.bottom));
@@ -107,7 +107,7 @@ void CoordinateLayout::DoLayout(Container *target)
     return;
   }
 
-  jgui::jsize_t 
+  jgui::jsize_t<int> 
     tsize = target->GetSize();
 
   if (tsize.width <= 0 || tsize.height <= 0) {
@@ -140,7 +140,7 @@ void CoordinateLayout::DoLayout(Container *target)
     Component *c = target->GetComponents()[i];
 
     jpoint_t point = c->GetLocation();
-    jsize_t size = c->GetPreferredSize();
+    jsize_t<int> size = c->GetPreferredSize();
 
     // c->SetLocation((int)(point.x*sx), (int)(point.y*sy));
     c->SetBounds((int)(point.x*sx), (int)(point.y*sy), size.width, size.height);

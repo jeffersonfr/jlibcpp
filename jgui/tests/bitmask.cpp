@@ -100,7 +100,7 @@ class BitMask : public jcommon::Object {
 	private:
 		uint32_t *_data;
 		uint32_t _transparent_color;
-		jgui::jsize_t _size;
+		jgui::jsize_t<int> _size;
 
 	public:
 		BitMask(uint32_t *data, int width, int height)
@@ -128,14 +128,14 @@ class BitMask : public jcommon::Object {
 				throw jexception::NullPointerException("Image must be valid");
 			}
 
-      jgui::jsize_t
+      jgui::jsize_t<int>
         size = image->GetSize();
 
 			_data = new uint32_t[size.width*size.height];
 			_size = image->GetSize();
 			_transparent_color = 0x00000000;
 
-			image->GetRGBArray(_data, 0, 0, _size.width, _size.height);
+			image->GetRGBArray(_data, {0, 0, _size.width, _size.height});
 			
 			if (_data == nullptr) {
 				throw jexception::NullPointerException("Image data must be valid");
@@ -156,14 +156,14 @@ class BitMask : public jcommon::Object {
 				throw jexception::NullPointerException("Image must be valid");
 			}
 
-      jgui::jsize_t
+      jgui::jsize_t<int>
         size = image->GetSize();
 
 			_data = new uint32_t[size.width*size.height];
 			_size = image->GetSize();
 			_transparent_color = 0x00000000;
 
-			image->GetRGBArray(_data, 0, 0, _size.width, _size.height);
+			image->GetRGBArray(_data, {0, 0, _size.width, _size.height});
 			
 			if (_data == nullptr) {
 				throw jexception::NullPointerException("Image data must be valid");
@@ -185,7 +185,7 @@ class BitMask : public jcommon::Object {
 			}
 		}
 
-		virtual jgui::jsize_t GetSize()
+		virtual jgui::jsize_t<int> GetSize()
 		{
 			return _size;
 		}
@@ -573,10 +573,10 @@ class BitMask : public jcommon::Object {
 
 		virtual jgui::Image * ConvertToImage()
 		{
-      jgui::Image *image = new jgui::BufferedImage(jgui::JPF_RGB32, _size.width, _size.height);
+      jgui::Image *image = new jgui::BufferedImage(jgui::JPF_RGB32, _size);
 
       image->GetGraphics()->SetCompositeFlags(jgui::JCF_SRC);
-      image->GetGraphics()->SetRGBArray(_data, 0, 0, _size.width, _size.height);
+      image->GetGraphics()->SetRGBArray(_data, {0, 0, _size.width, _size.height});
 
 			return image;
 		}
@@ -586,7 +586,7 @@ class BitMask : public jcommon::Object {
 			jgui::jcomposite_flags_t t = g->GetCompositeFlags();
 			
 			g->SetCompositeFlags(jgui::JCF_SRC);
-			g->SetRGBArray(_data, x, y, _size.width, _size.height);
+			g->SetRGBArray(_data, {x, y, _size.width, _size.height});
 			g->SetCompositeFlags(t);
 		}
 
@@ -598,7 +598,7 @@ class BitMaskTeste : public jgui::Window {
 		BitMask 
       *bmbg,
 		  *bmpacman;
-		jgui::jpoint_t 
+		jgui::jpoint_t<int> 
       _pacman_location;
 
 	public:
@@ -611,7 +611,7 @@ class BitMaskTeste : public jgui::Window {
 			bmbg = new BitMask("images/image.bmp");
 			bmpacman = new BitMask("images/bitmask.bmp");
 
-			jgui::jsize_t size = bmbg->GetSize();
+			jgui::jsize_t<int> size = bmbg->GetSize();
 
 			SetSize(size.width, size.height);
 		}
@@ -628,8 +628,8 @@ class BitMaskTeste : public jgui::Window {
 				return true;
 			}
 
-			jgui::jsize_t bg_size = bmbg->GetSize();
-			jgui::jsize_t pacman_size = bmpacman->GetSize();
+			jgui::jsize_t<int> bg_size = bmbg->GetSize();
+			jgui::jsize_t<int> pacman_size = bmpacman->GetSize();
 			int step = 4;
 
 			if (event->GetSymbol() == jevent::JKS_CURSOR_LEFT) {
@@ -681,7 +681,7 @@ class BitMaskTeste : public jgui::Window {
 		{
 			jgui::Window::Paint(g);
 
-			jgui::jsize_t size = bmpacman->GetSize();
+			jgui::jsize_t<int> size = bmpacman->GetSize();
 			int index = 1;
 
 			// INFO:: use mask

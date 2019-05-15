@@ -73,7 +73,7 @@ class Game2048 : public jgui::Window {
 			g->SetColor(jgui::Color::White);
 			g->SetFont(font);
 
-			jgui::jsize_t
+			jgui::jsize_t<int>
 				size = GetSize();
 
 			if (_is_done) {
@@ -83,13 +83,13 @@ class Game2048 : public jgui::Window {
 					s = "You've made it!";
 				}
 
-				g->DrawString(s, t.left, size.height - t.bottom - 16);
+				g->DrawString(s, jgui::jpoint_t<int>{t.left, size.height - t.bottom - 16});
 			} else {
 				std::ostringstream o;
 
 				o << "score:: " << _score;
 
-				g->DrawString(o.str(), t.left, size.height - t.bottom - 16);
+				g->DrawString(o.str(), jgui::jpoint_t<int>{t.left, size.height - t.bottom - 16});
 			}
 
 			int gap = 4;
@@ -100,7 +100,7 @@ class Game2048 : public jgui::Window {
 
 			for (int i=0; i<4; i++) {
 				for (int j=0; j<4; j++) {
-					g->DrawRectangle(t.left+i*(bw+gap), t.top+j*(bh+gap), bw, bh);
+					g->DrawRectangle({t.left+i*(bw+gap), t.top+j*(bh+gap), bw, bh});
 				}
 			}
 
@@ -109,7 +109,7 @@ class Game2048 : public jgui::Window {
 					if (_board[x][y].val > 0) {
 						std::ostringstream o;
 						
-						g->DrawImage(_images[_board[x][y].val], x*(bw+gap)+t.left, y*(bh+gap)+t.top, bw, bh);
+						g->DrawImage(_images[_board[x][y].val], {x*(bw+gap)+t.left, y*(bh+gap)+t.top, bw, bh});
 					}
 				}
 			}

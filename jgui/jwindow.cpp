@@ -143,12 +143,12 @@ void Window::SetBounds(int x, int y, int width, int height)
   _instance->SetBounds(x, y, width, height);
 }
 
-jgui::jregion_t Window::GetBounds()
+jgui::jregion_t<int> Window::GetBounds()
 {
   return _instance->GetBounds();
 }
 
-jgui::jregion_t Window::GetVisibleBounds()
+jgui::jregion_t<int> Window::GetVisibleBounds()
 {
   return GetBounds();
 }
@@ -315,7 +315,7 @@ void Window::PaintGlassPane(Graphics *g)
         count += font->GetStringWidth((*i).subtitle.c_str());
 
         g->SetColor(fg);
-        g->DrawString((*i).subtitle, size.width-count, size.height-insets.bottom+(SUBTITLE_SIZE-font->GetSize())/2+8);
+        g->DrawString((*i).subtitle, jgui::jpoint_t<int>{size.width-count, size.height-insets.bottom+(SUBTITLE_SIZE-font->GetSize())/2+8});
       }
 
       count += 8;
@@ -323,7 +323,7 @@ void Window::PaintGlassPane(Graphics *g)
       if ((*i).image != nullptr) {
         count += SUBTITLE_SIZE;
 
-        g->DrawImage((*i).image, size.width-count, size.height-insets.bottom+8, SUBTITLE_SIZE, SUBTITLE_SIZE);
+        g->DrawImage((*i).image, {size.width-count, size.height-insets.bottom+8, SUBTITLE_SIZE, SUBTITLE_SIZE});
       }
 
       count += 20;
@@ -495,7 +495,7 @@ void Window::SetCursorLocation(int x, int y)
   _instance->SetCursorLocation(x, y);
 }
 
-jpoint_t Window::GetCursorLocation()
+jpoint_t<int> Window::GetCursorLocation()
 {
   return _instance->GetCursorLocation();
 }

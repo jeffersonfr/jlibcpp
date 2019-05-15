@@ -109,7 +109,7 @@ void GridLayout::SetVerticalGap(int vgap)
   _vgap = vgap;
 }
 
-jsize_t GridLayout::GetMinimumLayoutSize(Container *parent)
+jsize_t<int> GridLayout::GetMinimumLayoutSize(Container *parent)
 {
   // WARN:: sync parent
   jinsets_t insets = parent->GetInsets();
@@ -128,7 +128,7 @@ jsize_t GridLayout::GetMinimumLayoutSize(Container *parent)
   for (int i = 0 ; i < ncomponents ; i++) {
     Component *comp = parent->GetComponents()[i];
     
-    jsize_t d = comp->GetMinimumSize();
+    jsize_t<int> d = comp->GetMinimumSize();
 
     if (w < d.width) {
       w = d.width;
@@ -138,19 +138,19 @@ jsize_t GridLayout::GetMinimumLayoutSize(Container *parent)
     }
   }
   
-  jsize_t t = {insets.left + insets.right + ncols*w + (ncols-1)*_hgap, insets.top + insets.bottom + nrows*h + (nrows-1)*_vgap};
+  jsize_t<int> t = {insets.left + insets.right + ncols*w + (ncols-1)*_hgap, insets.top + insets.bottom + nrows*h + (nrows-1)*_vgap};
 
   return t;
 }
 
-jsize_t GridLayout::GetMaximumLayoutSize(Container *parent)
+jsize_t<int> GridLayout::GetMaximumLayoutSize(Container *parent)
 {
-  jsize_t t = {INT_MAX, INT_MAX};
+  jsize_t<int> t = {INT_MAX, INT_MAX};
 
   return t;
 }
 
-jsize_t GridLayout::GetPreferredLayoutSize(Container *parent)
+jsize_t<int> GridLayout::GetPreferredLayoutSize(Container *parent)
 {
   // WARN:: sync parent
   jinsets_t insets = parent->GetInsets();
@@ -170,7 +170,7 @@ jsize_t GridLayout::GetPreferredLayoutSize(Container *parent)
   for (int i = 0 ; i < ncomponents ; i++) {
     Component *comp = parent->GetComponents()[i];
 
-    jsize_t d = comp->GetMinimumSize();
+    jsize_t<int> d = comp->GetMinimumSize();
 
     if (w < d.width) {
       w = d.width;
@@ -180,7 +180,7 @@ jsize_t GridLayout::GetPreferredLayoutSize(Container *parent)
     }
   }
 
-  jsize_t t = {insets.left + insets.right + ncols*w + (ncols-1)*_hgap, insets.top + insets.bottom + nrows*h + (nrows-1)*_vgap};
+  jsize_t<int> t = {insets.left + insets.right + ncols*w + (ncols-1)*_hgap, insets.top + insets.bottom + nrows*h + (nrows-1)*_vgap};
 
   return t;
 }
@@ -207,7 +207,7 @@ void GridLayout::DoLayout(Container *parent)
 
   jgui::jinsets_t 
     insets = parent->GetInsets();
-  jgui::jsize_t 
+  jgui::jsize_t<int> 
     size = parent->GetSize();
   int 
     w = size.width - (insets.left + insets.right),

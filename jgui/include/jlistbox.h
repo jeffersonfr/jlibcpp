@@ -155,13 +155,13 @@ class ListBox : public jgui::Component, public jgui::ItemComponent {
      * \brief
      *
      */
-    virtual jsize_t GetPreferredSize();
+    virtual jsize_t<int> GetPreferredSize();
 
     /**
      * \brief
      *
      */
-    virtual jsize_t GetScrollDimension();
+    virtual jsize_t<int> GetScrollDimension();
 
     /**
      * \brief

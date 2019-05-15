@@ -46,9 +46,9 @@ class TouchEvent : public jevent::EventObject {
 
   private:
     /** \brief */
-    jgui::jpoint_t _location;
+    jgui::jpoint_t<int> _location;
     /** \brief */
-    jgui::jpoint_t _distance;
+    jgui::jpoint_t<int> _distance;
     /** \brief */
     double _pressure;
     /** \brief */
@@ -67,13 +67,13 @@ class TouchEvent : public jevent::EventObject {
      * \brief Touch event;
      *
      */
-    TouchEvent(void *source, jtouchevent_type_t type, jgui::jpoint_t location, jgui::jpoint_t distance, double pressure, int finger_index);
+    TouchEvent(void *source, jtouchevent_type_t type, jgui::jpoint_t<int> location, jgui::jpoint_t<int> distance, double pressure, int finger_index);
     
     /**
      * \brief Gesture event;
      *
      */
-    TouchEvent(void *source, jtouchevent_type_t type, jgui::jpoint_t distance, double radians, double delta, int fingers);
+    TouchEvent(void *source, jtouchevent_type_t type, jgui::jpoint_t<int> distance, double radians, double delta, int fingers);
     
     /**
      * \brief
@@ -97,13 +97,13 @@ class TouchEvent : public jevent::EventObject {
      * \brief
      *
      */
-    virtual jgui::jpoint_t GetLocation();
+    virtual jgui::jpoint_t<int> GetLocation();
     
     /**
      * \brief
      *
      */
-    virtual jgui::jpoint_t GetDistance();
+    virtual jgui::jpoint_t<int> GetDistance();
 
     /**
      * \brief

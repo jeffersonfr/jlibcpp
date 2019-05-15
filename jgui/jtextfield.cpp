@@ -47,7 +47,7 @@ bool TextField::KeyPressed(jevent::KeyEvent *event)
 
   jgui::KeyMap 
     *keymap = GetKeyMap();
-  // jgui::jsize_t
+  // jgui::jsize_t<int>
   //   size = GetSize();
   jevent::jkeyevent_symbol_t 
     action = event->GetSymbol();
@@ -263,7 +263,7 @@ void TextField::Paint(Graphics *g)
     fg = theme->GetIntegerParam("component.fg"),
     fgfocus = theme->GetIntegerParam("component.fg.focus"),
     fgdisable = theme->GetIntegerParam("component.fg.disable");
-  jgui::jsize_t
+  jgui::jsize_t<int>
     size = GetSize();
   int
     x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
@@ -366,14 +366,14 @@ void TextField::Paint(Graphics *g)
       current_text_size = font->GetStringWidth(text.substr(0, _caret_position));
     }
 
-    g->DrawString(text, x+offset, y, w, h, JHA_LEFT, _valign);
+    g->DrawString(text, {x+offset, y, w, h}, JHA_LEFT, _valign);
 
     if (_caret_visible == true) {
       if (HasFocus() == true && IsEditable() == true) {
         g->SetColor(_caret_color);
       }
 
-      g->DrawString(cursor, x+current_text_size+offset, y, w, h, JHA_LEFT, _valign);
+      g->DrawString(cursor, {x+current_text_size+offset, y, w, h}, JHA_LEFT, _valign);
     }
   }
 }

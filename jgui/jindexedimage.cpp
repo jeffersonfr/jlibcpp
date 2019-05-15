@@ -28,8 +28,8 @@
 
 namespace jgui {
 
-IndexedImage::IndexedImage(uint32_t *palette, int palette_size, uint8_t *data, int width, int height):
-  Image(JPF_UNKNOWN, width, height)
+IndexedImage::IndexedImage(uint32_t *palette, int palette_size, uint8_t *data, jsize_t<int> size):
+  Image(JPF_UNKNOWN, size)
 {
   jcommon::Object::SetClassName("jgui::IndexedImage");
   
@@ -39,15 +39,15 @@ IndexedImage::IndexedImage(uint32_t *palette, int palette_size, uint8_t *data, i
   memcpy(_palette, palette, palette_size*sizeof(uint32_t));
   
   int 
-    size = width*height;
+    length = size.width*size.height;
 
-  _data = new uint8_t[size];
+  _data = new uint8_t[length];
   
-  memcpy(_data, data, size*sizeof(uint8_t));
+  memcpy(_data, data, length*sizeof(uint8_t));
 }
 
-IndexedImage::IndexedImage(uint32_t *palette, int palette_size, uint32_t *argb, int width, int height):
-  Image(JPF_UNKNOWN, width, height)
+IndexedImage::IndexedImage(uint32_t *palette, int palette_size, uint32_t *argb, jsize_t<int> size):
+  Image(JPF_UNKNOWN, size)
 {
   jcommon::Object::SetClassName("jgui::IndexedImage");
 
@@ -57,11 +57,11 @@ IndexedImage::IndexedImage(uint32_t *palette, int palette_size, uint32_t *argb, 
   memcpy(_palette, palette, palette_size*sizeof(uint32_t));
   
   int 
-    size = width*height;
+    length = size.width*size.height;
 
-  _data = new uint8_t[size];
+  _data = new uint8_t[length];
 
-  for (int i=0; i<size; i++) {
+  for (int i=0; i<length; i++) {
     _data[i] = 0;
 
     for (int j=0; j<_palette_size; j++) {
@@ -93,21 +93,21 @@ IndexedImage * IndexedImage::Pack(Image *image)
 
   if ((void *)image != nullptr) {
     if (image->GetGraphics() != nullptr) {
-      jgui::jsize_t 
+      jgui::jsize_t<int> 
         size = image->GetSize();
       uint32_t 
         rgb[size.width*size.height];
 
-      image->GetRGBArray(rgb, 0, 0, size.width, size.height);
+      image->GetRGBArray(rgb, {0, 0, size.width, size.height});
 
-      packed = Pack(rgb, size.width, size.height);
+      packed = Pack(rgb, size);
     }
   }
 
   return packed;
 }
 
-IndexedImage * IndexedImage::Pack(uint32_t *rgb, int width, int height)
+IndexedImage * IndexedImage::Pack(uint32_t *rgb, jsize_t<int> size)
 {
   if ((void *)rgb == nullptr) {
     return nullptr;
@@ -116,10 +116,10 @@ IndexedImage * IndexedImage::Pack(uint32_t *rgb, int width, int height)
   uint32_t 
     palette[256];
   int 
-    size = width*height,
+    length = size.width*size.height,
     palette_location = 0;
 
-  for (int i=0; i<size; i++) {
+  for (int i=0; i<length; i++) {
     uint32_t
       current = rgb[i];
     bool
@@ -142,12 +142,12 @@ IndexedImage * IndexedImage::Pack(uint32_t *rgb, int width, int height)
     }
   }
 
-  return new IndexedImage(palette, palette_location, rgb, width, height);
+  return new IndexedImage(palette, palette_location, rgb, size);
 }
 
 Image * IndexedImage::Flip(jflip_flags_t t)
 {
-  jsize_t 
+  jsize_t<int> 
     size = GetSize();
   uint8_t 
     *data = new uint8_t[size.width*size.height];
@@ -181,7 +181,7 @@ Image * IndexedImage::Flip(jflip_flags_t t)
     }
   }
 
-  IndexedImage *image = new IndexedImage(_palette, _palette_size, data, size.width, size.height);
+  IndexedImage *image = new IndexedImage(_palette, _palette_size, data, size);
 
   delete [] data;
 
@@ -192,7 +192,7 @@ Image * IndexedImage::Rotate(double radians, bool resize)
 {
   IndexedImage *image = nullptr;
 
-  jsize_t 
+  jsize_t<int> 
     isize = GetSize();
   double 
     angle = fmod(radians, 2*M_PI);
@@ -236,63 +236,63 @@ Image * IndexedImage::Rotate(double radians, bool resize)
     }
   }
 
-  image = new IndexedImage(_palette, _palette_size, data, iw, ih);
+  image = new IndexedImage(_palette, _palette_size, data, {iw, ih});
 
   delete[] data;
 
   return image;
 }
 
-Image * IndexedImage::Scale(int width, int height)
+Image * IndexedImage::Scale(jsize_t<int> size)
 {
-  if (width <= 0 || height <= 0) {
+  if (size.width <= 0 || size.height <= 0) {
     return nullptr;
   }
 
-  jgui::jsize_t 
-    size = GetSize();
+  jgui::jsize_t<int> 
+    isize = GetSize();
   double 
-    xRatio = size.width/(double)width,
-    yRatio = size.height/(double)height;
+    xRatio = isize.width/(double)size.width,
+    yRatio = isize.height/(double)size.height;
   uint8_t 
-    *data = new uint8_t[width*height];
+    *data = new uint8_t[size.width*size.height];
 
-  for(int y=0; y<height; y++) {
+  for(int y=0; y<size.height; y++) {
     double 
-      src = ((int)(y * yRatio)) * size.width;
+      src = ((int)(y * yRatio)) * isize.width;
     int 
-      dst = y * width;
+      dst = y * size.width;
 
-    for (int x=0; x<width; x++) {
+    for (int x=0; x<size.width; x++) {
       data[dst + x] = _data[(int)src];
     
       src = src + xRatio;
     }
   }
 
-  IndexedImage *image = new IndexedImage(_palette, _palette_size, data, width, height);
+  IndexedImage *image = new IndexedImage(_palette, _palette_size, data, size);
 
   delete [] data;
 
   return image;
 }
 
-Image * IndexedImage::Crop(int x, int y, int width, int height)
+Image * IndexedImage::Crop(jrect_t<int> rect)
 {
-  if (width <= 0 || height <= 0) {
+  if (rect.size.width <= 0 || rect.size.height <= 0) {
     return nullptr;
   }
 
   int 
-    size = width*height;
+    length = rect.size.width*rect.size.height;
   uint8_t 
-    *data = new uint8_t[size];
+    *data = new uint8_t[length];
 
-  for (int i=0; i<size; i++) {
-    data[i] = _data[x + i%width + ((y + i/width) * _size.width)];
+  for (int i=0; i<length; i++) {
+    data[i] = _data[rect.point.x + i%rect.size.width + ((rect.point.y + i/rect.size.width) * _size.width)];
   }
 
-  IndexedImage *image = new IndexedImage(_palette, _palette_size, data, width, height);
+  IndexedImage *image = new IndexedImage(_palette, _palette_size, data, rect.size);
 
   delete [] data;
 
@@ -306,7 +306,7 @@ Image * IndexedImage::Blend(double alpha)
 
 Image * IndexedImage::Colorize(Color color)
 {
-  jgui::jsize_t 
+  jgui::jsize_t<int> 
     size = GetSize();
   double 
     hue, 
@@ -333,7 +333,7 @@ Image * IndexedImage::Colorize(Color color)
     palette[i] = (0xff << 24) | (r << 16) | (g << 8) | (b << 0);
   }
 
-  return new IndexedImage(palette, _palette_size, _data, size.width, size.height);
+  return new IndexedImage(palette, _palette_size, _data, size);
 }
 
 uint8_t * IndexedImage::LockData()
@@ -345,12 +345,12 @@ void IndexedImage::UnlockData()
 {
 }
 
-void IndexedImage::GetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)
+void IndexedImage::GetRGBArray(uint32_t *rgb, jrect_t<int> rect)
 {
-  jgui::jsize_t 
+  jgui::jsize_t<int> 
     size = GetSize();
 
-  if ((xp + wp) > size.width || (yp + hp) > size.height) {
+  if ((rect.point.x + rect.size.width) > size.width || (rect.point.y + rect.size.height) > size.height) {
     throw jexception::InvalidArgumentException("The limits are out of bounds");
   }
 
@@ -358,12 +358,12 @@ void IndexedImage::GetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)
     throw jexception::NullPointerException("Destination buffer must be valid");
   }
 
-  for (int j=0; j<hp; j++) {
+  for (int j=0; j<rect.size.height; j++) {
     int 
-      data = (yp+j)*size.width+xp,
-      line = j*wp;
+      data = (rect.point.y + j)*size.width + rect.point.x,
+      line = j*rect.size.width;
 
-    for (int i=0; i<wp; i++) {
+    for (int i=0; i<rect.size.width; i++) {
       rgb[line + i] = _palette[_data[data + i]];
     }
   }
@@ -391,7 +391,7 @@ void IndexedImage::SetPalette(uint32_t *palette, int palette_size)
 
 jcommon::Object * IndexedImage::Clone()
 {
-  return (jcommon::Object *)(new IndexedImage(_palette, _palette_size, _data, _size.width, _size.height));
+  return (jcommon::Object *)(new IndexedImage(_palette, _palette_size, _data, _size));
 }
 
 }

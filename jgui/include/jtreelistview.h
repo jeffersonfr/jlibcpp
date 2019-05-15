@@ -188,7 +188,7 @@ class TreeListView : public jgui::Component, public jgui::ItemComponent {
      * \brief
      *
      */
-    virtual jsize_t GetScrollDimension();
+    virtual jsize_t<int> GetScrollDimension();
 
     /**
      * \brief

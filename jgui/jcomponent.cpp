@@ -93,11 +93,11 @@ Component::~Component()
 void Component::ScrollToVisibleArea(int x, int y, int width, int height, Component *coordinateSpace) 
 {
   if (IsScrollable()) {
-    jpoint_t 
+    jpoint_t<int> 
       slocation = GetScrollLocation();
-    jgui::jsize_t 
+    jgui::jsize_t<int> 
       size = GetSize();
-    jregion_t 
+    jregion_t<int> 
       view;
     int 
       scrollPosition = slocation.y;
@@ -139,7 +139,7 @@ void Component::ScrollToVisibleArea(int x, int y, int width, int height, Compone
           break;
         }
         
-        jgui::jpoint_t t = parent->GetLocation();
+        jgui::jpoint_t<int> t = parent->GetLocation();
 
         relativeX += t.x;
         relativeY += t.y;
@@ -152,7 +152,7 @@ void Component::ScrollToVisibleArea(int x, int y, int width, int height, Compone
       }
     }
 
-    jgui::jpoint_t
+    jgui::jpoint_t<int>
       nslocation = slocation;
 
     if (IsScrollableX()) {
@@ -312,7 +312,7 @@ jcomponent_orientation_t Component::GetComponentOrientation()
 
 bool Component::IsScrollableX()
 {
-  jgui::jsize_t
+  jgui::jsize_t<int>
     size = GetSize();
 
   return (_is_scrollable_x == true) && (GetScrollDimension().width > size.width);
@@ -320,7 +320,7 @@ bool Component::IsScrollableX()
 
 bool Component::IsScrollableY()
 {
-  jgui::jsize_t
+  jgui::jsize_t<int>
     size = GetSize();
 
   return (_is_scrollable_y == true) && (GetScrollDimension().height > size.height);
@@ -362,9 +362,9 @@ bool Component::IsSmoothScrolling()
   return _is_smooth_scroll;
 }
 
-jgui::jpoint_t Component::GetScrollLocation()
+jgui::jpoint_t<int> Component::GetScrollLocation()
 {
-  jgui::jpoint_t
+  jgui::jpoint_t<int>
     location = _scroll_location;
 
   if (IsScrollableX() == false) {
@@ -378,12 +378,12 @@ jgui::jpoint_t Component::GetScrollLocation()
   return location;
 }
 
-jsize_t Component::GetScrollDimension()
+jsize_t<int> Component::GetScrollDimension()
 {
   return GetSize();
 }
 
-jregion_t Component::GetBounds()
+jregion_t<int> Component::GetBounds()
 {
   return {
     .x = _location.x, 
@@ -393,14 +393,14 @@ jregion_t Component::GetBounds()
   };
 }
 
-jregion_t Component::GetVisibleBounds()
+jregion_t<int> Component::GetVisibleBounds()
 {
   return GetBounds();
 }
 
 void Component::SetScrollLocation(int x, int y)
 {
-  jsize_t
+  jsize_t<int>
     size = GetSize(),
     sdimention = GetScrollDimension();
   int 
@@ -430,7 +430,7 @@ void Component::SetScrollLocation(int x, int y)
   Repaint();
 }
 
-void Component::SetScrollLocation(jgui::jpoint_t t)
+void Component::SetScrollLocation(jgui::jpoint_t<int> t)
 {
   SetScrollLocation(t.x, t.y);
 }
@@ -470,9 +470,9 @@ void Component::PaintScrollbars(Graphics *g)
   jgui::Color 
     bg = theme->GetIntegerParam("component.bg"),
     fg = theme->GetIntegerParam("component.fg");
-  jgui::jpoint_t 
+  jgui::jpoint_t<int> 
     slocation = GetScrollLocation();
-  jgui::jsize_t
+  jgui::jsize_t<int>
     size = GetSize(),
     sdimention = GetScrollDimension();
   int 
@@ -488,10 +488,10 @@ void Component::PaintScrollbars(Graphics *g)
       block_size = (int)(size.width*block_size_ratio);
 
     g->SetColor(fg);
-    g->FillRectangle(bs, size.height - ss - bs, size.width - 2*bs, ss);
+    g->FillRectangle({bs, size.height - ss - bs, size.width - 2*bs, ss});
     g->SetGradientStop(0.0, fg);
     g->SetGradientStop(1.0, bg);
-    g->FillLinearGradient(offset, size.height - ss- bs, block_size, ss, 0, 0, 0, ss);
+    g->FillLinearGradient({offset, size.height - ss - bs, block_size, ss}, {0, 0}, {0, ss});
     g->ResetGradientStop();
   }
   
@@ -504,11 +504,11 @@ void Component::PaintScrollbars(Graphics *g)
       block_size = (int)(size.height*block_size_ratio);
 
     g->SetColor(fg);
-    g->FillRectangle(size.width - ss - bs, bs, ss, size.height);
+    g->FillRectangle({size.width - ss - bs, bs, ss, size.height});
 
     g->SetGradientStop(0.0, fg);
     g->SetGradientStop(1.0, bg);
-    g->FillLinearGradient(size.width - ss - bs, offset, ss, block_size, 0, 0, ss, 0);
+    g->FillLinearGradient({size.width - ss - bs, offset, ss, block_size}, {0, 0}, {ss, 0});
     g->ResetGradientStop();
   }
 
@@ -519,7 +519,7 @@ void Component::PaintScrollbars(Graphics *g)
 
     g->SetGradientStop(0.0, bg);
     g->SetGradientStop(1.0, fg);
-    g->FillRadialGradient(size.width-radius2, size.height-radius2, radius, radius, 0, 0, 0);
+    g->FillRadialGradient({size.width-radius2, size.height-radius2}, {radius, radius}, {0, 0}, 0);
     g->ResetGradientStop();
   }
 
@@ -531,7 +531,7 @@ void Component::PaintScrollbars(Graphics *g)
   pen.width = -bs;
   g->SetPen(pen);
 
-  g->DrawRectangle(0, 0, size.width, size.height);
+  g->DrawRectangle({0, 0, size.width, size.height});
 
   pen.width = width;
 
@@ -555,7 +555,7 @@ void Component::PaintBackground(Graphics *g)
     bg = theme->GetIntegerParam("component.bg"),
     bgfocus = theme->GetIntegerParam("component.bg.focus"),
     bgdisable = theme->GetIntegerParam("component.bg.disable");
-  jgui::jsize_t
+  jgui::jsize_t<int>
     size = GetSize();
   jcomponent_border_t 
     bordertype = (jcomponent_border_t)theme->GetIntegerParam("component.border.style");
@@ -576,11 +576,11 @@ void Component::PaintBackground(Graphics *g)
   }
 
   if (bordertype == JCB_ROUND) {
-    g->FillRoundRectangle(x, y, w, h);
+    g->FillRoundRectangle({x, y, w, h});
   } else if (bordertype == JCB_BEVEL) {
-    g->FillBevelRectangle(x, y, w, h);
+    g->FillBevelRectangle({x, y, w, h});
   } else {
-    g->FillRectangle(x, y, w, h);
+    g->FillRectangle({x, y, w, h});
   }
 }
 
@@ -605,7 +605,7 @@ void Component::PaintBorders(Graphics *g)
     border = theme->GetIntegerParam("component.border"),
     borderfocus = theme->GetIntegerParam("component.border.focus"),
     borderdisable = theme->GetIntegerParam("component.border.disable");
-  jgui::jsize_t
+  jgui::jsize_t<int>
     size = GetSize();
   int 
     bs = theme->GetIntegerParam("component.border.size");
@@ -638,103 +638,103 @@ void Component::PaintBorders(Graphics *g)
     width = pen.width;
 
   if (bordertype == JCB_LINE) {
-    g->SetColor(dr, dg, db, da);
+    g->SetColor({dr, dg, db, da});
     pen.width = -bs;
     g->SetPen(pen);
-    g->DrawRectangle(xp, yp, wp, hp);
+    g->DrawRectangle({xp, yp, wp, hp});
   } else if (bordertype == JCB_BEVEL) {
-    g->SetColor(dr, dg, db, da);
+    g->SetColor({dr, dg, db, da});
     pen.width = -bs;
     g->SetPen(pen);
-    g->DrawBevelRectangle(xp, yp, wp, hp);
+    g->DrawBevelRectangle({xp, yp, wp, hp});
   } else if (bordertype == JCB_ROUND) {
-    g->SetColor(dr, dg, db, da);
+    g->SetColor({dr, dg, db, da});
     pen.width = -bs;
     g->SetPen(pen);
-    g->DrawRoundRectangle(xp, yp, wp, hp);
+    g->DrawRoundRectangle({xp, yp, wp, hp});
   } else if (bordertype == JCB_RAISED_GRADIENT) {
     for (int i=0; i<bs && i<wp && i<hp; i++) {
-      g->SetColor(dr+step*(bs-i), dg+step*(bs-i), db+step*(bs-i));
-      g->DrawLine(xp+i, yp+i, xp+wp-i, yp+i); //cima
-      g->SetColor(dr-step*(bs-i), dg-step*(bs-i), db-step*(bs-i));
-      g->DrawLine(xp+i, yp+hp-i, xp+wp-i, yp+hp-i); //baixo
+      g->SetColor({dr+step*(bs-i), dg+step*(bs-i), db+step*(bs-i)});
+      g->DrawLine({xp+i, yp+i, xp+wp-i, yp+i}); //cima
+      g->SetColor({dr-step*(bs-i), dg-step*(bs-i), db-step*(bs-i)});
+      g->DrawLine({xp+i, yp+hp-i, xp+wp-i, yp+hp-i}); //baixo
     }
 
     for (int i=0; i<bs && i<wp && i<hp; i++) {
-      g->SetColor(dr+step*(bs-i), dg+step*(bs-i), db+step*(bs-i));
-      g->DrawLine(xp+i, yp+i, xp+i, yp+hp-i); //esquerda
-      g->SetColor(dr-step*(bs-i), dg-step*(bs-i), db-step*(bs-i));
-      g->DrawLine(xp+wp-i, yp+i, xp+wp-i, yp+hp-i); //direita
+      g->SetColor({dr+step*(bs-i), dg+step*(bs-i), db+step*(bs-i)});
+      g->DrawLine({xp+i, yp+i, xp+i, yp+hp-i}); //esquerda
+      g->SetColor({dr-step*(bs-i), dg-step*(bs-i), db-step*(bs-i)});
+      g->DrawLine({xp+wp-i, yp+i, xp+wp-i, yp+hp-i}); //direita
     }
   } else if (bordertype == JCB_LOWERED_GRADIENT) {
     for (int i=0; i<bs && i<wp && i<hp; i++) {
-      g->SetColor(dr-step*(bs-i), dg-step*(bs-i), db-step*(bs-i));
-      g->DrawLine(xp+i, yp+i, xp+wp-i, yp+i); //cima
-      g->SetColor(dr+step*(bs-i), dg+step*(bs-i), db+step*(bs-i));
-      g->DrawLine(xp+i, yp+hp-i, xp+wp-i, yp+hp-i); //baixo
+      g->SetColor({dr-step*(bs-i), dg-step*(bs-i), db-step*(bs-i)});
+      g->DrawLine({xp+i, yp+i, xp+wp-i, yp+i}); //cima
+      g->SetColor({dr+step*(bs-i), dg+step*(bs-i), db+step*(bs-i)});
+      g->DrawLine({xp+i, yp+hp-i, xp+wp-i, yp+hp-i}); //baixo
     }
 
     for (int i=0; i<bs && i<wp && i<hp; i++) {
-      g->SetColor(dr-step*(bs-i), dg-step*(bs-i), db-step*(bs-i));
-      g->DrawLine(xp+i, yp+i, xp+i, yp+hp-i); //esquerda
-      g->SetColor(dr+step*(bs-i), dg+step*(bs-i), db+step*(bs-i));
-      g->DrawLine(xp+wp-i, yp+i, xp+wp-i, yp+hp-i); //direita
+      g->SetColor({dr-step*(bs-i), dg-step*(bs-i), db-step*(bs-i)});
+      g->DrawLine({xp+i, yp+i, xp+i, yp+hp-i}); //esquerda
+      g->SetColor({dr+step*(bs-i), dg+step*(bs-i), db+step*(bs-i)});
+      g->DrawLine({xp+wp-i, yp+i, xp+wp-i, yp+hp-i}); //direita
     }
   } else if (bordertype == JCB_RAISED_BEVEL) {
     for (int i=0; i<bs && i<wp && i<hp; i++) {
-      g->SetColor(dr+step, dg+step, db+step);
-      g->DrawLine(xp+i, yp+i, xp+wp-i, yp+i); //cima
-      g->SetColor(dr-step, dg-step, db-step);
-      g->DrawLine(xp+i, yp+hp-i, xp+wp-i, yp+hp-i); //baixo
+      g->SetColor({dr+step, dg+step, db+step});
+      g->DrawLine({xp+i, yp+i, xp+wp-i, yp+i}); //cima
+      g->SetColor({dr-step, dg-step, db-step});
+      g->DrawLine({xp+i, yp+hp-i, xp+wp-i, yp+hp-i}); //baixo
     }
 
     for (int i=0; i<bs && i<wp && i<hp; i++) {
-      g->SetColor(dr+step, dg+step, db+step);
-      g->DrawLine(xp+i, yp+i, xp+i, yp+hp-i); //esquerda
-      g->SetColor(dr-step, dg-step, db-step);
-      g->DrawLine(xp+wp-i, yp+i, xp+wp-i, yp+hp-i); //direita
+      g->SetColor({dr+step, dg+step, db+step});
+      g->DrawLine({xp+i, yp+i, xp+i, yp+hp-i}); //esquerda
+      g->SetColor({dr-step, dg-step, db-step});
+      g->DrawLine({xp+wp-i, yp+i, xp+wp-i, yp+hp-i}); //direita
     }
   } else if (bordertype == JCB_LOWERED_BEVEL) {
     for (int i=0; i<bs && i<wp && i<hp; i++) {
-      g->SetColor(dr-step, dg-step, db-step);
-      g->DrawLine(xp+i, yp+i, xp+wp-i, yp+i); //cima
-      g->SetColor(dr+step, dg+step, db+step);
-      g->DrawLine(xp+i, yp+hp-i, xp+wp-i, yp+hp-i); //baixo
+      g->SetColor({dr-step, dg-step, db-step});
+      g->DrawLine({xp+i, yp+i, xp+wp-i, yp+i}); //cima
+      g->SetColor({dr+step, dg+step, db+step});
+      g->DrawLine({xp+i, yp+hp-i, xp+wp-i, yp+hp-i}); //baixo
     }
 
     for (int i=0; i<bs && i<wp && i<hp; i++) {
-      g->SetColor(dr-step, dg-step, db-step);
-      g->DrawLine(xp+i, yp+i, xp+i, yp+hp-i); //esquerda
-      g->SetColor(dr+step, dg+step, db+step);
-      g->DrawLine(xp+wp-i, yp+i, xp+wp-i, yp+hp-i); //direita
+      g->SetColor({dr-step, dg-step, db-step});
+      g->DrawLine({xp+i, yp+i, xp+i, yp+hp-i}); //esquerda
+      g->SetColor({dr+step, dg+step, db+step});
+      g->DrawLine({xp+wp-i, yp+i, xp+wp-i, yp+hp-i}); //direita
     }
   } else if (bordertype == JCB_RAISED_ETCHED) {
-    g->SetColor(dr+step, dg+step, db+step, da);
+    g->SetColor({dr+step, dg+step, db+step, da});
     pen.width = -bs;
     g->SetPen(pen);
-    g->DrawRectangle(xp, yp, wp, hp);
+    g->DrawRectangle({xp, yp, wp, hp});
     
-    g->SetColor(dr-step, dg-step, db-step, da);
+    g->SetColor({dr-step, dg-step, db-step, da});
     pen.width = -bs/2;
     g->SetPen(pen);
-    g->DrawRectangle(xp, yp, wp-bs/2, hp-bs/2);
+    g->DrawRectangle({xp, yp, wp-bs/2, hp-bs/2});
   } else if (bordertype == JCB_LOWERED_ETCHED) {
-    g->SetColor(dr-step, dg-step, db-step, da);
+    g->SetColor({dr-step, dg-step, db-step, da});
     pen.width = -bs;
     g->SetPen(pen);
-    g->DrawRectangle(xp, yp, wp, hp);
+    g->DrawRectangle({xp, yp, wp, hp});
     
-    g->SetColor(dr+step, dg+step, db+step, da);
+    g->SetColor({dr+step, dg+step, db+step, da});
     pen.width = -bs/2;
-    g->DrawRectangle(xp, yp, wp-bs/2, hp-bs/2);
+    g->DrawRectangle({xp, yp, wp-bs/2, hp-bs/2});
   }
 
   pen.width = width;
   g->SetPen(pen);
 
   if (_is_enabled == false) {
-    g->SetColor(0x00, 0x00, 0x00, 0x80);
-    g->FillRectangle(0, 0, size.width, size.height);
+    g->SetColor({0x00, 0x00, 0x00, 0x80});
+    g->FillRectangle({0, 0, size.width, size.height});
   }
 }
 
@@ -884,7 +884,7 @@ void Component::Repaint(Component *cmp)
   DispatchComponentEvent(new jevent::ComponentEvent(this, jevent::JCET_ONPAINT));
 }
 
-void Component::SetMinimumSize(jsize_t size)
+void Component::SetMinimumSize(jsize_t<int> size)
 {
   _minimum_size.width = size.width;
   _minimum_size.height = size.height;
@@ -905,7 +905,7 @@ void Component::SetMinimumSize(jsize_t size)
     _minimum_size.height = _maximum_size.height;
   }
 
-  jgui::jsize_t
+  jgui::jsize_t<int>
     size2 = GetSize();
 
   if (size2.width < _minimum_size.width || size2.height < _minimum_size.height) {
@@ -925,7 +925,7 @@ void Component::SetMinimumSize(jsize_t size)
   }
 }
 
-void Component::SetMaximumSize(jsize_t size)
+void Component::SetMaximumSize(jsize_t<int> size)
 {
   _maximum_size.width = size.width;
   _maximum_size.height = size.height;
@@ -946,7 +946,7 @@ void Component::SetMaximumSize(jsize_t size)
     _maximum_size.height = _minimum_size.height;
   }
 
-  jgui::jsize_t
+  jgui::jsize_t<int>
     size2 = GetSize();
 
   if (size2.width > _maximum_size.width || size2.height > _maximum_size.height) {
@@ -966,7 +966,7 @@ void Component::SetMaximumSize(jsize_t size)
   }
 }
 
-void Component::SetPreferredSize(jsize_t size)
+void Component::SetPreferredSize(jsize_t<int> size)
 {
   _preferred_size.width = size.width;
   _preferred_size.height = size.height;
@@ -988,37 +988,37 @@ void Component::SetPreferredSize(jsize_t size)
   }
 }
 
-jsize_t Component::GetMinimumSize()
+jsize_t<int> Component::GetMinimumSize()
 {
   return _minimum_size;
 }
 
-jsize_t Component::GetMaximumSize()
+jsize_t<int> Component::GetMaximumSize()
 {
   return _maximum_size;
 }
 
-jsize_t Component::GetPreferredSize()
+jsize_t<int> Component::GetPreferredSize()
 {
   return _preferred_size;
 }
 
 void Component::Move(int x, int y)
 {
-  jgui::jpoint_t
+  jgui::jpoint_t<int>
     location = GetLocation();
 
   SetLocation(location.x + x, location.y + y);
 }
 
-void Component::Move(jpoint_t point)
+void Component::Move(jpoint_t<int> point)
 {
   Move(point.x, point.y);
 }
 
 void Component::SetBounds(int x, int y, int width, int height)
 {
-  jgui::jsize_t
+  jgui::jsize_t<int>
     size = GetSize();
 
   if (_location.x == x && _location.y == y && size.width == width && size.height == height) {
@@ -1060,56 +1060,56 @@ void Component::SetBounds(int x, int y, int width, int height)
   Repaint();
 }
 
-void Component::SetBounds(jpoint_t point, jsize_t size)
+void Component::SetBounds(jpoint_t<int> point, jsize_t<int> size)
 {
   SetBounds(point.x, point.y, size.width, size.height);
 }
 
-void Component::SetBounds(jregion_t region)
+void Component::SetBounds(jregion_t<int> region)
 {
   SetBounds(region.x, region.y, region.width, region.height);
 }
 
 void Component::SetLocation(int x, int y)
 {
-  jgui::jsize_t
+  jgui::jsize_t<int>
     size = GetSize();
 
   SetBounds(x, y, size.width, size.height);
 }
 
-void Component::SetLocation(jpoint_t point)
+void Component::SetLocation(jpoint_t<int> point)
 {
   SetLocation(point.x, point.y);
 }
 
 void Component::SetSize(int width, int height)
 {
-  jgui::jpoint_t
+  jgui::jpoint_t<int>
     location = GetLocation();
 
   SetBounds(location.x, location.y, width, height);
 }
 
-void Component::SetSize(jsize_t size)
+void Component::SetSize(jsize_t<int> size)
 {
   SetSize(size.width, size.height);
 }
 
 bool Component::Contains(Component *c1, Component *c2)
 {
-  jgui::jpoint_t l1 = GetLocation();
-  jgui::jpoint_t l2 = GetLocation();
-  jgui::jsize_t s1 = GetSize();
-  jgui::jsize_t s2 = GetSize();
+  jgui::jpoint_t<int> l1 = GetLocation();
+  jgui::jpoint_t<int> l2 = GetLocation();
+  jgui::jsize_t<int> s1 = GetSize();
+  jgui::jsize_t<int> s2 = GetSize();
 
   return Contains(l1.x, l1.y, s1.width, s1.height, l2.x, l2.y, s2.width, s2.height);
 }
 
 bool Component::Contains(Component *c, int x, int y, int w, int h)
 {
-  jgui::jpoint_t l1 = GetLocation();
-  jgui::jsize_t s1 = GetSize();
+  jgui::jpoint_t<int> l1 = GetLocation();
+  jgui::jsize_t<int> s1 = GetSize();
 
   return Contains(l1.x, l1.y, s1.width, s1.height, x, y, w, h);
 }
@@ -1121,18 +1121,18 @@ bool Component::Contains(int x1, int y1, int w1, int h1, int x2, int y2, int w2,
 
 bool Component::Intersects(Component *c1, Component *c2)
 {
-  jgui::jpoint_t l1 = GetLocation();
-  jgui::jpoint_t l2 = GetLocation();
-  jgui::jsize_t s1 = GetSize();
-  jgui::jsize_t s2 = GetSize();
+  jgui::jpoint_t<int> l1 = GetLocation();
+  jgui::jpoint_t<int> l2 = GetLocation();
+  jgui::jsize_t<int> s1 = GetSize();
+  jgui::jsize_t<int> s2 = GetSize();
 
   return Intersects(l1.x, l1.y, s1.width, s1.height, l2.x, l2.y, s2.width, s2.height);
 }
 
 bool Component::Intersects(Component *c, int x, int y, int w, int h)
 {
-  jgui::jpoint_t l1 = GetLocation();
-  jgui::jsize_t s1 = GetSize();
+  jgui::jpoint_t<int> l1 = GetLocation();
+  jgui::jsize_t<int> s1 = GetSize();
 
   return Intersects(l1.x, l1.y, s1.width, s1.height, x, y, w, h);
 }
@@ -1153,11 +1153,11 @@ bool Component::Intersects(int x1, int y1, int w1, int h1, int x2, int y2, int w
   return (((ax > dx)||(bx < cx)||(ay > dy)||(by < cy)) == 0);
 }
 
-jpoint_t Component::GetAbsoluteLocation()
+jpoint_t<int> Component::GetAbsoluteLocation()
 {
   Container 
     *parent = GetParent();
-  jpoint_t
+  jpoint_t<int>
     location = {
       .x = 0, 
       .y = 0
@@ -1167,7 +1167,7 @@ jpoint_t Component::GetAbsoluteLocation()
     return location;
   }
 
-  jpoint_t
+  jpoint_t<int>
     slocation = GetScrollLocation();
 
   location = _location;
@@ -1179,7 +1179,7 @@ jpoint_t Component::GetAbsoluteLocation()
     location.y = location.y + slocation.y;  
   
     if (parent->GetParent() != nullptr) {
-      jgui::jpoint_t t = parent->GetLocation();
+      jgui::jpoint_t<int> t = parent->GetLocation();
 
       location.x = location.x + t.x;
       location.y = location.y + t.y;
@@ -1189,9 +1189,9 @@ jpoint_t Component::GetAbsoluteLocation()
   return location;
 }
 
-jpoint_t Component::GetLocation()
+jpoint_t<int> Component::GetLocation()
 {
-  jgui::jregion_t 
+  jgui::jregion_t<int> 
     region = GetVisibleBounds();
 
   return {
@@ -1200,9 +1200,9 @@ jpoint_t Component::GetLocation()
   };
 }
 
-jsize_t Component::GetSize()
+jsize_t<int> Component::GetSize()
 {
-  jgui::jregion_t 
+  jgui::jregion_t<int> 
     region = GetVisibleBounds();
 
   return {
@@ -1275,7 +1275,7 @@ int Component::GetGradientLevel()
 
 bool Component::Intersect(int x, int y)
 {
-  jgui::jsize_t
+  jgui::jsize_t<int>
     size = GetSize();
 
   if ((x > _location.x && x < (_location.x + size.width)) && (y > _location.y && y < (_location.y + size.height))) {
@@ -1320,12 +1320,12 @@ bool Component::MousePressed(jevent::MouseEvent *event)
   
   jgui::Theme 
     *theme = GetTheme();
-  jsize_t 
+  jsize_t<int> 
     size = GetSize(),
     sdimention = GetScrollDimension();
-  jpoint_t 
+  jpoint_t<int> 
     slocation = GetScrollLocation();
-  jpoint_t 
+  jpoint_t<int> 
     elocation = event->GetLocation();
   int 
     bs = 0,
@@ -1407,10 +1407,10 @@ bool Component::MouseMoved(jevent::MouseEvent *event)
     return false;
   }
   
-  jpoint_t 
+  jpoint_t<int> 
     slocation = GetScrollLocation(),
     elocation = event->GetLocation();
-  jsize_t 
+  jsize_t<int> 
     size = GetSize(),
     sdimention = GetScrollDimension();
 
@@ -1486,11 +1486,11 @@ bool Component::ProcessNavigation(jevent::KeyEvent *event)
     return false;
   }
 
-  jgui::jpoint_t 
+  jgui::jpoint_t<int> 
     location = GetAbsoluteLocation();
-  jgui::jsize_t 
+  jgui::jsize_t<int> 
     size = GetSize();
-  jregion_t 
+  jregion_t<int> 
     rect = {
       .x = location.x, 
       .y = location.y, 
@@ -1544,9 +1544,9 @@ bool Component::ProcessNavigation(jevent::KeyEvent *event)
           continue;
         }
 
-        jgui::jpoint_t 
+        jgui::jpoint_t<int> 
           t = cmp->GetAbsoluteLocation();
-        jgui::jsize_t 
+        jgui::jsize_t<int> 
           size = cmp->GetSize();
 
         if (x1 > t.x) {
@@ -1599,7 +1599,7 @@ bool Component::ProcessNavigation(jevent::KeyEvent *event)
   return false;
 }
 
-void Component::FindNextComponentFocus(jregion_t rect, Component **left, Component **right, Component **up, Component **down)
+void Component::FindNextComponentFocus(jregion_t<int> rect, Component **left, Component **right, Component **up, Component **down)
 {
   std::vector<Component *> components;
 
@@ -1622,9 +1622,9 @@ void Component::FindNextComponentFocus(jregion_t rect, Component **left, Compone
       continue;
     }
 
-    jsize_t 
+    jsize_t<int> 
       cmp_size = cmp->GetSize();
-    jpoint_t 
+    jpoint_t<int> 
       cmp_location = cmp->GetAbsoluteLocation();
     int 
       c1x = rect.x + rect.width/2,

@@ -296,12 +296,12 @@ class Main : public jgui::Window {
         return;
       }
 
-			jgui::jsize_t
+			jgui::jsize_t<int>
 				size = GetSize();
 			char tmp[255];
 
 			if (foffscreen == nullptr) {
-				foffscreen = new jgui::BufferedImage(jgui::JPF_RGB32, size.width, size.height);
+				foffscreen = new jgui::BufferedImage(jgui::JPF_RGB32, size);
 			
 				jgui::Graphics *goff = foffscreen->GetGraphics();
 
@@ -309,32 +309,32 @@ class Main : public jgui::Window {
 
 				jgui::Window::Paint(goff);
 
-				goff->SetColor(0x00, 0x00, 0x00, 0xff);
-				goff->DrawString(tmp, 0, size.height - 50);
+				goff->SetColor({0x00, 0x00, 0x00, 0xff});
+				goff->DrawString(tmp, jgui::jpoint_t<int>{0, size.height - 50});
 
 				goff->SetFont(fweights);
 
 				for (int i=0; i<MAX_COLS*MAX_ROWS; i++) {
 					sprintf(tmp, "%d", board[i].value);
 
-					goff->SetColor(0x00, 0x00, 0x00, 0xff);
-					goff->FillRectangle(board[i].x*(BLOCK_WIDTH+BLOCK_GAP), board[i].y*(BLOCK_HEIGHT+BLOCK_GAP), BLOCK_WIDTH, BLOCK_HEIGHT);
-					goff->SetColor(0xf0, 0xf0, 0xf0, 0xff);
-					goff->DrawString(tmp, board[i].x*(BLOCK_WIDTH+BLOCK_GAP), board[i].y*(BLOCK_HEIGHT+BLOCK_GAP));
+					goff->SetColor({0x00, 0x00, 0x00, 0xff});
+					goff->FillRectangle({board[i].x*(BLOCK_WIDTH+BLOCK_GAP), board[i].y*(BLOCK_HEIGHT+BLOCK_GAP), BLOCK_WIDTH, BLOCK_HEIGHT});
+					goff->SetColor({0xf0, 0xf0, 0xf0, 0xff});
+					goff->DrawString(tmp, jgui::jpoint_t<int>{board[i].x*(BLOCK_WIDTH+BLOCK_GAP), board[i].y*(BLOCK_HEIGHT+BLOCK_GAP)});
 				}
 			}
 
-			g->DrawImage(foffscreen, 0, 0);
+			g->DrawImage(foffscreen, jgui::jpoint_t<int>{0, 0});
 
 			for (int i=0; i<MAX_COLS*MAX_ROWS; i++) {
 				sprintf(tmp, "%d", board[i].value);
 
-				g->SetColor(board[i].phr, 0x00, 0x00, 0x80);
-				g->FillRectangle(board[i].x*(BLOCK_WIDTH+BLOCK_GAP), board[i].y*(BLOCK_HEIGHT+BLOCK_GAP), BLOCK_WIDTH, BLOCK_HEIGHT);
+				g->SetColor({board[i].phr, 0x00, 0x00, 0x80});
+				g->FillRectangle({board[i].x*(BLOCK_WIDTH+BLOCK_GAP), board[i].y*(BLOCK_HEIGHT+BLOCK_GAP), BLOCK_WIDTH, BLOCK_HEIGHT});
 			}
 
 #if DRAW_ANTS == 1
-			g->SetColor(0x00, 0xf0, 0x00);
+			g->SetColor({0x00, 0xf0, 0x00});
 
 			for (int j=0; j<K_ANTS; j++) {
 				for (int i=1; i<MAX_COLS; i++) {
@@ -346,13 +346,15 @@ class Main : public jgui::Window {
 			}
 #endif
 
-			g->SetColor(0xf0, 0xf0, 0xf0, 0xff);
+			g->SetColor({0xf0, 0xf0, 0xf0, 0xff});
 
 			for (int i=1; i<MAX_COLS; i++) {
-				g->DrawLine(solution[i-1]->x*(BLOCK_WIDTH+BLOCK_GAP)+BLOCK_WIDTH/2, 
+				g->DrawLine({
+          solution[i-1]->x*(BLOCK_WIDTH+BLOCK_GAP)+BLOCK_WIDTH/2, 
 					solution[i-1]->y*(BLOCK_HEIGHT+BLOCK_GAP)+BLOCK_HEIGHT/2, 
 					solution[i]->x*(BLOCK_WIDTH+BLOCK_GAP)+BLOCK_WIDTH/2, 
-					solution[i]->y*(BLOCK_HEIGHT+BLOCK_GAP)+BLOCK_HEIGHT/2);
+					solution[i]->y*(BLOCK_HEIGHT+BLOCK_GAP)+BLOCK_HEIGHT/2
+          });
 			}
 
       _mutex.unlock();

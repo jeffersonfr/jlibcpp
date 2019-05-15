@@ -105,7 +105,7 @@ void Application::Quit()
   _instance->InternalQuit();
 }
 
-jsize_t Application::GetScreenSize()
+jsize_t<int> Application::GetScreenSize()
 {
   g_application_mutex.lock();
 

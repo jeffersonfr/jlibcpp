@@ -25,7 +25,7 @@ Rectangle::~Rectangle()
 {
 }
 
-bool Rectangle::Contains(jregion_t region1, jregion_t region2)
+bool Rectangle::Contains(jregion_t<int> region1, jregion_t<int> region2)
 {
   return Contains(region1.x, region1.y, region1.width, region1.height, region2.x, region2.y, region2.width, region2.height);
 }
@@ -35,7 +35,7 @@ bool Rectangle::Contains(int x1, int y1, int w1, int h1, int x2, int y2, int w2,
   return (x2 >= x1) && (y2 >= y1) && ((x2+w2) <= w1) && ((y2+h2) <= h1);
 }
 
-bool Rectangle::Intersects(jregion_t region1, jregion_t region2)
+bool Rectangle::Intersects(jregion_t<int> region1, jregion_t<int> region2)
 {
   return Intersects(region1.x, region1.y, region1.width, region1.height, region2.x, region2.y, region2.width, region2.height);
 }
@@ -54,14 +54,14 @@ bool Rectangle::Intersects(int x1, int y1, int w1, int h1, int x2, int y2, int w
   return (((ax > dx)||(bx < cx)||(ay > dy)||(by < cy)) == 0);
 }
 
-jregion_t Rectangle::Intersection(jregion_t region1, jregion_t region2)
+jregion_t<int> Rectangle::Intersection(jregion_t<int> region1, jregion_t<int> region2)
 {
   return Intersection(region1.x, region1.y, region1.width, region1.height, region2.x, region2.y, region2.width, region2.height);
 }
 
-jregion_t Rectangle::Intersection(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2)
+jregion_t<int> Rectangle::Intersection(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2)
 {
-  jregion_t region;
+  jregion_t<int> region;
 
   region.x = 0;
   region.y = 0;

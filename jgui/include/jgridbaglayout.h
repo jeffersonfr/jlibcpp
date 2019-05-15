@@ -475,7 +475,7 @@ class GridBagLayout : public Layout {
      * \brief
      *
      */
-    virtual jpoint_t GetLayoutOrigin();
+    virtual jpoint_t<int> GetLayoutOrigin();
     
     /**
      * \brief
@@ -499,49 +499,49 @@ class GridBagLayout : public Layout {
      * \brief
      *
      */
-    virtual jgui::jpoint_t PreInitMaximumArraySizes(Container *parent);
+    virtual jgui::jpoint_t<int> PreInitMaximumArraySizes(Container *parent);
     
     /**
      * \brief
      *
      */
-    virtual bool CalculateBaseline(Component *c, GridBagConstraints *constraints, jsize_t size);
+    virtual bool CalculateBaseline(Component *c, GridBagConstraints *constraints, jsize_t<int> size);
     
     /**
      * \brief
      *
      */
-    virtual void AdjustForGravity(GridBagConstraints *constraints, jregion_t *r);
+    virtual void AdjustForGravity(GridBagConstraints *constraints, jregion_t<int> *r);
     
     /**
      * \brief
      *
      */
-    virtual void AlignOnBaseline(GridBagConstraints *cons, jregion_t *r, int cellY, int cellHeight);
+    virtual void AlignOnBaseline(GridBagConstraints *cons, jregion_t<int> *r, int cellY, int cellHeight);
     
     /**
      * \brief
      *
      */
-    virtual void AlignAboveBaseline(GridBagConstraints *cons, jregion_t *r, int cellY, int cellHeight);
+    virtual void AlignAboveBaseline(GridBagConstraints *cons, jregion_t<int> *r, int cellY, int cellHeight);
     
     /**
      * \brief
      *
      */
-    virtual void AlignBelowBaseline(GridBagConstraints *cons, jregion_t *r, int cellY, int cellHeight);
+    virtual void AlignBelowBaseline(GridBagConstraints *cons, jregion_t<int> *r, int cellY, int cellHeight);
     
     /**
      * \brief
      *
      */
-    virtual void CenterVertically(GridBagConstraints *cons, jregion_t *r, int cellHeight);
+    virtual void CenterVertically(GridBagConstraints *cons, jregion_t<int> *r, int cellHeight);
     
     /**
      * \brief
      *
      */
-    virtual jsize_t GetMinSize(Container *parent, GridBagLayoutInfo *info);
+    virtual jsize_t<int> GetMinSize(Container *parent, GridBagLayoutInfo *info);
     
     /**
      * \brief
@@ -553,19 +553,19 @@ class GridBagLayout : public Layout {
      * \brief
      *
      */
-    virtual jsize_t GetMinimumLayoutSize(Container *parent);
+    virtual jsize_t<int> GetMinimumLayoutSize(Container *parent);
     
     /**
      * \brief
      *
      */
-    virtual jsize_t GetMaximumLayoutSize(Container *parent);
+    virtual jsize_t<int> GetMaximumLayoutSize(Container *parent);
     
     /**
      * \brief
      *
      */
-    virtual jsize_t GetPreferredLayoutSize(Container *parent);
+    virtual jsize_t<int> GetPreferredLayoutSize(Container *parent);
 
     /**
      * \brief

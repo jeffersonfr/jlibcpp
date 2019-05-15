@@ -33,33 +33,33 @@ class Raster {
 	private:
     uint32_t *_buffer;
     uint32_t _color;
-    jgui::jsize_t _size;
+    jgui::jsize_t<int> _size;
 
   public:
-    Raster(uint32_t *data, jgui::jsize_t size);
+    Raster(uint32_t *data, jgui::jsize_t<int> size);
     virtual ~Raster();
     uint32_t * GetData();
-    jgui::jsize_t GetSize();
+    jgui::jsize_t<int> GetSize();
     void SetColor(uint32_t color);
     uint32_t GetColor();
     void Clear();
-    void SetPixel(jgui::jpoint_t v1);
-    uint32_t GetPixel(jgui::jpoint_t v1);
-    void ScanLine(jgui::jpoint_t v1, int size);
-    void DrawLine(jgui::jpoint_t v1, jgui::jpoint_t v2);
-    void DrawTriangle(jgui::jpoint_t v1, jgui::jpoint_t v2, jgui::jpoint_t v3);
-    void FillTriangle(jgui::jpoint_t v1, jgui::jpoint_t v2, jgui::jpoint_t v3);
-    void DrawRectangle(jgui::jpoint_t v1, jgui::jsize_t s1);
-    void FillRectangle(jgui::jpoint_t v1, jgui::jsize_t s1);
-    void DrawPolygon(jgui::jpoint_t v1, std::vector<jgui::jpoint_t> points);
-    void DrawBezier(jgui::jpoint_t v1, jgui::jpoint_t v2, jgui::jpoint_t v3);
-    void DrawCircle(jgui::jpoint_t v1, int size);
-    void FillCircle(jgui::jpoint_t v1, int size);
-    void DrawEllipse(jgui::jpoint_t v1, jgui::jsize_t s1);
-    void FillEllipse(jgui::jpoint_t v1, jgui::jsize_t s1);
-    void DrawArc(jgui::jpoint_t v1, jgui::jsize_t s1, float arc0, float arc1);
-    void FillArc(jgui::jpoint_t v1, jgui::jsize_t s1, float arc0, float arc1);
-    void FillPolygon(jgui::jpoint_t v1, std::vector<jgui::jpoint_t> points, bool holed);
+    void SetPixel(jgui::jpoint_t<int> v1);
+    uint32_t GetPixel(jgui::jpoint_t<int> v1);
+    void ScanLine(jgui::jpoint_t<int> v1, int size);
+    void DrawLine(jgui::jpoint_t<int> v1, jgui::jpoint_t<int> v2);
+    void DrawTriangle(jgui::jpoint_t<int> v1, jgui::jpoint_t<int> v2, jgui::jpoint_t<int> v3);
+    void FillTriangle(jgui::jpoint_t<int> v1, jgui::jpoint_t<int> v2, jgui::jpoint_t<int> v3);
+    void DrawRectangle(jgui::jpoint_t<int> v1, jgui::jsize_t<int> s1);
+    void FillRectangle(jgui::jpoint_t<int> v1, jgui::jsize_t<int> s1);
+    void DrawPolygon(jgui::jpoint_t<int> v1, std::vector<jgui::jpoint_t<int>> points);
+    void DrawBezier(jgui::jpoint_t<int> v1, jgui::jpoint_t<int> v2, jgui::jpoint_t<int> v3);
+    void DrawCircle(jgui::jpoint_t<int> v1, int size);
+    void FillCircle(jgui::jpoint_t<int> v1, int size);
+    void DrawEllipse(jgui::jpoint_t<int> v1, jgui::jsize_t<int> s1);
+    void FillEllipse(jgui::jpoint_t<int> v1, jgui::jsize_t<int> s1);
+    void DrawArc(jgui::jpoint_t<int> v1, jgui::jsize_t<int> s1, float arc0, float arc1);
+    void FillArc(jgui::jpoint_t<int> v1, jgui::jsize_t<int> s1, float arc0, float arc1);
+    void FillPolygon(jgui::jpoint_t<int> v1, std::vector<jgui::jpoint_t<int>> points, bool holed);
     void DrawGlyph(int glyph, int xp, int yp);
     void DrawString(std::string text, int xp, int yp);
 

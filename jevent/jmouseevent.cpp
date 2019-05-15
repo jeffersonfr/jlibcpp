@@ -21,7 +21,7 @@
 
 namespace jevent {
 
-MouseEvent::MouseEvent(void *source, jmouseevent_type_t type, jmouseevent_button_t button, jmouseevent_button_t buttons, jgui::jpoint_t location, int clicks):
+MouseEvent::MouseEvent(void *source, jmouseevent_type_t type, jmouseevent_button_t button, jmouseevent_button_t buttons, jgui::jpoint_t<int> location, int clicks):
   jevent::EventObject(source)
 {
   jcommon::Object::SetClassName("jevent::MouseEvent");
@@ -57,7 +57,7 @@ jmouseevent_button_t MouseEvent::GetButtons()
   return _buttons;
 }
 
-jgui::jpoint_t MouseEvent::GetLocation()
+jgui::jpoint_t<int> MouseEvent::GetLocation()
 {
   return _location;
 }

@@ -44,13 +44,13 @@ class XinePlayerComponentImpl : public jgui::Component {
 		/** \brief */
 		std::mutex _mutex;
 		/** \brief */
-		jgui::jregion_t _src;
+		jgui::jregion_t<int> _src;
 		/** \brief */
     jgui::Image **_buffer;
 		/** \brief */
 		int _buffer_index;
 		/** \brief */
-		jgui::jsize_t _frame_size;
+		jgui::jsize_t<int> _frame_size;
 
 	public:
 		XinePlayerComponentImpl(Player *player, int x, int y, int w, int h):
@@ -89,7 +89,7 @@ class XinePlayerComponentImpl : public jgui::Component {
 			}
 		}
 
-		virtual jgui::jsize_t GetPreferredSize()
+		virtual jgui::jsize_t<int> GetPreferredSize()
 		{
 			return _frame_size;
 		}
@@ -122,8 +122,8 @@ class XinePlayerComponentImpl : public jgui::Component {
 
 				_buffer = new jgui::Image*[2];
 
-				_buffer[0] = new jgui::BufferedImage(jgui::JPF_RGB32, width, height);
-				_buffer[1] = new jgui::BufferedImage(jgui::JPF_RGB32, width, height);
+				_buffer[0] = new jgui::BufferedImage(jgui::JPF_RGB32, {width, height});
+				_buffer[1] = new jgui::BufferedImage(jgui::JPF_RGB32, {width, height});
 			}
 			
 			jgui::Image *image = _buffer[(_buffer_index++)%2];
@@ -151,7 +151,7 @@ class XinePlayerComponentImpl : public jgui::Component {
         return;
       }
 
-      jgui::jsize_t
+      jgui::jsize_t<int>
         size = GetSize();
 
       jgui::Image *image = _buffer[(_buffer_index + 1)%2];
@@ -161,9 +161,9 @@ class XinePlayerComponentImpl : public jgui::Component {
 			_player->DispatchFrameGrabberEvent(new jevent::FrameGrabberEvent(image, jevent::JFE_GRABBED));
 
       if (_src.x == 0 and _src.y == 0 and _src.width == _frame_size.width and _src.height == _frame_size.height) {
-			  g->DrawImage(image, 0, 0, size.width, size.height);
+			  g->DrawImage(image, {0, 0, size.width, size.height});
       } else {
-			  g->DrawImage(image, _src.x, _src.y, _src.width, _src.height, 0, 0, size.width, size.height);
+			  g->DrawImage(image, {_src.x, _src.y, _src.width, _src.height}, {0, 0, size.width, size.height});
       }
       
       image->UnlockData();
@@ -308,12 +308,12 @@ class XineVideoSizeControlImpl : public VideoSizeControl {
 			impl->SetBounds(x, y, w, h);
 		}
 
-		virtual jgui::jregion_t GetSource()
+		virtual jgui::jregion_t<int> GetSource()
 		{
 			return dynamic_cast<XinePlayerComponentImpl *>(_player->_component)->_src;
 		}
 
-		virtual jgui::jregion_t GetDestination()
+		virtual jgui::jregion_t<int> GetDestination()
 		{
 			return dynamic_cast<XinePlayerComponentImpl *>(_player->_component)->GetVisibleBounds();
 		}

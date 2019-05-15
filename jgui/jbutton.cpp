@@ -196,7 +196,7 @@ void Button::Paint(Graphics *g)
     fg = theme->GetIntegerParam("component.fg"),
     fgfocus = theme->GetIntegerParam("component.fg.focus"),
     fgdisable = theme->GetIntegerParam("component.fg.disable");
-  jgui::jsize_t
+  jgui::jsize_t<int>
     size = GetSize();
   int
     x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
@@ -205,12 +205,12 @@ void Button::Paint(Graphics *g)
     h = size.height - 2*y;
 
   if (_image != nullptr) {
-    jgui::jsize_t
+    jgui::jsize_t<int>
       size = _image->GetSize();
 
     x = x + size.width + 8;;
 
-    g->DrawImage(_image, 8, 8);
+    g->DrawImage(_image, jpoint_t<int>{8, 8});
   }
 
   if (font != nullptr) {
@@ -228,7 +228,7 @@ void Button::Paint(Graphics *g)
 
     std::string text = font->TruncateString(GetText(), "...", w);
 
-    g->DrawString(text, x, y, w, h, _halign, _valign);
+    g->DrawString(text, {x, y, w, h}, _halign, _valign);
   }
 }
 

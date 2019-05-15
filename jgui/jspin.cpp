@@ -152,9 +152,9 @@ bool Spin::MousePressed(jevent::MouseEvent *event)
     return false;
   }
 
-  jgui::jpoint_t
+  jgui::jpoint_t<int>
     elocation = event->GetLocation();
-  jgui::jsize_t
+  jgui::jsize_t<int>
     size = GetSize();
   int
     x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
@@ -295,7 +295,7 @@ void Spin::Paint(Graphics *g)
     fg = theme->GetIntegerParam("component.fg"),
     fgfocus = theme->GetIntegerParam("component.fg.focus"),
     fgdisable = theme->GetIntegerParam("component.fg.disable");
-  jgui::jsize_t
+  jgui::jsize_t<int>
     size = GetSize();
   int
     x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
@@ -318,7 +318,7 @@ void Spin::Paint(Graphics *g)
       } else {
         g->SetColor(fg);
       }
-      g->FillTriangle(x+w, y+arrow_size, x+w-arrow_size, y, x+w-arrow_size, y+2*arrow_size);
+      g->FillTriangle({x+w, y+arrow_size}, {x+w-arrow_size, y}, {x+w-arrow_size, y+2*arrow_size});
     }
 
     if (_loop == true || (_index > 0 && _items.size() > 0)) {
@@ -327,7 +327,7 @@ void Spin::Paint(Graphics *g)
       } else {
         g->SetColor(fg);
       }
-      g->FillTriangle(x, y+arrow_size, x+arrow_size, y, x+arrow_size, y+2*arrow_size);
+      g->FillTriangle({x, y+arrow_size}, {x+arrow_size, y}, {x+arrow_size, y+2*arrow_size});
     }
 
     if (_items.size() > 0) {
@@ -350,7 +350,7 @@ void Spin::Paint(Graphics *g)
           text = font->TruncateString(text, "...", w);
         // }
 
-        g->DrawString(text, x, y, w, h, _items[_index]->GetHorizontalAlign(), _items[_index]->GetVerticalAlign());
+        g->DrawString(text, {x, y, w, h}, _items[_index]->GetHorizontalAlign(), _items[_index]->GetVerticalAlign());
       }
     }
   } else if (_type == JSO_VERTICAL) {
@@ -362,7 +362,7 @@ void Spin::Paint(Graphics *g)
       }
     }
 
-    g->FillTriangle(size.width-2*arrow_size-x, y+arrow_size, size.width-x, y+arrow_size, size.width-arrow_size-x, y);
+    g->FillTriangle({size.width-2*arrow_size-x, y+arrow_size}, {size.width-x, y+arrow_size}, {size.width-arrow_size-x, y});
 
     if (_loop == true || (_index > 0 && _items.size() > 0)) {
       if (HasFocus() == true) {
@@ -372,7 +372,7 @@ void Spin::Paint(Graphics *g)
       }
     }
 
-    g->FillTriangle(size.width-2*arrow_size-x, y+arrow_size+8, size.width-x, y+arrow_size+8, size.width-arrow_size-x, y+h);
+    g->FillTriangle({size.width-2*arrow_size-x, y+arrow_size+8}, {size.width-x, y+arrow_size+8}, {size.width-arrow_size-x, y+h});
 
     if (_items.size() > 0) {
       if (font != nullptr) {
@@ -394,7 +394,7 @@ void Spin::Paint(Graphics *g)
           text = font->TruncateString(text, "...", w);
         // }
 
-        g->DrawString(text, x, y, w, h, _items[_index]->GetHorizontalAlign(), _items[_index]->GetVerticalAlign());
+        g->DrawString(text, {x, y, w, h}, _items[_index]->GetHorizontalAlign(), _items[_index]->GetVerticalAlign());
       }
     }
   }

@@ -197,46 +197,7 @@ struct jpen_t {
  */
 struct jgradient_t {
   Color color;
-  double stop;
-};
-
-/**
- * \brief
- *
- */
-struct jpoint_t {
-  int x;
-  int y;
-};
-
-/**
- * \brief
- *
- */
-struct jpoint3d_t {
-  float x;
-  float y;
-  float z;
-};
-
-/**
- * \brief
- *
- */
-struct jsize_t {
-  int width;
-  int height;
-};
-
-/**
- * \brief
- *
- */
-struct jregion_t {
-  int x;
-  int y;
-  int width;
-  int height;
+  float stop;
 };
 
 /**
@@ -254,20 +215,72 @@ struct jinsets_t {
  * \brief
  *
  */
-struct jline_t {
-  int x0;
-  int y0;
-  int x1;
-  int y1;
+struct jrational_t {
+  int num;
+  int den;
 };
 
 /**
  * \brief
  *
  */
-struct jrational_t {
-  int num;
-  int den;
+template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
+  struct jpoint_t {
+    T x;
+    T y;
+  };
+
+/**
+ * \brief
+ *
+ */
+template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
+  struct jpoint3d_t {
+    T x;
+    T y;
+    T z;
+  };
+
+/**
+ * \brief
+ *
+ */
+template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
+  struct jsize_t {
+    T width;
+    T height;
+  };
+
+/**
+ * \brief
+ *
+ */
+template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
+  struct jregion_t {
+    T x;
+    T y;
+    T width;
+    T height;
+};
+
+/**
+ * \brief
+ *
+ */
+template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
+  struct jline_t {
+    struct jpoint_t<T> p0;
+    struct jpoint_t<T> p1;
+};
+
+/**
+ * \brief
+ *
+ */
+template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
+  struct jrect_t {
+    struct jpoint_t<T> point;
+    struct jsize_t<T> size;
 };
 
 class Image;
@@ -288,13 +301,13 @@ class Graphics : public virtual jcommon::Object {
     /** \brief */
     Color _color;
     /** \brief */
-    struct jpoint_t _translate;
+    struct jpoint_t<int> _translate;
     /** \brief */
     jpen_t _pen;
     /** \brief */
-    struct jregion_t _clip;
+    struct jregion_t<int> _clip;
     /** \brief */
-    struct jregion_t _internal_clip;
+    struct jregion_t<int> _internal_clip;
     /** \brief */
     jcomposite_flags_t _composite_flags;
     /** \brief */
@@ -335,31 +348,31 @@ class Graphics : public virtual jcommon::Object {
      * \brief
      *
      */
-    virtual void Translate(int x, int y);
+    virtual void Translate(jpoint_t<int> point);
 
     /**
      * \brief
      *
      */
-    virtual jpoint_t Translate();
+    virtual jpoint_t<int> Translate();
 
     /**
      * \brief
      *
      */
-    virtual jregion_t ClipRect(int xp, int yp, int wp, int hp);
+    virtual jregion_t<int> ClipRect(jrect_t<int> rect);
     
     /**
      * \brief
      *
      */
-    virtual void SetClip(int xp, int yp, int wp, int hp);
+    virtual void SetClip(jrect_t<int> rect);
     
     /**
      * \brief
      *
      */
-    virtual jregion_t GetClip();
+    virtual jregion_t<int> GetClip();
     
     /**
      * \brief
@@ -377,7 +390,7 @@ class Graphics : public virtual jcommon::Object {
      * \brief
      *
      */
-    virtual void Clear(int xp, int yp, int wp, int hp);
+    virtual void Clear(jrect_t<int> rect);
     
     /**
      * \brief
@@ -390,18 +403,6 @@ class Graphics : public virtual jcommon::Object {
      *
      */
     virtual void SetColor(const Color &color); 
-    
-    /**
-     * \brief
-     *
-     */
-    virtual void SetColor(uint32_t color); 
-    
-    /**
-     * \brief
-     *
-     */
-    virtual void SetColor(int red, int green, int blue, int alpha = 0xff); 
     
     /**
      * \brief
@@ -461,7 +462,7 @@ class Graphics : public virtual jcommon::Object {
      * \brief
      *
      */
-    virtual void DrawLine(int xp, int yp, int xf, int yf);
+    virtual void DrawLine(jline_t<int> line);
     
     /**
      * \brief
@@ -471,133 +472,133 @@ class Graphics : public virtual jcommon::Object {
      * \param interpolation Number of steps for the interpolation. Minimum number is 2.
      *
      */
-    virtual void DrawBezierCurve(jpoint_t *p, int npoints, int interpolation);
+    virtual void DrawBezierCurve(std::vector<jpoint_t<int>> points, int interpolation);
     
     /**
      * \brief
      *
      */
-    virtual void FillRectangle(int xp, int yp, int wp, int hp);
+    virtual void FillRectangle(jrect_t<int> rect);
     
     /**
      * \brief
      *
      */
-    virtual void DrawRectangle(int xp, int yp, int wp, int hp);
+    virtual void DrawRectangle(jrect_t<int> rect);
     
     /**
      * \brief
      *
      */
-    virtual void FillBevelRectangle(int xp, int yp, int wp, int hp, int dx = 10, int dy = 10, jrect_corner_t corners = (jrect_corner_t)0xff);
+    virtual void FillBevelRectangle(jrect_t<int> rect, int dx = 10, int dy = 10, jrect_corner_t corners = (jrect_corner_t)0xff);
     
     /**
      * \brief
      *
      */
-    virtual void DrawBevelRectangle(int xp, int yp, int wp, int hp, int dx = 10, int dy = 10, jrect_corner_t corners = (jrect_corner_t)0xff);
+    virtual void DrawBevelRectangle(jrect_t<int> rect, int dx = 10, int dy = 10, jrect_corner_t corners = (jrect_corner_t)0xff);
     
     /**
      * \brief
      *
      */
-    virtual void FillRoundRectangle(int xp, int yp, int wp, int hp, int dx = 10, int dy = 10, jrect_corner_t corners = (jrect_corner_t)0xff);
+    virtual void FillRoundRectangle(jrect_t<int> rect, int dx = 10, int dy = 10, jrect_corner_t corners = (jrect_corner_t)0xff);
     
     /**
      * \brief
      *
      */
-    virtual void DrawRoundRectangle(int xp, int yp, int wp, int hp, int dx = 10, int dy = 10, jrect_corner_t corners = (jrect_corner_t)0xff);
+    virtual void DrawRoundRectangle(jrect_t<int> rect, int dx = 10, int dy = 10, jrect_corner_t corners = (jrect_corner_t)0xff);
     
     /**
      * \brief
      *
      */
-    virtual void FillCircle(int xp, int yp, int rp);
+    virtual void FillCircle(jpoint_t<int> point, int rp);
     
     /**
      * \brief
      *
      */
-    virtual void DrawCircle(int xp, int yp, int rp);
+    virtual void DrawCircle(jpoint_t<int> point, int rp);
     
     /**
      * \brief
      *
      */
-    virtual void FillEllipse(int xcp, int ycp, int rxp, int ryp);
+    virtual void FillEllipse(jpoint_t<int> point, jsize_t<int> size);
 
     /**
      * \brief
      *
      */
-    virtual void DrawEllipse(int xcp, int ycp, int rxp, int ryp);
+    virtual void DrawEllipse(jpoint_t<int> point, jsize_t<int> size);
     
     /**
      * \brief
      *
      */
-    virtual void FillChord(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1);
+    virtual void FillChord(jpoint_t<int> point, jsize_t<int> size, float arc0, float arc1);
     
     /**
      * \brief
      *
      */
-    virtual void DrawChord(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1);
+    virtual void DrawChord(jpoint_t<int> point, jsize_t<int> size, float arc0, float arc1);
     
     /**
      * \brief
      *
      */
-    virtual void FillArc(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1);
+    virtual void FillArc(jpoint_t<int> point, jsize_t<int> size, float arc0, float arc1);
     
     /**
      * \brief
      *
      */
-    virtual void DrawArc(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1);
+    virtual void DrawArc(jpoint_t<int> point, jsize_t<int> size, float arc0, float arc1);
     
     /**
      * \brief
      *
      */
-    virtual void FillPie(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1);
+    virtual void FillPie(jpoint_t<int> point, jsize_t<int> size, float arc0, float arc1);
     
     /**
      * \brief
      *
      */
-    virtual void DrawPie(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1);
+    virtual void DrawPie(jpoint_t<int> point, jsize_t<int> size, float arc0, float arc1);
     
     /**
      * \brief
      *
      */
-    virtual void FillTriangle(int x1, int y1, int x2, int y2, int x3, int y3);
+    virtual void FillTriangle(jpoint_t<int> p0, jpoint_t<int> p1, jpoint_t<int> p2);
     
     /**
      * \brief
      *
      */
-    virtual void DrawTriangle(int x1, int y1, int x2, int y2, int x3, int y3);
+    virtual void DrawTriangle(jpoint_t<int> p0, jpoint_t<int> p1, jpoint_t<int> p2);
     
     /**
      * \brief
      *
      */
-    virtual void FillPolygon(int xp, int yp, jpoint_t *p, int npoints, bool even_odd = false);
+    virtual void FillPolygon(jpoint_t<int> point, std::vector<jpoint_t<int>> points, bool even_odd = false);
     
     /**
      * \brief
      *
      */
-    virtual void DrawPolygon(int xp, int yp, jpoint_t *p, int npoints, bool closed);
+    virtual void DrawPolygon(jpoint_t<int> point, std::vector<jpoint_t<int>> points, bool closed = false);
     
     /**
      * \brief
      *
      */
-    virtual void SetGradientStop(double stop, const Color &color);
+    virtual void SetGradientStop(float stop, const Color &color);
     
       /**
      * \brief
@@ -609,79 +610,79 @@ class Graphics : public virtual jcommon::Object {
      * \brief
      *
      */
-    virtual void FillRadialGradient(int xcp, int ycp, int wp, int hp, int x0p, int y0p, int r0p);
+    virtual void FillRadialGradient(jpoint_t<int> p0, jsize_t<int> size, jpoint_t<int> p1, int r0p);
     
     /**
      * \brief
      *
      */
-    virtual void FillLinearGradient(int xp, int yp, int wp, int hp, int x1p, int y1p, int x2p, int y2p);
+    virtual void FillLinearGradient(jrect_t<int> rect, jpoint_t<int> p0, jpoint_t<int> p1);
     
     /**
      * \brief
      *
      */
-    virtual void DrawGlyph(int symbol, int xp, int yp);
+    virtual void DrawGlyph(int symbol, jpoint_t<int> point);
     
     /**
      * \brief
      *
      */
-    virtual bool DrawImage(Image *img, int xp, int yp);
+    virtual bool DrawImage(Image *img, jpoint_t<int> point);
     
     /**
      * \brief
      *
      */
-    virtual bool DrawImage(Image *img, int xp, int yp, int wp, int hp);
+    virtual bool DrawImage(Image *img, jrect_t<int> dst);
     
     /**
      * \brief
      *
      */
-    virtual bool DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp, int yp);
+    virtual bool DrawImage(Image *img, jrect_t<int> src, jpoint_t<int> dst);
     
     /**
      * \brief
      *
      */
-    virtual bool DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp, int yp, int wp, int hp);
+    virtual bool DrawImage(Image *img, jrect_t<int> src, jrect_t<int> dst);
     
     /**
      * \brief
      *
      */
-    virtual void DrawString(std::string text, int xp, int yp);
+    virtual void DrawString(std::string text, jpoint_t<int> point);
     
     /**
      * \brief
      *
      */
-    virtual void DrawString(std::string text, int xp, int yp, int wp, int hp, jhorizontal_align_t halign = JHA_JUSTIFY, jvertical_align_t valign = JVA_CENTER, bool clipped = true);
+    virtual void DrawString(std::string text, jrect_t<int> rect, jhorizontal_align_t halign = JHA_JUSTIFY, jvertical_align_t valign = JVA_CENTER, bool clipped = true);
 
     /**
      * \brief
      *
      */
-    virtual uint32_t GetRGB(int xp, int yp, uint32_t pixel = 0xff000000);
+    virtual uint32_t GetRGB(jpoint_t<int> point, uint32_t pixel = 0xff000000);
     
     /**
      * \brief
      *
      */
-    virtual void GetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp);
+    virtual void GetRGBArray(uint32_t *rgb, jrect_t<int> rect);
     
     /**
      * \brief
      *
      */
-    virtual void SetRGB(uint32_t rgb, int xp, int yp);
+    virtual void SetRGB(uint32_t rgb, jpoint_t<int> point);
     
     /**
      * \brief
      *
      */
-    virtual void SetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp);
+    virtual void SetRGBArray(uint32_t *rgb, jrect_t<int> rect);
   
     /**
      * \brief
@@ -693,43 +694,43 @@ class Graphics : public virtual jcommon::Object {
      * \brief
      *
      */
-    virtual void SetPattern(int xp, int yp, int wp, int hp);
+    virtual void SetPattern(jpoint_t<int> p0, jpoint_t<int> p1);
 
     /**
      * \brief
      *
      */
-    virtual void SetPattern(int x0p, int y0p, int rad0, int x1p, int y1p, int rad1);
+    virtual void SetPattern(jpoint_t<int> p0, int rad0, jpoint_t<int> p1, int rad1);
 
     /**
      * \brief
      *
      */
-    virtual void MoveTo(int xp, int yp);
+    virtual void MoveTo(jpoint_t<int> point);
 
     /**
      * \brief
      *
      */
-    virtual void LineTo(int xp, int yp);
+    virtual void LineTo(jpoint_t<int> point);
 
     /**
      * \brief
      *
      */
-    virtual void CurveTo(int x1p, int y1p, int x2p, int y2p, int x3p, int y3p);
+    virtual void CurveTo(jpoint_t<int> p0, jpoint_t<int> p1, jpoint_t<int> p2);
 
     /**
      * \brief
      *
      */
-    virtual void ArcTo(int xcp, int ycp, int radius, double arc0, double arc1, bool negative = true);
+    virtual void ArcTo(jpoint_t<int> point, int radius, float arc0, float arc1, bool negative = true);
 
     /**
      * \brief
      *
      */
-    virtual void TextTo(std::string text, int xp, int yp);
+    virtual void TextTo(std::string text, jpoint_t<int> point);
 
     /**
      * \brief
@@ -765,13 +766,13 @@ class Graphics : public virtual jcommon::Object {
      * \brief
      *
      */
-    virtual void SetMatrix(double *matrix);
+    virtual void SetMatrix(float *matrix);
     
     /**
      * \brief
      *
      */
-    virtual void GetMatrix(double **matrix);
+    virtual void GetMatrix(float **matrix);
 
     /**
      * \brief

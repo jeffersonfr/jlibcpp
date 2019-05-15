@@ -75,7 +75,7 @@ class KeyButton : public Button {
     {
       jcommon::Object::SetClassName("KeyButton");
 
-      jsize_t t = {
+      jsize_t<int> t = {
         .width = width,
         .height = height
       };

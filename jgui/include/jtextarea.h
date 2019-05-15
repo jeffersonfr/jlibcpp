@@ -92,7 +92,7 @@ class TextArea : public jgui::TextComponent {
      * \brief
      *
      */
-    virtual jsize_t GetScrollDimension();
+    virtual jsize_t<int> GetScrollDimension();
     
     /**
      * \brief

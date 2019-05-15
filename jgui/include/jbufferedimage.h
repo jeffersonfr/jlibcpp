@@ -46,7 +46,7 @@ class BufferedImage : public virtual jgui::Image {
      * \brief
      *
      */
-    BufferedImage(jpixelformat_t pixelformat, int width, int height);
+    BufferedImage(jpixelformat_t pixelformat, jsize_t<int> size);
     
     /**
      * \brief
@@ -88,7 +88,7 @@ class BufferedImage : public virtual jgui::Image {
      * \brief
      *
      */
-    virtual Image * Shear(float dx, float dy);
+    virtual Image * Shear(jsize_t<float> size);
 
     /**
      * \brief
@@ -100,13 +100,13 @@ class BufferedImage : public virtual jgui::Image {
      * \brief
      *
      */
-    virtual Image * Scale(int wp, int hp);
+    virtual Image * Scale(jsize_t<int> size);
 
     /**
      * \brief
      *
      */
-    virtual Image * Crop(int xp, int yp, int wp, int hp);
+    virtual Image * Crop(jrect_t<int> rect);
 
     /**
      * \brief
@@ -124,7 +124,7 @@ class BufferedImage : public virtual jgui::Image {
      * \brief
      *
      */
-    virtual void GetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp);
+    virtual void GetRGBArray(uint32_t *rgb, jrect_t<int> rect);
     
     /**
      * \brief

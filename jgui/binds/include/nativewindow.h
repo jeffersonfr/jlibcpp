@@ -105,7 +105,7 @@ class NativeWindow : public jgui::Window {
 		 * \brief
 		 *
 		 */
-		virtual jgui::jregion_t GetBounds();
+		virtual jgui::jregion_t<int> GetBounds();
 		
 		/**
 		 * \brief
@@ -129,7 +129,7 @@ class NativeWindow : public jgui::Window {
 		 * \brief
 		 *
 		 */
-		virtual jpoint_t GetCursorLocation();
+		virtual jpoint_t<int> GetCursorLocation();
 		
 		/**
 		 * \brief

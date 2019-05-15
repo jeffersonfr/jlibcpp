@@ -109,15 +109,15 @@ class LibvlcPlayerComponentImpl : public jgui::Component {
 		/** \brief */
     std::mutex _mutex;
 		/** \brief */
-		jgui::jregion_t _src;
+		jgui::jregion_t<int> _src;
 		/** \brief */
-		jgui::jregion_t _dst;
+		jgui::jregion_t<int> _dst;
 		/** \brief */
     jgui::Image **_buffer;
 		/** \brief */
 		int _buffer_index;
 		/** \brief */
-		jgui::jsize_t _frame_size;
+		jgui::jsize_t<int> _frame_size;
 
 	public:
 		LibvlcPlayerComponentImpl(Player *player, int x, int y, int w, int h):
@@ -125,8 +125,8 @@ class LibvlcPlayerComponentImpl : public jgui::Component {
 		{
 			_buffer = new jgui::Image*[2];
 			
-			_buffer[0] = new jgui::BufferedImage(jgui::JPF_RGB32, w, h);
-			_buffer[1] = new jgui::BufferedImage(jgui::JPF_RGB32, w, h);
+			_buffer[0] = new jgui::BufferedImage(jgui::JPF_RGB32, {w, h});
+			_buffer[1] = new jgui::BufferedImage(jgui::JPF_RGB32, {w, h});
 
 			_buffer_index = 0;
 
@@ -164,7 +164,7 @@ class LibvlcPlayerComponentImpl : public jgui::Component {
 			}
 		}
 
-		virtual jgui::jsize_t GetPreferredSize()
+		virtual jgui::jsize_t<int> GetPreferredSize()
 		{
 			return _frame_size;
 		}
@@ -178,7 +178,7 @@ class LibvlcPlayerComponentImpl : public jgui::Component {
 		{
 			// jgui::Component::Paint(g);
 
-      jgui::jsize_t
+      jgui::jsize_t<int>
         size = GetSize();
 
       jgui::Image *image = _buffer[(_buffer_index + 1)%2];
@@ -190,9 +190,9 @@ class LibvlcPlayerComponentImpl : public jgui::Component {
 	    g->SetAntialias(jgui::JAM_NONE);
 
       if (_src.x == 0 and _src.y == 0 and _src.width == _frame_size.width and _src.height == _frame_size.height) {
-			  g->DrawImage(image, 0, 0, size.width, size.height);
+			  g->DrawImage(image, {0, 0, size.width, size.height});
       } else {
-			  g->DrawImage(image, _src.x, _src.y, _src.width, _src.height, 0, 0, size.width, size.height);
+			  g->DrawImage(image, {_src.x, _src.y, _src.width, _src.height}, {0, 0, size.width, size.height});
       }
       
       image->UnlockData();
@@ -443,12 +443,12 @@ class LibvlcVideoSizeControlImpl : public VideoSizeControl {
 			impl->SetBounds(x, y, w, h);
 		}
 
-		virtual jgui::jregion_t GetSource()
+		virtual jgui::jregion_t<int> GetSource()
 		{
 			return dynamic_cast<LibvlcPlayerComponentImpl *>(_player->_component)->_src;
 		}
 
-		virtual jgui::jregion_t GetDestination()
+		virtual jgui::jregion_t<int> GetDestination()
 		{
 			return dynamic_cast<LibvlcPlayerComponentImpl *>(_player->_component)->GetVisibleBounds();
 		}

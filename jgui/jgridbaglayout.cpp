@@ -66,21 +66,21 @@ GridBagLayout::~GridBagLayout()
   }
 }
 
-jsize_t GridBagLayout::GetMinimumLayoutSize(Container *parent)
+jsize_t<int> GridBagLayout::GetMinimumLayoutSize(Container *parent)
 {
   GridBagLayoutInfo *info = GetLayoutInfo(parent, JGBLS_MIN_SIZE);
 
   return GetMinSize(parent, info);
 }
 
-jsize_t GridBagLayout::GetMaximumLayoutSize(Container *parent)
+jsize_t<int> GridBagLayout::GetMaximumLayoutSize(Container *parent)
 {
-  jsize_t t = {INT_MAX, INT_MAX};
+  jsize_t<int> t = {INT_MAX, INT_MAX};
 
   return t;
 }
 
-jsize_t GridBagLayout::GetPreferredLayoutSize(Container *parent)
+jsize_t<int> GridBagLayout::GetPreferredLayoutSize(Container *parent)
 {
   GridBagLayoutInfo *info = GetLayoutInfo(parent, JGBLS_PREFERRED_SIZE);
 
@@ -136,9 +136,9 @@ void GridBagLayout::RemoveConstraints(Component *comp)
   comptable.erase(comp);
 }
 
-jpoint_t GridBagLayout::GetLayoutOrigin () 
+jpoint_t<int> GridBagLayout::GetLayoutOrigin () 
 {
-  jpoint_t origin = {0, 0};
+  jpoint_t<int> origin = {0, 0};
   if (layoutInfo != nullptr) {
     origin.x = layoutInfo->startx;
     origin.y = layoutInfo->starty;
@@ -156,7 +156,7 @@ void GridBagLayout::RemoveLayoutComponent(Component *comp)
   RemoveConstraints(comp);
 }
 
-jgui::jpoint_t GridBagLayout::PreInitMaximumArraySizes(Container *parent)
+jgui::jpoint_t<int> GridBagLayout::PreInitMaximumArraySizes(Container *parent)
 {
   const std::vector<Component *> 
     &components = parent->GetComponents();
@@ -164,7 +164,7 @@ jgui::jpoint_t GridBagLayout::PreInitMaximumArraySizes(Container *parent)
     *comp = nullptr;
   GridBagConstraints 
     *constraints = nullptr;
-  jgui::jpoint_t
+  jgui::jpoint_t<int>
     returnPoint;
   int 
     curX, 
@@ -230,7 +230,7 @@ GridBagLayoutInfo * GridBagLayout::GetLayoutInfo(Container *parent, int sizeflag
   GridBagLayoutInfo *r;
   Component *comp;
   GridBagConstraints *constraints;
-  jsize_t d;
+  jsize_t<int> d;
   // Code below will address index curX+curWidth in the case of yMaxArray, weightY
   // ( respectively curY+curHeight for xMaxArray, weightX ) where
   //  curX in 0 to preInitMaximumArraySizes.y
@@ -275,7 +275,7 @@ GridBagLayoutInfo * GridBagLayout::GetLayoutInfo(Container *parent, int sizeflag
   layoutWidth = layoutHeight = 0; 
   curRow = curCol = -1;
 
-  jgui::jpoint_t arraySizes = PreInitMaximumArraySizes(parent);
+  jgui::jpoint_t<int> arraySizes = PreInitMaximumArraySizes(parent);
 
   /* fix for 4623196.
    * If user try to create a very big grid we can
@@ -749,7 +749,7 @@ GridBagLayoutInfo * GridBagLayout::GetLayoutInfo(Container *parent, int sizeflag
   return r;
 } 
 
-bool GridBagLayout::CalculateBaseline(Component *c, GridBagConstraints *constraints, jsize_t size) 
+bool GridBagLayout::CalculateBaseline(Component *c, GridBagConstraints *constraints, jsize_t<int> size) 
 {
   int anchor = constraints->anchor;
   if (anchor == JGBLC_BASELINE ||
@@ -796,7 +796,7 @@ bool GridBagLayout::CalculateBaseline(Component *c, GridBagConstraints *constrai
   }
 }
 
-void GridBagLayout::AdjustForGravity(GridBagConstraints *constraints, jregion_t *r) 
+void GridBagLayout::AdjustForGravity(GridBagConstraints *constraints, jregion_t<int> *r) 
 {
   int diffx, diffy;
   int cellY = r->y;
@@ -946,7 +946,7 @@ void GridBagLayout::AdjustForGravity(GridBagConstraints *constraints, jregion_t 
   }
 }
 
-void GridBagLayout::AlignOnBaseline(GridBagConstraints *cons, jregion_t *r, int cellY, int cellHeight) 
+void GridBagLayout::AlignOnBaseline(GridBagConstraints *cons, jregion_t<int> *r, int cellY, int cellHeight) 
 {
   if (cons->ascent >= 0) {
     if (cons->baselineResizeBehavior == JCB_CONSTANT_DESCENT) {
@@ -1072,7 +1072,7 @@ void GridBagLayout::AlignOnBaseline(GridBagConstraints *cons, jregion_t *r, int 
   }
 }
 
-void GridBagLayout::AlignAboveBaseline(GridBagConstraints *cons, jregion_t *r, int cellY, int cellHeight) 
+void GridBagLayout::AlignAboveBaseline(GridBagConstraints *cons, jregion_t<int> *r, int cellY, int cellHeight) 
 {
   if (layoutInfo->HasBaseline(cons->tempY)) {
     int maxY; // Baseline for the row
@@ -1101,7 +1101,7 @@ void GridBagLayout::AlignAboveBaseline(GridBagConstraints *cons, jregion_t *r, i
   }
 }
 
-void GridBagLayout::AlignBelowBaseline(GridBagConstraints *cons, jregion_t *r, int cellY, int cellHeight) 
+void GridBagLayout::AlignBelowBaseline(GridBagConstraints *cons, jregion_t<int> *r, int cellY, int cellHeight) 
 {
   if (layoutInfo->HasBaseline(cons->tempY)) {
     if (layoutInfo->HasConstantDescent(cons->tempY)) {
@@ -1121,16 +1121,16 @@ void GridBagLayout::AlignBelowBaseline(GridBagConstraints *cons, jregion_t *r, i
   }
 }
 
-void GridBagLayout::CenterVertically(GridBagConstraints *cons, jregion_t *r, int cellHeight) 
+void GridBagLayout::CenterVertically(GridBagConstraints *cons, jregion_t<int> *r, int cellHeight) 
 {
   if (!cons->IsVerticallyResizable()) {
     r->y += jmath::Math<int>::Max(0, (cellHeight - cons->insets.top - cons->insets.bottom - cons->minHeight - cons->ipady) / 2);
   }
 }
 
-jsize_t GridBagLayout::GetMinSize(Container *parent, GridBagLayoutInfo *info) 
+jsize_t<int> GridBagLayout::GetMinSize(Container *parent, GridBagLayoutInfo *info) 
 {
-  jsize_t d = {0, 0};
+  jsize_t<int> d = {0, 0};
   int i, t;
   jinsets_t insets = parent->GetInsets();
 
@@ -1157,8 +1157,8 @@ void GridBagLayout::ArrangeGrid(Container *parent)
   GridBagConstraints *constraints;
   GridBagLayoutInfo *info;
   jinsets_t insets = parent->GetInsets();
-  jregion_t r = {0, 0};
-  jsize_t d;
+  jregion_t<int> r = {0, 0};
+  jsize_t<int> d;
   double weight;
   int compindex;
   int i, 
@@ -1172,7 +1172,7 @@ void GridBagLayout::ArrangeGrid(Container *parent)
     return;
   }
 
-  jgui::jsize_t size = parent->GetSize();
+  jgui::jsize_t<int> size = parent->GetSize();
 
   // Pass #1: scan all the slaves to figure out the total amount of space needed.
   info = GetLayoutInfo(parent, JGBLS_PREFERRED_SIZE);
@@ -1322,7 +1322,7 @@ void GridBagLayout::ArrangeGrid(Container *parent)
     if ((r.width <= 0) || (r.height <= 0)) {
       comp->SetBounds(0, 0, 0, 0);
     } else {
-      jgui::jregion_t r2 = comp->GetVisibleBounds();
+      jgui::jregion_t<int> r2 = comp->GetVisibleBounds();
 
       if (r2.x != r.x || r2.y != r.y || r2.width != r.width || r2.height != r.height) {
         comp->SetBounds(r.x, r.y, r.width, r.height);

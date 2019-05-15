@@ -27,10 +27,10 @@
 
 namespace jgui {
 
-void FillTriangle0(Raster *raster, jgui::jpoint_t v1, jgui::jpoint_t v2, jgui::jpoint_t v3)
+void FillTriangle0(Raster *raster, jgui::jpoint_t<int> v1, jgui::jpoint_t<int> v2, jgui::jpoint_t<int> v3)
 {
-  jgui::jpoint_t vTmp1 {v1.x, v1.y};
-  jgui::jpoint_t vTmp2 {v1.x, v1.y};
+  jgui::jpoint_t<int> vTmp1 {v1.x, v1.y};
+  jgui::jpoint_t<int> vTmp2 {v1.x, v1.y};
 
   bool changed1 = false;
   bool changed2 = false;
@@ -111,7 +111,7 @@ void FillTriangle0(Raster *raster, jgui::jpoint_t v1, jgui::jpoint_t v2, jgui::j
   }
 }
 
-Raster::Raster(uint32_t *data, jgui::jsize_t size)
+Raster::Raster(uint32_t *data, jgui::jsize_t<int> size)
 {
   if (data == nullptr) {
     throw jexception::NullPointerException("Invalid data");
@@ -131,7 +131,7 @@ uint32_t * Raster::GetData()
   return _buffer;
 }
 
-jgui::jsize_t Raster::GetSize()
+jgui::jsize_t<int> Raster::GetSize()
 {
   return _size;
 }
@@ -155,7 +155,7 @@ void Raster::Clear()
   }
 }
 
-void Raster::SetPixel(jgui::jpoint_t v1)
+void Raster::SetPixel(jgui::jpoint_t<int> v1)
 {
   if (v1.x < 0 or v1.y < 0 or v1.x >= _size.width or v1.y >= _size.height) {
     return;
@@ -164,7 +164,7 @@ void Raster::SetPixel(jgui::jpoint_t v1)
   _buffer[v1.y*_size.width + v1.x] = _color;
 }
 
-uint32_t Raster::GetPixel(jgui::jpoint_t v1)
+uint32_t Raster::GetPixel(jgui::jpoint_t<int> v1)
 {
   if (v1.x < 0 or v1.y < 0 or v1.x >= _size.width or v1.y >= _size.height) {
     return 0x00000000;
@@ -173,7 +173,7 @@ uint32_t Raster::GetPixel(jgui::jpoint_t v1)
   return _buffer[v1.y*_size.width + v1.x];
 }
 
-void Raster::ScanLine(jgui::jpoint_t v1, int size)
+void Raster::ScanLine(jgui::jpoint_t<int> v1, int size)
 {
   if ((v1.x + size) < 0 or v1.y < 0 or v1.x > _size.width or v1.y >= _size.height) {
     return;
@@ -193,7 +193,7 @@ void Raster::ScanLine(jgui::jpoint_t v1, int size)
   }
 }
 
-void Raster::DrawLine(jgui::jpoint_t v1, jgui::jpoint_t v2)
+void Raster::DrawLine(jgui::jpoint_t<int> v1, jgui::jpoint_t<int> v2)
 {
   v1.x = (v1.x < 0)?0:(v1.x >= _size.width)?_size.width - 1:v1.x;
   v1.y = (v1.y < 0)?0:(v1.y >= _size.height)?_size.height - 1:v1.y;
@@ -225,17 +225,17 @@ void Raster::DrawLine(jgui::jpoint_t v1, jgui::jpoint_t v2)
   }
 }
 
-void Raster::DrawTriangle(jgui::jpoint_t v1, jgui::jpoint_t v2, jgui::jpoint_t v3)
+void Raster::DrawTriangle(jgui::jpoint_t<int> v1, jgui::jpoint_t<int> v2, jgui::jpoint_t<int> v3)
 {
   DrawLine(v1, v2);
   DrawLine(v2, v3);
   DrawLine(v3, v1);
 }
 
-void Raster::FillTriangle(jgui::jpoint_t v1, jgui::jpoint_t v2, jgui::jpoint_t v3) 
+void Raster::FillTriangle(jgui::jpoint_t<int> v1, jgui::jpoint_t<int> v2, jgui::jpoint_t<int> v3) 
 {
   // at first sort the three vertices by y-coordinate ascending, so p1 is the topmost vertice
-  jgui::jpoint_t vTmp;
+  jgui::jpoint_t<int> vTmp;
 
   if (v1.y > v2.y) {
     vTmp = v1;
@@ -267,7 +267,7 @@ void Raster::FillTriangle(jgui::jpoint_t v1, jgui::jpoint_t v2, jgui::jpoint_t v
     FillTriangle0(this, v3, v1, v2);
   } else {
     // general case - split the triangle in a topflat and bottom-flat one
-    jgui::jpoint_t vTmp { (int)(v1.x + ((float)(v2.y - v1.y) / (float)(v3.y - v1.y)) * (v3.x - v1.x)), v2.y };
+    jgui::jpoint_t<int> vTmp { (int)(v1.x + ((float)(v2.y - v1.y) / (float)(v3.y - v1.y)) * (v3.x - v1.x)), v2.y };
 
     FillTriangle0(this, v1, v2, vTmp);
 
@@ -278,9 +278,9 @@ void Raster::FillTriangle(jgui::jpoint_t v1, jgui::jpoint_t v2, jgui::jpoint_t v
   }
 }
 
-void Raster::DrawRectangle(jgui::jpoint_t v1, jgui::jsize_t s1)
+void Raster::DrawRectangle(jgui::jpoint_t<int> v1, jgui::jsize_t<int> s1)
 {
-  jgui::jpoint_t 
+  jgui::jpoint_t<int> 
     v2 {v1.x + s1.width, v1.y},
     v3 {v1.x + s1.width, v1.x + s1.height},
     v4 {v1.x, v1.y + s1.height};
@@ -291,23 +291,23 @@ void Raster::DrawRectangle(jgui::jpoint_t v1, jgui::jsize_t s1)
   DrawLine(v4, v1);
 }
 
-void Raster::FillRectangle(jgui::jpoint_t v1, jgui::jsize_t s1)
+void Raster::FillRectangle(jgui::jpoint_t<int> v1, jgui::jsize_t<int> s1)
 {
   for (int j=0; j<s1.height; j++) {
     ScanLine({v1.x, v1.y + j}, s1.width);
   }
 }
 
-void Raster::DrawPolygon(jgui::jpoint_t v1, std::vector<jgui::jpoint_t> points)
+void Raster::DrawPolygon(jgui::jpoint_t<int> v1, std::vector<jgui::jpoint_t<int>> points)
 {
   if (points.size() == 0) {
     return;
   }
 
-  jgui::jpoint_t p1 = points[0];
+  jgui::jpoint_t<int> p1 = points[0];
 
   for (int i=1; i<(int)points.size(); i++) {
-    jgui::jpoint_t p2 = points[i];
+    jgui::jpoint_t<int> p2 = points[i];
 
     DrawLine({p1.x + v1.x, p1.y + v1.y}, {p2.x + v1.x, p2.y + v1.y});
 
@@ -315,7 +315,7 @@ void Raster::DrawPolygon(jgui::jpoint_t v1, std::vector<jgui::jpoint_t> points)
   }
 }
 
-void Raster::DrawBezier(jgui::jpoint_t v1, jgui::jpoint_t v2, jgui::jpoint_t v3)
+void Raster::DrawBezier(jgui::jpoint_t<int> v1, jgui::jpoint_t<int> v2, jgui::jpoint_t<int> v3)
 {
   int sx = v1.x < v3.x ? 1 : -1;
   int sy = v1.y < v3.y ? 1 : -1; // step direction
@@ -400,7 +400,7 @@ void DrawCircle0(Raster *raster, int xc, int yc, int x, int y)
   raster->SetPixel({xc+y, yc-x}); 
 } 
 
-void Raster::DrawCircle(jgui::jpoint_t v1, int size)
+void Raster::DrawCircle(jgui::jpoint_t<int> v1, int size)
 {
   int x = 0, y = size; 
   int d = 3 - 2 * size; 
@@ -429,7 +429,7 @@ void FillCircle0(Raster *raster, int xc, int yc, int x, int y)
   raster->ScanLine({xc-y, yc-x}, 2*y); 
 } 
 
-void Raster::FillCircle(jgui::jpoint_t v1, int size)
+void Raster::FillCircle(jgui::jpoint_t<int> v1, int size)
 {
   int x = 0, y = size; 
   int d = 3 - 2 * size; 
@@ -450,7 +450,7 @@ void Raster::FillCircle(jgui::jpoint_t v1, int size)
   }
 }
 
-void Raster::DrawEllipse(jgui::jpoint_t v1, jgui::jsize_t s1)
+void Raster::DrawEllipse(jgui::jpoint_t<int> v1, jgui::jsize_t<int> s1)
 {
   int 
     x0 = v1.x - s1.width,
@@ -503,7 +503,7 @@ void Raster::DrawEllipse(jgui::jpoint_t v1, jgui::jsize_t s1)
   }
 }
 
-void Raster::FillEllipse(jgui::jpoint_t v1, jgui::jsize_t s1)
+void Raster::FillEllipse(jgui::jpoint_t<int> v1, jgui::jsize_t<int> s1)
 {
   int 
     x0 = v1.x - s1.width,
@@ -556,7 +556,7 @@ void Raster::FillEllipse(jgui::jpoint_t v1, jgui::jsize_t s1)
   */
 }
 
-void Raster::DrawArc(jgui::jpoint_t v1, jgui::jsize_t s1, float arc0, float arc1)
+void Raster::DrawArc(jgui::jpoint_t<int> v1, jgui::jsize_t<int> s1, float arc0, float arc1)
 {
   int x0 = cos(arc0)*s1.width;
   int y0 = -sin(arc0)*s1.height;
@@ -572,16 +572,16 @@ void Raster::DrawArc(jgui::jpoint_t v1, jgui::jsize_t s1, float arc0, float arc1
   }
 }
 
-void Raster::FillArc(jgui::jpoint_t v1, jgui::jsize_t s1, float arc0, float arc1)
+void Raster::FillArc(jgui::jpoint_t<int> v1, jgui::jsize_t<int> s1, float arc0, float arc1)
 {
-  std::vector<jgui::jpoint_t> points;
+  std::vector<jgui::jpoint_t<int>> points;
 
   if ((arc0 + arc1) < 2*M_PI) {
     points.push_back({0, 0});
   }
 
   for (float i=arc0; i<=arc1; i+=0.05) {
-    points.push_back({cos(i)*s1.width, -sin(i)*s1.height});
+    points.push_back({(int)(cos(i)*s1.width), (int)(-sin(i)*s1.height)});
   }
   
   if ((arc0 + arc1) < 2*M_PI) {
@@ -591,7 +591,7 @@ void Raster::FillArc(jgui::jpoint_t v1, jgui::jsize_t s1, float arc0, float arc1
   FillPolygon(v1, points, false);
 }
 
-void FillPolygon0(jgui::Raster *raster, std::vector<jgui::jpoint_t> points, jgui::jpoint_t v1, jgui::jpoint_t v2)
+void FillPolygon0(jgui::Raster *raster, std::vector<jgui::jpoint_t<int>> points, jgui::jpoint_t<int> v1, jgui::jpoint_t<int> v2)
 {
 	int xnew, ynew, xold, yold, x1, y1, x2, y2, inside;
 
@@ -634,13 +634,13 @@ void FillPolygon0(jgui::Raster *raster, std::vector<jgui::jpoint_t> points, jgui
 	}
 }
 
-void Raster::FillPolygon(jgui::jpoint_t v1, std::vector<jgui::jpoint_t> points, bool holed)
+void Raster::FillPolygon(jgui::jpoint_t<int> v1, std::vector<jgui::jpoint_t<int>> points, bool holed)
 {
 	if (points.size() == 0) {
 		return;
 	}
 
-  std::vector<jgui::jpoint_t> v;
+  std::vector<jgui::jpoint_t<int>> v;
 	int 
     x1 = 0,
 		y1 = 0,
@@ -648,7 +648,7 @@ void Raster::FillPolygon(jgui::jpoint_t v1, std::vector<jgui::jpoint_t> points, 
 		y2 = 0;
 
 	for (int i=0; i<(int)points.size(); i++) {
-    jgui::jpoint_t p;
+    jgui::jpoint_t<int> p;
 
 		p.x = v1.x + points[i].x;
 		p.y = v1.y + points[i].y;

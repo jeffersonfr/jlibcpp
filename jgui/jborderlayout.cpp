@@ -67,39 +67,39 @@ void BorderLayout::SetVgap(int vgap)
   _vgap = vgap;
 }
 
-jsize_t BorderLayout::GetMinimumLayoutSize(Container *parent)
+jsize_t<int> BorderLayout::GetMinimumLayoutSize(Container *parent)
 {
   // WARN:: sync parent
   Component *cmp = nullptr;
-  jsize_t t = {0, 0};
+  jsize_t<int> t = {0, 0};
   bool ltr = (parent->GetComponentOrientation() == JCO_LEFT_TO_RIGHT);
       
   if ((cmp = GetChild(JBLA_EAST, ltr)) != nullptr) {
-      jsize_t d = cmp->GetMinimumSize();
+      jsize_t<int> d = cmp->GetMinimumSize();
       t.width += d.width + _hgap;
       t.height = (std::max)(d.height, t.height);
   }
   
   if ((cmp = GetChild(JBLA_WEST, ltr)) != nullptr) {
-      jsize_t d = cmp->GetMinimumSize();
+      jsize_t<int> d = cmp->GetMinimumSize();
       t.width += d.width + _hgap;
       t.height = (std::max)(d.height, t.height);
   }
   
   if ((cmp = GetChild(JBLA_CENTER, ltr)) != nullptr) {
-      jsize_t d = cmp->GetMinimumSize();
+      jsize_t<int> d = cmp->GetMinimumSize();
       t.width += d.width;
       t.height = (std::max)(d.height, t.height);
   }
   
   if ((cmp = GetChild(JBLA_NORTH, ltr)) != nullptr) {
-      jsize_t d = cmp->GetMinimumSize();
+      jsize_t<int> d = cmp->GetMinimumSize();
       t.width = (std::max)(d.width, t.width);
       t.height += d.height + _vgap;
   }
   
   if ((cmp = GetChild(JBLA_SOUTH, ltr)) != nullptr) {
-      jsize_t d = cmp->GetMinimumSize();
+      jsize_t<int> d = cmp->GetMinimumSize();
       t.width = (std::max)(d.width, t.width);
       t.height += d.height + _vgap;
   }
@@ -112,46 +112,46 @@ jsize_t BorderLayout::GetMinimumLayoutSize(Container *parent)
   return t;
 }
 
-jsize_t BorderLayout::GetMaximumLayoutSize(Container *parent)
+jsize_t<int> BorderLayout::GetMaximumLayoutSize(Container *parent)
 {
-  jsize_t t = {INT_MAX, INT_MAX};
+  jsize_t<int> t = {INT_MAX, INT_MAX};
 
   return t;
 }
 
-jsize_t BorderLayout::GetPreferredLayoutSize(Container *parent)
+jsize_t<int> BorderLayout::GetPreferredLayoutSize(Container *parent)
 {
   // WARN:: sync parent
   Component *cmp = nullptr;
-  jsize_t t = {0, 0};
+  jsize_t<int> t = {0, 0};
   bool ltr = (parent->GetComponentOrientation() == JCO_LEFT_TO_RIGHT);
       
   if ((cmp = GetChild(JBLA_EAST, ltr)) != nullptr) {
-      jsize_t d = cmp->GetPreferredSize();
+      jsize_t<int> d = cmp->GetPreferredSize();
       t.width += d.width + _hgap;
       t.height = (std::max)(d.height, t.height);
   }
   
   if ((cmp = GetChild(JBLA_WEST, ltr)) != nullptr) {
-      jsize_t d = cmp->GetPreferredSize();
+      jsize_t<int> d = cmp->GetPreferredSize();
       t.width += d.width + _hgap;
       t.height = (std::max)(d.height, t.height);
   }
   
   if ((cmp = GetChild(JBLA_CENTER, ltr)) != nullptr) {
-      jsize_t d = cmp->GetPreferredSize();
+      jsize_t<int> d = cmp->GetPreferredSize();
       t.width += d.width;
       t.height = (std::max)(d.height, t.height);
   }
   
   if ((cmp = GetChild(JBLA_NORTH, ltr)) != nullptr) {
-      jsize_t d = cmp->GetPreferredSize();
+      jsize_t<int> d = cmp->GetPreferredSize();
       t.width = (std::max)(d.width, t.width);
       t.height += d.height + _vgap;
   }
   
   if ((cmp = GetChild(JBLA_SOUTH, ltr)) != nullptr) {
-      jsize_t d = cmp->GetPreferredSize();
+      jsize_t<int> d = cmp->GetPreferredSize();
       t.width = (std::max)(d.width, t.width);
       t.height += d.height + _vgap;
   }
@@ -171,7 +171,7 @@ void BorderLayout::DoLayout(Container *target)
     *c = nullptr;
   jinsets_t 
     insets = target->GetInsets();
-  jsize_t 
+  jsize_t<int> 
     psize;
   int 
     top = insets.top,

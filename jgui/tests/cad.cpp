@@ -65,10 +65,10 @@ struct Shape;
 
 struct sNode {
 	Shape *parent;
-	jgui::jpoint3d_t pos;
+	jgui::jpoint3d_t<float> pos;
 };
 
-float magnitude(jgui::jpoint3d_t t) 
+float magnitude(jgui::jpoint3d_t<float> t) 
 {
   return sqrt(t.x*t.x + t.y*t.y + t.z*t.z);
 }
@@ -80,9 +80,9 @@ struct Shape {
   jgui::Color::jcolor_name_t col = jgui::Color::Green;
 
 	static float fWorldScale;
-	static jgui::jpoint3d_t vWorldOffset;
+	static jgui::jpoint3d_t<float> vWorldOffset;
 
-	void WorldToScreen(const jgui::jpoint3d_t &v, int &nScreenX, int &nScreenY)
+	void WorldToScreen(const jgui::jpoint3d_t<float> &v, int &nScreenX, int &nScreenY)
 	{
 		nScreenX = (int)((v.x - vWorldOffset.x) * fWorldScale);
 		nScreenY = (int)((v.y - vWorldOffset.y) * fWorldScale);
@@ -90,7 +90,7 @@ struct Shape {
 
 	virtual void DrawYourself(jgui::Graphics *g) = 0;
 
-	sNode* GetNextNode(const jgui::jpoint3d_t &p)
+	sNode* GetNextNode(const jgui::jpoint3d_t<float> &p)
 	{
 		if (vecNodes.size() == nMaxNodes)
 			return nullptr; // Shape is complete so no new nodes to be issued
@@ -105,7 +105,7 @@ struct Shape {
 		return &vecNodes[vecNodes.size() - 1];
 	}
 
-	sNode* HitNode(jgui::jpoint3d_t &p)
+	sNode* HitNode(jgui::jpoint3d_t<float> &p)
 	{
 		for (auto &n : vecNodes) {
 			if (magnitude({p.x - n.pos.x, p.y - n.pos.y, 0.0f}) < 0.01f) {
@@ -123,7 +123,7 @@ struct Shape {
 			int sx, sy;
 			WorldToScreen(n.pos, sx, sy);
       g->SetColor(jgui::Color::Red);
-			g->FillCircle(sx, sy, 2);
+			g->FillCircle({sx, sy}, 2);
 		}
 	}
 
@@ -134,7 +134,7 @@ struct Shape {
 };
 
 float Shape::fWorldScale = 1.0f;
-jgui::jpoint3d_t Shape::vWorldOffset = { 0,0 };
+jgui::jpoint3d_t<float> Shape::vWorldOffset = { 0,0 };
 
 struct Line : public Shape {
 	Line()
@@ -149,7 +149,7 @@ struct Line : public Shape {
 		WorldToScreen(vecNodes[0].pos, sx, sy);
 		WorldToScreen(vecNodes[1].pos, ex, ey);
     g->SetColor(col);
-		g->DrawLine(sx, sy, ex, ey);
+		g->DrawLine({{sx, sy}, {ex, ey}});
 	}
 };
 
@@ -166,7 +166,7 @@ struct Box : public Shape {
 		WorldToScreen(vecNodes[0].pos, sx, sy);
 		WorldToScreen(vecNodes[1].pos, ex, ey);
     g->SetColor(col);
-		g->DrawRectangle(sx, sy, ex - sx, ey - sy);
+		g->DrawRectangle({sx, sy, ex - sx, ey - sy});
 	}
 };
 
@@ -184,10 +184,10 @@ struct Circle : public Shape {
 		WorldToScreen(vecNodes[0].pos, sx, sy);
 		WorldToScreen(vecNodes[1].pos, ex, ey);
     g->SetColor(col);
-		g->DrawLine(sx, sy, ex, ey);
+		g->DrawLine({{sx, sy}, {ex, ey}});
 
     g->SetColor(col);
-		g->DrawCircle(sx, sy, (int32_t)(fRadius * fWorldScale));
+		g->DrawCircle({sx, sy}, (int32_t)(fRadius * fWorldScale));
 	}
 };
 
@@ -207,7 +207,7 @@ struct Curve : public Shape {
 			WorldToScreen(vecNodes[0].pos, sx, sy);
 			WorldToScreen(vecNodes[1].pos, ex, ey);
       g->SetColor(col);
-			g->DrawLine(sx, sy, ex, ey);
+			g->DrawLine({{sx, sy}, {ex, ey}});
 		}
 
 		if (vecNodes.size() == 3) {
@@ -215,20 +215,20 @@ struct Curve : public Shape {
 			WorldToScreen(vecNodes[0].pos, sx, sy);
 			WorldToScreen(vecNodes[1].pos, ex, ey);
       g->SetColor(col);
-			g->DrawLine(sx, sy, ex, ey);
+			g->DrawLine({{sx, sy}, {ex, ey}});
 
 			// Can draw second structural line
 			WorldToScreen(vecNodes[1].pos, sx, sy);
 			WorldToScreen(vecNodes[2].pos, ex, ey);
       g->SetColor(col);
-			g->DrawLine(sx, sy, ex, ey);
+			g->DrawLine({{sx, sy}, {ex, ey}});
 
 			// And bezier curve
-			jgui::jpoint3d_t op = vecNodes[0].pos;
-			jgui::jpoint3d_t np = op;
+			jgui::jpoint3d_t<float> op = vecNodes[0].pos;
+			jgui::jpoint3d_t<float> np = op;
 			for (float t = 0; t < 1.0f; t += 0.01f)
 			{
-        jgui::jpoint3d_t
+        jgui::jpoint3d_t<float>
           t1 = {(1 - t)*(1 - t)*vecNodes[0].pos.x, (1 - t)*(1 - t)*vecNodes[0].pos.y, 0.0f},
           t2 = {2*(1 - t)*t*vecNodes[1].pos.x, 2*(1 - t)*t*vecNodes[1].pos.y, 0.0f},
           t3 = {t*t*vecNodes[2].pos.x, t*t*vecNodes[2].pos.y, 0.0f};
@@ -237,7 +237,7 @@ struct Curve : public Shape {
 				WorldToScreen(op, sx, sy);
 				WorldToScreen(np, ex, ey);
         g->SetColor(col);
-				g->DrawLine(sx, sy, ex, ey);
+				g->DrawLine({{sx, sy}, {ex, ey}});
 				op = np;
 			}
 		}
@@ -247,18 +247,18 @@ struct Curve : public Shape {
 class CAD : public jgui::Window {
 
 	private:
-    jgui::jpoint3d_t vOffset = {0.0f, 0.0f};
-    jgui::jpoint3d_t vStartPan = {0.0f, 0.0f};
+    jgui::jpoint3d_t<float> vOffset = {0.0f, 0.0f};
+    jgui::jpoint3d_t<float> vStartPan = {0.0f, 0.0f};
     float fScale = 10.0f;
     float fGrid = 1.0f;
 
-    void WorldToScreen(const jgui::jpoint3d_t &v, int &nScreenX, int &nScreenY)
+    void WorldToScreen(const jgui::jpoint3d_t<float> &v, int &nScreenX, int &nScreenY)
     {
       nScreenX = (int)((v.x - vOffset.x)*fScale);
       nScreenY = (int)((v.y - vOffset.y)*fScale);
     }
 
-    void ScreenToWorld(int nScreenX, int nScreenY, jgui::jpoint3d_t &v)
+    void ScreenToWorld(int nScreenX, int nScreenY, jgui::jpoint3d_t<float> &v)
     {
       v.x = (float)(nScreenX)/fScale + vOffset.x;
       v.y = (float)(nScreenY)/fScale + vOffset.y;
@@ -267,13 +267,13 @@ class CAD : public jgui::Window {
     Shape* tempShape = nullptr;
     std::list<Shape*> listShapes;
     sNode *selectedNode = nullptr;
-    jgui::jpoint3d_t vCursor = {0, 0};
+    jgui::jpoint3d_t<float> vCursor = {0, 0};
 
   public:
     CAD():
       jgui::Window(0, 0, 720, 480)
     {
-      jgui::jsize_t
+      jgui::jsize_t<int>
         size = GetSize();
 
 		  vOffset = {(float)(-size.width/2)/fScale, (float)(-size.height/2)/fScale};
@@ -310,19 +310,19 @@ class CAD : public jgui::Window {
 
 		virtual bool MousePressed(jevent::MouseEvent *event)
 		{
-      jgui::jpoint_t
+      jgui::jpoint_t<int>
         elocation = event->GetLocation();
 
-      jgui::jpoint3d_t vMouse = {(float)elocation.x, (float)elocation.y};
+      jgui::jpoint3d_t<float> vMouse = {(float)elocation.x, (float)elocation.y};
 
       if (event->GetButton() == jevent::JMB_BUTTON2) {
         vStartPan = vMouse;
       }
 
-      jgui::jpoint3d_t vMouseBeforeZoom;
+      jgui::jpoint3d_t<float> vMouseBeforeZoom;
       ScreenToWorld((int)vMouse.x, (int)vMouse.y, vMouseBeforeZoom);
 
-      jgui::jpoint3d_t vMouseAfterZoom;
+      jgui::jpoint3d_t<float> vMouseAfterZoom;
       ScreenToWorld((int)vMouse.x, (int)vMouse.y, vMouseAfterZoom);
       vOffset = {vOffset.x + (vMouseBeforeZoom.x - vMouseAfterZoom.x), vOffset.y + (vMouseBeforeZoom.y - vMouseAfterZoom.y), 0.0f};
 
@@ -358,20 +358,20 @@ class CAD : public jgui::Window {
 
 		virtual bool MouseMoved(jevent::MouseEvent *event)
 		{
-      jgui::jpoint_t
+      jgui::jpoint_t<int>
         elocation = event->GetLocation();
 
-      jgui::jpoint3d_t vMouse = {(float)elocation.x, (float)elocation.y};
+      jgui::jpoint3d_t<float> vMouse = {(float)elocation.x, (float)elocation.y};
 
       if (event->GetButtons() & jevent::JMB_BUTTON2) {
         vOffset = {vOffset.x - (vMouse.x - vStartPan.x)/fScale, vOffset.y - (vMouse.y - vStartPan.y)/fScale, 0.0f};
         vStartPan = vMouse;
       }
 
-      jgui::jpoint3d_t vMouseBeforeZoom;
+      jgui::jpoint3d_t<float> vMouseBeforeZoom;
       ScreenToWorld((int)vMouse.x, (int)vMouse.y, vMouseBeforeZoom);
 
-      jgui::jpoint3d_t vMouseAfterZoom;
+      jgui::jpoint3d_t<float> vMouseAfterZoom;
       ScreenToWorld((int)vMouse.x, (int)vMouse.y, vMouseAfterZoom);
       vOffset = {vOffset.x + (vMouseBeforeZoom.x - vMouseAfterZoom.x), vOffset.y + (vMouseBeforeZoom.y - vMouseAfterZoom.y), 0.0f};
 
@@ -422,16 +422,16 @@ class CAD : public jgui::Window {
 
 		virtual void Paint(jgui::Graphics *g)
 		{
-			jgui::jsize_t
+			jgui::jsize_t<int>
 				size = GetSize();
 
 			g->Clear();
-			g->SetColor(0x20, 0x20, 0x80, 0xff);
+			g->SetColor({0x20, 0x20, 0x80, 0xff});
 		
       int sx, sy;
       int ex, ey;
 
-      jgui::jpoint3d_t vWorldTopLeft, vWorldBottomRight;
+      jgui::jpoint3d_t<float> vWorldTopLeft, vWorldBottomRight;
       ScreenToWorld(0, 0, vWorldTopLeft);
       ScreenToWorld(size.width, size.height, vWorldBottomRight);
 
@@ -443,7 +443,7 @@ class CAD : public jgui::Window {
       for (float x = vWorldTopLeft.x; x < vWorldBottomRight.x; x += fGrid) {
         for (float y = vWorldTopLeft.y; y < vWorldBottomRight.y; y += fGrid) {
           WorldToScreen({ x, y }, sx, sy);
-          g->SetRGB(0xff00f000, sx, sy);
+          g->SetRGB(0xff00f000, {sx, sy});
         }
       }
 
@@ -451,10 +451,10 @@ class CAD : public jgui::Window {
 
       WorldToScreen({ 0,vWorldTopLeft.y }, sx, sy);
       WorldToScreen({ 0,vWorldBottomRight.y }, ex, ey);
-      g->DrawLine(sx, sy, ex, ey);
+      g->DrawLine({{sx, sy}, {ex, ey}});
       WorldToScreen({ vWorldTopLeft.x,0 }, sx, sy);
       WorldToScreen({ vWorldBottomRight.x,0 }, ex, ey);
-      g->DrawLine(sx, sy, ex, ey);
+      g->DrawLine({{sx, sy}, {ex, ey}});
 
       Shape::fWorldScale = fScale;
       Shape::vWorldOffset = vOffset;
@@ -471,10 +471,10 @@ class CAD : public jgui::Window {
 
       WorldToScreen(vCursor, sx, sy);
       g->SetColor(jgui::Color::White);
-      g->DrawCircle(sx, sy, 3);
+      g->DrawCircle({sx, sy}, 3);
 
       g->SetFont(GetTheme()->GetFont("window.font"));
-      g->DrawString("X:[" + std::to_string(vCursor.x) + "], Y:[" + std::to_string(vCursor.y) + "]", 10, 10);
+      g->DrawString("X:[" + std::to_string(vCursor.x) + "], Y:[" + std::to_string(vCursor.y) + "]", jgui::jpoint_t<int>{10, 10});
 
       Framerate(25);
 

@@ -33,23 +33,23 @@ NullLayout::~NullLayout()
 {
 }
 
-jsize_t NullLayout::GetMinimumLayoutSize(Container *parent)
+jsize_t<int> NullLayout::GetMinimumLayoutSize(Container *parent)
 {
-  jsize_t t = {0, 0};
+  jsize_t<int> t = {0, 0};
 
   return t;
 }
 
-jsize_t NullLayout::GetMaximumLayoutSize(Container *parent)
+jsize_t<int> NullLayout::GetMaximumLayoutSize(Container *parent)
 {
-  jsize_t t = {INT_MAX, INT_MAX};
+  jsize_t<int> t = {INT_MAX, INT_MAX};
 
   return t;
 }
 
-jsize_t NullLayout::GetPreferredLayoutSize(Container *parent)
+jsize_t<int> NullLayout::GetPreferredLayoutSize(Container *parent)
 {
-  jsize_t t = {0, 0};
+  jsize_t<int> t = {0, 0};
 
   return t;
 }

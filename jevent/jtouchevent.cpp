@@ -21,7 +21,7 @@
 
 namespace jevent {
 
-TouchEvent::TouchEvent(void *source, jtouchevent_type_t type, jgui::jpoint_t location, jgui::jpoint_t distance, double pressure, int finger_index):
+TouchEvent::TouchEvent(void *source, jtouchevent_type_t type, jgui::jpoint_t<int> location, jgui::jpoint_t<int> distance, double pressure, int finger_index):
   jevent::EventObject(source)
 {
   jcommon::Object::SetClassName("jevent::TouchEvent");
@@ -36,7 +36,7 @@ TouchEvent::TouchEvent(void *source, jtouchevent_type_t type, jgui::jpoint_t loc
   _fingers = -1;
 }
 
-TouchEvent::TouchEvent(void *source, jtouchevent_type_t type, jgui::jpoint_t distance, double radians, double delta, int fingers):
+TouchEvent::TouchEvent(void *source, jtouchevent_type_t type, jgui::jpoint_t<int> distance, double radians, double delta, int fingers):
   jevent::EventObject(source)
 {
   jcommon::Object::SetClassName("jevent::TouchEvent");
@@ -65,12 +65,12 @@ int TouchEvent::GetFingerIndex()
   return _finger_index;
 }
 
-jgui::jpoint_t TouchEvent::GetLocation()
+jgui::jpoint_t<int> TouchEvent::GetLocation()
 {
   return _location;
 }
 
-jgui::jpoint_t TouchEvent::GetDistance()
+jgui::jpoint_t<int> TouchEvent::GetDistance()
 {
   return _distance;
 }

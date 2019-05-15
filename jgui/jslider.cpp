@@ -129,9 +129,9 @@ bool Slider::MousePressed(jevent::MouseEvent *event)
     return false;
   }
 
-  jgui::jpoint_t
+  jgui::jpoint_t<int>
     elocation = event->GetLocation();
-  jgui::jsize_t
+  jgui::jsize_t<int>
     size = GetSize();
   int
     dx = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
@@ -201,9 +201,9 @@ bool Slider::MouseMoved(jevent::MouseEvent *event)
     return false;
   }
 
-  jgui::jpoint_t
+  jgui::jpoint_t<int>
     elocation = event->GetLocation();
-  jgui::jsize_t
+  jgui::jsize_t<int>
     size = GetSize();
   int
     dx = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
@@ -258,7 +258,7 @@ void Slider::Paint(Graphics *g)
     fgfocus = theme->GetIntegerParam("component.fg.focus"),
     fgdisable = theme->GetIntegerParam("component.fg.disable"),
     scroll = theme->GetIntegerParam("component.scroll");
-  jgui::jsize_t
+  jgui::jsize_t<int>
     size = GetSize();
   int
     x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
@@ -280,10 +280,10 @@ void Slider::Paint(Graphics *g)
       g->SetColor(scroll);
     }
     
-    g->FillRectangle(x, (h-4)/2+y, w, 4);
+    g->FillRectangle({x, (h-4)/2+y, w, 4});
 
     if (_inverted == false) {
-      jgui::jpoint_t p[] = {
+      std::vector<jgui::jpoint_t<int>> p = {
         {0, 0},
         {_stone_size, 0},
         {_stone_size, (int)(h*0.4)},
@@ -291,9 +291,9 @@ void Slider::Paint(Graphics *g)
         {0, (int)(h*0.4)}
       };
 
-      g->FillPolygon((int)d+x, y, p, 5);
+      g->FillPolygon({(int)d+x, y}, p, 5);
     } else {
-      jgui::jpoint_t p[] = {
+      std::vector<jgui::jpoint_t<int>> p = {
         {_stone_size/2, 0},
         {_stone_size, (int)(h*0.6)},
         {_stone_size, h},
@@ -301,7 +301,7 @@ void Slider::Paint(Graphics *g)
         {0, (int)(h*0.6)}
       };
 
-      g->FillPolygon((int)d+x, y, p, 5);
+      g->FillPolygon({(int)d+x, y}, p);
     }
   } else if (_type == JSO_VERTICAL) {
     int 
@@ -317,10 +317,10 @@ void Slider::Paint(Graphics *g)
       g->SetColor(scroll);
     }
     
-    g->FillRectangle((w-10)/2+x, y, 10, h);
+    g->FillRectangle({(w-10)/2+x, y, 10, h});
 
     if (_inverted == false) {
-      jgui::jpoint_t p[] = {
+      std::vector<jgui::jpoint_t<int>> p = {
         {0, 0},
         {(int)(size.width*0.4), 0},
         {w, _stone_size/2},
@@ -328,9 +328,9 @@ void Slider::Paint(Graphics *g)
         {0, _stone_size}
       };
 
-      g->FillPolygon(x, (int)d+y, p, 5);
+      g->FillPolygon({x, (int)d+y}, p);
     } else {
-      jgui::jpoint_t p[] = {
+      std::vector<jgui::jpoint_t<int>> p = {
         {0, _stone_size/2},
         {(int)(size.width*0.6), 0},
         {w, 0},
@@ -338,7 +338,7 @@ void Slider::Paint(Graphics *g)
         {(int)(size.width*0.6), _stone_size}
       };
 
-      g->FillPolygon(x, (int)d+y, p, 5);
+      g->FillPolygon({x, (int)d+y}, p);
     }
   }
 }

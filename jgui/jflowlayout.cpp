@@ -117,7 +117,7 @@ int FlowLayout::MoveComponents(Container *target, int x, int y, int width, int h
 
     for (int i = rowStart ; i < rowEnd ; i++) {
       Component *m = target->GetComponents()[i];
-      jgui::jsize_t size = m->GetSize();
+      jgui::jsize_t<int> size = m->GetSize();
 
       if (m->IsVisible() == true) {
         if (ascent[i] >= 0) {
@@ -136,7 +136,7 @@ int FlowLayout::MoveComponents(Container *target, int x, int y, int width, int h
 
   for (int i = rowStart ; i < rowEnd ; i++) {
     Component *m = target->GetComponents()[i];
-    jgui::jsize_t size = m->GetSize();
+    jgui::jsize_t<int> size = m->GetSize();
 
     if (m->IsVisible() == true) {
       int cy;
@@ -150,7 +150,7 @@ int FlowLayout::MoveComponents(Container *target, int x, int y, int width, int h
       if (ltr) {
         m->SetLocation(x, cy);
       } else {
-        jgui::jsize_t size2 = target->GetSize();
+        jgui::jsize_t<int> size2 = target->GetSize();
 
         m->SetLocation(size2.width - x - size.width, cy);
       }
@@ -162,9 +162,9 @@ int FlowLayout::MoveComponents(Container *target, int x, int y, int width, int h
   return height;
 }
 
-jsize_t FlowLayout::GetMinimumLayoutSize(Container *target)
+jsize_t<int> FlowLayout::GetMinimumLayoutSize(Container *target)
 {
-  jsize_t t = {0, 0};
+  jsize_t<int> t = {0, 0};
 
   // WARN:: sync parent
   int nmembers = target->GetComponentCount(),
@@ -177,7 +177,7 @@ jsize_t FlowLayout::GetMinimumLayoutSize(Container *target)
     Component *m = target->GetComponents()[i];
 
     if (m->IsVisible()) {
-      jsize_t d = m->GetMinimumSize();
+      jsize_t<int> d = m->GetMinimumSize();
 
       t.height = jmath::Math<int>::Max(t.height, d.height);
 
@@ -212,16 +212,16 @@ jsize_t FlowLayout::GetMinimumLayoutSize(Container *target)
   return t;
 }
 
-jsize_t FlowLayout::GetMaximumLayoutSize(Container *target)
+jsize_t<int> FlowLayout::GetMaximumLayoutSize(Container *target)
 {
-  jsize_t t = {INT_MAX, INT_MAX};
+  jsize_t<int> t = {INT_MAX, INT_MAX};
 
   return t;
 }
 
-jsize_t FlowLayout::GetPreferredLayoutSize(Container *target)
+jsize_t<int> FlowLayout::GetPreferredLayoutSize(Container *target)
 {
-  jsize_t t = {0, 0};
+  jsize_t<int> t = {0, 0};
 
   // WARN:: sync parent
   int nmembers = target->GetComponentCount(),
@@ -234,7 +234,7 @@ jsize_t FlowLayout::GetPreferredLayoutSize(Container *target)
     Component *m = target->GetComponents()[i];
 
     if (m->IsVisible()) {
-      jsize_t d = m->GetMinimumSize();
+      jsize_t<int> d = m->GetMinimumSize();
 
       t.height = jmath::Math<int>::Max(t.height, d.height);
 
@@ -273,7 +273,7 @@ void FlowLayout::DoLayout(Container *target)
   // WARN:: syn with jframe
   jgui::jinsets_t 
     insets = target->GetInsets();
-  jgui::jsize_t 
+  jgui::jsize_t<int> 
     size = target->GetSize();
   int 
     maxwidth = size.width - (insets.left + insets.right + _hgap*2),
@@ -300,7 +300,7 @@ void FlowLayout::DoLayout(Container *target)
     Component *m = target->GetComponents()[i];
 
     if (m->IsVisible() == true) {
-      jsize_t psize = m->GetPreferredSize();
+      jsize_t<int> psize = m->GetPreferredSize();
 
       m->SetSize(psize.width, psize.height);
 

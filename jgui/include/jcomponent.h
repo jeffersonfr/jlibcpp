@@ -83,7 +83,7 @@ enum jcomponent_behavior_t {
   // consecutive heights and use the return value to determine if you need to pad calculations by 1.  The following shows 
   // how to calculate the baseline for any height:
   // <pre>
-  //    jregion_t preferredSize = component->GetPreferredSize();
+  //    jregion_t<int> preferredSize = component->GetPreferredSize();
   //    int baseline = GetBaseline(preferredSize.width, preferredSize.height);
   //    int nextBaseline = GetBaseline(preferredSize.width, preferredSize.height + 1);
   //     // Amount to add to height when calculating where baseline lands for a particular height:
@@ -150,21 +150,21 @@ class Component : public jevent::KeyListener, public jevent::MouseListener {
     /** \brief */
     std::string _name;
     /** \brief */
-    jpoint_t _location;
+    jpoint_t<int> _location;
     /** \brief */
-    jpoint_t _scroll_location;
+    jpoint_t<int> _scroll_location;
     /** \brief */
     int _scroll_minor_increment;
     /** \brief */
     int _scroll_major_increment;
     /** \brief */
-    jsize_t _size;
+    jsize_t<int> _size;
     /** \brief */
-    jsize_t _preferred_size;
+    jsize_t<int> _preferred_size;
     /** \brief */
-    jsize_t _minimum_size;
+    jsize_t<int> _minimum_size;
     /** \brief */
-    jsize_t _maximum_size;
+    jsize_t<int> _maximum_size;
     /** \brief */
     jcomponent_alignment_t _alignment_x;
     /** \brief */
@@ -225,7 +225,7 @@ class Component : public jevent::KeyListener, public jevent::MouseListener {
      * \brief
      *
      */
-    virtual void FindNextComponentFocus(jregion_t rect, Component **left, Component **right, Component **up, Component **down);
+    virtual void FindNextComponentFocus(jregion_t<int> rect, Component **left, Component **right, Component **up, Component **down);
 
     /**
      * \brief Makes sure the component is visible in the scroll if this container is scrollable.
@@ -395,31 +395,31 @@ class Component : public jevent::KeyListener, public jevent::MouseListener {
      * \brief
      *
      */
-    virtual jpoint_t GetAbsoluteLocation();
+    virtual jpoint_t<int> GetAbsoluteLocation();
     
     /**
      * \brief
      *
      */
-    virtual jgui::jpoint_t GetScrollLocation();
+    virtual jgui::jpoint_t<int> GetScrollLocation();
     
     /**
      * \brief
      *
      */
-    virtual jgui::jsize_t GetScrollDimension();
+    virtual jgui::jsize_t<int> GetScrollDimension();
     
     /**
      * \brief
      *
      */
-    virtual jgui::jregion_t GetBounds();
+    virtual jgui::jregion_t<int> GetBounds();
     
     /**
      * \brief
      *
      */
-    virtual jgui::jregion_t GetVisibleBounds();
+    virtual jgui::jregion_t<int> GetVisibleBounds();
     
     /**
      * \brief
@@ -431,7 +431,7 @@ class Component : public jevent::KeyListener, public jevent::MouseListener {
      * \brief
      *
      */
-    virtual void SetScrollLocation(jpoint_t t);
+    virtual void SetScrollLocation(jpoint_t<int> t);
     
     /**
      * \brief
@@ -713,37 +713,37 @@ class Component : public jevent::KeyListener, public jevent::MouseListener {
      * \brief
      *
      */
-    virtual void SetMinimumSize(jsize_t size);
+    virtual void SetMinimumSize(jsize_t<int> size);
     
     /**
      * \brief
      *
      */
-    virtual void SetMaximumSize(jsize_t size);
+    virtual void SetMaximumSize(jsize_t<int> size);
     
     /**
      * \brief
      *
      */
-    virtual void SetPreferredSize(jsize_t size);
+    virtual void SetPreferredSize(jsize_t<int> size);
     
     /**
      * \brief
      *
      */
-    virtual jsize_t GetMinimumSize();
+    virtual jsize_t<int> GetMinimumSize();
     
     /**
      * \brief
      *
      */
-    virtual jsize_t GetMaximumSize();
+    virtual jsize_t<int> GetMaximumSize();
     
     /**
      * \brief
      *
      */
-    virtual jsize_t GetPreferredSize();
+    virtual jsize_t<int> GetPreferredSize();
 
     /**
      * \brief
@@ -755,7 +755,7 @@ class Component : public jevent::KeyListener, public jevent::MouseListener {
      * \brief
      *
      */
-    virtual void Move(jpoint_t location);
+    virtual void Move(jpoint_t<int> location);
     
     /**
      * \brief
@@ -767,13 +767,13 @@ class Component : public jevent::KeyListener, public jevent::MouseListener {
      * \brief
      *
      */
-    virtual void SetBounds(jpoint_t location, jsize_t size);
+    virtual void SetBounds(jpoint_t<int> location, jsize_t<int> size);
     
     /**
      * \brief
      *
      */
-    virtual void SetBounds(jregion_t region);
+    virtual void SetBounds(jregion_t<int> region);
     
     /**
      * \brief
@@ -785,7 +785,7 @@ class Component : public jevent::KeyListener, public jevent::MouseListener {
      * \brief
      *
      */
-    virtual void SetLocation(jpoint_t point);
+    virtual void SetLocation(jpoint_t<int> point);
     
     /**
      * \brief
@@ -797,19 +797,19 @@ class Component : public jevent::KeyListener, public jevent::MouseListener {
      * \brief
      *
      */
-    virtual void SetSize(jsize_t size);
+    virtual void SetSize(jsize_t<int> size);
     
     /**
      * \brief
      *
      */
-    virtual jpoint_t GetLocation();
+    virtual jpoint_t<int> GetLocation();
     
     /**
      * \brief
      *
      */
-    virtual jsize_t GetSize();
+    virtual jsize_t<int> GetSize();
     
     /**
      * \brief

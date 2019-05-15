@@ -50,19 +50,19 @@ class NullLayout : public Layout {
      * \brief
      *
      */
-    virtual jsize_t GetMinimumLayoutSize(Container *parent);
+    virtual jsize_t<int> GetMinimumLayoutSize(Container *parent);
     
     /**
      * \brief
      *
      */
-    virtual jsize_t GetMaximumLayoutSize(Container *parent);
+    virtual jsize_t<int> GetMaximumLayoutSize(Container *parent);
     
     /**
      * \brief
      *
      */
-    virtual jsize_t GetPreferredLayoutSize(Container *parent);
+    virtual jsize_t<int> GetPreferredLayoutSize(Container *parent);
 
     /**
      * \brief

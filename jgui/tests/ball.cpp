@@ -143,7 +143,7 @@ class Ball {
 
 		void SetImage(jgui::Image *image) 
 		{
-			jgui::jsize_t
+			jgui::jsize_t<int>
 				size = image->GetSize();
 
 			_image = image;
@@ -157,7 +157,7 @@ class Ball {
 		void Draw(jgui::Graphics *g) 
 		{
 			if (_image != nullptr)
-				g->DrawImage(_image, (int)x-w/2, (int)y-h/2);
+				g->DrawImage(_image, jgui::jpoint_t<int>{(int)x-w/2, (int)y-h/2});
 		}
 
 		void Update(jgui::Image *img, int x, int y, int width, int height) 
@@ -181,7 +181,7 @@ class BallDrop : public jgui::Window {
 		  *backImage,
 		  *pin,
 		  *ball;
-		jgui::jsize_t 
+		jgui::jsize_t<int> 
       offDimension,
 		  backDimension;
 		double 
@@ -201,21 +201,21 @@ class BallDrop : public jgui::Window {
 		{
 			jgui::Image 
         *image;
-      jgui::jsize_t
+      jgui::jsize_t<int>
         size = GetSize();
 			int 
         w = 16,
 				h = 16;
 			
 			image = new jgui::BufferedImage("images/smallball.png");
-			ball = image->Scale(w/2, h/2);
+			ball = image->Scale({w/2, h/2});
 			delete image;
 
 			image = new jgui::BufferedImage("images/smallpin.png");
-			pin = image->Scale(w, h);
+			pin = image->Scale({w, h});
 			delete image;
 
-			jgui::jsize_t
+			jgui::jsize_t<int>
 				ps = pin->GetSize(),
 				bs = ball->GetSize();
 
@@ -284,7 +284,7 @@ class BallDrop : public jgui::Window {
 
 		void Paint(jgui::Graphics *g) 
 		{
-      jgui::jsize_t
+      jgui::jsize_t<int>
         size = GetSize();
 
 			UpdateBalls();
@@ -294,13 +294,13 @@ class BallDrop : public jgui::Window {
 				jgui::Graphics *backGraphics;
 
 				backDimension = size;
-				backImage = new jgui::BufferedImage(jgui::JPF_RGB32, size.width, size.height);
+				backImage = new jgui::BufferedImage(jgui::JPF_RGB32, size);
 				backGraphics = backImage->GetGraphics();
 
 				// Erase the previous image.
 				backGraphics->SetColor(GetTheme()->GetIntegerParam("window.bg"));
-				backGraphics->FillRectangle(0, 0, size.width, size.height);
-				backGraphics->SetColor(0x00, 0x00, 0x00, 0xff);
+				backGraphics->FillRectangle({0, 0, size.width, size.height});
+				backGraphics->SetColor({0x00, 0x00, 0x00, 0xff});
 
 				//Paint the frame into the image.
 				PaintBackground(backGraphics);
@@ -310,16 +310,16 @@ class BallDrop : public jgui::Window {
 
 			if ( (offImage == nullptr) || (size.width != offDimension.width) || (size.height != offDimension.height) ) {
 				offDimension = size;
-				offImage = new jgui::BufferedImage(jgui::JPF_RGB32, size.width, size.height);
+				offImage = new jgui::BufferedImage(jgui::JPF_RGB32, size);
 			}
 
-			offImage->GetGraphics()->DrawImage(backImage, 0, 0);
+			offImage->GetGraphics()->DrawImage(backImage, jgui::jpoint_t<int>{0, 0});
 
 			for (std::vector<Ball *>::iterator i=_balls.begin(); i!=_balls.end(); i++) {
 				(*i)->Draw(offImage->GetGraphics());
 			}
 
-			g->DrawImage(offImage, 0, 0);
+			g->DrawImage(offImage, jgui::jpoint_t<int>{0, 0});
 
        Framerate(60);
 
@@ -327,7 +327,7 @@ class BallDrop : public jgui::Window {
 		}
 
 		void PaintBackground(jgui::Graphics *g) {
-      jgui::jsize_t
+      jgui::jsize_t<int>
         size = GetSize();
 			double 
         scale, 
@@ -348,7 +348,7 @@ class BallDrop : public jgui::Window {
 
 				for(j=0;j<numcolumns;++j) { // Columns
 					pinx=(int)((j+(i%2)/2.0)*scale)+sidespace;
-					g->DrawImage(pin, pinx-pinw/2, piny-pinh/2);
+					g->DrawImage(pin, jgui::jpoint_t<int>{pinx-pinw/2, piny-pinh/2});
 				}
 			}
 
@@ -364,7 +364,7 @@ class BallDrop : public jgui::Window {
 				y = size.height*(1.0-.5*exp(-(double)(i-x)*(i-x)/(2*81)));
 
 				if (i > 0) {
-					g->DrawLine((int)((i-1)*scale),(int)oy,(int)(i*scale),(int)y);
+					g->DrawLine({(int)((i-1)*scale),(int)oy,(int)(i*scale),(int)y});
 				}
 				oy=y;
 			}
@@ -374,14 +374,14 @@ class BallDrop : public jgui::Window {
 				for(j=0;j<rackheight[i];++j) {
 					pinx=i*ballw;
 					piny=size.height-(j+1)*ballh;
-					g->DrawImage(ball, pinx, piny);            
+					g->DrawImage(ball, jgui::jpoint_t<int>{pinx, piny});
 				}
 			}
 		}
 
 		void UpdateRack(jgui::Graphics *g) 
 		{
-      jgui::jsize_t
+      jgui::jsize_t<int>
         size = GetSize();
 			int 
         i, 
@@ -393,7 +393,7 @@ class BallDrop : public jgui::Window {
 					++rackheight[i];
 					pinx = i*ballw;
 					piny = size.height - rackheight[i]*ballh;
-					g->DrawImage(ball, pinx, piny);            
+					g->DrawImage(ball, jgui::jpoint_t<int>{pinx, piny});
 					--rackdel[i];
 				}
 			}
@@ -401,7 +401,7 @@ class BallDrop : public jgui::Window {
 
 		void UpdateBalls() 
 		{
-      jgui::jsize_t
+      jgui::jsize_t<int>
         size = GetSize();
 			double 
         scale;

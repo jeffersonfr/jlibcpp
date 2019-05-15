@@ -114,7 +114,7 @@ void ListBox::SetCurrentIndex(int i)
     return;
   }
 
-  jgui::jpoint_t
+  jgui::jpoint_t<int>
     slocation = GetScrollLocation();
   int 
     is = theme->GetIntegerParam("item.size"),
@@ -222,16 +222,16 @@ int ListBox::GetSelectedIndex()
   return _selected_index;
 }
 
-jsize_t ListBox::GetPreferredSize()
+jsize_t<int> ListBox::GetPreferredSize()
 {
   Theme 
     *theme = GetTheme();
 
   if (theme == nullptr) {
-    return jgui::jsize_t {0, 0};
+    return jgui::jsize_t<int> {0, 0};
   }
 
-  jgui::jsize_t 
+  jgui::jsize_t<int> 
     t = GetSize();
   int
     // gx = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
@@ -262,7 +262,7 @@ bool ListBox::KeyPressed(jevent::KeyEvent *event)
     return false;
   }
   
-  jgui::jsize_t
+  jgui::jsize_t<int>
     size = GetSize();
   jevent::jkeyevent_symbol_t 
     action = event->GetSymbol();
@@ -352,7 +352,7 @@ bool ListBox::MouseWheel(jevent::MouseEvent *event)
     return false;
   }
   
-  jgui::jpoint_t
+  jgui::jpoint_t<int>
     slocation = GetScrollLocation();
 
   SetScrollLocation(slocation.x, slocation.y + theme->GetIntegerParam("item.size")*event->GetClicks());
@@ -388,9 +388,9 @@ void ListBox::Paint(Graphics *g)
     itemfgdisable = theme->GetIntegerParam("item.fg.disable"),
     itembgfocus = theme->GetIntegerParam("item.bg.focus"),
     itemfgfocus = theme->GetIntegerParam("item.fg.focus");
-  jpoint_t 
+  jpoint_t<int> 
     scroll_location = GetScrollLocation();
-  jgui::jsize_t
+  jgui::jsize_t<int>
     size = GetSize();
   // int 
     // bs = theme->GetIntegerParam("component.border.size"),
@@ -455,7 +455,7 @@ void ListBox::Paint(Graphics *g)
       g->SetColor(itembgfocus);
     }
 
-    g->FillRectangle(x, y + (is + ig)*i, w, is);
+    g->FillRectangle({x, y + (is + ig)*i, w, is});
 
     if (_mode == JLBM_SINGLE_SELECTION) {
       if (_selected_index == i) {
@@ -473,7 +473,7 @@ void ListBox::Paint(Graphics *g)
     } else if (_items[i]->GetType() == JIT_TEXT) {
     } else if (_items[i]->GetType() == JIT_IMAGE) {
       if (_items[i]->GetImage() != nullptr) {
-        g->DrawImage(_items[i]->GetImage(), hg, y + (is + ig)*i, is, is);
+        g->DrawImage(_items[i]->GetImage(), {hg, y + (is + ig)*i, is, is});
       }
     }
 
@@ -496,7 +496,7 @@ void ListBox::Paint(Graphics *g)
         text = font->TruncateString(text, "...", w - offset);
       // }
 
-      g->DrawString(text, x + offset, y + (is + ig)*i, w - offset, is, _items[i]->GetHorizontalAlign(), _items[i]->GetVerticalAlign());
+      g->DrawString(text, {x + offset, y + (is + ig)*i, w - offset, is}, _items[i]->GetHorizontalAlign(), _items[i]->GetVerticalAlign());
     }
   }
 }
@@ -529,9 +529,9 @@ void ListBox::IncrementLines(int lines)
     }
   }
 
-  jgui::jpoint_t 
+  jgui::jpoint_t<int> 
     scroll_location = GetScrollLocation();
-  jgui::jsize_t
+  jgui::jsize_t<int>
     size = GetSize();
   int 
     scrollx = (IsScrollableX() == true)?scroll_location.x:0,
@@ -582,9 +582,9 @@ void ListBox::DecrementLines(int lines)
     }
   }
 
-  jgui::jpoint_t 
+  jgui::jpoint_t<int> 
     scroll_location = GetScrollLocation();
-  jgui::jsize_t
+  jgui::jsize_t<int>
     size = GetSize();
   int 
     scrollx = (IsScrollableX() == true)?scroll_location.x:0,
@@ -603,15 +603,15 @@ void ListBox::DecrementLines(int lines)
   }
 }
 
-jsize_t ListBox::GetScrollDimension()
+jsize_t<int> ListBox::GetScrollDimension()
 {
   Theme *theme = GetTheme();
 
   if (theme == nullptr) {
-    return jgui::jsize_t {0, 0};
+    return jgui::jsize_t<int> {0, 0};
   }
 
-  jsize_t 
+  jsize_t<int> 
     t = GetSize();
   int 
     bs = theme->GetIntegerParam("component.border.size"),

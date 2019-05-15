@@ -58,7 +58,7 @@ class MouseEvent : public jevent::EventObject {
 
   private:
     /** \brief */
-    jgui::jpoint_t _location;
+    jgui::jpoint_t<int> _location;
     /** \brief */
     jmouseevent_button_t _button;
     /** \brief */
@@ -73,7 +73,7 @@ class MouseEvent : public jevent::EventObject {
      * \brief
      *
      */
-    MouseEvent(void *source, jmouseevent_type_t type, jmouseevent_button_t button, jmouseevent_button_t buttons, jgui::jpoint_t location, int clicks);
+    MouseEvent(void *source, jmouseevent_type_t type, jmouseevent_button_t button, jmouseevent_button_t buttons, jgui::jpoint_t<int> location, int clicks);
     
     /**
      * \brief
@@ -109,7 +109,7 @@ class MouseEvent : public jevent::EventObject {
      * \brief
      *
      */
-    virtual jgui::jpoint_t GetLocation();
+    virtual jgui::jpoint_t<int> GetLocation();
     
 };
 

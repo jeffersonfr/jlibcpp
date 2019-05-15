@@ -90,7 +90,7 @@ class Application : public jcommon::Object {
      * \brief
      *
      */
-    static jsize_t GetScreenSize();
+    static jsize_t<int> GetScreenSize();
 
     /**
      * \brief

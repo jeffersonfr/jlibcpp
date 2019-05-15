@@ -129,7 +129,7 @@ class Tetris : public jgui::Window {
       } else if (event->GetSymbol() == jevent::JKS_CURSOR_RIGHT) {
         dx = 1;
       } else if (event->GetSymbol() == jevent::JKS_CURSOR_DOWN) {
-        timer++;
+        timer = timer + 4;
       }
 
       return true;

@@ -144,7 +144,7 @@ Font::Font(std::string name, jfont_attributes_t attributes, int size):
 
   // INFO:: intializing the first 256 characters withs
   for (int i=0; i<256; i++) {
-    jregion_t bounds;
+    jregion_t<int> bounds;
 
     bounds = Font::GetGlyphExtends(i);
 
@@ -226,12 +226,12 @@ int Font::GetLeading()
 
 int Font::GetStringWidth(std::string text)
 {
-  jregion_t t = GetStringExtends(text);
+  jregion_t<int> t = GetStringExtends(text);
 
   return t.x+t.width;
 }
 
-jregion_t Font::GetStringExtends(std::string text)
+jregion_t<int> Font::GetStringExtends(std::string text)
 {
   const char *utf8 = text.c_str();
   int utf8_len = text.size();
@@ -245,7 +245,7 @@ jregion_t Font::GetStringExtends(std::string text)
 
   cairo_scaled_font_text_extents(_scaled_font, utf8, &t);
 
-  jregion_t r;
+  jregion_t<int> r;
 
   r.x = t.x_bearing;
   r.y = t.y_bearing;
@@ -259,7 +259,7 @@ jregion_t Font::GetStringExtends(std::string text)
   return r;
 }
 
-jregion_t Font::GetGlyphExtends(int symbol)
+jregion_t<int> Font::GetGlyphExtends(int symbol)
 {
   cairo_glyph_t glyph;
   cairo_text_extents_t t;
@@ -270,7 +270,7 @@ jregion_t Font::GetGlyphExtends(int symbol)
 
   cairo_scaled_font_glyph_extents(_scaled_font, &glyph, 1, &t);
 
-  jregion_t r;
+  jregion_t<int> r;
 
   r.x = t.x_bearing;
   r.y = t.y_bearing;

@@ -48,11 +48,11 @@ class IlistPlayerComponentImpl : public jgui::Component {
 		/** \brief */
     std::mutex _mutex;
 		/** \brief */
-		jgui::jregion_t _src;
+		jgui::jregion_t<int> _src;
 		/** \brief */
-		jgui::jregion_t _dst;
+		jgui::jregion_t<int> _dst;
 		/** \brief */
-		jgui::jsize_t _frame_size;
+		jgui::jsize_t<int> _frame_size;
 
 	public:
 		IlistPlayerComponentImpl(Player *player, int x, int y, int w, int h):
@@ -85,14 +85,14 @@ class IlistPlayerComponentImpl : public jgui::Component {
 			}
 		}
 
-		virtual jgui::jsize_t GetPreferredSize()
+		virtual jgui::jsize_t<int> GetPreferredSize()
 		{
 			return _frame_size;
 		}
 
 		virtual void UpdateComponent(jgui::Image *frame)
 		{
-			jgui::jsize_t isize = frame->GetSize();
+			jgui::jsize_t<int> isize = frame->GetSize();
 
 			if (_frame_size.width != isize.width || _frame_size.height != isize.height) {
 				if (_frame_size.width < 0 || _frame_size.height < 0) {
@@ -117,13 +117,13 @@ class IlistPlayerComponentImpl : public jgui::Component {
 		{
 			jgui::Component::Paint(g);
 
-      jgui::jsize_t
+      jgui::jsize_t<int>
         size = GetSize();
 
       if (_src.x == 0 and _src.y == 0 and _src.width == _frame_size.width and _src.height == _frame_size.height) {
-			  g->DrawImage(_image, 0, 0, size.width, size.height);
+			  g->DrawImage(_image, {0, 0, size.width, size.height});
       } else {
-			  g->DrawImage(_image, _src.x, _src.y, _src.width, _src.height, 0, 0, size.width, size.height);
+			  g->DrawImage(_image, {_src.x, _src.y, _src.width, _src.height}, {0, 0, size.width, size.height});
       }
 				
       delete _image;
@@ -180,12 +180,12 @@ class IlistVideoSizeControlImpl : public VideoSizeControl {
       impl->_mutex.unlock();
 		}
 
-		virtual jgui::jregion_t GetSource()
+		virtual jgui::jregion_t<int> GetSource()
 		{
 			return dynamic_cast<IlistPlayerComponentImpl *>(_player->_component)->_src;
 		}
 
-		virtual jgui::jregion_t GetDestination()
+		virtual jgui::jregion_t<int> GetDestination()
 		{
 			return dynamic_cast<IlistPlayerComponentImpl *>(_player->_component)->GetVisibleBounds();
 		}

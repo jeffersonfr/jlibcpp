@@ -268,7 +268,7 @@ class Container : public jgui::Component {
      * \brief
      *
      */
-    virtual jsize_t GetScrollDimension();
+    virtual jsize_t<int> GetScrollDimension();
     
     /**
      * \brief

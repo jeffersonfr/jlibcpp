@@ -61,7 +61,7 @@ static bool sg_visible = false;
 /** \brief */
 static bool sg_quitting = false;
 /** \brief */
-static jgui::jsize_t sg_screen = {0, 0};
+static jgui::jsize_t<int> sg_screen = {0, 0};
 /** \brief */
 static std::mutex sg_loop_mutex;
 /** \brief */
@@ -490,11 +490,11 @@ class QTWindowRender : public QDialog {
 
       // NativeWindow 
       //   *handler = reinterpret_cast<NativeWindow *>(user_data);
-      jregion_t 
+      jregion_t<int> 
         bounds = sg_jgui_window->GetBounds();
 
       if (sg_back_buffer != nullptr) {
-        jgui::jsize_t
+        jgui::jsize_t<int>
           size = sg_back_buffer->GetSize();
 
         if (size.width != bounds.width or size.height != bounds.height) {
@@ -504,7 +504,7 @@ class QTWindowRender : public QDialog {
       }
 
       if (sg_back_buffer == nullptr) {
-        sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, bounds.width, bounds.height);
+        sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, {bounds.width, bounds.height});
       }
 
       jgui::Graphics 
@@ -721,7 +721,7 @@ void NativeWindow::SetBounds(int x, int y, int width, int height)
   sg_handler->move(x, y);
 }
 
-jgui::jregion_t NativeWindow::GetBounds()
+jgui::jregion_t<int> NativeWindow::GetBounds()
 {
   QSize 
     size = sg_handler->size();
@@ -768,9 +768,9 @@ void NativeWindow::SetCursorLocation(int x, int y)
   cursor.setPos(QPoint(x, y));
 }
 
-jpoint_t NativeWindow::GetCursorLocation()
+jpoint_t<int> NativeWindow::GetCursorLocation()
 {
-	jpoint_t t;
+	jpoint_t<int> t;
 
 	t.x = 0;
 	t.y = 0;
@@ -878,10 +878,10 @@ void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 		return;
 	}
 
-	jsize_t t = shape->GetSize();
+	jsize_t<int> t = shape->GetSize();
 	uint32_t data[t.width*t.height];
 
-	shape->GetGraphics()->GetRGBArray(data, 0, 0, t.width, t.height);
+	shape->GetGraphics()->GetRGBArray(data, {0, 0, t.width, t.height});
 
 	if (data == nullptr) {
 		return;

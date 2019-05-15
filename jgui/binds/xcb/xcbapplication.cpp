@@ -81,9 +81,9 @@ static std::mutex sg_loop_mutex;
 /** \brief */
 static bool sg_quitting = false;
 /** \brief */
-static jgui::jsize_t sg_screen = {0, 0};
+static jgui::jsize_t<int> sg_screen = {0, 0};
 /** \brief */
-static jgui::jregion_t sg_previous_bounds;
+static jgui::jregion_t<int> sg_previous_bounds;
 /** \brief */
 static jcursor_style_t sg_jgui_cursor;
 /** \brief */
@@ -345,11 +345,11 @@ void NativeApplication::InternalPaint()
 
   // OPTIMIZE:: cairo_xlib_surface_create(Display, Drawable, Visual, width, height)
   
-  jregion_t 
+  jregion_t<int> 
     bounds = sg_jgui_window->GetBounds();
 
   if (sg_back_buffer != nullptr) {
-    jgui::jsize_t
+    jgui::jsize_t<int>
       size = sg_back_buffer->GetSize();
 
     if (size.width != bounds.width or size.height != bounds.height) {
@@ -359,7 +359,7 @@ void NativeApplication::InternalPaint()
   }
 
   if (sg_back_buffer == nullptr) {
-    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, bounds.width, bounds.height);
+    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, {bounds.width, bounds.height});
   }
 
   jgui::Graphics 
@@ -741,9 +741,9 @@ void NativeWindow::SetBounds(int x, int y, int width, int height)
   xcb_configure_window(sg_xcb_connection, sg_xcb_window, XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y | XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT, values);
 }
 
-jgui::jregion_t NativeWindow::GetBounds()
+jgui::jregion_t<int> NativeWindow::GetBounds()
 {
-	jgui::jregion_t 
+	jgui::jregion_t<int> 
     t = {0, 0, 0, 0};
 
   xcb_get_geometry_cookie_t 
@@ -775,7 +775,7 @@ bool NativeWindow::IsResizable()
 
 void NativeWindow::SetCursorLocation(int x, int y)
 {
-  // jgui::jsize_t
+  // jgui::jsize_t<int>
   //  size = GetSize();
 
 	if (x < 0) {
@@ -797,9 +797,9 @@ void NativeWindow::SetCursorLocation(int x, int y)
 	// XWarpPointer(_display, None, sg_xcb_window, 0, 0, size.width, size.height, x, y);
 }
 
-jpoint_t NativeWindow::GetCursorLocation()
+jpoint_t<int> NativeWindow::GetCursorLocation()
 {
-	jpoint_t t;
+	jpoint_t<int> t;
 
 	t.x = 0;
 	t.y = 0;
@@ -910,10 +910,10 @@ void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 		return;
 	}
 
-	jsize_t t = shape->GetSize();
+	jsize_t<int> t = shape->GetSize();
 	uint32_t data[t.width*t.height];
 	
-	shape->GetGraphics()->GetRGBArray(data, 0, 0, t.width, t.height);
+	shape->GetGraphics()->GetRGBArray(data, {0, 0, t.width, t.height});
 
 	if (data == nullptr) {
 		return;

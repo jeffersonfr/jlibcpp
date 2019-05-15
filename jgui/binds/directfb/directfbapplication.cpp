@@ -66,7 +66,7 @@ static std::mutex sg_loop_mutex;
 /** \brief */
 static bool sg_quitting = false;
 /** \brief */
-static jgui::jsize_t sg_screen = {0, 0};
+static jgui::jsize_t<int> sg_screen = {0, 0};
 /** \brief */
 static jcursor_style_t sg_jgui_cursor = JCS_DEFAULT;
 /** \brief */
@@ -410,12 +410,12 @@ void NativeApplication::InternalInit(int argc, char **argv)
 	}
 
 #define CURSOR_INIT(type, ix, iy, hotx, hoty) 													\
-	t.cursor = new jgui::BufferedImage(JPF_ARGB, w, h);												\
+	t.cursor = new jgui::BufferedImage(JPF_ARGB, {w, h});												\
 																																				\
 	t.hot_x = hotx;																												\
 	t.hot_y = hoty;																												\
 																																				\
-	t.cursor->GetGraphics()->DrawImage(cursors, ix*w, iy*h, w, h, 0, 0);	\
+	t.cursor->GetGraphics()->DrawImage(cursors, {ix*w, iy*h, w, h}, {0, 0});	\
 																																				\
 	sg_jgui_cursors[type] = t;																										\
 
@@ -453,11 +453,11 @@ void NativeApplication::InternalPaint()
 		return;
 	}
 
-  jregion_t 
+  jregion_t<int> 
     bounds = sg_jgui_window->GetBounds();
 
   if (sg_back_buffer != nullptr) {
-    jgui::jsize_t
+    jgui::jsize_t<int>
       size = sg_back_buffer->GetSize();
 
     if (size.width != bounds.width or size.height != bounds.height) {
@@ -467,7 +467,7 @@ void NativeApplication::InternalPaint()
   }
 
   if (sg_back_buffer == nullptr) {
-    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, bounds.width, bounds.height);
+    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, {bounds.width, bounds.height});
   }
 
   jgui::Graphics 
@@ -823,9 +823,9 @@ void NativeWindow::SetBounds(int x, int y, int width, int height)
   }
 }
 
-jgui::jregion_t NativeWindow::GetBounds()
+jgui::jregion_t<int> NativeWindow::GetBounds()
 {
-	jgui::jregion_t t;
+	jgui::jregion_t<int> t;
 
 	sg_window->GetPosition(sg_window, &t.x, &t.y);
 	sg_window->GetSize(sg_window, &t.width, &t.height);
@@ -847,9 +847,9 @@ void NativeWindow::SetCursorLocation(int x, int y)
 	sg_layer->WarpCursor(sg_layer, x, y);
 }
 
-jpoint_t NativeWindow::GetCursorLocation()
+jpoint_t<int> NativeWindow::GetCursorLocation()
 {
-	jpoint_t p;
+	jpoint_t<int> p;
 
 	p.x = 0;
 	p.y = 0;
@@ -913,7 +913,7 @@ void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 
 	IDirectFBSurface *surface = nullptr;
 	DFBSurfaceDescription desc;
-  jgui::jsize_t size = shape->GetSize();
+  jgui::jsize_t<int> size = shape->GetSize();
 
 	desc.flags = (DFBSurfaceDescriptionFlags)(DSDESC_WIDTH | DSDESC_HEIGHT | DSDESC_PIXELFORMAT);
 	desc.pixelformat = DSPF_ARGB;
@@ -929,7 +929,7 @@ void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 
 	surface->Lock(surface, DSLF_WRITE, &ptr, &pitch);
 
-	shape->GetGraphics()->GetRGBArray((uint32_t *)ptr, 0, 0, desc.width, desc.height);
+	shape->GetGraphics()->GetRGBArray((uint32_t *)ptr, {0, 0, desc.width, desc.height});
 
 	surface->Unlock(surface);
 

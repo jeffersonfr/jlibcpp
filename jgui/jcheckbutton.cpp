@@ -154,7 +154,7 @@ bool CheckButton::MousePressed(jevent::MouseEvent *event)
     return true;
   }
 
-  jgui::jsize_t
+  jgui::jsize_t<int>
     size = GetSize();
 
   if (event->GetButton() == jevent::JMB_BUTTON1) {
@@ -236,7 +236,7 @@ void CheckButton::Paint(Graphics *g)
     fg = theme->GetIntegerParam("component.fg"),
     fgfocus = theme->GetIntegerParam("component.fg.focus"),
     fgdisable = theme->GetIntegerParam("component.fg.disable");
-  jgui::jsize_t
+  jgui::jsize_t<int>
     size = GetSize();
   int
     x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
@@ -257,9 +257,9 @@ void CheckButton::Paint(Graphics *g)
   x = x + 8;
 
   if (_type == JCBT_CHECK) {
-    g->FillRectangle(x, y + (size.height - cs)/2, cs, cs);
+    g->FillRectangle({x, y + (size.height - cs)/2, cs, cs});
   } else if (_type == JCBT_RADIO) {
-    g->FillCircle(x + cs/2, size.height/2, cs);
+    g->FillCircle({x + cs/2, size.height/2}, cs);
   }
 
   if (IsSelected() == true) {
@@ -270,9 +270,9 @@ void CheckButton::Paint(Graphics *g)
     }
 
     if (_type == JCBT_CHECK) {
-      g->FillRectangle(x + minor, y + (size.height - cs)/2 + minor, cs - 2*minor, cs - 2*minor);
+      g->FillRectangle({x + minor, y + (size.height - cs)/2 + minor, cs - 2*minor, cs - 2*minor});
     } else {
-      g->FillCircle(x + cs/2, size.height/2, minor);
+      g->FillCircle({x + cs/2, size.height/2}, minor);
     }
   }
 
@@ -297,7 +297,7 @@ void CheckButton::Paint(Graphics *g)
       text = font->TruncateString(text, "...", w);
     }
 
-    g->DrawString(text, x, y, w, h, _halign, _valign);
+    g->DrawString(text, {x, y, w, h}, _halign, _valign);
   }
 }
 

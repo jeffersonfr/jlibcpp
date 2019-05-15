@@ -112,10 +112,10 @@ void Icon::Paint(Graphics *g)
     h = size.height - 2*y;
 
   if (_image != nullptr) {
-    g->DrawImage(_image, x, y, w, h);
+    g->DrawImage(_image, {x, y, w, h});
   } else {
     g->SetColor(Color::Black);
-    g->FillRectangle(x, y, w, h);
+    g->FillRectangle({x, y, w, h});
   }
 }
 

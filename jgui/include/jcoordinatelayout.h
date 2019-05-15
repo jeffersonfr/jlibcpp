@@ -45,7 +45,7 @@ class CoordinateLayout : public Layout {
     /** \brief */
     jcoordinatelayout_orientation_t _type;
     /** \brief */
-    jgui::jsize_t _size;
+    jgui::jsize_t<int> _size;
 
   public:
     /**
@@ -64,7 +64,7 @@ class CoordinateLayout : public Layout {
      * \brief
      *
      */
-    virtual void SetSize(jgui::jsize_t size);
+    virtual void SetSize(jgui::jsize_t<int> size);
     
     /**
      * \brief
@@ -76,7 +76,7 @@ class CoordinateLayout : public Layout {
      * \brief
      *
      */
-    virtual jgui::jsize_t GetSize();
+    virtual jgui::jsize_t<int> GetSize();
     
     /**
      * \brief
@@ -88,19 +88,19 @@ class CoordinateLayout : public Layout {
      * \brief
      *
      */
-    virtual jsize_t GetMinimumLayoutSize(Container *parent);
+    virtual jsize_t<int> GetMinimumLayoutSize(Container *parent);
     
     /**
      * \brief
      *
      */
-    virtual jsize_t GetMaximumLayoutSize(Container *parent);
+    virtual jsize_t<int> GetMaximumLayoutSize(Container *parent);
     
     /**
      * \brief
      *
      */
-    virtual jsize_t GetPreferredSize(Container *target);
+    virtual jsize_t<int> GetPreferredSize(Container *target);
 
     /**
      * \brief

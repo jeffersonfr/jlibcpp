@@ -107,7 +107,7 @@ void ProgressBar::Paint(Graphics *g)
     fgfocus = theme->GetIntegerParam("component.fg.focus"),
     fgdisable = theme->GetIntegerParam("component.fg.disable"),
     scroll = theme->GetIntegerParam("component.scroll");
-  jgui::jsize_t
+  jgui::jsize_t<int>
     size = GetSize();
   std::string 
     text;
@@ -128,7 +128,7 @@ void ProgressBar::Paint(Graphics *g)
     }
 
     g->SetColor(scroll);
-    g->FillRectangle(x, y, (int)d, h);
+    g->FillRectangle({x, y, (int)d, h});
 
     snprintf(t, 255-1, "%d %%", _value);
 
@@ -144,7 +144,7 @@ void ProgressBar::Paint(Graphics *g)
     }
 
     g->SetColor(scroll);
-    g->FillRectangle(x, y, w, (int)d);
+    g->FillRectangle({x, y, w, (int)d});
 
     snprintf(t, 255-1, "%d %%", _value);
 
@@ -166,7 +166,7 @@ void ProgressBar::Paint(Graphics *g)
   x = x + (w - font->GetStringWidth(text))/2;
   // }
 
-  g->DrawString(text, x, y, w, h);
+  g->DrawString(text, {x, y, w, h});
 }
 
 }

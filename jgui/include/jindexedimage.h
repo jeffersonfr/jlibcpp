@@ -46,13 +46,13 @@ class IndexedImage : public jgui::Image {
      * \brief
      *
      */
-    IndexedImage(uint32_t *palette, int palette_size, uint8_t *data, int wp, int hp);
+    IndexedImage(uint32_t *palette, int palette_size, uint8_t *data, jsize_t<int> size);
     
     /**
      * \brief
      *
      */
-    IndexedImage(uint32_t *palette, int palette_size, uint32_t *argb, int wp, int hp);
+    IndexedImage(uint32_t *palette, int palette_size, uint32_t *argb, jsize_t<int> size);
     
     /**
      * \brief
@@ -70,7 +70,7 @@ class IndexedImage : public jgui::Image {
      * \brief Packs the source argb image.
      *
      */
-    static IndexedImage * Pack(uint32_t *rgb, int wp, int hp);
+    static IndexedImage * Pack(uint32_t *rgb, jsize_t<int> size);
 
     /**
      * \brief
@@ -88,13 +88,13 @@ class IndexedImage : public jgui::Image {
      * \brief
      *
      */
-    virtual Image * Scale(int wp, int hp);
+    virtual Image * Scale(jsize_t<int> size);
 
     /**
      * \brief
      *
      */
-    virtual Image * Crop(int xp, int yp, int wp, int hp);
+    virtual Image * Crop(jrect_t<int> rect);
 
     /**
      * \brief
@@ -124,7 +124,7 @@ class IndexedImage : public jgui::Image {
      * \brief
      *
      */
-    virtual void GetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp);
+    virtual void GetRGBArray(uint32_t *rgb, jrect_t<int> rect);
     
     /**
      * \brief

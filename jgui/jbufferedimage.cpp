@@ -339,18 +339,17 @@ static void NearesNeighborRotate(uint32_t *src, int w, int h, uint32_t *dst, int
   }
 }
 
-BufferedImage::BufferedImage(jpixelformat_t pixelformat, int width, int height):
-  jgui::Image(pixelformat, width, height)
+BufferedImage::BufferedImage(jpixelformat_t pixelformat, jsize_t<int> size):
+  jgui::Image(pixelformat, size)
 {
   jcommon::Object::SetClassName("jgui::BufferedImage");
 
-  if (width <= 0 || height <= 0) {
+  if (size.width <= 0 || size.height <= 0) {
     throw jexception::RuntimeException("Image must have width and height greater than 0");
   }
 
   _pixelformat = pixelformat;
-  _size.width = width;
-  _size.height = height;
+  _size = size;
 
   cairo_format_t 
     format = CAIRO_FORMAT_INVALID;
@@ -371,7 +370,7 @@ BufferedImage::BufferedImage(jpixelformat_t pixelformat, int width, int height):
 }
 
 BufferedImage::BufferedImage(cairo_surface_t *surface):
-  jgui::Image(jgui::JPF_UNKNOWN, -1, -1)
+  jgui::Image(jgui::JPF_UNKNOWN, {-1, -1})
 {
   if (surface == nullptr) {
     throw jexception::RuntimeException("Unable to get target surface from cairo context");
@@ -407,7 +406,7 @@ BufferedImage::BufferedImage(std::string file):
 }
 
 BufferedImage::BufferedImage(jio::InputStream *stream):
-  jgui::Image(JPF_UNKNOWN, -1, -1)
+  jgui::Image(JPF_UNKNOWN, {-1, -1})
 {
   jcommon::Object::SetClassName("jgui::BufferedImage");
 
@@ -628,11 +627,11 @@ Image * BufferedImage::Flip(jflip_flags_t mode)
   return tmp;
 }
 
-Image * BufferedImage::Shear(float dx, float dy)
+Image * BufferedImage::Shear(jsize_t<float> size)
 {
   int 
-    tx = _size.width*fabs(dx),
-    ty = _size.height*fabs(dy);
+    tx = _size.width*fabs(size.width),
+    ty = _size.height*fabs(size.height);
 
   cairo_format_t 
     format = CAIRO_FORMAT_INVALID;
@@ -655,19 +654,19 @@ Image * BufferedImage::Shear(float dx, float dy)
   cairo_matrix_t m;
 
   cairo_matrix_init(&m,
-      1.0f, dy,
-      dx, 1.0f,
+      1.0f, size.height,
+      size.width, 1.0f,
       0.0f, 0.0f
    );
 
   cairo_transform(context, &m);
   // cairo_set_matrix(context, &m);
 
-  if (dx < 0.0f) {
+  if (size.width < 0.0f) {
     cairo_translate(context, tx, 0);
   }
 
-  if (dy < 0.0f) {
+  if (size.height < 0.0f) {
     cairo_translate(context, 0, ty);
   }
 
@@ -720,11 +719,11 @@ Image * BufferedImage::Rotate(double radians, bool resize)
       uint32_t src[_size.width*_size.height];
       uint32_t dst[iw*ih];
 
-      GetRGBArray(src, 0, 0, _size.width, _size.height);
+      GetRGBArray(src, {0, 0, _size.width, _size.height});
 
       NearesNeighborRotate(src, _size.width, _size.height, dst, iw, ih, radians, true);
 
-      image->GetGraphics()->SetRGBArray(dst, 0, 0, iw, ih);
+      image->GetGraphics()->SetRGBArray(dst, {0, 0, iw, ih});
     } else {
       cairo_t *dst_context = cairo_create(image->GetGraphics()->GetCairoSurface());
 
@@ -763,11 +762,11 @@ Image * BufferedImage::Rotate(double radians, bool resize)
     uint32_t src[_size.width*_size.height];
     uint32_t dst[iw*ih];
 
-    GetRGBArray(src, 0, 0, _size.width, _size.height);
+    GetRGBArray(src, {0, 0, _size.width, _size.height});
 
     NearesNeighborRotate(src, _size.width, _size.height, dst, iw, ih, radians, false);
 
-    image->GetGraphics()->SetRGBArray(dst, 0, 0, iw, ih);
+    image->GetGraphics()->SetRGBArray(dst, {0, 0, iw, ih});
   } else {
     cairo_t *dst_context = cairo_create(image->GetGraphics()->GetCairoSurface());
 
@@ -785,7 +784,7 @@ Image * BufferedImage::Rotate(double radians, bool resize)
   return image;
 }
 
-Image * BufferedImage::Scale(int width, int height)
+Image * BufferedImage::Scale(jsize_t<int> size)
 {
   cairo_format_t 
     format = CAIRO_FORMAT_INVALID;
@@ -801,7 +800,7 @@ Image * BufferedImage::Scale(int width, int height)
   }
 
   cairo_surface_t 
-    *surface = cairo_image_surface_create(format, width, height);
+    *surface = cairo_image_surface_create(format, size.width, size.height);
   cairo_t
     *context = cairo_create(surface);
   
@@ -809,7 +808,7 @@ Image * BufferedImage::Scale(int width, int height)
   std::string *data = (std::string *)cairo_surface_get_user_data(_cairo_surface, nullptr);
 
   if (data != nullptr) {
-    cairo_surface_t *svg_surface = create_svg_surface_from_data((uint8_t *)data->c_str(), data->size(), width, height);
+    cairo_surface_t *svg_surface = create_svg_surface_from_data((uint8_t *)data->c_str(), data->size(), size.width, size.height);
     
     cairo_set_source_surface(context, svg_surface, 0, 0);
     cairo_paint(context);
@@ -830,24 +829,24 @@ Image * BufferedImage::Scale(int width, int height)
     jinterpolation_method_t method = GetInterpolationMethod();
 
     uint32_t src[_size.width*_size.height];
-    uint32_t dst[width*height];
+    uint32_t dst[size.width*size.height];
 
-    GetRGBArray(src, 0, 0, _size.width, _size.height);
+    GetRGBArray(src, {0, 0, _size.width, _size.height});
 
     if (method == JIM_NEAREST) {
-      NearestNeighborScale(src, dst, _size.width, _size.height, width, height); 
+      NearestNeighborScale(src, dst, _size.width, _size.height, size.width, size.height); 
     } else if (method == JIM_BILINEAR) {
-      BilinearScale(src, dst, _size.width, _size.height, width, height); 
+      BilinearScale(src, dst, _size.width, _size.height, size.width, size.height); 
     } else if (method == JIM_BICUBIC) {
-      BicubicScale(src, dst, _size.width, _size.height, width, height); 
+      BicubicScale(src, dst, _size.width, _size.height, size.width, size.height); 
     }
 
-    image->GetGraphics()->SetRGBArray(dst, 0, 0, width, height);
+    image->GetGraphics()->SetRGBArray(dst, {0, 0, size.width, size.height});
   } else {
     cairo_t *context = cairo_create(image->GetGraphics()->GetCairoSurface());
 
     cairo_surface_flush(_cairo_surface);
-    cairo_scale(context, (double)width/_size.width, (double)height/_size.height);
+    cairo_scale(context, (double)size.width/_size.width, (double)size.height/_size.height);
     cairo_set_source_surface(context, _cairo_surface, 0, 0);
     cairo_paint(context);
 
@@ -859,7 +858,7 @@ Image * BufferedImage::Scale(int width, int height)
   return image;
 }
 
-Image * BufferedImage::Crop(int x, int y, int width, int height)
+Image * BufferedImage::Crop(jrect_t<int> rect)
 {
   cairo_format_t 
     format = CAIRO_FORMAT_INVALID;
@@ -875,12 +874,12 @@ Image * BufferedImage::Crop(int x, int y, int width, int height)
   }
 
   cairo_surface_t 
-    *surface = cairo_image_surface_create(format, width, height);
+    *surface = cairo_image_surface_create(format, rect.size.width, rect.size.height);
   cairo_t
     *context = cairo_create(surface);
 
   cairo_surface_flush(_cairo_surface);
-  cairo_set_source_surface(context, _cairo_surface, -x, -y);
+  cairo_set_source_surface(context, _cairo_surface, -rect.point.x, -rect.point.y);
   cairo_paint(context);
 
   jgui::Image *tmp = new jgui::BufferedImage(surface);
@@ -958,7 +957,7 @@ Image * BufferedImage::Colorize(Color color)
   jgui::Color::RGBtoHSB(color.GetRed(), color.GetGreen(), color.GetBlue(), &hue, &sat, &bri); 
 
   HSLColorSpace hsl(hue, sat, 0.0);
-  jgui::jsize_t size = image->GetSize();
+  jgui::jsize_t<int> size = image->GetSize();
 
   if (image->GetPixelFormat() == JPF_ARGB) {
     for (int j=0; j<size.height; j++) {
@@ -1049,13 +1048,13 @@ void BufferedImage::UnlockData()
   _mutex.unlock();
 }
 
-void BufferedImage::GetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)
+void BufferedImage::GetRGBArray(uint32_t *rgb, jrect_t<int> rect)
 {
   if (_graphics == nullptr) {
     return;
   }
 
-  _graphics->GetRGBArray(rgb, xp, yp, wp, hp);
+  _graphics->GetRGBArray(rgb, rect);
 }
     
 jcommon::Object * BufferedImage::Clone()
@@ -1085,7 +1084,7 @@ jcommon::Object * BufferedImage::Clone()
 
   g->SetCompositeFlags(jgui::JCF_SRC);
 
-  if (g->DrawImage(this, 0, 0) == false) {
+  if (g->DrawImage(this, jpoint_t<int>{0, 0}) == false) {
     delete clone;
     clone = nullptr;
   }
