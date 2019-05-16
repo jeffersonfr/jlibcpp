@@ -31,7 +31,7 @@ namespace jcommon {
  *
  * \author Jeff Ferr
  */
-class ParamMapper : public virtual jcommon::Object{
+class ParamMapper : public virtual jcommon::Object {
 
   private:
     std::map<std::string, std::string> _params;
@@ -138,6 +138,12 @@ class ParamMapper : public virtual jcommon::Object{
      *
      */
     virtual void RemoveParamByIndex(int index);
+
+    /**
+     * \brief
+     *
+     */
+    virtual void RemoveAll();
 
     /**
      * \brief

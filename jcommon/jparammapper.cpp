@@ -220,6 +220,11 @@ void ParamMapper::RemoveParamByIndex(int index)
   }
 }
 
+void ParamMapper::RemoveAll()
+{
+  _params.clear();
+}
+
 Object * ParamMapper::Clone()
 {
   std::map<std::string, std::string> params = GetParameters();
