@@ -130,7 +130,7 @@ bool Container::MoveScrollTowards(Component *next, jevent::jkeyevent_symbol_t sy
       nextIntersects = Contains(next) == true && Intersects({al.x, al.y, ns.width, ns.height}, {al.x + x, al.y + y, w, h});
 
     if ((nextIntersects && !currentLarge && !edge) || 
-        Rectangle::Contains(al.x + slocation.x, al.y + slocation.y, w, h, nl.x, nl.y, ns.width, ns.height)) {
+        Rectangle::Contains({al.x + slocation.x, al.y + slocation.y, w, h}, {nl.x, nl.y, ns.width, ns.height})) {
       //scrollComponentToVisible(next);
     } else {
       if (!scrollOutOfBounds) {
@@ -143,7 +143,7 @@ bool Container::MoveScrollTowards(Component *next, jevent::jkeyevent_symbol_t sy
 
         // if after moving the scroll the current focus is out of the view port and the next focus is in the view port move the focus
         if (nextIntersects == false || 
-            Rectangle::Intersects(cl.x, cl.y, cs.width, cs.height, al.x + x, al.y + y, w, h) != 0) {
+            Rectangle::Intersects({cl.x, cl.y, cs.width, cs.height}, {al.x + x, al.y + y, w, h}) != 0) {
           return false;
         }
       } else {

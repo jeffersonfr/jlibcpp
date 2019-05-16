@@ -25,62 +25,29 @@ Rectangle::~Rectangle()
 {
 }
 
-bool Rectangle::Contains(jregion_t<int> region1, jregion_t<int> region2)
+bool Rectangle::Contains(jrect_t<int> r1, jrect_t<int> r2)
 {
-  return Contains(region1.x, region1.y, region1.width, region1.height, region2.x, region2.y, region2.width, region2.height);
+  return (r2.point.x >= r1.point.x) && (r2.point.y >= r1.point.y) && ((r2.point.x + r2.size.width) <= r1.size.width) && ((r2.point.y + r2.size.height) <= r1.size.height);
 }
 
-bool Rectangle::Contains(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2)
+bool Rectangle::Intersects(jrect_t<int> r1, jrect_t<int> r2)
 {
-  return (x2 >= x1) && (y2 >= y1) && ((x2+w2) <= w1) && ((y2+h2) <= h1);
+  return (((r1.point.x > (r2.point.x + r2.size.width))||((r1.point.x + r1.size.width) < r2.point.x)||(r1.point.y > (r2.point.y + r2.size.height))||((r1.point.y + r1.size.height) < r2.point.y)) == 0);
 }
 
-bool Rectangle::Intersects(jregion_t<int> region1, jregion_t<int> region2)
+jrect_t<int> Rectangle::Intersection(jrect_t<int> r1, jrect_t<int> r2)
 {
-  return Intersects(region1.x, region1.y, region1.width, region1.height, region2.x, region2.y, region2.width, region2.height);
-}
-
-bool Rectangle::Intersects(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2)
-{
-  int ax = x1, 
-      ay = y1,
-      bx = ax+w1,
-      by = ay+h1;
-  int cx = x2, 
-      cy = y2,
-      dx = cx+w2, 
-      dy = cy+h2;
-
-  return (((ax > dx)||(bx < cx)||(ay > dy)||(by < cy)) == 0);
-}
-
-jregion_t<int> Rectangle::Intersection(jregion_t<int> region1, jregion_t<int> region2)
-{
-  return Intersection(region1.x, region1.y, region1.width, region1.height, region2.x, region2.y, region2.width, region2.height);
-}
-
-jregion_t<int> Rectangle::Intersection(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2)
-{
-  jregion_t<int> region;
-
-  region.x = 0;
-  region.y = 0;
-  region.width = 0;
-  region.height = 0;
-
-  int left = (std::max)(x1, x2),
-    top = (std::max)(y1, y2),
-    right = (std::min)(x1+w1, x2+w2),
-    bottom = (std::min)(y1+h1, y2+h2);
+  int 
+    left = (std::max)(r1.point.x, r2.point.x),
+    top = (std::max)(r1.point.y, r2.point.y),
+    right = (std::min)(r1.point.x + r1.size.width, r2.point.x + r2.size.width),
+    bottom = (std::min)(r1.point.y + r1.size.height, r2.point.y + r2.size.height);
 
   if (right > left && bottom > top) {
-    region.x = left;
-    region.y = top;
-    region.width = right-left;
-    region.height = bottom-top;
+    return {{left, top}, {right - left, bottom - top}};
   }
 
-  return region;
+  return {0, 0, 0, 0};
 }
 
 }

@@ -42,37 +42,19 @@ class Rectangle : public virtual jcommon::Object {
      * \brief
      *
      */
-    static bool Contains(jregion_t<int> region1, jregion_t<int> region2);
+    static bool Contains(jrect_t<int> region1, jrect_t<int> region2);
 
     /**
      * \brief
      *
      */
-    static bool Contains(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2);
+    static bool Intersects(jrect_t<int> region1, jrect_t<int> region2);
 
     /**
      * \brief
      *
      */
-    static bool Intersects(jregion_t<int> region1, jregion_t<int> region2);
-
-    /**
-     * \brief
-     *
-     */
-    static bool Intersects(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2);
-
-    /**
-     * \brief
-     *
-     */
-    static jregion_t<int> Intersection(jregion_t<int> region1, jregion_t<int> region2);
-
-    /**
-     * \brief
-     *
-     */
-    static jregion_t<int> Intersection(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2);
+    static jrect_t<int> Intersection(jrect_t<int> region1, jrect_t<int> region2);
 
 };
 

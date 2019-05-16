@@ -51,8 +51,10 @@ Graphics::Graphics(cairo_surface_t *surface):
 
   _translate.x = 0;
   _translate.y = 0;
-  _is_vertical_sync_enabled = false;
+
   _font = nullptr;
+  
+  _is_vertical_sync_enabled = false;
 
   _pen.dashes = nullptr;
   _pen.dashes_size = 0;
@@ -125,31 +127,35 @@ std::string Graphics::Dump(std::string dir, std::string prefix)
 
 jregion_t<int> Graphics::ClipRect(jrect_t<int> rect)
 {
-  jregion_t<int> clip = Rectangle::Intersection(
-      rect.point.x + _translate.x, rect.point.y + _translate.y, rect.size.width, rect.size.height, _internal_clip.x, _internal_clip.y, _internal_clip.width, _internal_clip.height);
-  
-  SetClip({clip.x - _translate.x, clip.y - _translate.y, clip.width, clip.height});
+  struct jpoint_t<int> t = Translate();
 
-  return clip;
+  jrect_t<int> clip = Rectangle::Intersection(
+      {rect.point.x + t.x, rect.point.y + t.y, rect.size.width, rect.size.height}, {_internal_clip.x, _internal_clip.y, _internal_clip.width, _internal_clip.height});
+  
+  SetClip({clip.point.x - t.x, clip.point.y - t.y, clip.size.width, clip.size.height});
+
+  return {clip.point.x, clip.point.y, clip.size.width, clip.size.height};
 }
 
 void Graphics::SetClip(jrect_t<int> rect)
 {
+  struct jpoint_t<int> t = Translate();
+
   int sw = cairo_image_surface_get_width(_cairo_surface);
   int sh = cairo_image_surface_get_height(_cairo_surface);
 
-  jregion_t<int> clip = Rectangle::Intersection(
-      rect.point.x + _translate.x, rect.point.y + _translate.y, rect.size.width, rect.size.height, 0, 0, sw, sh);
+  jrect_t<int> clip = Rectangle::Intersection(
+      {rect.point.x + t.x, rect.point.y + t.y, rect.size.width, rect.size.height}, {0, 0, sw, sh});
   
-  _clip.x = clip.x - _translate.x;
-  _clip.y = clip.y - _translate.y;
-  _clip.width = clip.width;
-  _clip.height = clip.height;
+  _clip.x = clip.point.x - t.x;
+  _clip.y = clip.point.y - t.y;
+  _clip.width = clip.size.width;
+  _clip.height = clip.size.height;
   
-  _internal_clip = clip;
+  _internal_clip = {clip.point.x, clip.point.y, clip.size.width, clip.size.height};
 
   cairo_reset_clip(_cairo_context);
-  cairo_rectangle(_cairo_context, clip.x, clip.y, clip.width + 1, clip.height + 1);
+  cairo_rectangle(_cairo_context, clip.point.x, clip.point.y, clip.size.width + 1, clip.size.height + 1);
   cairo_clip(_cairo_context);
 }
 
@@ -160,15 +166,17 @@ jregion_t<int> Graphics::GetClip()
 
 void Graphics::ReleaseClip()
 {
+  struct jpoint_t<int> t = Translate();
+
   _clip.x = 0;
   _clip.y = 0;
   _clip.width = cairo_image_surface_get_width(_cairo_surface);
   _clip.height = cairo_image_surface_get_height(_cairo_surface);
 
-  _internal_clip.x = _translate.x;
-  _internal_clip.y = _translate.y;
-  _internal_clip.width = _clip.width-_translate.x;
-  _internal_clip.height = _clip.height-_translate.y;
+  _internal_clip.x = t.x;
+  _internal_clip.y = t.y;
+  _internal_clip.width = _clip.width - t.x;
+  _internal_clip.height = _clip.height - t.y;
   
   cairo_reset_clip(_cairo_context);
 }
@@ -255,11 +263,13 @@ void Graphics::Clear()
 
 void Graphics::Clear(jrect_t<int> rect)
 {
+  struct jpoint_t<int> t = Translate();
+
   cairo_save(_cairo_context);
   cairo_set_source_rgba(_cairo_context, 0, 0, 0, 0);
   cairo_set_operator(_cairo_context, CAIRO_OPERATOR_SOURCE);
   
-  cairo_rectangle(_cairo_context, _translate.x + rect.point.x, _translate.y + rect.point.y, rect.size.width, rect.size.height);
+  cairo_rectangle(_cairo_context, t.x + rect.point.x, t.y + rect.point.y, rect.size.width, rect.size.height);
   cairo_fill(_cairo_context);
   
   cairo_restore(_cairo_context);
@@ -372,9 +382,11 @@ void Graphics::DrawLine(jline_t<int> line)
     return;
   }
 
+  struct jpoint_t<int> t = Translate();
+
   cairo_save(_cairo_context);
-  cairo_move_to(_cairo_context, line.p0.x + _translate.x, line.p0.y + _translate.y);
-  cairo_line_to(_cairo_context, line.p1.x + _translate.x, line.p1.y + _translate.y);
+  cairo_move_to(_cairo_context, line.p0.x + t.x, line.p0.y + t.y);
+  cairo_line_to(_cairo_context, line.p1.x + t.x, line.p1.y + t.y);
   cairo_set_line_width(_cairo_context, _pen.width);
   cairo_stroke(_cairo_context);
   cairo_restore(_cairo_context);
@@ -435,6 +447,8 @@ void Graphics::DrawBezierCurve(std::vector<jpoint_t<int>> points, int interpolat
     return;
   }
 
+  struct jpoint_t<int> t = Translate();
+
   float 
     *x, 
     *y, 
@@ -449,23 +463,23 @@ void Graphics::DrawBezierCurve(std::vector<jpoint_t<int>> points, int interpolat
   y = new float[points.size() + 1];
 
   for (int i=0; i<(int)points.size(); i++) {
-    x[i] = (float)(_translate.x + points[i].x);
-    y[i] = (float)(_translate.y + points[i].y);
+    x[i] = (float)(t.x + points[i].x);
+    y[i] = (float)(t.y + points[i].y);
   }
 
-  x[points.size()] = (float)(_translate.x + points[0].x);
-  y[points.size()] = (float)(_translate.y + points[0].y);
+  x[points.size()] = (float)(t.x + points[0].x);
+  y[points.size()] = (float)(t.y + points[0].y);
 
-  float t = 0.0;
+  float step = 0.0;
   
   cairo_save(_cairo_context);
   cairo_new_sub_path(_cairo_context);
 
   for (int i=0; i<=(int)(points.size()*interpolation); i++) {
-    t = t + stepsize;
+    step = step + stepsize;
 
-    x2 = EvaluateBezier0(x, points.size(), t);
-    y2 = EvaluateBezier0(y, points.size(), t);
+    x2 = EvaluateBezier0(x, points.size(), step);
+    y2 = EvaluateBezier0(y, points.size(), step);
   
     cairo_line_to(_cairo_context, x2, y2);
   }
@@ -479,8 +493,10 @@ void Graphics::DrawBezierCurve(std::vector<jpoint_t<int>> points, int interpolat
 
 void Graphics::FillRectangle(jrect_t<int> rect)
 {
+  struct jpoint_t<int> t = Translate();
+
   cairo_save(_cairo_context);
-  cairo_rectangle(_cairo_context, rect.point.x + _translate.x, rect.point.y + _translate.y, rect.size.width, rect.size.height);
+  cairo_rectangle(_cairo_context, rect.point.x + t.x, rect.point.y + t.y, rect.size.width, rect.size.height);
   cairo_fill(_cairo_context);
   cairo_restore(_cairo_context);
 }
@@ -491,8 +507,10 @@ void Graphics::DrawRectangle(jrect_t<int> rect)
     return;
   }
 
-  int x = rect.point.x + _translate.x;
-  int y = rect.point.y + _translate.y;
+  struct jpoint_t<int> t = Translate();
+
+  int x = rect.point.x + t.x;
+  int y = rect.point.y + t.y;
   int w = rect.size.width;
   int h = rect.size.height;
   int line_width = _pen.width;
@@ -526,8 +544,10 @@ void Graphics::FillBevelRectangle(jrect_t<int> rect, int dx, int dy, jrect_corne
     return;
   }
 
-  int x = rect.point.x + _translate.x;
-  int y = rect.point.y + _translate.y;
+  struct jpoint_t<int> t = Translate();
+
+  int x = rect.point.x + t.x;
+  int y = rect.point.y + t.y;
   int w = rect.size.width;
   int h = rect.size.height;
 
@@ -581,8 +601,10 @@ void Graphics::DrawBevelRectangle(jrect_t<int> rect, int dx, int dy, jrect_corne
     return;
   }
 
-  int x = rect.point.x + _translate.x;
-  int y = rect.point.y + _translate.y;
+  struct jpoint_t<int> t = Translate();
+
+  int x = rect.point.x + t.x;
+  int y = rect.point.y + t.y;
   int w = rect.size.width;
   int h = rect.size.height;
   int line_width = _pen.width;
@@ -654,8 +676,10 @@ void Graphics::FillRoundRectangle(jrect_t<int> rect, int dx, int dy, jrect_corne
     return;
   }
 
-  int x = rect.point.x + _translate.x;
-  int y = rect.point.y + _translate.y;
+  struct jpoint_t<int> t = Translate();
+
+  int x = rect.point.x + t.x;
+  int y = rect.point.y + t.y;
   int w = rect.size.width;
   int h = rect.size.height;
 
@@ -721,8 +745,10 @@ void Graphics::DrawRoundRectangle(jrect_t<int> rect, int dx, int dy, jrect_corne
     return;
   }
 
-  int x = rect.point.x + _translate.x;
-  int y = rect.point.y + _translate.y;
+  struct jpoint_t<int> t = Translate();
+
+  int x = rect.point.x + t.x;
+  int y = rect.point.y + t.y;
   int w = rect.size.width;
   int h = rect.size.height;
   int line_width = _pen.width;
@@ -822,11 +848,13 @@ void Graphics::DrawEllipse(jpoint_t<int> point, jsize_t<int> size)
 
 void Graphics::FillChord(jpoint_t<int> point, jsize_t<int> size, float arc0, float arc1)
 {
+  struct jpoint_t<int> t = Translate();
+
   arc0 = M_2PI - arc0;
   arc1 = M_2PI - arc1;
 
   cairo_save(_cairo_context);
-  cairo_translate(_cairo_context, point.x + _translate.x, point.y + _translate.y);
+  cairo_translate(_cairo_context, point.x + t.x, point.y + t.y);
   cairo_scale(_cairo_context, size.width, size.height);
   cairo_arc(_cairo_context, 0.0, 0.0, 1.0, arc1, arc0);
   cairo_close_path(_cairo_context);
@@ -836,8 +864,10 @@ void Graphics::FillChord(jpoint_t<int> point, jsize_t<int> size, float arc0, flo
 
 void Graphics::DrawChord(jpoint_t<int> point, jsize_t<int> size, float arc0, float arc1)
 {
-  int xc = point.x + _translate.x;
-  int yc = point.y + _translate.y;
+  struct jpoint_t<int> t = Translate();
+
+  int xc = point.x + t.x;
+  int yc = point.y + t.y;
   int rx = size.width;
   int ry = size.height;
   int line_width = _pen.width;
@@ -867,11 +897,13 @@ void Graphics::DrawChord(jpoint_t<int> point, jsize_t<int> size, float arc0, flo
 
 void Graphics::FillArc(jpoint_t<int> point, jsize_t<int> size, float arc0, float arc1)
 {
+  struct jpoint_t<int> t = Translate();
+
   arc0 = M_2PI - arc0;
   arc1 = M_2PI - arc1;
 
   cairo_save(_cairo_context);
-  cairo_translate(_cairo_context, point.x + _translate.x, point.y + _translate.y);
+  cairo_translate(_cairo_context, point.x + t.x, point.y + t.y);
   cairo_scale(_cairo_context, size.width, size.height);
   cairo_arc_negative(_cairo_context, 0.0, 0.0, 1.0, arc0, arc1);
   cairo_line_to(_cairo_context, 0, 0);
@@ -882,8 +914,10 @@ void Graphics::FillArc(jpoint_t<int> point, jsize_t<int> size, float arc0, float
 
 void Graphics::DrawArc(jpoint_t<int> point, jsize_t<int> size, float arc0, float arc1)
 {
-  int xc = point.x + _translate.x;
-  int yc = point.y + _translate.y;
+  struct jpoint_t<int> t = Translate();
+
+  int xc = point.x + t.x;
+  int yc = point.y + t.y;
   int rx = size.width;
   int ry = size.height;
   int line_width = _pen.width;
@@ -917,8 +951,10 @@ void Graphics::FillPie(jpoint_t<int> point, jsize_t<int> size, float arc0, float
 
 void Graphics::DrawPie(jpoint_t<int> point, jsize_t<int> size, float arc0, float arc1)
 {
-  int xc = point.x + _translate.x;
-  int yc = point.y + _translate.y;
+  struct jpoint_t<int> t = Translate();
+
+  int xc = point.x + t.x;
+  int yc = point.y + t.y;
   int rx = size.width;
   int ry = size.height;
   int line_width = _pen.width;
@@ -963,9 +999,11 @@ void Graphics::DrawPolygon(jpoint_t<int> point, std::vector<jpoint_t<int>> point
     return;
   }
 
+  struct jpoint_t<int> t = Translate();
+
   for (int i=0; i<(int)points.size(); i++) {
-    points[i].x = points[i].x + point.x + _translate.x;
-    points[i].y = points[i].y + point.y + _translate.y;
+    points[i].x = points[i].x + point.x + t.x;
+    points[i].y = points[i].y + point.y + t.y;
   }
   
   cairo_save(_cairo_context);
@@ -991,9 +1029,11 @@ void Graphics::FillPolygon(jpoint_t<int> point, std::vector<jpoint_t<int>> point
     return;
   }
 
+  struct jpoint_t<int> t = Translate();
+
   for (int i=0; i<(int)points.size(); i++) {
-    points[i].x = points[i].x + point.x + _translate.x;
-    points[i].y = points[i].y + point.y + _translate.y;
+    points[i].x = points[i].x + point.x + t.x;
+    points[i].y = points[i].y + point.y + t.y;
   }
   
   cairo_save(_cairo_context);
@@ -1035,8 +1075,10 @@ void Graphics::ResetGradientStop()
 
 void Graphics::FillRadialGradient(jpoint_t<int> point, jsize_t<int> size, jpoint_t<int> offset, int r0p)
 {
-  int xc = point.x + _translate.x;
-  int yc = point.y + _translate.y;
+  struct jpoint_t<int> t = Translate();
+
+  int xc = point.x + t.x;
+  int yc = point.y + t.y;
   int rx = size.width;
   int ry = size.height;
   int x0 = xc + offset.x;
@@ -1069,6 +1111,8 @@ void Graphics::FillRadialGradient(jpoint_t<int> point, jsize_t<int> size, jpoint
 
 void Graphics::FillLinearGradient(jrect_t<int> rect, jpoint_t<int> p0, jpoint_t<int> p1)
 {
+  struct jpoint_t<int> t = Translate();
+
   cairo_pattern_t *pattern = cairo_pattern_create_linear(p0.x, p0.y, p1.x, p1.y);
   
   for (std::vector<jgradient_t>::iterator i=_gradient_stops.begin(); i!=_gradient_stops.end(); i++) {
@@ -1084,7 +1128,7 @@ void Graphics::FillLinearGradient(jrect_t<int> rect, jpoint_t<int> p0, jpoint_t<
   }
   
   cairo_save(_cairo_context);
-  cairo_translate(_cairo_context, rect.point.x + _translate.x, rect.point.y + _translate.y);
+  cairo_translate(_cairo_context, rect.point.x + t.x, rect.point.y + t.y);
   cairo_rectangle(_cairo_context, 0, 0, rect.size.width, rect.size.height);
   cairo_set_source(_cairo_context, pattern);
   cairo_fill(_cairo_context);
@@ -1100,6 +1144,8 @@ void Graphics::DrawString(std::string text, jpoint_t<int> point)
     return;
   }
 
+  struct jpoint_t<int> t = Translate();
+
   Font *font = dynamic_cast<Font *>(_font);
   const char *utf8 = text.c_str();
   cairo_glyph_t *glyphs = nullptr;
@@ -1114,7 +1160,7 @@ void Graphics::DrawString(std::string text, jpoint_t<int> point)
   }
 
   status = cairo_scaled_font_text_to_glyphs(
-      font->GetScaledFont(), point.x + _translate.x, point.y + _translate.y + _font->GetAscender(), utf8, utf8_len, &glyphs, &glyphs_len, nullptr, nullptr, nullptr);
+      font->GetScaledFont(), point.x + t.x, point.y + t.y + _font->GetAscender(), utf8, utf8_len, &glyphs, &glyphs_len, nullptr, nullptr, nullptr);
 
   if (status == CAIRO_STATUS_SUCCESS) {
     cairo_show_glyphs(_cairo_context, glyphs, glyphs_len);
@@ -1134,10 +1180,12 @@ void Graphics::DrawGlyph(int symbol, jpoint_t<int> point)
     return;
   }
 
+  struct jpoint_t<int> t = Translate();
+
   cairo_glyph_t glyph;
 
-  glyph.x = point.x + _translate.x;
-  glyph.y = point.y + _translate.y + _font->GetAscender();
+  glyph.x = point.x + t.x;
+  glyph.y = point.y + t.y + _font->GetAscender();
   glyph.index = symbol;
 
   cairo_show_glyphs(_cairo_context, &glyph, 1);
@@ -1290,8 +1338,10 @@ void Graphics::DrawString(std::string text, jrect_t<int> rect, jhorizontal_align
 
 uint32_t Graphics::GetRGB(jpoint_t<int> point, uint32_t pixel)
 {
-  int x = point.x + _translate.x;
-  int y = point.y + _translate.y;
+  struct jpoint_t<int> t = Translate();
+
+  int x = point.x + t.x;
+  int y = point.y + t.y;
   int sw = cairo_image_surface_get_width(_cairo_surface);
   int sh = cairo_image_surface_get_height(_cairo_surface);
   
@@ -1316,8 +1366,10 @@ void Graphics::GetRGBArray(uint32_t *rgb, jrect_t<int> rect)
     throw jexception::NullPointerException("Pixel array is null");
   }
 
-  int x = rect.point.x + _translate.x;
-  int y = rect.point.y + _translate.y;
+  struct jpoint_t<int> t = Translate();
+
+  int x = rect.point.x + t.x;
+  int y = rect.point.y + t.y;
   int sw = cairo_image_surface_get_width(_cairo_surface);
   int sh = cairo_image_surface_get_height(_cairo_surface);
   
@@ -1415,8 +1467,10 @@ void Graphics::SetRGBArray(uint32_t *rgb, jrect_t<int> rect)
     throw jexception::NullPointerException("Pixel array is null");
   }
 
-  int x = rect.point.x + _translate.x;
-  int y = rect.point.y + _translate.y;
+  struct jpoint_t<int> t = Translate();
+
+  int x = rect.point.x + t.x;
+  int y = rect.point.y + t.y;
   int sw = cairo_image_surface_get_width(_cairo_surface);
   int sh = cairo_image_surface_get_height(_cairo_surface);
   
@@ -1772,10 +1826,12 @@ bool Graphics::DrawImage(Image *img, jpoint_t<int> point)
   Graphics *g = img->GetGraphics();
 
   if (g != nullptr) {
+    struct jpoint_t<int> t = Translate();
+
     cairo_surface_t *cairo_surface = g->GetCairoSurface();
 
     cairo_save(_cairo_context);
-    cairo_set_source_surface(_cairo_context, cairo_surface, point.x + _translate.x, point.y + _translate.y);
+    cairo_set_source_surface(_cairo_context, cairo_surface, point.x + t.x, point.y + t.y);
     cairo_paint(_cairo_context);
     cairo_restore(_cairo_context);
   } else {
@@ -1799,6 +1855,8 @@ bool Graphics::DrawImage(Image *img, jrect_t<int> dst)
   Graphics *g = img->GetGraphics();
 
   if (g != nullptr) {
+    struct jpoint_t<int> t = Translate();
+
     cairo_surface_t *cairo_surface = g->GetCairoSurface();
 
     jgui::jsize_t<int> isize = img->GetSize();
@@ -1807,7 +1865,7 @@ bool Graphics::DrawImage(Image *img, jrect_t<int> dst)
     float dy = dst.size.height/(float)isize.height;
     
     cairo_save(_cairo_context);
-    cairo_translate(_cairo_context, dst.point.x + _translate.x, dst.point.y + _translate.y);
+    cairo_translate(_cairo_context, dst.point.x + t.x, dst.point.y + t.y);
     cairo_scale(_cairo_context, dx, dy);
     cairo_set_source_surface(_cairo_context, cairo_surface, 0, 0);
     cairo_paint(_cairo_context);
@@ -1851,6 +1909,8 @@ bool Graphics::DrawImage(Image *img, jrect_t<int> src, jrect_t<int> dst)
   jgui::Graphics *g = img->GetGraphics();
 
   if (g != nullptr) {
+    struct jpoint_t<int> t = Translate();
+
     cairo_surface_t *cairo_surface = g->GetCairoSurface();
 
     float dx = dst.size.width/(float)src.size.width;
@@ -1866,7 +1926,7 @@ bool Graphics::DrawImage(Image *img, jrect_t<int> src, jrect_t<int> dst)
     cairo_paint(context);
 
     // scale
-    cairo_translate(_cairo_context, dst.point.x + _translate.x, dst.point.y + _translate.y);
+    cairo_translate(_cairo_context, dst.point.x + t.x, dst.point.y + t.y);
     cairo_scale(_cairo_context, dx, dy);
     cairo_set_source_surface(_cairo_context, surface, 0, 0);
     cairo_paint(_cairo_context);
