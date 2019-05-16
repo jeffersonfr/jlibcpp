@@ -39,14 +39,14 @@ class PorterTeste : public jgui::Window {
 
 			_bg = new jgui::BufferedImage("images/background.png");
 
-			_img1 = new jgui::BufferedImage(jgui::JPF_ARGB, RECT_SIZE, RECT_SIZE);
-			_img2 = new jgui::BufferedImage(jgui::JPF_ARGB, RECT_SIZE, RECT_SIZE);
+			_img1 = new jgui::BufferedImage(jgui::JPF_ARGB, {RECT_SIZE, RECT_SIZE});
+			_img2 = new jgui::BufferedImage(jgui::JPF_ARGB, {RECT_SIZE, RECT_SIZE});
 
 			_img1->GetGraphics()->SetColor(0xa0ff0000);
-			_img1->GetGraphics()->FillRectangle(0, 0, RECT_SIZE, RECT_SIZE);
+			_img1->GetGraphics()->FillRectangle({0, 0, RECT_SIZE, RECT_SIZE});
 
 			_img2->GetGraphics()->SetColor(0xa00000ff);
-			_img2->GetGraphics()->FillRectangle(0, 0, RECT_SIZE, RECT_SIZE);
+			_img2->GetGraphics()->FillRectangle({0, 0, RECT_SIZE, RECT_SIZE});
 		}
 
 		virtual ~PorterTeste()
@@ -58,33 +58,33 @@ class PorterTeste : public jgui::Window {
 
 		virtual void PaintComposition(jgui::Graphics *g, std::string name, jgui::jcomposite_flags_t t, int x, int y)
 		{
-			jgui::Image *image = new jgui::BufferedImage(jgui::JPF_ARGB, 2*RECT_SIZE, 2*RECT_SIZE);
+			jgui::Image *image = new jgui::BufferedImage(jgui::JPF_ARGB, {2*RECT_SIZE, 2*RECT_SIZE});
 			jgui::Graphics *ig = image->GetGraphics();
 
 			ig->SetCompositeFlags(jgui::JCF_SRC_OVER);
-			ig->DrawImage(_img1, 1*RECT_SIZE/2, 1*RECT_SIZE/2);
+			ig->DrawImage(_img1, jgui::jpoint_t<int>{1*RECT_SIZE/2, 1*RECT_SIZE/2});
 			ig->SetCompositeFlags(t);
 
 			if (_is_drawimage == true) {
-				ig->DrawImage(_img2, 2*RECT_SIZE/2, 2*RECT_SIZE/2);
+				ig->DrawImage(_img2, jgui::jpoint_t<int>{2*RECT_SIZE/2, 2*RECT_SIZE/2});
 			} else {
 				jgui::jsize_t size = _img2->GetSize();
 				uint32_t buffer[size.width*size.height];
 
-				_img2->GetGraphics()->GetRGBArray(buffer, 0, 0, size.width, size.height);
+				_img2->GetGraphics()->GetRGBArray(buffer, {0, 0, size.width, size.height});
 
-				ig->SetRGBArray(buffer, 2*RECT_SIZE/2, 2*RECT_SIZE/2, size.width, size.height);
+				ig->SetRGBArray(buffer, {2*RECT_SIZE/2, 2*RECT_SIZE/2, size.width, size.height});
 			}
 
 			g->SetCompositeFlags(jgui::JCF_SRC_OVER);
-			g->DrawImage(image, x, y);
+			g->DrawImage(image, jgui::jpoint_t<int>{x, y});
 			
 			jgui::Theme *theme = GetTheme();
 			jgui::Font *font = theme->GetFont("component.font");
 
 			g->SetColor(jgui::Color::White);
 			g->SetFont(font);
-			g->DrawString(name, x+RECT_SIZE/2, y);
+			g->DrawString(name, jgui::jpoint_t<int>{x+RECT_SIZE/2, y});
 
 			delete image;
 		}
@@ -115,14 +115,14 @@ class PorterTeste : public jgui::Window {
       jgui::jinsets_t
         insets = GetInsets();
       
-			g->DrawImage(_bg, 0, 0, size.width, size.height);
+			g->DrawImage(_bg, {0, 0, size.width, size.height});
 
 			jgui::Theme *theme = GetTheme();
 			jgui::Font *font = theme->GetFont("component.font");
 
 			g->SetColor(jgui::Color::White);
 			g->SetFont(font);
-			g->DrawString("Press 1 to use DrawImage() and 2 to use SetRGBArray()", insets.left, insets.top);
+			g->DrawString("Press 1 to use DrawImage() and 2 to use SetRGBArray()", jgui::jpoint_t<int>{insets.left, insets.top});
 
 			PaintComposition(g, "CLEAR", jgui::JCF_CLEAR, 0*(2*RECT_SIZE+16), 1*(2*RECT_SIZE+16));
 

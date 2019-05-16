@@ -675,10 +675,10 @@ class Picture : public jgui::Component {
 
 				g->SetColor(jgui::Color::White);
 				g->SetFont(font);
-				g->DrawString(_title, 0, 0);
+				g->DrawString(_title, jgui::jpoint_t<int>{0, 0});
       }
 			
-      g->DrawImage(_image, 0, height, size.width, size.height - height);
+      g->DrawImage(_image, {0, height, size.width, size.height - height});
 		}
 
 };
@@ -786,9 +786,9 @@ class BufferedImageTest : public Picture {
 			jgui::jsize_t
 				size = image->GetSize();
 
-			_image = new jgui::BufferedImage(jgui::JPF_RGB32, size.width, size.height);
+			_image = new jgui::BufferedImage(jgui::JPF_RGB32, size);
 
-			_image->GetGraphics()->DrawImage(image, 0, 0);
+			_image->GetGraphics()->DrawImage(image, jgui::jpoint_t<int>{0, 0});
 
 			delete image;
 
@@ -818,15 +818,15 @@ class RGBImageTest : public Picture {
 			uint32_t 
 				rgb[size.width*size.height];
 
-			image->GetRGBArray(rgb, 0, 0, size.width, size.height);
+			image->GetRGBArray(rgb, {0, 0, size.width, size.height});
 
       delete image;
       image = nullptr;
 
-			_image = new jgui::BufferedImage(jgui::JPF_RGB32, size.width, size.height);
+			_image = new jgui::BufferedImage(jgui::JPF_RGB32, size);
 
       _image->GetGraphics()->SetCompositeFlags(jgui::JCF_SRC);
-      _image->GetGraphics()->SetRGBArray(rgb, 0, 0, size.width, size.height);
+      _image->GetGraphics()->SetRGBArray(rgb, {0, 0, size.width, size.height});
 
 			_title = "RGB Image";
 		}
@@ -850,9 +850,10 @@ class RawImageTest : public Picture {
 			jio::File *file = jio::File::OpenFile(FILENAME);
 
 			char *raw = new char[file->GetSize()];
-			int64_t packet = 64*1024,
-							length,
-							count = 0;
+			int64_t 
+			  packet = 64*1024,
+				length,
+				count = 0;
 
 			while ((length = file->Read(raw+(int)count, packet)) > 0) {
 				count = count + length;
@@ -893,7 +894,7 @@ class IndexedImageTest : public Picture {
 				rgb[size.width*size.height],
 				*pixels = new uint32_t[length];
 
-			image->GetRGBArray(rgb, 0, 0, size.width, size.height);
+			image->GetRGBArray(rgb, {0, 0, size.width, size.height});
 
       delete image;
       image = nullptr;
@@ -906,7 +907,7 @@ class IndexedImageTest : public Picture {
 				pixels[i] = q.Convert(rgb[i]);
 			}
 
-			_image = jgui::IndexedImage::Pack(pixels, size.width, size.height);
+			_image = jgui::IndexedImage::Pack(pixels, size);
 
       delete [] pixels;
       pixels = nullptr;

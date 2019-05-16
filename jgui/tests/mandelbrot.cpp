@@ -143,7 +143,7 @@ class Mandelbrot : public jgui::Window {
 							pb = (int)((1+sin(C*0.15))*127.);
 						}
 
-						g->SetRGB((0xff << 0x18) | (pr << 0x10) | (pg << 0x08) | (pb << 0x00), x, y);
+						g->SetRGB((0xff << 0x18) | (pr << 0x10) | (pg << 0x08) | (pb << 0x00), {x, y});
 					}
 				}
 			}

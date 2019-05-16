@@ -280,7 +280,7 @@ class RayTracer : public jgui::Window {
         uint8_t cg = (uint8_t)(255 * std::max(0.f, std::min(1.f, framebuffer[i][1])));
         uint8_t cb = (uint8_t)(255 * std::max(0.f, std::min(1.f, framebuffer[i][2])));
 
-        g->SetRGB(0xff000000 | cr << 16 | cg << 8 | cb, i%width, i/width);
+        g->SetRGB(0xff000000 | cr << 16 | cg << 8 | cb, {i%width, i/width});
       }
 		}
 

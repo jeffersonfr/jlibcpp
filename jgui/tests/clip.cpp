@@ -40,8 +40,8 @@ class RectangleContainer : public jgui::Container {
 			jgui::jsize_t
 				size = GetSize();
 
-			g->SetColor(random()%0xff, random()%0xff, random()%0xff, 0xff);
-			g->DrawRectangle(0, 0, size.width, size.height);
+			g->SetColor({(int)(random()%0xff), (int)(random()%0xff), (int)(random()%0xff), 0xff});
+			g->DrawRectangle({0, 0, size.width, size.height});
 		}
 
 		virtual std::string What()

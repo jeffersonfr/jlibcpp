@@ -90,7 +90,7 @@ Component::~Component()
   }
 }
 
-void Component::ScrollToVisibleArea(int x, int y, int width, int height, Component *coordinateSpace) 
+void Component::ScrollToVisibleArea(jrect_t<int> rect, Component *coordinateSpace) 
 {
   if (IsScrollable()) {
     jpoint_t<int> 
@@ -115,8 +115,8 @@ void Component::ScrollToVisibleArea(int x, int y, int width, int height, Compone
       view.height = size.height;
     }
 
-    int relativeX = x;
-    int relativeY = y;
+    int relativeX = rect.point.x;
+    int relativeY = rect.point.y;
     
     // component needs to be in absolute coordinates ...
     Container *parent = nullptr;
@@ -126,15 +126,15 @@ void Component::ScrollToVisibleArea(int x, int y, int width, int height, Compone
     }
 
     if (parent == this) {
-      if (Contains(view.x, view.y, view.width, view.height, x, y, width, height) == true) {
+      if (Contains({view.x, view.y, view.width, view.height}, rect) == true) {
         return;
       }
     } else {
       while (parent != this) {
         // mostly a special case for list
         if (parent == nullptr) {
-          relativeX = x;
-          relativeY = y;
+          relativeX = rect.point.x;
+          relativeY = rect.point.y;
 
           break;
         }
@@ -147,7 +147,7 @@ void Component::ScrollToVisibleArea(int x, int y, int width, int height, Compone
         parent = parent->GetParent();
       }
 
-      if (Contains(view.x, view.y, view.width, view.height, relativeX, relativeY, width, height) == true) {
+      if (Contains({view.x, view.y, view.width, view.height}, {relativeX, relativeY, rect.size.width, rect.size.height}) == true) {
         return;
       }
     }
@@ -157,7 +157,7 @@ void Component::ScrollToVisibleArea(int x, int y, int width, int height, Compone
 
     if (IsScrollableX()) {
       int 
-        rightX = relativeX + width; // - s.getPadding(LEFT) - s.getPadding(RIGHT);
+        rightX = relativeX + rect.size.width; // - s.getPadding(LEFT) - s.getPadding(RIGHT);
 
       if (slocation.x > relativeX) {
         nslocation.x = relativeX;
@@ -174,7 +174,7 @@ void Component::ScrollToVisibleArea(int x, int y, int width, int height, Compone
 
     if (IsScrollableY()) {
       int 
-        bottomY = relativeY + height; // - s.getPadding(TOP) - s.getPadding(BOTTOM);
+        bottomY = relativeY + rect.size.height; // - s.getPadding(TOP) - s.getPadding(BOTTOM);
 
       if (slocation.y > relativeY) {
         scrollPosition = relativeY;
@@ -204,7 +204,7 @@ void Component::ScrollToVisibleArea(int x, int y, int width, int height, Compone
 
     if (parent != nullptr) {
       parent->ScrollToVisibleArea(
-          GetAbsoluteLocation().x-parent->GetAbsoluteLocation().x+x, GetAbsoluteLocation().y-parent->GetAbsoluteLocation().y+y, width, height, parent);
+          {GetAbsoluteLocation().x - parent->GetAbsoluteLocation().x + rect.point.x, GetAbsoluteLocation().y - parent->GetAbsoluteLocation().y + rect.point.y, rect.size.width, rect.size.height}, parent);
     }
   }
 }
@@ -1098,59 +1098,32 @@ void Component::SetSize(jsize_t<int> size)
 
 bool Component::Contains(Component *c1, Component *c2)
 {
-  jgui::jpoint_t<int> l1 = GetLocation();
-  jgui::jpoint_t<int> l2 = GetLocation();
-  jgui::jsize_t<int> s1 = GetSize();
-  jgui::jsize_t<int> s2 = GetSize();
-
-  return Contains(l1.x, l1.y, s1.width, s1.height, l2.x, l2.y, s2.width, s2.height);
+  return Contains({c1->GetLocation(), c1->GetSize()}, {c2->GetLocation(), c2->GetSize()});
 }
 
-bool Component::Contains(Component *c, int x, int y, int w, int h)
+bool Component::Contains(Component *c, jrect_t<int> rect)
 {
-  jgui::jpoint_t<int> l1 = GetLocation();
-  jgui::jsize_t<int> s1 = GetSize();
-
-  return Contains(l1.x, l1.y, s1.width, s1.height, x, y, w, h);
+  return Contains({c->GetLocation(), c->GetSize()}, rect);
 }
 
-bool Component::Contains(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2)
+bool Component::Contains(jrect_t<int> r1, jrect_t<int> r2)
 {
-  return (x2 >= x1) && (y2 >= y1) && ((x2+w2) <= w1) && ((y2+h2) <= h1);
+  return (r2.point.x >= r1.point.x) && (r2.point.y >= r1.point.y) && ((r2.point.x + r2.size.width) <= r1.size.width) && ((r2.point.y + r2.size.height) <= r1.size.height);
 }
 
 bool Component::Intersects(Component *c1, Component *c2)
 {
-  jgui::jpoint_t<int> l1 = GetLocation();
-  jgui::jpoint_t<int> l2 = GetLocation();
-  jgui::jsize_t<int> s1 = GetSize();
-  jgui::jsize_t<int> s2 = GetSize();
-
-  return Intersects(l1.x, l1.y, s1.width, s1.height, l2.x, l2.y, s2.width, s2.height);
+  return Intersects({c1->GetLocation(), c1->GetSize()}, {c2->GetLocation(), c2->GetSize()});
 }
 
-bool Component::Intersects(Component *c, int x, int y, int w, int h)
+bool Component::Intersects(Component *c, jrect_t<int> rect)
 {
-  jgui::jpoint_t<int> l1 = GetLocation();
-  jgui::jsize_t<int> s1 = GetSize();
-
-  return Intersects(l1.x, l1.y, s1.width, s1.height, x, y, w, h);
+  return Intersects({c->GetLocation(), c->GetSize()}, rect);
 }
 
-bool Component::Intersects(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2)
+bool Component::Intersects(jrect_t<int> r1, jrect_t<int> r2)
 {
-  int 
-    ax = x1, 
-    ay = y1,
-    bx = ax+w1,
-    by = ay+h1;
-  int 
-    cx = x2, 
-    cy = y2,
-    dx = cx+w2, 
-    dy = cy+h2;
-
-  return (((ax > dx)||(bx < cx)||(ay > dy)||(by < cy)) == 0);
+  return (((r1.point.x > (r2.point.x + r2.size.width)) || ((r1.point.x + r1.size.width) < r2.point.x) || (r1.point.y > (r2.point.y + r2.size.height)) || ((r1.point.y + r1.size.height) < r2.point.y)) == 0);
 }
 
 jpoint_t<int> Component::GetAbsoluteLocation()

@@ -302,7 +302,7 @@ class Minecraft : public jgui::Window {
         }
       }
 
-      g->SetRGBArray(buffer, 0, 0, size.width, size.height);
+      g->SetRGBArray(buffer, {0, 0, size.width, size.height});
 
       Framerate(25);
 

@@ -152,7 +152,7 @@ int loadImage(std::vector<uint32_t>& out, unsigned long& w, unsigned long& h, co
 	out.resize(length);
 
 	for (int i=0; i<length; i++) {
-		out[i] = image->GetGraphics()->GetRGB(i%size.width, i/size.width);
+		out[i] = image->GetGraphics()->GetRGB({i%size.width, i/size.width});
 	}
 
   delete image;
@@ -222,7 +222,7 @@ class GraphicsTeste : public jgui::Window {
 			  h = SCREEN_HEIGHT;
 
       static jgui::BufferedImage 
-        image(jgui::JPF_RGB32, SCREEN_WIDTH, SCREEN_HEIGHT);
+        image(jgui::JPF_RGB32, {SCREEN_WIDTH, SCREEN_HEIGHT});
       uint32_t 
         *buffer = (uint32_t *)image.LockData();
 
@@ -472,7 +472,7 @@ class GraphicsTeste : public jgui::Window {
 
       image.UnlockData();
 
-      g->DrawImage(&image, 0, 0);
+      g->DrawImage(&image, jgui::jpoint_t<int>{0, 0});
 		}
 
 		virtual bool KeyPressed(jevent::KeyEvent *event)

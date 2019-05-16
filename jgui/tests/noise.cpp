@@ -428,19 +428,18 @@ class Noise : public jgui::Window {
       g->SetFont(font);
       g->SetColor(theme->GetIntegerParam("component.fg"));
 
-      g->DrawString("Sinal Original", dx+40, dy-200);
-      g->DrawString("Sinal Ruidoso", dx+40, dy-150);
-      g->DrawString("Sinal Filtrado", dx+40, dy-100);
+      g->DrawString("Sinal Original", jgui::jpoint_t<int>{dx+40, dy-200});
+      g->DrawString("Sinal Ruidoso", jgui::jpoint_t<int>{dx+40, dy-150});
+      g->DrawString("Sinal Filtrado", jgui::jpoint_t<int>{dx+40, dy-100});
 
-      g->SetColor(0xff, 0x00, 0x00, 0xff);
-      g->FillRectangle(dx, dy-200, 20, 20);
+      g->SetColor({0xff, 0x00, 0x00, 0xff});
+      g->FillRectangle({dx, dy-200, 20, 20});
 
-      g->SetColor(0xff, 0xff, 0x00, 0xff);
-      g->SetColor(0xff, 0xff, 0x00, 0xff);
-      g->FillRectangle(dx, dy-150, 20, 20);
+      g->SetColor({0xff, 0xff, 0x00, 0xff});
+      g->FillRectangle({dx, dy-150, 20, 20});
 
-      g->SetColor(0x00, 0xff, 0x00, 0xff);
-      g->FillRectangle(dx, dy-100, 20, 20);
+      g->SetColor({0x00, 0xff, 0x00, 0xff});
+      g->FillRectangle({dx, dy-100, 20, 20});
 
       for (double i=0.0; i<100.0; i+=1.0) {
         Signal in(6);
@@ -461,17 +460,17 @@ class Noise : public jgui::Window {
         x5 = i;
         y5 = s(i);
 
-        g->SetColor(0xff, 0xff, 0x00, 0xff);
-        g->DrawLine(x0*scalex+dx, y0*scaley+dy, x1*scalex+dx, y1*scaley+dy);
+        g->SetColor({0xff, 0xff, 0x00, 0xff});
+        g->DrawLine({{(int)(x0*scalex+dx), (int)(y0*scaley+dy)}, {(int)(x1*scalex+dx), (int)(y1*scaley+dy)}});
 
-        g->SetColor(0x00, 0xff, 0x00, 0xff);
-        g->DrawLine(x2*scalex+dx, y2*scaley+dy, x3*scalex+dx, y3*scaley+dy);
+        g->SetColor({0x00, 0xff, 0x00, 0xff});
+        g->DrawLine({{(int)(x2*scalex+dx), (int)(y2*scaley+dy)}, {(int)(x3*scalex+dx), (int)(y3*scaley+dy)}});
 
-        g->SetColor(0xff, 0x00, 0x00, 0xff);
-        g->DrawLine(x4*scalex+dx, y4*scaley+dy, x5*scalex+dx, y5*scaley+dy);
+        g->SetColor({0xff, 0x00, 0x00, 0xff});
+        g->DrawLine({{(int)(x4*scalex+dx), (int)(y4*scaley+dy)}, {(int)(x5*scalex+dx), (int)(y5*scaley+dy)}});
 
-        g->SetColor(0xff, 0xff, 0x00, 0xff);
-        // g->DrawLine(x4*scalex+dx, y4*scaley+dy+offset, x5*scalex+dx, y5*scaley+dy+offset);
+        g->SetColor({0xff, 0xff, 0x00, 0xff});
+        // g->DrawLine({{(int)(x4*scalex+dx), (int)(y4*scaley+dy+offset)}, (int){(x5*scalex+dx), (int)(y5*scaley+dy+offset)}});
 
         x0 = x1;
         y0 = y1;
@@ -489,7 +488,7 @@ class Noise : public jgui::Window {
 
           sprintf(tmp, "%d", a/100);
 
-          g->SetColor(0x00, 0xff, 0xff, 0xff);
+          g->SetColor({0x00, 0xff, 0xff, 0xff});
           // g->DrawString(tmp, i*scalex+dx, dy);
         }
       }

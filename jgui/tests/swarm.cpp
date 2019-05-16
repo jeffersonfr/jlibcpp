@@ -308,18 +308,18 @@ class Main : public jgui::Window {
 		{
 			jgui::Window::Paint(g);
 
-			g->SetColor(0x80, 0x80, 0x80, 0xff);
+			g->SetColor({0x80, 0x80, 0x80, 0xff});
 			for (int i=0; i<_size_objects; i++) {
-				g->FillRectangle(_objects[i].x, _objects[i].y, 4, 4);
+				g->FillRectangle({_objects[i].x, _objects[i].y, 4, 4});
 			}
 			
-			g->SetColor(0x00, 0xff, 0x00, 0xff);
+			g->SetColor({0x00, 0xff, 0x00, 0xff});
 			for (int i=0; i<_size_particles; i++) {
-				g->FillRectangle(_particles[i].xi.x, _particles[i].xi.y, 4, 4);
+				g->FillRectangle({_particles[i].xi.x, _particles[i].xi.y, 4, 4});
 			}
 
-			g->SetColor(0xff, 0x00, 0x00, 0xff);
-			g->FillRectangle(_gbest.xi.x, _gbest.xi.y, 4, 4);
+			g->SetColor({0xff, 0x00, 0x00, 0xff});
+			g->FillRectangle({_gbest.xi.x, _gbest.xi.y, 4, 4});
 		}
 
 };

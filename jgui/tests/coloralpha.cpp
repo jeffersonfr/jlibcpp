@@ -121,7 +121,7 @@ class ColorAlphaTeste : public jgui::Window {
 			jgui::Graphics 
         *g = _fg->GetGraphics();
 			jgui::Color 
-        color(g->GetRGB(elocation.x, elocation.y));
+        color(g->GetRGB({elocation.x, elocation.y}));
 
 			_ref_color.a = 0xff/255.0;
 			_ref_color.r = color.GetRed()/255.0;
@@ -146,7 +146,7 @@ class ColorAlphaTeste : public jgui::Window {
 			uint32_t 
         buffer[isize.width*isize.height];
 
-			_fg->GetRGBArray(buffer, 0, 0, isize.width, isize.height);
+			_fg->GetRGBArray(buffer, {0, 0, isize.width, isize.height});
 
 			for (int i=0; i<isize.width*isize.height; i++) {
 				color_t color;
@@ -170,14 +170,14 @@ class ColorAlphaTeste : public jgui::Window {
 				buffer[i] = (a << 0x18) | (r << 0x10) | (g << 0x08) | (b << 0x00);
 			}
 
-			g->DrawImage(_bg, insets.left, insets.top, size.width-insets.left-insets.right, size.height-insets.top-insets.bottom);
+			g->DrawImage(_bg, {insets.left, insets.top, size.width-insets.left-insets.right, size.height-insets.top-insets.bottom});
 
-      jgui::Image *image = new jgui::BufferedImage(jgui::JPF_ARGB, size.width, size.height);
+      jgui::Image *image = new jgui::BufferedImage(jgui::JPF_ARGB, size);
 
       image->GetGraphics()->SetCompositeFlags(jgui::JCF_SRC);
-      image->GetGraphics()->SetRGBArray(buffer, 0, 0, size.width, size.height);
+      image->GetGraphics()->SetRGBArray(buffer, {0, 0, size.width, size.height});
 
-			g->DrawImage(image, insets.left, insets.top, size.width-insets.left-insets.right, size.height-insets.top-insets.bottom);
+			g->DrawImage(image, {insets.left, insets.top, size.width-insets.left-insets.right, size.height-insets.top-insets.bottom});
 
 			delete image;
 		}

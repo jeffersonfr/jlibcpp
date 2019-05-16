@@ -63,7 +63,7 @@ class Surface : public jgui::Window {
 		Surface():
 			jgui::Window(0, 0, 720, 480)
 		{
-      _buffer = new jgui::BufferedImage(jgui::JPF_RGB32, 800, 600);
+      _buffer = new jgui::BufferedImage(jgui::JPF_RGB32, {800, 600});
     
       nodesize = 2.0f;
       relax = 1.0f;
@@ -180,27 +180,27 @@ class Surface : public jgui::Window {
 
         for (a=0; a<GRID_A; a++) {
           for (b=0; b<GRID_B; b++) {
-            g->SetColor(55, 55, 55 + 200*point_vel[a][b]/vel, 0xff);
-            g->DrawCircle(point_worka[a][b], point_workb[a][b], nodesize);
+            g->SetColor({55, 55, (int)(55 + 200*point_vel[a][b]/vel), 0xff});
+            g->DrawCircle({(int)point_worka[a][b], (int)point_workb[a][b]}, nodesize);
           }
         }
 
         for (a=0; a<GRID_A - 1; a++) {
           for (b=0; b<GRID_B - 1; b++) {
-            g->SetColor(55, 55, 55 + 200*point_vel[a][b]/vel, 0xff);
-            g->DrawLine(point_worka[a][b], point_workb[a][b], point_worka[a + 1][b], point_workb[a + 1][b]);
-            g->DrawLine(point_worka[a][b], point_workb[a][b], point_worka[a][b + 1], point_workb[a][b + 1]);
+            g->SetColor({55, 55, (int)(55 + 200*point_vel[a][b]/vel), 0xff});
+            g->DrawLine({{(int)point_worka[a][b], (int)point_workb[a][b]}, {(int)point_worka[a + 1][b], (int)point_workb[a + 1][b]}});
+            g->DrawLine({{(int)point_worka[a][b], (int)point_workb[a][b]}, {(int)point_worka[a][b + 1], (int)point_workb[a][b + 1]}});
           }
         }
 
         for (a=0; a<GRID_A - 1; a++) {
-          g->SetColor(55, 55, 55 + 200*point_vel[a][b]/vel, 0xff);
-          g->DrawLine(point_worka[a][b], point_workb[a][b], point_worka[a + 1][b], point_workb[a + 1][b]);
+          g->SetColor({55, 55, (int)(55 + 200*point_vel[a][b]/vel), 0xff});
+          g->DrawLine({{(int)point_worka[a][b], (int)point_workb[a][b]}, {(int)point_worka[a + 1][b], (int)point_workb[a + 1][b]}});
         }
 
         for (b=0; b<GRID_B - 1; b++) {
-          g->SetColor(55, 55, 55 + 200*point_vel[a][b]/vel, 0xff);
-          g->DrawLine(point_worka[a][b], point_workb[a][b], point_worka[a][b + 1], point_workb[a][b + 1]);
+          g->SetColor({55, 55, (int)(55 + 200*point_vel[a][b]/vel), 0xff});
+          g->DrawLine({{(int)point_worka[a][b], (int)point_workb[a][b]}, {(int)point_worka[a][b + 1], (int)point_workb[a][b + 1]}});
         }
         
         _mutex_draw.unlock();
@@ -221,7 +221,7 @@ class Surface : public jgui::Window {
 
       _mutex_draw.lock();
 
-      g->DrawImage(_buffer, 0, 0, size.width, size.height);
+      g->DrawImage(_buffer, {0, 0, size.width, size.height});
 
       _mutex_draw.unlock();
       

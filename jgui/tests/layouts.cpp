@@ -46,8 +46,8 @@ class RectangleContainer : public jgui::Container {
       jgui::jsize_t
         size = GetSize();
 
-			g->SetColor(0xff, 0xff, 0x00, 0xff);
-			g->DrawRectangle(0, 0, size.width, size.height);
+			g->SetColor({0xff, 0xff, 0x00, 0xff});
+			g->DrawRectangle({0, 0, size.width, size.height});
 		}
 };
 

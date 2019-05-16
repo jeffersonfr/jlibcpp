@@ -52,7 +52,7 @@ class PacMan : public jgui::Window {
       *ii;
   	jgui::Theme 
       _theme;
-	  jgui::jregion_t 
+	  jgui::jregion_t<int>
       d;
 	uint32_t 
 		dotcolor,
@@ -298,7 +298,7 @@ class PacMan : public jgui::Window {
 	jgui::Image * GetImage(std::string file, int w, int h)
 	{
 		jgui::Image *image = new jgui::BufferedImage(file);
-		jgui::Image *scale = image->Scale(w, h);
+		jgui::Image *scale = image->Scale({w, h});
 
 		delete image;
 		
@@ -394,7 +394,7 @@ class PacMan : public jgui::Window {
 		std::string s;
 
 		if (goff == nullptr && d.width > 0 && d.height > 0) {
-			ii = new jgui::BufferedImage(jgui::JPF_RGB32, d.width, d.height);
+			ii = new jgui::BufferedImage(jgui::JPF_RGB32, {d.width, d.height});
 
 			goff = ii->GetGraphics();
 		}
@@ -403,8 +403,8 @@ class PacMan : public jgui::Window {
 			return;
 		}
 
-		goff->SetColor(0x00, 0x00, 0x00, 0xff);
-		goff->FillRectangle(0, 0, d.width, d.height);
+		goff->SetColor({0x00, 0x00, 0x00, 0xff});
+		goff->FillRectangle({0, 0, d.width, d.height});
 
 		DrawMaze();
 		DrawScore();
@@ -419,7 +419,7 @@ class PacMan : public jgui::Window {
 			PlayDemo();
 		}
 
-		g->DrawImage(ii, 2, 2);
+		g->DrawImage(ii, jgui::jpoint_t<int>{2, 2});
 
     Framerate(60);
 
@@ -497,7 +497,7 @@ class PacMan : public jgui::Window {
 		x_index = x_index*blocksize;
 		y_index = y_index*blocksize;
 
-		goff->DrawImage(pacman_bmp, x_index, y_index, blocksize, blocksize, pacmanx+1, pacmany+1, blocksize, blocksize);
+		goff->DrawImage(pacman_bmp, {x_index, y_index, blocksize, blocksize}, {pacmanx+1, pacmany+1, blocksize, blocksize});
 
 		if (deathcounter==0) {
 			pacsleft--;
@@ -600,7 +600,7 @@ class PacMan : public jgui::Window {
 		x_index = x_index*blocksize;
 		y_index = y_index*blocksize;
 
-		goff->DrawImage(ghost_bmp, x_index, y_index, blocksize, blocksize, x, y, blocksize, blocksize);
+		goff->DrawImage(ghost_bmp, {x_index, y_index, blocksize, blocksize}, {x, y, blocksize, blocksize});
 	}
 
 	void MovePacMan()
@@ -673,7 +673,7 @@ class PacMan : public jgui::Window {
 		x_index = x_index*blocksize;
 		y_index = y_index*blocksize;
 
-		goff->DrawImage(pacman_bmp, x_index, y_index, blocksize, blocksize, pacmanx, pacmany, blocksize, blocksize);
+		goff->DrawImage(pacman_bmp, {x_index, y_index, blocksize, blocksize}, {pacmanx, pacmany, blocksize, blocksize});
 	}
 
 	void DrawMaze()
@@ -689,32 +689,32 @@ class PacMan : public jgui::Window {
 
 		for (y=0; y<scrsize; y+=blocksize) {
 			for (x=0; x<scrsize; x+=blocksize) {
-				goff->SetColor((mazecolor>>0x10)&0xff, (mazecolor>>0x08)&0xff, (mazecolor>>0x00)&0xff, (mazecolor>>0x18)&0xff);
+				goff->SetColor(mazecolor);
 
 				if ((screendata[i]&1)!=0) {
-					goff->DrawLine(x, y, x, y+blocksize-1);
+					goff->DrawLine({{x, y}, {x, y+blocksize-1}});
 				}
 
 				if ((screendata[i]&2)!=0) {
-					goff->DrawLine(x, y, x+blocksize-1, y);
+					goff->DrawLine({{x, y}, {x+blocksize-1, y}});
 				}
 
 				if ((screendata[i]&4)!=0) {
-					goff->DrawLine(x+blocksize-1,y,x+blocksize-1,y+blocksize-1);
+					goff->DrawLine({{x+blocksize-1, y}, {x+blocksize-1, y+blocksize-1}});
 				}
 
 				if ((screendata[i]&8)!=0) {
-					goff->DrawLine(x,y+blocksize-1,x+blocksize-1,y+blocksize-1);
+					goff->DrawLine({{x, y+blocksize-1}, {x+blocksize-1, y+blocksize-1}});
 				}
 
 				if ((screendata[i]&16)!=0) {
-					goff->SetColor((dotcolor>>0x10)&0xff, (dotcolor>>0x08)&0xff, (dotcolor>>0x00)&0xff, (dotcolor>>0x18)&0xff);
-					goff->FillRectangle(x+(blocksize-2)/2, y+(blocksize-2)/2, 2, 2);
+					goff->SetColor(dotcolor);
+					goff->FillRectangle({x+(blocksize-2)/2, y+(blocksize-2)/2, 2, 2});
 				}
 
 				if ((screendata[i]&32)!=0) {
-					goff->SetColor(224, 224-bigdotcolor, bigdotcolor, 0xff);
-					goff->FillRectangle(x+(blocksize-8)/2, y+(blocksize-8)/2, 8, 8);
+					goff->SetColor({224, (int)(224-bigdotcolor), (int)(bigdotcolor), 0xff});
+					goff->FillRectangle({x+(blocksize-8)/2, y+(blocksize-8)/2, 8, 8});
 				}
 
 				i++;
@@ -734,11 +734,11 @@ class PacMan : public jgui::Window {
 		sprintf(tmp, "Score: %d", score);
 		
 		goff->SetFont(GetTheme()->GetFont("window"));
-		goff->SetColor(96, 128, 255, 0xff);
-		goff->DrawString(tmp, size.width - 180, scrsize + 16);
+		goff->SetColor({96, 128, 255, 0xff});
+		goff->DrawString(tmp, jgui::jpoint_t<int>{size.width - 180, scrsize + 16});
 
 		for (i=0; i<pacsleft; i++) {
-			goff->DrawImage(pacman_bmp, 1*blocksize, 1*blocksize, blocksize, blocksize, i*(blocksize+4)+8, scrsize+10, blocksize, blocksize);
+			goff->DrawImage(pacman_bmp, {1*blocksize, 1*blocksize, blocksize, blocksize}, {i*(blocksize+4)+8, scrsize+10, blocksize, blocksize});
 		}
 	}
 

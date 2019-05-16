@@ -91,11 +91,11 @@ class Main : public jgui::Window {
           x = count%items,
 				  y = count/items;
 
-				g->DrawImage(image, x*(bs+gap)+gap, y*(bs+gap)+16, bs, bs);
+				g->DrawImage(image, {x*(bs+gap)+gap, y*(bs+gap)+16, bs, bs});
 				g->SetColor(jgui::Color::Black);
-				g->FillRectangle(x*(bs+gap)+gap, y*(bs+gap)+16, 36, 24);
+				g->FillRectangle({x*(bs+gap)+gap, y*(bs+gap)+16, 36, 24});
 				g->SetColor(jgui::Color::White);
-				g->DrawString(i->first, x*(bs+gap)+gap, y*(bs+gap)+16);
+				g->DrawString(i->first, jgui::jpoint_t<int>{x*(bs+gap)+gap, y*(bs+gap)+16});
 
 				count = count + 1;
 			}

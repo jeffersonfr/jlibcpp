@@ -40,11 +40,11 @@ class ColorChooser : public jgui::Component {
 				cy = border / 2 + 1;
 			double border2 = border / 2;
 
-			_image = new jgui::BufferedImage(jgui::JPF_ARGB, size.width, size.height);
+			_image = new jgui::BufferedImage(jgui::JPF_ARGB, size);
 
 			for (double i = 0; i<360.; i+=.15) {
 				for (double j = 0; j<border2; j++) {
-					_image->GetGraphics()->SetRGB(HLS2RGB(i, 0.5, j/border2), (int)(cx - cos(M_PI * i / 180.0)*j), (int)(cy - sin(M_PI * i / 180.0)*j));
+					_image->GetGraphics()->SetRGB(HLS2RGB(i, 0.5, j/border2), {(int)(cx - cos(M_PI * i / 180.0)*j), (int)(cy - sin(M_PI * i / 180.0)*j)});
 				}
 			}
 
@@ -119,7 +119,7 @@ class ColorChooser : public jgui::Component {
 		{
 			jgui::Component::Paint(g);
 
-			g->DrawImage(_image, 0, 0);
+			g->DrawImage(_image, jgui::jpoint_t<int>{0, 0});
 		}
 		
 		virtual bool MouseMoved(jevent::MouseEvent *event)
@@ -133,7 +133,7 @@ class ColorChooser : public jgui::Component {
 
       jgui::Graphics *g = _image->GetGraphics();
 
-			_theme.SetIntegerParam("component.bg", g->GetRGB(elocation.x, elocation.y));
+			_theme.SetIntegerParam("component.bg", g->GetRGB({elocation.x, elocation.y}));
 
       Repaint();
 

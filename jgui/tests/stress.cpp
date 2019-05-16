@@ -34,7 +34,7 @@ class GraphicPanel : public jgui::Window {
 	{
 		srand(time(nullptr));
 
-    _buffer = new jgui::BufferedImage(jgui::JPF_ARGB, 1920, 1080);
+    _buffer = new jgui::BufferedImage(jgui::JPF_ARGB, {1920, 1080});
 	}
 
 	virtual ~GraphicPanel()
@@ -49,7 +49,7 @@ class GraphicPanel : public jgui::Window {
       t = _buffer->GetSize();
 
 		g->SetColor(jgui::Color::Black);
-		g->FillRectangle(0, 0, t.width, t.height);
+		g->FillRectangle({0, 0, t.width, t.height});
 	}
 
 	void DrawString(std::string msg) 
@@ -59,8 +59,8 @@ class GraphicPanel : public jgui::Window {
 
     Clear();
 
-		g->SetColor(0xf0, 0xf0, 0xf0, 0xff);
-		g->DrawString(msg, 16, 0);
+		g->SetColor({0xf0, 0xf0, 0xf0, 0xff});
+		g->DrawString(msg, jgui::jpoint_t<int>{16, 0});
 	}
 
 	virtual void Paint(jgui::Graphics *g)
@@ -70,7 +70,7 @@ class GraphicPanel : public jgui::Window {
     jgui::jsize_t 
       t = GetSize();
 
-    g->DrawImage(_buffer, 0, 0, t.width, t.height);
+    g->DrawImage(_buffer, {0, 0, t.width, t.height});
 	}
 
   virtual void ShowApp()
@@ -117,8 +117,8 @@ class GraphicPanel : public jgui::Window {
       g1 = rand()%0xff;
       b1 = rand()%0xff;
 
-      g->SetColor(r1, g1, b1, 0xff);
-      g->DrawString("Font Testing", x+insets.left, y+insets.top);
+      g->SetColor({r1, g1, b1, 0xff});
+      g->DrawString("Font Testing", jgui::jpoint_t<int>{x+insets.left, y+insets.top});
 
       Repaint();
     }
@@ -138,8 +138,8 @@ class GraphicPanel : public jgui::Window {
 			b1 = rand()%0xff;
 			a1 = rand()%0x80;
 
-			g->SetColor(r1, g1, b1, a1+0x80);
-			g->DrawString("Font Testing", x+insets.left, y+insets.top);
+			g->SetColor({r1, g1, b1, a1+0x80});
+			g->DrawString("Font Testing", jgui::jpoint_t<int>{x+insets.left, y+insets.top});
 
       Repaint();
 		}
@@ -163,13 +163,13 @@ class GraphicPanel : public jgui::Window {
 		y = (t.height + sh)/2;
 
 		jgui::Image 
-      *fimage = new jgui::BufferedImage(jgui::JPF_ARGB, 2*sw, sh);
+      *fimage = new jgui::BufferedImage(jgui::JPF_ARGB, {2*sw, sh});
 		jgui::Graphics 
       *gf = fimage->GetGraphics();
 
 		gf->SetFont(font);
-		gf->SetColor(0xff, 0xff, 0xff, 0xff);
-		gf->DrawString("Rotate String", 0, 0);
+		gf->SetColor({0xff, 0xff, 0xff, 0xff});
+		gf->DrawString("Rotate String", jgui::jpoint_t<int>{0, 0});
 
 		for (int i=0; i<iterations; i++) {
 			jgui::Image *rotate = fimage->Rotate(angle, true);
@@ -184,7 +184,7 @@ class GraphicPanel : public jgui::Window {
       jgui::jsize_t 
         t = rotate->GetSize();
 			
-			g->DrawImage(colorize, x - (t.width)/2, y - (t.height)/2);
+			g->DrawImage(colorize, jgui::jpoint_t<int>{x - (t.width)/2, y - (t.height)/2});
 
 			delete colorize;
 
@@ -238,8 +238,8 @@ class GraphicPanel : public jgui::Window {
 				g1 = rand()%0xff;
 				b1 = rand()%0xff;
 
-				g->SetColor(r1, g1, b1, 0xff);
-				g->DrawLine(x+insets.left, y+insets.top, x+insets.left+w, y+insets.top+h);
+				g->SetColor({r1, g1, b1, 0xff});
+				g->DrawLine({{x+insets.left, y+insets.top}, {x+insets.left+w, y+insets.top+h}});
 
         Repaint();
 			}
@@ -263,8 +263,8 @@ class GraphicPanel : public jgui::Window {
 				b1 = rand()%0xff;
 				a1 = rand()%0x80;
 
-				g->SetColor(r1, g1, b1, a1+0x80);
-				g->DrawLine(x+insets.left, y+insets.top, x+insets.left+w, y+insets.top+h);
+				g->SetColor({r1, g1, b1, a1+0x80});
+				g->DrawLine({{x+insets.left, y+insets.top}, {x+insets.left+w, y+insets.top+h}});
 
         Repaint();
 			}
@@ -291,10 +291,10 @@ class GraphicPanel : public jgui::Window {
 			x = x+insets.left;
 			y = y+insets.top+h;
 
-			g->SetColor(r1, g1, b1, 0xff);
-			g->FillTriangle(x, y, x+w/2, y-h, x+w, y);
-			g->SetColor(0x80, 0x80, 0x80, 0xff);
-			g->DrawTriangle(x, y, x+w/2, y-h, x+w, y);
+			g->SetColor({r1, g1, b1, 0xff});
+			g->FillTriangle({x, y}, {x+w/2, y-h}, {x+w, y});
+			g->SetColor({0x80, 0x80, 0x80, 0xff});
+			g->DrawTriangle({x, y}, {x+w/2, y-h}, {x+w, y});
 
       Repaint();
 		}
@@ -317,10 +317,10 @@ class GraphicPanel : public jgui::Window {
 			x = x+insets.left;
 			y = y+insets.top+h;
 
-			g->SetColor(r1, g1, b1, a1+0x80);
-			g->FillTriangle(x, y, x+w/2, y-h, x+w, y);
-			g->SetColor(0x80, 0x80, 0x80, 0xff);
-			g->DrawTriangle(x, y, x+w/2, y-h, x+w, y);
+			g->SetColor({r1, g1, b1, a1+0x80});
+			g->FillTriangle({x, y}, {x+w/2, y-h}, {x+w, y});
+			g->SetColor({0x80, 0x80, 0x80, 0xff});
+			g->DrawTriangle({x, y}, {x+w/2, y-h}, {x+w, y});
 
       Repaint();
 		}
@@ -339,10 +339,10 @@ class GraphicPanel : public jgui::Window {
 			g1 = rand()%0xff;
 			b1 = rand()%0xff;
 
-			g->SetColor(r1, g1, b1, 0xff);
-			g->FillRectangle(x+insets.left, y+insets.top, w, h);
-			g->SetColor(0x80, 0x80, 0x80, 0xff);
-			g->DrawRectangle(x+insets.left, y+insets.top, w, h);
+			g->SetColor({r1, g1, b1, 0xff});
+			g->FillRectangle({x+insets.left, y+insets.top, w, h});
+			g->SetColor({0x80, 0x80, 0x80, 0xff});
+			g->DrawRectangle({x+insets.left, y+insets.top, w, h});
 
       Repaint();
 		}
@@ -362,10 +362,10 @@ class GraphicPanel : public jgui::Window {
 			b1 = rand()%0xff;
 			a1 = rand()%0x80;
 
-			g->SetColor(r1, g1, b1, a1+0x80);
-			g->FillRectangle(x+insets.left, y+insets.top, w, h);
-			g->SetColor(0x80, 0x80, 0x80, 0xff);
-			g->DrawRectangle(x+insets.left, y+insets.top, w, h);
+			g->SetColor({r1, g1, b1, a1+0x80});
+			g->FillRectangle({x+insets.left, y+insets.top, w, h});
+			g->SetColor({0x80, 0x80, 0x80, 0xff});
+			g->DrawRectangle({x+insets.left, y+insets.top, w, h});
 
       Repaint();
 		}
@@ -384,10 +384,10 @@ class GraphicPanel : public jgui::Window {
 			g1 = rand()%0xff;
 			b1 = rand()%0xff;
 
-			g->SetColor(r1, g1, b1, 0xff);
-			g->FillRoundRectangle(x+insets.left, y+insets.top, w, h, 40, 40);
-			g->SetColor(0x80, 0x80, 0x80, 0xff);
-			g->DrawRoundRectangle(x+insets.left, y+insets.top, w, h, 40, 40);
+			g->SetColor({r1, g1, b1, 0xff});
+			g->FillRoundRectangle({x+insets.left, y+insets.top, w, h}, 40, 40);
+			g->SetColor({0x80, 0x80, 0x80, 0xff});
+			g->DrawRoundRectangle({x+insets.left, y+insets.top, w, h}, 40, 40);
 
       Repaint();
 		}
@@ -407,10 +407,10 @@ class GraphicPanel : public jgui::Window {
 			b1 = rand()%0xff;
 			a1 = rand()%0x80;
 
-			g->SetColor(r1, g1, b1, a1+0x80);
-			g->FillRoundRectangle(x+insets.left, y+insets.top, w, h);
-			g->SetColor(0x80, 0x80, 0x80, 0xff);
-			g->DrawRoundRectangle(x+insets.left, y+insets.top, w, h);
+			g->SetColor({r1, g1, b1, a1+0x80});
+			g->FillRoundRectangle({x+insets.left, y+insets.top, w, h});
+			g->SetColor({0x80, 0x80, 0x80, 0xff});
+			g->DrawRoundRectangle({x+insets.left, y+insets.top, w, h});
 
       Repaint();
 		}
@@ -429,10 +429,10 @@ class GraphicPanel : public jgui::Window {
 			g1 = rand()%0xff;
 			b1 = rand()%0xff;
 
-			g->SetColor(r1, g1, b1, 0xff);
-			g->FillBevelRectangle(x+insets.left, y+insets.top, w, h);
-			g->SetColor(0x80, 0x80, 0x80, 0xff);
-			g->DrawBevelRectangle(x+insets.left, y+insets.top, w, h);
+			g->SetColor({r1, g1, b1, 0xff});
+			g->FillBevelRectangle({x+insets.left, y+insets.top, w, h});
+			g->SetColor({0x80, 0x80, 0x80, 0xff});
+			g->DrawBevelRectangle({x+insets.left, y+insets.top, w, h});
 
       Repaint();
 		}
@@ -452,10 +452,10 @@ class GraphicPanel : public jgui::Window {
 			b1 = rand()%0xff;
 			a1 = rand()%0x80;
 
-			g->SetColor(r1, g1, b1, a1+0x80);
-			g->FillBevelRectangle(x+insets.left, y+insets.top, w, h);
-			g->SetColor(0x80, 0x80, 0x80, 0xff);
-			g->DrawBevelRectangle(x+insets.left, y+insets.top, w, h);
+			g->SetColor({r1, g1, b1, a1+0x80});
+			g->FillBevelRectangle({x+insets.left, y+insets.top, w, h});
+			g->SetColor({0x80, 0x80, 0x80, 0xff});
+			g->DrawBevelRectangle({x+insets.left, y+insets.top, w, h});
 
       Repaint();
 		}
@@ -475,10 +475,10 @@ class GraphicPanel : public jgui::Window {
 			g1 = rand()%0xff;
 			b1 = rand()%0xff;
 
-			g->SetColor(r1, g1, b1, 0xff);
-			g->FillCircle(x+insets.left+200, y+insets.top+200, z);
-			g->SetColor(0x80, 0x80, 0x80, 0xff);
-			g->DrawCircle(x+insets.left+200, y+insets.top+200, z);
+			g->SetColor({r1, g1, b1, 0xff});
+			g->FillCircle({x+insets.left+200, y+insets.top+200}, z);
+			g->SetColor({0x80, 0x80, 0x80, 0xff});
+			g->DrawCircle({x+insets.left+200, y+insets.top+200}, z);
 
       Repaint();
 		}
@@ -499,10 +499,10 @@ class GraphicPanel : public jgui::Window {
 			b1 = rand()%0xff;
 			a1 = rand()%0x80;
 
-			g->SetColor(r1, g1, b1, a1+0x80);
-			g->FillCircle(x+insets.left+200, y+insets.top+200, z);
-			g->SetColor(0x80, 0x80, 0x80, 0xff);
-			g->DrawCircle(x+insets.left+200, y+insets.top+200, z);
+			g->SetColor({r1, g1, b1, a1+0x80});
+			g->FillCircle({x+insets.left+200, y+insets.top+200}, z);
+			g->SetColor({0x80, 0x80, 0x80, 0xff});
+			g->DrawCircle({x+insets.left+200, y+insets.top+200}, z);
 
       Repaint();
 		}
@@ -522,10 +522,10 @@ class GraphicPanel : public jgui::Window {
 			g1 = rand()%0xff;
 			b1 = rand()%0xff;
 
-			g->SetColor(r1, g1, b1, 0xff);
-			g->FillArc(x+insets.left+200, y+insets.top+200, z, z, M_PI/6, -M_PI/6);
-			g->SetColor(0x80, 0x80, 0x80, 0xff);
-			g->DrawArc(x+insets.left+200, y+insets.top+200, z, z, M_PI/6, -M_PI/6);
+			g->SetColor({r1, g1, b1, 0xff});
+			g->FillArc({x+insets.left+200, y+insets.top+200}, {z, z}, M_PI/6, -M_PI/6);
+			g->SetColor({0x80, 0x80, 0x80, 0xff});
+			g->DrawArc({x+insets.left+200, y+insets.top+200}, {z, z}, M_PI/6, -M_PI/6);
 
       Repaint();
 		}
@@ -546,10 +546,10 @@ class GraphicPanel : public jgui::Window {
 			b1 = rand()%0xff;
 			a1 = rand()%0x80;
 
-			g->SetColor(r1, g1, b1, a1+0x80);
-			g->FillArc(x+insets.left+200, y+insets.top+200, z, z, M_PI/6, -M_PI/6);
-			g->SetColor(0x80, 0x80, 0x80, 0xff);
-			g->DrawArc(x+insets.left+200, y+insets.top+200, z, z, M_PI/6, -M_PI/6);
+			g->SetColor({r1, g1, b1, a1+0x80});
+			g->FillArc({x+insets.left+200, y+insets.top+200}, {z, z}, M_PI/6, -M_PI/6);
+			g->SetColor({0x80, 0x80, 0x80, 0xff});
+			g->DrawArc({x+insets.left+200, y+insets.top+200}, {z, z}, M_PI/6, -M_PI/6);
 
       Repaint();
 		}
@@ -569,10 +569,10 @@ class GraphicPanel : public jgui::Window {
 			g1 = rand()%0xff;
 			b1 = rand()%0xff;
 
-			g->SetColor(r1, g1, b1, 0xff);
-			g->FillChord(x+insets.left+200, y+insets.top+200, z, z, M_PI/6, -M_PI/6);
-			g->SetColor(0x80, 0x80, 0x80, 0xff);
-			g->DrawChord(x+insets.left+200, y+insets.top+200, z, z, M_PI/6, -M_PI/6);
+			g->SetColor({r1, g1, b1, 0xff});
+			g->FillChord({x+insets.left+200, y+insets.top+200}, {z, z}, M_PI/6, -M_PI/6);
+			g->SetColor({0x80, 0x80, 0x80, 0xff});
+			g->DrawChord({x+insets.left+200, y+insets.top+200}, {z, z}, M_PI/6, -M_PI/6);
 
       Repaint();
 		}
@@ -593,10 +593,10 @@ class GraphicPanel : public jgui::Window {
 			b1 = rand()%0xff;
 			a1 = rand()%0x80;
 
-			g->SetColor(r1, g1, b1, a1+0x80);
-			g->FillChord(x+insets.left+200, y+insets.top+200, z, z, M_PI/6, -M_PI/6);
-			g->SetColor(0x80, 0x80, 0x80, 0xff);
-			g->DrawChord(x+insets.left+200, y+insets.top+200, z, z, M_PI/6, -M_PI/6);
+			g->SetColor({r1, g1, b1, a1+0x80});
+			g->FillChord({x+insets.left+200, y+insets.top+200}, {z, z}, M_PI/6, -M_PI/6);
+			g->SetColor({0x80, 0x80, 0x80, 0xff});
+			g->DrawChord({x+insets.left+200, y+insets.top+200}, {z, z}, M_PI/6, -M_PI/6);
 
       Repaint();
 		}
@@ -617,7 +617,7 @@ class GraphicPanel : public jgui::Window {
 			y = rand()%(t.height-h-insets.top-insets.bottom);
 
 			g->SetColor(color);
-			g->DrawImage(off, x+insets.left, y+insets.top, w, h);
+			g->DrawImage(off, {x+insets.left, y+insets.top, w, h});
 			
       Repaint();
 		}
@@ -645,7 +645,7 @@ class GraphicPanel : public jgui::Window {
 
 			jgui::Image *colorize = off->Colorize(jgui::Color(color));
 
-			g->DrawImage(colorize, x, y, size, size);
+			g->DrawImage(colorize, {x, y, size, size});
 
       Repaint();
 			
@@ -668,14 +668,14 @@ class GraphicPanel : public jgui::Window {
 
 		angle = 0.1;
 
-		g->Translate(0, 0);
+		g->Translate({0, 0});
 			
 		pimage = new jgui::BufferedImage("images/tux-zombie.png");
 
 		for (int i=0; i<iterations; i++) {
-			jgui::Image *image = new jgui::BufferedImage(jgui::JPF_ARGB, size, size);
+			jgui::Image *image = new jgui::BufferedImage(jgui::JPF_ARGB, {size, size});
 
-			image->GetGraphics()->DrawImage(pimage, 0, 0, size, size);
+			image->GetGraphics()->DrawImage(pimage, {0, 0, size, size});
 
 			jgui::Image *rotate = image->Rotate(angle, true);
 
@@ -690,7 +690,7 @@ class GraphicPanel : public jgui::Window {
         t = rotate->GetSize();
 
 			g->SetColor(color);
-			g->DrawImage(rotate, x-(t.width-size)/2, y-(t.height-size)/2);
+			g->DrawImage(rotate, jgui::jpoint_t<int>{x-(t.width-size)/2, y-(t.height-size)/2});
 
       Repaint();
 

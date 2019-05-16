@@ -238,7 +238,7 @@ class Component : public jevent::KeyListener, public jevent::MouseListener {
      *     x/y are relative to that component (they are not absolute).
      *
      */
-    virtual void ScrollToVisibleArea(int x, int y, int width, int height, Component *coordinateSpace);
+    virtual void ScrollToVisibleArea(jrect_t<int> rect, Component *coordinateSpace);
 
   public:
     /**
@@ -425,7 +425,7 @@ class Component : public jevent::KeyListener, public jevent::MouseListener {
      * \brief
      *
      */
-    virtual void SetScrollLocation(int x, int yt);
+    virtual void SetScrollLocation(int x, int y);
     
     /**
      * \brief
@@ -683,13 +683,13 @@ class Component : public jevent::KeyListener, public jevent::MouseListener {
      * \brief
      *
      */
-    virtual bool Contains(Component *c, int x, int y, int width, int height);
+    virtual bool Contains(Component *c, jrect_t<int> rect);
 
     /**
      * \brief
      *
      */
-    virtual bool Contains(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2);
+    virtual bool Contains(jrect_t<int> r1, jrect_t<int> r2);
 
     /**
      * \brief Verify if the second component intersects the first one;
@@ -701,13 +701,13 @@ class Component : public jevent::KeyListener, public jevent::MouseListener {
      * \brief
      *
      */
-    virtual bool Intersects(Component *c, int x, int y, int width, int height);
+    virtual bool Intersects(Component *c, jrect_t<int> rect);
 
     /**
      * \brief
      *
      */
-    virtual bool Intersects(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2);
+    virtual bool Intersects(jrect_t<int> r1, jrect_t<int> r2);
 
     /**
      * \brief

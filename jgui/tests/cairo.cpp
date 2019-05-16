@@ -120,7 +120,7 @@ int main(int argc, char **argv)
     int cb = random()%255;
 
     g.SetColor(ca << 24 | cr << 16 | cg << 8 | cb);
-    g.FillRectangle(random()%(x - 200), random()%(y - 200), 200, 200);
+    g.FillRectangle({(int)(random()%(x - 200)), (int)(random()%(y - 200)), 200, 200});
 
     cairo_pop_group_to_source(ctx);
     cairo_paint(ctx);

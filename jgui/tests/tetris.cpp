@@ -49,8 +49,8 @@ int figures[7][4] =
 class Tetris : public jgui::Window {
 
   private:
-    struct jgui::jpoint_t a[4];
-    struct jgui::jpoint_t b[4];
+    struct jgui::jpoint_t<int> a[4];
+    struct jgui::jpoint_t<int> b[4];
     jgui::Image *s1;
     jgui::Image *s2;
     jgui::Image *s3;
@@ -166,7 +166,7 @@ class Tetris : public jgui::Window {
 
       // rotate
       if (rotate) {
-        jgui::jpoint_t p = a[1]; //center of rotation
+        jgui::jpoint_t<int> p = a[1]; //center of rotation
 
         for (int i=0; i<4; i++) {
           int x = a[i].y - p.y;
@@ -231,7 +231,7 @@ class Tetris : public jgui::Window {
       dx = 0;
 
       // draw
-      g->DrawImage(s2, 0, 0);
+      g->DrawImage(s2, jgui::jpoint_t<int>{0, 0});
 
       for (int i=0; i<M; i++) {
         for (int j=0; j<N; j++) {
@@ -239,15 +239,15 @@ class Tetris : public jgui::Window {
             continue;
           }
 
-          g->DrawImage(s1, field[i][j]*18, 0, 18, 18, j*18 + 28, i*18 + 31, 18, 18);
+          g->DrawImage(s1, {field[i][j]*18, 0, 18, 18}, {j*18 + 28, i*18 + 31, 18, 18});
         }
       }
 
       for (int i=0; i<4; i++) {
-        g->DrawImage(s1, colorNum*18, 0, 18, 18, a[i].x*18 + 28, a[i].y*18 + 31, 18, 18);
+        g->DrawImage(s1, {colorNum*18, 0, 18, 18}, {a[i].x*18 + 28, a[i].y*18 + 31, 18, 18});
       }
       
-      g->DrawImage(s3, 0, 0);
+      g->DrawImage(s3, jgui::jpoint_t<int>{0, 0});
 
       Repaint();
 

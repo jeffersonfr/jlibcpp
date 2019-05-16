@@ -284,7 +284,7 @@ class NewVox : public jgui::Window {
 			}
 			
 			g->SetCompositeFlags(jgui::JCF_SRC);
-			g->SetRGBArray(buffer, 0, 0, MAXW, MAXH);
+			g->SetRGBArray(buffer, {0, 0, MAXW, MAXH});
 		}
 
 		virtual bool KeyPressed(jevent::KeyEvent *event)

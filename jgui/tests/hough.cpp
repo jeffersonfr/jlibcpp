@@ -81,9 +81,9 @@ class Hough {
 			return 0;
 		}
 
-		std::vector<jgui::jline_t> GetLines(int threshold)
+		std::vector<jgui::jline_t<int>> GetLines(int threshold)
 		{
-			std::vector<jgui::jline_t> lines;
+			std::vector<jgui::jline_t<int>> lines;
 
 			if (_accu == 0) {
 				return lines;
@@ -128,12 +128,12 @@ class Hough {
 							x2 = ((double)(r-(_accu_h/2)) - ((y2 - (_img_h/2) ) * sin(t * DEG2RAD))) / cos(t * DEG2RAD) + (_img_w / 2);
 						}
 
-						jgui::jline_t t;
+						jgui::jline_t<int> t;
 
-						t.x0 = x1;
-						t.y0 = y1;
-						t.x1 = x2;
-						t.y1 = y2;
+						t.p0.x = x1;
+						t.p0.y = y1;
+						t.p1.x = x2;
+						t.p1.y = y2;
 
 						lines.push_back(t);
 					}
@@ -176,7 +176,7 @@ class Test : public jgui::Window {
       jgui::jsize_t
         size = _image->GetSize();
 
-      _hough = new jgui::BufferedImage(jgui::JPF_RGB32, size.width, size.height);
+      _hough = new jgui::BufferedImage(jgui::JPF_RGB32, size);
 
 		}
 
@@ -188,7 +188,7 @@ class Test : public jgui::Window {
 
 		virtual void ProcessFrame()
 		{
-			jgui::jsize_t 
+			jgui::jsize_t<int> 
         size;
 
 			size = _image->GetSize();
@@ -196,7 +196,7 @@ class Test : public jgui::Window {
 			uint32_t 
         data[size.width*size.height];
       
-			_image->GetGraphics()->GetRGBArray(data, 0, 0, size.width, size.height);
+			_image->GetGraphics()->GetRGBArray(data, {0, 0, size.width, size.height});
 
 			// INFO:: convert to gray and binarize
 			uint8_t *gray = new uint8_t[size.width*size.height];
@@ -274,7 +274,7 @@ class Test : public jgui::Window {
 			}
 
       _hough->GetGraphics()->SetCompositeFlags(jgui::JCF_SRC);
-      _hough->GetGraphics()->SetRGBArray(gray32, 0, 0, size.width, size.height);
+      _hough->GetGraphics()->SetRGBArray(gray32, {0, 0, size.width, size.height});
 
 			delete [] gray;
 
@@ -288,21 +288,21 @@ class Test : public jgui::Window {
 
 			ProcessFrame();
 
-			std::vector<jgui::jline_t> 
+			std::vector<jgui::jline_t<int>> 
         lines = _transform.GetLines(_lines_threshold);
-			jgui::jsize_t 
+			jgui::jsize_t<int> 
 				size = _hough->GetSize();
 
-			g->DrawImage(_image, 0, 0, size.width, size.height);
-			g->DrawImage(_hough, size.width, 0, size.width, size.height);
+			g->DrawImage(_image, {0, 0, size.width, size.height});
+			g->DrawImage(_hough, {size.width, 0, size.width, size.height});
 
 			g->SetColor(jgui::Color::Red);
-			g->SetClip(0, 0, size.width, size.height);
+			g->SetClip({0, 0, size.width, size.height});
 
-			for (std::vector<jgui::jline_t>::iterator i=lines.begin(); i!=lines.end(); i++) {
-				jgui::jline_t t = (*i);
+			for (std::vector<jgui::jline_t<int>>::iterator i=lines.begin(); i!=lines.end(); i++) {
+				jgui::jline_t<int> t = (*i);
 
-				g->DrawLine(t.x0, t.y0, t.x1, t.y1);
+				g->DrawLine({{t.p0.x, t.p0.y}, {t.p1.x, t.p1.y}});
 			}
 		}
 

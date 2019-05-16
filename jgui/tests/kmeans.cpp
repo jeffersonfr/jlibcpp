@@ -409,9 +409,9 @@ class SOM : public jgui::Window {
       jgui::jsize_t
         size = GetSize();
 
-			// g->Clear();
-			g->SetColor(0xf0, 0xf0, 0xf0, 0xff);
-			g->FillRectangle(0, 0, size.width, size.height);
+			g->Clear();
+			g->SetColor({0xf0, 0xf0, 0xf0, 0xff});
+			g->FillRectangle({0, 0, size.width, size.height});
 
 			int 
         dx = size.width/4,
@@ -430,7 +430,7 @@ class SOM : public jgui::Window {
           classe = (int)c,
 					color = GetColor(classe);
 
-				g->SetRGB(color, (int)(x*s+dx), (int)(y*s+dy));
+				g->SetRGB(color, {(int)(x*s+dx), (int)(y*s+dy)});
 			}
 			
 			if (_classify_input != nullptr) {
@@ -445,11 +445,11 @@ class SOM : public jgui::Window {
             classe = (int)round(c),
 						color = GetColor(classe);
 
-					g->SetRGB(color, (int)(x*s+ex), (int)(y*s+ey));
+					g->SetRGB(color, {(int)(x*s+ex), (int)(y*s+ey)});
 				}
 			}
 			
-			g->SetColor(0x00, 0x00, 0x00, 0xff);
+			g->SetColor({0x00, 0x00, 0x00, 0xff});
 
 			for (int i=0; i<_neurons_size; i++) {
 				Neuron 
@@ -459,12 +459,12 @@ class SOM : public jgui::Window {
 					color = GetColor(classe);
 
 				g->SetColor(color);
-				g->FillRectangle((int)(neuron->GetWeight(0)*s+dx), (int)(neuron->GetWeight(1)*s+dy), 8, 8);
+				g->FillRectangle({(int)(neuron->GetWeight(0)*s+dx), (int)(neuron->GetWeight(1)*s+dy), 8, 8});
 			}
 
-			g->SetColor(0x00, 0x00, 0x00, 0xff);
-			g->DrawCircle(dx, dy, 1*s);
-			g->DrawCircle(3*dx, dy, 1*s);
+			g->SetColor({0x00, 0x00, 0x00, 0xff});
+			g->DrawCircle({dx, dy}, 1*s);
+			g->DrawCircle({3*dx, dy}, 1*s);
 
       _mutex.unlock();
 		}

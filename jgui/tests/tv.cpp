@@ -81,7 +81,7 @@ class TV : public jgui::Window {
         *ptr++ = 0xff000000 | (noise << 16) | (noise << 8) | noise;
       }
 
-      g->SetRGBArray(buffer, 0, 0, size.width, size.height);
+      g->SetRGBArray(buffer, {0, 0, size.width, size.height});
 
       Framerate(25);
 

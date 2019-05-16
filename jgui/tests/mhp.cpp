@@ -98,8 +98,8 @@ class BackgroundLayer : public ScreenLayer {
         t = GetSize();
 
 			g->SetColor(_color);
-			g->FillRectangle(0, 0, t.width, t.height);
-			g->DrawImage(_image, 0, 0, t.width, t.height);
+			g->FillRectangle({0, 0, t.width, t.height});
+			g->DrawImage(_image, {0, 0, t.width, t.height});
 		}
 
 };
@@ -467,7 +467,7 @@ class AppTest : public Scene {
         sx = _mindex/3,
 				sy = _mindex%3;
 
-			g->DrawImage(_image, sx*169, sy*126, 169, 126, _dx, _dy, 128, 128);
+			g->DrawImage(_image, {sx*169, sy*126, 169, 126}, {_dx, _dy, 128, 128});
 		}
 
 };

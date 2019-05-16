@@ -41,7 +41,7 @@ class RasterTest : public jgui::Window {
 
       jgui::Raster raster((uint32_t *)cairo_image_surface_get_data(surface), GetSize());
 
-      std::vector<jgui::jpoint_t> hourglass = {
+      std::vector<jgui::jpoint_t<int>> hourglass = {
         {0, 0},
         {100, 0},
         {0, 100},

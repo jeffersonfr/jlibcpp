@@ -73,7 +73,7 @@ void Display::Paint(jgui::Graphics *g)
 	jgui::Font 
     *font = theme->GetFont("component.font");
 
-	g->SetColor(0xf0, 0xf0, 0xf0, 0xff);
+	g->SetColor({0xf0, 0xf0, 0xf0, 0xff});
 
 	if (font != nullptr) {
 		g->SetFont(font);
@@ -82,8 +82,8 @@ void Display::Paint(jgui::Graphics *g)
 	jgui::jsize_t 
 		size = GetSize();
 
-	g->DrawString(_text, 0, (size.height - font->GetSize())/2, size.width - 10, size.height, jgui::JHA_RIGHT, jgui::JVA_CENTER);
-	g->DrawString(_operation, 10, (size.height - font->GetSize())/2, 30, size.height - 4, jgui::JHA_LEFT, jgui::JVA_CENTER);
+	g->DrawString(_text, {0, (size.height - font->GetSize())/2, size.width - 10, size.height}, jgui::JHA_RIGHT, jgui::JVA_CENTER);
+	g->DrawString(_operation, {10, (size.height - font->GetSize())/2, 30, size.height - 4}, jgui::JHA_LEFT, jgui::JVA_CENTER);
 }
 
 void Display::SetOperation(std::string text)

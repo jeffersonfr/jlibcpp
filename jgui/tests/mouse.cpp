@@ -23,7 +23,7 @@
 class GraphicsTeste : public jgui::Window {
 
 	private:
-		std::vector<jgui::jpoint_t> 
+		std::vector<jgui::jpoint_t<int>> 
       points;
 		double 
       wsize,
@@ -58,9 +58,9 @@ class GraphicsTeste : public jgui::Window {
 
 		virtual bool MousePressed(jevent::MouseEvent *event)
 		{
-      jgui::jpoint_t
+      jgui::jpoint_t<int>
         elocation = event->GetLocation();
-			std::vector<jgui::jpoint_t>::iterator 
+			std::vector<jgui::jpoint_t<int>>::iterator 
         i = points.begin();
 			int 
         x = (int)((elocation.x/(int)wsize)*wsize),
@@ -76,7 +76,7 @@ class GraphicsTeste : public jgui::Window {
 			}
 
 			if (i == points.end()) {
-				jgui::jpoint_t t;
+				jgui::jpoint_t<int> t;
 
 				t.x = x;
 				t.y = y;
@@ -98,7 +98,7 @@ class GraphicsTeste : public jgui::Window {
 
 		virtual bool MouseMoved(jevent::MouseEvent *event)
 		{
-      jgui::jpoint_t
+      jgui::jpoint_t<int>
         elocation = event->GetLocation();
 
 			cx = elocation.x;
@@ -120,27 +120,27 @@ class GraphicsTeste : public jgui::Window {
 				size = GetSize();
 
 			g->Clear();
-			g->SetColor(0x20, 0x20, 0x80, 0xff);
+			g->SetColor({0x20, 0x20, 0x80, 0xff});
 			
 			for (int i=0; i<wblocks; i++) {
-				g->DrawLine((int)(i*wsize), 0, (int)(i*wsize), size.height);
+				g->DrawLine({{(int)(i*wsize), 0}, {(int)(i*wsize), size.height}});
 			}
 			
 			for (int i=0; i<hblocks; i++) {
-				g->DrawLine(0, (int)(i*hsize), size.width, (int)(i*hsize));
+				g->DrawLine({{0, (int)(i*hsize)}, {size.width, (int)(i*hsize)}});
 			}
 	
-			g->SetColor(0x80, 0x00, 0x00, 0xff);
-			for (std::vector<jgui::jpoint_t>::iterator i=points.begin(); i!=points.end(); i++) {
-				g->FillRectangle((int)(((*i).x/(int)wsize)*wsize), (int)(((*i).y/(int)hsize)*hsize), (int)wsize, (int)hsize);
+			g->SetColor({0x80, 0x00, 0x00, 0xff});
+			for (std::vector<jgui::jpoint_t<int>>::iterator i=points.begin(); i!=points.end(); i++) {
+				g->FillRectangle({(int)(((*i).x/(int)wsize)*wsize), (int)(((*i).y/(int)hsize)*hsize), (int)wsize, (int)hsize});
 			}
 
-			g->SetColor(0x60, 0x60, 0x80, 0xa0);
-			g->FillRectangle((int)((cx/(int)wsize)*wsize), (int)((cy/(int)hsize)*hsize), (int)wsize, (int)hsize);
+			g->SetColor({0x60, 0x60, 0x80, 0xa0});
+			g->FillRectangle({(int)((cx/(int)wsize)*wsize), (int)((cy/(int)hsize)*hsize), (int)wsize, (int)hsize});
 
-			g->SetColor(0xff, 0xff, 0xff, 0xff);
-			g->FillRectangle(cx, 0, 1, size.height);
-			g->FillRectangle(0, cy, size.width, 1);
+			g->SetColor({0xff, 0xff, 0xff, 0xff});
+			g->FillRectangle({cx, 0, 1, size.height});
+			g->FillRectangle({0, cy, size.width, 1});
 		}
 
 };

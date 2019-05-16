@@ -159,15 +159,15 @@ class GraphicsTeste : public jgui::Window {
             case 4: color = 0xfff0f000; break;
           }
 
-          g->SetColor((color>>16)&0xff, (color>>8)&0xff, (color>>0)&0xff, (color>>24)&0xff);
-          g->DrawRectangle(i*block_size, j*block_size, block_size, block_size);
+          g->SetColor(color);
+          g->DrawRectangle({i*block_size, j*block_size, block_size, block_size});
         }
       }
 
       g->SetColor(jgui::Color::Red);
-      g->FillCircle((int)(posX * block_size), (int)(posY * block_size), block_size/2);
+      g->FillCircle({(int)(posX * block_size), (int)(posY * block_size)}, block_size/2);
       g->SetColor(jgui::Color::Yellow);
-      g->FillCircle((int)((posX + dirX) * block_size), (int)((posY + dirY) * block_size), 4);
+      g->FillCircle({(int)((posX + dirX) * block_size), (int)((posY + dirY) * block_size)}, 4);
 		}
 
 		virtual bool KeyPressed(jevent::KeyEvent *event)

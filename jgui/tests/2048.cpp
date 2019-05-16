@@ -96,7 +96,7 @@ class Game2048 : public jgui::Window {
 			int bw = (size.width - t.left - t.right - 4*gap)/4;
 			int bh = (size.height - t.top - t.bottom - 4*gap - 16)/4;
 
-			g->SetColor(jgui::Color::Black);
+			g->SetColor(jgui::Color::Gray);
 
 			for (int i=0; i<4; i++) {
 				for (int j=0; j<4; j++) {

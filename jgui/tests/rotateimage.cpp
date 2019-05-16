@@ -94,21 +94,21 @@ class Main : public jgui::Window {
 			double 
         radians[3] = {-_angle, 0, _angle};
 
-			g->SetColor(0xf0, 0xf0, 0xf0, 0xff);
+			g->SetColor({0xf0, 0xf0, 0xf0, 0xff});
 
 			for (int i=0; i<=9; i++) {
-				g->DrawLine((int)(x+i*boxw), y, (int)(x+i*boxw), y+h);
+				g->DrawLine({{(int)(x+i*boxw), y}, {(int)(x+i*boxw), y+h}});
 			}
 
 			for (int i=0; i<=8; i++) {
-				g->DrawLine(x, (int)(y+i*boxh), x+w, (int)(y+i*boxh));
+				g->DrawLine({{x, (int)(y+i*boxh)}, {x+w, (int)(y+i*boxh)}});
 			}
 
-			g->SetColor(0x80, 0x80, 0x80, 0xff);
+			g->SetColor({0x80, 0x80, 0x80, 0xff});
 
 			for (int i=0; i<9; i++) {
 				for (int j=0; j<8; j++) {
-					g->FillRectangle((int)(x+gapx+i*boxw), (int)(y+gapy+j*boxh), iw, ih);
+					g->FillRectangle({(int)(x+gapx+i*boxw), (int)(y+gapy+j*boxh), iw, ih});
 				}
 			}
 
@@ -118,34 +118,34 @@ class Main : public jgui::Window {
 			if (off == nullptr) {
 				jgui::Image *image = new jgui::BufferedImage("images/square.png");
 
-				off = image->Scale(iw, ih);
-				offsub = off->Crop(0, 0, iw/2, ih/2);
+				off = image->Scale({iw, ih});
+				offsub = off->Crop({0, 0, iw/2, ih/2});
 
 				delete image;
 			}
 		 
 			for (int k=0,j=-1; j<=1; k++,j++) {
-				g->Translate(j*gapx, j*gapy);
+				g->Translate({j*gapx, j*gapy});
 
 				for (int i=0; i<3; i++) {
 					jgui::Image *image = off->Rotate(radians[i], false);
 					jgui::Image *simage = offsub->Rotate(radians[i], false);
  
-					g->DrawImage(image, (int)(x+gapx+(i+k*3)*boxw), y+gapy+0*boxh);
-					g->DrawImage(image, (int)(x+gapx+(i+k*3)*boxw), y+gapy+1*boxh, iw, ih);
-					g->DrawImage(simage, (int)(x+gapx+(i+k*3)*boxw), y+gapy+2*boxh);
-					g->DrawImage(simage, (int)(x+gapx+(i+k*3)*boxw), y+gapy+3*boxh, iw, ih);
+					g->DrawImage(image, jgui::jpoint_t<int>{(int)(x+gapx+(i+k*3)*boxw), (int)(y+gapy+0*boxh)});
+					g->DrawImage(image, {(int)(x+gapx+(i+k*3)*boxw), (int)(y+gapy+1*boxh), iw, ih});
+					g->DrawImage(simage, jgui::jpoint_t<int>{(int)(x+gapx+(i+k*3)*boxw), (int)(y+gapy+2*boxh)});
+					g->DrawImage(simage, {(int)(x+gapx+(i+k*3)*boxw), (int)(y+gapy+3*boxh), iw, ih});
 
-					g->DrawImage(image, (int)(x+gapx+(i+k*3)*boxw), y+gapy+4*boxh);
-					g->DrawImage(image, (int)(x+gapx+(i+k*3)*boxw), y+gapy+5*boxh, iw, ih);
-					g->DrawImage(simage, (int)(x+gapx+(i+k*3)*boxw), y+gapy+6*boxh);
-					g->DrawImage(simage, (int)(x+gapx+(i+k*3)*boxw), y+gapy+7*boxh, iw, ih);
+					g->DrawImage(image, jgui::jpoint_t<int>{(int)(x+gapx+(i+k*3)*boxw), (int)(y+gapy+4*boxh)});
+					g->DrawImage(image, {(int)(x+gapx+(i+k*3)*boxw), (int)(y+gapy+5*boxh), iw, ih});
+					g->DrawImage(simage, jgui::jpoint_t<int>{(int)(x+gapx+(i+k*3)*boxw), (int)(y+gapy+6*boxh)});
+					g->DrawImage(simage, {(int)(x+gapx+(i+k*3)*boxw), (int)(y+gapy+7*boxh), iw, ih});
 
 					delete image;
 					delete simage;
 				}
 
-				g->Translate(-j*gapx, -j*gapy);
+				g->Translate({-j*gapx, -j*gapy});
 			}
 		}
 

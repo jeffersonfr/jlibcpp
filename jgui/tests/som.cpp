@@ -258,43 +258,49 @@ class SOM : public jgui::Window {
 
 			// CLEAR ALL
 			g->SetColor(bkC);
-			g->FillRectangle(0, 0, w, h);
+			g->FillRectangle({0, 0, w, h});
+
 			// DRAW GRID
 			g->SetColor(bk2C);
 			for(double i=0; i<=COUNTRY; i+=(COUNTRY/20.0)){
-				g->DrawLine(toXReal(0.0),toYReal(i),toXReal(COUNTRY),toYReal(i));
-				g->DrawLine(toXReal(i),toYReal(0.0),toXReal(i),toYReal(COUNTRY));
+				g->DrawLine({{toXReal(0.0), toYReal(i)}, {toXReal(COUNTRY),toYReal(i)}});
+				g->DrawLine({{toXReal(i), toYReal(0.0)}, {toXReal(i),toYReal(COUNTRY)}});
 			}
 
 			//DRAW PATH
 			g->SetColor(lnC);
 
-			for(int x=0; x<(W-1); x++)
+			for(int x=0; x<(W-1); x++) {
 				for(int y=0; y<(H-1); y++){
-					g->DrawCircle( toXReal(gn[x*W+y]->wx), toYReal(gn[x*W+y]->wy), 4);
-					g->DrawLine( toXReal(gn[x*W+y]->wx),toYReal(gn[x*W+y]->wy),toXReal(gn[(x+1)*W+y]->wx),toYReal(gn[(x+1)*W+y]->wy));
-					g->DrawLine( toXReal(gn[x*W+y]->wx),toYReal(gn[x*W+y]->wy),toXReal(gn[x*W+y+1]->wx),toYReal(gn[x*W+y+1]->wy));
+					g->DrawCircle({toXReal(gn[x*W+y]->wx), toYReal(gn[x*W+y]->wy)}, 4);
+					g->DrawLine({{toXReal(gn[x*W+y]->wx), toYReal(gn[x*W+y]->wy)}, {toXReal(gn[(x+1)*W+y]->wx),toYReal(gn[(x+1)*W+y]->wy)}});
+					g->DrawLine({{toXReal(gn[x*W+y]->wx), toYReal(gn[x*W+y]->wy)}, {toXReal(gn[x*W+y+1]->wx),toYReal(gn[x*W+y+1]->wy)}});
 				}
-			for(int x=0; x<(W-1); x++){
-				g->DrawCircle( toXReal(gn[x*W+H-1]->wx), toYReal(gn[x*W+H-1]->wy),4);
-				g->DrawLine( toXReal(gn[x*W+H-1]->wx),toYReal(gn[x*W+H-1]->wy),toXReal(gn[(x+1)*W+H-1]->wx),toYReal(gn[(x+1)*W+H-1]->wy));
 			}
+
+			for(int x=0; x<(W-1); x++){
+				g->DrawCircle({toXReal(gn[x*W+H-1]->wx), toYReal(gn[x*W+H-1]->wy)}, 4);
+				g->DrawLine({{toXReal(gn[x*W+H-1]->wx), toYReal(gn[x*W+H-1]->wy)} ,{toXReal(gn[(x+1)*W+H-1]->wx), toYReal(gn[(x+1)*W+H-1]->wy)}});
+			}
+
 			for(int y=0; y<(H-1); y++){
-				g->DrawCircle( toXReal(gn[(W-1)*W+y]->wx), toYReal(gn[(W-1)*W+y]->wy),4);
-				g->DrawLine( toXReal(gn[(W-1)*W+y]->wx),toYReal(gn[(W-1)*W+y]->wy),toXReal(gn[(W-1)*W+y+1]->wx),toYReal(gn[(W-1)*W+y+1]->wy));
-			}            
-			g->DrawCircle( toXReal(gn[(W-1)*W+H-1]->wx), toYReal(gn[(W-1)*W+H-1]->wy),4);
+				g->DrawCircle({toXReal(gn[(W-1)*W+y]->wx), toYReal(gn[(W-1)*W+y]->wy)}, 4);
+				g->DrawLine({{toXReal(gn[(W-1)*W+y]->wx), toYReal(gn[(W-1)*W+y]->wy)}, {toXReal(gn[(W-1)*W+y+1]->wx), toYReal(gn[(W-1)*W+y+1]->wy)}});
+			}
+
+			g->DrawCircle({toXReal(gn[(W-1)*W+H-1]->wx), toYReal(gn[(W-1)*W+H-1]->wy)}, 4);
 
 			g->SetColor(fgC);
-			g->DrawLine( toXReal(0.0), toYReal(0.0),toXReal(COUNTRY),toYReal(0.0));
-			g->DrawLine( toXReal(0.0), toYReal(0.0),toXReal(0.0),toYReal(COUNTRY));
+			g->DrawLine({{toXReal(0.0), toYReal(0.0)}, {toXReal(COUNTRY), toYReal(0.0)}});
+			g->DrawLine({{toXReal(0.0), toYReal(0.0)}, {toXReal(0.0), toYReal(COUNTRY)}});
 
-			double dx = toXReal(0.0),
-						 dy = toYReal(0.0);
+			double 
+			  dx = toXReal(0.0),
+			  dy = toYReal(0.0);
 
-			g->DrawArc(dx, dy, size.width-2*dx, size.height-2*dy, 3*M_PI_2,  2*M_PI);
+			g->DrawArc({(int)dx, (int)dy}, {(int)(size.width-2*dx), (int)(size.height-2*dy)}, 3*M_PI_2,  2*M_PI);
 			
-			g->DrawCircle( toXReal(px), toYReal(py), 6);
+			g->DrawCircle({toXReal(px), toYReal(py)}, 6);
 		}    
 
 		virtual void Paint(jgui::Graphics *g) 
@@ -306,10 +312,10 @@ class SOM : public jgui::Window {
 				h = size.height;
 
 			g->SetColor(bkC);
-			g->FillRectangle(0, 0, size.width, size.height);
+			g->FillRectangle({0, 0, size.width, size.height});
 
 			if ((offscreen == nullptr) || ((imagewidth != w) || (imageheight != h))) {
-				offscreen = new jgui::BufferedImage(jgui::JPF_RGB32, w, h);
+				offscreen = new jgui::BufferedImage(jgui::JPF_RGB32, {w, h});
 
 				imagewidth = w;
 				imageheight = h;
@@ -318,11 +324,11 @@ class SOM : public jgui::Window {
 			jgui::Graphics *goff = offscreen->GetGraphics();
 
 			paintLeft(goff);
-			g->DrawImage(offscreen, 0, 0);
+			g->DrawImage(offscreen, jgui::jpoint_t<int>{0, 0});
 
 			// CLEAR ALL
 			g->SetColor(bkC);
-			g->FillRectangle(w/2+30,0,w/2+130, 20);
+			g->FillRectangle({w/2+30, 0, w/2+130, 20});
 			g->SetColor(fgC);
 
       _mutex.unlock();

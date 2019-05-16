@@ -72,8 +72,8 @@ class CustomContainer : public jgui::Container {
           offset = (int)(size.width*offset_ratio),
 					block_size = (int)(size.width*block_size_ratio);
 
-				g->DrawRectangle(bs, size.height-ss-bs, size.width-2*bs, ss);
-				g->DrawImage(_image, offset, size.height-ss-bs, block_size, ss);
+				g->DrawRectangle({bs, size.height-ss-bs, size.width-2*bs, ss});
+				g->DrawImage(_image, {offset, size.height-ss-bs, block_size, ss});
 			}
 
 			if (IsScrollableY() == true) {
@@ -84,8 +84,8 @@ class CustomContainer : public jgui::Container {
           offset = (int)(size.height*offset_ratio),
 					block_size = (int)(size.height*block_size_ratio);
 
-				g->DrawRectangle(size.width-ss-bs, bs, ss, size.height);
-				g->DrawImage(_image, size.width-ss-bs, offset, ss, block_size);
+				g->DrawRectangle({size.width-ss-bs, bs, ss, size.height});
+				g->DrawImage(_image, {size.width-ss-bs, offset, ss, block_size});
 			}
 		}
 

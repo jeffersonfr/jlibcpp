@@ -63,13 +63,13 @@ class Fullscreen : public jgui::Window {
 
 			printf("Window Bounds:: %d, %d, %d, %d\n", insets.left, insets.top, size.width-insets.left-insets.right, size.height-insets.top-insets.bottom);
 
-			g->DrawImage(_bg, insets.left, insets.top, size.width-insets.left-insets.right, size.height-insets.top-insets.bottom);
+			g->DrawImage(_bg, {insets.left, insets.top, size.width-insets.left-insets.right, size.height-insets.top-insets.bottom});
 
 			g->SetColor(jgui::Color::Red);
-			g->FillRectangle(100, 100, 100, 100);
+			g->FillRectangle({100, 100, 100, 100});
 			
 			g->SetColor(jgui::Color::White);
-			g->DrawString("Press F to use enable/disable fullscreen mode", 100, 100);
+			g->DrawString("Press F to use enable/disable fullscreen mode", jgui::jpoint_t<int>{100, 100});
 		}
 
 };

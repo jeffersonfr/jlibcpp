@@ -179,8 +179,8 @@ class GraphicsTeste : public jgui::Window {
 					color = color / 2;
 				}
 
-				g->SetColor((color>>16)&0xff, (color>>8)&0xff, (color>>0)&0xff, (color>>24)&0xff);
-				g->DrawLine(x, drawStart, x, drawEnd);
+				g->SetColor(color);
+				g->DrawLine({{x, drawStart}, {x, drawEnd}});
 			}
 		}
 

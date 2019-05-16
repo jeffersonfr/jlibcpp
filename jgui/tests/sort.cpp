@@ -1693,15 +1693,15 @@ class SortComponent : public jgui::Component, public jcommon::Observer {
 
 			g->SetColor(_colors[0]);
 			for (int i=0; i<_array_size; i++) {
-				g->FillRectangle(0, i*hsize, _array[i], hsize);
+				g->FillRectangle({0, i*hsize, _array[i], hsize});
 			}
 
 			if (_algorithm != nullptr) {
 				g->SetColor(_colors[1]);
-				g->DrawRectangle(0, _algorithm->GetIndex0()*hsize, size.width, hsize);
+				g->DrawRectangle({0, _algorithm->GetIndex0()*hsize, size.width, hsize});
 
 				g->SetColor(_colors[2]);
-				g->DrawRectangle(0, _algorithm->GetIndex1()*hsize, size.width, hsize);
+				g->DrawRectangle({0, _algorithm->GetIndex1()*hsize, size.width, hsize});
 			}
 
 			jgui::Theme *theme = GetTheme();
@@ -1709,7 +1709,7 @@ class SortComponent : public jgui::Component, public jcommon::Observer {
 
 			g->SetColor(jgui::Color::White);
 			g->SetFont(font);
-			g->DrawString(_algorithm->GetName(), 0, 0, size.width, size.height);
+			g->DrawString(_algorithm->GetName(), {0, 0, size.width, size.height});
       
       _mutex.unlock();
 		}

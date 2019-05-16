@@ -95,20 +95,20 @@ Mines::Mines(int x, int y):
 	jgui::Image *image;
 
 	image = new jgui::BufferedImage("images/bomb.png");
-	small_bomb = image->Scale(isize, isize);
-	huge_bomb = image->Scale(4*isize, 4*isize);
+	small_bomb = image->Scale({isize, isize});
+	huge_bomb = image->Scale({4*isize, 4*isize});
 	delete image;
 
 	image = new jgui::BufferedImage("images/flag.png");
-	flag = image->Scale(isize, isize);
+	flag = image->Scale({isize, isize});
 	delete image;
 
 	image = new jgui::BufferedImage("images/smile_face.png");
-	smile_face = image->Scale(4*isize, 4*isize);
+	smile_face = image->Scale({4*isize, 4*isize});
 	delete image;
 
 	image = new jgui::BufferedImage("images/dead_face.png");
-	dead_face = image->Scale(4*isize, 4*isize);
+	dead_face = image->Scale({4*isize, 4*isize});
 	delete image;
 
 	SetupBoard();
@@ -156,30 +156,30 @@ void Mines::Paint(jgui::Graphics *g)
 		for (int j=0; j<max_rows; j++) {
 			block_t block = board[j*max_cols+i];
 
-			g->SetColor(0x80, 0x80, 0x80, 0xff);
+			g->SetColor({0x80, 0x80, 0x80, 0xff});
 
 			if (block.state == CLOSED_BLOCK) {
-				g->FillRectangle(insets.left+i*(isize+delta), insets.top+j*(isize+delta), isize, isize);
+				g->FillRectangle({insets.left+i*(isize+delta), insets.top+j*(isize+delta), isize, isize});
 			} else if (block.state == OPENED_BLOCK) {
-				g->SetColor(0xd0, 0xd0, 0xd0, 0xff);
-				g->FillRectangle(insets.left+i*(isize+delta), insets.top+j*(isize+delta), isize, isize);
+				g->SetColor({0xd0, 0xd0, 0xd0, 0xff});
+				g->FillRectangle({insets.left+i*(isize+delta), insets.top+j*(isize+delta), isize, isize});
 
 				if (block.type == BOMB_BLOCK) {
-					g->FillRectangle(insets.left+i*(isize+delta), insets.top+j*(isize+delta), isize, isize);
-					g->DrawImage(small_bomb, insets.left+i*(isize+delta), insets.top+j*(isize+delta));
+					g->FillRectangle({insets.left+i*(isize+delta), insets.top+j*(isize+delta), isize, isize});
+					g->DrawImage(small_bomb, jgui::jpoint_t<int>{insets.left+i*(isize+delta), insets.top+j*(isize+delta)});
 				} else {
 					if (block.value != 0) {
 						char tmp[256];
 
 						sprintf(tmp, "%d", block.value);
 
-						g->SetColor(0xff, 0x00, 0x00, 0xff);
-						g->DrawString(tmp, insets.left+i*(isize+delta), insets.top+j*(isize+delta), isize, isize, jgui::JHA_CENTER, jgui::JVA_CENTER);
+						g->SetColor({0xff, 0x00, 0x00, 0xff});
+						g->DrawString(tmp, {insets.left+i*(isize+delta), insets.top+j*(isize+delta), isize, isize}, jgui::JHA_CENTER, jgui::JVA_CENTER);
 					}
 				}
 			} else if (block.state == MARKED_BLOCK) {
-				g->FillRectangle(insets.left+i*(isize+delta), insets.top+j*(isize+delta), isize, isize);
-				g->DrawImage(flag, insets.left+i*(isize+delta), insets.top+j*(isize+delta));
+				g->FillRectangle({insets.left+i*(isize+delta), insets.top+j*(isize+delta), isize, isize});
+				g->DrawImage(flag, jgui::jpoint_t<int>{insets.left+i*(isize+delta), insets.top+j*(isize+delta)});
 			}
 		}
 	}
@@ -197,24 +197,24 @@ void Mines::Paint(jgui::Graphics *g)
 
 
 	if (GetResult() != LOSE) {
-		g->DrawString("You Win", size.width - 150, 80);
-		g->DrawImage(smile_face, size.width - 200, 80, 160, 140);
+		g->DrawString("You Win", jgui::jpoint_t<int>{size.width - 150, 80});
+		g->DrawImage(smile_face, {size.width - 200, 80, 160, 140});
 	} else {
-		g->DrawString("You Lost", size.width - 150, 80);
-		g->DrawImage(dead_face, size.width - 200, 80, 160, 140);
+		g->DrawString("You Lost", jgui::jpoint_t<int>{size.width - 150, 80});
+		g->DrawImage(dead_face, {size.width - 200, 80, 160, 140});
 	}
 
 	sprintf(tmp, "bombs [ %02d ]", hide_bombs);
 
-	g->DrawImage(huge_bomb, x, y, w, h);
+	g->DrawImage(huge_bomb, {x, y, w, h});
 
-	g->SetColor(0x00, 0x00, 0x00, 0xff);
-	g->FillRectangle(x, y+h+10, w, font->GetSize());
-	g->SetColor(0xf0, 0xf0, 0xf0, 0xff);
-	g->DrawString(tmp, x+10, y+h+10);
+	g->SetColor({0x00, 0x00, 0x00, 0xff});
+	g->FillRectangle({x, y+h+10, w, font->GetSize()});
+	g->SetColor({0xf0, 0xf0, 0xf0, 0xff});
+	g->DrawString(tmp, jgui::jpoint_t<int>{x+10, y+h+10});
 				
-	g->SetColor(0x20, 0x40, 0xa0, 0x80);
-	g->FillRectangle(insets.left+current_col*(isize+delta), insets.top+current_row*(isize+delta), isize, isize);
+	g->SetColor({0x20, 0x40, 0xa0, 0x80});
+	g->FillRectangle({insets.left+current_col*(isize+delta), insets.top+current_row*(isize+delta), isize, isize});
 }
 
 bool Mines::KeyPressed(jevent::KeyEvent *event)

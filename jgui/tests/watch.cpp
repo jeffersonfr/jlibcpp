@@ -65,7 +65,7 @@ class WatchTeste : public jgui::Window {
         current = std::time(nullptr);
       std::tm 
         *gtime = std::localtime(&current);
-      jgui::jsize_t
+	      jgui::jsize_t<int>
 				size = GetSize();
       jgui::jinsets_t
         insets = GetInsets();
@@ -75,7 +75,7 @@ class WatchTeste : public jgui::Window {
         hours = gtime->tm_hour,
         minutes = gtime->tm_min,
         seconds = gtime->tm_sec;
-			double 
+      float 
         th = (30*hours + minutes/2)*M_PI/180.0 - M_PI/2,
         tm = (minutes*6 + seconds/10)*M_PI/180.0 - M_PI/2,
         ts = (seconds*6)*M_PI/180.0 - M_PI/2,
@@ -87,8 +87,8 @@ class WatchTeste : public jgui::Window {
         vm = 0.35*m,
         hs = 0.10*m,
         vs = 0.40*m;
-			char 
-        tmp[255];
+      char 
+	tmp[255];
 
 			sprintf(tmp, "%02d:%02d:%02d", hours, minutes, seconds);
 
@@ -97,20 +97,20 @@ class WatchTeste : public jgui::Window {
 			pen.width = 10;
 			g->SetPen(pen);
 			
-			g->SetColor(0xf0, 0xf0, 0xf0, 0xff);
-			g->DrawCircle((int)xc, (int)yc, (int)(vs+10));
+			g->SetColor({0xf0, 0xf0, 0xf0, 0xff});
+			g->DrawCircle({(int)xc, (int)yc}, (int)(vs+10));
 
 			pen.width = 1;
 			g->SetPen(pen);
 			
-			g->SetColor(0x00, 0x0, 0x00, 0xff);
-			g->DrawCircle((int)xc, (int)yc, (int)(vs+10+5));
+			g->SetColor({0x00, 0x0, 0x00, 0xff});
+			g->DrawCircle({(int)xc, (int)yc}, (int)(vs+10+5));
 
 			for (int i=0; i<12; i++) {
 				double teta = (i*30)*M_PI/180.0;
 
-				g->FillCircle((int)(xc+(vs+10+4)*cos(teta)), (int)(yc+(vs+10+4)*sin(teta)), 5);
-				// g->DrawLine((int)(xc+(vs+10)*cos(teta)), (int)(yc+(vs+10)*sin(teta)), (int)(xc+(vs+10+10)*cos(teta)), (int)(yc+(vs+10+10)*sin(teta)));
+				g->FillCircle({(int)(xc+(vs+10+4)*cos(teta)), (int)(yc+(vs+10+4)*sin(teta))}, 5);
+				// g->DrawLine({{(int)(xc+(vs+10)*cos(teta)), (int)(yc+(vs+10)*sin(teta))}, {(int)(xc+(vs+10+10)*cos(teta)), (int)(yc+(vs+10+10)*sin(teta))}});
 			}
 
 			jgui::Theme *theme = GetTheme();
@@ -118,12 +118,12 @@ class WatchTeste : public jgui::Window {
 
 			g->SetColor(jgui::Color::White);
 			g->SetFont(font);
-			g->DrawString(tmp, insets.left, insets.top);
+			g->DrawString(tmp, jgui::jpoint_t<int>{insets.left, insets.top});
 	
-			g->SetColor(0xd0, 0xd0, 0xd0, 0xff);
+			g->SetColor({0xd0, 0xd0, 0xd0, 0xff});
 
 			// draw hour
-			jgui::jpoint_t ph[] = {
+			std::vector<jgui::jpoint_t<int>> ph = {
 				{(int)(hh*cos(th+M_PI/2)), (int)(hh*sin(th+M_PI/2))}, 
 				{(int)(vh*cos(th)), (int)(vh*sin(th))},
 				{(int)(hh*cos(th+3*M_PI/2)), (int)(hh*sin(th+3*M_PI/2))},
@@ -132,15 +132,15 @@ class WatchTeste : public jgui::Window {
 			};
 
 			if (_filled == false) {
-				g->DrawPolygon(xc, yc, ph, 5, false);
+				g->DrawPolygon({(int)xc, (int)yc}, ph, false);
 			} else {
-				g->FillPolygon(xc, yc, ph, 5);
+				g->FillPolygon({(int)xc, (int)yc}, ph);
 			}
 			
-			g->SetColor(0xa0, 0xa0, 0xa0, 0xff);
+			g->SetColor({0xa0, 0xa0, 0xa0, 0xff});
 
 			// draw minute
-			jgui::jpoint_t pm[] = {
+			std::vector<jgui::jpoint_t<int>> pm = {
 				{(int)(hm*cos(tm+M_PI/2)), (int)(hm*sin(tm+M_PI/2))},
 				{(int)(vm*cos(tm)), (int)(vm*sin(tm))},
 				{(int)(hm*cos(tm+3*M_PI/2)), (int)(hm*sin(tm+3*M_PI/2))},
@@ -149,16 +149,16 @@ class WatchTeste : public jgui::Window {
 			};
 
 			if (_filled == false) {
-				g->DrawPolygon(xc, yc, pm, 5, false);
+				g->DrawPolygon({(int)xc, (int)yc}, pm, false);
 			} else {
-				g->FillPolygon(xc, yc, pm, 5);
+				g->FillPolygon({(int)xc, (int)yc}, pm);
 			}
 			
-			g->SetColor(0x80, 0xa0, 0xd0, 0xff);
+			g->SetColor({0x80, 0xa0, 0xd0, 0xff});
 
 			// draw second
-			g->DrawLine((int)(xc), (int)(yc), (int)(xc+vs*cos(ts)), (int)(yc+vs*sin(ts)));
-			g->DrawLine((int)(xc), (int)(yc), (int)(xc+hs*cos(ts+M_PI)), (int)(yc+hs*sin(ts+M_PI)));
+			g->DrawLine({{(int)(xc), (int)(yc)}, {(int)(xc+vs*cos(ts)), (int)(yc+vs*sin(ts))}});
+			g->DrawLine({{(int)(xc), (int)(yc)}, {(int)(xc+hs*cos(ts+M_PI)), (int)(yc+hs*sin(ts+M_PI))}});
 
       std::time_t t = std::time(nullptr);
       std::tm *lt = std::localtime(&t);
@@ -168,8 +168,8 @@ class WatchTeste : public jgui::Window {
 
       g->SetFont(GetTheme()->GetFont("component.font"));
       g->SetColor(jgui::Color::White);
-      g->DrawRectangle(92, 92, 34, 34);
-      g->DrawString(o.str(), 100, 100);
+      g->DrawRectangle({92, 92, 34, 34});
+      g->DrawString(o.str(), jgui::jpoint_t<int>{100, 100});
 
       Framerate(1);
 

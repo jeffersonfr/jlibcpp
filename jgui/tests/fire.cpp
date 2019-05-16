@@ -44,7 +44,7 @@ class Fire : public jgui::Window {
       fire = new uint32_t[size.width*size.height];
       
       image = 
-        new jgui::BufferedImage(jgui::JPF_RGB32, size.width, size.height/2);
+        new jgui::BufferedImage(jgui::JPF_RGB32, {size.width, size.height/2});
 
       for (int i = 0; i < size.width*size.height; i++) {
         fire[i] = 0;

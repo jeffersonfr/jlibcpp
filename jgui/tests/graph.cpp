@@ -91,7 +91,7 @@ class Graph : public jgui::Window {
         
         g->SetColor(nodes[x]["clr"]);
 
-        g->FillCircle(nodes[x]["x"], nodes[x]["y"], 3);
+        g->FillCircle({(int)nodes[x]["x"], (int)nodes[x]["y"]}, 3);
       }
 
       for (int i=0; i<(int)nodes.size(); i++) {
@@ -103,7 +103,7 @@ class Graph : public jgui::Window {
           if (dist < nodes.size()) {
             g->SetColor(nodes[i]["clr"]);
 
-            g->DrawLine(nodes[i]["x"] , nodes[i]["y"], nodes[j]["x"], nodes[j]["y"]);
+            g->DrawLine({{(int)nodes[i]["x"] , (int)nodes[i]["y"]}, {(int)nodes[j]["x"], (int)nodes[j]["y"]}});
           }
 
         }

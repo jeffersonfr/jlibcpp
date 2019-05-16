@@ -66,9 +66,9 @@ class Function : public jgui::Window {
 		Function():
 			jgui::Window(0, 0, 720, 480)
 		{
-      _buffer = new jgui::BufferedImage(jgui::JPF_RGB32, 960, 720);
+      _buffer = new jgui::BufferedImage(jgui::JPF_RGB32, {960, 720});
     
-      jgui::jsize_t
+      jgui::jsize_t<int>
         size = _buffer->GetSize();
 
       cx = (int)(size.width/2);
@@ -124,7 +124,7 @@ class Function : public jgui::Window {
 		{
       jgui::Graphics
         *g = _buffer->GetGraphics();
-      jgui::jsize_t
+      jgui::jsize_t<int>
         size = _buffer->GetSize();
 
 			do {
@@ -146,7 +146,7 @@ class Function : public jgui::Window {
             float ix = (int)(sx + tx);
             float iy = size.height - (int)(sy + ty);
             
-            g->SetRGB(0xff808080, ix, iy);
+            g->SetRGB(0xff808080, {(int)ix, (int)iy});
           }
         }
 
@@ -172,12 +172,12 @@ class Function : public jgui::Window {
 
 		void Paint(jgui::Graphics *g) 
 		{
-      jgui::jsize_t
+      jgui::jsize_t<int>
         size = GetSize();
 
       _mutex.lock();
 
-      g->DrawImage(_buffer, 0, 0, size.width, size.height);
+      g->DrawImage(_buffer, {0, 0, size.width, size.height});
       
       _mutex.unlock();
     }

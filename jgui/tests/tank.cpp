@@ -67,11 +67,11 @@ class Main : public jgui::Window {
 			jgui::Image *image;
 
 			image = new jgui::BufferedImage("images/tank2.png");
-			_image = image->Scale(_tw, _th);
+			_image = image->Scale({(int)_tw, (int)_th});
 			delete image;
 
 			image = new jgui::BufferedImage("images/tiles.png");
-			_tiles = image->Scale(10*_tile_w, 4*_tile_h);
+			_tiles = image->Scale({(int)(10*_tile_w), (int)(4*_tile_h)});
 			delete image;
 
 			SetSize((int)(10.0*_tile_w), (int)(8.0*_tile_h));
@@ -91,20 +91,20 @@ class Main : public jgui::Window {
 
 			for (int j=0; j<8; j++) {
 				for (int i=0; i<10; i++) {
-					g->DrawImage(_tiles, 
-							(int)(2*_tile_w), (int)(0*_tile_h), (int)(_tile_w), (int)(_tile_h), 
-							(int)(i*_tile_w), (int)(j*_tile_h), (int)_tile_w, (int)_tile_h);
+					g->DrawImage(_tiles,
+							{(int)(2*_tile_w), (int)(0*_tile_h), (int)(_tile_w), (int)(_tile_h)}, 
+							{(int)(i*_tile_w), (int)(j*_tile_h), (int)_tile_w, (int)_tile_h});
 				}
 			}
 
 			if (_has_bullet == true) {
-				g->SetColor(0xf0, 0xf0, 0xf0, 0xff);
-				g->FillCircle((int)_bullet_x, (int)_bullet_y, 3);
+				g->SetColor({0xf0, 0xf0, 0xf0, 0xff});
+				g->FillCircle({(int)_bullet_x, (int)_bullet_y}, 3);
 			}
 			
 			jgui::Image *image = _image->Rotate(_angle, false);
 
-			g->DrawImage(image, (int)_tx, (int)_ty);
+			g->DrawImage(image, jgui::jpoint_t<int>{(int)_tx, (int)_ty});
 
 			delete image;
 		}

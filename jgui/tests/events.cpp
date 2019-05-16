@@ -194,7 +194,7 @@ class UserWindow: public jgui::Window {
 	private:
 		std::map<jevent::jkeyevent_symbol_t, event_t *> _events;
 		std::vector<UserEventListener *> _user_listeners;
-		jgui::jpoint_t _last_mouse_location;
+		jgui::jpoint_t<int> _last_mouse_location;
 		uint64_t _last_mouse_move;
 
 	private:
@@ -332,7 +332,7 @@ class UserWindow: public jgui::Window {
 
 		virtual bool MousePressed(jevent::MouseEvent *event)
 		{
-      jgui::jpoint_t
+      jgui::jpoint_t<int>
         elocation = event->GetLocation();
 
 			if (event->GetClicks() == 1) {
@@ -346,7 +346,7 @@ class UserWindow: public jgui::Window {
 
 		virtual bool MouseReleased(jevent::MouseEvent *event)
 		{
-      jgui::jpoint_t
+      jgui::jpoint_t<int>
         elocation = event->GetLocation();
 
 			DispatchUserEvent(new UserEvent(ON_MOUSE_RELEASE_EVENT, event->GetButton(), event->GetClicks(), elocation.x, elocation.y, 0.0, 0.0));
@@ -356,7 +356,7 @@ class UserWindow: public jgui::Window {
 
 		virtual bool MouseMoved(jevent::MouseEvent *event)
 		{
-      jgui::jpoint_t
+      jgui::jpoint_t<int>
         elocation = event->GetLocation();
 			double 
         tdiff = (double)(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() - _last_mouse_move),
@@ -375,7 +375,7 @@ class UserWindow: public jgui::Window {
 
 		virtual bool MouseWheel(jevent::MouseEvent *event)
 		{
-      jgui::jpoint_t
+      jgui::jpoint_t<int>
         elocation = event->GetLocation();
 
 			DispatchUserEvent(new UserEvent(ON_MOUSE_WHEEL_EVENT, event->GetButton(), event->GetClicks(), elocation.x, elocation.y, 0.0, 0.0));
@@ -388,8 +388,8 @@ class UserWindow: public jgui::Window {
 class Test : public UserWindow, public UserEventListener {
 
 	private:
-		jgui::jpoint_t _ball;
-		jgui::jpoint_t _ball_diff;
+		jgui::jpoint_t<int> _ball;
+		jgui::jpoint_t<int> _ball_diff;
 		int _raio;
 		int _color;
 		bool _pressed;
@@ -526,7 +526,7 @@ class Test : public UserWindow, public UserEventListener {
 				g->SetColor(jgui::Color::Blue);
 			}
 
-			g->FillCircle(_ball.x, _ball.y, _raio);
+			g->FillCircle(_ball, _raio);
 		}
 
 };

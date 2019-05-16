@@ -404,6 +404,8 @@ void Window::PaintGlassPane(Graphics *g)
 
 void Window::Paint(jgui::Graphics *g)
 {
+	g->Clear();
+
   Container::Paint(g);
 }
 

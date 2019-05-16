@@ -35,7 +35,7 @@ class Terrain : public jgui::Window {
 		Terrain():
 			jgui::Window(0, 0, 720, 480)
 		{
-      _buffer = new jgui::BufferedImage(jgui::JPF_RGB32, 720, 480);
+      _buffer = new jgui::BufferedImage(jgui::JPF_RGB32, {720, 480});
 		}
 
 		virtual ~Terrain()
@@ -96,31 +96,35 @@ class Terrain : public jgui::Window {
                 h = 60*sin(d*0.3 + t) + 65;
               }
 
-              jgui::jpoint_t p[4];
+              std::vector<jgui::jpoint_t<int>> p = {
+								{.x = (int)(x), .y = (int)(y - h)},
+								{.x = (int)(x + 10), .y = (int)(y + 5 - h)},
+								{.x = (int)(x + 20), .y = (int)(y - h)},
+								{.x = (int)(x + 10), .y = (int)(y - 5 - h)}
+							};
 
-              p[0] = {.x = (int)(x), .y = (int)(y - h)};
-              p[1] = {.x = (int)(x + 10), .y = (int)(y + 5 - h)};
-              p[2] = {.x = (int)(x + 20), .y = (int)(y - h)};
-              p[3] = {.x = (int)(x + 10), .y = (int)(y - 5 - h)};
+              g->SetColor({(int)(100 + h), (int)(100 + h), (int)(h + 0), 0xff});
+              g->FillPolygon({0, 0}, p);
 
-              g->SetColor((int)(100 + h), (int)(100 + h), (int)(h + 0), 0xff);
-              g->FillPolygon(0, 0, p, 4);
+							p = {
+								{.x = (int)(x), .y = (int)(y - h)},
+								{.x = (int)(x + 10), .y = (int)(y + 5 - h)},
+								{.x = (int)(x + 10), .y = (int)(y)},
+								{.x = (int)(x), .y = (int)(y - 5)}
+							};
 
-              p[0] = {.x = (int)(x), .y = (int)(y - h)};
-              p[1] = {.x = (int)(x + 10), .y = (int)(y + 5 - h)};
-              p[2] = {.x = (int)(x + 10), .y = (int)(y)};
-              p[3] = {.x = (int)(x), .y = (int)(y - 5)};
+              g->SetColor({60, 60, 0});
+              g->FillPolygon({0, 0}, p);
 
-              g->SetColor(60, 60, 0);
-              g->FillPolygon(0, 0, p, 4);
+							p = {
+								{.x = (int)(x + 10), .y = (int)(y + 5 - h)},
+								{.x = (int)(x + 10), .y = (int)(y)},
+								{.x = (int)(x + 20), .y = (int)(y - 5)},
+								{.x = (int)(x + 20), .y = (int)(y - h)}
+							};
 
-              p[0] = {.x = (int)(x + 10), .y = (int)(y + 5 - h)};
-              p[1] = {.x = (int)(x + 10), .y = (int)(y)};
-              p[2] = {.x = (int)(x + 20), .y = (int)(y - 5)};
-              p[3] = {.x = (int)(x + 20), .y = (int)(y - h)};
-
-              g->SetColor(150, 150, 0);
-              g->FillPolygon(0, 0, p, 4);
+              g->SetColor({150, 150, 0});
+              g->FillPolygon({0, 0}, p);
             }
           }
 
@@ -140,7 +144,7 @@ class Terrain : public jgui::Window {
 		{
       _mutex.lock();
 
-      g->DrawImage(_buffer, 0, 0);
+      g->DrawImage(_buffer, jgui::jpoint_t<int>{0, 0});
       
       _mutex.unlock();
     }

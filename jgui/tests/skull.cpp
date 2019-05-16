@@ -394,16 +394,16 @@ class Render3D : public jgui::Window {
       g = (light1 * light1) * 255.0;
       b = light1 * 64.0 + light2 * 64.0;
 
-      graphics->SetColor(r, g, b, 0xff);
+      graphics->SetColor({r, g, b, 0xff});
 
       switch (PrimitiveType) {
         case FLAT_SHADED:
-          graphics->FillTriangle(tri->a->x + X, tri->a->y + Y, tri->b->x + X, tri->b->y + Y, tri->c->x + X, tri->c->y + Y);
+          graphics->FillTriangle({(int)(tri->a->x + X), (int)(tri->a->y + Y)}, {(int)(tri->b->x + X), (int)(tri->b->y + Y)}, {(int)(tri->c->x + X), (int)(tri->c->y + Y)});
           break;
         case WIRE_FRAME:
-          graphics->DrawLine(tri->a->x + X, tri->a->y + Y, tri->b->x + X, tri->b->y + Y);
-          graphics->DrawLine(tri->b->x + X, tri->b->y + Y, tri->c->x + X, tri->c->y + Y);
-          graphics->DrawLine(tri->c->x + X, tri->c->y + Y, tri->a->x + X, tri->a->y + Y);
+          graphics->DrawLine({{(int)(tri->a->x + X), (int)(tri->a->y + Y)}, {(int)(tri->b->x + X), (int)(tri->b->y + Y)}});
+          graphics->DrawLine({{(int)(tri->b->x + X), (int)(tri->b->y + Y)}, {(int)(tri->c->x + X), (int)(tri->c->y + Y)}});
+          graphics->DrawLine({{(int)(tri->c->x + X), (int)(tri->c->y + Y)}, {(int)(tri->a->x + X), (int)(tri->a->y + Y)}});
           break;
         default:
           break;
@@ -491,8 +491,6 @@ class Render3D : public jgui::Window {
 
       // jgui::jsize_t
       //   size = GetSize();
-
-      g->Clear();
 
       int count, NumUsed = 0;
       Tri3D *current = Triangles;
