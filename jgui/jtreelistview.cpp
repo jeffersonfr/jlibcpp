@@ -462,9 +462,9 @@ void TreeListView::IncrementLines(int lines)
   }
 
   if ((_item_size+_item_gap)*_index < scrolly) {
-    ScrollToVisibleArea(scrollx, (std::max)(0, (_item_size+_item_gap)*_index), size.width, size.height, this);
+    ScrollToVisibleArea({scrollx, (std::max)(0, (_item_size+_item_gap)*_index), size.width, size.height}, this);
   } else if ((scrolly+size.height) < (_item_size+_item_gap)*(int)_index) {
-    ScrollToVisibleArea(scrollx, (_item_size+_item_gap)*(_index+1)-size.height+2*_item_gap, size.width, size.height, this);
+    ScrollToVisibleArea({scrollx, (_item_size+_item_gap)*(_index+1)-size.height+2*_item_gap, size.width, size.height}, this);
   }
 
   if (_index != old_index) {
@@ -504,9 +504,9 @@ void TreeListView::DecrementLines(int lines)
       scrolly = (IsScrollableY() == true)?scroll_location.y:0;
 
   if ((scrolly+size.height) < (_item_size+_item_gap)*(int)(_index+1)) {
-    ScrollToVisibleArea(scrollx, (_item_size+_item_gap)*(_index+1)-size.height+2*_item_gap, size.width, size.height, this);
+    ScrollToVisibleArea({scrollx, (_item_size+_item_gap)*(_index+1)-size.height+2*_item_gap, size.width, size.height}, this);
   } else if ((_item_size+_item_gap)*_index < scrolly) {
-    ScrollToVisibleArea(scrollx, (std::max)(0, (_item_size+_item_gap)*_index), size.width, size.height, this);
+    ScrollToVisibleArea({scrollx, (std::max)(0, (_item_size+_item_gap)*_index), size.width, size.height}, this);
   }
 
   if (_index != old_index) {

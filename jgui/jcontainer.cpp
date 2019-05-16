@@ -116,7 +116,7 @@ bool Container::MoveScrollTowards(Component *next, jevent::jkeyevent_symbol_t sy
     
     //if the Form doesn't contain a focusable Component simply move the viewport by pixels
     if (next == nullptr || next == this){
-      ScrollToVisibleArea(x, y, w, h, this);
+      ScrollToVisibleArea({x, y, w, h}, this);
 
       return false;
     }
@@ -127,7 +127,7 @@ bool Container::MoveScrollTowards(Component *next, jevent::jkeyevent_symbol_t sy
     jgui::jsize_t<int>
       ns = next->GetSize();
     bool 
-      nextIntersects = Contains(next) == true && Intersects(al.x, al.y, ns.width, ns.height, al.x + x, al.y + y, w, h);
+      nextIntersects = Contains(next) == true && Intersects({al.x, al.y, ns.width, ns.height}, {al.x + x, al.y + y, w, h});
 
     if ((nextIntersects && !currentLarge && !edge) || 
         Rectangle::Contains(al.x + slocation.x, al.y + slocation.y, w, h, nl.x, nl.y, ns.width, ns.height)) {
@@ -139,7 +139,7 @@ bool Container::MoveScrollTowards(Component *next, jevent::jkeyevent_symbol_t sy
         jgui::jsize_t<int>
           cs = current->GetSize();
 
-        ScrollToVisibleArea(x, y, w, h, this);
+        ScrollToVisibleArea({x, y, w, h}, this);
 
         // if after moving the scroll the current focus is out of the view port and the next focus is in the view port move the focus
         if (nextIntersects == false || 
