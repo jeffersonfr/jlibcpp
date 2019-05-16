@@ -2007,7 +2007,7 @@ class SIData : public SI {
 
             ptr = ptr + 6;
 
-            if (object_kind == 0x73726700) {
+            if (object_kind == 0x73726700) { // 's','r','g','\0' (ServiceGateway)
               _names[object_key] = "/";
             }
 
@@ -5123,7 +5123,7 @@ class PSIParser : public jevent::DemuxListener {
       printf("DSMCCInformation:: protocol discriminator:[0x%02x], dsmcc type:[0x%02x], message id:[0x%04x], transaction id:[0x%04x]\n", protocol_discriminator, dsmcc_type, message_id, transaction_id);
 
       if (protocol_discriminator != 0x11 || // MPEG-2 DSM-CC message
-          dsmcc_type != 0x03 || // Download message
+          dsmcc_type != 0x03 || // DownloadMessage
           reserved != 0xff) {
         return;
       }
@@ -5343,7 +5343,7 @@ class PSIParser : public jevent::DemuxListener {
       printf("DSMCC:DownloadDataMessage: protocol discriminator:[0x%02x], dsmcc type:[0x%02x], message id:[0x%04x], download id:[0x%08x]\n", protocol_discriminator, dsmcc_type, message_id, download_id);
 
       if (protocol_discriminator != 0x11 || // MPEG-2 DSM-CC message
-          dsmcc_type != 0x03 || // Download message
+          dsmcc_type != 0x03 || // DownloadMessage
           reserved != 0xff) {
         return;
       }

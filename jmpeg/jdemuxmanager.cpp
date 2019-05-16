@@ -192,9 +192,10 @@ void DemuxManager::ProcessPSI(const char *data, const int length)
     if (ptr < end) {
       int length = end - ptr;
 
-      if (length < 3) {
-        return;
-      }
+      // INFO:: causing problems to mount dsmcc
+      // if (length < 3) {
+      //  return;
+      // }
 
       section_length = TS_PSI_G_SECTION_LENGTH(ptr) + 3;
 
@@ -452,16 +453,20 @@ void DemuxManager::Run()
     _demux_mutex.unlock();
 
     if (transport_error_indicator == 1) {
-      return;
+      continue;
     }
-  
+    
+    if (pid == 0x1fff or pid == 0x1ff0) { // null packets, iip packets
+      continue;
+    }
+
     // INFO:: process continuity counter
     std::map<int, struct jstream_counter_t>::iterator i = counter.find(pid);
 
     if (i != counter.end()) {
       int counter = (i->second.continuity_counter + 1)%16;
 
-      if (pid != 0x1fff and contains_payload == 0x01) { // INFO:: 0x1fff<null packet>
+      if (contains_payload == 0x01) {
         if (continuity_counter != counter) {
           i->second.packets[continuity_counter] = std::string(data, TS_PACKET_LENGTH);
         } else {
