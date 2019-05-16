@@ -289,7 +289,7 @@ static void PaintThread(NativeApplication *app)
     
     dw->update();
 
-    sg_paint_condition.wait_for(lock, std::chrono::milliseconds(1000));
+    sg_paint_condition.wait_for(lock, std::chrono::milliseconds(1));
   }
 }
 
