@@ -201,9 +201,9 @@ class Ray : public jgui::Window, public jevent::PlayerListener {
 			_candle_index = 0;
 			_splash_index = 0;
 
-			_scene = new jgui::BufferedImage(jgui::JPF_RGB32, SCREEN_X, SCREEN_Y);
-			_scene2x = new jgui::BufferedImage(jgui::JPF_RGB32, SCREEN_X*2, SCREEN_Y*2);
-			_map = new jgui::BufferedImage(jgui::JPF_RGB32, MAP_X+2, MAP_Y+2);
+			_scene = new jgui::BufferedImage(jgui::JPF_RGB32, {SCREEN_X, SCREEN_Y});
+			_scene2x = new jgui::BufferedImage(jgui::JPF_RGB32, {SCREEN_X*2, SCREEN_Y*2});
+			_map = new jgui::BufferedImage(jgui::JPF_RGB32, {MAP_X+2, MAP_Y+2});
 			_candle = new jgui::BufferedImage("images/candle.png");
 			_splash = new jgui::BufferedImage("images/splash.png");
 
@@ -214,7 +214,7 @@ class Ray : public jgui::Window, public jevent::PlayerListener {
 				_player->Play();
 			}
 
-			jgui::jsize_t 
+			jgui::jsize_t<int> 
         screen = GetSize();
 			int 
         n = screen.height/SCREEN_Y;
@@ -364,12 +364,12 @@ class Ray : public jgui::Window, public jevent::PlayerListener {
 
 		virtual void PaintCandle(jgui::Graphics *graphics)
 		{
-			jgui::jsize_t screen = _scene->GetSize();
-			jgui::jsize_t size = _candle->GetSize();
+			jgui::jsize_t<int> screen = _scene->GetSize();
+			jgui::jsize_t<int> size = _candle->GetSize();
 			int w = size.width/4;
 			int h = size.height;
 
-			graphics->DrawImage(_candle, _candle_index*w, 0, w, h, (screen.width-w)/2 + 6*cos(_hand/10.0), screen.height-h + 6*sin(_hand/10.0) + 2);
+			graphics->DrawImage(_candle, {_candle_index*w, 0, w, h}, jgui::jpoint_t<int>{(screen.width-w)/2 + 6*cos(_hand/10.0), screen.height-h + 6*sin(_hand/10.0) + 2});
 
 			_candle_index = (_candle_index + 1) % 4;
 			_hand = _hand + _dhd;
@@ -382,8 +382,8 @@ class Ray : public jgui::Window, public jevent::PlayerListener {
 		virtual void PaintMap(jgui::Graphics *graphics)
 		{
 			jgui::Graphics *g = _map->GetGraphics();
-			jgui::jsize_t screen = _scene->GetSize();
-			jgui::jsize_t size = _map->GetSize();
+			jgui::jsize_t<int> screen = _scene->GetSize();
+			jgui::jsize_t<int> size = _map->GetSize();
 
 			g->Clear();
 			g->SetColor(jgui::Color::White);
@@ -396,7 +396,7 @@ class Ray : public jgui::Window, public jevent::PlayerListener {
 			for (int j=0; j<MAP_Y; j++) {
 				for (int i=0; i<MAP_X; i++) {
 					if (table[i][j] > 0) {
-						g->SetRGB((0xff << 0x18) | (c << 0x10) | (c << 0x08) | (c), i*bw+1, (MAP_Y-j-1)*bh+1);
+						g->SetRGB((0xff << 0x18) | (c << 0x10) | (c << 0x08) | (c), {i*bw+1, (MAP_Y-j-1)*bh+1});
 					}
 				}
 			}
@@ -405,7 +405,7 @@ class Ray : public jgui::Window, public jevent::PlayerListener {
 			int ly = _py/MAP_Y;
 
 			g->SetColor(0xff800000);
-			g->FillRectangle(lx*bw+1, (MAP_Y-ly-1)*bh+1, bw, bh);
+			g->FillRectangle({lx*bw+1, (MAP_Y-ly-1)*bh+1, bw, bh});
 
 			jgui::Image *rotate = _map->Rotate(_angle*M_PI/180.0, true);
 
@@ -413,18 +413,18 @@ class Ray : public jgui::Window, public jevent::PlayerListener {
 				if (_splash_index > 30) {
 					jgui::Image 
             *blend = rotate->Blend(1.0*(_splash_index-30)/30);
-          jgui::jsize_t
+          jgui::jsize_t<int>
             t = rotate->GetSize();
 
-					graphics->DrawImage(blend, screen.width-size.width+8-t.width/2, screen.height-size.height+8-t.height/2);
+					graphics->DrawImage(blend, jgui::jpoint_t<int>{screen.width-size.width+8-t.width/2, screen.height-size.height+8-t.height/2});
 
 					delete blend;
 				}
 			} else {
-        jgui::jsize_t
+        jgui::jsize_t<int>
           t = rotate->GetSize();
 
-				graphics->DrawImage(rotate, screen.width-size.width+8-t.width/2, screen.height-size.height+8-t.height/2);
+				graphics->DrawImage(rotate, jgui::jpoint_t<int>{screen.width-size.width+8-t.width/2, screen.height-size.height+8-t.height/2});
 			}
 
 			delete rotate;
@@ -446,7 +446,7 @@ class Ray : public jgui::Window, public jevent::PlayerListener {
 		virtual void PaintScene(jgui::Graphics *graphics)
 		{
 			jgui::Graphics *g = _scene->GetGraphics();
-			jgui::jsize_t size = _scene->GetSize();
+			jgui::jsize_t<int> size = _scene->GetSize();
 			float vlx = (size.width/_fov)/DPI;
 			float rlx = (random()%10)/10.0;
 			float x = 0.0;
@@ -490,7 +490,7 @@ class Ray : public jgui::Window, public jevent::PlayerListener {
 				int cc = (int)(0x40) / (2*_warp + 1);
 
 				g->SetColor((0xff << 0x18) | (cc << 0x10) | (cc << 0x08) | (cc << 0x00));
-				g->FillRectangle(x, 0, vlx+1, tmp1);
+				g->FillRectangle({x, 0, vlx+1, tmp1});
 
 				// walls
 				uint32_t color = 0x00000000;
@@ -509,13 +509,13 @@ class Ray : public jgui::Window, public jevent::PlayerListener {
 				}
 
 				g->SetColor(GetLuminosity(color, l+rlx));
-				g->FillRectangle(x, tmp1, vlx+1, tmp2-tmp1);
+				g->FillRectangle({x, tmp1, vlx+1, tmp2-tmp1});
 
 				// ground
 				int gc = (int)(0x20/(_lum+5.0));
 
 				g->SetColor((0xff << 0x18) | (gc << 0x10) | (gc << 0x08) | (gc << 0x00));
-				g->FillRectangle(x, tmp2, vlx+1, size.height-tmp2);
+				g->FillRectangle({x, tmp2, vlx+1, size.height-tmp2});
 				
 				x = x + vlx;
 			}
@@ -539,43 +539,45 @@ class Ray : public jgui::Window, public jevent::PlayerListener {
 				} else if (_splash_index > 30) {
 					jgui::Image *blend = _splash->Blend(0.80);
 
-					g->DrawImage(_splash, 0, 0, size.width, size.height);
+					g->DrawImage(_splash, {0, 0, size.width, size.height});
 
 					delete _splash;
 					_splash = nullptr;
 
 					_splash = blend;
 				} else if (_splash_index > 0) {
-					g->DrawImage(_splash, 0, 0, size.width, size.height);
+					g->DrawImage(_splash, {0, 0, size.width, size.height});
 				}
 			}
 
-			static uint32_t *dst = nullptr;
-			
+      /*
 			// CHANGE:: pixel scaler
 			jgui::Graphics 
         *g2 = _scene2x->GetGraphics();
 			uint32_t 
-        *src = nullptr;
+        src[size.width*size.height],
+        dst[size.width*size.height];
 
-			g->GetRGBArray(&src, 0, 0, size.width, size.height);
+			g->GetRGBArray(src, {0, 0, size.width, size.height});
 
 			if (dst == nullptr) {
-				g2->GetRGBArray(&dst, 0, 0, 2*size.width, 2*size.height);
+				g2->GetRGBArray(dst, {0, 0, 2*size.width, 2*size.height});
 			}
 
-			EPXScaler2x(src, dst, size.width, size.height);
+			// EPXScaler2x(src, dst, size.width, size.height);
 
 			g2->SetCompositeFlags(jgui::JCF_SRC);
-			g2->SetRGBArray(dst, 0, 0, 2*size.width, 2*size.height);
-			
-      jgui::jsize_t
+			g2->SetRGBArray(dst, {0, 0, 2*size.width, 2*size.height});
+      */
+
+      jgui::jsize_t<int>
         t = GetSize();
 
-			graphics->DrawImage(_scene2x, 0, 0, t.width, t.height);
+			// CHANGE:: with pixel scaler
+			// graphics->DrawImage(_scene2x, {0, 0, t.width, t.height});
 			
-			// CHANGE:: without pixel scaler
-			// graphics->DrawImage(_scene, 0, 0, GetWidth(), GetHeight());
+      // CHANGE:: without pixel scaler
+			graphics->DrawImage(_scene, {0, 0, t.width, t.height});
 		}
 
 		virtual void Paint(jgui::Graphics *g)

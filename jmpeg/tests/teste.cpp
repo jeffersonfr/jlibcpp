@@ -45,6 +45,7 @@
 #include <string.h>
 #include <math.h>
 #include <fcntl.h>
+#include <signal.h>
 
 #define TS_AIT_TABLE_ID 0x74
 
@@ -5580,6 +5581,8 @@ class PSIParser : public jevent::DemuxListener {
 
 };
 
+static bool cancel = false;
+
 class ISDBTFileInputStream : public jio::InputStream {
 
   private:
@@ -5625,7 +5628,7 @@ class ISDBTFileInputStream : public jio::InputStream {
 
       _stream->Skip(_rgap);
 
-      if (r <= 0) {
+      if (r <= 0 or cancel == true) {
         return -1LL;
       }
 
@@ -5665,7 +5668,7 @@ class ISDBTDatagramInputStream : public jio::InputStream {
       int64_t 
         r = _stream->Read(data, _lgap + size + _rgap);
 
-      if (r <= 0) {
+      if (r <= 0 or cancel == true) {
         return -1LL;
       }
 
@@ -5674,6 +5677,11 @@ class ISDBTDatagramInputStream : public jio::InputStream {
       return size;
     }
 };
+
+void catch_signal(int signal)
+{
+  cancel = true;
+}
 
 int main(int argc, char **argv)
 {
@@ -5714,6 +5722,8 @@ int main(int argc, char **argv)
 
     return -1;
   }
+
+  signal(SIGINT, catch_signal);
 
   manager->SetInputStream(stream);
   
@@ -5826,4 +5836,3 @@ int main(int argc, char **argv)
 
   return 0;
 }
-
