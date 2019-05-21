@@ -633,6 +633,10 @@ static void PaintThread(NativeApplication *app)
 
 void NativeApplication::InternalLoop()
 {
+  if (sg_jgui_window == nullptr) {
+    return;
+  }
+
   std::lock_guard<std::mutex> lock(sg_loop_mutex);
 
   std::thread thread = std::thread(PaintThread, this);

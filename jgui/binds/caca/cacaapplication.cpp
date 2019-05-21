@@ -376,6 +376,10 @@ void NativeApplication::InternalPaint()
 
 void NativeApplication::InternalLoop()
 {
+  if (sg_jgui_window == nullptr) {
+    return;
+  }
+
   std::lock_guard<std::mutex> lock(sg_loop_mutex);
 
   struct caca_event cev;

@@ -519,6 +519,10 @@ static Bool check_x11_event(Display*, XEvent* event, XPointer userData)
 
 void NativeApplication::InternalLoop()
 {
+  if (sg_jgui_window == nullptr) {
+    return;
+  }
+
   std::lock_guard<std::mutex> lock(sg_loop_mutex);
 
 	XEvent event;

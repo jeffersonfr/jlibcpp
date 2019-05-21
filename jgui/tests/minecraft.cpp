@@ -205,13 +205,14 @@ class Minecraft : public jgui::Window {
         buffer[size.width*size.height];
 
       // for each column
-      for (int x = 0; x < size.width; x++) {
-        // get the x axis delta
-        float ___xd = ((float)x - (float)size.width / 2.f) / (float)size.height;
+#pragma omp parallel for
+      for (int y = 0; y < size.height; y++) {
+        // get the y axis delta
+        float  __yd = ((float)y - (float)size.height / 2.f) / (float)size.height;
         // for each row
-        for (int y = 0; y < size.height; y++) {
-          // get the y axis delta
-          float  __yd = ((float)y - (float)size.height / 2.f) / (float)size.height;
+        for (int x = 0; x < size.width; x++) {
+          // get the x axis delta
+          float ___xd = ((float)x - (float)size.width / 2.f) / (float)size.height;
           float  __zd = 1;
           float ___zd =  __zd * yCos +  __yd * ySin;
           float   _yd =  __yd * yCos -  __zd * ySin;

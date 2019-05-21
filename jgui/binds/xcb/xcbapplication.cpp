@@ -416,6 +416,10 @@ void update_event_queue(){
 
 void NativeApplication::InternalLoop()
 {
+  if (sg_jgui_window == nullptr) {
+    return;
+  }
+
   std::lock_guard<std::mutex> lock(sg_loop_mutex);
 
   xcb_generic_event_t *event;

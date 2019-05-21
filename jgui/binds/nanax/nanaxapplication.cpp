@@ -295,6 +295,10 @@ static void PaintThread(NativeApplication *app)
 
 void NativeApplication::InternalLoop()
 {
+  if (sg_jgui_window == nullptr) {
+    return;
+  }
+
   sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_OPENED));
 
   std::lock_guard<std::mutex> lock(sg_loop_mutex);
