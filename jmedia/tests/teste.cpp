@@ -223,7 +223,7 @@ class PlayerTest : public jgui::Window, public jevent::PlayerListener, public je
 			jgui::Graphics *g = image->GetGraphics();
 
 			g->SetColor(jgui::Color::Blue);
-			g->FillRectangle(4, 4, 12, 12);
+			g->FillRectangle({4, 4, 12, 12});
 		}
 
 		virtual void ShowApp() 

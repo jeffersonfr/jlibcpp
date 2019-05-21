@@ -340,7 +340,7 @@ void NativeApplication::InternalPaint()
 	int iw = cucul_get_canvas_width(cv);
 	int ih = cucul_get_canvas_height(cv);
 
-  jgui::Image *scale = sg_back_buffer->Scale(iw, ih);
+  jgui::Image *scale = sg_back_buffer->Scale({iw, ih});
 
   uint32_t *data = (uint32_t *)scale->LockData();
 

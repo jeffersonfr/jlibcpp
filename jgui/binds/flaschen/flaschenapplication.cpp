@@ -316,7 +316,7 @@ void NativeApplication::InternalPaint()
 
   g->Flush();
 
-  jgui::Image *scale = sg_back_buffer->Scale(FLASCHEN_DISPLAY_WIDTH, FLASCHEN_DISPLAY_HEIGHT);
+  jgui::Image *scale = sg_back_buffer->Scale({FLASCHEN_DISPLAY_WIDTH, FLASCHEN_DISPLAY_HEIGHT});
 
   uint8_t *data = (uint8_t *)scale->LockData();
 
