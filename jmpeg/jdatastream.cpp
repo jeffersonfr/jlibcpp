@@ -29,9 +29,13 @@ DataStream::DataStream(std::string data)
   _data = data;
 }
 
-DataStream::DataStream(const char *data, size_t length):
-  DataStream(std::string(data, length))
+DataStream::DataStream(const char *data, int length)
 {
+  if (length < 0) {
+    throw jexception::OutOfBoundsException("Data length must be greater than zero");
+  }
+
+  _data = std::string(data, length);
   _data_index = 0;
 }
 

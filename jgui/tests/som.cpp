@@ -166,6 +166,7 @@ class SOM : public jgui::Window {
 
 		void makeR(double th)
 		{
+#pragma omp parallel for
 			for(int i=0; i<NGEONEURON; i++){
 				r[i][i]= 1.0;
 				for(int j=i+1; j<NGEONEURON; j++){

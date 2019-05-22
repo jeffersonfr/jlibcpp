@@ -34,6 +34,9 @@ const int fireColorsPalette[37][3] = {
   {255, 255, 255}
 };
 
+#define SCREEN_WIDTH 640
+#define SCREEN_HEIGHT 480
+
 class Doom : public jgui::Window {
 
   private:
@@ -43,13 +46,13 @@ class Doom : public jgui::Window {
 
   public:
     Doom():
-      jgui::Window(720, 480)
+      jgui::Window(SCREEN_WIDTH, SCREEN_HEIGHT)
     {
       srand(time(NULL));
 
-      numberOfPixels = (720/fireSize) * (480/fireSize);
+      numberOfPixels = (SCREEN_WIDTH/fireSize) * (SCREEN_HEIGHT/fireSize);
 
-      firePixelsArray = new int[720*480];
+      firePixelsArray = new int[SCREEN_WIDTH*SCREEN_HEIGHT];
 
       for (int i = 0; i < numberOfPixels; i++) {
         firePixelsArray[i] = 36;
@@ -101,6 +104,7 @@ class Doom : public jgui::Window {
       uint32_t 
         *pixels = (uint32_t *)cairo_image_surface_get_data(cairo_surface);
 
+// #pragma omp parallel for
       for (int y = 0; y < size.height; y+=fireSize) {
         int c2 = c1*y;
 

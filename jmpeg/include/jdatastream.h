@@ -45,7 +45,7 @@ class DataStream : public jcommon::Object {
      * \brief
      *
      */
-    DataStream(const char *data, size_t length);
+    DataStream(const char *data, int length);
     
     /**
      * \brief
