@@ -46,7 +46,7 @@ class Raster {
     void SetPixel(jgui::jpoint_t<int> v1);
     uint32_t GetPixel(jgui::jpoint_t<int> v1);
     void ScanLine(jgui::jpoint_t<int> v1, int size);
-    void DrawLine(jgui::jpoint_t<int> v1, jgui::jpoint_t<int> v2);
+    void DrawLine(jline_t<int> line);
     void DrawTriangle(jgui::jpoint_t<int> v1, jgui::jpoint_t<int> v2, jgui::jpoint_t<int> v3);
     void FillTriangle(jgui::jpoint_t<int> v1, jgui::jpoint_t<int> v2, jgui::jpoint_t<int> v3);
     void DrawRectangle(jgui::jpoint_t<int> v1, jgui::jsize_t<int> s1);
