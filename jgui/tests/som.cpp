@@ -166,70 +166,18 @@ class SOM : public jgui::Window {
 
 		void makeR(double th)
 		{
+      float c0 = -2.0f*th*th;
+
 #pragma omp parallel for
 			for(int i=0; i<NGEONEURON; i++){
 				r[i][i]= 1.0;
+
 				for(int j=i+1; j<NGEONEURON; j++){
-					r[i][j] = exp( -1.0 * ( gn[i]->dist(gn[j])*gn[i]->dist(gn[j]) )/(2.0*th*th));
+					float c1 = gn[i]->dist(gn[j]);
+          
+					r[i][j] = expf(c1*c1/c0);
 					r[j][i] = r[i][j];
 				}
-			}
-		}
-
-		virtual void ShowApp() 
-    {
-			double 
-        x1,
-				x2,
-				mindist;
-			int 
-        j;
-
-			while (please_stop == 0 && IsHidden() == false) {
-				counter++;
-
-				// CHOSE A RANDOM PATTERN
-				x1 = (COUNTRY*((double)rand()/((double)(RAND_MAX))));
-				x2 = (COUNTRY*((double)rand()/((double)(RAND_MAX))));
-
-				while ((x1*x1+x2*x2) > 1.0){
-					x1 = (COUNTRY*((double)rand()/((double)(RAND_MAX))));
-					x2 = (COUNTRY*((double)rand()/((double)(RAND_MAX))));
-				}
-
-				px = x1;
-				py = x2;
-
-				// SEARCH FOR MINIMAL
-				j = -1;
-				mindist = 100000.0;
-
-				for(int i=0; i<NGEONEURON;i++){
-					double d = (x1 - gn[i]->wx)*(x1 - gn[i]->wx) + (x2 - gn[i]->wy)*(x2 - gn[i]->wy);
-					if(d < mindist){
-						mindist = d;
-						j = i;
-					}
-				}
-
-				gn[j]->update++;
-
-				// UPDATE WEIGHTS
-				for(int i=0; i<NGEONEURON;i++){
-					gn[i]->wx += (phi * r[i][j] * (x1 - gn[i]->wx));
-					gn[i]->wy += (phi * r[i][j] * (x2 - gn[i]->wy));
-				}
-
-				// DECREASE LEARNING PARAMETERS
-				phi *= momentum;
-				theta *= momentum;
-
-				// RE-COMPUTE r MATRIX
-				makeR(theta);
-
-        _mutex.lock();
-
-				Repaint();
 			}
 		}
 
@@ -308,9 +256,54 @@ class SOM : public jgui::Window {
 		{
       jgui::jsize_t
         size = GetSize();
+			double 
+        x1,
+				x2,
+				mindist;
 			int 
         w = size.width, 
 				h = size.height;
+			int 
+        j;
+
+      // CHOSE A RANDOM PATTERN
+      x1 = (COUNTRY*((double)rand()/((double)(RAND_MAX))));
+      x2 = (COUNTRY*((double)rand()/((double)(RAND_MAX))));
+
+      while ((x1*x1+x2*x2) > 1.0){
+        x1 = (COUNTRY*((double)rand()/((double)(RAND_MAX))));
+        x2 = (COUNTRY*((double)rand()/((double)(RAND_MAX))));
+      }
+
+      px = x1;
+      py = x2;
+
+      // SEARCH FOR MINIMAL
+      j = -1;
+      mindist = 100000.0;
+
+      for(int i=0; i<NGEONEURON;i++){
+        double d = (x1 - gn[i]->wx)*(x1 - gn[i]->wx) + (x2 - gn[i]->wy)*(x2 - gn[i]->wy);
+        if(d < mindist){
+          mindist = d;
+          j = i;
+        }
+      }
+
+      gn[j]->update++;
+
+      // UPDATE WEIGHTS
+      for(int i=0; i<NGEONEURON;i++){
+        gn[i]->wx += (phi * r[i][j] * (x1 - gn[i]->wx));
+        gn[i]->wy += (phi * r[i][j] * (x2 - gn[i]->wy));
+      }
+
+      // DECREASE LEARNING PARAMETERS
+      phi *= momentum;
+      theta *= momentum;
+
+      // RE-COMPUTE r MATRIX
+      makeR(theta);
 
 			g->SetColor(bkC);
 			g->FillRectangle({0, 0, size.width, size.height});
@@ -325,14 +318,10 @@ class SOM : public jgui::Window {
 			jgui::Graphics *goff = offscreen->GetGraphics();
 
 			paintLeft(goff);
+
 			g->DrawImage(offscreen, jgui::jpoint_t<int>{0, 0});
 
-			// CLEAR ALL
-			g->SetColor(bkC);
-			g->FillRectangle({w/2+30, 0, w/2+130, 20});
-			g->SetColor(fgC);
-
-      _mutex.unlock();
+      Repaint();
 		}
 
 };

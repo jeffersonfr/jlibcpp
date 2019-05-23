@@ -183,7 +183,10 @@ OBJS_doom = \
 OBJS_raster = \
 		raster.o\
 
-all: primitives border ball breakout skull raycaster1 raycaster2 raycaster3 clip custom calc mines ants swarm cube mouse watch tank pacman tetris signal layouts stress mhp drawimage drawtypes rotateimage sort noise kmeans som events colorchooser scroll hough 2048 newvox mandelbrot porter fire minecraft fullscreen coloralpha bitmask widgets tree terrain surface function graph dialogs cad cairo raytracer tv doom raster
+OBJS_caster = \
+		caster.o\
+
+all: primitives border ball breakout skull raycaster1 raycaster2 raycaster3 clip custom calc mines ants swarm cube mouse watch tank pacman tetris signal layouts stress mhp drawimage drawtypes rotateimage sort noise kmeans som events colorchooser scroll hough 2048 newvox mandelbrot porter fire minecraft fullscreen coloralpha bitmask widgets tree terrain surface function graph dialogs cad cairo raytracer tv doom raster caster
 	
 primitives: $(OBJS_primitives)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
@@ -359,6 +362,9 @@ doom: $(OBJS_doom)
 raster: $(OBJS_raster)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) -lX11 ; $(ECHO) "Compiling $< ...  $(OK)" 
 
+caster: $(OBJS_caster)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) -lX11 ; $(ECHO) "Compiling $< ...  $(OK)" 
+
 .cpp.o: $<  
 	@$(CC) $(CCFLAGS) -c $< ; $(ECHO) "Compiling $< ...  $(OK)" 
 
@@ -366,4 +372,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *.xml *~ primitives border ball breakout clip custom calc mines ants cube raycaster1 raycaster2 raycaster3 skull swarm mouse watch tank pacman tetris signal stress layouts mhp drawimage drawtypes rotateimage sort noise kmeans som events colorchooser scroll hough 2048 newvox mandelbrot porter fire minecraft fullscreen coloralpha bitmask widgets tree terrain surface function graph opentube dialogs cad cairo raytracer tv doom raster
+	@rm -rvf *.o *.xml *~ primitives border ball breakout clip custom calc mines ants cube raycaster1 raycaster2 raycaster3 skull swarm mouse watch tank pacman tetris signal stress layouts mhp drawimage drawtypes rotateimage sort noise kmeans som events colorchooser scroll hough 2048 newvox mandelbrot porter fire minecraft fullscreen coloralpha bitmask widgets tree terrain surface function graph opentube dialogs cad cairo raytracer tv doom raster caster

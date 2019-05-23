@@ -111,11 +111,14 @@ void FillTriangle0(Raster *raster, jgui::jpoint_t<int> v1, jgui::jpoint_t<int> v
   }
 }
 
-Raster::Raster(uint32_t *data, jgui::jsize_t<int> size)
+Raster::Raster(uint32_t *data, jgui::jsize_t<int> size):
+  jcommon::Object()
 {
   if (data == nullptr) {
     throw jexception::NullPointerException("Invalid data");
   }
+  
+  jcommon::Object::SetClassName("jgui::Raster");
 
   _buffer = data;
   _size = size;
@@ -151,7 +154,7 @@ void Raster::Clear()
   int size = _size.width*_size.height;
 
   for (int i=0; i<size; i++) {
-    *_buffer++ = _color;
+    _buffer[i] = 0xff000000;
   }
 }
 

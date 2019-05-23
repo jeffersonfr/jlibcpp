@@ -28,7 +28,7 @@
 
 namespace jgui {
 
-class Raster {
+class Raster : public jcommon::Object {
 
 	private:
     uint32_t *_buffer;

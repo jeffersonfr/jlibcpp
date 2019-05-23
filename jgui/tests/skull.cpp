@@ -310,8 +310,8 @@ class Render3D : public jgui::Window {
       int i;
 
       for (i = 0; i < 3600; i++) {
-        Cosine[i] = (float)cos(2.0 * M_PI * (double)i / 3600.0);
-        Sine[i]   = (float)sin(2.0 * M_PI * (double)i / 3600.0);
+        Cosine[i] = (float)cos(2.0 * M_PI * (float)i / 3600.0);
+        Sine[i]   = (float)sin(2.0 * M_PI * (float)i / 3600.0);
       }
     }
 
@@ -574,7 +574,7 @@ class Render3D : public jgui::Window {
       while (first) {
         if (Lighting) {
           length = ((first->normal.x * first->normal.x) + (first->normal.y * first->normal.y) + (first->normal.z * first->normal.z));
-          length = (float)sqrt((double)length);
+          length = (float)sqrtf((float)length);
           light1 = -((first->normal.x * Light1.x) + (first->normal.y * Light1.y) + (first->normal.z * Light1.z)) / length;
           light1 = CLAMP (light1, 0.0, 1.0);
           light2 = abs((first->normal.x * Light2.x) + (first->normal.y * Light2.y) + (first->normal.z * Light2.z)) / length;
