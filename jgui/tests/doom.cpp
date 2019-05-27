@@ -1,48 +1,27 @@
-/***************************************************************************
- *   Copyright (C) 2005 by Jeff Ferr                                       *
- *   root@sat                                                              *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
 #include "jgui/japplication.h"
 #include "jgui/jwindow.h"
+#include "jgui/jindexedimage.h"
 #include "jgui/jbufferedimage.h"
 
-const int fireColorsPalette[37][3] = {
-  {  7,   7,   7}, { 31,   7,   7}, {47,   15,   7}, { 71,  15,   7}, 
-  { 87,  23,   7}, {103,  31,   7}, {119,  31,   7}, {143,  39,   7}, 
-  {159,  47,   7}, {175,  63,   7}, {191,  71,   7}, {199,  71,   7}, 
-  {223,  79,   7}, {223,  87,   7}, {223,  87,   7}, {215,  95,   7}, 
-  {215,  95,   7}, {215, 103,  15}, {207, 111,  15}, {207, 119,  15}, 
-  {207, 127,  15}, {207, 135,  23}, {199, 135,  23}, {199, 143,  23}, 
-  {199, 151,  31}, {191, 159,  31}, {191, 159,  31}, {191, 167,  39}, 
-  {191, 167,  39}, {191, 175,  47}, {183, 175,  47}, {183, 183,  47}, 
-  {183, 183,  55}, {207, 207, 111}, {223, 223, 159}, {239, 239, 199}, 
-  {255, 255, 255}
+#define SCREEN_WIDTH 240
+#define SCREEN_HEIGHT 135
+
+uint32_t palette[37] = {
+  0xff070707, 0xff1f0707, 0xff2f0f07, 0xff470f07, 
+  0xff571707, 0xff671f07, 0xff771f07, 0xff8f2707, 
+  0xff9f2f07, 0xffaf3f07, 0xffbf4707, 0xffc74707, 
+  0xffdf4f07, 0xffdf5707, 0xffdf5707, 0xffd75f07, 
+  0xffd75f07, 0xffd7670f, 0xffcf6f0f, 0xffcf770f, 
+  0xffcf7f0f, 0xffcf8717, 0xffc78717, 0xffc78f17, 
+  0xffc7971f, 0xffbf9f1f, 0xffbf9f1f, 0xffbfa727, 
+  0xffbfa727, 0xffbfaf2f, 0xffb7af2f, 0xffb7b72f, 
+  0xffb7b737, 0xffcfcf6f, 0xffdfdf9f, 0xffefefc7, 
+  0xffffffff
 };
 
-#define SCREEN_WIDTH 640
-#define SCREEN_HEIGHT 480
+uint8_t buffer[SCREEN_HEIGHT][SCREEN_WIDTH];
 
 class Doom : public jgui::Window {
-
-  private:
-    int fireSize = 4;
-    int *firePixelsArray;
-    int numberOfPixels = 0; 
 
   public:
     Doom():
@@ -50,20 +29,15 @@ class Doom : public jgui::Window {
     {
       srand(time(NULL));
 
-      numberOfPixels = (SCREEN_WIDTH/fireSize) * (SCREEN_HEIGHT/fireSize);
-
-      firePixelsArray = new int[SCREEN_WIDTH*SCREEN_HEIGHT];
-
-      for (int i = 0; i < numberOfPixels; i++) {
-        firePixelsArray[i] = 36;
+      for (int j=0; j<SCREEN_HEIGHT; j++) {
+      	for (int i=0; i<SCREEN_WIDTH; i++) {
+					buffer[j][i] = 36;
+				}
       }
-
-      SetResizable(false);
     }
 
     virtual ~Doom()
     {
-      delete [] firePixelsArray;
     }
 
     void Framerate(int fps)
@@ -82,65 +56,32 @@ class Doom : public jgui::Window {
       std::this_thread::sleep_for(diff);
     }
 
-    void updateFireIntensityPerPixel(int currentPixelIndex) 
-    {
-    }
-
-    void FillRectangle(uint32_t *pixels, uint32_t color, int x, int y, int w, int h, int stride)
-    {
-    }
-
     virtual void Paint(jgui::Graphics *g) 
     {
-      // jgui::Window::Paint(g);
-
-      jgui::jsize_t 
+      jgui::jsize_t<int>
         size = GetSize();
-      int 
-        c1 = size.width/fireSize;
-      
-      cairo_surface_t 
-        *cairo_surface = g->GetCairoSurface();
-      uint32_t 
-        *pixels = (uint32_t *)cairo_image_surface_get_data(cairo_surface);
+ 
+      for (int j=0; j<SCREEN_HEIGHT - 1; j++) {
+        for (int i=0; i<SCREEN_WIDTH; i++) {
+					int decay = random()%3;
+          int intensity = buffer[j + 1][i] - decay;
 
-// #pragma omp parallel for
-      for (int y = 0; y < size.height; y+=fireSize) {
-        int c2 = c1*y;
+					if (intensity < 0) {
+						intensity = 0;
+					}
 
-        for (int x = 0; x < size.width; x+=fireSize) {
-          const int *fireIntensity = fireColorsPalette[firePixelsArray[(x + c2)/fireSize]];
-
-          // INFO:: cairo's rectangle/fill is very slow
-          for (int j=y; j<y+fireSize; j++) {
-            uint32_t *dst = pixels + j*size.width;
-
-            for (int i=x; i<x+fireSize; i++) {
-              dst[i] = 0xff000000 | fireIntensity[0] << 16 | fireIntensity[1] << 8 | fireIntensity[2];
-            }
-          }
-
-          // g->SetColor(fireIntensity[0], fireIntensity[1], fireIntensity[2], 0xff);
-          // g->FillRectangle(x, y, x + fireSize, y + fireSize);
+					buffer[j][i + decay] = intensity;
         }
       }
       
-      for (int i = 0; i < numberOfPixels; i++) {
-        int belowPixelIndex = i + (size.width / fireSize);
+			jgui::IndexedImage image(
+				palette, 37, (uint8_t *)buffer, {SCREEN_WIDTH, SCREEN_HEIGHT});
 
-        if (belowPixelIndex < numberOfPixels) {
-          int decay = floor(rand() % 3);
-          int belowPixelFireIntensity = firePixelsArray[belowPixelIndex];
-          int newFireIntensity = belowPixelFireIntensity - decay >= 0 ? belowPixelFireIntensity - decay : 0;
-          int pos = (i - decay >= 0) ? i - decay : 0;
-
-          firePixelsArray[pos] = newFireIntensity;
-        }
-      }
+			g->DrawImage(&image, {0, 0, size.width, size.height});
 
       Repaint();
 
-      Framerate(25);
+      Framerate(30);
     }
 
 };

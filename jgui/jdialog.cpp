@@ -40,7 +40,7 @@ Dialog::Dialog(Container *parent, std::string title, int x, int y, int width, in
     throw jexception::InvalidArgumentException("Parent must be a window");
   }
 
-  jgui::jinsets_t 
+  jgui::jinsets_t<int> 
     insets;
   
   insets.left = 8;
@@ -66,7 +66,7 @@ void Dialog::SetTitle(std::string title)
 {
   _title = title;
   
-  jgui::jinsets_t 
+  jgui::jinsets_t<int>
     insets;
   
   insets.left = 8;

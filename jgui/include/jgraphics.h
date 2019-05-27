@@ -204,17 +204,6 @@ struct jgradient_t {
  * \brief
  *
  */
-struct jinsets_t {
-  int left;
-  int top;
-  int right;
-  int bottom;
-};
-
-/**
- * \brief
- *
- */
 struct jrational_t {
   int num;
   int den;
@@ -239,6 +228,15 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
     T x;
     T y;
     T z;
+    
+    operator jgui::jpoint_t<T>()
+    {
+      return {
+        .x = x,
+        .y = y
+      };
+    }
+
   };
 
 /**
@@ -250,18 +248,6 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
     T width;
     T height;
   };
-
-/**
- * \brief
- *
- */
-template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
-  struct jregion_t {
-    T x;
-    T y;
-    T width;
-    T height;
-};
 
 /**
  * \brief
@@ -281,7 +267,107 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
   struct jrect_t {
     struct jpoint_t<T> point;
     struct jsize_t<T> size;
+    
+    operator jgui::jpoint_t<T>()
+    {
+      return {
+        .x = point.x,
+        .y = point.y
+      };
+    }
+
+    operator jgui::jsize_t<T>()
+    {
+      return {
+        .width = size.width,
+        .height = size.height
+      };
+    }
+
+    operator jgui::jline_t<T>()
+    {
+      return {
+        .p0 = {
+          .x = point.x,
+          .y = point.y
+        },
+        .p1 = {
+          .x = point.x + size.width,
+          .y = point.y + size.height
+        }
+      };
+    }
+
 };
+
+/**
+ * \brief
+ *
+ */
+template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
+  struct jregion_t {
+    T x;
+    T y;
+    T width;
+    T height;
+
+    operator jgui::jpoint_t<T>()
+    {
+      return {
+        .x = x,
+        .y = y
+      };
+    }
+
+    operator jgui::jsize_t<T>()
+    {
+      return {
+        .width = width,
+        .height = height
+      };
+    }
+
+    operator jgui::jline_t<T>()
+    {
+      return {
+        .p0 = {
+          .x = x,
+          .y = y
+        },
+        .p1 = {
+          .x = x + width,
+          .y = y + height
+        }
+      };
+    }
+
+    operator jgui::jrect_t<T>()
+    {
+      return {
+        .point = {
+          .x = x,
+          .y = y
+        },
+        .size = {
+          .width = width,
+          .height = height
+        }
+      };
+    }
+
+};
+
+/**
+ * \brief
+ *
+ */
+template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
+  struct jinsets_t {
+    T left;
+    T top;
+    T right;
+    T bottom;
+  };
 
 class Image;
 class Font;

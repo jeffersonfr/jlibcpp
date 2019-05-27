@@ -62,7 +62,7 @@ class Container : public jgui::Component {
     /** \brief */
     Layout *_layout;
     /** \brief */
-    jinsets_t _insets;
+    jinsets_t<int> _insets;
     /** \brief */
     bool _optimized_paint;
 
@@ -226,13 +226,13 @@ class Container : public jgui::Component {
      * \brief
      *
      */
-    virtual jinsets_t GetInsets();
+    virtual jinsets_t<int> GetInsets();
 
     /**
      * \brief
      *
      */
-    virtual void SetInsets(jinsets_t insets);
+    virtual void SetInsets(jinsets_t<int> insets);
 
     /**
      * \brief

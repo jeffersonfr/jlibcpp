@@ -348,7 +348,7 @@ void Container::Pack(bool fit)
 {
   Component 
     *c = nullptr;
-  jinsets_t 
+  jinsets_t<int> 
     insets = GetInsets();
   int 
     min_x = insets.left,
@@ -407,12 +407,12 @@ void Container::Pack(bool fit)
   SetSize(max_w + insets.right, max_h + insets.bottom);
 }
 
-jinsets_t Container::GetInsets()
+jinsets_t<int> Container::GetInsets()
 {
   return _insets;
 }
 
-void Container::SetInsets(jinsets_t insets)
+void Container::SetInsets(jinsets_t<int> insets)
 {
   _insets = insets;
   

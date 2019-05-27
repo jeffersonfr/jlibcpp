@@ -63,7 +63,7 @@ Window::Window(int x, int y, int width, int height):
 
   _event_manager = new EventManager(this);
 
-  jgui::jinsets_t insets = {8, 8, 8, 8};
+  jgui::jinsets_t<int> insets = {8, 8, 8, 8};
 
   SetInsets(insets);
 

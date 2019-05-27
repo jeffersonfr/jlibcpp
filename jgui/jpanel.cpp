@@ -27,7 +27,7 @@ Panel::Panel(int x, int y, int width, int height):
 {
   jcommon::Object::SetClassName("jgui::Panel");
   
-  jgui::jinsets_t
+  jgui::jinsets_t<int>
     insets;
 
   insets.left = 8;
@@ -47,7 +47,7 @@ Panel::Panel(std::string title, int x, int y, int width, int height):
   
   _title = title;
 
-  jgui::jinsets_t
+  jgui::jinsets_t<int>
     insets;
 
   insets.left = 8;
@@ -97,7 +97,7 @@ void Panel::PaintGlassPane(Graphics *g)
     scroll = theme->GetIntegerParam("window.scroll");
   jgui::jsize_t<int>
     size = GetSize();
-  jinsets_t 
+  jinsets_t<int>
     insets = GetInsets();
   int 
     bs = theme->GetIntegerParam("window.border.size");

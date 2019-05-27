@@ -195,7 +195,7 @@ class GridBagConstraints {
 
   public:
     /** \brief */
-    jinsets_t insets;
+    jinsets_t<int> insets;
     /** \brief */
     double weightx;
     /** \brief */
@@ -273,7 +273,7 @@ class GridBagConstraints {
       this->baselineResizeBehavior = JCB_OTHER;
     }
 
-    GridBagConstraints(int gridx, int gridy, int gridwidth, int gridheight, double weightx, double weighty, int anchor, int fill, jinsets_t insets, int ipadx, int ipady) 
+    GridBagConstraints(int gridx, int gridy, int gridwidth, int gridheight, double weightx, double weighty, int anchor, int fill, jinsets_t<int> insets, int ipadx, int ipady) 
     {
       this->gridx = gridx;
       this->gridy = gridy;
