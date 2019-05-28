@@ -56,8 +56,6 @@ class Main : public jgui::Window {
 			_angle = 0.0;
 			_has_bullet = false;
 
-			_tc = _tw;
-
 			if (_th > _tw) {
 				_tc = _th;
 			}
@@ -89,6 +87,8 @@ class Main : public jgui::Window {
 		{
 			jgui::Window::Paint(g);
 
+			KeyPressed();
+
 			for (int j=0; j<8; j++) {
 				for (int i=0; i<10; i++) {
 					g->DrawImage(_tiles,
@@ -102,9 +102,10 @@ class Main : public jgui::Window {
 				g->FillCircle({(int)_bullet_x, (int)_bullet_y}, 3);
 			}
 			
-			jgui::Image *image = _image->Rotate(_angle, false);
+			jgui::Image *image = _image->Rotate(_angle);
+			jgui::jsize_t<int> isize = image->GetSize();
 
-			g->DrawImage(image, jgui::jpoint_t<int>{(int)_tx, (int)_ty});
+			g->DrawImage(image, jgui::jpoint_t<int>{(int)_tx - isize.width/2, (int)_ty - isize.height/2});
 
 			delete image;
 		}
@@ -134,20 +135,20 @@ class Main : public jgui::Window {
 				_tx = _tx + _step*cos(_angle); // +M_PI_2);
 				_ty = _ty - _step*sin(_angle); // +M_PI_2);
 
-				if (_tx < 0) {
-					_tx = 0;
+				if (_tx < _tw/2) {
+					_tx = _tw/2;
 				}
 
-				if (_tx > (size.width - _tw)) {
-					_tx = (size.width - _tw);
+				if (_tx > (size.width - _tw/2)) {
+					_tx = (size.width - _tw/2);
 				}
 
-				if (_ty < 0) {
-					_ty = 0;
+				if (_ty < _th/2) {
+					_ty = _th/2;
 				}
 
-				if (_ty > (size.height - _th)) {
-					_ty = (size.height - _th);
+				if (_ty > (size.height - _th/2)) {
+					_ty = (size.height - _th/2);
 				}
 
 				_bullet_x = _bullet_x + 12*cos(_bullet_angle);
@@ -163,46 +164,49 @@ class Main : public jgui::Window {
 			}
 		}
 
-		virtual bool KeyPressed(jevent::KeyEvent *event)
+		virtual void KeyPressed()
 		{
-			if (jgui::Window::KeyPressed(event) == true) {
-				return true;
-			}
-
+			jgui::EventManager *ev = GetEventManager();
 			double angle_step = 0.1;
 
-			if (event->GetSymbol() == jevent::JKS_SPACE) {
+			if (ev->IsKeyDown(jevent::JKS_SPACE)) {
 				if (_has_bullet == false) {
-					_bullet_x = _tx+_tc;
-					_bullet_y = _ty+_tc;
-					_bullet_angle = _angle;//+M_PI_2;
+					_bullet_x = _tx;
+					_bullet_y = _ty;
+					_bullet_angle = _angle;
 					_has_bullet = true;
 				}
-			} else if (event->GetSymbol() == jevent::JKS_CURSOR_UP) {
+			}
+			
+			if (ev->IsKeyDown(jevent::JKS_CURSOR_UP)) {
 				_step = _step + 2;
 
 				if (_step > 8) {
 					_step = 8;
 				}
-			} else if (event->GetSymbol() == jevent::JKS_CURSOR_DOWN) {
+			}
+			
+			if (ev->IsKeyDown(jevent::JKS_CURSOR_DOWN)) {
 				_step = _step - 2;
 
 				if (_step < -8) {
 					_step = -8;
 				}
-			} else if (event->GetSymbol() == jevent::JKS_CURSOR_RIGHT) {
+			}
+			
+			if (ev->IsKeyDown(jevent::JKS_CURSOR_RIGHT)) {
 				_step = 0.0;
 				_angle = (_angle-angle_step);
 				
 				if (_angle < 0.0) {
 					_angle = 2*M_PI;
 				}
-			} else if (event->GetSymbol() == jevent::JKS_CURSOR_LEFT) {
+			}
+			
+			if (ev->IsKeyDown(jevent::JKS_CURSOR_LEFT)) {
 				_step = 0.0;
 				_angle = fmod(_angle+angle_step, 2*M_PI);
 			}
-
-			return true;
 		}
 
 };
