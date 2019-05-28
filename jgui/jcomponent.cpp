@@ -1175,13 +1175,7 @@ jpoint_t<int> Component::GetLocation()
 
 jsize_t<int> Component::GetSize()
 {
-  jgui::jregion_t<int> 
-    region = GetVisibleBounds();
-
-  return {
-    .width = region.width, 
-    .height = region.height
-  };
+	return GetBounds();
 }
 
 void Component::RaiseToTop()

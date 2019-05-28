@@ -150,7 +150,10 @@ jgui::jregion_t<int> Window::GetBounds()
 
 jgui::jregion_t<int> Window::GetVisibleBounds()
 {
-  return GetBounds();
+  jgui::jregion_t<int> size = GetBounds();
+	jgui::jpoint_t<int> scroll = GetScrollLocation();
+
+	return {-scroll.x, -scroll.y, size.width, size.height};
 }
 
 void Window::SetTitle(std::string title)
