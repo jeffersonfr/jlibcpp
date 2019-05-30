@@ -394,7 +394,7 @@ class PacMan : public jgui::Window {
 		std::string s;
 
 		if (goff == nullptr && d.width > 0 && d.height > 0) {
-			ii = new jgui::BufferedImage(jgui::JPF_RGB32, {d.width, d.height});
+			ii = new jgui::BufferedImage(jgui::JPF_RGB32, d);
 
 			goff = ii->GetGraphics();
 		}

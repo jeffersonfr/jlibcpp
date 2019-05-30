@@ -281,12 +281,13 @@ void Raster::FillTriangle(jgui::jpoint_t<int> v1, jgui::jpoint_t<int> v2, jgui::
   }
 }
 
-void Raster::DrawRectangle(jgui::jpoint_t<int> v1, jgui::jsize_t<int> s1)
+void Raster::DrawRectangle(jgui::jrect_t<int> rect)
 {
-  jgui::jpoint_t<int> 
-    v2 {v1.x + s1.width, v1.y},
-    v3 {v1.x + s1.width, v1.x + s1.height},
-    v4 {v1.x, v1.y + s1.height};
+  jgui::jpoint_t<int>
+    v1 {rect.point},
+    v2 {v1.x + rect.size.width, v1.y},
+    v3 {v1.x + rect.size.width, v1.y + rect.size.height},
+    v4 {v1.x, v1.y + rect.size.height};
 
   DrawLine({v1, v2});
   DrawLine({v2, v3});
@@ -294,10 +295,10 @@ void Raster::DrawRectangle(jgui::jpoint_t<int> v1, jgui::jsize_t<int> s1)
   DrawLine({v4, v1});
 }
 
-void Raster::FillRectangle(jgui::jpoint_t<int> v1, jgui::jsize_t<int> s1)
+void Raster::FillRectangle(jgui::jrect_t<int> rect)
 {
-  for (int j=0; j<s1.height; j++) {
-    ScanLine({v1.x, v1.y + j}, s1.width);
+  for (int j=0; j<rect.size.height; j++) {
+    ScanLine({rect.point.x, rect.point.y + j}, rect.size.width);
   }
 }
 

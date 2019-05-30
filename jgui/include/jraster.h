@@ -49,8 +49,8 @@ class Raster : public jcommon::Object {
     void DrawLine(jline_t<int> line);
     void DrawTriangle(jgui::jpoint_t<int> v1, jgui::jpoint_t<int> v2, jgui::jpoint_t<int> v3);
     void FillTriangle(jgui::jpoint_t<int> v1, jgui::jpoint_t<int> v2, jgui::jpoint_t<int> v3);
-    void DrawRectangle(jgui::jpoint_t<int> v1, jgui::jsize_t<int> s1);
-    void FillRectangle(jgui::jpoint_t<int> v1, jgui::jsize_t<int> s1);
+    void DrawRectangle(jgui::jrect_t<int> rect);
+    void FillRectangle(jgui::jrect_t<int> rect);
     void DrawPolygon(jgui::jpoint_t<int> v1, std::vector<jgui::jpoint_t<int>> points);
     void DrawBezier(jgui::jpoint_t<int> v1, jgui::jpoint_t<int> v2, jgui::jpoint_t<int> v3);
     void DrawCircle(jgui::jpoint_t<int> v1, int size);

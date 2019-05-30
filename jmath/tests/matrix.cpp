@@ -25,6 +25,8 @@
 
 void absolute_value() 
 {
+  std::cout << "Absolute Value" << std::endl;
+
   // Take the absolute values of each element.
   jmath::Matrix<double> a(1,2,1,2,-2.0);
   jmath::Vector<double> b(1,9,-3.0);
@@ -40,6 +42,8 @@ void absolute_value()
 
 void addition() 
 {
+  std::cout << "Addition" << std::endl;
+
   // jmath::Vectors and Matrices with the same dimensions and type can be added together.
   jmath::Matrix<double> a(1,2,1,2,19.0);
   jmath::Matrix<double> b(3,4,1,2,10.0);
@@ -71,6 +75,8 @@ void addition()
 
 void changing_type() 
 {
+  std::cout << "Change Type" << std::endl;
+
   // New jmath::Vectors and Matrices with different types can be formed. 
   // Suppose we have a double jmath::Matrix which we want to float.  We create
   // a new float jmath::Matrix as follows:
@@ -87,6 +93,8 @@ void changing_type()
 
 void comparisons() 
 {
+  std::cout << "Comparisions" << std::endl;
+
   // jmath::Vectors and Matrices with the same dimensions and type can compared element-by-element.
   jmath::Matrix<double> a(1,2,1,2,19.0);
   jmath::Matrix<double> b(3,4,1,2,10.0);
@@ -114,6 +122,8 @@ void comparisons()
 
 void complex_argument() 
 {
+  std::cout << "Complex Argument" << std::endl;
+
   // Take the std::complex argument of each element.  This is only sensible
   // for std::complex Matrices and jmath::Vectors.
   jmath::Matrix< std::complex<double> > c(1,2,1,2,std::complex<double>(2.0,1.0));
@@ -128,6 +138,8 @@ void complex_argument()
 
 void complex_conjugate() 
 {
+  std::cout << "Complex Conjugate" << std::endl;
+
   // Take the std::complex conjugate of each element.  This is only sensible
   // for std::complex Matrices and jmath::Vectors.
   jmath::Matrix< std::complex<double> > c(1,2,1,2,std::complex<double>(2.0,1.0));
@@ -138,6 +150,8 @@ void complex_conjugate()
 
 void complex_values() 
 {
+  std::cout << "Complex Values" << std::endl;
+
   // Complex values can be used, drawing from C's <std::complex> classes.
   jmath::Matrix< std::complex<double> > a(1,2,1,2,std::complex<double>(19.0,0));
   jmath::Matrix< std::complex<double> > b(3,4,1,2,std::complex<double>(10.0,0));
@@ -153,6 +167,8 @@ void complex_values()
 
 void contruction() 
 {
+  std::cout << "Construction" << std::endl;
+
   // jmath::Vector and jmath::Matrix dimensions can be specified on initialization.  The
   // following form makes indices begin at 1.
   jmath::Matrix<double> a(2,3);
@@ -198,6 +214,8 @@ void contruction()
 
 void copy_by_value() 
 {
+  std::cout << "Copy by Value" << std::endl;
+
   // Matrices
   //
   // Matrices can be initialized to a scalar value on construction.  The
@@ -268,6 +286,8 @@ void copy_by_value()
 
 void cossine() 
 {
+  std::cout << "Cossine" << std::endl;
+
   // Take the cosine of each element.
   jmath::Matrix<double> a(1,2,1,2,-2.0);
   jmath::Vector<double> b(1,9,3.0);
@@ -283,6 +303,8 @@ void cossine()
 
 void cube() 
 {
+  std::cout << "Cube" << std::endl;
+
   // Take the cube of each element.
   jmath::Matrix<double> a(1,2,1,2,-2.0);
   jmath::Vector<double> b(1,9,3.0);
@@ -298,6 +320,8 @@ void cube()
 
 void determinant() 
 {
+  std::cout << "Determinant" << std::endl;
+
   // Want to find the determinant of:
   //
   //    [  2   3   1    2 ]
@@ -320,6 +344,8 @@ void determinant()
 
 void division() 
 {
+  std::cout << "Division" << std::endl;
+
   // jmath::Vectors and Matrices with the same dimensions and type can be
   // divided by one another element-by-element.
   jmath::Matrix<double> a(1,2,1,2,19.0);
@@ -353,6 +379,8 @@ void division()
 
 void exponential() 
 {
+  std::cout << "Exponential" << std::endl;
+
   // Take the exponential of each element.
   jmath::Matrix<double> a(1,2,1,2,-2.0);
   jmath::Vector<double> b(1,9,3.0);
@@ -368,6 +396,8 @@ void exponential()
 
 void hyperbolic_cossine() 
 {
+  std::cout << "Hyperbolic Cossine" << std::endl;
+
   // Take the hyperbolic cosine of each element.
   jmath::Matrix<double> a(1,2,1,2,-2.0);
   jmath::Vector<double> b(1,9,3.0);
@@ -383,6 +413,8 @@ void hyperbolic_cossine()
 
 void hyperbolic_sine() 
 {
+  std::cout << "Hyperbolic Sine" << std::endl;
+
   // Take the hyperbolic sine of each element.
   jmath::Matrix<double> a(1,2,1,2,-2.0);
   jmath::Vector<double> b(1,9,3.0);
@@ -398,6 +430,8 @@ void hyperbolic_sine()
 
 void hyperbolic_tangent() 
 {
+  std::cout << "Hyperbolic Tangent" << std::endl;
+
   // Take the hyperbolic tangent of each element.
   jmath::Matrix<double> a(1,2,1,2,-2.0);
   jmath::Vector<double> b(1,9,3.0);
@@ -413,6 +447,8 @@ void hyperbolic_tangent()
 
 void inverse() 
 {
+  std::cout << "Inverse" << std::endl;
+
   // Want to find the inverse of the following:
   //
   //    [  2   0   1   2 ]
@@ -436,8 +472,10 @@ void inverse()
   }
 }
 
-void logatithms() 
+void logarithms() 
 {
+  std::cout << "Logarithms" << std::endl;
+
   // Take the natural (base-e) logarithm of each element.
   jmath::Matrix<double> a(1,2,1,2,2.0);
   jmath::Vector<double> b(1,9,3.0);
@@ -461,6 +499,8 @@ void logatithms()
 
 void norms() 
 {
+  std::cout << "Norms" << std::endl;
+
   // jmath::Matrix
   //
   // Frobenius norm.
@@ -513,6 +553,8 @@ void norms()
 
 void power() 
 {
+  std::cout << "Power" << std::endl;
+
   // Take each element to some power.
   jmath::Matrix<double> a(1,2,1,2,2.0);
   jmath::Vector<double> b(1,9,3.0);
@@ -528,6 +570,8 @@ void power()
 
 void sine() 
 {
+  std::cout << "Sine" << std::endl;
+
   // Take the sine of each element.
   jmath::Matrix<double> a(1,2,1,2,-2.0);
   jmath::Vector<double> b(1,9,3.0);
@@ -543,6 +587,8 @@ void sine()
 
 void square() 
 {
+  std::cout << "Square" << std::endl;
+
   // Take the square of each element.
   jmath::Matrix<double> a(1,2,1,2,-2.0);
   jmath::Vector<double> b(1,9,3.0);
@@ -558,6 +604,8 @@ void square()
 
 void square_root() 
 {
+  std::cout << "Square Root" << std::endl;
+
   // Take the square roots of each element.
   jmath::Matrix<double> a(1,2,1,2,2.0);
   jmath::Vector<double> b(1,9,3.0);
@@ -573,6 +621,8 @@ void square_root()
 
 void trace() 
 {
+  std::cout << "Trace" << std::endl;
+
   // Take the trace of a jmath::Matrix.  Only sensible for square matrices.
   jmath::Matrix<double> a(1,3,1,3,3.4);
   a(1,1) = 5.9;
@@ -589,6 +639,8 @@ void trace()
 
 void tangent() 
 {
+  std::cout << "Tangent" << std::endl;
+
   // Take the tangent of each element.
   jmath::Matrix<double> a(1,2,1,2,-2.0);
   jmath::Vector<double> b(1,9,3.0);
@@ -604,6 +656,8 @@ void tangent()
 
 void transpose() 
 {
+  std::cout << "Transpose" << std::endl;
+
   // Take the tranpose of a jmath::Matrix.
   jmath::Matrix<double> a(1,2,1,3,3.4);
   a(1,2) = 5.9;
@@ -620,6 +674,8 @@ void transpose()
 
 void subtraction() 
 {
+  std::cout << "Subtraction" << std::endl;
+
   // jmath::Vectors and Matrices with the same dimensions and type can be substracted from one another.
   jmath::Matrix<double> a(1,2,1,2,19.0);
   jmath::Matrix<double> b(3,4,1,2,10.0);
@@ -655,6 +711,8 @@ void subtraction()
 
 void multiplication() 
 {
+  std::cout << "Multiplication" << std::endl;
+
   // jmath::Vectors and Matrices with the same dimensions and type can be multiplied 
 	// element-by-element.
   jmath::Matrix<double> a(1,2,1,2,19.0);
@@ -710,6 +768,8 @@ void multiplication()
 
 void minimum_and_maximum() 
 {
+  std::cout << "Minimum and Maximum" << std::endl;
+
   // jmath::Vectors and Matrices with the same dimensions and type can be
   // compared element-by-element, producing a new jmath::Vector or jmath::Matrix with
   // the maximum of each element pair.
@@ -746,6 +806,8 @@ void minimum_and_maximum()
 
 void real_components() 
 {
+  std::cout << "Real Components" << std::endl;
+
   // Take the real component of each element.  This is only sensible
   // for std::complex Matrices and jmath::Vectors.
   jmath::Matrix< std::complex<double> > c(1,2,1,2,std::complex<double>(2.0,1.0));
@@ -756,6 +818,8 @@ void real_components()
 
 void sum_of_elements() 
 {
+  std::cout << "Sum of Elements" << std::endl;
+
   // We can sum all elements of a jmath::Vector or jmath::Matrix.
   jmath::Matrix<double> a(1,2,1,2,19.0);
   jmath::Vector<double> b(1,9,10.0);
@@ -766,6 +830,8 @@ void sum_of_elements()
 
 void pointers_to_matrices() 
 {
+  std::cout << "Pointers to Matrices" << std::endl;
+
   // Make a pointer to slate Matrices.  Each jmath::Matrix is uninitialized.
   jmath::Matrix<double> *a = new jmath::Matrix<double>[6];
 
@@ -784,6 +850,8 @@ void pointers_to_matrices()
 
 void system_of_linear_equations() 
 {
+  std::cout << "System of Linear Equations" << std::endl;
+
   // Want to solve the following:
   //
   //    [  1  -1   2  -1 ]     [  6 ]
@@ -818,6 +886,8 @@ void system_of_linear_equations()
 
 void hermitian_conjugate() 
 {
+  std::cout << "Hermitian Conjugate" << std::endl;
+
   // Take the Hermitian conjugate of the jmath::Matrix.  This is only sensible
   // for std::complex Matrices.
   jmath::Matrix< std::complex<double> > c(1,2,1,3,std::complex<double>(2.0,1.0));
@@ -829,6 +899,8 @@ void hermitian_conjugate()
 
 void array_of_matrices() 
 {
+  std::cout << "Array of Matrices" << std::endl;
+
   // Make an array of slate Matrices.  Each jmath::Matrix is uninitialized.
   jmath::Matrix<double> a[10];
 
@@ -859,6 +931,8 @@ void array_of_matrices()
 
 void extracting_subsections() 
 {
+  std::cout << "Extracting Subsections" << std::endl;
+
   // jmath::Matrix and jmath::Vector elements can be used as lhs and rhs values.
   jmath::Matrix<float> a(1,4,1,4,2.0);
   std::cout << a << std::endl;
@@ -891,6 +965,8 @@ void extracting_subsections()
 
 void imaginary_components() 
 {
+  std::cout << "Imaginary Components" << std::endl;
+
   // Take the imaginary component of each element.  This is only sensible
   // for std::complex Matrices and jmath::Vectors.
   jmath::Matrix< std::complex<double> > c(1,2,1,2,std::complex<double>(2.0,1.0));
@@ -901,6 +977,8 @@ void imaginary_components()
 
 void viewing_vectors_and_matrices() 
 {
+  std::cout << "Viewing Vectors and Matrices" << std::endl;
+
   // All jmath::Vectors and Matrices (and their elements) can be displayed with
   // the insertion operator ('<<') to std::cout:
   jmath::Matrix<double> a(1,2,1,2,19.0);
@@ -930,6 +1008,8 @@ void viewing_vectors_and_matrices()
 
 void converting_matrices_to_vectors() 
 {
+  std::cout << "Converting Matrices to Vectors" << std::endl;
+
   // Suppose we have a 5x5 jmath::Matrix, with index offset (5,2).
   jmath::Matrix<float> a(5,9,2,6,2.0);
 
@@ -944,6 +1024,8 @@ void converting_matrices_to_vectors()
 
 void importing_from_files() 
 {
+  std::cout << "Importing from Files" << std::endl;
+
   // "data.txt" contents:
   //
   // 2 3 1 2\n
@@ -976,6 +1058,8 @@ void importing_from_files()
 
 void import_from_stdin() 
 {
+  std::cout << "Import from Stdin" << std::endl;
+
   // Importing a matrix from stdin.
   //
   // Note: row*col entries will be taken from stdin; if too few
@@ -1017,6 +1101,8 @@ void import_from_stdin()
 // The original jmath::Matrix is not changed.
 void matmod(jmath::Matrix<double> a) 
 {
+  std::cout << "MatMod" << std::endl;
+
   a = a + 1.0;
   std::cout << a << std::endl;
 }
@@ -1025,6 +1111,8 @@ void matmod(jmath::Matrix<double> a)
 // The original jmath::Vector is not changed.
 void vecmod(jmath::Vector<double> v) 
 {
+  std::cout << "VecMod" << std::endl;
+
   v = v + 1.0;
   std::cout << v << std::endl;
 }
@@ -1033,6 +1121,8 @@ void vecmod(jmath::Vector<double> v)
 // The original jmath::Matrix *is* changed, since it's passed by reference.
 void matmod2(jmath::Matrix<double> &a) 
 {
+  std::cout << "MatMod2" << std::endl;
+
   a = a + 1.0;
   std::cout << a << std::endl;
 }
@@ -1041,6 +1131,8 @@ void matmod2(jmath::Matrix<double> &a)
 // The original jmath::Vector *is* changed, since it's passed by reference.
 void vecmod2(jmath::Vector<double> &v) 
 {
+  std::cout << "VecMod2" << std::endl;
+
   v = v + 1.0;
   std::cout << v << std::endl;
 }
@@ -1048,6 +1140,8 @@ void vecmod2(jmath::Vector<double> &v)
 
 void using_as_function_parameters() 
 {
+  std::cout << "Using as Function Parameters" << std::endl;
+
   // Pass a jmath::Matrix as a parameter - passing by value (so orig not changed)
   jmath::Matrix<double> a(1,5,1,5,3.0);
   matmod(a);
@@ -1076,6 +1170,8 @@ void using_as_function_parameters()
 // begin at 0.
 void tweak(double **mat, int nrows, int ncols) 
 {
+  std::cout << "Tweak" << std::endl;
+
   for (int i=0; i<nrows; i++) 
     for (int j=0; j<ncols; j++)
       mat[i][j] += 0.1;
@@ -1084,6 +1180,8 @@ void tweak(double **mat, int nrows, int ncols)
 // Similar external function, but it takes a pointer to a contiguous block of values.
 void tweak2(double *mat, int nrows, int ncols) 
 {
+  std::cout << "Tweak2" << std::endl;
+
   for (int i=0; i<nrows*ncols; i++) 
     mat[i] += 0.1;
 }
@@ -1091,6 +1189,8 @@ void tweak2(double *mat, int nrows, int ncols)
 // Similar to tweak2(), but assumes a vector of data is input.
 void tweak3(double *vec, int nelems) 
 {
+  std::cout << "Tweak3" << std::endl;
+
   for (int i=0; i<nelems; i++)
     vec[i] += 0.1;
 }
@@ -1098,6 +1198,8 @@ void tweak3(double *vec, int nelems)
 // Generates a unit NxN matrix, in a pointer to data form.
 void unit(double *u, int n) 
 {
+  std::cout << "Unit" << std::endl;
+
   for (int i=0; i<n; i++) 
     for (int j=0; j<n; j++) {
       if (i==j) u[i*n+j] = 1.0;
@@ -1107,6 +1209,8 @@ void unit(double *u, int n)
 
 void interfacing_matrix() 
 {
+  std::cout << "Interfacing Matrix" << std::endl;
+
   // Start with a slate++ matrix. We're interfacing with external functions
   // that expect indices starting at 0, so we need to specify slate Matrices
   // with corresponding index bounds (i.e., all starting at 0).
@@ -1166,7 +1270,7 @@ int main()
 	hyperbolic_sine();
 	hyperbolic_tangent();
 	inverse();
-	logatithms();
+	logarithms();
 	norms();
 	power();
 	sine();

@@ -54,7 +54,7 @@ class TV : public jgui::Window {
 
 		void Paint(jgui::Graphics *g) 
 		{
-      static int seed = 0x12345;
+      static int seed = time(NULL);
       
       jgui::jsize_t
         size = GetSize();

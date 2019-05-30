@@ -479,7 +479,7 @@ int main(int argc, char **argv)
 
 	BallDrop app;
 
-	app.SetTitle("Ball Drop");
+	app.SetTitle("BallDrop");
   app.Exec();
 
 	jgui::Application::Loop();

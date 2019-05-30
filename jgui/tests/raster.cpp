@@ -51,7 +51,7 @@ class RasterTest : public jgui::Window {
 
       raster.SetColor(0xfff0f0f0);
       raster.FillTriangle({20, 20}, {100, 100}, {75, 150});
-      raster.FillRectangle({100, 100}, {100, 100});
+      raster.FillRectangle({100, 100, 100, 100});
       raster.FillCircle({200, 200}, 50);
       raster.FillEllipse({250, 300}, {50, 100});
       raster.DrawBezier({350, 200}, {350, 150}, {400, 150});
@@ -60,7 +60,7 @@ class RasterTest : public jgui::Window {
       
       raster.SetColor(0xfff00000);
       raster.DrawTriangle({20, 20}, {100, 100}, {75, 150});
-      raster.DrawRectangle({100, 100}, {100, 100});
+      raster.DrawRectangle({100, 100, 100, 100});
       raster.DrawCircle({200, 200}, 50);
       raster.DrawEllipse({250, 300}, {50, 100});
       raster.DrawPolygon({300, 300}, hourglass);
