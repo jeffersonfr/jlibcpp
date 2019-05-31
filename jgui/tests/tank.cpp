@@ -178,6 +178,8 @@ class Main : public jgui::Window {
 				}
 			}
 			
+			_step = 0.0;
+
 			if (ev->IsKeyDown(jevent::JKS_CURSOR_UP)) {
 				_step = _step + 2;
 
@@ -195,7 +197,7 @@ class Main : public jgui::Window {
 			}
 			
 			if (ev->IsKeyDown(jevent::JKS_CURSOR_RIGHT)) {
-				_step = 0.0;
+				// _step = 0.0;
 				_angle = (_angle-angle_step);
 				
 				if (_angle < 0.0) {
@@ -204,7 +206,7 @@ class Main : public jgui::Window {
 			}
 			
 			if (ev->IsKeyDown(jevent::JKS_CURSOR_LEFT)) {
-				_step = 0.0;
+				// _step = 0.0;
 				_angle = fmod(_angle+angle_step, 2*M_PI);
 			}
 		}

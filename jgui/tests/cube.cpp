@@ -210,56 +210,51 @@ class GraphicsTeste : public jgui::Window {
 
 		}
 
-		virtual bool KeyPressed(jevent::KeyEvent *event)
-		{
-			if (jgui::Window::KeyPressed(event) == true) {
-				return true;
-			}
+    void Framerate(int fps)
+    {
+      static auto begin = std::chrono::steady_clock::now();
+      static int index = 0;
 
-			for (int i=0; i<100; i++) {
-				GiraCubo_z(&p1, &p2, &p3, &p4, &q1, &q2, &q3, &q4, -angulo);
-				GiraCubo_y(&p1, &p2, &p3, &p4, &q1, &q2, &q3, &q4, angulo*2);
+      std::chrono::time_point<std::chrono::steady_clock> timestamp = begin + std::chrono::milliseconds(index++*(1000/fps));
+      std::chrono::time_point<std::chrono::steady_clock> current = std::chrono::steady_clock::now();
+      std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - current);
 
-        if (IsHidden() == false) {
-          _mutex.lock();
+      if (diff.count() < 0) {
+        return;
+      }
 
-				  Repaint();
-        }
-			}
-
-			/*
-			if (event->GetSymbol() == jevent::JKS_ENTER) {
-			} else if (event->GetSymbol() == jevent::JKS_a) {
-					GiraCubo_z(&p1, &p2, &p3, &p4, &q1, &q2, &q3, &q4, -angulo);
-			} else if (event->GetSymbol() == jevent::JKS_s) {
-					GiraCubo_z(&p1, &p2, &p3, &p4, &q1, &q2, &q3, &q4, angulo);
-			} else if (event->GetSymbol() == jevent::JKS_d) {
-					GiraCubo_y(&p1, &p2, &p3, &p4, &q1, &q2, &q3, &q4, -angulo);
-			} else if (event->GetSymbol() == jevent::JKS_f) {
-					GiraCubo_y(&p1, &p2, &p3, &p4, &q1, &q2, &q3, &q4, angulo);
-			} else if (event->GetSymbol() == jevent::JKS_g) {
-					TAM *= 1.25;
-			} else if (event->GetSymbol() == jevent::JKS_h) {
-					TAM /= 1.25;
-			} else if (event->GetSymbol() == jevent::JKS_j) {
-					teta *= 1.25;
-			} else if (event->GetSymbol() == jevent::JKS_k) {
-					fi *= 1.25;
-			}
-
-			Repaint();
-			*/
-
-			return true;
-		}
+      std::this_thread::sleep_for(diff);
+    }
 
 		virtual void Paint(jgui::Graphics *g)
 		{
 			jgui::Window::Paint(g);
 
+      jgui::EventManager *ev = GetEventManager();
+
+			if (ev->IsKeyDown(jevent::JKS_CURSOR_LEFT)) {
+					GiraCubo_z(&p1, &p2, &p3, &p4, &q1, &q2, &q3, &q4, angulo);
+			} else if (ev->IsKeyDown(jevent::JKS_CURSOR_RIGHT)) {
+					GiraCubo_z(&p1, &p2, &p3, &p4, &q1, &q2, &q3, &q4, -angulo);
+      }
+
+			if (ev->IsKeyDown(jevent::JKS_CURSOR_UP)) {
+					GiraCubo_y(&p1, &p2, &p3, &p4, &q1, &q2, &q3, &q4, -angulo);
+			} else if (ev->IsKeyDown(jevent::JKS_CURSOR_DOWN)) {
+					GiraCubo_y(&p1, &p2, &p3, &p4, &q1, &q2, &q3, &q4, angulo);
+			} 
+      
+      if (ev->IsKeyDown(jevent::JKS_q)) {
+					TAM *= 1.25;
+			} else if (ev->IsKeyDown(jevent::JKS_w)) {
+					TAM /= 1.25;
+			}
+
 			DesenhaCubo(g, &p1, &p2, &p3, &p4, &q1, &q2, &q3, &q4);
 
-      _mutex.unlock();
+      Repaint();
+
+      Framerate(50);
 		}
 };
 
