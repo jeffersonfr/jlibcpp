@@ -61,7 +61,8 @@ class Raster : public jcommon::Object {
     void FillArc(jgui::jpoint_t<int> v1, jgui::jsize_t<int> s1, float arc0, float arc1);
     void FillPolygon(jgui::jpoint_t<int> v1, std::vector<jgui::jpoint_t<int>> points, bool holed);
     void DrawGlyph(int glyph, int xp, int yp);
-    void DrawString(std::string text, int xp, int yp);
+    void DrawString(std::string text, jgui::jpoint_t<int> v1);
+    void DrawImage(jgui::Image *image, jgui::jpoint_t<int> v1);
 
 };
 

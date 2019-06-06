@@ -580,9 +580,9 @@ void Raster::FillArc(jgui::jpoint_t<int> v1, jgui::jsize_t<int> s1, float arc0, 
 {
   std::vector<jgui::jpoint_t<int>> points;
 
-  if ((arc0 + arc1) < 2*M_PI) {
+  // if ((arc0 + arc1) < 2*M_PI) {
     points.push_back({0, 0});
-  }
+  // }
 
   for (float i=arc0; i<=arc1; i+=0.05) {
     points.push_back({(int)(cos(i)*s1.width), (int)(-sin(i)*s1.height)});
@@ -959,13 +959,46 @@ void Raster::DrawGlyph(int glyph, int xp, int yp)
 	}
 }
 
-void Raster::DrawString(std::string text, int xp, int yp)
+void Raster::DrawString(std::string text, jgui::jpoint_t<int> v1)
 {
 	for (int i=0; i<(int)text.size(); i++) {
-		DrawGlyph(text[i], xp, yp);
+		DrawGlyph(text[i], v1.x, v1.y);
 
-		xp = xp + 8 + 1;
+		v1.x = v1.x + 8 + 1;
 	}
+}
+
+void Raster::DrawImage(jgui::Image *image, jgui::jpoint_t<int> v1)
+{
+  if (image == nullptr) {
+    return;
+  }
+
+  jgui::jsize_t<int>
+    size = image->GetSize();
+  uint32_t
+    data[size.width*size.height];
+
+  image->GetRGBArray(data, {0, 0, size});
+
+  for (int j=0; j<size.height; j++) {
+    if ((j + v1.y) < 0 or (j + v1.y) > _size.height) {
+      continue;
+    }
+
+    uint32_t *src = data + j*size.width;
+    uint32_t *dst = _buffer + (j + v1.y)*_size.width;
+
+    for (int i=0; i<size.width; i++) {
+      if ((i + v1.x) < 0 or (i + v1.x) > _size.width) {
+        continue;
+      }
+
+      if (src[i] & 0xff000000) {
+        dst[i + v1.x] = src[i];
+      }
+    }
+  }
 }
 
 }

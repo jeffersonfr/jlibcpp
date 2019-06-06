@@ -15,6 +15,8 @@ class Dummy : public jgui::Window {
 
     virtual void Paint(jgui::Graphics *g) 
     {
+      jgui::Window::Paint(g);
+
 			g->SetColor(jgui::Color::Red);
 			g->FillRectangle({0, 0, GetSize()});
     }

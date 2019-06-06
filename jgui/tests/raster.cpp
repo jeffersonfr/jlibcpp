@@ -67,7 +67,7 @@ class RasterTest : public jgui::Window {
       raster.DrawArc({500, 200}, {50, 50}, M_PI/4, 3*M_PI/2);
       
       raster.SetColor(0xfff0f0f0);
-      raster.DrawString("Hello, world !", 300, 100);
+      raster.DrawString("Hello, world !", {300, 100});
     }
 
 };
