@@ -77,7 +77,7 @@ class SOM : public jgui::Window {
 	public:
 		enum {
 			bkC = 0xff000090,
-			bk2C = 0xff000050,
+			bk2C = 0xff6060a0,
 			lnC = 0xffff0000,
 			ln2C = 0xffcccc00,
 			fgC = 0xffffffff
@@ -211,9 +211,9 @@ class SOM : public jgui::Window {
 
 			// DRAW GRID
 			g->SetColor(bk2C);
-			for(double i=0; i<=COUNTRY; i+=(COUNTRY/20.0)){
-				g->DrawLine({{toXReal(0.0), toYReal(i)}, {toXReal(COUNTRY),toYReal(i)}});
-				g->DrawLine({{toXReal(i), toYReal(0.0)}, {toXReal(i),toYReal(COUNTRY)}});
+			for(double i=0; i<COUNTRY+COUNTRY/20.0; i+=(COUNTRY/20.0)){
+				g->DrawLine({{toXReal(0.0), toYReal(i)}, {toXReal(COUNTRY), toYReal(i)}});
+				g->DrawLine({{toXReal(i), toYReal(0.0)}, {toXReal(i), toYReal(COUNTRY)}});
 			}
 
 			//DRAW PATH
@@ -222,8 +222,8 @@ class SOM : public jgui::Window {
 			for(int x=0; x<(W-1); x++) {
 				for(int y=0; y<(H-1); y++){
 					g->DrawCircle({toXReal(gn[x*W+y]->wx), toYReal(gn[x*W+y]->wy)}, 4);
-					g->DrawLine({{toXReal(gn[x*W+y]->wx), toYReal(gn[x*W+y]->wy)}, {toXReal(gn[(x+1)*W+y]->wx),toYReal(gn[(x+1)*W+y]->wy)}});
-					g->DrawLine({{toXReal(gn[x*W+y]->wx), toYReal(gn[x*W+y]->wy)}, {toXReal(gn[x*W+y+1]->wx),toYReal(gn[x*W+y+1]->wy)}});
+					g->DrawLine({{toXReal(gn[x*W+y]->wx), toYReal(gn[x*W+y]->wy)}, {toXReal(gn[(x+1)*W+y]->wx), toYReal(gn[(x+1)*W+y]->wy)}});
+					g->DrawLine({{toXReal(gn[x*W+y]->wx), toYReal(gn[x*W+y]->wy)}, {toXReal(gn[x*W+y+1]->wx), toYReal(gn[x*W+y+1]->wy)}});
 				}
 			}
 
