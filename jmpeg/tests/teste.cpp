@@ -46,6 +46,20 @@
 #include <math.h>
 #include <fcntl.h>
 #include <signal.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <errno.h>
+#include <stdlib.h>
+
+#include <linux/dvb/frontend.h>
+#include <linux/dvb/dmx.h>
+
+#define ADAPTER "/dev/dvb/adapter0"
+#define FRONTEND ADAPTER"/frontend0"
+#define DVR ADAPTER"/dvr0"
+#define DEMUX ADAPTER"/demux0"
 
 #define TS_AIT_TABLE_ID 0x74
 
@@ -63,6 +77,8 @@
 #define TS_PCR_TIMEOUT  1000
 
 #define DHEX2DEC(value) ((((value & 0xf0) >> 4) * 10) + (value & 0x0f))
+
+#define ISDB_DEVICE_BUFFER_LENGTH (188*10240)
 
 class Utils {
 
@@ -5678,6 +5694,350 @@ class ISDBTDatagramInputStream : public jio::InputStream {
     }
 };
 
+class ISDBTDeviceInputStream : public jio::InputStream {
+
+  private:
+    struct dvb_frontend_parameters _frontend;
+    int _frontend_fd;
+    int _dvr_fd;
+    int _demux_fd;
+    int _pat_fd;
+    int _lgap;
+    int _rgap;
+
+  private:
+    int set_property(int fd, uint32_t cmd, uint32_t data)
+    {
+      struct dtv_property p, *b;
+      struct dtv_properties c;
+      int ret;
+
+      p.cmd = cmd;
+      c.num = 1;
+      c.props = &p;
+      b = &p;
+      b->u.data = data;
+      ret = ioctl(fd, FE_SET_PROPERTY, &c);
+      
+      if (ret < 0) {
+        fprintf(stderr, "FE_SET_PROPERTY returned %d\n", ret);
+        
+        return -1;
+      }
+      
+      return 0;
+    }
+
+    int get_property(int fd, uint32_t pcmd, uint32_t *len, uint8_t *data)
+    {
+      struct dtv_property p, *b;
+      struct dtv_properties cmd;
+      int ret;
+
+      p.cmd = pcmd;
+      cmd.num = 1;
+      cmd.props = &p;
+      b = &p;
+
+      ret = ioctl(fd, FE_GET_PROPERTY, &cmd);
+      
+      if (ret < 0) {
+        fprintf(stderr, "FE_SET_PROPERTY returned %d\n", ret);
+        
+        return -1;
+      }
+      
+      memcpy(len, &b->u.buffer.len, sizeof (uint32_t));
+      memcpy(data, b->u.buffer.data, *len);
+      
+      return 0;
+    }
+
+    int dvbfe_set_delsys(int fd, enum fe_delivery_system delsys)
+    {
+      return set_property(fd, DTV_DELIVERY_SYSTEM, delsys);
+    }
+
+    static int map_delivery_mode(fe_type_t *type, enum fe_delivery_system delsys)
+    {
+      switch (delsys) {
+        case SYS_DSS:
+        case SYS_DVBS:
+        case SYS_DVBS2:
+        case SYS_TURBO:
+          *type = FE_QPSK;
+          break;
+        case SYS_DVBT:
+        case SYS_DVBT2:
+        case SYS_DVBH:
+        case SYS_ISDBT:
+          *type = FE_OFDM;
+          break;
+        case SYS_DVBC_ANNEX_A:
+        case SYS_DVBC_ANNEX_C:
+          *type = FE_QAM;
+          break;
+        case SYS_ATSC:
+        case SYS_DVBC_ANNEX_B:
+          *type = FE_ATSC;
+          break;
+        default:
+          fprintf(stderr, "Delivery system unsupported, please report to linux-media ML\n");
+          return -1;
+      }
+      
+      return 0;
+    }
+
+    int dvbfe_enum_delsys(int fd, uint32_t *len, uint8_t *data)
+    {
+      return get_property(fd, DTV_ENUM_DELSYS, len, data);
+    }
+
+    int check_frontend_v3(int fd, enum fe_type type)
+    {
+      struct dvb_frontend_info info;
+      int ret;
+
+      ret = ioctl(fd, FE_GET_INFO, &info);
+      
+      if (ret < 0) {
+        perror("ioctl FE_GET_INFO failed");
+        close(fd);
+        ret = -1;
+        goto exit;
+      }
+      
+      if (info.type != type) {
+        fprintf(stderr, "Not a valid frontend device!\n");
+        close(fd);
+        ret = -EINVAL;
+        goto exit;
+      }
+
+exit:
+      return ret;
+    }
+
+    int check_frontend_multi(int fd, enum fe_type type, uint32_t *mstd)
+    {
+      enum fe_type delmode = FE_OFDM;
+      unsigned int i, valid_delsys = 0;
+      uint32_t len;
+      uint8_t data[32];
+      int ret;
+
+      ret = dvbfe_enum_delsys(fd, &len, data);
+      
+      if (ret) {
+        fprintf(stderr, "enum_delsys failed, ret=%d\n", ret);
+        ret = -EIO;
+        goto exit;
+      }
+      
+      /* check whether frontend can support our delivery */
+      for (i = 0; i < len; i++) {
+        map_delivery_mode(&delmode, (fe_delivery_system)data[i]);
+        
+        if (type == delmode) {
+          valid_delsys = 1;
+          ret = 0;
+          break;
+        }
+      }
+      
+      if (!valid_delsys) {
+        fprintf(stderr, "Not a valid frontend device!\n");
+        ret = -EINVAL;
+        goto exit;
+      }
+      
+      *mstd = len; /* mstd has supported delsys count */
+
+exit:
+      return ret;
+    }
+
+    int dvbfe_get_version(int fd, int *major, int *minor)
+    {
+      struct dtv_property p, *b;
+      struct dtv_properties cmd;
+      int ret;
+
+      p.cmd = DTV_API_VERSION;
+      cmd.num = 1;
+      cmd.props = &p;
+      b = &p;
+
+      ret = ioctl(fd, FE_GET_PROPERTY, &cmd);
+      
+      if (ret < 0) {
+        fprintf(stderr, "FE_GET_PROPERTY failed, ret=%d\n", ret);
+        
+        return -1;
+      }
+      
+      *major = (b->u.data >> 8) & 0xff;
+      *minor = b->u.data & 0xff;
+      
+      return 0;
+    }
+
+    int check_frontend(int fd, enum fe_type type, uint32_t *mstd)
+    {
+      int major, minor, ret;
+
+      ret = dvbfe_get_version(fd, &major, &minor);
+      
+      if (ret) {
+        goto exit;
+      }
+      
+      fprintf(stderr, "Version: %d.%d  ", major, minor);
+      
+      if ((major == 5) && (minor > 8)) {
+        ret = check_frontend_multi(fd, type, mstd);
+        
+        if (ret) {
+          goto exit;
+        }
+      } else {
+        ret = check_frontend_v3(fd, type);
+        
+        if (ret) {
+          goto exit;
+        }
+      }
+exit:
+      return ret;
+    }
+
+    int setup_frontend (int fe_fd, struct dvb_frontend_parameters *frontend)
+    {
+      uint32_t mstd;
+      int ret;
+
+      if (check_frontend(fe_fd, FE_OFDM, &mstd) < 0) {
+        close(fe_fd);
+        
+        return -1;
+      }
+      
+      ret = dvbfe_set_delsys(fe_fd, SYS_DVBT);
+      
+      if (ret) {
+        printf("SET Delsys failed");
+        
+        return -1;
+      }
+
+      fprintf (stderr,"tuning to %i Hz\n", frontend->frequency);
+
+      if (ioctl(fe_fd, FE_SET_FRONTEND, frontend) < 0) {
+        printf("ioctl FE_SET_FRONTEND failed");
+        
+        return -1;
+      }
+
+      return 0;
+    }
+
+
+  public:
+    ISDBTDeviceInputStream(int frequency, int lgap, int rgap):
+      jio::InputStream()
+    {
+      _lgap = lgap;
+      _rgap = rgap;
+      
+      memset(&_frontend, 0, sizeof(struct dvb_frontend_parameters));
+
+      _frontend.frequency = frequency;
+      _frontend.inversion = INVERSION_AUTO;
+      _frontend.u.ofdm.bandwidth = BANDWIDTH_6_MHZ;
+      _frontend.u.ofdm.code_rate_HP = FEC_3_4;
+      _frontend.u.ofdm.code_rate_LP = FEC_AUTO;
+      _frontend.u.ofdm.constellation = QAM_AUTO;
+      _frontend.u.ofdm.transmission_mode = TRANSMISSION_MODE_AUTO;
+      _frontend.u.ofdm.guard_interval = GUARD_INTERVAL_AUTO;
+      _frontend.u.ofdm.hierarchy_information = HIERARCHY_NONE;
+
+      if ((_frontend_fd = open(FRONTEND, O_RDWR | O_NONBLOCK)) < 0) {
+        throw jexception::RuntimeException("Failed to open frontend");
+      }
+
+      if (setup_frontend(_frontend_fd, &_frontend) < 0) {
+        throw jexception::RuntimeException("Failed to setup frontend");
+      }
+
+      if ((_dvr_fd = open(DVR, O_RDONLY)) < 0) { 
+        throw jexception::RuntimeException("Failed to open dvr");
+      }
+
+      // INFO:: buffer size
+      ioctl(_dvr_fd, DMX_SET_BUFFER_SIZE, ISDB_DEVICE_BUFFER_LENGTH);
+
+      if ((_demux_fd = open(DEMUX, O_RDONLY)) < 0) { 
+        throw jexception::RuntimeException("Failed to open demux");
+      }
+
+      // INFO:: reads all ts pids
+      struct dmx_pes_filter_params filter;
+
+      memset(&filter, 0, sizeof(filter));
+      filter.pid = 0x2000; // INFO:: any pid (-1, equivalent)
+      filter.input = DMX_IN_FRONTEND;
+      filter.output = DMX_OUT_TS_TAP;
+      filter.pes_type = DMX_PES_OTHER;
+      filter.flags |= DMX_IMMEDIATE_START;
+
+      if (ioctl(_demux_fd, DMX_SET_PES_FILTER, &filter) != 0) {
+        throw jexception::RuntimeException("Failed to setup pid filter");
+      }
+
+      // INFO:: force PAT demux (create a function with code below)
+      if ((_pat_fd = open(DEMUX, O_RDWR)) < 0) {
+        return;
+      }
+
+      struct dmx_pes_filter_params pesfilter;
+
+      if (ioctl(_pat_fd, DMX_SET_BUFFER_SIZE, 64*1024) == -1) {
+        perror("DMX_SET_BUFFER_SIZE failed");
+      }
+
+      pesfilter.pid = 0x00;
+      pesfilter.input = DMX_IN_FRONTEND;
+      pesfilter.output = DMX_OUT_TS_TAP;
+      pesfilter.pes_type = DMX_PES_OTHER;
+      pesfilter.flags = DMX_IMMEDIATE_START;
+
+      ioctl(_pat_fd, DMX_SET_PES_FILTER, &pesfilter);
+    }
+    
+    virtual ~ISDBTDeviceInputStream() 
+    {
+      close(_frontend_fd);
+      close(_dvr_fd);
+      close(_demux_fd);
+      close(_pat_fd);
+    }
+    
+    virtual int64_t Read(char *data, int64_t size)
+    {
+      int r = read(_dvr_fd, data, _lgap + size + _rgap);
+
+      if (r != (_lgap + size + _rgap) or cancel == true) {
+        return -1LL;
+      }
+      
+      memcpy(data, data + _lgap, size);
+
+      return size;
+    }
+};
+
+
 void catch_signal(int signal)
 {
   cancel = true;
@@ -5686,7 +6046,12 @@ void catch_signal(int signal)
 int main(int argc, char **argv)
 {
   if (argc < 4) {
-    std::cout << "usage:: " << argv[0] << " <file.ts> <lgap> <rgap> [[<id>:<pid>]...]" << std::endl;
+    std::cout << "usage:: " << argv[0] << " <url> <lgap> <rgap> [[<id>:<pid>]...]" << std::endl;
+    std::cout << std::endl;
+    std::cout << "  url: locator to source stream (file, udp, isdb-t)" << std::endl;
+    std::cout << "      file:<filepath>" << std::endl;
+    std::cout << "       udp://@:<port>" << std::endl;
+    std::cout << "    isdb-t://<frequency>" << std::endl;
     std::cout << std::endl;
     std::cout << "  lgap: bytes before ts packet (lgap + 188 bytes)" << std::endl;
     std::cout << "  rgap: bytes after ts packet (188 + rgap bytes)" << std::endl;
@@ -5715,6 +6080,8 @@ int main(int argc, char **argv)
     stream = new ISDBTFileInputStream(url.GetPath(), atoi(argv[2]), atoi(argv[3]));
   } else if (url.GetProtocol() == "udp") {
     stream = new ISDBTDatagramInputStream(url.GetPort(), atoi(argv[2]), atoi(argv[3]));
+  } else if (url.GetProtocol() == "isdb-t") {
+    stream = new ISDBTDeviceInputStream(atoi(url.GetPath().c_str()), atoi(argv[2]), atoi(argv[3]));
   }
 
   if (stream == nullptr) {
