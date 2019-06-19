@@ -32,6 +32,17 @@ namespace jgui {
 struct jrational_t {
   int num;
   int den;
+    
+  bool operator==(jrational_t<T> param)
+  {
+    return (num == param.num and den == param.den);
+  }
+
+  bool operator!=(jrational_t<T> param)
+  {
+    return (num != param.num or den != param.den);
+  }
+
 };
 
 /**
@@ -44,6 +55,17 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
     T top;
     T right;
     T bottom;
+    
+    bool operator==(jinsets_t<T> param)
+    {
+      return (left == param.left and top == param.top and right == param.right and bottom == param.bottom);
+    }
+
+    bool operator!=(jinsets_t<T> param)
+    {
+      return (left != param.left or top != param.top or right != param.right or bottom != param.bottom);
+    }
+
   };
 
 /**
