@@ -5989,7 +5989,7 @@ exit:
       filter.input = DMX_IN_FRONTEND;
       filter.output = DMX_OUT_TS_TAP;
       filter.pes_type = DMX_PES_OTHER;
-      filter.flags |= DMX_IMMEDIATE_START;
+      filter.flags = DMX_IMMEDIATE_START;
 
       if (ioctl(_demux_fd, DMX_SET_PES_FILTER, &filter) != 0) {
         throw jexception::RuntimeException("Failed to setup pid filter");

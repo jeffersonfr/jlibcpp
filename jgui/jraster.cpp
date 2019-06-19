@@ -982,7 +982,7 @@ void Raster::DrawImage(jgui::Image *image, jgui::jpoint_t<int> v1)
   image->GetRGBArray(data, {0, 0, size});
 
   for (int j=0; j<size.height; j++) {
-    if ((j + v1.y) < 0 or (j + v1.y) > _size.height) {
+    if ((j + v1.y) < 0 or (j + v1.y) >= _size.height) {
       continue;
     }
 
@@ -990,7 +990,7 @@ void Raster::DrawImage(jgui::Image *image, jgui::jpoint_t<int> v1)
     uint32_t *dst = _buffer + (j + v1.y)*_size.width;
 
     for (int i=0; i<size.width; i++) {
-      if ((i + v1.x) < 0 or (i + v1.x) > _size.width) {
+      if ((i + v1.x) < 0 or (i + v1.x) >= _size.width) {
         continue;
       }
 
