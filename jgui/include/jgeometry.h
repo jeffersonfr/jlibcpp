@@ -33,12 +33,12 @@ struct jrational_t {
   int num;
   int den;
     
-  bool operator==(jrational_t<T> param)
+  bool operator==(jrational_t param)
   {
     return (num == param.num and den == param.den);
   }
 
-  bool operator!=(jrational_t<T> param)
+  bool operator!=(jrational_t param)
   {
     return (num != param.num or den != param.den);
   }
