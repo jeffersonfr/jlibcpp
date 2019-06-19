@@ -284,6 +284,7 @@ OBJS_jgui += \
   jfilechooserdialog.o\
   jflowlayout.o\
   jfont.o\
+  jgeometry.o\
   jgraphics.o\
   jgridbaglayout.o\
   jgridlayout.o\
@@ -305,7 +306,6 @@ OBJS_jgui += \
   jpanel.o\
   jprogressbar.o\
   jraster.o\
-  jrectangle.o\
   jscrollbar.o\
   jslider.o\
   jslidercomponent.o\

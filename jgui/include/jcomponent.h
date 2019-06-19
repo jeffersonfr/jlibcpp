@@ -83,7 +83,7 @@ enum jcomponent_behavior_t {
   // consecutive heights and use the return value to determine if you need to pad calculations by 1.  The following shows 
   // how to calculate the baseline for any height:
   // <pre>
-  //    jregion_t<int> preferredSize = component->GetPreferredSize();
+  //    jrect_t<int> preferredSize = component->GetPreferredSize();
   //    int baseline = GetBaseline(preferredSize.width, preferredSize.height);
   //    int nextBaseline = GetBaseline(preferredSize.width, preferredSize.height + 1);
   //     // Amount to add to height when calculating where baseline lands for a particular height:
@@ -225,7 +225,7 @@ class Component : public jevent::KeyListener, public jevent::MouseListener {
      * \brief
      *
      */
-    virtual void FindNextComponentFocus(jregion_t<int> rect, Component **left, Component **right, Component **up, Component **down);
+    virtual void FindNextComponentFocus(jrect_t<int> rect, Component **left, Component **right, Component **up, Component **down);
 
     /**
      * \brief Makes sure the component is visible in the scroll if this container is scrollable.
@@ -413,13 +413,13 @@ class Component : public jevent::KeyListener, public jevent::MouseListener {
      * \brief
      *
      */
-    virtual jgui::jregion_t<int> GetBounds();
+    virtual jgui::jrect_t<int> GetBounds();
     
     /**
      * \brief
      *
      */
-    virtual jgui::jregion_t<int> GetVisibleBounds();
+    virtual jgui::jrect_t<int> GetVisibleBounds();
     
     /**
      * \brief
@@ -674,42 +674,6 @@ class Component : public jevent::KeyListener, public jevent::MouseListener {
     virtual bool HasFocus();
 
     /**
-     * \brief Verify if the second component contains the first one;
-     *
-     */
-    virtual bool Contains(Component *c1, Component *c2);
-    
-    /**
-     * \brief
-     *
-     */
-    virtual bool Contains(Component *c, jrect_t<int> rect);
-
-    /**
-     * \brief
-     *
-     */
-    virtual bool Contains(jrect_t<int> r1, jrect_t<int> r2);
-
-    /**
-     * \brief Verify if the second component intersects the first one;
-     *
-     */
-    virtual bool Intersects(Component *c1, Component *c2);
-    
-    /**
-     * \brief
-     *
-     */
-    virtual bool Intersects(Component *c, jrect_t<int> rect);
-
-    /**
-     * \brief
-     *
-     */
-    virtual bool Intersects(jrect_t<int> r1, jrect_t<int> r2);
-
-    /**
      * \brief
      *
      */
@@ -773,7 +737,7 @@ class Component : public jevent::KeyListener, public jevent::MouseListener {
      * \brief
      *
      */
-    virtual void SetBounds(jregion_t<int> region);
+    virtual void SetBounds(jrect_t<int> region);
     
     /**
      * \brief
@@ -864,12 +828,6 @@ class Component : public jevent::KeyListener, public jevent::MouseListener {
      *
      */
     virtual Container * GetFocusCycleRootAncestor();
-
-    /**
-     * \brief
-     *
-     */
-    virtual bool Intersect(int x, int y);
 
     /**
      * \brief

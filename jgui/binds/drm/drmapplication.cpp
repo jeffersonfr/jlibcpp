@@ -612,7 +612,7 @@ void NativeApplication::InternalInit(int argc, char **argv)
 	t.hot_x = hotx;																												\
 	t.hot_y = hoty;																												\
 																																				\
-	t.cursor->GetGraphics()->DrawImage(cursors, {ix*w, iy*h, w, h}, {0, 0});	\
+	t.cursor->GetGraphics()->DrawImage(cursors, {ix*w, iy*h, w, h}, jgui::jpoint_t<int>{0, 0});	\
 																																				\
 	sg_jgui_cursors[type] = t;																										\
 
@@ -648,21 +648,21 @@ void NativeApplication::InternalPaint()
     return;
   }
 
-  jregion_t<int> 
+  jrect_t<int> 
     bounds = sg_jgui_window->GetBounds();
 
   if (sg_back_buffer != nullptr) {
     jgui::jsize_t<int>
       size = sg_back_buffer->GetSize();
 
-    if (size.width != bounds.width or size.height != bounds.height) {
+    if (size.width != bounds.size.width or size.height != bounds.size.height) {
       delete sg_back_buffer;
       sg_back_buffer = nullptr;
     }
   }
 
   if (sg_back_buffer == nullptr) {
-    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, {bounds.width, bounds.height});
+    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, bounds.size);
   }
 
   jgui::Graphics 
@@ -675,7 +675,7 @@ void NativeApplication::InternalPaint()
   sg_jgui_window->Paint(g);
 
   if (sg_cursor_enabled == true) {
-    g->DrawImage(sg_cursor_params.cursor, sg_mouse_x, sg_mouse_y);
+    g->DrawImage(sg_cursor_params.cursor, jgui::jpoint_t<int>{sg_mouse_x, sg_mouse_y});
   }
   
   g->Flush();
@@ -687,8 +687,8 @@ void NativeApplication::InternalPaint()
   uint32_t *src = (uint32_t *)data;
   uint32_t *dst = (uint32_t *)buf->map;
 
-  for (int j = 0; j < bounds.height; j++) {
-    for (int i = 0; i < bounds.width; i++) {
+  for (int j = 0; j < bounds.size.height; j++) {
+    for (int i = 0; i < bounds.size.width; i++) {
       *dst++ = *src++;
     }
   }
@@ -959,16 +959,14 @@ void NativeWindow::SetBounds(int x, int y, int width, int height)
 {
 }
 
-jgui::jregion_t<int> NativeWindow::GetBounds()
+jgui::jrect_t<int> NativeWindow::GetBounds()
 {
-	jgui::jregion_t<int> t = {
-    .x = 0,
-    .y = 0,
-    .width = sg_screen.width,
-    .height = sg_screen.height
+  return {
+    0,
+    0,
+    sg_screen.width,
+    sg_screen.height
   };
-
-	return t;
 }
 		
 void NativeWindow::SetResizable(bool resizable)

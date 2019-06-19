@@ -685,21 +685,21 @@ void NativeApplication::InternalPaint()
 		return;
 	}
 
-  jregion_t<int> 
+  jrect_t<int> 
     bounds = sg_jgui_window->GetBounds();
 
   if (sg_back_buffer != nullptr) {
     jgui::jsize_t<int>
       size = sg_back_buffer->GetSize();
 
-    if (size.width != bounds.width or size.height != bounds.height) {
+    if (size.width != bounds.size.width or size.height != bounds.size.height) {
       delete sg_back_buffer;
       sg_back_buffer = nullptr;
     }
   }
 
   if (sg_back_buffer == nullptr) {
-    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, {bounds.width, bounds.height});
+    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, bounds.size);
   }
 
   jgui::Graphics 
@@ -746,7 +746,7 @@ void NativeApplication::InternalPaint()
   glBindTexture(GL_TEXTURE_2D, texture);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_BGRA_EXT, sg_screen.width, sg_screen.height, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, data);
 
-  glViewport(0, 0, bounds.width, bounds.height);
+  glViewport(0, 0, bounds.size.width, bounds.size.height);
   glClearColor(0, 0, 0, 0);
   glMatrixMode(GL_TEXTURE);
 
@@ -776,9 +776,9 @@ void NativeApplication::InternalPaint()
   glEnable(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, texture);
 
-  gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, bounds.width, bounds.height, GL_BGRA, GL_UNSIGNED_BYTE, data);
+  gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, bounds.size.width, bounds.size.height, GL_BGRA, GL_UNSIGNED_BYTE, data);
 
-  glViewport(0, -bounds.height, bounds.width*2, bounds.height*2);
+  glViewport(0, -bounds.size.height, bounds.size.width*2, bounds.size.height*2);
   glClearColor(0, 0, 0, 0);
   glMatrixMode(GL_TEXTURE);
 
@@ -787,16 +787,16 @@ void NativeApplication::InternalPaint()
   glBegin(GL_QUADS);
 
   glTexCoord2f(0.0f, 0.0f);
-  glVertex2f(-bounds.width, bounds.height);
+  glVertex2f(-bounds.size.width, bounds.size.height);
 
-  glTexCoord2f(0.0f, bounds.height);
-  glVertex2f(-bounds.width, 0.0f);
+  glTexCoord2f(0.0f, bounds.size.height);
+  glVertex2f(-bounds.size.width, 0.0f);
 
-  glTexCoord2f(bounds.width, bounds.height);
+  glTexCoord2f(bounds.size.width, bounds.size.height);
   glVertex2f(0, 0.0f);
 
-  glTexCoord2f(bounds.width, 0.0f);
-  glVertex2f(0, bounds.height);
+  glTexCoord2f(bounds.size.width, 0.0f);
+  glVertex2f(0, bounds.size.height);
   
   glEnd();
 
@@ -1286,19 +1286,19 @@ void NativeWindow::ToggleFullScreen()
 
 #else
 
-  static jgui::jregion_t<int> _previous_bounds = {
+  static jgui::jrect_t<int> previous_bounds = {
 	  0, 0, 0, 0
   };
 
   if (sg_fullscreen == false) {
-    _previous_bounds = GetBounds();
+    previous_bounds = GetBounds();
 
     SetBounds(0, 0, sg_screen.width, sg_screen.height);
 
     sg_fullscreen = true;
   } else {
     xcb_unmap_window(sg_xcb_connection, sg_xcb_window);
-    SetBounds(_previous_bounds.x, _previous_bounds.y, _previous_bounds.width, _previous_bounds.height);
+    SetBounds(previous_bounds.point.x, previous_bounds.point.y, previous_bounds.size.width, previous_bounds.size.height);
     xcb_map_window(sg_xcb_connection, sg_xcb_window);
 
     sg_fullscreen = false;
@@ -1373,9 +1373,9 @@ void NativeWindow::SetBounds(int x, int y, int width, int height)
 #endif
 }
 
-jgui::jregion_t<int> NativeWindow::GetBounds()
+jgui::jrect_t<int> NativeWindow::GetBounds()
 {
-	jgui::jregion_t<int> 
+	jgui::jrect_t<int> 
     t = {0, 0, 0, 0};
 
 #ifdef RASPBERRY_PI
@@ -1391,10 +1391,12 @@ jgui::jregion_t<int> NativeWindow::GetBounds()
     *reply = nullptr;
 
   if ((reply = xcb_get_geometry_reply(sg_xcb_connection, cookie, nullptr))) {
-    t.x = reply->x;
-    t.y = reply->y;
-    t.width = reply->width;
-    t.height = reply->height;
+    t = {
+      reply->x,
+      reply->y,
+      reply->width,
+      reply->height
+    };
   }
 
   free(reply);

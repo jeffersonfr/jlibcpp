@@ -415,7 +415,7 @@ void NativeApplication::InternalInit(int argc, char **argv)
 	t.hot_x = hotx;																												\
 	t.hot_y = hoty;																												\
 																																				\
-	t.cursor->GetGraphics()->DrawImage(cursors, {ix*w, iy*h, w, h}, {0, 0});	\
+	t.cursor->GetGraphics()->DrawImage(cursors, {ix*w, iy*h, w, h}, jgui::jpoint_t<int>{0, 0});	\
 																																				\
 	sg_jgui_cursors[type] = t;																										\
 
@@ -453,21 +453,21 @@ void NativeApplication::InternalPaint()
 		return;
 	}
 
-  jregion_t<int> 
+  jrect_t<int> 
     bounds = sg_jgui_window->GetBounds();
 
   if (sg_back_buffer != nullptr) {
     jgui::jsize_t<int>
       size = sg_back_buffer->GetSize();
 
-    if (size.width != bounds.width or size.height != bounds.height) {
+    if (size.width != bounds.size.width or size.height != bounds.size.height) {
       delete sg_back_buffer;
       sg_back_buffer = nullptr;
     }
   }
 
   if (sg_back_buffer == nullptr) {
-    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, {bounds.width, bounds.height});
+    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, bounds.size);
   }
 
   jgui::Graphics 
@@ -491,10 +491,10 @@ void NativeApplication::InternalPaint()
 
 	rect.x = 0;
 	rect.y = 0;
-	rect.w = bounds.width;
-	rect.h = bounds.height;
+	rect.w = bounds.size.width;
+	rect.h = bounds.size.height;
 
-	sg_surface->Write(sg_surface, &rect, data, bounds.width*4);
+	sg_surface->Write(sg_surface, &rect, data, bounds.size.width*4);
 		
   if (g->IsVerticalSyncEnabled() == false) {
   	sg_surface->Flip(sg_surface, nullptr, (DFBSurfaceFlipFlags)(DSFLIP_NONE));
@@ -827,12 +827,12 @@ void NativeWindow::SetBounds(int x, int y, int width, int height)
   }
 }
 
-jgui::jregion_t<int> NativeWindow::GetBounds()
+jgui::jrect_t<int> NativeWindow::GetBounds()
 {
-	jgui::jregion_t<int> t;
+	jgui::jrect_t<int> t;
 
-	sg_window->GetPosition(sg_window, &t.x, &t.y);
-	sg_window->GetSize(sg_window, &t.width, &t.height);
+	sg_window->GetPosition(sg_window, &t.point.x, &t.point.y);
+	sg_window->GetSize(sg_window, &t.size.width, &t.size.height);
 
 	return t;
 }

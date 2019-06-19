@@ -196,21 +196,21 @@ void Raster::ScanLine(jgui::jpoint_t<int> v1, int size)
   }
 }
 
-void Raster::DrawLine(jline_t<int> line)
+void Raster::DrawLine(jpoint_t<int> p0, jpoint_t<int> p1)
 {
-  line.p0.x = (line.p0.x < 0)?0:(line.p0.x >= _size.width)?_size.width - 1:line.p0.x;
-  line.p0.y = (line.p0.y < 0)?0:(line.p0.y >= _size.height)?_size.height - 1:line.p0.y;
-  line.p1.x = (line.p1.x < 0)?0:(line.p1.x >= _size.width)?_size.width - 1:line.p1.x;
-  line.p1.y = (line.p1.y < 0)?0:(line.p1.y >= _size.height)?_size.height - 1:line.p1.y;
+  p0.x = (p0.x < 0)?0:(p0.x >= _size.width)?_size.width - 1:p0.x;
+  p0.y = (p0.y < 0)?0:(p0.y >= _size.height)?_size.height - 1:p0.y;
+  p1.x = (p1.x < 0)?0:(p1.x >= _size.width)?_size.width - 1:p1.x;
+  p1.y = (p1.y < 0)?0:(p1.y >= _size.height)?_size.height - 1:p1.y;
 
-  int dx = abs(line.p1.x-line.p0.x), sx = line.p0.x<line.p1.x ? 1 : -1;
-  int dy = abs(line.p1.y-line.p0.y), sy = line.p0.y<line.p1.y ? 1 : -1;
+  int dx = abs(p1.x-p0.x), sx = p0.x<p1.x ? 1 : -1;
+  int dy = abs(p1.y-p0.y), sy = p0.y<p1.y ? 1 : -1;
   int err = (dx>dy ? dx : -dy)/2, e2;
 
   for(;;) {
-    _buffer[line.p0.y*_size.width + line.p0.x] = _color;
+    _buffer[p0.y*_size.width + p0.x] = _color;
 
-    if (line.p0.x == line.p1.x && line.p0.y == line.p1.y) {
+    if (p0.x == p1.x && p0.y == p1.y) {
       break;
     }
 
@@ -218,21 +218,21 @@ void Raster::DrawLine(jline_t<int> line)
 
     if (e2 >-dx) { 
       err -= dy; 
-      line.p0.x += sx; 
+      p0.x += sx; 
     }
 
     if (e2 < dy) { 
       err += dx; 
-      line.p0.y += sy; 
+      p0.y += sy; 
     }
   }
 }
 
 void Raster::DrawTriangle(jgui::jpoint_t<int> v1, jgui::jpoint_t<int> v2, jgui::jpoint_t<int> v3)
 {
-  DrawLine({v1, v2});
-  DrawLine({v2, v3});
-  DrawLine({v3, v1});
+  DrawLine(v1, v2);
+  DrawLine(v2, v3);
+  DrawLine(v3, v1);
 }
 
 void Raster::FillTriangle(jgui::jpoint_t<int> v1, jgui::jpoint_t<int> v2, jgui::jpoint_t<int> v3) 
@@ -289,10 +289,10 @@ void Raster::DrawRectangle(jgui::jrect_t<int> rect)
     v3 {v1.x + rect.size.width, v1.y + rect.size.height},
     v4 {v1.x, v1.y + rect.size.height};
 
-  DrawLine({v1, v2});
-  DrawLine({v2, v3});
-  DrawLine({v3, v4});
-  DrawLine({v4, v1});
+  DrawLine(v1, v2);
+  DrawLine(v2, v3);
+  DrawLine(v3, v4);
+  DrawLine(v4, v1);
 }
 
 void Raster::FillRectangle(jgui::jrect_t<int> rect)
@@ -313,7 +313,7 @@ void Raster::DrawPolygon(jgui::jpoint_t<int> v1, std::vector<jgui::jpoint_t<int>
   for (int i=1; i<(int)points.size(); i++) {
     jgui::jpoint_t<int> p2 = points[i];
 
-    DrawLine({{p1.x + v1.x, p1.y + v1.y}, {p2.x + v1.x, p2.y + v1.y}});
+    DrawLine({p1.x + v1.x, p1.y + v1.y}, {p2.x + v1.x, p2.y + v1.y});
 
     p1 = p2;
   }
@@ -335,7 +335,7 @@ void Raster::DrawBezier(jgui::jpoint_t<int> v1, jgui::jpoint_t<int> v2, jgui::jp
   // assert ((v1.x - v2.x) * (v3.x - v2.x) <= 0 && (v1.y - v2.y) * (v3.y - v2.y) <= 0); 
   
   if (cur == 0) { // straight line
-    DrawLine({{v1.x, v1.y}, {v3.x, v3.y}});
+    DrawLine({v1.x, v1.y}, {v3.x, v3.y});
 
     return;
   }
@@ -355,8 +355,8 @@ void Raster::DrawBezier(jgui::jpoint_t<int> v1, jgui::jpoint_t<int> v2, jgui::jp
 
   // algorithm fails for almost straight line, check error values 
   if (dx >= -y || dy <= -x || ex <= -y || ey >= -x) {        
-    DrawLine({{v1.x, v1.y}, {v2.x, v2.y}}); // simple approximation 
-    DrawLine({{v2.x, v2.y}, {v3.x, v3.y}});
+    DrawLine({v1.x, v1.y}, {v2.x, v2.y}); // simple approximation 
+    DrawLine({v2.x, v2.y}, {v3.x, v3.y});
 
     return;
   }
@@ -569,7 +569,7 @@ void Raster::DrawArc(jgui::jpoint_t<int> v1, jgui::jsize_t<int> s1, float arc0, 
     int x1 = cos(i)*s1.width;
     int y1 = -sin(i)*s1.height;
 
-    DrawLine({{v1.x + x0, v1.y + y0}, {v1.x + x1, v1.y + y1}});
+    DrawLine({v1.x + x0, v1.y + y0}, {v1.x + x1, v1.y + y1});
 
     x0 = x1;
     y0 = y1;

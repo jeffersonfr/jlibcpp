@@ -61,7 +61,7 @@ static bool sg_jgui_cursor_enabled = true;
 /** \brief */
 static bool sg_visible = true;
 /** \brief */
-static jgui::jregion_t<int> sg_previous_bounds;
+static jgui::jrect_t<int> sg_previous_bounds;
 /** \brief */
 static std::mutex sg_loop_mutex;
 /** \brief */
@@ -355,21 +355,21 @@ void NativeApplication::InternalPaint()
 		return;
 	}
 
-  jregion_t<int> 
+  jrect_t<int> 
     bounds = sg_jgui_window->GetBounds();
 
   if (sg_back_buffer != nullptr) {
     jgui::jsize_t<int>
       size = sg_back_buffer->GetSize();
 
-    if (size.width != bounds.width or size.height != bounds.height) {
+    if (size.width != bounds.size.width or size.height != bounds.size.height) {
       delete sg_back_buffer;
       sg_back_buffer = nullptr;
     }
   }
 
   if (sg_back_buffer == nullptr) {
-    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, {bounds.width, bounds.height});
+    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, bounds.size);
   }
 
   jgui::Graphics 
@@ -386,7 +386,7 @@ void NativeApplication::InternalPaint()
 	ALLEGRO_LOCKED_REGION 
     *lock = al_lock_bitmap(sg_surface, ALLEGRO_PIXEL_FORMAT_ARGB_8888, ALLEGRO_LOCK_WRITEONLY);
 	int 
-    size = bounds.width*bounds.height;
+    size = bounds.size.width*bounds.size.height;
 	uint8_t 
     *src = sg_back_buffer->LockData(),
 	  *dst = (uint8_t *)lock->data;
@@ -654,7 +654,7 @@ void NativeWindow::ToggleFullScreen()
     al_set_display_flag(sg_display, ALLEGRO_FULLSCREEN_WINDOW, false);
     al_set_display_flag(sg_display, ALLEGRO_GENERATE_EXPOSE_EVENTS, true);
     
-    SetBounds(sg_previous_bounds.x, sg_previous_bounds.y, sg_previous_bounds.width, sg_previous_bounds.height);
+    SetBounds(sg_previous_bounds.point.x, sg_previous_bounds.point.y, sg_previous_bounds.size.width, sg_previous_bounds.size.height);
 	}
 
 	sg_repaint = true;
@@ -717,14 +717,14 @@ void NativeWindow::SetBounds(int x, int y, int width, int height)
 	sg_surface = al_create_bitmap(width, height);
 }
 
-jgui::jregion_t<int> NativeWindow::GetBounds()
+jgui::jrect_t<int> NativeWindow::GetBounds()
 {
-	jgui::jregion_t<int> t;
+	jgui::jrect_t<int> t;
 
-  t.width = al_get_bitmap_width(sg_surface);
-  t.height = al_get_bitmap_height(sg_surface);
+  t.size.width = al_get_bitmap_width(sg_surface);
+  t.size.height = al_get_bitmap_height(sg_surface);
 
-	al_get_window_position(sg_display, &t.x, &t.y);
+	al_get_window_position(sg_display, &t.point.x, &t.point.y);
 
 	return t;
 }

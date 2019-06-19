@@ -33,17 +33,17 @@ VideoSizeControl::~VideoSizeControl()
 
 void VideoSizeControl::SetSize(jgui::jsize_t<int> t)
 {
-  SetSize(t.width, t.height);
+  SetSize(t);
 }
 
-void VideoSizeControl::SetSource(jgui::jregion_t<int> t)
+void VideoSizeControl::SetSource(jgui::jrect_t<int> t)
 {
-  SetSource(t.x, t.y, t.width, t.height);
+  SetSource(t);
 }
 
-void VideoSizeControl::SetDestination(jgui::jregion_t<int> t)
+void VideoSizeControl::SetDestination(jgui::jrect_t<int> t)
 {
-  SetDestination(t.x, t.y, t.width, t.height);
+  SetDestination(t);
 }
 
 void VideoSizeControl::SetSize(int w, int h)
@@ -60,36 +60,17 @@ void VideoSizeControl::SetDestination(int x, int y, int w, int h)
 
 jgui::jsize_t<int> VideoSizeControl::GetSize()
 {
-  jgui::jsize_t<int> t;
-
-  t.width = 0;
-  t.height = 0;
-
-  return t;
+  return {0, 0};
 }
 
-jgui::jregion_t<int> VideoSizeControl::GetSource()
+jgui::jrect_t<int> VideoSizeControl::GetSource()
 {
-  jgui::jregion_t<int> t;
-
-  t.x = 0;
-  t.y = 0;
-  t.width = 0;
-  t.height = 0;
-
-  return t;
+  return {0, 0, 0, 0};
 }
 
-jgui::jregion_t<int> VideoSizeControl::GetDestination()
+jgui::jrect_t<int> VideoSizeControl::GetDestination()
 {
-  jgui::jregion_t<int> t;
-
-  t.x = 0;
-  t.y = 0;
-  t.width = 0;
-  t.height = 0;
-
-  return t;
+  return {0, 0, 0, 0};
 }
 
 }

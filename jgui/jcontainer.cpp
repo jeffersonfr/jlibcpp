@@ -19,7 +19,6 @@
  ***************************************************************************/
 #include "jgui/jcontainer.h"
 #include "jgui/jcardlayout.h"
-#include "jgui/jrectangle.h"
 #include "jgui/jdialog.h"
 #include "jexception/joutofboundsexception.h"
 #include "jexception/jnullpointerexception.h"
@@ -126,11 +125,13 @@ bool Container::MoveScrollTowards(Component *next, jevent::jkeyevent_symbol_t sy
       nl = next->GetAbsoluteLocation();
     jgui::jsize_t<int>
       ns = next->GetSize();
+    jgui::jrect_t<int>
+      region1 {al.x, al.y, ns.width, ns.height},
+      region2 {al.x + slocation.x, al.y + slocation.y, w, h};
     bool 
-      nextIntersects = Contains(next) == true && Intersects({al.x, al.y, ns.width, ns.height}, {al.x + x, al.y + y, w, h});
+      nextIntersects = GetBounds().Contains(next->GetBounds()) == true && region1.Intersects({al.x + x, al.y + y, w, h});
 
-    if ((nextIntersects && !currentLarge && !edge) || 
-        Rectangle::Contains({al.x + slocation.x, al.y + slocation.y, w, h}, {nl.x, nl.y, ns.width, ns.height})) {
+    if ((nextIntersects && !currentLarge && !edge) || region2.Contains({nl.x, nl.y, ns.width, ns.height})) {
       //scrollComponentToVisible(next);
     } else {
       if (!scrollOutOfBounds) {
@@ -138,12 +139,13 @@ bool Container::MoveScrollTowards(Component *next, jevent::jkeyevent_symbol_t sy
           cl = current->GetAbsoluteLocation();
         jgui::jsize_t<int>
           cs = current->GetSize();
+        jgui::jrect_t<int>
+          region3 {cl.x, cl.y, cs.width, cs.height};
 
         ScrollToVisibleArea({x, y, w, h}, this);
 
         // if after moving the scroll the current focus is out of the view port and the next focus is in the view port move the focus
-        if (nextIntersects == false || 
-            Rectangle::Intersects({cl.x, cl.y, cs.width, cs.height}, {al.x + x, al.y + y, w, h}) != 0) {
+        if (nextIntersects == false || region3.Intersects({al.x + x, al.y + y, w, h}) != 0) {
           return false;
         }
       } else {
@@ -282,7 +284,7 @@ Component * Container::GetTargetComponent(Container *target, int x, int y, int *
     Component *c = (*i);
   
     if (c->IsVisible() == true) {
-      if (c->Intersect(x+scrollx, y+scrolly) == true) {
+      if (c->GetBounds().Intersects(jpoint_t<int>{x + scrollx, y + scrolly}) == true) {
         jgui::jpoint_t cl = c->GetLocation();
 
         if ((void *)dx != nullptr) {
@@ -540,58 +542,58 @@ void Container::PaintBorders(Graphics *g)
   } else if (bordertype == JCB_RAISED_GRADIENT) {
     for (int i=0; i<bs && i<wp && i<hp; i++) {
       g->SetColor({dr+step*(bs-i), dg+step*(bs-i), db+step*(bs-i)});
-      g->DrawLine({xp+i, yp+i, xp+wp-i, yp+i}); //cima
+      g->DrawLine({xp+i, yp+i}, {xp+wp-i, yp+i}); //cima
       g->SetColor({dr-step*(bs-i), dg-step*(bs-i), db-step*(bs-i)});
-      g->DrawLine({xp+i, yp+hp-i, xp+wp-i, yp+hp-i}); //baixo
+      g->DrawLine({xp+i, yp+hp-i}, {xp+wp-i, yp+hp-i}); //baixo
     }
 
     for (int i=0; i<bs && i<wp && i<hp; i++) {
       g->SetColor({dr+step*(bs-i), dg+step*(bs-i), db+step*(bs-i)});
-      g->DrawLine({xp+i, yp+i, xp+i, yp+hp-i}); //esquerda
+      g->DrawLine({xp+i, yp+i}, {xp+i, yp+hp-i}); //esquerda
       g->SetColor({dr-step*(bs-i), dg-step*(bs-i), db-step*(bs-i)});
-      g->DrawLine({xp+wp-i, yp+i, xp+wp-i, yp+hp-i}); //direita
+      g->DrawLine({xp+wp-i, yp+i}, {xp+wp-i, yp+hp-i}); //direita
     }
   } else if (bordertype == JCB_LOWERED_GRADIENT) {
     for (int i=0; i<bs && i<wp && i<hp; i++) {
       g->SetColor({dr-step*(bs-i), dg-step*(bs-i), db-step*(bs-i)});
-      g->DrawLine({xp+i, yp+i, xp+wp-i, yp+i}); //cima
+      g->DrawLine({xp+i, yp+i}, {xp+wp-i, yp+i}); //cima
       g->SetColor({dr+step*(bs-i), dg+step*(bs-i), db+step*(bs-i)});
-      g->DrawLine({xp+i, yp+hp-i, xp+wp-i, yp+hp-i}); //baixo
+      g->DrawLine({xp+i, yp+hp-i}, {xp+wp-i, yp+hp-i}); //baixo
     }
 
     for (int i=0; i<bs && i<wp && i<hp; i++) {
       g->SetColor({dr-step*(bs-i), dg-step*(bs-i), db-step*(bs-i)});
-      g->DrawLine({xp+i, yp+i, xp+i, yp+hp-i}); //esquerda
+      g->DrawLine({xp+i, yp+i}, {xp+i, yp+hp-i}); //esquerda
       g->SetColor({dr+step*(bs-i), dg+step*(bs-i), db+step*(bs-i)});
-      g->DrawLine({xp+wp-i, yp+i, xp+wp-i, yp+hp-i}); //direita
+      g->DrawLine({xp+wp-i, yp+i}, {xp+wp-i, yp+hp-i}); //direita
     }
   } else if (bordertype == JCB_RAISED_BEVEL) {
     for (int i=0; i<bs && i<wp && i<hp; i++) {
       g->SetColor({dr+step, dg+step, db+step});
-      g->DrawLine({xp+i, yp+i, xp+wp-i, yp+i}); //cima
+      g->DrawLine({xp+i, yp+i}, {xp+wp-i, yp+i}); //cima
       g->SetColor({dr-step, dg-step, db-step});
-      g->DrawLine({xp+i, yp+hp-i, xp+wp-i, yp+hp-i}); //baixo
+      g->DrawLine({xp+i, yp+hp-i}, {xp+wp-i, yp+hp-i}); //baixo
     }
 
     for (int i=0; i<bs && i<wp && i<hp; i++) {
       g->SetColor({dr+step, dg+step, db+step});
-      g->DrawLine({xp+i, yp+i, xp+i, yp+hp-i}); //esquerda
+      g->DrawLine({xp+i, yp+i}, {xp+i, yp+hp-i}); //esquerda
       g->SetColor({dr-step, dg-step, db-step});
-      g->DrawLine({xp+wp-i, yp+i, xp+wp-i, yp+hp-i}); //direita
+      g->DrawLine({xp+wp-i, yp+i}, {xp+wp-i, yp+hp-i}); //direita
     }
   } else if (bordertype == JCB_LOWERED_BEVEL) {
     for (int i=0; i<bs && i<wp && i<hp; i++) {
       g->SetColor({dr-step, dg-step, db-step});
-      g->DrawLine({xp+i, yp+i, xp+wp-i, yp+i}); //cima
+      g->DrawLine({xp+i, yp+i}, {xp+wp-i, yp+i}); //cima
       g->SetColor({dr+step, dg+step, db+step});
-      g->DrawLine({xp+i, yp+hp-i, xp+wp-i, yp+hp-i}); //baixo
+      g->DrawLine({xp+i, yp+hp-i}, {xp+wp-i, yp+hp-i}); //baixo
     }
 
     for (int i=0; i<bs && i<wp && i<hp; i++) {
       g->SetColor({dr-step, dg-step, db-step});
-      g->DrawLine({xp+i, yp+i, xp+i, yp+hp-i}); //esquerda
+      g->DrawLine({xp+i, yp+i}, {xp+i, yp+hp-i}); //esquerda
       g->SetColor({dr+step, dg+step, db+step});
-      g->DrawLine({xp+wp-i, yp+i, xp+wp-i, yp+hp-i}); //direita
+      g->DrawLine({xp+wp-i, yp+i}, {xp+wp-i, yp+hp-i}); //direita
     }
   } else if (bordertype == JCB_RAISED_ETCHED) {
     g->SetColor({dr+step, dg+step, db+step, da});
@@ -631,7 +633,7 @@ void Container::Paint(Graphics *g)
 
   jpoint_t 
     slocation = GetScrollLocation();
-  jregion_t 
+  jrect_t 
     clip = g->GetClip();
 
   Component::Paint(g);
@@ -680,12 +682,12 @@ void Container::Paint(Graphics *g)
         }
         
         g->Translate({-cx, -cy});
-        g->SetClip({clip.x, clip.y, clip.width, clip.height});
+        g->SetClip(clip);
       }
     }
   }
         
-  g->SetClip({clip.x, clip.y, clip.width, clip.height});
+  g->SetClip(clip);
 
   if (IsScrollVisible() == true) {
     g->Reset(); 
@@ -693,7 +695,7 @@ void Container::Paint(Graphics *g)
   }
 
   // INFO:: paint dialogs over the container
-  g->SetClip({clip.x, clip.y, clip.width, clip.height});
+  g->SetClip(clip);
 
   _dialogs_mutex.lock();
 
@@ -719,7 +721,7 @@ void Container::Paint(Graphics *g)
         c->Paint(g);
         
         g->Translate({-cx, -cy});
-        g->SetClip({clip.x, clip.y, clip.width, clip.height});
+        g->SetClip(clip);
       }
     }
   }

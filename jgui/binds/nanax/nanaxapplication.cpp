@@ -59,7 +59,7 @@ static bool sg_quitting = false;
 /** \brief */
 static jgui::jsize_t<int> sg_screen = {0, 0};
 /** \brief */
-static jgui::jregion_t<int> sg_last_bounds = {0, 0, 0, 0};
+static jgui::jrect_t<int> sg_last_bounds = {0, 0, 0, 0};
 /** \brief */
 static std::mutex sg_loop_mutex;
 /** \brief */
@@ -443,21 +443,21 @@ static void paint_callback(const nana::paint::graphics& graph)
     return;
   }
 
-  jregion_t<int> 
+  jrect_t<int> 
     bounds = sg_jgui_window->GetBounds();
 
   if (sg_back_buffer != nullptr) {
     jgui::jsize_t<int>
       size = sg_back_buffer->GetSize();
 
-    if (size.width != bounds.width or size.height != bounds.height) {
+    if (size.width != bounds.size.width or size.height != bounds.size.height) {
       delete sg_back_buffer;
       sg_back_buffer = nullptr;
     }
   }
 
   if (sg_back_buffer == nullptr) {
-    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, {bounds.width, bounds.height});
+    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, bounds.size);
   }
 
   jgui::Graphics 
@@ -476,13 +476,13 @@ static void paint_callback(const nana::paint::graphics& graph)
   nana::paint::pixel_buffer pixbuf{ graph.handle(), nana::rectangle{ graph.size() } };
   // size sz = pixbuf.size();
 
-  for (int i=0; i<bounds.height; i++) {
-    const uint8_t *src = data + i*bounds.width*4;
+  for (int i=0; i<bounds.size.height; i++) {
+    const uint8_t *src = data + i*bounds.size.width*4;
 
-    pixbuf.fill_row(i, src, bounds.width*4, 32);
+    pixbuf.fill_row(i, src, bounds.size.width*4, 32);
   }
 
-  // pixbuf.put((unsigned char *)data, bounds.width, bounds.height, 32, bounds.width*4, false);
+  // pixbuf.put((unsigned char *)data, bounds.size.width, bounds.size.height, 32, bounds.size.width*4, false);
   pixbuf.paste(graph.handle(), {});
 
   sg_back_buffer->UnlockData();
@@ -559,8 +559,8 @@ void NativeWindow::ToggleFullScreen()
 
     sg_fullscreen = true;
   } else {
-    fm->size({(nana::size::value_type)sg_last_bounds.width, (nana::size::value_type)sg_last_bounds.height});
-    fm->move({sg_last_bounds.x, sg_last_bounds.y});
+    fm->size({(nana::size::value_type)sg_last_bounds.size.width, (nana::size::value_type)sg_last_bounds.size.height});
+    fm->move({sg_last_bounds.point.x, sg_last_bounds.point.y});
 
     sg_fullscreen = false;
   }
@@ -616,19 +616,17 @@ void NativeWindow::SetBounds(int x, int y, int width, int height)
   fm->move({x, y});
 }
 
-jgui::jregion_t<int> NativeWindow::GetBounds()
+jgui::jrect_t<int> NativeWindow::GetBounds()
 {
-  jgui::jregion_t<int> t {0, 0, 0, 0};
- 
   nana::size s = fm->size();
   nana::point p = fm->pos();
 
-  t.x = p.x;
-  t.y = p.y;
-  t.width = s.width;
-  t.height = s.height;
-
-  return t;
+  return {
+    p.x,
+    p.y,
+    (int)s.width,
+    (int)s.height
+  };
 }
     
 void NativeWindow::SetResizable(bool resizable)

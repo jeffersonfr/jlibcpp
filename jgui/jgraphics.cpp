@@ -20,7 +20,6 @@
 #include "jgui/jgraphics.h"
 #include "jgui/jfont.h"
 #include "jgui/jimage.h"
-#include "jgui/jrectangle.h"
 #include "jmath/jmath.h"
 #include "jcommon/jstringtokenizer.h"
 #include "jcommon/jstringutils.h"
@@ -75,10 +74,12 @@ Graphics::Graphics(cairo_surface_t *surface):
     _pixelformat = jgui::JPF_UNKNOWN;
   }
   
-  _clip.x = 0;
-  _clip.y = 0;
-  _clip.width = cairo_image_surface_get_width(surface);
-  _clip.height = cairo_image_surface_get_height(surface);
+  _clip = {
+    0, 
+    0, 
+    cairo_image_surface_get_width(surface), 
+    cairo_image_surface_get_height(surface)
+  };
 
   _cairo_context = cairo_create(_cairo_surface);
 
@@ -125,12 +126,12 @@ std::string Graphics::Dump(std::string dir, std::string prefix)
   return name;
 }
 
-jregion_t<int> Graphics::ClipRect(jrect_t<int> rect)
+jrect_t<int> Graphics::ClipRect(jrect_t<int> rect)
 {
   struct jpoint_t<int> t = Translate();
 
-  jrect_t<int> clip = Rectangle::Intersection(
-      {rect.point.x + t.x, rect.point.y + t.y, rect.size.width, rect.size.height}, {_internal_clip.x, _internal_clip.y, _internal_clip.width, _internal_clip.height});
+  jrect_t<int> 
+    clip = _internal_clip.Intersection({rect.point.x + t.x, rect.point.y + t.y, rect.size.width, rect.size.height});
   
   SetClip({clip.point.x - t.x, clip.point.y - t.y, clip.size.width, clip.size.height});
 
@@ -144,13 +145,12 @@ void Graphics::SetClip(jrect_t<int> rect)
   int sw = cairo_image_surface_get_width(_cairo_surface);
   int sh = cairo_image_surface_get_height(_cairo_surface);
 
-  jrect_t<int> clip = Rectangle::Intersection(
-      {rect.point.x + t.x, rect.point.y + t.y, rect.size.width, rect.size.height}, {0, 0, sw, sh});
+  jrect_t<int> 
+    region = {0, 0, sw, sh},
+    clip = region.Intersection({rect.point.x + t.x, rect.point.y + t.y, rect.size.width, rect.size.height});
   
-  _clip.x = clip.point.x - t.x;
-  _clip.y = clip.point.y - t.y;
-  _clip.width = clip.size.width;
-  _clip.height = clip.size.height;
+  _clip.point = clip.point - jpoint_t<int>{t.x, t.y};
+  _clip.size = clip.size;
   
   _internal_clip = {clip.point.x, clip.point.y, clip.size.width, clip.size.height};
 
@@ -159,7 +159,7 @@ void Graphics::SetClip(jrect_t<int> rect)
   cairo_clip(_cairo_context);
 }
 
-jregion_t<int> Graphics::GetClip()
+jrect_t<int> Graphics::GetClip()
 {
   return _clip;
 }
@@ -168,15 +168,19 @@ void Graphics::ReleaseClip()
 {
   struct jpoint_t<int> t = Translate();
 
-  _clip.x = 0;
-  _clip.y = 0;
-  _clip.width = cairo_image_surface_get_width(_cairo_surface);
-  _clip.height = cairo_image_surface_get_height(_cairo_surface);
+  _clip = {
+    0,
+    0,
+    cairo_image_surface_get_width(_cairo_surface),
+    cairo_image_surface_get_height(_cairo_surface)
+  };
 
-  _internal_clip.x = t.x;
-  _internal_clip.y = t.y;
-  _internal_clip.width = _clip.width - t.x;
-  _internal_clip.height = _clip.height - t.y;
+  _internal_clip = {
+    t.x,
+    t.y,
+    _clip.size.width - t.x,
+    _clip.size.height - t.y
+  };
   
   cairo_reset_clip(_cairo_context);
 }
@@ -376,7 +380,7 @@ jpen_t Graphics::GetPen()
   return _pen;
 }
 
-void Graphics::DrawLine(jline_t<int> line)
+void Graphics::DrawLine(jpoint_t<int> p0, jpoint_t<int> p1)
 {
   if (_pen.width <= 0) {
     return;
@@ -385,8 +389,8 @@ void Graphics::DrawLine(jline_t<int> line)
   struct jpoint_t<int> t = Translate();
 
   cairo_save(_cairo_context);
-  cairo_move_to(_cairo_context, line.p0.x + t.x, line.p0.y + t.y);
-  cairo_line_to(_cairo_context, line.p1.x + t.x, line.p1.y + t.y);
+  cairo_move_to(_cairo_context, p0.x + t.x, p0.y + t.y);
+  cairo_line_to(_cairo_context, p1.x + t.x, p1.y + t.y);
   cairo_set_line_width(_cairo_context, _pen.width);
   cairo_stroke(_cairo_context);
   cairo_restore(_cairo_context);
@@ -1252,7 +1256,7 @@ void Graphics::DrawString(std::string text, jrect_t<int> rect, jhorizontal_align
     }
   }
 
-  jregion_t<int> clip = GetClip();
+  jrect_t<int> clip = GetClip();
 
   if (clipped == true) {
     ClipRect(rect);
@@ -1332,7 +1336,7 @@ void Graphics::DrawString(std::string text, jrect_t<int> rect, jhorizontal_align
   }
   
   if (clipped == true) {
-    SetClip({clip.x, clip.y, clip.width, clip.height});
+    SetClip(clip);
   }
 }
 

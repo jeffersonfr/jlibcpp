@@ -267,13 +267,13 @@ class Window : public jgui::Container {
      * \brief
      *
      */
-    virtual jgui::jregion_t<int> GetBounds();
+    virtual jgui::jrect_t<int> GetBounds();
 
     /**
      * \brief
      *
      */
-    virtual jgui::jregion_t<int> GetVisibleBounds();
+    virtual jgui::jrect_t<int> GetVisibleBounds();
 
     /**
      * \brief

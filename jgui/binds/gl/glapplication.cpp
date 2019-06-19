@@ -55,7 +55,7 @@ static bool sg_visible = true;
 /** \brief */
 static bool sg_fullscreen = false;
 /** \brief */
-static jgui::jregion_t<int> sg_previous_bounds;
+static jgui::jrect_t<int> sg_previous_bounds;
 /** \brief */
 static bool sg_quitting = false;
 /** \brief */
@@ -416,21 +416,21 @@ void OnDraw()
 		return;
 	}
 
-  jregion_t<int> 
+  jrect_t<int> 
     bounds = sg_jgui_window->GetBounds();
 
   if (sg_back_buffer != nullptr) {
     jgui::jsize_t<int>
       size = sg_back_buffer->GetSize();
 
-    if (size.width != bounds.width or size.height != bounds.height) {
+    if (size.width != bounds.size.width or size.height != bounds.size.height) {
       delete sg_back_buffer;
       sg_back_buffer = nullptr;
     }
   }
 
   if (sg_back_buffer == nullptr) {
-    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, {bounds.width, bounds.height});
+    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, bounds.size);
   }
 
   jgui::Graphics 
@@ -449,10 +449,10 @@ void OnDraw()
   // INFO:: invert the y-axis
   uint32_t 
     *r1 = data,
-    *r2 = data + (bounds.height - 1)*bounds.width;
+    *r2 = data + (bounds.size.height - 1)*bounds.size.width;
 
-  for (int i=0; i<bounds.height/2; i++) {
-    for (int j=0; j<bounds.width; j++) {
+  for (int i=0; i<bounds.size.height/2; i++) {
+    for (int j=0; j<bounds.size.width; j++) {
       uint32_t p = r1[j];
 
       r1[j] = r2[j];
@@ -460,13 +460,13 @@ void OnDraw()
       r2[j] = p;
     }
 
-    r1 = r1 + bounds.width;
-    r2 = r2 - bounds.width;
+    r1 = r1 + bounds.size.width;
+    r2 = r2 - bounds.size.width;
 	}
 
   // glClear(GL_COLOR_BUFFER_BIT);
 
-  glDrawPixels(bounds.width, bounds.height, GL_BGRA, GL_UNSIGNED_BYTE, data);
+  glDrawPixels(bounds.size.width, bounds.size.height, GL_BGRA, GL_UNSIGNED_BYTE, data);
   
   if (g->IsVerticalSyncEnabled() == false) {
     glFlush();
@@ -782,7 +782,7 @@ void NativeWindow::ToggleFullScreen()
 
     sg_fullscreen = true;
   } else {
-    SetBounds(sg_previous_bounds.x, sg_previous_bounds.y, sg_previous_bounds.width, sg_previous_bounds.height);
+    SetBounds(sg_previous_bounds.point.x, sg_previous_bounds.point.y, sg_previous_bounds.size.width, sg_previous_bounds.size.height);
     
     sg_fullscreen = false;
   }
@@ -840,16 +840,14 @@ void NativeWindow::SetBounds(int x, int y, int width, int height)
   glutReshapeWindow(width, height);
 }
 
-jgui::jregion_t<int> NativeWindow::GetBounds()
+jgui::jrect_t<int> NativeWindow::GetBounds()
 {
-	jgui::jregion_t<int> t;
-
-  t.x = glutGet(GLUT_WINDOW_X);
-  t.y = glutGet(GLUT_WINDOW_Y);
-  t.width = glutGet(GLUT_WINDOW_WIDTH);
-  t.height = glutGet(GLUT_WINDOW_HEIGHT);
-
-	return t;
+  return {
+    glutGet(GLUT_WINDOW_X),
+    glutGet(GLUT_WINDOW_Y),
+    glutGet(GLUT_WINDOW_WIDTH),
+    glutGet(GLUT_WINDOW_HEIGHT)
+  };
 }
 		
 void NativeWindow::SetVisible(bool visible)

@@ -82,7 +82,7 @@ static ::Window sg_window = 0;
 /** \brief */
 static ::XEvent sg_lastsg_key_release_event;
 /** \brief */
-static jgui::jregion_t<int> sg_visible_bounds;
+static jgui::jrect_t<int> sg_visible_bounds;
 /** \brief */
 static bool sg_key_repeat;
 /** \brief */
@@ -106,7 +106,7 @@ static bool sg_cursor_enabled = true;
 /** \brief */
 static bool sg_visible = true;
 /** \brief */
-static jgui::jregion_t<int> sg_previous_bounds;
+static jgui::jrect_t<int> sg_previous_bounds;
 /** \brief */
 static bool sg_quitting = false;
 /** \brief */
@@ -461,21 +461,21 @@ void NativeApplication::InternalPaint()
 		return;
 	}
 
-  jregion_t<int> 
+  jrect_t<int> 
     bounds = sg_jgui_window->GetBounds();
 
   if (sg_back_buffer != nullptr) {
     jgui::jsize_t<int>
       size = sg_back_buffer->GetSize();
 
-    if (size.width != bounds.width or size.height != bounds.height) {
+    if (size.width != bounds.size.width or size.height != bounds.size.height) {
       delete sg_back_buffer;
       sg_back_buffer = nullptr;
     }
   }
 
   if (sg_back_buffer == nullptr) {
-    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, {bounds.width, bounds.height});
+    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, bounds.size);
   }
 
   jgui::Graphics 
@@ -495,7 +495,7 @@ void NativeApplication::InternalPaint()
     data
   };
   uint32_t pitches[1] = {
-    (uint32_t)bounds.width*4
+    (uint32_t)bounds.size.width*4
   };
   VdpTime 
     this_time = 0;
@@ -587,13 +587,15 @@ void NativeApplication::InternalLoop()
       } else if (event.type == FocusIn) {
       } else if (event.type == FocusOut) {
       } else if (event.type == ConfigureNotify) {
-        sg_visible_bounds.x = event.xconfigure.x;
-        sg_visible_bounds.y = event.xconfigure.y;
-        sg_visible_bounds.width = event.xconfigure.width;
-        sg_visible_bounds.height = event.xconfigure.height;
+        sg_visible_bounds = {
+          event.xconfigure.x,
+          event.xconfigure.y,
+          event.xconfigure.width,
+          event.xconfigure.height
+        };
 
         OutputSurfaceDestroy(sg_vdp_surface);
-        OutputSurfaceCreate(sg_vdp_device, VDP_RGBA_FORMAT_B8G8R8A8, sg_visible_bounds.width, sg_visible_bounds.height, &sg_vdp_surface);
+        OutputSurfaceCreate(sg_vdp_device, VDP_RGBA_FORMAT_B8G8R8A8, sg_visible_bounds.size.width, sg_visible_bounds.size.height, &sg_vdp_surface);
 
         InternalPaint();
         
@@ -836,10 +838,12 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 			sg_display, sg_window, ExposureMask | EnterNotify | LeaveNotify | KeyPress | KeyRelease | ButtonPress | ButtonRelease | MotionNotify | PointerMotionMask | StructureNotifyMask | SubstructureNotifyMask
 	);
 
-  sg_visible_bounds.x = x;
-  sg_visible_bounds.y = y;
-  sg_visible_bounds.width = width;
-  sg_visible_bounds.height = height;
+  sg_visible_bounds = {
+    x,
+    y,
+    width,
+    height
+  };
 
   XMapRaised(sg_display, sg_window);
 
@@ -956,7 +960,7 @@ void NativeWindow::ToggleFullScreen()
     sg_fullscreen = true;
   } else {
 	  XUnmapWindow(sg_display, sg_window);
-    XMoveResizeWindow(sg_display, sg_window, sg_previous_bounds.x, sg_previous_bounds.y, sg_previous_bounds.width, sg_previous_bounds.height);
+    XMoveResizeWindow(sg_display, sg_window, sg_previous_bounds.point.x, sg_previous_bounds.point.y, sg_previous_bounds.size.width, sg_previous_bounds.size.height);
 	  XMapWindow(sg_display, sg_window);
 
     sg_fullscreen = false;
@@ -1065,14 +1069,9 @@ void NativeWindow::SetBounds(int x, int y, int width, int height)
 	XMoveResizeWindow(sg_display, sg_window, x, y, width, height);
 }
 
-jgui::jregion_t<int> NativeWindow::GetBounds()
+jgui::jrect_t<int> NativeWindow::GetBounds()
 {
-	return {
-    .x = sg_visible_bounds.x,
-    .y = sg_visible_bounds.y,
-    .width = sg_visible_bounds.width,
-    .height = sg_visible_bounds.height,
-  };
+  return sg_visible_bounds;
 }
 
 void NativeWindow::SetResizable(bool resizable)

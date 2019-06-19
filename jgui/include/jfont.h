@@ -175,13 +175,13 @@ class Font : public virtual jcommon::Object {
      * \brief
      *
      */
-    virtual jregion_t<int> GetStringExtends(std::string text);
+    virtual jrect_t<int> GetStringExtends(std::string text);
 
     /**
      * \brief
      *
      */
-    virtual jregion_t<int> GetGlyphExtends(int symbol);
+    virtual jrect_t<int> GetGlyphExtends(int symbol);
 
     /**
      * \brief

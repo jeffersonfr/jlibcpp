@@ -83,7 +83,7 @@ static bool sg_quitting = false;
 /** \brief */
 static jgui::jsize_t<int> sg_screen = {0, 0};
 /** \brief */
-static jgui::jregion_t<int> sg_previous_bounds;
+static jgui::jrect_t<int> sg_previous_bounds;
 /** \brief */
 static jcursor_style_t sg_jgui_cursor;
 /** \brief */
@@ -345,21 +345,21 @@ void NativeApplication::InternalPaint()
 
   // OPTIMIZE:: cairo_xlib_surface_create(Display, Drawable, Visual, width, height)
   
-  jregion_t<int> 
+  jrect_t<int> 
     bounds = sg_jgui_window->GetBounds();
 
   if (sg_back_buffer != nullptr) {
     jgui::jsize_t<int>
       size = sg_back_buffer->GetSize();
 
-    if (size.width != bounds.width or size.height != bounds.height) {
+    if (size.width != bounds.size.width or size.height != bounds.size.height) {
       delete sg_back_buffer;
       sg_back_buffer = nullptr;
     }
   }
 
   if (sg_back_buffer == nullptr) {
-    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, {bounds.width, bounds.height});
+    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, bounds.size);
   }
 
   jgui::Graphics 
@@ -384,7 +384,7 @@ void NativeApplication::InternalPaint()
   }
 
   cairo_surface_t 
-    *surface = cairo_xcb_surface_create(sg_xcb_connection, sg_xcb_window, vt, bounds.width, bounds.height);
+    *surface = cairo_xcb_surface_create(sg_xcb_connection, sg_xcb_window, vt, bounds.size.width, bounds.size.height);
   cairo_t 
     *cr = cairo_create(surface);
 
@@ -651,7 +651,7 @@ void NativeWindow::ToggleFullScreen()
     sg_fullscreen = true;
   } else {
     xcb_unmap_window(sg_xcb_connection, sg_xcb_window);
-    SetBounds(sg_previous_bounds.x, sg_previous_bounds.y, sg_previous_bounds.width, sg_previous_bounds.height);
+    SetBounds(sg_previous_bounds.point.x, sg_previous_bounds.point.y, sg_previous_bounds.size.width, sg_previous_bounds.size.height);
     xcb_map_window(sg_xcb_connection, sg_xcb_window);
 
     sg_fullscreen = false;
@@ -745,9 +745,9 @@ void NativeWindow::SetBounds(int x, int y, int width, int height)
   xcb_configure_window(sg_xcb_connection, sg_xcb_window, XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y | XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT, values);
 }
 
-jgui::jregion_t<int> NativeWindow::GetBounds()
+jgui::jrect_t<int> NativeWindow::GetBounds()
 {
-	jgui::jregion_t<int> 
+	jgui::jrect_t<int> 
     t = {0, 0, 0, 0};
 
   xcb_get_geometry_cookie_t 
@@ -756,10 +756,12 @@ jgui::jregion_t<int> NativeWindow::GetBounds()
     *reply = nullptr;
 
   if ((reply = xcb_get_geometry_reply(sg_xcb_connection, cookie, nullptr))) {
-    t.x = reply->x;
-    t.y = reply->y;
-    t.width = reply->width;
-    t.height = reply->height;
+    t = {
+      reply->x,
+      reply->y,
+      reply->width,
+      reply->height
+    };
   }
 
   free(reply);

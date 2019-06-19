@@ -40,7 +40,7 @@ class GStreamerPlayerComponentImpl : public jgui::Component {
 		/** \brief */
     std::mutex _mutex;
 		/** \brief */
-		jgui::jregion_t<int> _src;
+		jgui::jrect_t<int> _src;
 		/** \brief */
 		uint32_t **_buffer;
 		/** \brief */
@@ -61,10 +61,9 @@ class GStreamerPlayerComponentImpl : public jgui::Component {
 			_frame_size.width = width;
 			_frame_size.height = height;
 
-			_src.x = 0;
-			_src.y = 0;
-			_src.width = width;
-			_src.height = height;
+			_src = {
+        0, 0, width, height
+      };
 
 			SetVisible(true);
 		}
@@ -105,12 +104,12 @@ class GStreamerPlayerComponentImpl : public jgui::Component {
         _buffer[0] = new uint32_t[width*height];
         _buffer[1] = new uint32_t[width*height];
 
-        if (_src.width < 0) {
-			    _src.width = _frame_size.width;
+        if (_src.size.width < 0) {
+			    _src.size.width = _frame_size.width;
         }
 
-        if (_src.height < 0) {
-			    _src.height = _frame_size.height;
+        if (_src.size.height < 0) {
+			    _src.size.height = _frame_size.height;
         }
       }
 
@@ -145,10 +144,10 @@ class GStreamerPlayerComponentImpl : public jgui::Component {
 
 			cairo_surface_mark_dirty(surface);
 
-      if (_src.x == 0 and _src.y == 0 and _src.width == _frame_size.width and _src.height == _frame_size.height) {
+      if (_src.point.x == 0 and _src.point.y == 0 and _src.size.width == _frame_size.width and _src.size.height == _frame_size.height) {
 			  g->DrawImage(&image, {0, 0, size.width, size.height});
       } else {
-			  g->DrawImage(&image, {_src.x, _src.y, _src.width, _src.height}, {0, 0, size.width, size.height});
+			  g->DrawImage(&image, _src, {0, 0, size.width, size.height});
       }
 
 			cairo_surface_destroy(surface);
@@ -326,10 +325,9 @@ class GStreamerVideoSizeControlImpl : public VideoSizeControl {
 
       std::unique_lock<std::mutex> lock(impl->_mutex);
 			
-			impl->_src.x = x;
-			impl->_src.y = y;
-			impl->_src.width = w;
-			impl->_src.height = h;
+			impl->_src = {
+        x, y, w, h
+      };
 		}
 
 		virtual void SetDestination(int x, int y, int w, int h)
@@ -341,14 +339,14 @@ class GStreamerVideoSizeControlImpl : public VideoSizeControl {
 			impl->SetBounds(x, y, w, h);
 		}
 
-		virtual jgui::jregion_t<int> GetSource()
+		virtual jgui::jrect_t<int> GetSource()
 		{
 			return dynamic_cast<GStreamerPlayerComponentImpl *>(_player->_component)->_src;
 		}
 
-		virtual jgui::jregion_t<int> GetDestination()
+		virtual jgui::jrect_t<int> GetDestination()
 		{
-			return dynamic_cast<GStreamerPlayerComponentImpl *>(_player->_component)->GetVisibleBounds();
+			return dynamic_cast<GStreamerPlayerComponentImpl *>(_player->_component)->GetBounds();
 		}
 
 };

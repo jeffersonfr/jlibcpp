@@ -105,7 +105,7 @@ class NativeWindow : public jgui::Window {
 		 * \brief
 		 *
 		 */
-		virtual jgui::jregion_t<int> GetBounds();
+		virtual jgui::jrect_t<int> GetBounds();
 		
 		/**
 		 * \brief

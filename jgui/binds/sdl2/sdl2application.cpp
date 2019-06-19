@@ -385,21 +385,21 @@ void NativeApplication::InternalPaint()
 		return;
 	}
 
-  jregion_t<int> 
+  jrect_t<int> 
     bounds = sg_jgui_window->GetBounds();
 
   if (sg_back_buffer != nullptr) {
     jgui::jsize_t<int>
       size = sg_back_buffer->GetSize();
 
-    if (size.width != bounds.width or size.height != bounds.height) {
+    if (size.width != bounds.size.width or size.height != bounds.size.height) {
       delete sg_back_buffer;
       sg_back_buffer = nullptr;
     }
   }
 
   if (sg_back_buffer == nullptr) {
-    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, {bounds.width, bounds.height});
+    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, bounds.size);
   }
 
   jgui::Graphics 
@@ -415,7 +415,7 @@ void NativeApplication::InternalPaint()
 
   uint32_t *data = (uint32_t *)sg_back_buffer->LockData();
 
-  SDL_Surface *surface = SDL_CreateRGBSurfaceFrom(data, bounds.width, bounds.height, 32, bounds.width*4, 0, 0, 0, 0);
+  SDL_Surface *surface = SDL_CreateRGBSurfaceFrom(data, bounds.size.width, bounds.size.height, 32, bounds.size.width*4, 0, 0, 0, 0);
   SDL_Texture *texture = SDL_CreateTextureFromSurface(sg_renderer, surface);
 
   if (texture == nullptr) {
@@ -744,12 +744,12 @@ void NativeWindow::SetBounds(int x, int y, int width, int height)
   SDL_SetWindowSize(sg_window, width, height);
 }
 
-jgui::jregion_t<int> NativeWindow::GetBounds()
+jgui::jrect_t<int> NativeWindow::GetBounds()
 {
-	jgui::jregion_t<int> t;
+	jgui::jrect_t<int> t;
 
-  SDL_GetWindowPosition(sg_window, &t.x, &t.y);
-  SDL_GetWindowSize(sg_window, &t.width, &t.height);
+  SDL_GetWindowPosition(sg_window, &t.point.x, &t.point.y);
+  SDL_GetWindowSize(sg_window, &t.size.width, &t.size.height);
 
 	return t;
 }

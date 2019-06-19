@@ -17,38 +17,182 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jgui/jrectangle.h"
+#include <type_traits>
 
 namespace jgui {
 
-Rectangle::~Rectangle()
-{
-}
+/**
+ * \brief
+ *
+ */
+struct jrational_t {
+  int num;
+  int den;
+};
 
-bool Rectangle::Contains(jrect_t<int> r1, jrect_t<int> r2)
-{
-  return (r2.point.x >= r1.point.x) && (r2.point.y >= r1.point.y) && ((r2.point.x + r2.size.width) <= r1.size.width) && ((r2.point.y + r2.size.height) <= r1.size.height);
-}
+/**
+ * \brief
+ *
+ */
+template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
+  struct jinsets_t {
+    T left;
+    T top;
+    T right;
+    T bottom;
+  };
 
-bool Rectangle::Intersects(jrect_t<int> r1, jrect_t<int> r2)
-{
-  return (((r1.point.x > (r2.point.x + r2.size.width))||((r1.point.x + r1.size.width) < r2.point.x)||(r1.point.y > (r2.point.y + r2.size.height))||((r1.point.y + r1.size.height) < r2.point.y)) == 0);
-}
+/**
+ * \brief
+ *
+ */
+template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
+  struct jpoint_t {
+    T x;
+    T y;
 
-jrect_t<int> Rectangle::Intersection(jrect_t<int> r1, jrect_t<int> r2)
-{
-  int 
-    left = (std::max)(r1.point.x, r2.point.x),
-    top = (std::max)(r1.point.y, r2.point.y),
-    right = (std::min)(r1.point.x + r1.size.width, r2.point.x + r2.size.width),
-    bottom = (std::min)(r1.point.y + r1.size.height, r2.point.y + r2.size.height);
+    struct jpoint_t operator+(struct jpoint_t &&param)
+    {
+      return {x + param.x, y + param.y};
+    }
+  };
 
-  if (right > left && bottom > top) {
-    return {{left, top}, {right - left, bottom - top}};
-  }
+/**
+ * \brief
+ *
+ */
+template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
+  struct jpoint3d_t {
+    T x;
+    T y;
+    T z;
+    
+    operator jgui::jpoint_t<T>()
+    {
+      return {
+        .x = x,
+        .y = y
+      };
+    }
 
-  return {0, 0, 0, 0};
-}
+  };
+
+/**
+ * \brief
+ *
+ */
+template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
+  struct jsize_t {
+    T width;
+    T height;
+  };
+
+/**
+ * \brief
+ *
+ */
+template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
+  struct jline_t {
+    struct jpoint_t<T> p0;
+    struct jpoint_t<T> p1;
+};
+
+/**
+ * \brief
+ *
+ */
+template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
+  struct jrect_t {
+    struct jpoint_t<T> point;
+    struct jsize_t<T> size;
+    
+    operator jgui::jpoint_t<T>()
+    {
+      return {
+        .x = point.x,
+        .y = point.y
+      };
+    }
+
+    operator jgui::jsize_t<T>()
+    {
+      return {
+        .width = size.width,
+        .height = size.height
+      };
+    }
+
+    operator jgui::jline_t<T>()
+    {
+      return {
+        .p0 = {
+          .x = point.x,
+          .y = point.y
+        },
+        .p1 = {
+          .x = point.x + size.width,
+          .y = point.y + size.height
+        }
+      };
+    }
+
+};
+
+/**
+ * \brief
+ *
+ */
+template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
+  struct jregion_t {
+    T x;
+    T y;
+    T width;
+    T height;
+
+    operator jgui::jpoint_t<T>()
+    {
+      return {
+        .x = x,
+        .y = y
+      };
+    }
+
+    operator jgui::jsize_t<T>()
+    {
+      return {
+        .width = width,
+        .height = height
+      };
+    }
+
+    operator jgui::jline_t<T>()
+    {
+      return {
+        .p0 = {
+          .x = x,
+          .y = y
+        },
+        .p1 = {
+          .x = x + width,
+          .y = y + height
+        }
+      };
+    }
+
+    operator jgui::jrect_t<T>()
+    {
+      return {
+        .point = {
+          .x = x,
+          .y = y
+        },
+        .size = {
+          .width = width,
+          .height = height
+        }
+      };
+    }
+  };
 
 }
 

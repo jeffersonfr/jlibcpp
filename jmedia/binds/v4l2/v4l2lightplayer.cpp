@@ -45,7 +45,7 @@ class V4l2PlayerComponentImpl : public jgui::Component {
 		/** \brief */
     std::mutex  _mutex;
 		/** \brief */
-		jgui::jregion_t<int> _src;
+		jgui::jrect_t<int> _src;
 		/** \brief */
 		uint32_t **_buffer;
 		/** \brief */
@@ -66,10 +66,9 @@ class V4l2PlayerComponentImpl : public jgui::Component {
 			_frame_size.width = w;
 			_frame_size.height = h;
 
-			_src.x = 0;
-			_src.y = 0;
-			_src.width = w;
-			_src.height = h;
+			_src = {
+        0, 0, w, h
+      };
 
 			SetVisible(true);
 		}
@@ -92,8 +91,8 @@ class V4l2PlayerComponentImpl : public jgui::Component {
 
 		virtual void Reset()
 		{
-			_frame_size.width = _src.width = -1;
-			_frame_size.height = _src.height = -1;
+			_frame_size.width = _src.size.width = -1;
+			_frame_size.height = _src.size.height = -1;
 		}
 
 		virtual void UpdateComponent(const uint8_t *buffer, int width, int height, jgui::jpixelformat_t format)
@@ -120,12 +119,12 @@ class V4l2PlayerComponentImpl : public jgui::Component {
         _buffer[0] = new uint32_t[width*height];
         _buffer[1] = new uint32_t[width*height];
 
-        if (_src.width < 0) {
-			    _src.width = _frame_size.width;
+        if (_src.size.width < 0) {
+			    _src.size.width = _frame_size.width;
         }
 
-        if (_src.height < 0) {
-			    _src.height = _frame_size.height;
+        if (_src.size.height < 0) {
+			    _src.size.height = _frame_size.height;
         }
       }
 
@@ -168,10 +167,10 @@ class V4l2PlayerComponentImpl : public jgui::Component {
 
 			cairo_surface_mark_dirty(surface);
 
-      if (_src.x == 0 and _src.y == 0 and _src.width == _frame_size.width and _src.height == _frame_size.height) {
+      if (_src.point.x == 0 and _src.point.y == 0 and _src.size.width == _frame_size.width and _src.size.height == _frame_size.height) {
 			  g->DrawImage(&image, {0, 0, size.width, size.height});
       } else {
-			  g->DrawImage(&image, {_src.x, _src.y, _src.width, _src.height}, {0, 0, size.width, size.height});
+			  g->DrawImage(&image, _src, {0, 0, size.width, size.height});
       }
 
 			cairo_surface_destroy(surface);
@@ -226,10 +225,9 @@ class V4l2VideoSizeControlImpl : public VideoSizeControl {
 
       impl->_mutex.lock();
 			
-			impl->_src.x = x;
-			impl->_src.y = y;
-			impl->_src.width = -1;
-			impl->_src.height = -1;
+			impl->_src = {
+        x, y, -1, -1
+      };
 
       impl->_mutex.unlock();
 		}
@@ -250,14 +248,14 @@ class V4l2VideoSizeControlImpl : public VideoSizeControl {
 			return dynamic_cast<V4l2PlayerComponentImpl *>(_player->_component)->GetPreferredSize();
 		}
 
-		virtual jgui::jregion_t<int> GetSource()
+		virtual jgui::jrect_t<int> GetSource()
 		{
 			return dynamic_cast<V4l2PlayerComponentImpl *>(_player->_component)->_src;
 		}
 
-		virtual jgui::jregion_t<int> GetDestination()
+		virtual jgui::jrect_t<int> GetDestination()
 		{
-			return dynamic_cast<V4l2PlayerComponentImpl *>(_player->_component)->GetVisibleBounds();
+			return dynamic_cast<V4l2PlayerComponentImpl *>(_player->_component)->GetBounds();
 		}
 
 };

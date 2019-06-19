@@ -404,21 +404,21 @@ void NativeApplication::InternalPaint()
 		return;
 	}
 
-  jregion_t<int> 
+  jrect_t<int> 
     bounds = sg_jgui_window->GetBounds();
 
   if (sg_back_buffer != nullptr) {
     jgui::jsize_t<int>
       size = sg_back_buffer->GetSize();
 
-    if (size.width != bounds.width or size.height != bounds.height) {
+    if (size.width != bounds.size.width or size.height != bounds.size.height) {
       delete sg_back_buffer;
       sg_back_buffer = nullptr;
     }
   }
 
   if (sg_back_buffer == nullptr) {
-    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, {bounds.width, bounds.height});
+    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, bounds.size);
   }
 
   jgui::Graphics 
@@ -445,22 +445,22 @@ void NativeApplication::InternalPaint()
   // INFO:: invert the y-axis
   uint32_t 
 	  *r1 = (uint32_t *)data,
-	  *r2 = (uint32_t *)data + (bounds.height - 1)*bounds.width;
+	  *r2 = (uint32_t *)data + (bounds.size.height - 1)*bounds.size.width;
 
-  for (int i=0; i<bounds.height/2; i++) {
-	  for (int j=0; j<bounds.width; j++) {
+  for (int i=0; i<bounds.size.height/2; i++) {
+	  for (int j=0; j<bounds.size.width; j++) {
 		  uint32_t p = r1[j];
 
 		  r1[j] = r2[j];
 		  r2[j] = p; 
 	  }    
 
-	  r1 = r1 + bounds.width;
-	  r2 = r2 - bounds.width;
+	  r1 = r1 + bounds.size.width;
+	  r2 = r2 - bounds.size.width;
   }
 
-  VGImage img = vgCreateImage(VG_sARGB_8888, bounds.width, bounds.height, VG_IMAGE_QUALITY_BETTER);
-  vgImageSubData(img, data, stride, VG_sARGB_8888, 0, 0, bounds.width, bounds.height);
+  VGImage img = vgCreateImage(VG_sARGB_8888, bounds.size.width, bounds.size.height, VG_IMAGE_QUALITY_BETTER);
+  vgImageSubData(img, data, stride, VG_sARGB_8888, 0, 0, bounds.size.width, bounds.size.height);
   vgDrawImage(img);
   vgDestroyImage(img);
   
@@ -774,15 +774,14 @@ void NativeWindow::SetBounds(int x, int y, int width, int height)
 {
 }
 
-jgui::jregion_t<int> NativeWindow::GetBounds()
+jgui::jrect_t<int> NativeWindow::GetBounds()
 {
-	jgui::jregion_t<int> 
-    t = {0, 0, 0, 0};
-
-	t.width = sg_screen.width;
-	t.height = sg_screen.height;
-
-	return t;
+	return {
+    0,
+    0,
+    sg_screen.width,
+	  sg_screen.height
+  };
 }
 		
 void NativeWindow::SetResizable(bool resizable)

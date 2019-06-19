@@ -48,9 +48,9 @@ class IlistPlayerComponentImpl : public jgui::Component {
 		/** \brief */
     std::mutex _mutex;
 		/** \brief */
-		jgui::jregion_t<int> _src;
+		jgui::jrect_t<int> _src;
 		/** \brief */
-		jgui::jregion_t<int> _dst;
+		jgui::jrect_t<int> _dst;
 		/** \brief */
 		jgui::jsize_t<int> _frame_size;
 
@@ -64,15 +64,13 @@ class IlistPlayerComponentImpl : public jgui::Component {
 			_frame_size.width = w;
 			_frame_size.height = h;
 
-			_src.x = 0;
-			_src.y = 0;
-			_src.width = w;
-			_src.height = h;
+			_src = {
+        0, 0, w, h
+      };
 
-			_dst.x = 0;
-			_dst.y = 0;
-			_dst.width = w;
-			_dst.height = h;
+			_dst = {
+        0, 0, w, h
+      };
 
 			SetVisible(true);
 		}
@@ -96,12 +94,10 @@ class IlistPlayerComponentImpl : public jgui::Component {
 
 			if (_frame_size.width != isize.width || _frame_size.height != isize.height) {
 				if (_frame_size.width < 0 || _frame_size.height < 0) {
-					_src.width = isize.width;
-					_src.height = isize.height;
+					_src.size = isize;
 				}
 
-				_frame_size.width = isize.width;
-				_frame_size.height = isize.height;
+				_frame_size = isize;
 			}
 
 			_player->DispatchFrameGrabberEvent(new jevent::FrameGrabberEvent(frame, jevent::JFE_GRABBED));
@@ -120,10 +116,10 @@ class IlistPlayerComponentImpl : public jgui::Component {
       jgui::jsize_t<int>
         size = GetSize();
 
-      if (_src.x == 0 and _src.y == 0 and _src.width == _frame_size.width and _src.height == _frame_size.height) {
+      if (_src.point.x == 0 and _src.point.y == 0 and _src.size.width == _frame_size.width and _src.size.height == _frame_size.height) {
 			  g->DrawImage(_image, {0, 0, size.width, size.height});
       } else {
-			  g->DrawImage(_image, {_src.x, _src.y, _src.width, _src.height}, {0, 0, size.width, size.height});
+			  g->DrawImage(_image, _src, {0, 0, size.width, size.height});
       }
 				
       delete _image;
@@ -161,10 +157,9 @@ class IlistVideoSizeControlImpl : public VideoSizeControl {
 
       impl->_mutex.lock();
 
-			impl->_src.x = x;
-			impl->_src.y = y;
-			impl->_src.width = w;
-			impl->_src.height = h;
+			impl->_src = {
+        x, y, w, h
+      };
 
       impl->_mutex.unlock();
 		}
@@ -180,14 +175,14 @@ class IlistVideoSizeControlImpl : public VideoSizeControl {
       impl->_mutex.unlock();
 		}
 
-		virtual jgui::jregion_t<int> GetSource()
+		virtual jgui::jrect_t<int> GetSource()
 		{
 			return dynamic_cast<IlistPlayerComponentImpl *>(_player->_component)->_src;
 		}
 
-		virtual jgui::jregion_t<int> GetDestination()
+		virtual jgui::jrect_t<int> GetDestination()
 		{
-			return dynamic_cast<IlistPlayerComponentImpl *>(_player->_component)->GetVisibleBounds();
+			return dynamic_cast<IlistPlayerComponentImpl *>(_player->_component)->GetBounds();
 		}
 
 };

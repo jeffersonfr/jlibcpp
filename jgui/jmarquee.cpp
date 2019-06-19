@@ -146,7 +146,7 @@ void Marquee::Paint(Graphics *g)
       text = (char *)(_text.c_str());
     }
 
-    jregion_t 
+    jrect_t 
       clip = g->GetClip();
     int 
       cx = x,
@@ -154,25 +154,25 @@ void Marquee::Paint(Graphics *g)
       cw = w,
       ch = h;
 
-    if (cx > clip.width) {
-      cx = clip.width;
+    if (cx > clip.size.width) {
+      cx = clip.size.width;
     }
 
-    if (cy > clip.height) {
-      cy = clip.height;
+    if (cy > clip.size.height) {
+      cy = clip.size.height;
     }
 
-    if (cw > (clip.width-cx)) {
-      cw = clip.width - cx;
+    if (cw > (clip.size.width - cx)) {
+      cw = clip.size.width - cx;
     }
 
-    if (ch > (clip.height-cy)) {
-      ch = clip.height - cy;
+    if (ch > (clip.size.height - cy)) {
+      ch = clip.size.height - cy;
     }
 
     g->ClipRect({cx, cy, cw - 1, ch - 1});
     g->DrawString(text, jpoint_t<int>{x + _position, y});
-    g->SetClip({clip.x, clip.y, clip.width, clip.height});
+    g->SetClip(clip);
   }
 }
 

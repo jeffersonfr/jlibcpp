@@ -143,17 +143,19 @@ void Window::SetBounds(int x, int y, int width, int height)
   _instance->SetBounds(x, y, width, height);
 }
 
-jgui::jregion_t<int> Window::GetBounds()
+jgui::jrect_t<int> Window::GetBounds()
 {
   return _instance->GetBounds();
 }
 
-jgui::jregion_t<int> Window::GetVisibleBounds()
+jgui::jrect_t<int> Window::GetVisibleBounds()
 {
-  jgui::jregion_t<int> size = GetBounds();
-	jgui::jpoint_t<int> scroll = GetScrollLocation();
+  jgui::jrect_t<int> 
+    size = GetBounds();
+	jgui::jpoint_t<int> 
+    scroll = GetScrollLocation();
 
-	return {-scroll.x, -scroll.y, size.width, size.height};
+	return {{-scroll.x, -scroll.y}, size};
 }
 
 void Window::SetTitle(std::string title)

@@ -796,157 +796,157 @@ bool GridBagLayout::CalculateBaseline(Component *c, GridBagConstraints *constrai
   }
 }
 
-void GridBagLayout::AdjustForGravity(GridBagConstraints *constraints, jregion_t<int> *r) 
+void GridBagLayout::AdjustForGravity(GridBagConstraints *constraints, jrect_t<int> *r) 
 {
   int diffx, diffy;
-  int cellY = r->y;
-  int cellHeight = r->height;
+  int cellY = r->point.y;
+  int cellHeight = r->size.height;
 
   if (!rightToLeft) {
-    r->x += constraints->insets.left;
+    r->point.x += constraints->insets.left;
   } else {
-    r->x -= r->width - constraints->insets.right;
+    r->point.x -= r->size.width - constraints->insets.right;
   }
-  r->width -= (constraints->insets.left + constraints->insets.right);
-  r->y += constraints->insets.top;
+  r->size.width -= (constraints->insets.left + constraints->insets.right);
+  r->point.y += constraints->insets.top;
   // CHANGE:: remove negative symbol after parenthesis
-  r->height -= (-constraints->insets.top + constraints->insets.bottom);
+  r->size.height -= (-constraints->insets.top + constraints->insets.bottom);
 
   diffx = 0;
   if ((constraints->fill != JGBLC_HORIZONTAL &&
         constraints->fill != JGBLC_BOTH)
-      && (r->width > (constraints->minWidth + constraints->ipadx))) {
-    diffx = r->width - (constraints->minWidth + constraints->ipadx);
-    r->width = constraints->minWidth + constraints->ipadx;
+      && (r->size.width > (constraints->minWidth + constraints->ipadx))) {
+    diffx = r->size.width - (constraints->minWidth + constraints->ipadx);
+    r->size.width = constraints->minWidth + constraints->ipadx;
   }
 
   diffy = 0;
-  if ((constraints->fill != JGBLC_VERTICAL && constraints->fill != JGBLC_BOTH) && (r->height > (constraints->minHeight + constraints->ipady))) {
-    diffy = r->height - (constraints->minHeight + constraints->ipady);
-    r->height = constraints->minHeight + constraints->ipady;
+  if ((constraints->fill != JGBLC_VERTICAL && constraints->fill != JGBLC_BOTH) && (r->size.height > (constraints->minHeight + constraints->ipady))) {
+    diffy = r->size.height - (constraints->minHeight + constraints->ipady);
+    r->size.height = constraints->minHeight + constraints->ipady;
   }
 
   switch (constraints->anchor) {
     case JGBLC_BASELINE:
-      r->x += diffx/2;
+      r->point.x += diffx/2;
       AlignOnBaseline(constraints, r, cellY, cellHeight);
       break;
     case JGBLC_BASELINE_LEADING:
       if (rightToLeft) {
-        r->x += diffx;
+        r->point.x += diffx;
       }
       AlignOnBaseline(constraints, r, cellY, cellHeight);
       break;
     case JGBLC_BASELINE_TRAILING:
       if (!rightToLeft) {
-        r->x += diffx;
+        r->point.x += diffx;
       }
       AlignOnBaseline(constraints, r, cellY, cellHeight);
       break;
     case JGBLC_ABOVE_BASELINE:
-      r->x += diffx/2;
+      r->point.x += diffx/2;
       AlignAboveBaseline(constraints, r, cellY, cellHeight);
       break;
     case JGBLC_ABOVE_BASELINE_LEADING:
       if (rightToLeft) {
-        r->x += diffx;
+        r->point.x += diffx;
       }
       AlignAboveBaseline(constraints, r, cellY, cellHeight);
       break;
     case JGBLC_ABOVE_BASELINE_TRAILING:
       if (!rightToLeft) {
-        r->x += diffx;
+        r->point.x += diffx;
       }
       AlignAboveBaseline(constraints, r, cellY, cellHeight);
       break;
     case JGBLC_BELOW_BASELINE:
-      r->x += diffx/2;
+      r->point.x += diffx/2;
       AlignBelowBaseline(constraints, r, cellY, cellHeight);
       break;
     case JGBLC_BELOW_BASELINE_LEADING:
       if (rightToLeft) {
-        r->x += diffx;
+        r->point.x += diffx;
       }
       AlignBelowBaseline(constraints, r, cellY, cellHeight);
       break;
     case JGBLC_BELOW_BASELINE_TRAILING:
       if (!rightToLeft) {
-        r->x += diffx;
+        r->point.x += diffx;
       }
       AlignBelowBaseline(constraints, r, cellY, cellHeight);
       break;
     case JGBLC_CENTER:
-      r->x += diffx/2;
-      r->y += diffy/2;
+      r->point.x += diffx/2;
+      r->point.y += diffy/2;
       break;
     case JGBLC_PAGE_START:
     case JGBLC_NORTH:
-      r->x += diffx/2;
+      r->point.x += diffx/2;
       break;
     case JGBLC_NORTHEAST:
-      r->x += diffx;
+      r->point.x += diffx;
       break;
     case JGBLC_EAST:
-      r->x += diffx;
-      r->y += diffy/2;
+      r->point.x += diffx;
+      r->point.y += diffy/2;
       break;
     case JGBLC_SOUTHEAST:
-      r->x += diffx;
-      r->y += diffy;
+      r->point.x += diffx;
+      r->point.y += diffy;
       break;
     case JGBLC_PAGE_END:
     case JGBLC_SOUTH:
-      r->x += diffx/2;
-      r->y = diffy;
+      r->point.x += diffx/2;
+      r->point.y = diffy;
       break;
     case JGBLC_SOUTHWEST:
-      r->y += diffy;
+      r->point.y += diffy;
       break;
     case JGBLC_WEST:
-      r->y += diffy/2;
+      r->point.y += diffy/2;
       break;
     case JGBLC_NORTHWEST:
       break;
     case JGBLC_LINE_START:
       if (rightToLeft) {
-        r->x += diffx;
+        r->point.x += diffx;
       }
-      r->y += diffy/2;
+      r->point.y += diffy/2;
       break;
     case JGBLC_LINE_END:
       if (!rightToLeft) {
-        r->x += diffx;
+        r->point.x += diffx;
       }
-      r->y += diffy/2;
+      r->point.y += diffy/2;
       break;
     case JGBLC_FIRST_LINE_START:
       if (rightToLeft) {
-        r->x += diffx;
+        r->point.x += diffx;
       }  
       break;
     case JGBLC_FIRST_LINE_END:
       if (!rightToLeft) {
-        r->x += diffx;
+        r->point.x += diffx;
       }  
       break;
     case JGBLC_LAST_LINE_START:
       if (rightToLeft) {
-        r->x += diffx;
+        r->point.x += diffx;
       }
-      r->y += diffy;
+      r->point.y += diffy;
       break;
     case JGBLC_LAST_LINE_END:
       if (!rightToLeft) {
-        r->x += diffx;
+        r->point.x += diffx;
       }
-      r->y += diffy;
+      r->point.y += diffy;
       break;
     default:
       break;
   }
 }
 
-void GridBagLayout::AlignOnBaseline(GridBagConstraints *cons, jregion_t<int> *r, int cellY, int cellHeight) 
+void GridBagLayout::AlignOnBaseline(GridBagConstraints *cons, jrect_t<int> *r, int cellY, int cellHeight) 
 {
   if (cons->ascent >= 0) {
     if (cons->baselineResizeBehavior == JCB_CONSTANT_DESCENT) {
@@ -962,14 +962,14 @@ void GridBagLayout::AlignOnBaseline(GridBagConstraints *cons, jregion_t<int> *r,
       if (!cons->IsVerticallyResizable()) {
         // Component not resizable, calculate y location
         // from maxY - height.
-        r->y = maxY - cons->minHeight;
-        r->height = cons->minHeight;
+        r->point.y = maxY - cons->minHeight;
+        r->size.height = cons->minHeight;
       } else {
         // Component is resizable. As brb is constant descent,
         // can expand component to fill region above baseline.
         // Subtract out the top inset so that components insets
         // are honored.
-        r->height = maxY - cellY - cons->insets.top;
+        r->size.height = maxY - cellY - cons->insets.top;
       }
     }
     else {
@@ -991,7 +991,7 @@ void GridBagLayout::AlignOnBaseline(GridBagConstraints *cons, jregion_t<int> *r,
         // the baseline by asking for it again giving the
         // size we plan on using for the component.
         bool fits = false;
-        ascent = componentAdjusting->GetBaseline(r->width, r->height);
+        ascent = componentAdjusting->GetBaseline(r->size.width, r->size.height);
         if (ascent >= 0) {
           // Component has a baseline, pad with top inset
           // (this follows from calculateBaseline which
@@ -1001,7 +1001,7 @@ void GridBagLayout::AlignOnBaseline(GridBagConstraints *cons, jregion_t<int> *r,
         if (ascent >= 0 && ascent <= baseline) {
           // Components baseline fits within rows baseline.
           // Make sure the descent fits within the space as well.
-          if (baseline + (r->height - ascent - cons->insets.top) <=
+          if (baseline + (r->size.height - ascent - cons->insets.top) <=
               cellHeight - cons->insets.bottom) {
             // It fits, we're good.
             fits = true;
@@ -1010,14 +1010,14 @@ void GridBagLayout::AlignOnBaseline(GridBagConstraints *cons, jregion_t<int> *r,
             // Doesn't fit, but it's resizable.  Try
             // again assuming we'll get ascent again.
             int ascent2 = componentAdjusting->GetBaseline(
-                r->width, cellHeight - cons->insets.bottom -
+                r->size.width, cellHeight - cons->insets.bottom -
                 baseline + ascent);
             if (ascent2 >= 0) {
               ascent2 += cons->insets.top;
             }
             if (ascent2 >= 0 && ascent2 <= ascent) {
               // It'll fit
-              r->height = cellHeight - cons->insets.bottom -
+              r->size.height = cellHeight - cons->insets.bottom -
                 baseline + ascent;
               ascent = ascent2;
               fits = true;
@@ -1027,23 +1027,23 @@ void GridBagLayout::AlignOnBaseline(GridBagConstraints *cons, jregion_t<int> *r,
         if (!fits) {
           // Doesn't fit, use min size and original ascent
           ascent = cons->ascent;
-          r->width = cons->minWidth;
-          r->height = cons->minHeight;
+          r->size.width = cons->minWidth;
+          r->size.height = cons->minHeight;
         }
       }
       // Reset the components y location based on
       // components ascent and baseline for row. Because ascent
       // includes the baseline
-      r->y = cellY + baseline - ascent + cons->insets.top;
+      r->point.y = cellY + baseline - ascent + cons->insets.top;
       if (cons->IsVerticallyResizable()) {
         switch(cons->baselineResizeBehavior) {
           case JCB_CONSTANT_ASCENT:
-            r->height = jmath::Math<int>::Max(cons->minHeight,cellY + cellHeight - r->y - cons->insets.bottom);
+            r->size.height = jmath::Math<int>::Max(cons->minHeight,cellY + cellHeight - r->point.y - cons->insets.bottom);
             break;
           case JCB_CENTER_OFFSET:
             {
-              int upper = r->y - cellY - cons->insets.top;
-              int lower = cellY + cellHeight - r->y -  cons->minHeight - cons->insets.bottom;
+              int upper = r->point.y - cellY - cons->insets.top;
+              int lower = cellY + cellHeight - r->point.y -  cons->minHeight - cons->insets.bottom;
               int delta = jmath::Math<int>::Min(upper, lower);
               delta += delta;
               if (delta > 0 &&
@@ -1052,9 +1052,9 @@ void GridBagLayout::AlignOnBaseline(GridBagConstraints *cons, jregion_t<int> *r,
                 // Off by 1
                 delta--;
               }
-              r->height = cons->minHeight + delta;
-              r->y = cellY + baseline -
-                (r->height + cons->centerPadding) / 2 -
+              r->size.height = cons->minHeight + delta;
+              r->point.y = cellY + baseline -
+                (r->size.height + cons->centerPadding) / 2 -
                 cons->centerOffset;
             }
             break;
@@ -1072,7 +1072,7 @@ void GridBagLayout::AlignOnBaseline(GridBagConstraints *cons, jregion_t<int> *r,
   }
 }
 
-void GridBagLayout::AlignAboveBaseline(GridBagConstraints *cons, jregion_t<int> *r, int cellY, int cellHeight) 
+void GridBagLayout::AlignAboveBaseline(GridBagConstraints *cons, jrect_t<int> *r, int cellY, int cellHeight) 
 {
   if (layoutInfo->HasBaseline(cons->tempY)) {
     int maxY; // Baseline for the row
@@ -1087,13 +1087,13 @@ void GridBagLayout::AlignAboveBaseline(GridBagConstraints *cons, jregion_t<int> 
     if (cons->IsVerticallyResizable()) {
       // Component is resizable. Top edge is offset by top
       // inset, bottom edge on baseline.
-      r->y = cellY + cons->insets.top;
-      r->height = maxY - r->y;
+      r->point.y = cellY + cons->insets.top;
+      r->size.height = maxY - r->point.y;
     }
     else {
       // Not resizable.
-      r->height = cons->minHeight + cons->ipady;
-      r->y = maxY - r->height;
+      r->size.height = cons->minHeight + cons->ipady;
+      r->point.y = maxY - r->size.height;
     }
   }
   else {
@@ -1101,19 +1101,19 @@ void GridBagLayout::AlignAboveBaseline(GridBagConstraints *cons, jregion_t<int> 
   }
 }
 
-void GridBagLayout::AlignBelowBaseline(GridBagConstraints *cons, jregion_t<int> *r, int cellY, int cellHeight) 
+void GridBagLayout::AlignBelowBaseline(GridBagConstraints *cons, jrect_t<int> *r, int cellY, int cellHeight) 
 {
   if (layoutInfo->HasBaseline(cons->tempY)) {
     if (layoutInfo->HasConstantDescent(cons->tempY)) {
       // Prefer descent
-      r->y = cellY + cellHeight - layoutInfo->maxDescent[cons->tempY];
+      r->point.y = cellY + cellHeight - layoutInfo->maxDescent[cons->tempY];
     }
     else {
       // Prefer ascent
-      r->y = cellY + layoutInfo->maxAscent[cons->tempY];
+      r->point.y = cellY + layoutInfo->maxAscent[cons->tempY];
     }
     if (cons->IsVerticallyResizable()) {
-      r->height = cellY + cellHeight - r->y - cons->insets.bottom;
+      r->size.height = cellY + cellHeight - r->point.y - cons->insets.bottom;
     }
   }
   else {
@@ -1121,10 +1121,10 @@ void GridBagLayout::AlignBelowBaseline(GridBagConstraints *cons, jregion_t<int> 
   }
 }
 
-void GridBagLayout::CenterVertically(GridBagConstraints *cons, jregion_t<int> *r, int cellHeight) 
+void GridBagLayout::CenterVertically(GridBagConstraints *cons, jrect_t<int> *r, int cellHeight) 
 {
   if (!cons->IsVerticallyResizable()) {
-    r->y += jmath::Math<int>::Max(0, (cellHeight - cons->insets.top - cons->insets.bottom - cons->minHeight - cons->ipady) / 2);
+    r->point.y += jmath::Math<int>::Max(0, (cellHeight - cons->insets.top - cons->insets.bottom - cons->minHeight - cons->ipady) / 2);
   }
 }
 
@@ -1157,13 +1157,11 @@ void GridBagLayout::ArrangeGrid(Container *parent)
   GridBagConstraints *constraints;
   GridBagLayoutInfo *info;
   jinsets_t insets = parent->GetInsets();
-  jregion_t<int> r = {0, 0};
+  jrect_t<int> r = {0, 0};
   jsize_t<int> d;
   double weight;
   int compindex;
-  int i, 
-      diffw, 
-      diffh;
+  int i, diffw, diffh;
 
   rightToLeft = !(parent->GetComponentOrientation() == JCO_LEFT_TO_RIGHT);
 
@@ -1191,11 +1189,11 @@ void GridBagLayout::ArrangeGrid(Container *parent)
   }
 
   layoutInfo = info;
-  r.width = d.width;
-  r.height = d.height;
+  r.size.width = d.width;
+  r.size.height = d.height;
 
   // If the current dimensions of the window don't match the desired dimensions, then adjust the minWidth and minHeight arrays according to the weights.
-  diffw = size.width - r.width;
+  diffw = size.width - r.size.width;
 
   if (diffw != 0) {
     weight = 0.0;
@@ -1209,21 +1207,21 @@ void GridBagLayout::ArrangeGrid(Container *parent)
         int dx = (int)(( ((double)diffw) * info->weightX[i]) / weight);
     
         info->minWidth[i] += dx;
-        r.width += dx;
+        r.size.width += dx;
         
         if (info->minWidth[i] < 0) {
-          r.width -= info->minWidth[i];
+          r.size.width -= info->minWidth[i];
           info->minWidth[i] = 0;
         }
       }
     }
 
-    diffw = size.width - r.width;
+    diffw = size.width - r.size.width;
   } else {
     diffw = 0;
   }
 
-  diffh = size.height - r.height;
+  diffh = size.height - r.size.height;
 
   if (diffh != 0) {
     weight = 0.0;
@@ -1237,15 +1235,15 @@ void GridBagLayout::ArrangeGrid(Container *parent)
         int dy = (int)(( ((double)diffh) * info->weightY[i]) / weight);
 
         info->minHeight[i] += dy;
-        r.height += dy;
+        r.size.height += dy;
 
         if (info->minHeight[i] < 0) {
-          r.height -= info->minHeight[i];
+          r.size.height -= info->minHeight[i];
           info->minHeight[i] = 0;
         }
       }
     }
-    diffh = size.height - r.height;
+    diffh = size.height - r.size.height;
   } else {
     diffh = 0;
   }
@@ -1268,49 +1266,49 @@ void GridBagLayout::ArrangeGrid(Container *parent)
     constraints = LookupConstraints(comp);
 
     if (!rightToLeft) {
-      r.x = info->startx;
+      r.point.x = info->startx;
 
       for(i = 0; i < constraints->tempX; i++) {
-        r.x += info->minWidth[i];
+        r.point.x += info->minWidth[i];
       }
     } else {
-      r.x = size.width - (diffw/2 + insets.right);
+      r.point.x = size.width - (diffw/2 + insets.right);
 
       for(i = 0; i < constraints->tempX; i++) {
-        r.x -= info->minWidth[i];
+        r.point.x -= info->minWidth[i];
       }
     }
 
-    r.y = info->starty;
+    r.point.y = info->starty;
 
     for(i = 0; i < constraints->tempY; i++) {
-      r.y += info->minHeight[i];
+      r.point.y += info->minHeight[i];
     }
 
-    r.width = 0;
+    r.size.width = 0;
 
     for(i = constraints->tempX; i < (constraints->tempX + constraints->tempWidth); i++) {
-      r.width += info->minWidth[i];
+      r.size.width += info->minWidth[i];
     }
 
-    r.height = 0;
+    r.size.height = 0;
 
     for(i = constraints->tempY; i < (constraints->tempY + constraints->tempHeight); i++) {
-      r.height += info->minHeight[i];
+      r.size.height += info->minHeight[i];
     }
 
     componentAdjusting = comp;
 
     AdjustForGravity(constraints, &r);
 
-    if (r.x < 0) {
-      r.width += r.x;
-      r.x = 0;
+    if (r.point.x < 0) {
+      r.size.width += r.point.x;
+      r.point.x = 0;
     }
 
-    if (r.y < 0) {
-      r.height += r.y;
-      r.y = 0;
+    if (r.point.y < 0) {
+      r.size.height += r.point.y;
+      r.point.y = 0;
     }
 
     /*
@@ -1319,13 +1317,13 @@ void GridBagLayout::ArrangeGrid(Container *parent)
      * it's mapped.
      */
 
-    if ((r.width <= 0) || (r.height <= 0)) {
+    if ((r.size.width <= 0) || (r.size.height <= 0)) {
       comp->SetBounds(0, 0, 0, 0);
     } else {
-      jgui::jregion_t<int> r2 = comp->GetVisibleBounds();
+      jgui::jrect_t<int> r2 = comp->GetVisibleBounds();
 
-      if (r2.x != r.x || r2.y != r.y || r2.width != r.width || r2.height != r.height) {
-        comp->SetBounds(r.x, r.y, r.width, r.height);
+      if (r2.point.x != r.point.x || r2.point.y != r.point.y || r2.size.width != r.size.width || r2.size.height != r.size.height) {
+        comp->SetBounds(r);
       }
     }
   }

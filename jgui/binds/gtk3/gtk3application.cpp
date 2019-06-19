@@ -49,7 +49,7 @@ static GtkWidget *sg_frame = nullptr;
 /** \brief */
 static GtkWidget *sg_widget = nullptr;
 /** \brief */
-static jgui::jregion_t<int> sg_visible_bounds;
+static jgui::jrect_t<int> sg_visible_bounds;
 /** \brief */
 static float sg_opacity = 1.0f;
 /** \brief */
@@ -413,21 +413,21 @@ static gboolean OnDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
 
 	// NativeWindow 
   //   *handler = reinterpret_cast<NativeWindow *>(user_data);
-  jregion_t<int> 
+  jrect_t<int> 
     bounds = sg_jgui_window->GetBounds();
 
   if (sg_back_buffer != nullptr) {
     jgui::jsize_t<int>
       size = sg_back_buffer->GetSize();
 
-    if (size.width != bounds.width or size.height != bounds.height) {
+    if (size.width != bounds.size.width or size.height != bounds.size.height) {
       delete sg_back_buffer;
       sg_back_buffer = nullptr;
     }
   }
 
   if (sg_back_buffer == nullptr) {
-    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, {bounds.width, bounds.height});
+    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, bounds.size);
   }
 
   jgui::Graphics 
@@ -547,8 +547,8 @@ static void OnClose(void)
 
 static gboolean OnConfigureEvent(GtkWidget *widget, GdkEventConfigure *event, gpointer user_data)
 {
-  gtk_window_get_position((GtkWindow *)sg_window, &sg_visible_bounds.x, &sg_visible_bounds.y);
-  gtk_window_get_size((GtkWindow *)sg_window, &sg_visible_bounds.width, &sg_visible_bounds.height);
+  gtk_window_get_position((GtkWindow *)sg_window, &sg_visible_bounds.point.x, &sg_visible_bounds.point.y);
+  gtk_window_get_size((GtkWindow *)sg_window, &sg_visible_bounds.size.width, &sg_visible_bounds.size.height);
 
   gtk_widget_queue_draw(sg_widget);
 
@@ -560,7 +560,7 @@ static void ConfigureApplication(GtkApplication *app, gpointer user_data)
   sg_window = gtk_application_window_new(app);
 
   gtk_window_set_title(GTK_WINDOW(sg_window), "");
-  gtk_window_set_default_size(GTK_WINDOW(sg_window), sg_visible_bounds.width, sg_visible_bounds.height);
+  gtk_window_set_default_size(GTK_WINDOW(sg_window), sg_visible_bounds.size.width, sg_visible_bounds.size.height);
 
   sg_frame = gtk_frame_new(nullptr);
 
@@ -672,10 +672,12 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 
 	sg_window = nullptr;
 
-  sg_visible_bounds.x = x;
-  sg_visible_bounds.y = y;
-  sg_visible_bounds.width = width;
-  sg_visible_bounds.height = height;
+  sg_visible_bounds = {
+    x,
+    y,
+    width,
+    height
+  };
 
   sg_jgui_icon = new BufferedImage(_DATA_PREFIX"/images/small-gnu.png");
 
@@ -785,7 +787,7 @@ void NativeWindow::SetBounds(int x, int y, int width, int height)
 	gtk_widget_set_size_request(sg_window, width, height);
 }
 
-jgui::jregion_t<int> NativeWindow::GetBounds()
+jgui::jrect_t<int> NativeWindow::GetBounds()
 {
   return sg_visible_bounds;
 }

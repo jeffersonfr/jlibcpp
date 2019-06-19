@@ -21,6 +21,7 @@
 #define J_GRAPHICS_H
 
 #include "jgui/jcolor.h"
+#include "jgui/jgeometry.h"
 
 #include <cairo.h>
 
@@ -200,175 +201,6 @@ struct jgradient_t {
   float stop;
 };
 
-/**
- * \brief
- *
- */
-struct jrational_t {
-  int num;
-  int den;
-};
-
-/**
- * \brief
- *
- */
-template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
-  struct jpoint_t {
-    T x;
-    T y;
-  };
-
-/**
- * \brief
- *
- */
-template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
-  struct jpoint3d_t {
-    T x;
-    T y;
-    T z;
-    
-    operator jgui::jpoint_t<T>()
-    {
-      return {
-        .x = x,
-        .y = y
-      };
-    }
-
-  };
-
-/**
- * \brief
- *
- */
-template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
-  struct jsize_t {
-    T width;
-    T height;
-  };
-
-/**
- * \brief
- *
- */
-template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
-  struct jline_t {
-    struct jpoint_t<T> p0;
-    struct jpoint_t<T> p1;
-};
-
-/**
- * \brief
- *
- */
-template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
-  struct jrect_t {
-    struct jpoint_t<T> point;
-    struct jsize_t<T> size;
-    
-    operator jgui::jpoint_t<T>()
-    {
-      return {
-        .x = point.x,
-        .y = point.y
-      };
-    }
-
-    operator jgui::jsize_t<T>()
-    {
-      return {
-        .width = size.width,
-        .height = size.height
-      };
-    }
-
-    operator jgui::jline_t<T>()
-    {
-      return {
-        .p0 = {
-          .x = point.x,
-          .y = point.y
-        },
-        .p1 = {
-          .x = point.x + size.width,
-          .y = point.y + size.height
-        }
-      };
-    }
-
-};
-
-/**
- * \brief
- *
- */
-template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
-  struct jregion_t {
-    T x;
-    T y;
-    T width;
-    T height;
-
-    operator jgui::jpoint_t<T>()
-    {
-      return {
-        .x = x,
-        .y = y
-      };
-    }
-
-    operator jgui::jsize_t<T>()
-    {
-      return {
-        .width = width,
-        .height = height
-      };
-    }
-
-    operator jgui::jline_t<T>()
-    {
-      return {
-        .p0 = {
-          .x = x,
-          .y = y
-        },
-        .p1 = {
-          .x = x + width,
-          .y = y + height
-        }
-      };
-    }
-
-    operator jgui::jrect_t<T>()
-    {
-      return {
-        .point = {
-          .x = x,
-          .y = y
-        },
-        .size = {
-          .width = width,
-          .height = height
-        }
-      };
-    }
-
-};
-
-/**
- * \brief
- *
- */
-template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
-  struct jinsets_t {
-    T left;
-    T top;
-    T right;
-    T bottom;
-  };
-
 class Image;
 class Font;
 
@@ -391,9 +223,9 @@ class Graphics : public virtual jcommon::Object {
     /** \brief */
     jpen_t _pen;
     /** \brief */
-    struct jregion_t<int> _clip;
+    struct jrect_t<int> _clip;
     /** \brief */
-    struct jregion_t<int> _internal_clip;
+    struct jrect_t<int> _internal_clip;
     /** \brief */
     jcomposite_flags_t _composite_flags;
     /** \brief */
@@ -446,7 +278,7 @@ class Graphics : public virtual jcommon::Object {
      * \brief
      *
      */
-    virtual jregion_t<int> ClipRect(jrect_t<int> rect);
+    virtual jrect_t<int> ClipRect(jrect_t<int> rect);
     
     /**
      * \brief
@@ -458,7 +290,7 @@ class Graphics : public virtual jcommon::Object {
      * \brief
      *
      */
-    virtual jregion_t<int> GetClip();
+    virtual jrect_t<int> GetClip();
     
     /**
      * \brief
@@ -548,7 +380,7 @@ class Graphics : public virtual jcommon::Object {
      * \brief
      *
      */
-    virtual void DrawLine(jline_t<int> line);
+    virtual void DrawLine(jpoint_t<int> p0, jpoint_t<int> p1);
     
     /**
      * \brief

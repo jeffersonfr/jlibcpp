@@ -144,11 +144,11 @@ Font::Font(std::string name, jfont_attributes_t attributes, int size):
 
   // INFO:: intializing the first 256 characters withs
   for (int i=0; i<256; i++) {
-    jregion_t<int> bounds;
+    jrect_t<int> bounds;
 
     bounds = Font::GetGlyphExtends(i);
 
-    _widths[i] = bounds.x+bounds.width;
+    _widths[i] = bounds.point.x + bounds.size.width;
   }
 }
 
@@ -226,12 +226,12 @@ int Font::GetLeading()
 
 int Font::GetStringWidth(std::string text)
 {
-  jregion_t<int> t = GetStringExtends(text);
+  jrect_t<int> t = GetStringExtends(text);
 
-  return t.x+t.width;
+  return t.point.x + t.size.width;
 }
 
-jregion_t<int> Font::GetStringExtends(std::string text)
+jrect_t<int> Font::GetStringExtends(std::string text)
 {
   const char *utf8 = text.c_str();
   int utf8_len = text.size();
@@ -245,12 +245,13 @@ jregion_t<int> Font::GetStringExtends(std::string text)
 
   cairo_scaled_font_text_extents(_scaled_font, utf8, &t);
 
-  jregion_t<int> r;
-
-  r.x = t.x_bearing;
-  r.y = t.y_bearing;
-  r.width = t.width;
-  r.height = t.height;
+  jrect_t<int> 
+    r {
+      (int)t.x_bearing, 
+      (int)t.y_bearing, 
+      (int)t.width, 
+      (int)t.height
+    };
 
   if (GetEncoding() == JFE_ISO_8859_1) {
     delete [] utf8;
@@ -259,7 +260,7 @@ jregion_t<int> Font::GetStringExtends(std::string text)
   return r;
 }
 
-jregion_t<int> Font::GetGlyphExtends(int symbol)
+jrect_t<int> Font::GetGlyphExtends(int symbol)
 {
   cairo_glyph_t glyph;
   cairo_text_extents_t t;
@@ -270,14 +271,12 @@ jregion_t<int> Font::GetGlyphExtends(int symbol)
 
   cairo_scaled_font_glyph_extents(_scaled_font, &glyph, 1, &t);
 
-  jregion_t<int> r;
-
-  r.x = t.x_bearing;
-  r.y = t.y_bearing;
-  r.width = t.width;
-  r.height = t.height;
-
-  return r;
+  return {
+    (int)t.x_bearing, 
+    (int)t.y_bearing, 
+    (int)t.width, 
+    (int)t.height
+  };
 }
 
 void Font::GetStringBreak(std::vector<std::string> *lines, std::string text, int wp, int hp, bool justify)

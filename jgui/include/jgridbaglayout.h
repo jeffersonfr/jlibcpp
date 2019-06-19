@@ -511,31 +511,31 @@ class GridBagLayout : public Layout {
      * \brief
      *
      */
-    virtual void AdjustForGravity(GridBagConstraints *constraints, jregion_t<int> *r);
+    virtual void AdjustForGravity(GridBagConstraints *constraints, jrect_t<int> *r);
     
     /**
      * \brief
      *
      */
-    virtual void AlignOnBaseline(GridBagConstraints *cons, jregion_t<int> *r, int cellY, int cellHeight);
+    virtual void AlignOnBaseline(GridBagConstraints *cons, jrect_t<int> *r, int cellY, int cellHeight);
     
     /**
      * \brief
      *
      */
-    virtual void AlignAboveBaseline(GridBagConstraints *cons, jregion_t<int> *r, int cellY, int cellHeight);
+    virtual void AlignAboveBaseline(GridBagConstraints *cons, jrect_t<int> *r, int cellY, int cellHeight);
     
     /**
      * \brief
      *
      */
-    virtual void AlignBelowBaseline(GridBagConstraints *cons, jregion_t<int> *r, int cellY, int cellHeight);
+    virtual void AlignBelowBaseline(GridBagConstraints *cons, jrect_t<int> *r, int cellY, int cellHeight);
     
     /**
      * \brief
      *
      */
-    virtual void CenterVertically(GridBagConstraints *cons, jregion_t<int> *r, int cellHeight);
+    virtual void CenterVertically(GridBagConstraints *cons, jrect_t<int> *r, int cellHeight);
     
     /**
      * \brief

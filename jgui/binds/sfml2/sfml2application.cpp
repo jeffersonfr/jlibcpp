@@ -71,7 +71,7 @@ static jgui::jsize_t<int> sg_screen = {0, 0};
 /** \brief */
 static std::mutex sg_loop_mutex;
 /** \brief */
-static jgui::jregion_t<int> sg_previous_bounds;
+static jgui::jrect_t<int> sg_previous_bounds;
 /** \brief */
 static Window *sg_jgui_window = nullptr;
 /** \brief */
@@ -350,21 +350,21 @@ void NativeApplication::InternalPaint()
 		return;
 	}
 
-  jregion_t<int> 
+  jrect_t<int> 
     bounds = sg_jgui_window->GetBounds();
 
   if (sg_back_buffer != nullptr) {
     jgui::jsize_t<int>
       size = sg_back_buffer->GetSize();
 
-    if (size.width != bounds.width or size.height != bounds.height) {
+    if (size.width != bounds.size.width or size.height != bounds.size.height) {
       delete sg_back_buffer;
       sg_back_buffer = nullptr;
     }
   }
 
   if (sg_back_buffer == nullptr) {
-    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, {bounds.width, bounds.height});
+    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, bounds.size);
   }
 
   jgui::Graphics 
@@ -383,14 +383,14 @@ void NativeApplication::InternalPaint()
 	sf::Texture texture;
 	sf::Sprite sprite;
 
-	texture.create(bounds.width, bounds.height);
+	texture.create(bounds.size.width, bounds.size.height);
 	texture.setSmooth(g->GetAntialias() != JAM_NONE);
 
 	sprite.setTexture(texture, false);
   
-  sf::Vector2f targetSize(bounds.width, bounds.height);
+  sf::Vector2f targetSize(bounds.size.width, bounds.size.height);
 
-	int size = bounds.width*bounds.height;
+	int size = bounds.size.width*bounds.size.height;
 	uint8_t *src = data;
 
 	for (int i=0; i<size; i++) {
@@ -641,9 +641,9 @@ void NativeWindow::ToggleFullScreen()
 
     sg_fullscreen = true;
   } else {
-    window = new sf::RenderWindow(sf::VideoMode(sg_previous_bounds.width, sg_previous_bounds.height), GetTitle().c_str(), flags);
+    window = new sf::RenderWindow(sf::VideoMode(sg_previous_bounds.size.width, sg_previous_bounds.size.height), GetTitle().c_str(), flags);
 
-    window->setPosition(sf::Vector2i(sg_previous_bounds.x, sg_previous_bounds.y));
+    window->setPosition(sf::Vector2i(sg_previous_bounds.point.x, sg_previous_bounds.point.y));
 
     sg_fullscreen = false;
   }
@@ -717,7 +717,7 @@ void NativeWindow::SetBounds(int x, int y, int width, int height)
   sg_window->setView(sf::View(sf::FloatRect(0, 0, width, height)));
 }
 
-jgui::jregion_t<int> NativeWindow::GetBounds()
+jgui::jrect_t<int> NativeWindow::GetBounds()
 {
   sf::Vector2i 
     location = sg_window->getPosition();
@@ -725,10 +725,10 @@ jgui::jregion_t<int> NativeWindow::GetBounds()
     size = sg_window->getSize();
 
 	return {
-    .x = location.x, 
-    .y = location.y, 
-    .width = (int)size.x, 
-    .height = (int)size.y
+    location.x, 
+    location.y, 
+    (int)size.x, 
+    (int)size.y
   };
 }
 	
