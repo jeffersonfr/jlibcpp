@@ -123,6 +123,7 @@ Raster::Raster(uint32_t *data, jgui::jsize_t<int> size):
   _buffer = data;
   _size = size;
   _color = 0xfff0f0f0;
+  _blend_enabled = false;
 }
 
 Raster::~Raster()
@@ -994,11 +995,42 @@ void Raster::DrawImage(jgui::Image *image, jgui::jpoint_t<int> v1)
         continue;
       }
 
-      if (src[i] & 0xff000000) {
-        dst[i + v1.x] = src[i];
+      if (_blend_enabled == false) {
+        if (src[i] & 0xff000000) {
+          dst[i + v1.x] = src[i];
+        }
+      } else {
+        uint32_t
+          sp = src[i],
+          dp = dst[i + v1.x];
+        int
+          sa = (sp >> 0x18) & 0xff,
+          sr = (sp >> 0x10) & 0xff,
+          sg = (sp >> 0x08) & 0xff,
+          sb = (sp >> 0x00) & 0xff,
+          // da = (dp >> 0x18) & 0xff,
+          dr = (dp >> 0x10) & 0xff,
+          dg = (dp >> 0x08) & 0xff,
+          db = (dp >> 0x00) & 0xff;
+
+        sr = (sr*sa + dr*(0xff - sa))/0xff;
+        sg = (sg*sa + dg*(0xff - sa))/0xff;
+        sb = (sb*sa + db*(0xff - sa))/0xff;
+
+        dst[i + v1.x] = 0xff000000 | sr << 0x10 | sg << 0x08 | sb;
       }
     }
   }
+}
+
+void Raster::SetBlendEnabled(bool param)
+{
+  _blend_enabled = param;
+}
+
+float Raster::GetBlendEnabled()
+{
+  return _blend_enabled;
 }
 
 }
