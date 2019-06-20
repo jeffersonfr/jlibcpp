@@ -129,9 +129,9 @@ bool Container::MoveScrollTowards(Component *next, jevent::jkeyevent_symbol_t sy
       region1 {al.x, al.y, ns.width, ns.height},
       region2 {al.x + slocation.x, al.y + slocation.y, w, h};
     bool 
-      nextIntersects = GetBounds().Contains(next->GetBounds()) == true && region1.Intersects({al.x + x, al.y + y, w, h});
+      nextIntersects = GetBounds().Contains(next->GetBounds()) == true && region1.Intersects(jgui::jrect_t<int>{al.x + x, al.y + y, w, h});
 
-    if ((nextIntersects && !currentLarge && !edge) || region2.Contains({nl.x, nl.y, ns.width, ns.height})) {
+    if ((nextIntersects && !currentLarge && !edge) || region2.Contains(jgui::jrect_t<int>{nl.x, nl.y, ns.width, ns.height})) {
       //scrollComponentToVisible(next);
     } else {
       if (!scrollOutOfBounds) {
@@ -145,7 +145,7 @@ bool Container::MoveScrollTowards(Component *next, jevent::jkeyevent_symbol_t sy
         ScrollToVisibleArea({x, y, w, h}, this);
 
         // if after moving the scroll the current focus is out of the view port and the next focus is in the view port move the focus
-        if (nextIntersects == false || region3.Intersects({al.x + x, al.y + y, w, h}) != 0) {
+        if (nextIntersects == false || region3.Intersects(jgui::jrect_t<int>{al.x + x, al.y + y, w, h}) != 0) {
           return false;
         }
       } else {

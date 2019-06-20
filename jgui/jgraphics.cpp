@@ -131,7 +131,7 @@ jrect_t<int> Graphics::ClipRect(jrect_t<int> rect)
   struct jpoint_t<int> t = Translate();
 
   jrect_t<int> 
-    clip = _internal_clip.Intersection({rect.point.x + t.x, rect.point.y + t.y, rect.size.width, rect.size.height});
+    clip = _internal_clip.Intersection(jgui::jrect_t<int>{rect.point.x + t.x, rect.point.y + t.y, rect.size.width, rect.size.height});
   
   SetClip({clip.point.x - t.x, clip.point.y - t.y, clip.size.width, clip.size.height});
 
@@ -147,7 +147,7 @@ void Graphics::SetClip(jrect_t<int> rect)
 
   jrect_t<int> 
     region = {0, 0, sw, sh},
-    clip = region.Intersection({rect.point.x + t.x, rect.point.y + t.y, rect.size.width, rect.size.height});
+    clip = region.Intersection(jgui::jrect_t<int>{rect.point.x + t.x, rect.point.y + t.y, rect.size.width, rect.size.height});
   
   _clip.point = clip.point - jpoint_t<int>{t.x, t.y};
   _clip.size = clip.size;

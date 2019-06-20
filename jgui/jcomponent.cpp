@@ -139,7 +139,7 @@ void Component::ScrollToVisibleArea(jrect_t<int> rect, Component *coordinateSpac
         parent = parent->GetParent();
       }
 
-      if (view.Contains({relativeX, relativeY, rect.size.width, rect.size.height}) == true) {
+      if (view.Contains(jgui::jrect_t<int>{relativeX, relativeY, rect.size.width, rect.size.height}) == true) {
         return;
       }
     }
