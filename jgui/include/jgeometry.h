@@ -116,6 +116,22 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return {x - param.x, y - param.y};
     }
     
+    template<typename U> jpoint_t<T> & operator+=(jpoint_t<U> param)
+    {
+      x = x + param.x;
+      y = y + param.y;
+
+      return *this;
+    }
+    
+    template<typename U> jpoint_t<T> & operator-=(jpoint_t<U> param)
+    {
+      x = x - param.x;
+      y = y - param.y;
+
+      return *this;
+    }
+    
     jpoint_t<T> operator*(float param)
     {
       return {x*param, y*param};
@@ -209,6 +225,24 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return {x - param.x, y - param.y, z - param.z};
     }
     
+    template<typename U> jpoint3d_t<T> & operator+=(jpoint3d_t<U> param)
+    {
+      x = x + param.x;
+      y = y + param.y;
+      z = z + param.z;
+
+      return *this;
+    }
+    
+    template<typename U> jpoint3d_t<T> & operator-=(jpoint3d_t<U> param)
+    {
+      x = x - param.x;
+      y = y - param.y;
+      z = z - param.z;
+
+      return *this;
+    }
+    
     jpoint3d_t<T> operator*(float param)
     {
       return {x*param, y*param, z*param};
@@ -282,12 +316,28 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
 
     template<typename U> jsize_t<T> operator+(jsize_t<U> param)
     {
-      return {width + param.width, width + param.width};
+      return {width + param.width, height + param.height};
     }
     
     template<typename U> jsize_t<T> operator-(jsize_t<U> param)
     {
-      return {height - param.height, height - param.height};
+      return {width - param.width, height - param.height};
+    }
+    
+    template<typename U> jsize_t<T> & operator+=(jsize_t<U> param)
+    {
+      width = width + param.width;
+      height = height + param.height;
+
+      return *this;
+    }
+    
+    template<typename U> jsize_t<T> & operator-=(jsize_t<U> param)
+    {
+      width = width - param.width;
+      height = height - param.height;
+
+      return *this;
     }
     
     jsize_t<T> operator*(float param)
@@ -384,6 +434,22 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
     template<typename U> jrect_t<T> operator-(jrect_t<U> param)
     {
       return {point - param.point, size - param.size};
+    }
+    
+    template<typename U> jrect_t<T> & operator+=(jrect_t<U> param)
+    {
+      point = point + param.point;
+      size = size + param.size;
+
+      return *this;
+    }
+    
+    template<typename U> jrect_t<T> & operator-=(jrect_t<U> param)
+    {
+      point = point - param.point;
+      size = size - param.size;
+
+      return *this;
     }
     
     jrect_t<T> operator*(float param)
