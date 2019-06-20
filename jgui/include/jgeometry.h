@@ -24,6 +24,8 @@
 #include <type_traits>
 #include <cmath>
 
+#include <stdio.h>
+
 namespace jgui {
 
 /**
@@ -56,7 +58,17 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
     T top;
     T right;
     T bottom;
-    
+ 
+    jinsets_t<T> & operator=(T param)
+    {
+      left = param;
+      top = param;
+      right = param;
+      bottom = param;
+
+      return *this;
+    }
+
     bool operator==(jinsets_t<T> param)
     {
       return (left == param.left and top == param.top and right == param.right and bottom == param.bottom);
@@ -77,6 +89,22 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
   struct jpoint_t {
     T x;
     T y;
+
+    template<typename U> operator jgui::jpoint_t<U>()
+    {
+      return {
+        .x = (U)x,
+        .y = (U)y
+      };
+    }
+
+    jpoint_t<T> & operator=(T param)
+    {
+      x = param;
+      y = param;
+
+      return *this;
+    }
 
     template<typename U> jpoint_t<T> operator+(jpoint_t<U> param)
     {
@@ -144,12 +172,31 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
     T y;
     T z;
     
-    operator jgui::jpoint_t<T>()
+    template<typename U> operator jgui::jpoint3d_t<U>()
     {
       return {
-        .x = x,
-        .y = y
+        .x = (U)x,
+        .y = (U)y,
+        .z = (U)z
       };
+    }
+
+    jpoint3d_t<T> & operator=(T param)
+    {
+      x = param;
+      y = param;
+      z = param;
+
+      return *this;
+    }
+
+    template<typename U> jpoint3d_t<T> & operator=(jgui::jpoint_t<U> &param)
+    {
+      x = param.x;
+      y = param.y;
+      z = 0;
+
+      return *this;
     }
 
     template<typename U> jpoint3d_t<T> operator+(jpoint3d_t<U> param)
@@ -217,6 +264,22 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
     T width;
     T height;
     
+    template<typename U> operator jgui::jsize_t<U>()
+    {
+      return {
+        .width = (U)width,
+        .height = (U)height
+      };
+    }
+
+    jsize_t<T> & operator=(T param)
+    {
+      width = param;
+      height = param;
+
+      return *this;
+    }
+
     template<typename U> jsize_t<T> operator+(jsize_t<U> param)
     {
       return {width + param.width, width + param.width};
@@ -283,20 +346,34 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
     jpoint_t<T> point;
     jsize_t<T> size;
     
-    operator jgui::jpoint_t<T>()
+    template<typename U> operator jgui::jrect_t<U>()
     {
       return {
-        .x = point.x,
-        .y = point.y
+        .point = point,
+        .size = size
       };
     }
 
-    operator jgui::jsize_t<T>()
+    jrect_t<T> & operator=(T param)
     {
-      return {
-        .width = size.width,
-        .height = size.height
-      };
+      point = param;
+      size = param;
+
+      return *this;
+    }
+
+    template<typename U> jrect_t<T> & operator=(jpoint_t<U> &param)
+    {
+      point = param;
+
+      return *this;
+    }
+
+    template<typename U> jrect_t<T> & operator=(jsize_t<U> &param)
+    {
+      size = param;
+
+      return *this;
     }
 
     template<typename U> jrect_t<T> operator+(jrect_t<U> param)
