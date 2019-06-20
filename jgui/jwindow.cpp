@@ -150,10 +150,10 @@ jgui::jrect_t<int> Window::GetBounds()
 
 jgui::jrect_t<int> Window::GetVisibleBounds()
 {
-  jgui::jrect_t<int> 
-    size = GetBounds();
 	jgui::jpoint_t<int> 
     scroll = GetScrollLocation();
+  jgui::jsize_t<int> 
+    size = GetSize();
 
 	return {{-scroll.x, -scroll.y}, size};
 }
