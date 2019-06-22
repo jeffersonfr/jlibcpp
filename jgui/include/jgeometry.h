@@ -90,7 +90,7 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
     T x;
     T y;
 
-    template<typename U> operator jgui::jpoint_t<U>()
+    template<typename U> operator jpoint_t<U>()
     {
       return {
         .x = (U)x,
@@ -108,38 +108,38 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
 
     template<typename U> jpoint_t<T> operator+(jpoint_t<U> param)
     {
-      return {x + param.x, y + param.y};
+      return {x + (T)param.x, y + (T)param.y};
     }
     
     template<typename U> jpoint_t<T> operator-(jpoint_t<U> param)
     {
-      return {x - param.x, y - param.y};
+      return {x - (T)param.x, y - (T)param.y};
     }
     
     template<typename U> jpoint_t<T> & operator+=(jpoint_t<U> param)
     {
-      x = x + param.x;
-      y = y + param.y;
+      x = x + (T)param.x;
+      y = y + (T)param.y;
 
       return *this;
     }
     
     template<typename U> jpoint_t<T> & operator-=(jpoint_t<U> param)
     {
-      x = x - param.x;
-      y = y - param.y;
+      x = x - (T)param.x;
+      y = y - (T)param.y;
 
       return *this;
     }
     
     jpoint_t<T> operator*(float param)
     {
-      return {x*param, y*param};
+      return {(T)(x*param), (T)(y*param)};
     }
     
     jpoint_t<T> operator/(float param)
     {
-      return {x/param, y/param};
+      return {(T)(x/param), (T)(y/param)};
     }
 
     bool operator==(jpoint_t<T> param)
@@ -155,15 +155,25 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
     template<typename U> float Distance(jpoint_t<U> param)
     {
       T
-        px = x - param.x,
-        py = y - param.y;
+        px = x - (T)param.x,
+        py = y - (T)param.y;
 
       return std::sqrt(px*px + py*py);
     }
 
+    float Norm()
+    {
+      return x*x + y*y;
+    }
+
+    float EuclidianNorm()
+    {
+      return std::sqrt(x*x + y*y);
+    }
+
     jpoint_t<float> Normalize()
     {
-      return jpoint_t<float>{(float)x, (float)y}/std::sqrt(x*x + y*y);
+      return jpoint_t<float>{(float)x, (float)y}/Norm();
     }
  
     T Min()
@@ -178,115 +188,156 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
 
   };
 
-/**
- * \brief
- *
- */
 template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
-  struct jpoint3d_t {
-    T x;
-    T y;
-    T z;
+  struct jline_t {
+    jpoint_t<T> p0;
+    jpoint_t<T> p1;
     
-    template<typename U> operator jgui::jpoint3d_t<U>()
+    template<typename U> operator jline_t<U>()
     {
       return {
-        .x = (U)x,
-        .y = (U)y,
-        .z = (U)z
+        .p0 = p0,
+        .p1 = p1,
       };
     }
 
-    jpoint3d_t<T> & operator=(T param)
+    jline_t<T> & operator=(T param)
     {
-      x = param;
-      y = param;
-      z = param;
+      p0 = param;
+      p1 = param;
 
       return *this;
     }
 
-    template<typename U> jpoint3d_t<T> & operator=(jgui::jpoint_t<U> &param)
+    template<typename U> jline_t<T> & operator=(jpoint_t<U> &param)
     {
-      x = param.x;
-      y = param.y;
-      z = 0;
+      p0 = param;
+      p1 = param;
 
       return *this;
     }
 
-    template<typename U> jpoint3d_t<T> operator+(jpoint3d_t<U> param)
+    template<typename U> jline_t<T> operator+(jline_t<U> param)
     {
-      return {x + param.x, y + param.y, x + param.z};
+      return {p0 + param.p0, p1 + param.p1};
     }
     
-    template<typename U> jpoint3d_t<T> operator-(jpoint3d_t<U> param)
+    template<typename U> jline_t<T> operator-(jline_t<U> param)
     {
-      return {x - param.x, y - param.y, z - param.z};
+      return {p0 - param.p0, p1 - param.p1};
     }
     
-    template<typename U> jpoint3d_t<T> & operator+=(jpoint3d_t<U> param)
+    template<typename U> jline_t<T> & operator+=(jline_t<U> param)
     {
-      x = x + param.x;
-      y = y + param.y;
-      z = z + param.z;
+      p0 = p0 + param.p0;
+      p1 = p1 + param.p1;
 
       return *this;
     }
     
-    template<typename U> jpoint3d_t<T> & operator-=(jpoint3d_t<U> param)
+    template<typename U> jline_t<T> & operator-=(jline_t<U> param)
     {
-      x = x - param.x;
-      y = y - param.y;
-      z = z - param.z;
+      p0 = p0 - param.p0;
+      p1 = p1 - param.p1;
 
       return *this;
     }
     
-    jpoint3d_t<T> operator*(float param)
+    jline_t<T> operator*(float param)
     {
-      return {x*param, y*param, z*param};
+      return {p0*param, p1*param};
     }
     
-    jpoint3d_t<T> operator/(float param)
+    jline_t<T> operator/(float param)
     {
-      return {x/param, y/param, z/param};
+      return {p0/param, p1/param};
     }
 
-    bool operator==(jpoint3d_t<T> param)
+    bool operator==(jline_t<T> param)
     {
-      return (x == param.x and y == param.y and z == param.z);
+      return (p0 == param.p0 and p1 == param.p1);
     }
 
-    bool operator!=(jpoint3d_t<T> param)
+    bool operator!=(jline_t<T> param)
     {
-      return (x != param.x or y != param.y or z != param.z);
+      return (p0 != param.p0 and p1 != param.p1);
     }
 
-    template<typename U> float Distance(jpoint3d_t<U> param)
+    T Size()
     {
-      T
-        px = x - param.x,
-        py = y - param.y,
-        pz = z - param.z;
-
-      return std::sqrt(px*px + py*py + pz*pz);
+        return p0.Distance(p1);
     }
 
-    jpoint3d_t<float> Normalize()
+    bool Exists(jgui::jpoint_t<float, float> point)
     {
-      return jpoint3d_t<float>{(float)x, (float)y, (float)z}/std::sqrt(x*x + y*y + z*z);
-    }
- 
-    T Min()
-    {
-      return std::min<T>(x, y, z);
+      float t = PerpendicularIntersection(point);
+
+      return (t >= 0.0f and t <= 1.0f);
     }
 
-    T Max()
+    jpoint_t<T> Point(float t)
     {
-      return std::max<T>(x, y, z);
+      return jpoint_t<T>{(T)(p0.x + t*(p1.x - p0.x)), (T)(p0.y + t*(p1.y - p0.y))};
     }
+
+    /**
+     * \brief Returns the perpendicular intersection in line u=[0..1]. To known 
+     * the point in line calculate the intersection point as follows:
+     *
+     * x = u*(line.p1.x - line.p0.x)
+     * y = u*(line.p1.y - line.p0.y)
+     *
+     */
+    template<typename U> float PerpendicularIntersection(jpoint_t<U> point)
+    {
+      float
+        px = p1.x - p0.x,
+        py = p1.y - p0.y;
+      float
+        den = (px*px + py*py);
+
+      if (den == 0.0f) {
+          return NAN;
+      }
+
+      return ((point.x - p0.x)*px + (point.y - p0.y)*py)/den;
+    }
+
+    /**
+     * \brief Returns the intersection point u and v in range [0..1]. To known 
+     * the point in line calculate the intersection point as follows:
+     *
+     * x0 = t*(line0.p1.x - line0.p0.x)
+     * y0 = t*(line0.p1.y - line0.p0.y)
+     *
+     * x1 = u*(line1.p1.x - line1.p0.x)
+     * y1 = u*(line1.p1.y - line1.p0.y)
+     *
+     */
+    template<typename U> std::pair<float, float> Intersection(jline_t<U> line)
+    {
+      const float x1 = line.p0.x;
+      const float y1 = line.p0.y;
+      const float x2 = line.p1.x;
+      const float y2 = line.p1.y;
+
+      const float x3 = p0.x;
+      const float y3 = p0.y;
+      const float x4 = p1.x;
+      const float y4 = p1.y;
+
+      const float den = (x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4);
+
+      if (den == 0) {
+        return {NAN, NAN};
+      }
+
+      const float t1 = -((x1 - x2)*(y1 - y3) - (y1 - y2)*(x1 - x3))/den;
+      const float t0 = ((x1 - x3)*(y3 - y4) - (y1 - y3)*(x3 - x4))/den;
+
+      return {t1, t0};
+    }
+
   };
 
 /**
@@ -298,7 +349,7 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
     T width;
     T height;
     
-    template<typename U> operator jgui::jsize_t<U>()
+    template<typename U> operator jsize_t<U>()
     {
       return {
         .width = (U)width,
@@ -308,46 +359,46 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
 
     jsize_t<T> & operator=(T param)
     {
-      width = param;
-      height = param;
+      width = (T)param;
+      height = (T)param;
 
       return *this;
     }
 
     template<typename U> jsize_t<T> operator+(jsize_t<U> param)
     {
-      return {width + param.width, height + param.height};
+      return {width + (T)param.width, height + (T)param.height};
     }
     
     template<typename U> jsize_t<T> operator-(jsize_t<U> param)
     {
-      return {width - param.width, height - param.height};
+      return {width - (T)param.width, height - (T)param.height};
     }
     
     template<typename U> jsize_t<T> & operator+=(jsize_t<U> param)
     {
-      width = width + param.width;
-      height = height + param.height;
+      width = width + (T)param.width;
+      height = height + (T)param.height;
 
       return *this;
     }
     
     template<typename U> jsize_t<T> & operator-=(jsize_t<U> param)
     {
-      width = width - param.width;
-      height = height - param.height;
+      width = width - (T)param.width;
+      height = height - (T)param.height;
 
       return *this;
     }
     
     jsize_t<T> operator*(float param)
     {
-      return {width*param, height*param};
+      return {(T)(width*param), (T)(height*param)};
     }
     
     jsize_t<T> operator/(float param)
     {
-      return {width/param, height/param};
+      return {(T)(width/param), (T)(height/param)};
     }
 
     bool operator>(jsize_t<T> param)
@@ -396,7 +447,7 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
     jpoint_t<T> point;
     jsize_t<T> size;
     
-    template<typename U> operator jgui::jrect_t<U>()
+    template<typename U> operator jrect_t<U>()
     {
       return {
         .point = point,
@@ -487,7 +538,7 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return (point == param.point and size == param.size);
     }
 
-    bool operator!=(jsize_t<T> param)
+    bool operator!=(jrect_t<T> param)
     {
       return (point != param.point or size != param.size);
     }
@@ -514,10 +565,10 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
     template<typename U> jrect_t<T> Intersection(jrect_t<U> param)
     {
       int 
-        left = (std::max)(point.x, param.point.x),
-        top = (std::max)(point.y, param.point.y),
-        right = (std::min)(point.x + size.width, param.point.x + param.size.width),
-        bottom = (std::min)(point.y + size.height, param.point.y + param.size.height);
+        left = std::max(point.x, param.point.x),
+        top = std::max(point.y, param.point.y),
+        right = std::min(point.x + size.width, param.point.x + param.size.width),
+        bottom = std::min(point.y + size.height, param.point.y + param.size.height);
 
       if (right > left and bottom > top) {
         return {{left, top}, {right - left, bottom - top}};
