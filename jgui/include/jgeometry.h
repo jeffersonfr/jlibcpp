@@ -168,7 +168,7 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
 
     float EuclidianNorm()
     {
-      return std::sqrt(x*x + y*y);
+      return std::sqrt(Norm());
     }
 
     jpoint_t<float> Normalize()
@@ -176,6 +176,27 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return jpoint_t<float>{(float)x, (float)y}/Norm();
     }
  
+    template<typename U> float Angle()
+    {
+      float
+        angle = fabs(atanf(y/(float)x));
+
+      if (x > 0) {
+        if (y > 0) {
+        } else {
+          angle = 2*M_PI - angle;
+        }
+      } else {
+        if (y > 0) {
+          angle = M_PI - angle;
+        } else {
+          angle = M_PI + angle;
+        }
+      }
+
+      return angle;
+    }
+
     T Min()
     {
       return std::min<T>(x, y);
@@ -217,6 +238,16 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return *this;
     }
 
+    template<typename U> jline_t<T> operator+(jpoint_t<U> param)
+    {
+      return {p0 + param, p1 + param};
+    }
+    
+    template<typename U> jline_t<T> operator-(jpoint_t<U> param)
+    {
+      return {p0 - param, p1 - param};
+    }
+    
     template<typename U> jline_t<T> operator+(jline_t<U> param)
     {
       return {p0 + param.p0, p1 + param.p1};
@@ -280,6 +311,22 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return jpoint_t<T>{(T)(p0.x + t*(p1.x - p0.x)), (T)(p0.y + t*(p1.y - p0.y))};
     }
 
+    template<typename U> int Sign(jpoint_t<U> point)
+    {
+      T
+        sign = (p1.x - p0.x)*(point.y - p0.y) - (p1.y - p0.y)*(point.x - p0.x);
+
+      if (sign < 0) {
+        return (T)-1;
+      }
+
+      if (sign > 0) {
+        return (T)+1;
+      }
+
+      return 0;
+    }
+
     /**
      * \brief Returns the perpendicular intersection in line u=[0..1]. To known 
      * the point in line calculate the intersection point as follows:
@@ -336,6 +383,21 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       const float t0 = ((x1 - x3)*(y3 - y4) - (y1 - y3)*(x3 - x4))/den;
 
       return {t1, t0};
+    }
+
+    template<typename U> float Angle(jline_t<U> line)
+    {
+      float
+        m0 = (p1.y - p0.y)/(p1.x - p0.x),
+        m1 = (line.p1.y - line.p0.y)/(line.p1.x - line.p0.x);
+      float
+        den = 1 + m0*m1;
+
+      if (den == 0.0f) {
+        return M_PI/2.0f;
+      }
+
+      return atanf((m0 - m1)/den);
     }
 
   };
@@ -436,6 +498,16 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return width*height;
     }
 
+    T Min()
+    {
+      return std::min<T>(width, height);
+    }
+
+    T Max()
+    {
+      return std::max<T>(width, height);
+    }
+
   };
 
 /**
@@ -477,6 +549,26 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return *this;
     }
 
+    template<typename U> jline_t<T> operator+(jpoint_t<U> param)
+    {
+      return {point + param, size};
+    }
+    
+    template<typename U> jline_t<T> operator-(jpoint_t<U> param)
+    {
+      return {point - param, size};
+    }
+    
+    template<typename U> jline_t<T> operator+(jsize_t<U> param)
+    {
+      return {point, size + param};
+    }
+    
+    template<typename U> jline_t<T> operator-(jsize_t<U> param)
+    {
+      return {point, size + param};
+    }
+    
     template<typename U> jrect_t<T> operator+(jrect_t<U> param)
     {
       return {point + param.point, size + param.size};
