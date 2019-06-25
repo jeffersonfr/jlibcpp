@@ -151,13 +151,13 @@ class GraphicPanel : public jgui::Window {
     //////////////////////////////////////////////
 		DrawString("Rotate String");
 
-		jgui::jregion_t 
+		jgui::jrect_t 
       region = font->GetStringExtends("Rotate String");
 		double 
       angle = 0.1;
 		int 
-      sw = region.x + region.width,
-			sh = region.x + region.height;
+      sw = region.point.x + region.size.width,
+			sh = region.point.x + region.size.height;
 
 		x = (t.width - sw)/2;
 		y = (t.height + sh)/2;
@@ -239,7 +239,7 @@ class GraphicPanel : public jgui::Window {
 				b1 = rand()%0xff;
 
 				g->SetColor({r1, g1, b1, 0xff});
-				g->DrawLine({{x+insets.left, y+insets.top}, {x+insets.left+w, y+insets.top+h}});
+				g->DrawLine({x+insets.left, y+insets.top}, {x+insets.left+w, y+insets.top+h});
 
         Repaint();
 			}
@@ -264,7 +264,7 @@ class GraphicPanel : public jgui::Window {
 				a1 = rand()%0x80;
 
 				g->SetColor({r1, g1, b1, a1+0x80});
-				g->DrawLine({{x+insets.left, y+insets.top}, {x+insets.left+w, y+insets.top+h}});
+				g->DrawLine({x+insets.left, y+insets.top}, {x+insets.left+w, y+insets.top+h});
 
         Repaint();
 			}

@@ -63,12 +63,18 @@
 
 struct Shape;
 
-struct sNode {
-	Shape *parent;
-	jgui::jpoint3d_t<float> pos;
+template<typename T> struct jpoint3d_t {
+  T x;
+  T y;
+  T z;
 };
 
-float magnitude(jgui::jpoint3d_t<float> t) 
+struct sNode {
+	Shape *parent;
+	jpoint3d_t<float> pos;
+};
+
+float magnitude(jpoint3d_t<float> t) 
 {
   return sqrt(t.x*t.x + t.y*t.y + t.z*t.z);
 }
@@ -80,9 +86,9 @@ struct Shape {
   jgui::Color::jcolor_name_t col = jgui::Color::Green;
 
 	static float fWorldScale;
-	static jgui::jpoint3d_t<float> vWorldOffset;
+	static jpoint3d_t<float> vWorldOffset;
 
-	void WorldToScreen(const jgui::jpoint3d_t<float> &v, int &nScreenX, int &nScreenY)
+	void WorldToScreen(const jpoint3d_t<float> &v, int &nScreenX, int &nScreenY)
 	{
 		nScreenX = (int)((v.x - vWorldOffset.x) * fWorldScale);
 		nScreenY = (int)((v.y - vWorldOffset.y) * fWorldScale);
@@ -90,7 +96,7 @@ struct Shape {
 
 	virtual void DrawYourself(jgui::Graphics *g) = 0;
 
-	sNode* GetNextNode(const jgui::jpoint3d_t<float> &p)
+	sNode* GetNextNode(const jpoint3d_t<float> &p)
 	{
 		if (vecNodes.size() == nMaxNodes)
 			return nullptr; // Shape is complete so no new nodes to be issued
@@ -105,7 +111,7 @@ struct Shape {
 		return &vecNodes[vecNodes.size() - 1];
 	}
 
-	sNode* HitNode(jgui::jpoint3d_t<float> &p)
+	sNode* HitNode(jpoint3d_t<float> &p)
 	{
 		for (auto &n : vecNodes) {
 			if (magnitude({p.x - n.pos.x, p.y - n.pos.y, 0.0f}) < 0.01f) {
@@ -134,7 +140,7 @@ struct Shape {
 };
 
 float Shape::fWorldScale = 1.0f;
-jgui::jpoint3d_t<float> Shape::vWorldOffset = { 0,0 };
+jpoint3d_t<float> Shape::vWorldOffset = { 0,0 };
 
 struct Line : public Shape {
 	Line()
@@ -149,7 +155,7 @@ struct Line : public Shape {
 		WorldToScreen(vecNodes[0].pos, sx, sy);
 		WorldToScreen(vecNodes[1].pos, ex, ey);
     g->SetColor(col);
-		g->DrawLine({{sx, sy}, {ex, ey}});
+		g->DrawLine({sx, sy}, {ex, ey});
 	}
 };
 
@@ -184,7 +190,7 @@ struct Circle : public Shape {
 		WorldToScreen(vecNodes[0].pos, sx, sy);
 		WorldToScreen(vecNodes[1].pos, ex, ey);
     g->SetColor(col);
-		g->DrawLine({{sx, sy}, {ex, ey}});
+		g->DrawLine({sx, sy}, {ex, ey});
 
     g->SetColor(col);
 		g->DrawCircle({sx, sy}, (int32_t)(fRadius * fWorldScale));
@@ -207,7 +213,7 @@ struct Curve : public Shape {
 			WorldToScreen(vecNodes[0].pos, sx, sy);
 			WorldToScreen(vecNodes[1].pos, ex, ey);
       g->SetColor(col);
-			g->DrawLine({{sx, sy}, {ex, ey}});
+			g->DrawLine({sx, sy}, {ex, ey});
 		}
 
 		if (vecNodes.size() == 3) {
@@ -215,20 +221,20 @@ struct Curve : public Shape {
 			WorldToScreen(vecNodes[0].pos, sx, sy);
 			WorldToScreen(vecNodes[1].pos, ex, ey);
       g->SetColor(col);
-			g->DrawLine({{sx, sy}, {ex, ey}});
+			g->DrawLine({sx, sy}, {ex, ey});
 
 			// Can draw second structural line
 			WorldToScreen(vecNodes[1].pos, sx, sy);
 			WorldToScreen(vecNodes[2].pos, ex, ey);
       g->SetColor(col);
-			g->DrawLine({{sx, sy}, {ex, ey}});
+			g->DrawLine({sx, sy}, {ex, ey});
 
 			// And bezier curve
-			jgui::jpoint3d_t<float> op = vecNodes[0].pos;
-			jgui::jpoint3d_t<float> np = op;
+			jpoint3d_t<float> op = vecNodes[0].pos;
+			jpoint3d_t<float> np = op;
 			for (float t = 0; t < 1.0f; t += 0.01f)
 			{
-        jgui::jpoint3d_t<float>
+        jpoint3d_t<float>
           t1 = {(1 - t)*(1 - t)*vecNodes[0].pos.x, (1 - t)*(1 - t)*vecNodes[0].pos.y, 0.0f},
           t2 = {2*(1 - t)*t*vecNodes[1].pos.x, 2*(1 - t)*t*vecNodes[1].pos.y, 0.0f},
           t3 = {t*t*vecNodes[2].pos.x, t*t*vecNodes[2].pos.y, 0.0f};
@@ -237,7 +243,7 @@ struct Curve : public Shape {
 				WorldToScreen(op, sx, sy);
 				WorldToScreen(np, ex, ey);
         g->SetColor(col);
-				g->DrawLine({{sx, sy}, {ex, ey}});
+				g->DrawLine({sx, sy}, {ex, ey});
 				op = np;
 			}
 		}
@@ -247,18 +253,18 @@ struct Curve : public Shape {
 class CAD : public jgui::Window {
 
 	private:
-    jgui::jpoint3d_t<float> vOffset = {0.0f, 0.0f};
-    jgui::jpoint3d_t<float> vStartPan = {0.0f, 0.0f};
+    jpoint3d_t<float> vOffset = {0.0f, 0.0f};
+    jpoint3d_t<float> vStartPan = {0.0f, 0.0f};
     float fScale = 10.0f;
     float fGrid = 1.0f;
 
-    void WorldToScreen(const jgui::jpoint3d_t<float> &v, int &nScreenX, int &nScreenY)
+    void WorldToScreen(const jpoint3d_t<float> &v, int &nScreenX, int &nScreenY)
     {
       nScreenX = (int)((v.x - vOffset.x)*fScale);
       nScreenY = (int)((v.y - vOffset.y)*fScale);
     }
 
-    void ScreenToWorld(int nScreenX, int nScreenY, jgui::jpoint3d_t<float> &v)
+    void ScreenToWorld(int nScreenX, int nScreenY, jpoint3d_t<float> &v)
     {
       v.x = (float)(nScreenX)/fScale + vOffset.x;
       v.y = (float)(nScreenY)/fScale + vOffset.y;
@@ -267,7 +273,7 @@ class CAD : public jgui::Window {
     Shape* tempShape = nullptr;
     std::list<Shape*> listShapes;
     sNode *selectedNode = nullptr;
-    jgui::jpoint3d_t<float> vCursor = {0, 0};
+    jpoint3d_t<float> vCursor = {0, 0};
 
   public:
     CAD():
@@ -313,16 +319,16 @@ class CAD : public jgui::Window {
       jgui::jpoint_t<int>
         elocation = event->GetLocation();
 
-      jgui::jpoint3d_t<float> vMouse = {(float)elocation.x, (float)elocation.y};
+      jpoint3d_t<float> vMouse = {(float)elocation.x, (float)elocation.y};
 
       if (event->GetButton() == jevent::JMB_BUTTON2) {
         vStartPan = vMouse;
       }
 
-      jgui::jpoint3d_t<float> vMouseBeforeZoom;
+      jpoint3d_t<float> vMouseBeforeZoom;
       ScreenToWorld((int)vMouse.x, (int)vMouse.y, vMouseBeforeZoom);
 
-      jgui::jpoint3d_t<float> vMouseAfterZoom;
+      jpoint3d_t<float> vMouseAfterZoom;
       ScreenToWorld((int)vMouse.x, (int)vMouse.y, vMouseAfterZoom);
       vOffset = {vOffset.x + (vMouseBeforeZoom.x - vMouseAfterZoom.x), vOffset.y + (vMouseBeforeZoom.y - vMouseAfterZoom.y), 0.0f};
 
@@ -361,17 +367,17 @@ class CAD : public jgui::Window {
       jgui::jpoint_t<int>
         elocation = event->GetLocation();
 
-      jgui::jpoint3d_t<float> vMouse = {(float)elocation.x, (float)elocation.y};
+      jpoint3d_t<float> vMouse = {(float)elocation.x, (float)elocation.y};
 
       if (event->GetButtons() & jevent::JMB_BUTTON2) {
         vOffset = {vOffset.x - (vMouse.x - vStartPan.x)/fScale, vOffset.y - (vMouse.y - vStartPan.y)/fScale, 0.0f};
         vStartPan = vMouse;
       }
 
-      jgui::jpoint3d_t<float> vMouseBeforeZoom;
+      jpoint3d_t<float> vMouseBeforeZoom;
       ScreenToWorld((int)vMouse.x, (int)vMouse.y, vMouseBeforeZoom);
 
-      jgui::jpoint3d_t<float> vMouseAfterZoom;
+      jpoint3d_t<float> vMouseAfterZoom;
       ScreenToWorld((int)vMouse.x, (int)vMouse.y, vMouseAfterZoom);
       vOffset = {vOffset.x + (vMouseBeforeZoom.x - vMouseAfterZoom.x), vOffset.y + (vMouseBeforeZoom.y - vMouseAfterZoom.y), 0.0f};
 
@@ -431,7 +437,7 @@ class CAD : public jgui::Window {
       int sx, sy;
       int ex, ey;
 
-      jgui::jpoint3d_t<float> vWorldTopLeft, vWorldBottomRight;
+      jpoint3d_t<float> vWorldTopLeft, vWorldBottomRight;
       ScreenToWorld(0, 0, vWorldTopLeft);
       ScreenToWorld(size.width, size.height, vWorldBottomRight);
 
@@ -451,10 +457,10 @@ class CAD : public jgui::Window {
 
       WorldToScreen({ 0,vWorldTopLeft.y }, sx, sy);
       WorldToScreen({ 0,vWorldBottomRight.y }, ex, ey);
-      g->DrawLine({{sx, sy}, {ex, ey}});
+      g->DrawLine({sx, sy}, {ex, ey});
       WorldToScreen({ vWorldTopLeft.x,0 }, sx, sy);
       WorldToScreen({ vWorldBottomRight.x,0 }, ex, ey);
-      g->DrawLine({{sx, sy}, {ex, ey}});
+      g->DrawLine({sx, sy}, {ex, ey});
 
       Shape::fWorldScale = fScale;
       Shape::vWorldOffset = vOffset;

@@ -112,11 +112,11 @@ class GraphicsTeste : public jgui::Window {
 			g->SetColor({0x20, 0x20, 0x80, 0xff});
 			
 			for (int i=0; i<wblocks; i++) {
-				g->DrawLine({{i*wsize, 0}, {i*wsize, size.height}});
+				g->DrawLine({i*wsize, 0}, {i*wsize, size.height});
 			}
 			
 			for (int i=0; i<hblocks; i++) {
-				g->DrawLine({{0, i*hsize}, {size.width, i*hsize}});
+				g->DrawLine({0, i*hsize}, {size.width, i*hsize});
 			}
 	
 			g->SetColor({0x80, 0x00, 0x00, 0xff});

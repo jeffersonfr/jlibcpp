@@ -43,7 +43,7 @@ class Barrier {
 
     void Paint(jgui::Raster &raster)
     {
-      raster.DrawLine(_line);
+      raster.DrawLine(_line.p0, _line.p1);
     }
 
 };
@@ -124,7 +124,7 @@ class Ray {
 
     void Paint(jgui::Raster &raster)
     {
-      raster.DrawLine({_p0, {(int)(_p0.x + 10*_p1.x), (int)(_p0.y + 10*_p1.y)}});
+      raster.DrawLine(_p0, {(int)(_p0.x + 10*_p1.x), (int)(_p0.y + 10*_p1.y)});
     }
 
 };
@@ -178,7 +178,7 @@ class Light {
           }
         }
 
-        raster.DrawLine({pray, best});
+        raster.DrawLine(pray, best);
       }
     }
 

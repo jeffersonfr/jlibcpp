@@ -171,14 +171,14 @@ class GraphicLayer : public ScreenLayer {
 		GraphicLayer():
 			ScreenLayer()
 		{
-      jgui::jregion_t
-        t = GetVisibleBounds();
+      jgui::jsize_t
+        t = GetSize();
 
-			_user_container = new jgui::Container(t.x, t.y, t.width, t.height);
+			_user_container = new jgui::Container(0, 0, t.width, t.height);
 			_user_container->SetParent(this);
 			_user_container->SetBackgroundVisible(false);
 			
-			_system_container = new jgui::Container(t.x, t.y, t.width, t.height);
+			_system_container = new jgui::Container(0, 0, t.width, t.height);
 			_system_container->SetParent(this);
 			_system_container->SetBackgroundVisible(false);
 		}

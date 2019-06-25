@@ -23,11 +23,16 @@
 
 #include <mutex>
 
-typedef struct { 
-	float 
-    x,
-	  y; 
-} ponto_plano;
+template<typename T> struct jpoint3d_t {
+  T x;
+  T y;
+  T z;
+};
+
+struct ponto_plano { 
+	float x;
+  float y; 
+};
 
 class GraphicsTeste : public jgui::Window {
 
@@ -43,9 +48,9 @@ class GraphicsTeste : public jgui::Window {
       teta,
       fi,
       proj_X, 
-      proj_Y,	// Coordenadas da projecao do jgui::jpoint3d_t<float> (x, y, z)
+      proj_Y,	// Coordenadas da projecao do jpoint3d_t<float> (x, y, z)
       angulo;
-    jgui::jpoint3d_t<float>
+    jpoint3d_t<float>
       p1, 
       p2,
       p3, 
@@ -92,8 +97,8 @@ class GraphicsTeste : public jgui::Window {
 
 		void ProjetaPonto(float x, float y, float z) 
 		{
-			// Calcula as coordenadas do jgui::jpoint3d_t<float> (x, y, z) no plano de projecao. E' feita uma ampliacao de TAM 
-			// unidades e uma translacao da origem  do  sistema de coordenadas do plano de projecao para o jgui::jpoint3d_t<float> (A, B) 
+			// Calcula as coordenadas do jpoint3d_t<float> (x, y, z) no plano de projecao. E' feita uma ampliacao de TAM 
+			// unidades e uma translacao da origem  do  sistema de coordenadas do plano de projecao para o jpoint3d_t<float> (A, B) 
 			float X, Y;
 
 			// Gira (x, y, z) de teta radianos em torno do eixo z e de fi radianos em torno do eixo y seguida de uma projecao ortografica na direcao x 
@@ -105,7 +110,7 @@ class GraphicsTeste : public jgui::Window {
 			proj_Y = B - Y*TAM;
 		}
 
-		void DesenhaCubo(jgui::Graphics *g, jgui::jpoint3d_t<float> *p1, jgui::jpoint3d_t<float> *p2, jgui::jpoint3d_t<float> *p3, jgui::jpoint3d_t<float> *p4, jgui::jpoint3d_t<float> *q1, jgui::jpoint3d_t<float> *q2, jgui::jpoint3d_t<float> *q3, jgui::jpoint3d_t<float> *q4) 
+		void DesenhaCubo(jgui::Graphics *g, jpoint3d_t<float> *p1, jpoint3d_t<float> *p2, jpoint3d_t<float> *p3, jpoint3d_t<float> *p4, jpoint3d_t<float> *q1, jpoint3d_t<float> *q2, jpoint3d_t<float> *q3, jpoint3d_t<float> *q4) 
 		{
 			ponto_plano P1, P2, P3, P4, Q1, Q2, Q3, Q4;
 
@@ -121,23 +126,23 @@ class GraphicsTeste : public jgui::Window {
 
 			g->SetColor({0xf0, 0xf0, 0xf0, 0xff});
 
-			g->DrawLine({{(int)P1.x, (int)P1.y}, {(int)P2.x, (int)P2.y}});
-			g->DrawLine({{(int)P2.x, (int)P2.y}, {(int)P3.x, (int)P3.y}});
-			g->DrawLine({{(int)P3.x, (int)P3.y}, {(int)P4.x, (int)P4.y}});
-			g->DrawLine({{(int)P4.x, (int)P4.y}, {(int)P1.x, (int)P1.y}});
+			g->DrawLine({(int)P1.x, (int)P1.y}, {(int)P2.x, (int)P2.y});
+			g->DrawLine({(int)P2.x, (int)P2.y}, {(int)P3.x, (int)P3.y});
+			g->DrawLine({(int)P3.x, (int)P3.y}, {(int)P4.x, (int)P4.y});
+			g->DrawLine({(int)P4.x, (int)P4.y}, {(int)P1.x, (int)P1.y});
 
-			g->DrawLine({{(int)Q1.x, (int)Q1.y}, {(int)Q2.x, (int)Q2.y}});
-			g->DrawLine({{(int)Q2.x, (int)Q2.y}, {(int)Q3.x, (int)Q3.y}});
-			g->DrawLine({{(int)Q3.x, (int)Q3.y}, {(int)Q4.x, (int)Q4.y}});
-			g->DrawLine({{(int)Q4.x, (int)Q4.y}, {(int)Q1.x, (int)Q1.y}});
+			g->DrawLine({(int)Q1.x, (int)Q1.y}, {(int)Q2.x, (int)Q2.y});
+			g->DrawLine({(int)Q2.x, (int)Q2.y}, {(int)Q3.x, (int)Q3.y});
+			g->DrawLine({(int)Q3.x, (int)Q3.y}, {(int)Q4.x, (int)Q4.y});
+			g->DrawLine({(int)Q4.x, (int)Q4.y}, {(int)Q1.x, (int)Q1.y});
 
-			g->DrawLine({{(int)Q1.x, (int)Q1.y}, {(int)P1.x, (int)P1.y}});
-			g->DrawLine({{(int)Q2.x, (int)Q2.y}, {(int)P2.x, (int)P2.y}});
-			g->DrawLine({{(int)Q3.x, (int)Q3.y}, {(int)P3.x, (int)P3.y}});
-			g->DrawLine({{(int)Q4.x, (int)Q4.y}, {(int)P4.x, (int)P4.y}});
+			g->DrawLine({(int)Q1.x, (int)Q1.y}, {(int)P1.x, (int)P1.y});
+			g->DrawLine({(int)Q2.x, (int)Q2.y}, {(int)P2.x, (int)P2.y});
+			g->DrawLine({(int)Q3.x, (int)Q3.y}, {(int)P3.x, (int)P3.y});
+			g->DrawLine({(int)Q4.x, (int)Q4.y}, {(int)P4.x, (int)P4.y});
 		}
 
-		void GiraCubo_z(jgui::jpoint3d_t<float> *p1, jgui::jpoint3d_t<float> *p2, jgui::jpoint3d_t<float> *p3, jgui::jpoint3d_t<float> *p4, jgui::jpoint3d_t<float> *q1, jgui::jpoint3d_t<float> *q2, jgui::jpoint3d_t<float> *q3, jgui::jpoint3d_t<float> *q4, float angulo) 
+		void GiraCubo_z(jpoint3d_t<float> *p1, jpoint3d_t<float> *p2, jpoint3d_t<float> *p3, jpoint3d_t<float> *p4, jpoint3d_t<float> *q1, jpoint3d_t<float> *q2, jpoint3d_t<float> *q3, jpoint3d_t<float> *q4, float angulo) 
 		{
 			float x, 
 				  y,
@@ -173,7 +178,7 @@ class GraphicsTeste : public jgui::Window {
 			q4->x = x, q4->y = y;
 		}
 
-		void GiraCubo_y(jgui::jpoint3d_t<float> *p1, jgui::jpoint3d_t<float> *p2, jgui::jpoint3d_t<float> *p3, jgui::jpoint3d_t<float> *p4, jgui::jpoint3d_t<float> *q1, jgui::jpoint3d_t<float> *q2, jgui::jpoint3d_t<float> *q3, jgui::jpoint3d_t<float> *q4, float angulo) 
+		void GiraCubo_y(jpoint3d_t<float> *p1, jpoint3d_t<float> *p2, jpoint3d_t<float> *p3, jpoint3d_t<float> *p4, jpoint3d_t<float> *q1, jpoint3d_t<float> *q2, jpoint3d_t<float> *q3, jpoint3d_t<float> *q4, float angulo) 
 		{
 			float x, 
 				  z,

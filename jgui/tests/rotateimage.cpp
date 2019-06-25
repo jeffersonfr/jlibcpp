@@ -97,11 +97,11 @@ class Main : public jgui::Window {
 			g->SetColor({0xf0, 0xf0, 0xf0, 0xff});
 
 			for (int i=0; i<=9; i++) {
-				g->DrawLine({{(int)(x+i*boxw), y}, {(int)(x+i*boxw), y+h}});
+				g->DrawLine({(int)(x+i*boxw), y}, {(int)(x+i*boxw), y+h});
 			}
 
 			for (int i=0; i<=8; i++) {
-				g->DrawLine({{x, (int)(y+i*boxh)}, {x+w, (int)(y+i*boxh)}});
+				g->DrawLine({x, (int)(y+i*boxh)}, {x+w, (int)(y+i*boxh)});
 			}
 
 			g->SetColor({0x80, 0x80, 0x80, 0xff});

@@ -103,7 +103,7 @@ class Graph : public jgui::Window {
           if (dist < nodes.size()) {
             g->SetColor(nodes[i]["clr"]);
 
-            g->DrawLine({{(int)nodes[i]["x"] , (int)nodes[i]["y"]}, {(int)nodes[j]["x"], (int)nodes[j]["y"]}});
+            g->DrawLine({(int)nodes[i]["x"] , (int)nodes[i]["y"]}, {(int)nodes[j]["x"], (int)nodes[j]["y"]});
           }
 
         }

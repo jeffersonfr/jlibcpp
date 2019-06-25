@@ -212,8 +212,8 @@ class SOM : public jgui::Window {
 			// DRAW GRID
 			g->SetColor(bk2C);
 			for(double i=0; i<COUNTRY+COUNTRY/20.0; i+=(COUNTRY/20.0)){
-				g->DrawLine({{toXReal(0.0), toYReal(i)}, {toXReal(COUNTRY), toYReal(i)}});
-				g->DrawLine({{toXReal(i), toYReal(0.0)}, {toXReal(i), toYReal(COUNTRY)}});
+				g->DrawLine({toXReal(0.0), toYReal(i)}, {toXReal(COUNTRY), toYReal(i)});
+				g->DrawLine({toXReal(i), toYReal(0.0)}, {toXReal(i), toYReal(COUNTRY)});
 			}
 
 			//DRAW PATH
@@ -222,26 +222,26 @@ class SOM : public jgui::Window {
 			for(int x=0; x<(W-1); x++) {
 				for(int y=0; y<(H-1); y++){
 					g->DrawCircle({toXReal(gn[x*W+y]->wx), toYReal(gn[x*W+y]->wy)}, 4);
-					g->DrawLine({{toXReal(gn[x*W+y]->wx), toYReal(gn[x*W+y]->wy)}, {toXReal(gn[(x+1)*W+y]->wx), toYReal(gn[(x+1)*W+y]->wy)}});
-					g->DrawLine({{toXReal(gn[x*W+y]->wx), toYReal(gn[x*W+y]->wy)}, {toXReal(gn[x*W+y+1]->wx), toYReal(gn[x*W+y+1]->wy)}});
+					g->DrawLine({toXReal(gn[x*W+y]->wx), toYReal(gn[x*W+y]->wy)}, {toXReal(gn[(x+1)*W+y]->wx), toYReal(gn[(x+1)*W+y]->wy)});
+					g->DrawLine({toXReal(gn[x*W+y]->wx), toYReal(gn[x*W+y]->wy)}, {toXReal(gn[x*W+y+1]->wx), toYReal(gn[x*W+y+1]->wy)});
 				}
 			}
 
 			for(int x=0; x<(W-1); x++){
 				g->DrawCircle({toXReal(gn[x*W+H-1]->wx), toYReal(gn[x*W+H-1]->wy)}, 4);
-				g->DrawLine({{toXReal(gn[x*W+H-1]->wx), toYReal(gn[x*W+H-1]->wy)} ,{toXReal(gn[(x+1)*W+H-1]->wx), toYReal(gn[(x+1)*W+H-1]->wy)}});
+				g->DrawLine({toXReal(gn[x*W+H-1]->wx), toYReal(gn[x*W+H-1]->wy)} ,{toXReal(gn[(x+1)*W+H-1]->wx), toYReal(gn[(x+1)*W+H-1]->wy)});
 			}
 
 			for(int y=0; y<(H-1); y++){
 				g->DrawCircle({toXReal(gn[(W-1)*W+y]->wx), toYReal(gn[(W-1)*W+y]->wy)}, 4);
-				g->DrawLine({{toXReal(gn[(W-1)*W+y]->wx), toYReal(gn[(W-1)*W+y]->wy)}, {toXReal(gn[(W-1)*W+y+1]->wx), toYReal(gn[(W-1)*W+y+1]->wy)}});
+				g->DrawLine({toXReal(gn[(W-1)*W+y]->wx), toYReal(gn[(W-1)*W+y]->wy)}, {toXReal(gn[(W-1)*W+y+1]->wx), toYReal(gn[(W-1)*W+y+1]->wy)});
 			}
 
 			g->DrawCircle({toXReal(gn[(W-1)*W+H-1]->wx), toYReal(gn[(W-1)*W+H-1]->wy)}, 4);
 
 			g->SetColor(fgC);
-			g->DrawLine({{toXReal(0.0), toYReal(0.0)}, {toXReal(COUNTRY), toYReal(0.0)}});
-			g->DrawLine({{toXReal(0.0), toYReal(0.0)}, {toXReal(0.0), toYReal(COUNTRY)}});
+			g->DrawLine({toXReal(0.0), toYReal(0.0)}, {toXReal(COUNTRY), toYReal(0.0)});
+			g->DrawLine({toXReal(0.0), toYReal(0.0)}, {toXReal(0.0), toYReal(COUNTRY)});
 
 			double 
 			  dx = toXReal(0.0),

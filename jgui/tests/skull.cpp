@@ -401,9 +401,9 @@ class Render3D : public jgui::Window {
           graphics->FillTriangle({(int)(tri->a->x + X), (int)(tri->a->y + Y)}, {(int)(tri->b->x + X), (int)(tri->b->y + Y)}, {(int)(tri->c->x + X), (int)(tri->c->y + Y)});
           break;
         case WIRE_FRAME:
-          graphics->DrawLine({{(int)(tri->a->x + X), (int)(tri->a->y + Y)}, {(int)(tri->b->x + X), (int)(tri->b->y + Y)}});
-          graphics->DrawLine({{(int)(tri->b->x + X), (int)(tri->b->y + Y)}, {(int)(tri->c->x + X), (int)(tri->c->y + Y)}});
-          graphics->DrawLine({{(int)(tri->c->x + X), (int)(tri->c->y + Y)}, {(int)(tri->a->x + X), (int)(tri->a->y + Y)}});
+          graphics->DrawLine({(int)(tri->a->x + X), (int)(tri->a->y + Y)}, {(int)(tri->b->x + X), (int)(tri->b->y + Y)});
+          graphics->DrawLine({(int)(tri->b->x + X), (int)(tri->b->y + Y)}, {(int)(tri->c->x + X), (int)(tri->c->y + Y)});
+          graphics->DrawLine({(int)(tri->c->x + X), (int)(tri->c->y + Y)}, {(int)(tri->a->x + X), (int)(tri->a->y + Y)});
           break;
         default:
           break;

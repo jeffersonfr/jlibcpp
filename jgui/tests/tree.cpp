@@ -244,15 +244,15 @@ class Tree : public jgui::Window {
         
         if (branch.generation == generations) {
           g->SetColor({branch.treec3, branch.treec2, branch.treec1, 255});
-          g->DrawLine({{branch.start.x, branch.start.y}, {branch.end.x, branch.end.y}});
-          g->DrawLine({{branch.start.x+2, branch.start.y}, {branch.end.x, branch.end.y}});
-          g->DrawLine({{branch.start.x-2, branch.start.y}, {branch.end.x, branch.end.y}});
+          g->DrawLine({branch.start.x, branch.start.y}, {branch.end.x, branch.end.y});
+          g->DrawLine({branch.start.x+2, branch.start.y}, {branch.end.x, branch.end.y});
+          g->DrawLine({branch.start.x-2, branch.start.y}, {branch.end.x, branch.end.y});
         } else if (branch.generation > generations) {
           g->SetColor({branch.leavesc3, branch.leavesc2, branch.leavesc1, 150}); 
-          g->DrawLine({{branch.start.x, branch.start.y}, {branch.end.x, branch.end.y}});
+          g->DrawLine({branch.start.x, branch.start.y}, {branch.end.x, branch.end.y});
         } else {
           g->SetColor({branch.treec3, branch.treec2, branch.treec1, 255});
-          g->DrawLine({{branch.start.x, branch.start.y}, {branch.end.x, branch.end.y}}); 
+          g->DrawLine({branch.start.x, branch.start.y}, {branch.end.x, branch.end.y}); 
         }
       }
     }

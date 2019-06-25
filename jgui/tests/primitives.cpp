@@ -104,13 +104,13 @@ class Primitives : public jgui::Window {
         dx = (bar_width*i)/num_colors;
 
         g->SetColor({red, green, blue, 0xff});
-        g->DrawLine({{10+dx, 20}, {10+dx, 20+100}});
+        g->DrawLine({10+dx, 20}, {10+dx, 20+100});
       }
 
       // gray bar
       for (int i=0; i<400; i++) {
         g->SetColor({i/2, i/2, i/2, 0xff});
-        g->DrawLine({{i+10, 1*(100+10)+20}, {i+10, 1*(100+10)+100+20}});
+        g->DrawLine({i+10, 1*(100+10)+20}, {i+10, 1*(100+10)+100+20});
       }
 
       g->SetAntialias(jgui::JAM_NORMAL);
@@ -427,31 +427,31 @@ class Primitives : public jgui::Window {
       g->SetPen(pen);
 
       g->SetColor(pcolor);
-      g->DrawLine({{x0, y0}, {x0+100, y0+(240-10)}});
-      g->DrawLine({{x0, y0+(240-10)}, {x0+100, y0}});
-      g->DrawLine({{x0, y0+(240-10)/2}, {x0+100, y0+(240-10)/2}});
+      g->DrawLine({x0, y0}, {x0+100, y0+(240-10)});
+      g->DrawLine({x0, y0+(240-10)}, {x0+100, y0});
+      g->DrawLine({x0, y0+(240-10)/2}, {x0+100, y0+(240-10)/2});
 
       pen.width = 40;
       g->SetPen(pen);
 
-      g->DrawLine({{x0+150, y0}, {x0+250, y0+(240-10)}});
+      g->DrawLine({x0+150, y0}, {x0+250, y0+(240-10)});
 
       pen.width = 20;
       g->SetPen(pen);
 
-      g->DrawLine({{x0+150, y0+(240-10)}, {x0+250, y0}});
+      g->DrawLine({x0+150, y0+(240-10)}, {x0+250, y0});
 
       pen.width = 10;
       g->SetPen(pen);
 
-      g->DrawLine({{x0+150, y0+(240-10)/2}, {x0+250, y0+(240-10)/2}});
+      g->DrawLine({x0+150, y0+(240-10)/2}, {x0+250, y0+(240-10)/2});
 
       pen.width = 1;
       g->SetPen(pen);
 
       g->SetColor(rcolor);
       g->DrawRectangle({x0, y0, 250, (240-10)});
-      g->DrawLine({{x0, y0+(240-10)/2}, {x0+250, y0+(240-10)/2}});
+      g->DrawLine({x0, y0+(240-10)/2}, {x0+250, y0+(240-10)/2});
 
       // draw line dashes
       double dashes[] = {
@@ -467,17 +467,17 @@ class Primitives : public jgui::Window {
       g->SetPen(pen);
 
       g->SetColor(pcolor);
-      g->DrawLine({{10+0*(120+10)+10, 6*(120+10)+10}, {10+10*(120+10)-20, 6*(120+10)+10}});
+      g->DrawLine({10+0*(120+10)+10, 6*(120+10)+10}, {10+10*(120+10)-20, 6*(120+10)+10});
 
       pen.width = 10;
       g->SetPen(pen);
 
-      g->DrawLine({{10+0*(120+10)+10, 6*(120+10)+40}, {10+10*(120+10)-20, 6*(120+10)+40}});
+      g->DrawLine({10+0*(120+10)+10, 6*(120+10)+40}, {10+10*(120+10)-20, 6*(120+10)+40});
 
       pen.width = 20;
 
       g->SetPen(pen);
-      g->DrawLine({{10+0*(120+10)+10, 6*(120+10)+80}, {10+10*(120+10)-20, 6*(120+10)+80}});
+      g->DrawLine({10+0*(120+10)+10, 6*(120+10)+80}, {10+10*(120+10)-20, 6*(120+10)+80});
 
       pen.dashes = nullptr;
       pen.dashes_size = 0;

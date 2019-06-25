@@ -52,7 +52,7 @@ class PacMan : public jgui::Window {
       *ii;
   	jgui::Theme 
       _theme;
-	  jgui::jregion_t<int>
+	  jgui::jrect_t<int>
       d;
 	uint32_t 
 		dotcolor,
@@ -216,7 +216,7 @@ class PacMan : public jgui::Window {
 
 	void Init()
 	{
-		jgui::jregion_t
+		jgui::jrect_t
 			region = GetVisibleBounds();
 
 		GetImages();
@@ -393,8 +393,8 @@ class PacMan : public jgui::Window {
 
 		std::string s;
 
-		if (goff == nullptr && d.width > 0 && d.height > 0) {
-			ii = new jgui::BufferedImage(jgui::JPF_RGB32, d);
+		if (goff == nullptr && d.size.width > 0 && d.size.height > 0) {
+			ii = new jgui::BufferedImage(jgui::JPF_RGB32, d.size);
 
 			goff = ii->GetGraphics();
 		}
@@ -404,7 +404,7 @@ class PacMan : public jgui::Window {
 		}
 
 		goff->SetColor({0x00, 0x00, 0x00, 0xff});
-		goff->FillRectangle({0, 0, d.width, d.height});
+		goff->FillRectangle({0, 0, d.size.width, d.size.height});
 
 		DrawMaze();
 		DrawScore();
@@ -692,19 +692,19 @@ class PacMan : public jgui::Window {
 				goff->SetColor(mazecolor);
 
 				if ((screendata[i]&1)!=0) {
-					goff->DrawLine({{x, y}, {x, y+blocksize-1}});
+					goff->DrawLine({x, y}, {x, y+blocksize-1});
 				}
 
 				if ((screendata[i]&2)!=0) {
-					goff->DrawLine({{x, y}, {x+blocksize-1, y}});
+					goff->DrawLine({x, y}, {x+blocksize-1, y});
 				}
 
 				if ((screendata[i]&4)!=0) {
-					goff->DrawLine({{x+blocksize-1, y}, {x+blocksize-1, y+blocksize-1}});
+					goff->DrawLine({x+blocksize-1, y}, {x+blocksize-1, y+blocksize-1});
 				}
 
 				if ((screendata[i]&8)!=0) {
-					goff->DrawLine({{x, y+blocksize-1}, {x+blocksize-1, y+blocksize-1}});
+					goff->DrawLine({x, y+blocksize-1}, {x+blocksize-1, y+blocksize-1});
 				}
 
 				if ((screendata[i]&16)!=0) {

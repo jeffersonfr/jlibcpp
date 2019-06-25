@@ -364,7 +364,7 @@ class BallDrop : public jgui::Window {
 				y = size.height*(1.0-.5*exp(-(double)(i-x)*(i-x)/(2*81)));
 
 				if (i > 0) {
-					g->DrawLine({(int)((i-1)*scale),(int)oy,(int)(i*scale),(int)y});
+					g->DrawLine({(int)((i-1)*scale), (int)oy}, {(int)(i*scale),(int)y});
 				}
 				oy=y;
 			}

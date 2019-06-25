@@ -280,13 +280,13 @@ class SignalMetter : public jgui::Component {
 
 			if (_vertical_lines == true) {
 				for (int i=_interval; i<=size.width; i+=_interval) {
-					g->DrawLine({{i, 0}, {i, size.height - 1}});
+					g->DrawLine({i, 0}, {i, size.height - 1});
 				}
 			}
 			
 			if (_horizontal_lines == true) {
 				for (int i=_interval; i<=size.width; i+=_interval) {
-					g->DrawLine({{0, size.height - i}, {size.width - 1, size.height - i}});
+					g->DrawLine({0, size.height - i}, {size.width - 1, size.height - i});
 				}
 			}
 
@@ -294,9 +294,9 @@ class SignalMetter : public jgui::Component {
 
 			for (std::vector<int>::iterator i=_points.begin(); i!=_points.end(); i++) {
 				if (i != _points.begin()) {
-					g->DrawLine({{x-_interval, y-*(i-1)}, {x, y-(*i)}});
+					g->DrawLine({x-_interval, y-*(i-1)}, {x, y-(*i)});
 				} else {
-					g->DrawLine({{x-_interval, y-*(i)}, {x, y-(*i)}});
+					g->DrawLine({x-_interval, y-*(i)}, {x, y-(*i)});
 				}
 
 				x = x + _interval;

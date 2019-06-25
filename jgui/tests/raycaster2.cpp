@@ -180,7 +180,7 @@ class GraphicsTeste : public jgui::Window {
 				}
 
 				g->SetColor(color);
-				g->DrawLine({{x, drawStart}, {x, drawEnd}});
+				g->DrawLine({x, drawStart}, {x, drawEnd});
 			}
 		}
 

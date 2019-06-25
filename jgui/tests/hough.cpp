@@ -302,7 +302,7 @@ class Test : public jgui::Window {
 			for (std::vector<jgui::jline_t<int>>::iterator i=lines.begin(); i!=lines.end(); i++) {
 				jgui::jline_t<int> t = (*i);
 
-				g->DrawLine({{t.p0.x, t.p0.y}, {t.p1.x, t.p1.y}});
+				g->DrawLine({t.p0.x, t.p0.y}, {t.p1.x, t.p1.y});
 			}
 		}
 

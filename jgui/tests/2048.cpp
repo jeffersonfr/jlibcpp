@@ -65,7 +65,7 @@ class Game2048 : public jgui::Window {
 		{
 			jgui::Window::Paint(g);
 
-			jgui::jinsets_t t = {4, 4, 0, 0}; // GetInsets();
+			jgui::jinsets_t<int> t = {4, 4, 0, 0}; // GetInsets();
 
 			jgui::Theme *theme = GetTheme();
 			jgui::Font *font = theme->GetFont("component");

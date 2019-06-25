@@ -349,12 +349,10 @@ class Main : public jgui::Window {
 			g->SetColor({0xf0, 0xf0, 0xf0, 0xff});
 
 			for (int i=1; i<MAX_COLS; i++) {
-				g->DrawLine({
-          solution[i-1]->x*(BLOCK_WIDTH+BLOCK_GAP)+BLOCK_WIDTH/2, 
-					solution[i-1]->y*(BLOCK_HEIGHT+BLOCK_GAP)+BLOCK_HEIGHT/2, 
-					solution[i]->x*(BLOCK_WIDTH+BLOCK_GAP)+BLOCK_WIDTH/2, 
-					solution[i]->y*(BLOCK_HEIGHT+BLOCK_GAP)+BLOCK_HEIGHT/2
-          });
+				g->DrawLine(
+            {solution[i-1]->x*(BLOCK_WIDTH+BLOCK_GAP)+BLOCK_WIDTH/2, solution[i-1]->y*(BLOCK_HEIGHT+BLOCK_GAP)+BLOCK_HEIGHT/2}, 
+            {solution[i]->x*(BLOCK_WIDTH+BLOCK_GAP)+BLOCK_WIDTH/2, solution[i]->y*(BLOCK_HEIGHT+BLOCK_GAP)+BLOCK_HEIGHT/2}
+            );
 			}
 
       _mutex.unlock();

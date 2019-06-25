@@ -110,7 +110,7 @@ class WatchTeste : public jgui::Window {
 				double teta = (i*30)*M_PI/180.0;
 
 				g->FillCircle({(int)(xc+(vs+10+4)*cos(teta)), (int)(yc+(vs+10+4)*sin(teta))}, 5);
-				// g->DrawLine({{(int)(xc+(vs+10)*cos(teta)), (int)(yc+(vs+10)*sin(teta))}, {(int)(xc+(vs+10+10)*cos(teta)), (int)(yc+(vs+10+10)*sin(teta))}});
+				// g->DrawLine({(int)(xc+(vs+10)*cos(teta)), (int)(yc+(vs+10)*sin(teta))}, {(int)(xc+(vs+10+10)*cos(teta)), (int)(yc+(vs+10+10)*sin(teta))});
 			}
 
 			jgui::Theme *theme = GetTheme();
@@ -157,8 +157,8 @@ class WatchTeste : public jgui::Window {
 			g->SetColor({0x80, 0xa0, 0xd0, 0xff});
 
 			// draw second
-			g->DrawLine({{(int)(xc), (int)(yc)}, {(int)(xc+vs*cos(ts)), (int)(yc+vs*sin(ts))}});
-			g->DrawLine({{(int)(xc), (int)(yc)}, {(int)(xc+hs*cos(ts+M_PI)), (int)(yc+hs*sin(ts+M_PI))}});
+			g->DrawLine({(int)(xc), (int)(yc)}, {(int)(xc+vs*cos(ts)), (int)(yc+vs*sin(ts))});
+			g->DrawLine({(int)(xc), (int)(yc)}, {(int)(xc+hs*cos(ts+M_PI)), (int)(yc+hs*sin(ts+M_PI))});
 
       std::time_t t = std::time(nullptr);
       std::tm *lt = std::localtime(&t);
