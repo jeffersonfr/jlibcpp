@@ -150,12 +150,12 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return *this;
     }
     
-    jpoint_t<T> operator*(float param)
+    template<typename U> jpoint_t<T> operator*(U param)
     {
       return {(T)(x*param), (T)(y*param)};
     }
     
-    jpoint_t<T> operator/(float param)
+    template<typename U> jpoint_t<T> operator/(T param)
     {
       return {(T)(x/param), (T)(y/param)};
     }
@@ -225,6 +225,16 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return std::max<T>(x, y);
     }
 
+    template<typename U> friend jpoint_t<T> operator*(U param, jpoint_t<T> thiz)
+    {
+      return {(T)(thiz.x*param), (T)(thiz.y*param)};
+    }
+    
+    template<typename U> friend jpoint_t<T> operator/(U param, jpoint_t<T> thiz)
+    {
+      return {(T)(thiz.x/param), (T)(thiz.y/param)};
+    }
+    
   };
 
 template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
@@ -300,12 +310,12 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return *this;
     }
     
-    jline_t<T> operator*(float param)
+    template<typename U> jline_t<T> operator*(U param)
     {
       return {p0*param, p1*param};
     }
     
-    jline_t<T> operator/(float param)
+    template<typename U> jline_t<T> operator/(U param)
     {
       return {p0/param, p1/param};
     }
@@ -317,7 +327,7 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
 
     bool operator!=(jline_t<T> param)
     {
-      return (p0 != param.p0 and p1 != param.p1);
+      return (p0 != param.p0 or p1 != param.p1);
     }
 
     T Size()
@@ -424,6 +434,140 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return atanf((m0 - m1)/den);
     }
 
+    template<typename U> friend jline_t<T> operator*(U param, jline_t<T> thiz)
+    {
+      return {thiz.p0*param, thiz.p1*param};
+    }
+    
+    template<typename U> friend jline_t<T> operator/(U param, jline_t<T> thiz)
+    {
+      return {thiz.p0/param, thiz.p1/param};
+    }
+    
+  };
+
+template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
+  struct jcircle_t {
+    jpoint_t<T> center;
+    T radius;
+    
+    template<typename U> operator jcircle_t<U>()
+    {
+      return {
+        .center = center,
+        .radius = radius
+      };
+    }
+
+    jcircle_t<T> & operator=(T param)
+    {
+      center = param;
+      radius = param;
+
+      return *this;
+    }
+
+    template<typename U> jcircle_t<T> & operator=(jpoint_t<U> &param)
+    {
+      center = param;
+
+      return *this;
+    }
+
+    template<typename U> jcircle_t<T> operator+(jpoint_t<U> param)
+    {
+      return {center + param, radius};
+    }
+    
+    template<typename U> jcircle_t<T> operator-(jpoint_t<U> param)
+    {
+      return {center - param, radius};
+    }
+    
+    template<typename U> jcircle_t<T> & operator+=(jpoint_t<U> param)
+    {
+      center = center + param;
+
+      return *this;
+    }
+    
+    template<typename U> jcircle_t<T> & operator-=(jpoint_t<U> param)
+    {
+      center = center - param.center;
+
+      return *this;
+    }
+    
+    template<typename U> jline_t<T> operator*(U param)
+    {
+      return {center, (T)(radius*param)};
+    }
+    
+    template<typename U> jline_t<T> operator/(U param)
+    {
+      return {center, (T)(radius/param)};
+    }
+
+    bool operator==(jcircle_t<T> param)
+    {
+      return (center == param.center and radius == param.radius);
+    }
+
+    bool operator!=(jline_t<T> param)
+    {
+      return (center != param.center or radius != param.radius);
+    }
+
+    T Size()
+    {
+        return 2*M_PI*radius;
+    }
+
+    template<typename U> bool Exists(jgui::jpoint_t<U> point)
+    {
+      return point.Distance(center) <= radius;
+    }
+
+    float Angle(jpoint_t<T> param)
+    {
+      return (param - center).Angle();
+    }
+
+    /**
+     * \brief Returns the intersection circle and line.
+     *
+     */
+    template<typename U> std::pair<jgui::jpoint_t<float>, jgui::jpoint_t<float>> Intersection(jline_t<U> line)
+    {
+      float 
+        dx = line.p1.x - line.p0.x, 
+        dy = line.p1.y - line.p0.y, 
+        A = dx * dx + dy * dy,
+        B = 2 * (dx * (line.p0.x - center.x) + dy * (line.p0.y - center.y)),
+        C = (line.p0.x - center.x) * (line.p0.x - center.x) + (line.p0.y - center.y) * (line.p0.y - center.y) - radius * radius,
+        det = B * B - 4 * A * C;
+
+      if ((A <= 0.0000001) || (det < 0)) { // no real solutions
+        return {{NAN, NAN}, {NAN, NAN}};
+      }
+
+      float
+        t0 = (float)((-B + sqrtf(det)) / (2 * A)),
+        t1 = (float)((-B - sqrtf(det)) / (2 * A));
+
+      return {{line.p0.x + t0 * dx, line.p0.y + t0 * dy}, {line.p0.x + t1 * dx, line.p0.y + t1 * dy}};
+    }
+
+    template<typename U> friend jcircle_t<T> operator*(U param, jcircle_t<T> thiz)
+    {
+      return {thiz.center, (T)(thiz.radius*param)};
+    }
+    
+    template<typename U> friend jcircle_t<T> operator/(U param, jcircle_t<T> thiz)
+    {
+      return {thiz.center, (T)(thiz.radius*param)};
+    }
+
   };
 
 /**
@@ -485,12 +629,12 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return *this;
     }
     
-    jsize_t<T> operator*(float param)
+    template<typename U> jsize_t<T> operator*(U param)
     {
       return {(T)(width*param), (T)(height*param)};
     }
     
-    jsize_t<T> operator/(float param)
+    template<typename U> jsize_t<T> operator/(U param)
     {
       return {(T)(width/param), (T)(height/param)};
     }
@@ -540,6 +684,16 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return std::max<T>(width, height);
     }
 
+    template<typename U> friend jsize_t<T> operator*(U param, jsize_t<T> thiz)
+    {
+      return {(T)(thiz.width*param), (T)(thiz.height*param)};
+    }
+    
+    template<typename U> friend jsize_t<T> operator/(U param, jsize_t<T> thiz)
+    {
+      return {(T)(thiz.width/param), (T)(thiz.height/param)};
+    }
+    
   };
 
 /**
@@ -635,12 +789,12 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return *this;
     }
     
-    jrect_t<T> operator*(float param)
+    template<typename U> jrect_t<T> operator*(U param)
     {
       return {point*param, size*param};
     }
     
-    jrect_t<T> operator/(float param)
+    template<typename U> jrect_t<T> operator/(U param)
     {
       return {point/param, size/param};
     }
@@ -709,6 +863,16 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return {0, 0, 0, 0};
     }
 
+    template<typename U> friend jrect_t<T> operator*(U param, jrect_t<T> thiz)
+    {
+      return {thiz.point*param, thiz.size*param};
+    }
+    
+    template<typename U> friend jrect_t<T> operator/(U param, jrect_t<T> thiz)
+    {
+      return {thiz.point/param, thiz.size/param};
+    }
+    
 };
 
 }
