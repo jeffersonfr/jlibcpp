@@ -32,26 +32,6 @@ namespace jgui {
  * \brief
  *
  */
-struct jrational_t {
-  int num;
-  int den;
-    
-  bool operator==(jrational_t param)
-  {
-    return (num == param.num and den == param.den);
-  }
-
-  bool operator!=(jrational_t param)
-  {
-    return (num != param.num or den != param.den);
-  }
-
-};
-
-/**
- * \brief
- *
- */
 template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
   struct jinsets_t {
     T left;
@@ -59,6 +39,48 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
     T right;
     T bottom;
  
+    jinsets_t()
+    {
+      left = 0;
+      top = 0;
+      right = 0;
+      bottom = 0;
+    }
+
+    jinsets_t(T param)
+    {
+      left = param;
+      top = param;
+      right = param;
+      bottom = param;
+    }
+
+    jinsets_t(std::initializer_list<T> list)
+    {
+      const T *i = list.begin();
+
+      left = 0;
+      top = 0;
+      right = 0;
+      bottom = 0;
+
+      if (i != list.end()) {
+        left = *i++;
+      }
+      
+      if (i != list.end()) {
+        top = *i++;
+      }
+
+      if (i != list.end()) {
+        right = *i++;
+      }
+
+      if (i != list.end()) {
+        bottom = *i++;
+      }
+    }
+
     template<typename U> operator jinsets_t<U>()
     {
       return {
@@ -99,6 +121,34 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
   struct jpoint_t {
     T x;
     T y;
+
+    jpoint_t()
+    {
+      x = 0;
+      y = 0;
+    }
+
+    jpoint_t(T param)
+    {
+      x = param;
+      y = param;
+    }
+
+    jpoint_t(std::initializer_list<T> list)
+    {
+      const T *i = list.begin();
+
+      x = 0;
+      y = 0;
+
+      if (i != list.end()) {
+        x = *i++;
+      }
+      
+      if (i != list.end()) {
+        y = *i++;
+      }
+    }
 
     template<typename U> operator jpoint_t<U>()
     {
@@ -239,14 +289,53 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
     {
       return {(T)(param/thiz.x), (T)(param/thiz.y)};
     }
-    
   };
 
+/**
+ * brief
+ *
+ */
 template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
   struct jline_t {
     jpoint_t<T> p0;
     jpoint_t<T> p1;
     
+    jline_t()
+    {
+      p0 = 0;
+      p1 = 0;
+    }
+
+    jline_t(T param)
+    {
+      p0 = param;
+      p1 = param;
+    }
+
+    jline_t(std::initializer_list<T> list)
+    {
+      const T *i = list.begin();
+
+      p0 = 0;
+      p1 = 0;
+
+      if (i != list.end()) {
+        p0.x = *i++;
+      }
+      
+      if (i != list.end()) {
+        p0.y = *i++;
+      }
+
+      if (i != list.end()) {
+        p1.x = *i++;
+      }
+
+      if (i != list.end()) {
+        p1.y = *i++;
+      }
+    }
+
     template<typename U> operator jline_t<U>()
     {
       return {
@@ -451,11 +540,47 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
     
   };
 
+/**
+ * \brief
+ *
+ */
 template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
   struct jcircle_t {
     jpoint_t<T> center;
     T radius;
     
+    jcircle_t()
+    {
+      center = 0;
+      radius = 0;
+    }
+
+    jcircle_t(T param)
+    {
+      center = 0;
+      radius = param;
+    }
+
+    jcircle_t(std::initializer_list<T> list)
+    {
+      const T *i = list.begin();
+
+      center = 0;
+      radius = 0;
+
+      if (i != list.end()) {
+        center.x = *i++;
+      }
+      
+      if (i != list.end()) {
+        center.y = *i++;
+      }
+
+      if (i != list.end()) {
+        radius.x = *i++;
+      }
+    }
+
     template<typename U> operator jcircle_t<U>()
     {
       return {
@@ -466,7 +591,6 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
 
     jcircle_t<T> & operator=(T param)
     {
-      center = param;
       radius = param;
 
       return *this;
@@ -594,6 +718,34 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
     T width;
     T height;
     
+    jsize_t()
+    {
+      width = 0;
+      height = 0;
+    }
+
+    jsize_t(T param)
+    {
+      width = param;
+      height = param;
+    }
+
+    jsize_t(std::initializer_list<T> list)
+    {
+      const T *i = list.begin();
+
+      width = 0;
+      height = 0;
+
+      if (i != list.end()) {
+        width = *i++;
+      }
+      
+      if (i != list.end()) {
+        height = *i++;
+      }
+    }
+
     template<typename U> operator jsize_t<U>()
     {
       return {
@@ -720,6 +872,41 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
     jpoint_t<T> point;
     jsize_t<T> size;
     
+    jrect_t()
+    {
+      point = 0;
+      size = 0;
+    }
+
+    jrect_t(T param)
+    {
+      size = param;
+    }
+
+    jrect_t(std::initializer_list<T> list)
+    {
+      const T *i = list.begin();
+
+      point = 0;
+      size = 0;
+
+      if (i != list.end()) {
+        point.x = *i++;
+      }
+      
+      if (i != list.end()) {
+        point.y = *i++;
+      }
+
+      if (i != list.end()) {
+        size.width = *i++;
+      }
+
+      if (i != list.end()) {
+        size.height = *i++;
+      }
+    }
+
     template<typename U> operator jrect_t<U>()
     {
       return {
@@ -730,7 +917,6 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
 
     jrect_t<T> & operator=(T param)
     {
-      point = param;
       size = param;
 
       return *this;
@@ -844,11 +1030,6 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return (point != param.point or size != param.size);
     }
 
-    template<typename U> bool Contains(jrect_t<U> param)
-    {
-      return (param.point.x >= point.x) and (param.point.y >= point.y) and ((param.point.x + param.size.width) <= size.width) and ((param.point.y + param.size.height) <= size.height);
-    }
-
     template<typename U> bool Intersects(jpoint_t<U> param)
     {
       if (param.x > point.x and param.x < (point.x + size.width) and param.y > point.y and param.y < (point.y + size.height)) {
@@ -856,6 +1037,44 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       }
 
       return false;
+    }
+
+    template<typename U> bool Intersects(jline_t<U> param)
+    {
+      std::pair<float, float>
+        i0 = param.Intersection({{point.x, point.y}, {point.x + size.width, point.y}}),
+        i1 = param.Intersection({{point.x + size.width, point.y}, {point.x + size.width, point.y + size.height}}),
+        i2 = param.Intersection({{point.x + size.width, point.y + size.height}, {point.x, point.y + size.height}}),
+        i3 = param.Intersection({{point.x, point.y + size.height}, {point.x, point.y}});
+
+      if (i0.first >= 0.0f and i0.first <= 1.0f or
+          i1.first >= 0.0f and i1.first <= 1.0f or
+          i2.first >= 0.0f and i2.first <= 1.0f or
+          i3.first >= 0.0f and i3.first <= 1.0f) {
+        return true;
+      }
+
+      return false;
+    }
+
+    template<typename U> bool Intersects(jcircle_t<U> param)
+    {
+      std::pair<jgui::jpoint_t<float>, jgui::jpoint_t<float>> 
+        i0 = param.Intersection({{point.x, point.y}, {point.x + size.width, point.y}}),
+        i1 = param.Intersection({{point.x + size.width, point.y}, {point.x + size.width, point.y + size.height}}),
+        i2 = param.Intersection({{point.x + size.width, point.y + size.height}, {point.x, point.y + size.height}}),
+        i3 = param.Intersection({{point.x, point.y + size.height}, {point.x, point.y}});
+
+      if (i0.first.x != NAN and i1.first.x != NAN and i2.first.x != NAN and i3.first.x != NAN) {
+        return true;
+      }
+
+      return false;
+    }
+
+    template<typename U> bool Contains(jrect_t<U> param)
+    {
+      return (param.point.x >= point.x) and (param.point.y >= point.y) and ((param.point.x + param.size.width) <= size.width) and ((param.point.y + param.size.height) <= size.height);
     }
 
     template<typename U> bool Intersects(jrect_t<U> param)

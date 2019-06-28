@@ -57,20 +57,10 @@ class Ray {
   public:
     Ray(jgui::jpoint_t<int> p0, float angle)
     {
-      _p0 = p0;
-
       angle = 2*M_PI*angle/360.0f;
 
-      float 
-        fx = cos(angle),
-        fy = sin(angle);
-      float
-        magnitude = fabs(fx*fx + fy*fy);
-
-      _p1 = {
-        .x = fx/magnitude,
-        .y = fy/magnitude
-      };
+      _p0 = p0;
+      _p1 = jgui::jpoint_t<float>{cos(angle), sin(angle)};
     }
 
     virtual ~Ray()
@@ -92,34 +82,16 @@ class Ray {
       _p0 = point;
     }
 
-    jgui::jpoint_t<int> * Cast(Barrier &barrier)
+    std::optional<jgui::jpoint_t<int>> Cast(Barrier &barrier)
     {
-      jgui::jline_t<int> line = barrier.GetBounds();
+      std::pair<float, float>
+        pair = barrier.GetBounds().Intersection(jgui::jline_t<float>{_p0, jgui::jpoint_t<float>(_p0) + _p1});
 
-      const float x1 = line.p0.x;
-      const float y1 = line.p0.y;
-      const float x2 = line.p1.x;
-      const float y2 = line.p1.y;
-
-      const float x3 = _p0.x;
-      const float y3 = _p0.y;
-      const float x4 = _p0.x + _p1.x;
-      const float y4 = _p0.y + _p1.y;
-
-      const float den = (x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4);
-
-      if (den == 0) {
-        return nullptr;
+      if (pair.first >= 0.0f and pair.first <= 1.0f and pair.second >= 0.0f) {
+        return barrier.GetBounds().Point(pair.first);
       }
 
-      const float t = ((x1 - x3)*(y3 - y4) - (y1 - y3)*(x3 - x4))/den;
-      const float u = -((x1 - x2)*(y1 - y3) - (y1 - y2)*(x1 - x3))/den;
-
-      if (t > 0.0f and t < 1.0f and u > 0.0f) {
-        return new jgui::jpoint_t<int>{(int)(x1 + t*(x2 - x1)), (int)(y1 + t*(y2 - y1))};
-      }
-
-      return nullptr;
+      return std::nullopt;
     }
 
     void Paint(jgui::Raster &raster)
@@ -161,20 +133,21 @@ class Light {
         jgui::jpoint_t<int> 
           pray = ray.GetPosition(),
           best = {9999, 9999};
+        int
+          d0 = (pray - best).Norm();
 
         for (auto &barrier : barriers) {
-          jgui::jpoint_t<int> *point = ray.Cast(barrier);
+          std::optional<jgui::jpoint_t<int>> 
+            point = ray.Cast(barrier);
 
-          if (point != nullptr) {
+          if (point != std::nullopt) {
             int 
-              d0 = (pray.x - best.x)*(pray.x - best.x) + (pray.y - best.y)*(pray.y - best.y),
-              d1 = (pray.x - point->x)*(pray.x - point->x) + (pray.y - point->y)*(pray.y - point->y);
+              d1 = (pray - *point).Norm();
 
             if (d1 < d0) {
+              d0 = d1;
               best = *point;
             }
-
-            delete point;
           }
         }
 
@@ -200,13 +173,11 @@ class Scene : public jgui::Window {
       _barriers.emplace_back(jgui::jline_t<int>{{0, 480}, {0, 0}});
 
       for (int i=0; i<3; i++) {
-        jgui::jline_t<int>
-          line = {
-            {(int)(random()%720), (int)(random()%480)},
-            {(int)(random()%720), (int)(random()%480)}
-          };
-
-        _barriers.emplace_back(line);
+        _barriers.emplace_back(
+            jgui::jline_t<long int>{
+              {random()%720, random()%480}, 
+              {random()%720, random()%480}
+            });
       }
       
       _light.SetPoint(jgui::jpoint_t<int>{200, 250});
@@ -229,7 +200,8 @@ class Scene : public jgui::Window {
     {
       jgui::Window::Paint(g);
 
-      jgui::Raster raster((uint32_t *)cairo_image_surface_get_data(g->GetCairoSurface()), GetSize());
+      jgui::Raster 
+        raster((uint32_t *)cairo_image_surface_get_data(g->GetCairoSurface()), GetSize());
 
       for (auto &i : _barriers) {
         i.Paint(raster);
