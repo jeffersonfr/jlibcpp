@@ -39,48 +39,6 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
     T right;
     T bottom;
  
-    jinsets_t()
-    {
-      left = 0;
-      top = 0;
-      right = 0;
-      bottom = 0;
-    }
-
-    jinsets_t(T param)
-    {
-      left = param;
-      top = param;
-      right = param;
-      bottom = param;
-    }
-
-    jinsets_t(std::initializer_list<T> list)
-    {
-      const T *i = list.begin();
-
-      left = 0;
-      top = 0;
-      right = 0;
-      bottom = 0;
-
-      if (i != list.end()) {
-        left = *i++;
-      }
-      
-      if (i != list.end()) {
-        top = *i++;
-      }
-
-      if (i != list.end()) {
-        right = *i++;
-      }
-
-      if (i != list.end()) {
-        bottom = *i++;
-      }
-    }
-
     template<typename U> operator jinsets_t<U>()
     {
       return {
@@ -121,34 +79,6 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
   struct jpoint_t {
     T x;
     T y;
-
-    jpoint_t()
-    {
-      x = 0;
-      y = 0;
-    }
-
-    jpoint_t(T param)
-    {
-      x = param;
-      y = param;
-    }
-
-    jpoint_t(std::initializer_list<T> list)
-    {
-      const T *i = list.begin();
-
-      x = 0;
-      y = 0;
-
-      if (i != list.end()) {
-        x = *i++;
-      }
-      
-      if (i != list.end()) {
-        y = *i++;
-      }
-    }
 
     template<typename U> operator jpoint_t<U>()
     {
@@ -300,42 +230,6 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
     jpoint_t<T> p0;
     jpoint_t<T> p1;
     
-    jline_t()
-    {
-      p0 = 0;
-      p1 = 0;
-    }
-
-    jline_t(T param)
-    {
-      p0 = param;
-      p1 = param;
-    }
-
-    jline_t(std::initializer_list<T> list)
-    {
-      const T *i = list.begin();
-
-      p0 = 0;
-      p1 = 0;
-
-      if (i != list.end()) {
-        p0.x = *i++;
-      }
-      
-      if (i != list.end()) {
-        p0.y = *i++;
-      }
-
-      if (i != list.end()) {
-        p1.x = *i++;
-      }
-
-      if (i != list.end()) {
-        p1.y = *i++;
-      }
-    }
-
     template<typename U> operator jline_t<U>()
     {
       return {
@@ -549,38 +443,6 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
     jpoint_t<T> center;
     T radius;
     
-    jcircle_t()
-    {
-      center = 0;
-      radius = 0;
-    }
-
-    jcircle_t(T param)
-    {
-      center = 0;
-      radius = param;
-    }
-
-    jcircle_t(std::initializer_list<T> list)
-    {
-      const T *i = list.begin();
-
-      center = 0;
-      radius = 0;
-
-      if (i != list.end()) {
-        center.x = *i++;
-      }
-      
-      if (i != list.end()) {
-        center.y = *i++;
-      }
-
-      if (i != list.end()) {
-        radius.x = *i++;
-      }
-    }
-
     template<typename U> operator jcircle_t<U>()
     {
       return {
@@ -718,34 +580,6 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
     T width;
     T height;
     
-    jsize_t()
-    {
-      width = 0;
-      height = 0;
-    }
-
-    jsize_t(T param)
-    {
-      width = param;
-      height = param;
-    }
-
-    jsize_t(std::initializer_list<T> list)
-    {
-      const T *i = list.begin();
-
-      width = 0;
-      height = 0;
-
-      if (i != list.end()) {
-        width = *i++;
-      }
-      
-      if (i != list.end()) {
-        height = *i++;
-      }
-    }
-
     template<typename U> operator jsize_t<U>()
     {
       return {
@@ -872,41 +706,6 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
     jpoint_t<T> point;
     jsize_t<T> size;
     
-    jrect_t()
-    {
-      point = 0;
-      size = 0;
-    }
-
-    jrect_t(T param)
-    {
-      size = param;
-    }
-
-    jrect_t(std::initializer_list<T> list)
-    {
-      const T *i = list.begin();
-
-      point = 0;
-      size = 0;
-
-      if (i != list.end()) {
-        point.x = *i++;
-      }
-      
-      if (i != list.end()) {
-        point.y = *i++;
-      }
-
-      if (i != list.end()) {
-        size.width = *i++;
-      }
-
-      if (i != list.end()) {
-        size.height = *i++;
-      }
-    }
-
     template<typename U> operator jrect_t<U>()
     {
       return {
