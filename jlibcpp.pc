@@ -8,5 +8,5 @@ Description: Portable C++ library.
 Version: @version@
 Requires: @requires@
 URL: http://sourceforge.net/projects/jlibcpp
-Libs: -L${libdir} @libs@ -ljlibcpp -lrt -ldl -lpthread -std=c++14
-Cflags: @defines@ -fPIC -std=c++17 -D_GNU_SOURCE -D_REENTANT -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -I${includedir}/jlibcpp
+Libs: -L${libdir} @libs@ -ljlibcpp -lrt -ldl -lpthread -std=c++17
+Cflags: @defines@ -fPIC -D_GNU_SOURCE -D_REENTANT -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -I${includedir}/jlibcpp
