@@ -21,8 +21,9 @@
 #define J_GEOMETRY_H
 
 #include <algorithm>
-#include <type_traits>
 #include <cmath>
+#include <optional>
+#include <type_traits>
 
 #include <stdio.h>
 
@@ -389,7 +390,7 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
      * y = u*(line.p1.y - line.p0.y)
      *
      */
-    template<typename U> float PerpendicularIntersection(jpoint_t<U> point)
+    template<typename U> std::optional<float> PerpendicularIntersection(jpoint_t<U> point)
     {
       float
         px = p1.x - p0.x,
@@ -398,7 +399,7 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
         den = (px*px + py*py);
 
       if (den == 0.0f) {
-          return NAN;
+				return std::nullopt;
       }
 
       return ((point.x - p0.x)*px + (point.y - p0.y)*py)/den;
@@ -415,7 +416,7 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
      * y1 = u*(line1.p1.y - line1.p0.y)
      *
      */
-    template<typename U> std::pair<float, float> Intersection(jline_t<U> line)
+    template<typename U> std::optional<std::pair<float, float>> Intersection(jline_t<U> line)
     {
       const float x1 = line.p0.x;
       const float y1 = line.p0.y;
@@ -430,13 +431,13 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       const float den = (x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4);
 
       if (den == 0) {
-        return {NAN, NAN};
+				return std::nullopt;
       }
 
       const float t1 = -((x1 - x2)*(y1 - y3) - (y1 - y2)*(x1 - x3))/den;
       const float t0 = ((x1 - x3)*(y3 - y4) - (y1 - y3)*(x3 - x4))/den;
 
-      return {t1, t0};
+      return std::make_pair(t1, t0);
     }
 
     template<typename U> float Angle(jline_t<U> line)
@@ -598,7 +599,7 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
      * \brief Returns the intersection circle and line.
      *
      */
-    template<typename U> std::pair<jgui::jpoint_t<float>, jgui::jpoint_t<float>> Intersection(jline_t<U> line)
+    template<typename U> std::optional<std::pair<jgui::jpoint_t<float>, jgui::jpoint_t<float>>> Intersection(jline_t<U> line)
     {
       float 
         dx = line.p1.x - line.p0.x, 
@@ -609,14 +610,14 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
         det = B * B - 4 * A * C;
 
       if ((A <= 0.0000001) || (det < 0)) { // no real solutions
-        return {{NAN, NAN}, {NAN, NAN}};
+				return std::nullopt;
       }
 
       float
         t0 = (float)((-B + sqrtf(det)) / (2 * A)),
         t1 = (float)((-B - sqrtf(det)) / (2 * A));
 
-      return {{line.p0.x + t0 * dx, line.p0.y + t0 * dy}, {line.p0.x + t1 * dx, line.p0.y + t1 * dy}};
+      return std::make_pair({line.p0.x + t0 * dx, line.p0.y + t0 * dy}, {line.p0.x + t1 * dx, line.p0.y + t1 * dy});
     }
 
     template<typename U> friend jcircle_t<T> operator*(U param, jcircle_t<T> thiz)
@@ -988,13 +989,13 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
 
     template<typename U> bool Intersects(jcircle_t<U> param)
     {
-      std::pair<jgui::jpoint_t<float>, jgui::jpoint_t<float>> 
+      std::optional<std::pair<jgui::jpoint_t<float>, jgui::jpoint_t<float>>>
         i0 = param.Intersection({{point.x, point.y}, {point.x + size.width, point.y}}),
         i1 = param.Intersection({{point.x + size.width, point.y}, {point.x + size.width, point.y + size.height}}),
         i2 = param.Intersection({{point.x + size.width, point.y + size.height}, {point.x, point.y + size.height}}),
         i3 = param.Intersection({{point.x, point.y + size.height}, {point.x, point.y}});
 
-      if (i0.first.x != NAN and i1.first.x != NAN and i2.first.x != NAN and i3.first.x != NAN) {
+      if (i0 != std::nullopt and i1 != std::nullopt and i2 != std::nullopt and i3 != std::nullopt) {
         return true;
       }
 
