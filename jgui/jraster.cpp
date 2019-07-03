@@ -199,17 +199,12 @@ void Raster::ScanLine(jgui::jpoint_t<int> v1, int size)
 
 void Raster::DrawLine(jpoint_t<int> p0, jpoint_t<int> p1)
 {
-  p0.x = (p0.x < 0)?0:(p0.x >= _size.width)?_size.width - 1:p0.x;
-  p0.y = (p0.y < 0)?0:(p0.y >= _size.height)?_size.height - 1:p0.y;
-  p1.x = (p1.x < 0)?0:(p1.x >= _size.width)?_size.width - 1:p1.x;
-  p1.y = (p1.y < 0)?0:(p1.y >= _size.height)?_size.height - 1:p1.y;
-
   int dx = abs(p1.x-p0.x), sx = p0.x<p1.x ? 1 : -1;
   int dy = abs(p1.y-p0.y), sy = p0.y<p1.y ? 1 : -1;
   int err = (dx>dy ? dx : -dy)/2, e2;
 
   for(;;) {
-    _buffer[p0.y*_size.width + p0.x] = _color;
+    SetPixel(p0);
 
     if (p0.x == p1.x && p0.y == p1.y) {
       break;
