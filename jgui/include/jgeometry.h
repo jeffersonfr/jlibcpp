@@ -255,27 +255,25 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return std::max<T>(x, y);
     }
 
-    /*
-    template<typename U> friend jpoint_t<T> operator+(U param, jpoint_t<T> thiz)
+    friend jpoint_t<T> operator+(T param, jpoint_t<T> thiz)
     {
       return {(T)(param + thiz.x), (T)(param + thiz.y)};
     }
     
-    template<typename U> friend jpoint_t<T> operator-(U param, jpoint_t<T> thiz)
+    friend jpoint_t<T> operator-(T param, jpoint_t<T> thiz)
     {
       return {(T)(param - thiz.x), (T)(param - thiz.y)};
     }
     
-    template<typename U> friend jpoint_t<T> operator*(U param, jpoint_t<T> thiz)
+    friend jpoint_t<T> operator*(T param, jpoint_t<T> thiz)
     {
       return {(T)(param*thiz.x), (T)(param*thiz.y)};
     }
     
-    template<typename U> friend jpoint_t<T> operator/(U param, jpoint_t<T> thiz)
+    friend jpoint_t<T> operator/(T param, jpoint_t<T> thiz)
     {
       return {(T)(param/thiz.x), (T)(param/thiz.y)};
     }
-    */
 
   };
 
@@ -504,27 +502,25 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return atanf((m0 - m1)/den);
     }
 
-    /*
-    template<typename U> friend jline_t<T> operator+(U param, jline_t<T> thiz)
+    friend jline_t<T> operator+(T param, jline_t<T> thiz)
     {
       return {param + thiz.p0, param + thiz.p1};
     }
     
-    template<typename U> friend jline_t<T> operator-(U param, jline_t<T> thiz)
+    friend jline_t<T> operator-(T param, jline_t<T> thiz)
     {
       return {param - thiz.p0, param - thiz.p1};
     }
     
-    template<typename U> friend jline_t<T> operator*(U param, jline_t<T> thiz)
+    friend jline_t<T> operator*(T param, jline_t<T> thiz)
     {
       return {param*thiz.p0, param*thiz.p1};
     }
     
-    template<typename U> friend jline_t<T> operator/(U param, jline_t<T> thiz)
+    friend jline_t<T> operator/(T param, jline_t<T> thiz)
     {
       return {param/thiz.p0, param/thiz.p1};
     }
-    */
     
   };
 
@@ -676,37 +672,35 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return std::make_pair(jpoint_t<float>{line.p0.x + t0*dx, line.p0.y + t0*dy}, jpoint_t<float>{line.p0.x + t1*dx, line.p0.y + t1*dy});
     }
 
-    /*
-    template<typename U> friend jcircle_t<T> operator+(U param, jcircle_t<T> thiz)
+    friend jcircle_t<T> operator+(T param, jcircle_t<T> thiz)
     {
       return {thiz.center, (T)(param + thiz.radius)};
     }
     
-    template<typename U> friend jcircle_t<T> operator-(U param, jcircle_t<T> thiz)
+    friend jcircle_t<T> operator-(T param, jcircle_t<T> thiz)
     {
       return {thiz.center, (T)(param - thiz.radius)};
     }
 
-    template<typename U> friend jcircle_t<T> operator*(U param, jcircle_t<T> thiz)
+    friend jcircle_t<T> operator*(T param, jcircle_t<T> thiz)
     {
       return {thiz.center, (T)(param*thiz.radius)};
     }
     
-    template<typename U> friend jcircle_t<T> operator/(U param, jcircle_t<T> thiz)
+    friend jcircle_t<T> operator/(T param, jcircle_t<T> thiz)
     {
       return {thiz.center, (T)(param/thiz.radius)};
     }
 
-    template<typename U> friend jcircle_t<T> operator+(jpoint_t<U> param, jcircle_t<T> thiz)
+    friend jcircle_t<T> operator+(jpoint_t<T> param, jcircle_t<T> thiz)
     {
       return {thiz.center + param, thiz.radius};
     }
     
-    template<typename U> friend jcircle_t<T> operator-(jpoint_t<U> param, jcircle_t<T> thiz)
+    friend jcircle_t<T> operator-(jpoint_t<T> param, jcircle_t<T> thiz)
     {
       return {thiz.center - param, thiz.radius};
     }
-    */
     
   };
 
@@ -828,27 +822,25 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return std::max<T>(width, height);
     }
 
-    /*
-    template<typename U> friend jsize_t<T> operator+(U param, jsize_t<T> thiz)
+    friend jsize_t<T> operator+(T param, jsize_t<T> thiz)
     {
       return {(T)(param + thiz.width), (T)(param + thiz.height)};
     }
     
-    template<typename U> friend jsize_t<T> operator-(U param, jsize_t<T> thiz)
+    friend jsize_t<T> operator-(T param, jsize_t<T> thiz)
     {
       return {(T)(param - thiz.width), (T)(param - thiz.height)};
     }
     
-    template<typename U> friend jsize_t<T> operator*(U param, jsize_t<T> thiz)
+    friend jsize_t<T> operator*(T param, jsize_t<T> thiz)
     {
       return {(T)(param*thiz.width), (T)(param*thiz.height)};
     }
     
-    template<typename U> friend jsize_t<T> operator/(U param, jsize_t<T> thiz)
+    friend jsize_t<T> operator/(T param, jsize_t<T> thiz)
     {
       return {(T)(param/thiz.width), (T)(param/thiz.height)};
     }
-    */
     
   };
 
@@ -1095,47 +1087,45 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return {0, 0, 0, 0};
     }
 
-    /*
-    template<typename U> friend jrect_t<T> operator+(U param, jrect_t<T> thiz)
+    friend jrect_t<T> operator+(T param, jrect_t<T> thiz)
     {
       return {param + thiz.point, param + thiz.size};
     }
     
-    template<typename U> friend jrect_t<T> operator-(U param, jrect_t<T> thiz)
+    friend jrect_t<T> operator-(T param, jrect_t<T> thiz)
     {
       return {param - thiz.point, param - thiz.size};
     }
     
-    template<typename U> friend jrect_t<T> operator*(U param, jrect_t<T> thiz)
+    friend jrect_t<T> operator*(T param, jrect_t<T> thiz)
     {
       return {param*thiz.point, param*thiz.size};
     }
     
-    template<typename U> friend jrect_t<T> operator/(U param, jrect_t<T> thiz)
+    friend jrect_t<T> operator/(T param, jrect_t<T> thiz)
     {
       return {param/thiz.point, param/thiz.size};
     }
     
-    template<typename U> friend jline_t<T> operator+(jpoint_t<U> param, jrect_t<T> thiz)
+    friend jline_t<T> operator+(jpoint_t<T> param, jrect_t<T> thiz)
     {
       return {param + thiz.point, thiz.size};
     }
     
-    template<typename U> friend jline_t<T> operator-(jpoint_t<U> param, jrect_t<T> thiz)
+    friend jline_t<T> operator-(jpoint_t<T> param, jrect_t<T> thiz)
     {
       return {param - thiz.point, thiz.size};
     }
     
-    template<typename U> friend jline_t<T> operator+(jsize_t<U> param, jrect_t<T> thiz)
+    friend jline_t<T> operator+(jsize_t<T> param, jrect_t<T> thiz)
     {
       return {thiz.point, param + thiz.size};
     }
     
-    template<typename U> friend jline_t<T> operator-(jsize_t<U> param, jrect_t<T> thiz)
+    friend jline_t<T> operator-(jsize_t<T> param, jrect_t<T> thiz)
     {
       return {thiz.point, param - thiz.size};
     }
-    */
     
 };
 
