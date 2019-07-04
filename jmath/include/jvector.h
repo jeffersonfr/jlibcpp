@@ -28,6 +28,7 @@
 #include <fstream>
 #include <complex>
 #include <algorithm>
+#include <optional>
 
 namespace jmath {
 
@@ -483,6 +484,19 @@ template<size_t N, typename T, typename = typename std::enable_if<std::is_arithm
       return jvector_t<N, double>(*this)/EuclidianNorm();
     }
  
+    std::optional<T &> Find(const T &param)
+    {
+      for (size_t i=0; i<N; i++) {
+        if (data[i] == param) {
+          return data[i];
+        }
+
+        return std::nullopt;
+      }
+
+      return *std::min_element(data, data + N);
+    }
+
     T Min()
     {
       return *std::min_element(data, data + N);

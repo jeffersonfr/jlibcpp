@@ -156,7 +156,7 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
 
     template<typename U> jmatrix_t<R, C, T> operator+(U param)
     {
-      jmatrix_t<R, C, U> m;
+      jmatrix_t<R, C, T> m;
 
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C; i++) {
@@ -169,7 +169,7 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
     
     template<typename U> jmatrix_t<R, C, T> operator-(U param)
     {
-      jmatrix_t<R, C, U> m;
+      jmatrix_t<R, C, T> m;
 
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C; i++) {
@@ -182,7 +182,7 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
     
     template<typename U> jmatrix_t<R, C, T> operator*(U param)
     {
-      jmatrix_t<R, C, U> m;
+      jmatrix_t<R, C, T> m;
 
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C; i++) {
@@ -195,7 +195,7 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
     
     template<typename U> jmatrix_t<R, C, T> operator/(U param)
     {
-      jmatrix_t<R, C, U> m;
+      jmatrix_t<R, C, T> m;
 
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C; i++) {
@@ -219,7 +219,7 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
 
     template<typename U> jmatrix_t<R, C, T> operator+(jmatrix_t<R, C, U> param)
     {
-      jmatrix_t<R, C, U> m;
+      jmatrix_t<R, C, T> m;
 
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C; i++) {
@@ -232,7 +232,7 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
     
     template<typename U> jmatrix_t<R, C, T> operator-(jmatrix_t<R, C, U> param)
     {
-      jmatrix_t<R, C, U> m;
+      jmatrix_t<R, C, T> m;
 
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C; i++) {
@@ -243,13 +243,13 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
       return m;
     }
     
-    template<size_t R1 = C, size_t C1, typename U> jmatrix_t<R, C, T> operator*(jmatrix_t<R1, C1, U> param)
+    template<size_t R1 = C, size_t C1, typename U> jmatrix_t<C1, R, T> operator*(jmatrix_t<R1, C1, U> param)
     {
-      jmatrix_t<C1, R, U> m;
+      jmatrix_t<C1, R, T> m;
 
       for (size_t j=0; j<C1; j++) {
         for (size_t i=0; i<R; i++) {
-          m.data[j][i] = Row(j).Scalar(param.Col(i));
+          m.data[j][i] = Row(i).Scalar(param.Col(j));
         }
       }
 
@@ -340,6 +340,69 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
       return std::pow(-1, (r + c)&0x01)*m.Determinant();
     }
 
+    bool IsSingular()
+    {
+      return Determinant() == 0.0f;
+    }
+
+    bool IsDiagonal()
+    {
+      for (size_t j=0; j<R; j++) {
+        for (size_t i=0; i<C; i++) {
+					if (j != i and data[j][i] != 0) {
+            return false;
+					}
+        }
+      }
+
+      return true;
+    }
+
+    bool IsIdentity()
+    {
+      if (IsDiagonal() == false) {
+        return false;
+      }
+
+      for (size_t j=0; j<R; j++) {
+        for (size_t i=0; i<C; i++) {
+					if (j == i and data[j][i] != 1) {
+            return false;
+					}
+        }
+      }
+
+      return true;
+    }
+
+    bool IsScalar()
+    {
+      T ref = data[0][0];
+
+      for (size_t j=0; j<R; j++) {
+        for (size_t i=0; i<C; i++) {
+					if ((j == i and data[j][i] != ref) or (j != i and data[j][i] != 0)) {
+            return false;
+					}
+        }
+      }
+
+      return true;
+    }
+
+    bool IsNull()
+    {
+      for (size_t j=0; j<R; j++) {
+        for (size_t i=0; i<C; i++) {
+					if (data[j][i] != 0) {
+            return false;
+					}
+        }
+      }
+
+      return true;
+    }
+
     double LUDecomposition(double m[R][C])
     {
 			if (R < 1 or C < 1) {
@@ -414,7 +477,7 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
       return m;
     }
 
-    jmatrix_t<R, C, T> Indentity()
+    jmatrix_t<R, C, T> Identity()
 		{
       jmatrix_t<R, C, T> m;
 
@@ -429,6 +492,21 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
       }
 
       return m;
+		}
+
+    T Trace()
+		{
+      T sum = 0;
+
+      for (size_t j=0; j<R; j++) {
+        for (size_t i=0; i<C; i++) {
+					if (j == i) {
+          	sum = sum + data[i][j];
+					}
+        }
+      }
+
+      return sum;
 		}
 
     jmatrix_t<R, C, T> Inverse()
@@ -448,6 +526,20 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
 			}
 
 			return m.Transpose()/d;
+    }
+
+    std::optional<T &> Find(const T &param)
+    {
+			for (size_t j=0; j<R; j++) {
+        std::optional<T &>
+          opt = data[j].Find(param);
+
+        if (opt != std::nullopt) {
+          return opt;
+        }
+			}
+
+      return std::nullopt;
     }
 
     T Min()
