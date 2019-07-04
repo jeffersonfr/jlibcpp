@@ -32,7 +32,7 @@
 
 namespace jmath {
 
-template<size_t R, size_t C, typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
+template<size_t R, size_t C, typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value || is_complex<T>::value, T>::type>
   struct jmatrix_t {
     jvector_t<C, T> data[R];
 
@@ -147,7 +147,7 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
     {
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C; i++) {
-          data[j][i] = (T)param.data[j][i];
+          data[j][i] = (T)param;
         }
       }
 
@@ -804,6 +804,26 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
       }
 
       return m;
+    }
+
+    jmatrix_t<R, C, T> Conjugate()
+    {
+      static_assert(is_complex<T>::value, "T != std::complex<U>");
+
+      jmatrix_t<R, C, T> m;
+
+      for (size_t j=0; j<R; j++) {
+        m.data[j] = data[j].Conjugate();
+      }
+
+      return m;
+    }
+
+    jmatrix_t<R, C, T> Hermitian()
+    {
+      static_assert(is_complex<T>::value, "T != std::complex<U>");
+
+      return Transpose().Conjugate();
     }
 
     friend jmatrix_t<R, C, T> operator+(T param, jmatrix_t<R, C, T> thiz)

@@ -28,8 +28,14 @@ int main()
 			2, 1,
 			5, 3
 		};
+	jmath::jmatrix_t<2, 2, std::complex<float>>
+		c {
+			2, {1.0, 1.0},
+			5, 3
+		};
 
-	std::cout << m.Inverse().Inverse() << std::endl;
+	std::cout << m << std::endl;
+	std::cout << c << std::endl;
 
 	return 0;
 }
