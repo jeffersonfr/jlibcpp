@@ -145,9 +145,9 @@ class Grid : public jgui::Window {
 			} else if (event->GetSymbol() == jevent::JKS_CURSOR_DOWN) {
 				_rotatex -= 0.1f;
 			} else if (event->GetSymbol() == jevent::JKS_SQUARE_BRACKET_LEFT) {
-				_rotatex -= 0.1f;
+				_rotatez += 0.1f;
 			} else if (event->GetSymbol() == jevent::JKS_SQUARE_BRACKET_RIGHT) {
-				_rotatex += 0.1f;
+				_rotatez -= 0.1f;
 			} else if (event->GetSymbol() == jevent::JKS_q) {
 				_scale *= 0.9f;
 			} else if (event->GetSymbol() == jevent::JKS_w) {
