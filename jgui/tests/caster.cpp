@@ -84,11 +84,11 @@ class Ray {
 
     std::optional<jgui::jpoint_t<int>> Cast(Barrier &barrier)
     {
-      std::pair<float, float>
+      std::optional<std::pair<float, float>>
         pair = barrier.GetBounds().Intersection(jgui::jline_t<float>{_p0, jgui::jpoint_t<float>(_p0) + _p1});
 
-      if (pair.first >= 0.0f and pair.first <= 1.0f and pair.second >= 0.0f) {
-        return barrier.GetBounds().Point(pair.first);
+      if (pair != std::nullopt and pair->first >= 0.0f and pair->first <= 1.0f and pair->second >= 0.0f) {
+        return barrier.GetBounds().Point(pair->first);
       }
 
       return std::nullopt;

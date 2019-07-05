@@ -358,6 +358,11 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
       return std::pow(-1, (r + c)&0x01)*m.Determinant();
     }
 
+    bool IsNormal()
+    {
+      return (*this * this->Hermitan()) == (this->Hermitan() * *this);
+    }
+
     bool IsSingular()
     {
       return Determinant() == 0.0f;
@@ -467,9 +472,7 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
 
     double Determinant()
     {
-      if (R != C) {
-        throw jexception::RuntimeException("Square matrix needed to calculate determinant");
-      }
+      static_assert(R == C, "Determinant needs a square matrix");
 
       double m[R][C];
 
@@ -527,13 +530,9 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
       return sum;
 		}
 
-    jmatrix_t<R, C, T> Inverse()
+    jmatrix_t<R, C, T> Adjoint()
     {
-      double d = Determinant();
-
-      if (d == 0.0f) {
-        throw jexception::RuntimeException("Matrix in not inversible");
-      }
+      static_assert(R == C, "Determinant needs a square matrix");
 
       jmatrix_t<R, C, T> m;
 
@@ -543,7 +542,18 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
 				}
 			}
 
-			return m.Transpose()/d;
+			return m.Transpose();
+    }
+
+    jmatrix_t<R, C, T> Inverse()
+    {
+      double d = Determinant();
+
+      if (d == 0.0f) {
+        throw jexception::RuntimeException("Matrix in not inversible");
+      }
+
+      return Adjoint()/d;
     }
 
     std::optional<T &> Find(const T &param)

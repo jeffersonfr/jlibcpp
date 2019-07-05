@@ -23,6 +23,8 @@
 #include "jgui/jraster.h"
 #include "jmath/jmatrix.h"
 
+const float ANGLE_STEP = 0.05;
+
 float f1(float x, float y)
 {
 	return x*x + y*y;
@@ -49,9 +51,9 @@ class Grid : public jgui::Window {
 	private:
 		float
 			_scale = 100.0f,
-			_rotatex = 0.0f,
+			_rotatex = 1.0f,
 			_rotatey = 0.0f,
-			_rotatez = 0.0f;
+			_rotatez = 0.8f;
 
 	public:
 		Grid():
@@ -125,17 +127,17 @@ class Grid : public jgui::Window {
 				_rotatey = 0.0f;
 				_rotatez = 0.0f;
       } else if (event->GetSymbol() == jevent::JKS_CURSOR_LEFT) {
-				_rotatey += 0.1f;
+				_rotatey += ANGLE_STEP;
 			} else if (event->GetSymbol() == jevent::JKS_CURSOR_RIGHT) {
-				_rotatey -= 0.1f;
+				_rotatey -= ANGLE_STEP;
 			} else if (event->GetSymbol() == jevent::JKS_CURSOR_UP) {
-				_rotatex += 0.1f;
+				_rotatex += ANGLE_STEP;
 			} else if (event->GetSymbol() == jevent::JKS_CURSOR_DOWN) {
-				_rotatex -= 0.1f;
+				_rotatex -= ANGLE_STEP;
 			} else if (event->GetSymbol() == jevent::JKS_SQUARE_BRACKET_LEFT) {
-				_rotatez += 0.1f;
+				_rotatez -= ANGLE_STEP;
 			} else if (event->GetSymbol() == jevent::JKS_SQUARE_BRACKET_RIGHT) {
-				_rotatez -= 0.1f;
+				_rotatez += ANGLE_STEP;
 			} else if (event->GetSymbol() == jevent::JKS_q) {
 				_scale *= 0.9f;
 			} else if (event->GetSymbol() == jevent::JKS_w) {
@@ -201,22 +203,24 @@ class Grid : public jgui::Window {
 				l = -l;
 			}
 
+      const float axis = 2.0f;
+
       jgui::jpoint_t<float> 
-        px0 = Project({-2.0f, 0.0f, 0.0f}),
-        px1 = Project({+2.0f, 0.0f, 0.0f}),
-        pxt0 = Project({+2.0f, 0.1f, 0.0f}),
+        px0 = Project({-axis, 0.0f, 0.0f}),
+        px1 = Project({+axis, 0.0f, 0.0f}),
+        pxt0 = Project({+axis, 0.1f, 0.0f}),
         pxt1 = Project({+2.1f, 0.0f, 0.0f}),
-        pxt2 = Project({+2.0f, -0.1f, 0.0f}),
-        py0 = Project({0.0f, -2.0f, 0.0f}),
-        py1 = Project({0.0f, +2.0f, 0.0f}),
-        pyt0 = Project({-0.1f, +2.0f, 0.0f}),
+        pxt2 = Project({+axis, -0.1f, 0.0f}),
+        py0 = Project({0.0f, -axis, 0.0f}),
+        py1 = Project({0.0f, +axis, 0.0f}),
+        pyt0 = Project({-0.1f, +axis, 0.0f}),
         pyt1 = Project({0.0f, +2.1f, 0.0f}),
-        pyt2 = Project({0.1f, +2.0f, 0.0f}),
-        pz0 = Project({0.0f, 0.0f, -2.0f}),
-        pz1 = Project({0.0f, 0.0f, +2.0f}),
-        pzt0 = Project({0.0f, 0.1f, +2.0f}),
+        pyt2 = Project({0.1f, +axis, 0.0f}),
+        pz0 = Project({0.0f, 0.0f, -axis}),
+        pz1 = Project({0.0f, 0.0f, +axis}),
+        pzt0 = Project({0.0f, 0.1f, +axis}),
         pzt1 = Project({0.0f, 0.0f, +2.1f}),
-        pzt2 = Project({0.0f, -0.1f, +2.0f});
+        pzt2 = Project({0.0f, -0.1f, +axis});
 
       raster.SetColor(0xffff0000);
       raster.DrawLine(px0, px1);
@@ -228,6 +232,20 @@ class Grid : public jgui::Window {
       raster.DrawLine(pz0, pz1);
       raster.DrawTriangle(pzt0, pzt1, pzt2);
 
+			raster.SetColor(0xff808080);
+
+			for (float y=axis; y>-axis; y-=.1) {
+				for (float x=-axis; x<axis; x+=.1) {
+          raster.SetPixel(Project({x, y, -axis}));
+          raster.SetPixel(Project({x, -axis, y}));
+          raster.SetPixel(Project({-axis, x, y}));
+
+          // raster.SetPixel(Project({x, y, 0.0f}));
+          // raster.SetPixel(Project({x, 0.0f, y}));
+          // raster.SetPixel(Project({0.0f, x, y}));
+				}
+			}
+
 			raster.SetColor(0xffffffff);
 
 			for (float y=1; y>-1; y-=.1) {
@@ -238,7 +256,7 @@ class Grid : public jgui::Window {
 
 			Repaint();
 
-      Framerate(25);
+      Framerate(120);
 		}
 
 };

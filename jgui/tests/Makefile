@@ -354,7 +354,7 @@ cad: $(OBJS_cad)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
 cairo: $(OBJS_cairo)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) -lX11 ; $(ECHO) "Compiling $< ...  $(OK)" 
         
 raytracer: $(OBJS_raytracer)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
