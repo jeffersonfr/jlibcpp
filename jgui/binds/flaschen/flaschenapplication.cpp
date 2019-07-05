@@ -486,8 +486,6 @@ void NativeApplication::InternalLoop()
 
       continue;
     }
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
 
   sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_CLOSED));

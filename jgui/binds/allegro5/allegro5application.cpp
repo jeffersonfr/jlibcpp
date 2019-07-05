@@ -442,8 +442,6 @@ void NativeApplication::InternalLoop()
     }
 
     if (al_get_next_event(queue, &event) == false) {
-      std::this_thread::sleep_for(std::chrono::milliseconds(1));
-      
       continue;
     }
  

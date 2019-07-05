@@ -713,8 +713,6 @@ void NativeApplication::InternalLoop()
         sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, jevent::JMB_NONE, {sg_mouse_x, sg_mouse_y}, mouse_z));
       }
     }
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
 
   sg_jgui_window->SetVisible(false);

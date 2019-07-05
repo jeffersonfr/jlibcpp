@@ -626,8 +626,6 @@ static void PaintThread(NativeApplication *app)
     if (sg_repaint.exchange(false) == true) {
       gtk_widget_queue_draw(GTK_WIDGET(sg_widget));
     }
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
 }
 

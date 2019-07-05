@@ -547,8 +547,6 @@ void NativeApplication::InternalLoop()
 
       xcb_flush(sg_xcb_connection);
     }
-    
-    std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
 
   sg_jgui_window->SetVisible(false);

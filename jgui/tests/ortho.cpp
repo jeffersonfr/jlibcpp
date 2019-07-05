@@ -73,24 +73,12 @@ class Grid : public jgui::Window {
     {
       constexpr float M = sizeT/(2*M_PI);
 
-      angle = fmod(angle, 2*M_PI);
-
-      if (angle < 0.0f) {
-        angle = angle + 2*M_PI;
-      }
-
       return cosT[(int)(angle*M)];
     }
 
     float Sin(float angle)
     {
       constexpr float M = sizeT/(2*M_PI);
-
-      angle = fmod(angle, 2*M_PI);
-
-      if (angle < 0.0f) {
-        angle = angle + 2*M_PI;
-      }
 
       return sinT[(int)(angle*M)];
     }
@@ -160,8 +148,42 @@ class Grid : public jgui::Window {
 				f = f3;
 			}
 
+      _rotatex = fmod(_rotatex, 2*M_PI);
+
+      if (_rotatex < 0.0f) {
+        _rotatex = _rotatex + 2*M_PI;
+      }
+
+      _rotatey = fmod(_rotatey, 2*M_PI);
+
+      if (_rotatey < 0.0f) {
+        _rotatey = _rotatey + 2*M_PI;
+      }
+
+      _rotatez = fmod(_rotatez, 2*M_PI);
+
+      if (_rotatez < 0.0f) {
+        _rotatez = _rotatez + 2*M_PI;
+      }
+
 			return true;
 		}
+
+    void Framerate(int fps)
+    {
+      static auto begin = std::chrono::steady_clock::now();
+      static int index = 0;
+
+      std::chrono::time_point<std::chrono::steady_clock> timestamp = begin + std::chrono::milliseconds(index++*(1000/fps));
+      std::chrono::time_point<std::chrono::steady_clock> current = std::chrono::steady_clock::now();
+      std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - current);
+
+      if (diff.count() < 0) {
+        return;
+      }
+
+      std::this_thread::sleep_for(diff);
+    }
 
 		void Paint(jgui::Graphics *g) 
 		{
@@ -206,15 +228,17 @@ class Grid : public jgui::Window {
       raster.DrawLine(pz0, pz1);
       raster.DrawTriangle(pzt0, pzt1, pzt2);
 
-			for (float y=1; y>-1; y-=.1) {
-				raster.SetColor(0xffffffff);
+			raster.SetColor(0xffffffff);
 
+			for (float y=1; y>-1; y-=.1) {
 				for (float x=-1; x<1; x+=.1) {
           raster.SetPixel(Project({x, y, f(x, y)*k}));
 				}
 			}
 
 			Repaint();
+
+      Framerate(25);
 		}
 
 };
