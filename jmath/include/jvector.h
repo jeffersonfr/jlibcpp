@@ -55,7 +55,7 @@ template<size_t N, typename T, typename = typename std::enable_if<std::is_arithm
       return v;
     }
 
-    T & operator[](size_t n) 
+    T & operator[](size_t n)
     {
       if (n >= N) {
         throw jexception::OutOfBoundsException("Element index is out of bounds");
@@ -64,7 +64,16 @@ template<size_t N, typename T, typename = typename std::enable_if<std::is_arithm
       return data[n];
     }
 
-    bool operator==(T param)
+    const T & operator[](size_t n) const
+    {
+      if (n >= N) {
+        throw jexception::OutOfBoundsException("Element index is out of bounds");
+      }
+      
+      return data[n];
+    }
+
+    bool operator==(const T &param)
     {
       for (size_t i=0; i<N; i++) {
         if (data[i] != param) {
@@ -75,7 +84,7 @@ template<size_t N, typename T, typename = typename std::enable_if<std::is_arithm
       return true;
     }
 
-    bool operator!=(T param)
+    bool operator!=(const T &param)
     {
       for (size_t i=0; i<N; i++) {
         if (data[i] != param) {
@@ -86,7 +95,7 @@ template<size_t N, typename T, typename = typename std::enable_if<std::is_arithm
       return false;
     }
 
-    bool operator==(jvector_t<N, T> param)
+    bool operator==(const jvector_t<N, T> &param)
     {
       for (size_t i=0; i<N; i++) {
         if (data[i] != param.data[i]) {
@@ -97,7 +106,7 @@ template<size_t N, typename T, typename = typename std::enable_if<std::is_arithm
       return true;
     }
 
-    bool operator!=(jvector_t<N, T> param)
+    bool operator!=(const jvector_t<N, T> &param)
     {
       for (size_t i=0; i<N; i++) {
         if (data[i] != param.data[i]) {
@@ -117,7 +126,7 @@ template<size_t N, typename T, typename = typename std::enable_if<std::is_arithm
       return *this;
     }
  
-    template<typename U> jvector_t<N, T> & operator=(U param)
+    template<typename U> jvector_t<N, T> & operator=(const U &param)
     {
       for (size_t i=0; i<N; i++) {
         data[i] = (T)param;
@@ -126,7 +135,7 @@ template<size_t N, typename T, typename = typename std::enable_if<std::is_arithm
       return *this;
     }
 
-    template<typename U> jvector_t<N, T> operator+(U param)
+    template<typename U> jvector_t<N, T> operator+(const U &param)
     {
       jvector_t<N, U> v;
 
@@ -137,7 +146,7 @@ template<size_t N, typename T, typename = typename std::enable_if<std::is_arithm
       return v;
     }
     
-    template<typename U> jvector_t<N, T> operator-(U param)
+    template<typename U> jvector_t<N, T> operator-(const U &param)
     {
       jvector_t<N, U> v;
 
@@ -148,7 +157,7 @@ template<size_t N, typename T, typename = typename std::enable_if<std::is_arithm
       return v;
     }
     
-    template<typename U> jvector_t<N, T> operator*(U param)
+    template<typename U> jvector_t<N, T> operator*(const U &param)
     {
       jvector_t<N, U> v;
 
@@ -159,7 +168,7 @@ template<size_t N, typename T, typename = typename std::enable_if<std::is_arithm
       return v;
     }
     
-    template<typename U> jvector_t<N, T> operator/(U param)
+    template<typename U> jvector_t<N, T> operator/(const U &param)
     {
       jvector_t<N, U> v;
 
@@ -170,7 +179,7 @@ template<size_t N, typename T, typename = typename std::enable_if<std::is_arithm
       return v;
     }
 
-    template<typename U> jvector_t<N, T> & operator=(jvector_t<N, U> param)
+    template<typename U> jvector_t<N, T> & operator=(const jvector_t<N, U> &param)
     {
       for (size_t i=0; i<N; i++) {
         data[i] = (T)param.data[i];
@@ -179,7 +188,7 @@ template<size_t N, typename T, typename = typename std::enable_if<std::is_arithm
       return *this;
     }
 
-    template<typename U> jvector_t<N, T> operator+(jvector_t<N, U> param)
+    template<typename U> jvector_t<N, T> operator+(const jvector_t<N, U> &param)
     {
       jvector_t<N, U> v;
 
@@ -190,7 +199,7 @@ template<size_t N, typename T, typename = typename std::enable_if<std::is_arithm
       return v;
     }
     
-    template<typename U> jvector_t<N, T> operator-(jvector_t<N, U> param)
+    template<typename U> jvector_t<N, T> operator-(const jvector_t<N, U> &param)
     {
       jvector_t<N, U> v;
 
@@ -201,7 +210,7 @@ template<size_t N, typename T, typename = typename std::enable_if<std::is_arithm
       return v;
     }
     
-    template<typename U> jvector_t<N, T> operator*(jvector_t<N, U> param)
+    template<typename U> jvector_t<N, T> operator*(const jvector_t<N, U> &param)
     {
       jvector_t<N, U> v;
 
@@ -212,7 +221,7 @@ template<size_t N, typename T, typename = typename std::enable_if<std::is_arithm
       return v;
     }
     
-    template<typename U> jvector_t<N, T> operator/(jvector_t<N, U> param)
+    template<typename U> jvector_t<N, T> operator/(const jvector_t<N, U> &param)
     {
       jvector_t<N, U> v;
 
@@ -223,27 +232,27 @@ template<size_t N, typename T, typename = typename std::enable_if<std::is_arithm
       return v;
     }
     
-    template<typename U> jvector_t<N, T> & operator+=(jvector_t<N, U> param)
+    template<typename U> jvector_t<N, T> & operator+=(const jvector_t<N, U> &param)
     {
       return (*this = *this + param);
     }
     
-    template<typename U> jvector_t<N, T> & operator-=(jvector_t<N, U> param)
+    template<typename U> jvector_t<N, T> & operator-=(const jvector_t<N, U> &param)
     {
       return (*this = *this - param);
     }
     
-    template<typename U> jvector_t<N, T> & operator*=(jvector_t<N, U> param)
+    template<typename U> jvector_t<N, T> & operator*=(const jvector_t<N, U> &param)
     {
       return (*this = *this*param);
     }
     
-    template<typename U> jvector_t<N, T> & operator/=(jvector_t<N, U> param)
+    template<typename U> jvector_t<N, T> & operator/=(const jvector_t<N, U> &param)
     {
       return (*this = *this/param);
     }
     
-    template<typename U> T Scalar(jvector_t<N, U> param)
+    template<typename U> T Scalar(const jvector_t<N, U> &param)
     {
       T n = 0;
 
@@ -528,7 +537,7 @@ template<size_t N, typename T, typename = typename std::enable_if<std::is_arithm
       return conj;
     }
 
-    friend jvector_t<N, T> operator+(T param, jvector_t<N, T> thiz)
+    friend jvector_t<N, T> operator+(const T &param, const jvector_t<N, T> &thiz)
     {
       jvector_t<N, T> v;
 
@@ -539,7 +548,7 @@ template<size_t N, typename T, typename = typename std::enable_if<std::is_arithm
       return v;
     }
     
-    friend jvector_t<N, T> operator-(T param, jvector_t<N, T> thiz)
+    friend jvector_t<N, T> operator-(const T &param, const jvector_t<N, T> &thiz)
     {
       jvector_t<N, T> v;
 
@@ -550,7 +559,7 @@ template<size_t N, typename T, typename = typename std::enable_if<std::is_arithm
       return v;
     }
     
-    friend jvector_t<N, T> operator*(T param, jvector_t<N, T> thiz)
+    friend jvector_t<N, T> operator*(const T &param, const jvector_t<N, T> &thiz)
     {
       jvector_t<N, T> v;
 
@@ -561,7 +570,7 @@ template<size_t N, typename T, typename = typename std::enable_if<std::is_arithm
       return v;
     }
     
-    friend jvector_t<N, T> operator/(T param, jvector_t<N, T> thiz)
+    friend jvector_t<N, T> operator/(const T &param, const jvector_t<N, T> &thiz)
     {
       jvector_t<N, T> v;
 

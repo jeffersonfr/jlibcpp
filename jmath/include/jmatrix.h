@@ -80,7 +80,25 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
       return data[row][col];
     }
 
-    bool operator==(T param)
+    const T & operator()(size_t n) const
+    {
+      if (n >= R*C) {
+        throw jexception::OutOfBoundsException("Element index is out of bounds");
+      }
+      
+      return data[n/C][n%C];
+    }
+
+    const T & operator()(size_t row, size_t col) const
+    {
+      if (row >= R or col >= C) {
+        throw jexception::OutOfBoundsException("Element index is out of bounds");
+      }
+      
+      return data[row][col];
+    }
+
+    bool operator==(const T &param)
     {
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C; i++) {
@@ -93,7 +111,7 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
       return true;
     }
 
-    bool operator!=(T param)
+    bool operator!=(const T &param)
     {
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C; i++) {
@@ -106,7 +124,7 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
       return false;
     }
 
-    bool operator==(jmatrix_t<R, C, T> param)
+    bool operator==(const jmatrix_t<R, C, T> &param)
     {
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C; i++) {
@@ -119,7 +137,7 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
       return true;
     }
 
-    bool operator!=(jmatrix_t<R, C, T> param)
+    bool operator!=(const jmatrix_t<R, C, T> &param)
     {
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C; i++) {
@@ -143,7 +161,7 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
       return *this;
     }
  
-    template<typename U> jmatrix_t<R, C, T> & operator=(U param)
+    template<typename U> jmatrix_t<R, C, T> & operator=(const U &param)
     {
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C; i++) {
@@ -154,7 +172,7 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
       return *this;
     }
 
-    template<typename U> jmatrix_t<R, C, T> operator+(U param)
+    template<typename U> jmatrix_t<R, C, T> operator+(const U &param)
     {
       jmatrix_t<R, C, T> m;
 
@@ -167,7 +185,7 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
       return m;
     }
     
-    template<typename U> jmatrix_t<R, C, T> operator-(U param)
+    template<typename U> jmatrix_t<R, C, T> operator-(const U &param)
     {
       jmatrix_t<R, C, T> m;
 
@@ -180,7 +198,7 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
       return m;
     }
     
-    template<typename U> jmatrix_t<R, C, T> operator*(U param)
+    template<typename U> jmatrix_t<R, C, T> operator*(const U &param)
     {
       jmatrix_t<R, C, T> m;
 
@@ -193,7 +211,7 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
       return m;
     }
     
-    template<typename U> jmatrix_t<R, C, T> operator/(U param)
+    template<typename U> jmatrix_t<R, C, T> operator/(const U &param)
     {
       jmatrix_t<R, C, T> m;
 
@@ -206,7 +224,7 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
       return m;
     }
  
-    template<typename U> jmatrix_t<R, C, T> & operator=(jmatrix_t<R, C, U> param)
+    template<typename U> jmatrix_t<R, C, T> & operator=(const jmatrix_t<R, C, U> &param)
     {
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C; i++) {
@@ -217,7 +235,7 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
       return *this;
     }
 
-    template<typename U> jmatrix_t<R, C, T> operator+(jmatrix_t<R, C, U> param)
+    template<typename U> jmatrix_t<R, C, T> operator+(const jmatrix_t<R, C, U> &param)
     {
       jmatrix_t<R, C, T> m;
 
@@ -230,7 +248,7 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
       return m;
     }
     
-    template<typename U> jmatrix_t<R, C, T> operator-(jmatrix_t<R, C, U> param)
+    template<typename U> jmatrix_t<R, C, T> operator-(const jmatrix_t<R, C, U> &param)
     {
       jmatrix_t<R, C, T> m;
 
@@ -243,7 +261,7 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
       return m;
     }
     
-    template<size_t R1 = C, size_t C1, typename U> jmatrix_t<R, C1, T> operator*(jmatrix_t<R1, C1, U> param)
+    template<size_t R1 = C, size_t C1, typename U> jmatrix_t<R, C1, T> operator*(const jmatrix_t<R1, C1, U> &param)
     {
       jmatrix_t<R, C1, T> m;
 
@@ -256,27 +274,27 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
       return m;
     }
     
-    template<typename U> jmatrix_t<R, C, T> operator/(jmatrix_t<R, C, U> param)
+    template<typename U> jmatrix_t<R, C, T> operator/(const jmatrix_t<R, C, U> &param)
     {
 			return *this*param.Inverse();
     }
     
-    template<typename U> jmatrix_t<R, C, T> & operator+=(jmatrix_t<R, C, U> param)
+    template<typename U> jmatrix_t<R, C, T> & operator+=(const jmatrix_t<R, C, U> &param)
     {
       return (*this = *this + param);
     }
     
-    template<typename U> jmatrix_t<R, C, T> & operator-=(jmatrix_t<R, C, U> param)
+    template<typename U> jmatrix_t<R, C, T> & operator-=(const jmatrix_t<R, C, U> &param)
     {
       return (*this = *this - param);
     }
     
-    template<typename U> jmatrix_t<R, C, T> & operator*=(jmatrix_t<R, C, U> param)
+    template<typename U> jmatrix_t<R, C, T> & operator*=(const jmatrix_t<R, C, U> &param)
     {
       return (*this = *this*param);
     }
     
-    template<typename U> jmatrix_t<R, C, T> & operator/=(jmatrix_t<R, C, U> param)
+    template<typename U> jmatrix_t<R, C, T> & operator/=(const jmatrix_t<R, C, U> &param)
     {
       return (*this = *this/param);
     }
@@ -286,7 +304,7 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
       return R*C;
     }
 
-    jvector_t<C, T> Row(size_t n)
+    jvector_t<C, T> Row(size_t n) const
     {
       if (n >= R) {
         throw jexception::OutOfBoundsException("Row index is out of bounds");
@@ -295,7 +313,7 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
       return data[n];
     }
 
-    jvector_t<R, T> Col(size_t n)
+    jvector_t<R, T> Col(size_t n) const
     {
       if (n >= C) {
         throw jexception::OutOfBoundsException("Row index is out of bounds");
@@ -578,7 +596,7 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
       return mul;
     }
 
-    T Mul(jmatrix_t<R, C, T> &param)
+    T Mul(const jmatrix_t<R, C, T> &param)
     {
       jmatrix_t<R, C, T> m;
 
@@ -591,7 +609,7 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
       return m;
     }
 
-    T Div(jmatrix_t<R, C, T> &param)
+    T Div(const jmatrix_t<R, C, T> &param)
     {
       jmatrix_t<R, C, T> m;
 
@@ -826,7 +844,7 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
       return Transpose().Conjugate();
     }
 
-    friend jmatrix_t<R, C, T> operator+(T param, jmatrix_t<R, C, T> thiz)
+    friend jmatrix_t<R, C, T> operator+(const T &param, const jmatrix_t<R, C, T> &thiz)
     {
       jmatrix_t<R, C, T> m;
 
@@ -839,7 +857,7 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
       return m;
     }
     
-    friend jmatrix_t<R, C, T> operator-(T param, jmatrix_t<R, C, T> thiz)
+    friend jmatrix_t<R, C, T> operator-(const T &param, const jmatrix_t<R, C, T> &thiz)
     {
       jmatrix_t<R, C, T> m;
 
@@ -852,7 +870,7 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
       return m;
     }
     
-    friend jmatrix_t<R, C, T> operator*(T param, jmatrix_t<R, C, T> thiz)
+    friend jmatrix_t<R, C, T> operator*(const T &param, const jmatrix_t<R, C, T> &thiz)
     {
       jmatrix_t<R, C, T> m;
 
@@ -865,7 +883,7 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
       return m;
     }
     
-    friend jmatrix_t<R, C, T> operator/(T param, jmatrix_t<R, C, T> thiz)
+    friend jmatrix_t<R, C, T> operator/(const T &param, const jmatrix_t<R, C, T> &thiz)
     {
       jmatrix_t<R, C, T> m;
 
