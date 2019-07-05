@@ -243,13 +243,13 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
       return m;
     }
     
-    template<size_t R1 = C, size_t C1, typename U> jmatrix_t<C1, R, T> operator*(jmatrix_t<R1, C1, U> param)
+    template<size_t R1 = C, size_t C1, typename U> jmatrix_t<R, C1, T> operator*(jmatrix_t<R1, C1, U> param)
     {
-      jmatrix_t<C1, R, T> m;
+      jmatrix_t<R, C1, T> m;
 
-      for (size_t j=0; j<C1; j++) {
-        for (size_t i=0; i<R; i++) {
-          m.data[j][i] = Row(i).Scalar(param.Col(j));
+      for (size_t j=0; j<R; j++) {
+        for (size_t i=0; i<C1; i++) {
+          m.data[j][i] = Row(j).Scalar(param.Col(i));
         }
       }
 

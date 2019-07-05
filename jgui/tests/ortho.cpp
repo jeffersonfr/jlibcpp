@@ -122,7 +122,7 @@ class Grid : public jgui::Window {
           0.0f, 0.0f, 1.0f
         };
 
-      p = (xrotation*yrotation*zrotation*p).Transpose();
+      p = xrotation*yrotation*zrotation*p;
 
       jgui::jsize_t<int>
         size = GetSize();
