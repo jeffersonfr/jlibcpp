@@ -50,10 +50,11 @@ class Grid : public jgui::Window {
 
 	private:
 		float
-			_scale = 100.0f,
-			_rotatex = 1.0f,
+			_scale = 400.0f,
+			_perspective = 5.0f,
+			_rotatex = 1.2f,
 			_rotatey = 0.0f,
-			_rotatez = 0.8f;
+			_rotatez = 2.4f;
 
 	public:
 		Grid():
@@ -113,16 +114,19 @@ class Grid : public jgui::Window {
         };
 
       p = xrotation*yrotation*zrotation*p;
-
+  
       jgui::jsize_t<int>
         size = GetSize();
+			float 
+				z = p(2, 0) - _perspective;
 
-      return jgui::jpoint_t<float>{p(0, 0), -p(1, 0)}*_scale + jgui::jpoint_t<int>{size.width/2, size.height/2};
+      return jgui::jpoint_t<float>{p(0, 0)/z, p(1, 0)/z}*_scale + jgui::jpoint_t<int>{size.width/2, size.height/2};
 		}
 
 		bool KeyPressed(jevent::KeyEvent *event)
 		{
 			if (event->GetSymbol() == jevent::JKS_ESCAPE) {
+				_perspective = 0.0f;
 				_rotatex = 0.0f;
 				_rotatey = 0.0f;
 				_rotatez = 0.0f;
@@ -142,12 +146,20 @@ class Grid : public jgui::Window {
 				_scale *= 0.9f;
 			} else if (event->GetSymbol() == jevent::JKS_w) {
 				_scale *= 1.1f;
+			} else if (event->GetSymbol() == jevent::JKS_a) {
+				_perspective -= 1.0f;
+			} else if (event->GetSymbol() == jevent::JKS_s) {
+				_perspective += 1.0f;
 			} else if (event->GetSymbol() == jevent::JKS_1) {
 				f = f1;
 			} else if (event->GetSymbol() == jevent::JKS_2) {
 				f = f2;
 			} else if (event->GetSymbol() == jevent::JKS_3) {
 				f = f3;
+			}
+
+		  if (_perspective < 0.0f) {
+				_perspective = 0.0f;
 			}
 
       _rotatex = fmod(_rotatex, 2*M_PI);
