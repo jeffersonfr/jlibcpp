@@ -23,8 +23,6 @@
 #include <unistd.h>
 #include <math.h>
 
-#define sgn(a) ( ( (a) < 0 )  ?  -1   : ( (a) > 0 ) )
-
 namespace jgui {
 
 Raster::Raster(uint32_t *data, jgui::jsize_t<int> size):
@@ -285,8 +283,14 @@ void Raster::FillTriangle(jgui::jpoint_t<int> v1, jgui::jpoint_t<int> v2, jgui::
 		
 		E = jgui::jpoint_t<float>(v2);
 		
-		for (; S.y<v3.y and S.y<_size.height; S.y++, E.y++, S.x+=dx2, E.x+=dx3) {
-    	ScanLine(jgui::jpoint_t<float>{S.x, S.y}, E.x - S.x);
+		if (S.x < E.x) {
+			for (; S.y<v3.y and S.y<_size.height; S.y++, E.y++, S.x+=dx2, E.x+=dx3) {
+				ScanLine(jgui::jpoint_t<float>{S.x, S.y}, E.x - S.x);
+			}
+		} else {
+			for (; S.y<v3.y and S.y<_size.height; S.y++, E.y++, S.x+=dx2, E.x+=dx3) {
+				ScanLine(jgui::jpoint_t<float>{E.x, S.y}, S.x - E.x);
+			}
 		}
 	} else {
 		if (S.y < 0) {
@@ -304,8 +308,14 @@ void Raster::FillTriangle(jgui::jpoint_t<int> v1, jgui::jpoint_t<int> v2, jgui::
 		
 		S = jgui::jpoint_t<float>(v2);
 		
-		for (; S.y<v3.y and S.y<_size.height; S.y++, E.y++, S.x+=dx3, E.x+=dx2) {
-    	ScanLine(jgui::jpoint_t<float>{S.x, S.y}, E.x - S.x);
+		if (S.x < E.x) {
+			for (; S.y<v3.y and S.y<_size.height; S.y++, E.y++, S.x+=dx3, E.x+=dx2) {
+				ScanLine(jgui::jpoint_t<float>{S.x, S.y}, E.x - S.x);
+			}
+		} else {
+			for (; S.y<v3.y and S.y<_size.height; S.y++, E.y++, S.x+=dx3, E.x+=dx2) {
+				ScanLine(jgui::jpoint_t<float>{E.x, S.y}, S.x - E.x);
+			}
 		}
 	}
 }
