@@ -28,6 +28,7 @@
 #include "jgui/japplication.h"
 #include "jgui/jwindow.h"
 #include "jgui/jbufferedimage.h"
+#include "jgui/jraster.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -382,7 +383,7 @@ class Render3D : public jgui::Window {
       }
     }
 
-    void DrawTriangle(jgui::Graphics *graphics, float light1, float light2, Tri3D* tri)
+    void DrawTriangle(jgui::Raster &raster, float light1, float light2, Tri3D* tri)
     {
       uint8_t r, g, b;
       int X, Y;
@@ -394,16 +395,20 @@ class Render3D : public jgui::Window {
       g = (light1 * light1) * 255.0;
       b = light1 * 64.0 + light2 * 64.0;
 
-      graphics->SetColor({r, g, b, 0xff});
+      raster.SetColor(0xff000000 | r << 0x10 | g << 0x08 | b);
 
       switch (PrimitiveType) {
         case FLAT_SHADED:
-          graphics->FillTriangle({(int)(tri->a->x + X), (int)(tri->a->y + Y)}, {(int)(tri->b->x + X), (int)(tri->b->y + Y)}, {(int)(tri->c->x + X), (int)(tri->c->y + Y)});
+          raster.FillTriangle(
+						{(int)(tri->a->x + X), (int)(tri->a->y + Y)}, 
+						{(int)(tri->b->x + X), (int)(tri->b->y + Y)}, 
+						{(int)(tri->c->x + X), (int)(tri->c->y + Y)});
           break;
         case WIRE_FRAME:
-          graphics->DrawLine({(int)(tri->a->x + X), (int)(tri->a->y + Y)}, {(int)(tri->b->x + X), (int)(tri->b->y + Y)});
-          graphics->DrawLine({(int)(tri->b->x + X), (int)(tri->b->y + Y)}, {(int)(tri->c->x + X), (int)(tri->c->y + Y)});
-          graphics->DrawLine({(int)(tri->c->x + X), (int)(tri->c->y + Y)}, {(int)(tri->a->x + X), (int)(tri->a->y + Y)});
+          raster.DrawTriangle(
+						{(int)(tri->a->x + X), (int)(tri->a->y + Y)}, 
+						{(int)(tri->b->x + X), (int)(tri->b->y + Y)}, 
+						{(int)(tri->c->x + X), (int)(tri->c->y + Y)});
           break;
         default:
           break;
@@ -571,6 +576,9 @@ class Render3D : public jgui::Window {
         points++;
       }
 
+      jgui::Raster 
+				raster((uint32_t *)cairo_image_surface_get_data(g->GetCairoSurface()), GetSize());
+
       while (first) {
         if (Lighting) {
           length = ((first->normal.x * first->normal.x) + (first->normal.y * first->normal.y) + (first->normal.z * first->normal.z));
@@ -584,7 +592,7 @@ class Render3D : public jgui::Window {
           light2 = 0.0;
         }
 
-        DrawTriangle(g, light1, light2, first);
+        DrawTriangle(raster, light1, light2, first);
 
         first = first->next;
       }

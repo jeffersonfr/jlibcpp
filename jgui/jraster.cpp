@@ -27,90 +27,6 @@
 
 namespace jgui {
 
-void FillTriangle0(Raster *raster, jgui::jpoint_t<int> v1, jgui::jpoint_t<int> v2, jgui::jpoint_t<int> v3)
-{
-  jgui::jpoint_t<int> vTmp1 {v1.x, v1.y};
-  jgui::jpoint_t<int> vTmp2 {v1.x, v1.y};
-
-  bool changed1 = false;
-  bool changed2 = false;
-
-  int dx1 = abs(v2.x - v1.x);
-  int dy1 = abs(v2.y - v1.y);
-
-  int dx2 = abs(v3.x - v1.x);
-  int dy2 = abs(v3.y - v1.y);
-
-  int signx1 = sgn(v2.x - v1.x);
-  int signx2 = sgn(v3.x - v1.x);
-
-  int signy1 = sgn(v2.y - v1.y);
-  int signy2 = sgn(v3.y - v1.y);
-
-  if (dy1 > dx1) {   // swap values
-    int tmp = dx1;
-
-    dx1 = dy1;
-    dy1 = tmp;
-    changed1 = true;
-  }
-
-  if (dy2 > dx2) {   // swap values
-    int tmp = dx2;
-
-    dx2 = dy2;
-    dy2 = tmp;
-    changed2 = true;
-  }
-
-  int e1 = 2 * dy1 - dx1;
-  int e2 = 2 * dy2 - dx2;
-
-  for (int i = 0; i <= dx1; i++) {
-    raster->ScanLine({std::min(vTmp1.x, vTmp2.x) + 1, vTmp1.y}, std::abs(vTmp1.x - vTmp2.x));
-    // ScanLine(vTmp2, vTmp1.x - vTmp2.x);
-
-    while (e1 >= 0) {
-      if (changed1) {
-        vTmp1.x += signx1;
-      } else {
-        vTmp1.y += signy1;
-      }
-
-      e1 = e1 - 2 * dx1;
-    }
-
-    if (changed1) {
-      vTmp1.y += signy1;
-    } else {
-      vTmp1.x += signx1;
-    }
-
-    e1 = e1 + 2 * dy1;
-
-    // here we rendered the next point on line 1 so follow now line 2 until we are on the same y-value as line 1.
-    while (vTmp2.y != vTmp1.y) {
-      while (e2 >= 0) {
-        if (changed2) {
-          vTmp2.x += signx2;
-        } else {
-          vTmp2.y += signy2;
-        }
-
-        e2 = e2 - 2 * dx2;
-      }
-
-      if (changed2) {
-        vTmp2.y += signy2;
-      } else {
-        vTmp2.x += signx2;
-      }
-
-      e2 = e2 + 2 * dy2;
-    }
-  }
-}
-
 Raster::Raster(uint32_t *data, jgui::jsize_t<int> size):
   jcommon::Object()
 {
@@ -179,7 +95,7 @@ uint32_t Raster::GetPixel(jgui::jpoint_t<int> v1)
 
 void Raster::ScanLine(jgui::jpoint_t<int> v1, int size)
 {
-  if ((v1.x + size) < 0 or v1.y < 0 or v1.x > _size.width or v1.y >= _size.height) {
+  if ((v1.x + size) < 0 or v1.y < 0 or v1.x >= _size.width or v1.y >= _size.height) {
     return;
   }
 
@@ -189,39 +105,125 @@ void Raster::ScanLine(jgui::jpoint_t<int> v1, int size)
   }
 
   if ((v1.x + size) >= _size.width) {
-    size = size - (v1.x + size - _size.width - 1);
+    size = _size.width - v1.x - 1;
   }
 
+	uint32_t *ptr = (_buffer + v1.y*_size.width + v1.x);
+
   for (int i=0; i<size; i++) {
-    _buffer[v1.y*_size.width + v1.x + i] = _color;
+    *ptr++ = _color;
   }
 }
 
 void Raster::DrawLine(jpoint_t<int> p0, jpoint_t<int> p1)
 {
-  int dx = abs(p1.x-p0.x), sx = p0.x<p1.x ? 1 : -1;
-  int dy = abs(p1.y-p0.y), sy = p0.y<p1.y ? 1 : -1;
-  int err = (dx>dy ? dx : -dy)/2, e2;
+	int 
+		shortLen = p1.y - p0.y,
+		longLen = p1.x - p0.x,
+		step = 1;
+	bool 
+		yLonger = false;
 
-  for(;;) {
-    SetPixel(p0);
+	if (abs(shortLen) > abs(longLen)) {
+		std::swap(shortLen, longLen);
 
-    if (p0.x == p1.x && p0.y == p1.y) {
-      break;
-    }
+		yLonger = true;
+	}
 
-    e2 = err;
+	if (longLen < 0) {
+		step = -1;
+	}
 
-    if (e2 >-dx) { 
-      err -= dy; 
-      p0.x += sx; 
-    }
+	float multDiff = (float)shortLen;
 
-    if (e2 < dy) { 
-      err += dx; 
-      p0.y += sy; 
-    }
-  }
+	if (longLen != 0) {
+		multDiff = shortLen/(float)longLen;
+	}
+
+	jpoint_t<int> 
+		p {0, 0};
+	bool 
+		minus = (step*multDiff < 0.0f)?true:false;;
+
+	if (yLonger == true) {
+		for (int i=0; i!=longLen; i+=step) {
+			p.x = p0.x + (int)(i*multDiff);
+			p.y = p0.y + i;
+
+			if (p.x < 0) {
+				if (minus == true) {
+					break;
+				}
+
+				continue;
+			}
+
+			if (p.y < 0) {
+				if (step < 0) {
+					break;
+				}
+
+				continue;
+			}
+
+			if (p.x >= _size.width) {
+				if (minus == false) {
+					break;
+				}
+
+				continue;
+			}
+
+			if (p.y >= _size.height) {
+				if (step > 0) {
+					break;
+				}
+
+				continue;
+			}
+
+  		_buffer[p.y*_size.width + p.x] = _color;
+		}
+	} else {
+		for (int i=0; i!=longLen; i+=step) {
+			p.x = p0.x + i;
+			p.y = p0.y + (int)(i*multDiff);
+
+			if (p.x < 0) {
+				if (step < 0) {
+					break;
+				}
+
+				continue;
+			}
+
+			if (p.y < 0) {
+				if (minus == true) {
+					break;
+				}
+
+				continue;
+			}
+
+			if (p.x >= _size.width) {
+				if (step > 0) {
+					break;
+				}
+
+				continue;
+			}
+
+			if (p.y >= _size.height) {
+				if (minus == false) {
+					break;
+				}
+
+				continue;
+			}
+
+  		_buffer[p.y*_size.width + p.x] = _color;
+		}
+	}
 }
 
 void Raster::DrawTriangle(jgui::jpoint_t<int> v1, jgui::jpoint_t<int> v2, jgui::jpoint_t<int> v3)
@@ -233,48 +235,79 @@ void Raster::DrawTriangle(jgui::jpoint_t<int> v1, jgui::jpoint_t<int> v2, jgui::
 
 void Raster::FillTriangle(jgui::jpoint_t<int> v1, jgui::jpoint_t<int> v2, jgui::jpoint_t<int> v3) 
 {
-  // at first sort the three vertices by y-coordinate ascending, so p1 is the topmost vertice
-  jgui::jpoint_t<int> vTmp;
+	float
+		dx1 = 0,
+		dx2 = 0,
+		dx3 = 0;
 
-  if (v1.y > v2.y) {
-    vTmp = v1;
-    v1 = v2;
-    v2 = vTmp;
-  }
+	// INFO:: sort by 'y'
+	if (v1.y > v2.y) {
+		std::swap(v1, v2);
+	}
+	
+	if (v1.y > v3.y) {
+		std::swap(v1, v3);
+	}
+	
+	if (v2.y > v3.y) {
+		std::swap(v2, v3);
+	}
+	
+	if (v2.y - v1.y > 0) {
+		dx1 = (v2.x - v1.x)/(float)(v2.y - v1.y);
+	}
+	
+	if (v3.y - v1.y > 0) {
+		dx2 = (v3.x - v1.x)/(float)(v3.y - v1.y);
+	}
+	
+	if (v3.y - v2.y > 0) {
+		dx3 = (v3.x - v2.x)/(float)(v3.y - v2.y);
+	}
 
-  // here v1.y <= v2.y
-  if (v1.y > v3.y) {
-    vTmp = v1;
-    v1 = v3;
-    v3 = vTmp;
-  }
+	jgui::jpoint_t<float>
+		S = v1,
+		E = v1;
 
-  // here v1.y <= v2.y and v1.y <= v3.y so test v2 vs. v3 
-  if (v2.y > v3.y) {
-    vTmp = v2;
-    v2 = v3;
-    v3 = vTmp;
-  }
+	if (dx1 > dx2) {
+		if (S.y < 0) {
+			int d = -S.y;
 
-  // here we know that v1.y <= v2.y <= v3.y check for trivial case of bottom-flat triangle
-  if (v2.y == v3.y) {
-    FillTriangle0(this, v1, v2, v3);
-  }
+			S.x = S.x + d*dx2;
+			S.y = 0;
+			E.x = E.x + d*dx1;
+			E.y = E.y + d;
+		}
 
-  // check for trivial case of top-flat triangle
-  else if (v1.y == v2.y) {
-    FillTriangle0(this, v3, v1, v2);
-  } else {
-    // general case - split the triangle in a topflat and bottom-flat one
-    jgui::jpoint_t<int> vTmp { (int)(v1.x + ((float)(v2.y - v1.y) / (float)(v3.y - v1.y)) * (v3.x - v1.x)), v2.y };
+		for (; S.y<=v2.y; S.y++, E.y++, S.x+=dx2, E.x+=dx1) {
+    	ScanLine(jgui::jpoint_t<float>{S.x, S.y}, E.x - S.x);
+		}
+		
+		E = jgui::jpoint_t<float>(v2);
+		
+		for (; S.y<v3.y and S.y<_size.height; S.y++, E.y++, S.x+=dx2, E.x+=dx3) {
+    	ScanLine(jgui::jpoint_t<float>{S.x, S.y}, E.x - S.x);
+		}
+	} else {
+		if (S.y < 0) {
+			int d = -S.y;
 
-    FillTriangle0(this, v1, v2, vTmp);
+			S.x = S.x + d*dx1;
+			S.y = 0;
+			E.x = E.x + d*dx2;
+			E.y = E.y + d;
+		}
 
-    v2.y++;
-    vTmp.y++;
-
-    FillTriangle0(this, v3, v2, vTmp);
-  }
+		for (; S.y<=v2.y; S.y++, E.y++, S.x+=dx1, E.x+=dx2) {
+    	ScanLine(jgui::jpoint_t<float>{S.x, S.y}, E.x - S.x);
+		}
+		
+		S = jgui::jpoint_t<float>(v2);
+		
+		for (; S.y<v3.y and S.y<_size.height; S.y++, E.y++, S.x+=dx3, E.x+=dx2) {
+    	ScanLine(jgui::jpoint_t<float>{S.x, S.y}, E.x - S.x);
+		}
+	}
 }
 
 void Raster::DrawRectangle(jgui::jrect_t<int> rect)
