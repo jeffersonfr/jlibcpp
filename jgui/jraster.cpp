@@ -138,88 +138,13 @@ void Raster::DrawLine(jpoint_t<int> p0, jpoint_t<int> p1)
 		multDiff = shortLen/(float)longLen;
 	}
 
-	jpoint_t<int> 
-		p {0, 0};
-	bool 
-		minus = (step*multDiff < 0.0f)?true:false;;
-
 	if (yLonger == true) {
 		for (int i=0; i!=longLen; i+=step) {
-			p.x = p0.x + (int)(i*multDiff);
-			p.y = p0.y + i;
-
-			if (p.x < 0) {
-				if (minus == true) {
-					break;
-				}
-
-				continue;
-			}
-
-			if (p.y < 0) {
-				if (step < 0) {
-					break;
-				}
-
-				continue;
-			}
-
-			if (p.x >= _size.width) {
-				if (minus == false) {
-					break;
-				}
-
-				continue;
-			}
-
-			if (p.y >= _size.height) {
-				if (step > 0) {
-					break;
-				}
-
-				continue;
-			}
-
-  		_buffer[p.y*_size.width + p.x] = _color;
+			SetPixel({p0.x + (int)(i*multDiff), p0.y + i});
 		}
 	} else {
 		for (int i=0; i!=longLen; i+=step) {
-			p.x = p0.x + i;
-			p.y = p0.y + (int)(i*multDiff);
-
-			if (p.x < 0) {
-				if (step < 0) {
-					break;
-				}
-
-				continue;
-			}
-
-			if (p.y < 0) {
-				if (minus == true) {
-					break;
-				}
-
-				continue;
-			}
-
-			if (p.x >= _size.width) {
-				if (step > 0) {
-					break;
-				}
-
-				continue;
-			}
-
-			if (p.y >= _size.height) {
-				if (minus == false) {
-					break;
-				}
-
-				continue;
-			}
-
-  		_buffer[p.y*_size.width + p.x] = _color;
+			SetPixel({p0.x + i, p0.y + (int)(i*multDiff)});
 		}
 	}
 }
