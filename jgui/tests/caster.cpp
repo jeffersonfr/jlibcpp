@@ -131,10 +131,9 @@ class Light {
         ray.Paint(raster);
 
         jgui::jpoint_t<int> 
-          pray = ray.GetPosition(),
-          best = {9999, 9999};
+          best = {-1, -1};
         int
-          d0 = (pray - best).Norm();
+          d0 = INT_MAX;
 
         for (auto &barrier : barriers) {
           std::optional<jgui::jpoint_t<int>> 
@@ -142,7 +141,7 @@ class Light {
 
           if (point != std::nullopt) {
             int 
-              d1 = (pray - *point).Norm();
+              d1 = (ray.GetPosition() - *point).Norm();
 
             if (d1 < d0) {
               d0 = d1;
@@ -151,7 +150,7 @@ class Light {
           }
         }
 
-        raster.DrawLine(pray, best);
+        raster.DrawLine(ray.GetPosition(), best);
       }
     }
 
