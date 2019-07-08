@@ -43,15 +43,9 @@ class NewVox : public jgui::Window {
 
 	private:
 		float 
-      ss,
-		  sa,
-		  a,
-		  s;
+      ss, sa, a, s;
 		int 
-      i,
-  		k,
-	  	x0,
-		  y0;
+      i, k, x0, y0;
 		bool 
       done;
 

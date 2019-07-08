@@ -204,7 +204,7 @@ class Grid : public jgui::Window {
 			jgui::Window::Paint(g);
 
       jgui::Raster 
-				raster((uint32_t *)cairo_image_surface_get_data(g->GetCairoSurface()), GetSize());
+				raster(g->GetCairoSurface());
 
 			static float k = 0.0f;
 			static float l = 0.01f;

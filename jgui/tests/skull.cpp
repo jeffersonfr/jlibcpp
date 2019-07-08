@@ -577,7 +577,7 @@ class Render3D : public jgui::Window {
       }
 
       jgui::Raster 
-				raster((uint32_t *)cairo_image_surface_get_data(g->GetCairoSurface()), GetSize());
+				raster(g->GetCairoSurface());
 
       while (first) {
         if (Lighting) {

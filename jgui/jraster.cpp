@@ -25,6 +25,16 @@
 
 namespace jgui {
 
+jrect_t<int> Raster::GetClip()
+{
+  return _clip;
+}
+
+Raster::Raster(cairo_surface_t *surface):
+  Raster((uint32_t *)cairo_image_surface_get_data(surface), {cairo_image_surface_get_width(surface), cairo_image_surface_get_height(surface)})
+{
+}
+
 Raster::Raster(uint32_t *data, jgui::jsize_t<int> size):
   jcommon::Object()
 {
@@ -38,10 +48,48 @@ Raster::Raster(uint32_t *data, jgui::jsize_t<int> size):
   _size = size;
   _color = 0xfff0f0f0;
   _blend_enabled = false;
+  
+  _clip = {
+    .point = {
+      0, 0
+    }, 
+    .size = _size
+  };
 }
 
 Raster::~Raster()
 {
+}
+
+void Raster::SetClip(jrect_t<int> rect)
+{
+  _clip = rect;
+
+  if (_clip.point.x < 0) {
+    _clip.point.x = 0;
+  }
+
+  if (_clip.point.y < 0) {
+    _clip.point.y = 0;
+  }
+
+  if (_clip.point.x >= _size.width) {
+    _clip.point.x = _size.width - 1;
+    _clip.size.width = 0;
+  }
+
+  if (_clip.point.y >= _size.height) {
+    _clip.point.y = _size.height - 1;
+    _clip.size.height = 0;
+  }
+  
+  if ((_clip.point.x + _clip.size.width) >= _size.width) {
+    _clip.size.width = _size.width - _clip.point.x - 1;
+  }
+
+  if ((_clip.point.y + _clip.size.height) >= _size.height) {
+    _clip.size.height = _size.height - _clip.point.y - 1;
+  }
 }
 
 uint32_t * Raster::GetData()
@@ -75,7 +123,7 @@ void Raster::Clear()
 
 void Raster::SetPixel(jgui::jpoint_t<int> v1)
 {
-  if (v1.x < 0 or v1.y < 0 or v1.x >= _size.width or v1.y >= _size.height) {
+  if (v1.x < _clip.point.x or v1.y < _clip.point.y or v1.x >= _clip.size.width or v1.y >= _clip.size.height) {
     return;
   }
 
@@ -93,23 +141,17 @@ uint32_t Raster::GetPixel(jgui::jpoint_t<int> v1)
 
 void Raster::ScanLine(jgui::jpoint_t<int> v1, int size)
 {
-  if ((v1.x + size) < 0 or v1.y < 0 or v1.x >= _size.width or v1.y >= _size.height) {
-    return;
+  if (v1.x < _clip.point.x) {
+    size = size - (_clip.point.x - v1.x);
+    v1.x = _clip.point.x;
   }
 
-  if (v1.x < 0) {
-    size = size + v1.x;
-    v1.x = 0;
+  if ((v1.x + size) >= _clip.size.width) {
+    size = _clip.size.width - v1.x - 1;
   }
-
-  if ((v1.x + size) >= _size.width) {
-    size = _size.width - v1.x - 1;
-  }
-
-	uint32_t *ptr = (_buffer + v1.y*_size.width + v1.x);
 
   for (int i=0; i<size; i++) {
-    *ptr++ = _color;
+    SetPixel({v1.x + i, v1.y});
   }
 }
 
@@ -356,24 +398,19 @@ void Raster::DrawBezier(jgui::jpoint_t<int> v1, jgui::jpoint_t<int> v2, jgui::jp
   }
 } 
 
-void DrawCircle0(Raster *raster, int xc, int yc, int x, int y) 
-{ 
-  raster->SetPixel({xc-x, yc+y}); 
-  raster->SetPixel({xc+x, yc+y}); 
-  raster->SetPixel({xc-x, yc-y}); 
-  raster->SetPixel({xc+x, yc-y}); 
-  raster->SetPixel({xc-y, yc+x}); 
-  raster->SetPixel({xc+y, yc+x}); 
-  raster->SetPixel({xc-y, yc-x}); 
-  raster->SetPixel({xc+y, yc-x}); 
-} 
-
 void Raster::DrawCircle(jgui::jpoint_t<int> v1, int size)
 {
   int x = 0, y = size; 
   int d = 3 - 2 * size; 
 
-  DrawCircle0(this, v1.x, v1.y, x, y); 
+  SetPixel({v1.x - x, v1.y + y}); 
+  SetPixel({v1.x + x, v1.y + y}); 
+  SetPixel({v1.x - x, v1.y - y}); 
+  SetPixel({v1.x + x, v1.y - y}); 
+  SetPixel({v1.x - y, v1.y + x}); 
+  SetPixel({v1.x + y, v1.y + x}); 
+  SetPixel({v1.x - y, v1.y - x}); 
+  SetPixel({v1.x + y, v1.y - x}); 
 
   while (y >= x) { 
     x++; 
@@ -385,24 +422,26 @@ void Raster::DrawCircle(jgui::jpoint_t<int> v1, int size)
       d = d + 4 * x + 6; 
     }
   
-    DrawCircle0(this, v1.x, v1.y, x, y); 
+    SetPixel({v1.x - x, v1.y + y}); 
+    SetPixel({v1.x + x, v1.y + y}); 
+    SetPixel({v1.x - x, v1.y - y}); 
+    SetPixel({v1.x + x, v1.y - y}); 
+    SetPixel({v1.x - y, v1.y + x}); 
+    SetPixel({v1.x + y, v1.y + x}); 
+    SetPixel({v1.x - y, v1.y - x}); 
+    SetPixel({v1.x + y, v1.y - x}); 
   }
 }
-
-void FillCircle0(Raster *raster, int xc, int yc, int x, int y) 
-{ 
-  raster->ScanLine({xc-x, yc+y}, 2*x); 
-  raster->ScanLine({xc-x, yc-y}, 2*x); 
-  raster->ScanLine({xc-y, yc+x}, 2*y); 
-  raster->ScanLine({xc-y, yc-x}, 2*y); 
-} 
 
 void Raster::FillCircle(jgui::jpoint_t<int> v1, int size)
 {
   int x = 0, y = size; 
   int d = 3 - 2 * size; 
 
-  FillCircle0(this, v1.x, v1.y, x, y); 
+  ScanLine({v1.x - x, v1.y + y}, 2*x); 
+  ScanLine({v1.x - x, v1.y - y}, 2*x); 
+  ScanLine({v1.x - y, v1.y + x}, 2*y); 
+  ScanLine({v1.x - y, v1.y - x}, 2*y); 
 
   while (y >= x) { 
     x++; 
@@ -414,7 +453,10 @@ void Raster::FillCircle(jgui::jpoint_t<int> v1, int size)
       d = d + 4 * x + 6;
     }
   
-    FillCircle0(this, v1.x, v1.y, x, y); 
+    ScanLine({v1.x - x, v1.y + y}, 2*x); 
+    ScanLine({v1.x - x, v1.y - y}, 2*x); 
+    ScanLine({v1.x - y, v1.y + x}, 2*y); 
+    ScanLine({v1.x - y, v1.y - x}, 2*y); 
   }
 }
 
@@ -426,9 +468,11 @@ void Raster::DrawEllipse(jgui::jpoint_t<int> v1, jgui::jsize_t<int> s1)
     x1 = v1.x + s1.width,
     y1 = v1.y + s1.height;
 
-  int a = abs (x1 - x0), b = abs (y1 - y0), b1 = b & 1;
-  long dx = 4 * (1 - a) * b * b, dy = 4 * (b1 + 1) * a * a;
-  long err = dx + dy + b1 * a * a, e2;
+  int 
+    a = abs (x1 - x0), b = abs (y1 - y0), b1 = b & 1;
+  long 
+    dx = 4 * (1 - a) * b * b, dy = 4 * (b1 + 1) * a * a,
+    err = dx + dy + b1 * a * a, e2;
 
   if (x0 > x1) { 
     x0 = x1; x1 += a; 
@@ -479,9 +523,11 @@ void Raster::FillEllipse(jgui::jpoint_t<int> v1, jgui::jsize_t<int> s1)
     x1 = v1.x + s1.width,
     y1 = v1.y + s1.height;
 
-  int a = abs (x1 - x0), b = abs (y1 - y0), b1 = b & 1;
-  long dx = 4 * (1 - a) * b * b, dy = 4 * (b1 + 1) * a * a;
-  long err = dx + dy + b1 * a * a, e2;
+  int 
+    a = abs (x1 - x0), b = abs (y1 - y0), b1 = b & 1;
+  long 
+    dx = 4 * (1 - a) * b * b, dy = 4 * (b1 + 1) * a * a,
+    err = dx + dy + b1 * a * a, e2;
 
   if (x0 > x1) { 
     x0 = x1; x1 += a; 
@@ -946,7 +992,7 @@ void Raster::DrawImage(jgui::Image *image, jgui::jpoint_t<int> v1)
   image->GetRGBArray(data, {0, 0, size});
 
   for (int j=0; j<size.height; j++) {
-    if ((j + v1.y) < 0 or (j + v1.y) >= _size.height) {
+    if ((j + v1.y) < _clip.point.y or (j + v1.y) >= _clip.size.height) {
       continue;
     }
 
@@ -954,7 +1000,7 @@ void Raster::DrawImage(jgui::Image *image, jgui::jpoint_t<int> v1)
     uint32_t *dst = _buffer + (j + v1.y)*_size.width;
 
     for (int i=0; i<size.width; i++) {
-      if ((i + v1.x) < 0 or (i + v1.x) >= _size.width) {
+      if ((i + v1.x) < _clip.point.x or (i + v1.x) >= _clip.size.width) {
         continue;
       }
 

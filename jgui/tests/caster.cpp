@@ -201,7 +201,7 @@ class Scene : public jgui::Window {
       jgui::Window::Paint(g);
 
       jgui::Raster 
-        raster((uint32_t *)cairo_image_surface_get_data(g->GetCairoSurface()), GetSize());
+        raster(g->GetCairoSurface());
 
       for (auto &i : _barriers) {
         i.Paint(raster);
