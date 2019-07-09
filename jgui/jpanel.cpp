@@ -91,7 +91,7 @@ void Panel::PaintGlassPane(Graphics *g)
 
   jgui::Font 
     *font = theme->GetFont("window.font");
-  jgui::Color 
+  jgui::jcolor_t<float>
     bg = theme->GetIntegerParam("window.bg"),
     fg = theme->GetIntegerParam("window.fg"),
     scroll = theme->GetIntegerParam("window.scroll");

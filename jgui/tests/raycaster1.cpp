@@ -208,7 +208,7 @@ class GraphicsTeste : public jgui::Window {
 			}
 
       // draw map
-      g->SetColor(jgui::Color::Blue);
+      g->SetColor(jgui::jcolor_name_t::Blue);
 
       for (int j=0; j<mapHeight; j++) {
         for (int i=0; i<mapWidth; i++) {
@@ -226,9 +226,9 @@ class GraphicsTeste : public jgui::Window {
         }
       }
 
-      g->SetColor(jgui::Color::Red);
+      g->SetColor(jgui::jcolor_name_t::Red);
       g->FillCircle({(int)(posX * block_size), (int)(posY * block_size)}, block_size/2);
-      g->SetColor(jgui::Color::Yellow);
+      g->SetColor(jgui::jcolor_name_t::Yellow);
       g->FillCircle({(int)((posX + dirX) * block_size), (int)((posY + dirY) * block_size)}, 4);
 
       Repaint();

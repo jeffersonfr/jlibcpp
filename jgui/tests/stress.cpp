@@ -48,7 +48,7 @@ class GraphicPanel : public jgui::Window {
     jgui::jsize_t 
       t = _buffer->GetSize();
 
-		g->SetColor(jgui::Color::Black);
+		g->SetColor(jgui::jcolor_name_t::Black);
 		g->FillRectangle({0, 0, t.width, t.height});
 	}
 
@@ -180,7 +180,7 @@ class GraphicPanel : public jgui::Window {
 			// a1 = rand()%0x80;
 
 			jgui::Image 
-        *colorize = rotate->Colorize(jgui::Color(r1, g1, b1));
+        *colorize = rotate->Colorize({r1, g1, b1});
       jgui::jsize_t 
         t = rotate->GetSize();
 			
@@ -643,7 +643,7 @@ class GraphicPanel : public jgui::Window {
 			x = (t.width-size)/2;
 			y = (t.height-size)/2;
 
-			jgui::Image *colorize = off->Colorize(jgui::Color(color));
+			jgui::Image *colorize = off->Colorize(color);
 
 			g->DrawImage(colorize, {x, y, size, size});
 

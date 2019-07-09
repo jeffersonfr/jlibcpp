@@ -106,7 +106,7 @@ class IndexedImage : public jgui::Image {
      * \brief
      *
      */
-    virtual Image * Colorize(Color color);
+    virtual Image * Colorize(jcolor_t<float> color);
 
     /**
      * \brief

@@ -258,8 +258,8 @@ void TextField::Paint(Graphics *g)
     return;
   }
 
-  jgui::Color 
-    bg = theme->GetIntegerParam("component.bg"),
+  jgui::jcolor_t<float>
+    // bg = theme->GetIntegerParam("component.bg"),
     fg = theme->GetIntegerParam("component.fg"),
     fgfocus = theme->GetIntegerParam("component.fg.focus"),
     fgdisable = theme->GetIntegerParam("component.fg.disable");

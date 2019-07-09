@@ -454,7 +454,7 @@ void Component::PaintScrollbars(Graphics *g)
     return;
   }
 
-  jgui::Color 
+  jgui::jcolor_t<float>
     bg = theme->GetIntegerParam("component.bg"),
     fg = theme->GetIntegerParam("component.fg");
   jgui::jpoint_t<int> 
@@ -538,7 +538,7 @@ void Component::PaintBackground(Graphics *g)
     return;
   }
 
-  jgui::Color 
+  jgui::jcolor_t<float>
     bg = theme->GetIntegerParam("component.bg"),
     bgfocus = theme->GetIntegerParam("component.bg.focus"),
     bgdisable = theme->GetIntegerParam("component.bg.disable");
@@ -587,7 +587,7 @@ void Component::PaintBorders(Graphics *g)
     return;
   }
 
-  jgui::Color
+  jgui::jcolor_t<float>
     color,
     border = theme->GetIntegerParam("component.border"),
     borderfocus = theme->GetIntegerParam("component.border.focus"),
@@ -615,10 +615,10 @@ void Component::PaintBorders(Graphics *g)
   }
 
   int 
-    dr = color.GetRed(),
-    dg = color.GetGreen(),
-    db = color.GetBlue(),
-    da = color.GetAlpha();
+    dr = color[2],
+    dg = color[1],
+    db = color[0],
+    da = color[3];
   jpen_t 
     pen = g->GetPen();
   int 

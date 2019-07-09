@@ -231,8 +231,8 @@ void CheckButton::Paint(Graphics *g)
 
   Font 
     *font = theme->GetFont("component.font");
-  Color 
-    bg = theme->GetIntegerParam("component.bg"),
+  jcolor_t<float> 
+    // bg = theme->GetIntegerParam("component.bg"),
     fg = theme->GetIntegerParam("component.fg"),
     fgfocus = theme->GetIntegerParam("component.fg.focus"),
     fgdisable = theme->GetIntegerParam("component.fg.disable");

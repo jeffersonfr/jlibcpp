@@ -65,10 +65,10 @@ class Fullscreen : public jgui::Window {
 
 			g->DrawImage(_bg, {insets.left, insets.top, size.width-insets.left-insets.right, size.height-insets.top-insets.bottom});
 
-			g->SetColor(jgui::Color::Red);
+			g->SetColor(jgui::jcolor_name_t::Red);
 			g->FillRectangle({100, 100, 100, 100});
 			
-			g->SetColor(jgui::Color::White);
+			g->SetColor(jgui::jcolor_name_t::White);
 			g->DrawString("Press F to use enable/disable fullscreen mode", jgui::jpoint_t<int>{100, 100});
 		}
 

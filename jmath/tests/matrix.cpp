@@ -34,7 +34,7 @@ int main()
 			5, 3
 		};
 
-	std::cout << m << std::endl;
+	std::cout << m.Inverse().Inverse() << std::endl;
 	std::cout << c << std::endl;
 
 	return 0;

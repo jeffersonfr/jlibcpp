@@ -279,22 +279,16 @@ void Graphics::Clear(jrect_t<int> rect)
   cairo_restore(_cairo_context);
 }
 
-Color & Graphics::GetColor()
+jcolor_t<float> & Graphics::GetColor()
 {
   return _color;
 } 
 
-void Graphics::SetColor(const Color &color)
+void Graphics::SetColor(const jcolor_t<float> &color)
 {
   _color = color;
 
-  int 
-    r = _color.GetRed(),
-    g = _color.GetGreen(),
-    b = _color.GetBlue(),
-    a = _color.GetAlpha();
-
-  cairo_set_source_rgba(_cairo_context, r/255.0, g/255.0, b/255.0, a/255.0);
+  cairo_set_source_rgba(_cairo_context, _color.red, _color.green, _color.blue, _color.alpha);
 } 
 
 bool Graphics::HasFont()
@@ -1062,7 +1056,7 @@ void Graphics::FillPolygon(jpoint_t<int> point, std::vector<jpoint_t<int>> point
   }
 }
 
-void Graphics::SetGradientStop(float stop, const Color &color)
+void Graphics::SetGradientStop(float stop, const jcolor_t<float> &color)
 {
   jgradient_t t;
 
@@ -1092,15 +1086,12 @@ void Graphics::FillRadialGradient(jpoint_t<int> point, jsize_t<int> size, jpoint
   cairo_pattern_t *pattern = cairo_pattern_create_radial(xc, yc, std::max(rx, ry), x0, y0, r0);
 
   for (std::vector<jgradient_t>::iterator i=_gradient_stops.begin(); i!=_gradient_stops.end(); i++) {
-    jgradient_t gradient = (*i);
+    jgradient_t 
+      gradient = (*i);
+    jcolor_t<float> 
+      &color = gradient.color;
 
-    int 
-      sr = gradient.color.GetRed(),
-      sg = gradient.color.GetGreen(),
-      sb = gradient.color.GetBlue(),
-      sa = gradient.color.GetAlpha();
-
-    cairo_pattern_add_color_stop_rgba(pattern, gradient.stop, sr/255.0, sg/255.0, sb/255.0, sa/255.0);
+    cairo_pattern_add_color_stop_rgba(pattern, gradient.stop, color.red, color.green, color.blue, color.alpha);
   }
 
   cairo_set_source(_cairo_context, pattern);
@@ -1120,15 +1111,12 @@ void Graphics::FillLinearGradient(jrect_t<int> rect, jpoint_t<int> p0, jpoint_t<
   cairo_pattern_t *pattern = cairo_pattern_create_linear(p0.x, p0.y, p1.x, p1.y);
   
   for (std::vector<jgradient_t>::iterator i=_gradient_stops.begin(); i!=_gradient_stops.end(); i++) {
-    jgradient_t gradient = (*i);
+    jgradient_t 
+      gradient = (*i);
+    jcolor_t<float> 
+      &color = gradient.color;
 
-    int 
-      sr = gradient.color.GetRed(),
-      sg = gradient.color.GetGreen(),
-      sb = gradient.color.GetBlue(),
-      sa = gradient.color.GetAlpha();
-
-    cairo_pattern_add_color_stop_rgba(pattern, gradient.stop, sr/255.0, sg/255.0, sb/255.0, sa/255.0);
+    cairo_pattern_add_color_stop_rgba(pattern, gradient.stop, color.red, color.green, color.blue, color.alpha);
   }
   
   cairo_save(_cairo_context);
@@ -2015,15 +2003,12 @@ void Graphics::SetPattern(jpoint_t<int> p0, jpoint_t<int> p1)
   cairo_pattern_t *pattern = cairo_pattern_create_linear(x0, y0, x1, y1);
 
   for (std::vector<jgradient_t>::iterator i=_gradient_stops.begin(); i!=_gradient_stops.end(); i++) {
-    jgradient_t gradient = (*i);
+    jgradient_t 
+      gradient = (*i);
+    jcolor_t<float> 
+      &color = gradient.color;
 
-    int 
-      sr = gradient.color.GetRed(),
-      sg = gradient.color.GetGreen(),
-      sb = gradient.color.GetBlue(),
-      sa = gradient.color.GetAlpha();
-
-    cairo_pattern_add_color_stop_rgba(pattern, gradient.stop, sr/255.0, sg/255.0, sb/255.0, sa/255.0);
+    cairo_pattern_add_color_stop_rgba(pattern, gradient.stop, color.red, color.green, color.blue, color.alpha);
   }
 
   // cairo_rectangle(_cairo_context, x, y, w, h);
@@ -2046,15 +2031,12 @@ void Graphics::SetPattern(jpoint_t<int> p0, int rad0, jpoint_t<int> p1, int rad1
   cairo_pattern_t *pattern = cairo_pattern_create_radial(x0, y0, rad0, x1, y1, rad1);
 
   for (std::vector<jgradient_t>::iterator i=_gradient_stops.begin(); i!=_gradient_stops.end(); i++) {
-    jgradient_t gradient = (*i);
+    jgradient_t 
+      gradient = (*i);
+    jcolor_t<float> 
+      &color = gradient.color;
 
-    int 
-      sr = gradient.color.GetRed(),
-      sg = gradient.color.GetGreen(),
-      sb = gradient.color.GetBlue(),
-      sa = gradient.color.GetAlpha();
-
-    cairo_pattern_add_color_stop_rgba(pattern, gradient.stop, sr/255.0, sg/255.0, sb/255.0, sa/255.0);
+    cairo_pattern_add_color_stop_rgba(pattern, gradient.stop, color.red, color.green, color.blue, color.alpha);
   }
 
   // cairo_arc(cairo_context, x0, y0, rad0, 0.0, 2 * M_PI);

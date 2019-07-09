@@ -304,29 +304,29 @@ Image * IndexedImage::Blend(double alpha)
   return nullptr;
 }
 
-Image * IndexedImage::Colorize(Color color)
+Image * IndexedImage::Colorize(jcolor_t<float> color)
 {
   jgui::jsize_t<int> 
     size = GetSize();
-  double 
+  float
     hue, 
     sat, 
     bri;
   uint32_t 
     palette[_palette_size];
 
-  jgui::Color::RGBtoHSB(color.GetRed(), color.GetGreen(), color.GetBlue(), &hue, &sat, &bri); 
+  color.ToHSB(hue, sat, bri);
 
   HSLColorSpace 
     hsl(hue, sat, 0.0);
 
   for (int i=0; i<_palette_size; i++) {
-    jgui::Color 
+    jgui::jcolor_t<float>
       color(_palette[i]);
     int 
-      r = color.GetRed(),
-      g = color.GetGreen(),
-      b = color.GetBlue();
+      r = color[2],
+      g = color[1],
+      b = color[0];
 
     hsl.GetRGB(&r, &g, &b);
 

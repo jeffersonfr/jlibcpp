@@ -928,7 +928,7 @@ Image * BufferedImage::Blend(double alpha)
   return tmp;
 }
 
-Image * BufferedImage::Colorize(Color color)
+Image * BufferedImage::Colorize(jcolor_t<float> color)
 {
   Image 
     *image = (Image *)Blend(1.0);
@@ -952,9 +952,9 @@ Image * BufferedImage::Colorize(Color color)
 
   int stride = cairo_image_surface_get_stride(surface);
 
-  double hue, sat, bri;
+  float hue, sat, bri;
 
-  jgui::Color::RGBtoHSB(color.GetRed(), color.GetGreen(), color.GetBlue(), &hue, &sat, &bri); 
+  color.ToHSB(hue, sat, bri);
 
   HSLColorSpace hsl(hue, sat, 0.0);
   jgui::jsize_t<int> size = image->GetSize();

@@ -90,7 +90,7 @@ Image * Image::Blend(double alpha)
   return nullptr;
 }
 
-Image * Image::Colorize(Color color)
+Image * Image::Colorize(jcolor_t<float> color)
 {
   return nullptr;
 }

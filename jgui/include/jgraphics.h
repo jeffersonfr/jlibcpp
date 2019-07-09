@@ -197,7 +197,7 @@ struct jpen_t {
  *
  */
 struct jgradient_t {
-  Color color;
+  jcolor_t<float> color;
   float stop;
 };
 
@@ -217,7 +217,7 @@ class Graphics : public virtual jcommon::Object {
     /** \brief */
     Font *_font;
     /** \brief */
-    Color _color;
+    jcolor_t<float> _color;
     /** \brief */
     struct jpoint_t<int> _translate;
     /** \brief */
@@ -314,13 +314,13 @@ class Graphics : public virtual jcommon::Object {
      * \brief
      *
      */
-    virtual Color & GetColor(); 
+    virtual jcolor_t<float> & GetColor(); 
     
     /**
      * \brief
      *
      */
-    virtual void SetColor(const Color &color); 
+    virtual void SetColor(const jcolor_t<float> &color); 
     
     /**
      * \brief
@@ -516,9 +516,9 @@ class Graphics : public virtual jcommon::Object {
      * \brief
      *
      */
-    virtual void SetGradientStop(float stop, const Color &color);
+    virtual void SetGradientStop(float stop, const jcolor_t<float> &color);
     
-      /**
+    /**
      * \brief
      *
      */

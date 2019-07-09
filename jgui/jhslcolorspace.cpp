@@ -92,15 +92,13 @@ void HSLColorSpace::Initialize()
 
     double temp_light = (double)i/255.0;
 
-    int red, green, blue;
+    jcolor_t<float> color;
+    
+    color.FromHSB(temp_hue, temp_sat, temp_light);
 
-    jgui::Color::HSBtoRGB(temp_hue, temp_sat, temp_light, &red, &green, &blue);
-
-    Color color(red, green, blue);
-
-    _final_red_lookup[i] = (int)(color.GetRed());
-    _final_green_lookup[i] = (int)(color.GetGreen());
-    _final_blue_lookup[i] = (int)(color.GetBlue());
+    _final_red_lookup[i] = (int)(color[2]);
+    _final_green_lookup[i] = (int)(color[1]);
+    _final_blue_lookup[i] = (int)(color[0]);
   }
 }
 

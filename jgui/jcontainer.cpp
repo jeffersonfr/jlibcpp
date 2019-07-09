@@ -438,7 +438,7 @@ void Container::PaintBackground(Graphics *g)
     return;
   }
 
-  jgui::Color 
+  jgui::jcolor_t<float>
     bg = theme->GetIntegerParam("container.bg"),
     bgfocus = theme->GetIntegerParam("container.bg.focus"),
     bgdisable = theme->GetIntegerParam("container.bg.disable");
@@ -487,7 +487,7 @@ void Container::PaintBorders(Graphics *g)
     return;
   }
 
-  jgui::Color
+  jgui::jcolor_t<float>
     color,
     border = theme->GetIntegerParam("container.border"),
     borderfocus = theme->GetIntegerParam("container.border.focus"),
@@ -515,10 +515,10 @@ void Container::PaintBorders(Graphics *g)
   }
 
   int 
-    dr = color.GetRed(),
-    dg = color.GetGreen(),
-    db = color.GetBlue(),
-    da = color.GetAlpha();
+    dr = color[2],
+    dg = color[1],
+    db = color[0],
+    da = color[3];
   jpen_t 
     pen = g->GetPen();
   int 

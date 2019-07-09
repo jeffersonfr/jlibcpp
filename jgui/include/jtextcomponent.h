@@ -52,7 +52,7 @@ class TextComponent : public jgui::Component {
     /** \brief */
     std::mutex _text_listener_mutex;
     /** \brief */
-    Color _caret_color;
+    jcolor_t<float> _caret_color;
     /** \brief */
     jhorizontal_align_t _halign;
     /** \brief */
@@ -93,19 +93,13 @@ class TextComponent : public jgui::Component {
      * \brief
      *
      */
-    virtual Color & GetCaretColor();
+    virtual jcolor_t<float> & GetCaretColor();
     
     /**
      * \brief
      *
      */
-    virtual void SetCaretColor(int red, int green, int blue, int alpha);
-    
-    /**
-     * \brief
-     *
-     */
-    virtual void SetCaretColor(const Color &color);
+    virtual void SetCaretColor(const jcolor_t<float> &color);
     
     /**
      * \brief

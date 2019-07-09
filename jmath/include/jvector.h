@@ -40,7 +40,7 @@ template<class T>
   struct is_complex<std::complex<T>> : std::true_type {
   };
 
-template<size_t N, typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value || is_complex<T>::value, T>::type>
+template<size_t N, typename T = float, typename = typename std::enable_if<std::is_arithmetic<T>::value || is_complex<T>::value, T>::type>
   struct jvector_t {
     T data[N];
 
@@ -278,147 +278,128 @@ template<size_t N, typename T, typename = typename std::enable_if<std::is_arithm
       return v;
     }
 
-    jvector_t<N, T> Pow(double e)
+    jvector_t<N, T> & Pow(double e)
     {
-      jvector_t<N, T> v;
-
       for (size_t i=0; i<N; i++) {
-        v.data[i] = (T)std::pow(data[i], e);
+        data[i] = (T)std::pow(data[i], e);
       }
 
-      return v;
+      return *this;
     }
 
-    jvector_t<N, T> Sqrt()
+    jvector_t<N, T> & Sqrt()
     {
-      jvector_t<N, T> v;
-
       for (size_t i=0; i<N; i++) {
-        v.data[i] = (T)std::sqrt(data[i]);
+        data[i] = (T)std::sqrt(data[i]);
       }
 
-      return v;
+      return *this;
     }
 
-    jvector_t<N, T> Abs()
+    jvector_t<N, T> & Abs()
     {
-      jvector_t<N, T> v;
-
       for (size_t i=0; i<N; i++) {
-        v.data[i] = (T)std::abs(data[i]);
+        data[i] = (T)std::abs(data[i]);
       }
 
-      return v;
+      return *this;
     }
 
-    jvector_t<N, T> Sin()
+    jvector_t<N, T> & Sin()
     {
-      jvector_t<N, T> v;
-
       for (size_t i=0; i<N; i++) {
-        v.data[i] = (T)std::sin(data[i]);
+        data[i] = (T)std::sin(data[i]);
       }
 
-      return v;
+      return *this;
     }
 
-    jvector_t<N, T> Cos()
+    jvector_t<N, T> & Cos()
     {
-      jvector_t<N, T> v;
-
       for (size_t i=0; i<N; i++) {
-        v.data[i] = (T)std::cos(data[i]);
+        data[i] = (T)std::cos(data[i]);
       }
 
-      return v;
+      return *this;
     }
 
-    jvector_t<N, T> Tan()
+    jvector_t<N, T> & Tan()
     {
-      jvector_t<N, T> v;
-
       for (size_t i=0; i<N; i++) {
-        v.data[i] = (T)std::tan(data[i]);
+        data[i] = (T)std::tan(data[i]);
       }
 
-      return v;
+      return *this;
     }
 
-    jvector_t<N, T> SinH()
+    jvector_t<N, T> & SinH()
     {
-      jvector_t<N, T> v;
-
       for (size_t i=0; i<N; i++) {
-        v.data[i] = (T)std::sinh(data[i]);
+        data[i] = (T)std::sinh(data[i]);
       }
 
-      return v;
+      return *this;
     }
 
-    jvector_t<N, T> CosH()
+    jvector_t<N, T> & CosH()
     {
-      jvector_t<N, T> v;
-
       for (size_t i=0; i<N; i++) {
-        v.data[i] = (T)std::cosh(data[i]);
+        data[i] = (T)std::cosh(data[i]);
       }
 
-      return v;
+      return *this;
     }
 
-    jvector_t<N, T> TanH()
+    jvector_t<N, T> & TanH()
     {
-      jvector_t<N, T> v;
-
       for (size_t i=0; i<N; i++) {
-        v.data[i] = (T)std::tanh(data[i]);
+        data[i] = (T)std::tanh(data[i]);
       }
 
-      return v;
+      return *this;
     }
 
-    jvector_t<N, T> Exp()
+    jvector_t<N, T> & Exp()
     {
-      jvector_t<N, T> v;
-
       for (size_t i=0; i<N; i++) {
-        v.data[i] = (T)std::exp(data[i]);
+        data[i] = (T)std::exp(data[i]);
       }
 
-      return v;
+      return *this;
     }
 
-    jvector_t<N, T> Log()
+    jvector_t<N, T> & Log()
     {
-      jvector_t<N, T> v;
-
       for (size_t i=0; i<N; i++) {
-        v.data[i] = (T)std::log(data[i]);
+        data[i] = (T)std::log(data[i]);
       }
 
-      return v;
+      return *this;
     }
 
-    jvector_t<N, T> Log2()
+    jvector_t<N, T> & Log2()
     {
-      jvector_t<N, T> v;
-
       for (size_t i=0; i<N; i++) {
-        v.data[i] = (T)std::log2(data[i]);
+        data[i] = (T)std::log2(data[i]);
       }
 
-      return v;
+      return *this;
     }
 
-    jvector_t<N, T> Log10()
+    jvector_t<N, T> & Log10()
     {
-      jvector_t<N, T> v;
-
       for (size_t i=0; i<N; i++) {
-        v.data[i] = (T)std::log10(data[i]);
+        data[i] = (T)std::log10(data[i]);
       }
 
-      return v;
+      return *this;
+    }
+
+    jvector_t<N, T> & Sort()
+    {
+      std::sort(data, data + N);
+
+      return *this;
     }
 
     size_t Size()
@@ -524,17 +505,15 @@ template<size_t N, typename T, typename = typename std::enable_if<std::is_arithm
       return *std::max_element(data, data + N);
     }
 
-    jvector_t<N, T> Conjugate()
+    jvector_t<N, T> & Conjugate()
     {
       static_assert(is_complex<T>::value, "T != std::complex<U>");
 
-      jvector_t<N, T> conj;
-
       for (size_t i=0; i<N; i++) {
-        conj.data[i] = std::conj(data[i]);
+        data[i] = std::conj(data[i]);
       }
 
-      return conj;
+      return *this;
     }
 
     friend jvector_t<N, T> operator+(const T &param, const jvector_t<N, T> &thiz)

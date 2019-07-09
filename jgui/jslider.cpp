@@ -252,11 +252,11 @@ void Slider::Paint(Graphics *g)
     return;
   }
 
-  jgui::Color 
-    bg = theme->GetIntegerParam("component.bg"),
-    fg = theme->GetIntegerParam("component.fg"),
+  jgui::jcolor_t<float>
+    // bg = theme->GetIntegerParam("component.bg"),
+    // fg = theme->GetIntegerParam("component.fg"),
     fgfocus = theme->GetIntegerParam("component.fg.focus"),
-    fgdisable = theme->GetIntegerParam("component.fg.disable"),
+    // fgdisable = theme->GetIntegerParam("component.fg.disable"),
     scroll = theme->GetIntegerParam("component.scroll");
   jgui::jsize_t<int>
     size = GetSize();

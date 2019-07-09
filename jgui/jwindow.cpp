@@ -302,7 +302,7 @@ void Window::PaintGlassPane(Graphics *g)
 
   jgui::Font 
     *font = theme->GetFont("window.font");
-  jgui::Color 
+  jgui::jcolor_t<float>
     fg = theme->GetIntegerParam("window.fg");
   jgui::jsize_t
     size = GetSize();
@@ -310,7 +310,7 @@ void Window::PaintGlassPane(Graphics *g)
     insets = GetInsets();
 
   g->SetFont(font);
-  g->SetColor(jgui::Color::White);
+  g->SetColor(jgui::jcolor_name_t::White);
   
   if (_subtitles.size() > 0) {
     int count = insets.right;

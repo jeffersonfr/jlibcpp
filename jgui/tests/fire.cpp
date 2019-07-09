@@ -36,10 +36,6 @@ class Fire : public jgui::Window {
     {
       jgui::jsize_t 
         size = GetSize();
-      int 
-        r, 
-        g, 
-        b;
 
       fire = new uint32_t[size.width*size.height];
       
@@ -52,14 +48,16 @@ class Fire : public jgui::Window {
 
       // generate the palette
       for (int x=0; x<256; x++) {
+        jgui::jcolor_t<float>
+          color;
         double 
           h = (x/8.0)/255.0,
           s = 255.0/255.0,
           l = std::min(255.0, (x * 2)/255.0);
 
-        jgui::Color::HSBtoRGB(h, s, l, &r, &g, &b);
+        color.FromHSB(h, s, l);
 
-        palette[x] = (0xff << 0x18) | (r << 0x10) | (g << 0x08) | (b << 0x00);
+        palette[x] = uint32_t(color);
       }
     }
 

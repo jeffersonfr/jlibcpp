@@ -32,9 +32,26 @@
 
 namespace jmath {
 
-template<size_t R, size_t C, typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value || is_complex<T>::value, T>::type>
+template<size_t R, size_t C, typename T = float, typename = typename std::enable_if<std::is_arithmetic<T>::value || is_complex<T>::value, T>::type>
   struct jmatrix_t {
     jvector_t<C, T> data[R];
+
+    static jmatrix_t<R, C, T> Identity()
+		{
+      jmatrix_t<R, C, T> m;
+
+			m = 0;
+
+      for (size_t j=0; j<R; j++) {
+        for (size_t i=0; i<C; i++) {
+					if (j == i) {
+          	m.data[i][j] = 1;
+					}
+        }
+      }
+
+      return m;
+		}
 
     template<typename U> operator jvector_t<R*C, U>()
     {
@@ -358,6 +375,19 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
       return std::pow(-1, (r + c)&0x01)*m.Determinant();
     }
 
+    T Mean()
+		{
+      T count = 0;
+
+      for (size_t j=0; j<R; j++) {
+        for (size_t i=0; i<C; i++) {
+          count = count + data[i][j];
+        }
+      }
+
+      return count/(R*C);
+		}
+
     bool IsNormal()
     {
       return (*this * this->Hermitan()) == (this->Hermitan() * *this);
@@ -485,35 +515,16 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
       return LUDecomposition(m);
     }
 
-    jmatrix_t<C, R, T> Transpose()
+    jmatrix_t<C, R, T> & Transpose()
     {
-      jmatrix_t<C, R, T> m;
-
-      for (size_t j=0; j<R; j++) {
-        for (size_t i=0; i<C; i++) {
-          m.data[i][j] = data[j][i];
+      for (size_t j=0; j<R/2; j++) {
+        for (size_t i=0; i<C/2; i++) {
+          data[i][j] = data[j][i];
         }
       }
 
-      return m;
+      return *this;
     }
-
-    jmatrix_t<R, C, T> Identity()
-		{
-      jmatrix_t<R, C, T> m;
-
-			m = 0;
-
-      for (size_t j=0; j<R; j++) {
-        for (size_t i=0; i<C; i++) {
-					if (j == i) {
-          	m.data[i][j] = 1;
-					}
-        }
-      }
-
-      return m;
-		}
 
     T Trace()
 		{
@@ -665,189 +676,161 @@ template<size_t R, size_t C, typename T, typename = typename std::enable_if<std:
       return jmatrix_t<R, C, double>(*this)/EuclidianNorm();
     }
  
-    jmatrix_t<R, C, T> Pow(double e)
+    jmatrix_t<R, C, T> & Pow(double e)
     {
-      jmatrix_t<R, C, T> m;
-
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C; i++) {
-          m.data[j][i] = (T)std::pow(data[j][i], e);
+          data[j][i] = (T)std::pow(data[j][i], e);
         }
       }
 
-      return m;
+      return *this;
     }
 
-    jmatrix_t<R, C, T> Sqrt()
+    jmatrix_t<R, C, T> & Sqrt()
     {
-      jmatrix_t<R, C, T> m;
-
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C; i++) {
-          m.data[j][i] = (T)std::sqrt(data[j][i]);
+          data[j][i] = (T)std::sqrt(data[j][i]);
         }
       }
 
-      return m;
+      return *this;
     }
 
-    jmatrix_t<R, C, T> Abs()
+    jmatrix_t<R, C, T> & Abs()
     {
-      jmatrix_t<R, C, T> m;
-
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C; i++) {
-          m.data[j][i] = (T)std::abs(data[j][i]);
+          data[j][i] = (T)std::abs(data[j][i]);
         }
       }
 
-      return m;
+      return *this;
     }
 
-    jmatrix_t<R, C, T> Sin()
+    jmatrix_t<R, C, T> & Sin()
     {
-      jmatrix_t<R, C, T> m;
-
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C; i++) {
-          m.data[j][i] = (T)std::sin(data[j][i]);
+          data[j][i] = (T)std::sin(data[j][i]);
         }
       }
 
-      return m;
+      return *this;
     }
 
-    jmatrix_t<R, C, T> Cos()
+    jmatrix_t<R, C, T> & Cos()
     {
-      jmatrix_t<R, C, T> m;
-
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C; i++) {
-          m.data[j][i] = (T)std::cos(data[j][i]);
+          data[j][i] = (T)std::cos(data[j][i]);
         }
       }
 
-      return m;
+      return *this;
     }
 
-    jmatrix_t<R, C, T> Tan()
+    jmatrix_t<R, C, T> & Tan()
     {
-      jmatrix_t<R, C, T> m;
-
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C; i++) {
-          m.data[j][i] = (T)std::tan(data[j][i]);
+          data[j][i] = (T)std::tan(data[j][i]);
         }
       }
 
-      return m;
+      return *this;
     }
 
-    jmatrix_t<R, C, T> SinH()
+    jmatrix_t<R, C, T> & SinH()
     {
-      jmatrix_t<R, C, T> m;
-
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C; i++) {
-          m.data[j][i] = (T)std::sinh(data[j][i]);
+          data[j][i] = (T)std::sinh(data[j][i]);
         }
       }
 
-      return m;
+      return *this;
     }
 
-    jmatrix_t<R, C, T> CosH()
+    jmatrix_t<R, C, T> & CosH()
     {
-      jmatrix_t<R, C, T> m;
-
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C; i++) {
-          m.data[j][i] = (T)std::cosh(data[j][i]);
+          data[j][i] = (T)std::cosh(data[j][i]);
         }
       }
 
-      return m;
+      return *this;
     }
 
-    jmatrix_t<R, C, T> TanH()
+    jmatrix_t<R, C, T> & TanH()
     {
-      jmatrix_t<R, C, T> m;
-
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C; i++) {
-          m.data[j][i] = (T)std::tanh(data[j][i]);
+          data[j][i] = (T)std::tanh(data[j][i]);
         }
       }
 
-      return m;
+      return *this;
     }
 
-    jmatrix_t<R, C, T> Exp()
+    jmatrix_t<R, C, T> & Exp()
     {
-      jmatrix_t<R, C, T> m;
-
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C; i++) {
-          m.data[j][i] = (T)std::exp(data[j][i]);
+          data[j][i] = (T)std::exp(data[j][i]);
         }
       }
 
-      return m;
+      return *this;
     }
 
-    jmatrix_t<R, C, T> Log()
+    jmatrix_t<R, C, T> & Log()
     {
-      jmatrix_t<R, C, T> m;
-
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C; i++) {
-          m.data[j][i] = (T)std::log(data[j][i]);
+          data[j][i] = (T)std::log(data[j][i]);
         }
       }
 
-      return m;
+      return *this;
     }
 
-    jmatrix_t<R, C, T> Log2()
+    jmatrix_t<R, C, T> & Log2()
     {
-      jmatrix_t<R, C, T> m;
-
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C; i++) {
-          m.data[j][i] = (T)std::log2(data[j][i]);
+          data[j][i] = (T)std::log2(data[j][i]);
         }
       }
 
-      return m;
+      return *this;
     }
 
-    jmatrix_t<R, C, T> Log10()
+    jmatrix_t<R, C, T> & Log10()
     {
-      jmatrix_t<R, C, T> m;
-
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C; i++) {
-          m.data[j][i] = (T)std::log10(data[j][i]);
+          data[j][i] = (T)std::log10(data[j][i]);
         }
       }
 
-      return m;
+      return *this;
     }
 
-    jmatrix_t<R, C, T> Conjugate()
+    jmatrix_t<R, C, T> & Conjugate()
     {
       static_assert(is_complex<T>::value, "T != std::complex<U>");
 
-      jmatrix_t<R, C, T> m;
-
       for (size_t j=0; j<R; j++) {
-        m.data[j] = data[j].Conjugate();
+        data[j] = data[j].Conjugate();
       }
 
-      return m;
+      return *this;
     }
 
-    jmatrix_t<R, C, T> Hermitian()
+    jmatrix_t<R, C, T> & Hermitian()
     {
       static_assert(is_complex<T>::value, "T != std::complex<U>");
 

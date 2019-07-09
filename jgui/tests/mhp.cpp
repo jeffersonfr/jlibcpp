@@ -38,7 +38,7 @@ class ScreenLayer : public jgui::Container {
 		ScreenLayer():
 			jgui::Container(0, 0, 1920, 1080)
 		{
-      _theme.SetIntegerParam("component.bg", jgui::Color::Black);
+      _theme.SetIntegerParam("component.bg", uint32_t(jgui::jcolor_name_t::Black));
 
       SetTheme(&_theme);
 			
@@ -55,14 +55,14 @@ class BackgroundLayer : public ScreenLayer {
 
 	private:
 		jgui::Image *_image;
-		jgui::Color _color;
+		jgui::jcolor_t<float> _color;
 
 	public:
 		BackgroundLayer():
 			ScreenLayer()
 		{
 			_image = nullptr;
-			_color = jgui::Color(0x00, 0x00, 0x00, 0xff);
+			_color = {0x00, 0x00, 0x00, 0xff};
 		}
 
 		virtual ~BackgroundLayer()
@@ -75,7 +75,7 @@ class BackgroundLayer : public ScreenLayer {
 
 		void SetColor(uint8_t red, uint8_t green, uint8_t blue)
 		{
-			_color = jgui::Color(red, green, blue, 0xff);
+			_color = jgui::jcolor_t<float>(red, green, blue, 0xff);
 
 			Repaint();
 		}
@@ -525,7 +525,7 @@ class MenuTest : public Scene {
 		{
       jgui::Theme
         *theme = GetTheme();
-			jgui::Color 
+			jgui::jcolor_t<float>
         color = theme->GetIntegerParam("component.bg");
       jgui::jpoint_t 
         t = GetLocation();
@@ -547,9 +547,9 @@ class MenuTest : public Scene {
 			} else if (_mstate == 2) {
 				_malpha = _malpha + M_PI/16;
 
-				color.SetAlpha(0x80 + (int)(64.0*sin(_malpha)));
+				color(3, 0x80 + (int)(64.0*sin(_malpha)));
 
-	      theme->SetIntegerParam("component.bg", color.GetARGB());
+	      theme->SetIntegerParam("component.bg", uint32_t(color));
 
 				return true;
 			} else if (_mstate == 3) {

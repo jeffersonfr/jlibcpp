@@ -47,7 +47,7 @@ class CustomContainer : public jgui::Container {
 
 			jgui::Theme 
         *theme = GetTheme();
-      jgui::Color 
+      jgui::jcolor_t<float>
         scroll = theme->GetIntegerParam("component.scroll");
       jgui::jsize_t 
         scroll_dimension = GetScrollDimension();

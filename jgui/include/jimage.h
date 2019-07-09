@@ -138,7 +138,7 @@ class Image : public virtual jcommon::Object {
      * \brief
      *
      */
-    virtual Image * Colorize(Color color);
+    virtual Image * Colorize(jcolor_t<float> color);
 
     /**
      * \brief

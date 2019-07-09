@@ -98,11 +98,11 @@ void Icon::Paint(Graphics *g)
     return;
   }
 
-  jgui::Color 
-    bg = theme->GetIntegerParam("component.bg"),
-    fg = theme->GetIntegerParam("component.fg"),
-    fgfocus = theme->GetIntegerParam("component.fg.focus"),
-    fgdisable = theme->GetIntegerParam("component.fg.disable");
+  jgui::jcolor_t<float> 
+    bg = theme->GetIntegerParam("component.bg");
+    // fg = theme->GetIntegerParam("component.fg"),
+    // fgfocus = theme->GetIntegerParam("component.fg.focus"),
+    // fgdisable = theme->GetIntegerParam("component.fg.disable");
   jgui::jsize_t
     size = GetSize();
   int
@@ -114,7 +114,7 @@ void Icon::Paint(Graphics *g)
   if (_image != nullptr) {
     g->DrawImage(_image, {x, y, w, h});
   } else {
-    g->SetColor(Color::Black);
+    g->SetColor(bg);
     g->FillRectangle({x, y, w, h});
   }
 }

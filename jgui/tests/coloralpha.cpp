@@ -21,13 +21,6 @@
 #include "jgui/jwindow.h"
 #include "jgui/jbufferedimage.h"
 
-struct color_t {
-	float a;
-	float r;
-	float g;
-	float b;
-};
-
 class ColorAlphaTeste : public jgui::Window {
 
 	private:
@@ -35,61 +28,61 @@ class ColorAlphaTeste : public jgui::Window {
       *_fg;
 		jgui::Image 
       *_bg;
-		color_t 
+    jgui::jcolor_t<float>
       _ref_color;
 
 	private:
-		void Color2Alpha(color_t *src, color_t *ref)
+		void Color2Alpha(jgui::jcolor_t<float> *src, jgui::jcolor_t<float> *ref)
 		{
-			color_t alpha;
+      jgui::jcolor_t<float> alpha;
 
-			alpha.a = src->a;
+			alpha.alpha = src->alpha;
 
-			if (ref->r < 0.0001)
-				alpha.r = src->r;
-			else if (src->r > ref->r)
-				alpha.r = (src->r - ref->r) / (1.0 - ref->r);
-			else if (src->r < ref->r)
-				alpha.r = (ref->r - src->r) / ref->r;
-			else alpha.r = 0.0;
+			if (ref->red < 0.0001)
+				alpha.red = src->red;
+			else if (src->red > ref->red)
+				alpha.red = (src->red - ref->red) / (1.0 - ref->red);
+			else if (src->red < ref->red)
+				alpha.red = (ref->red - src->red) / ref->red;
+			else alpha.red = 0.0;
 
-			if (ref->g < 0.0001)
-				alpha.g = src->g;
-			else if (src->g > ref->g)
-				alpha.g = (src->g - ref->g) / (1.0 - ref->g);
-			else if (src->g < ref->g)
-				alpha.g = (ref->g - src->g) / (ref->g);
-			else alpha.g = 0.0;
+			if (ref->green < 0.0001)
+				alpha.green = src->green;
+			else if (src->green > ref->green)
+				alpha.green = (src->green - ref->green) / (1.0 - ref->green);
+			else if (src->green < ref->green)
+				alpha.green = (ref->green - src->green) / (ref->green);
+			else alpha.green = 0.0;
 
-			if (ref->b < 0.0001)
-				alpha.b = src->b;
-			else if (src->b > ref->b)
-				alpha.b = (src->b - ref->b) / (1.0 - ref->b);
-			else if (src->b < ref->b)
-				alpha.b = (ref->b - src->b) / (ref->b);
-			else alpha.b = 0.0;
+			if (ref->blue < 0.0001)
+				alpha.blue = src->blue;
+			else if (src->blue > ref->blue)
+				alpha.blue = (src->blue - ref->blue) / (1.0 - ref->blue);
+			else if (src->blue < ref->blue)
+				alpha.blue = (ref->blue - src->blue) / (ref->blue);
+			else alpha.blue = 0.0;
 
-			if (alpha.r > alpha.g) {
-				if (alpha.r > alpha.b) {
-					src->a = alpha.r;
+			if (alpha.red > alpha.green) {
+				if (alpha.red > alpha.blue) {
+					src->alpha = alpha.red;
 				} else {
-					src->a = alpha.b;
+					src->alpha = alpha.blue;
 				}
-			} else if (alpha.g > alpha.b) {
-				src->a = alpha.g;
+			} else if (alpha.green > alpha.blue) {
+				src->alpha = alpha.green;
 			} else {
-				src->a = alpha.b;
+				src->alpha = alpha.blue;
 			}
 
-			if (src->a < 0.0001) {
+			if (src->alpha < 0.0001) {
 				return;
 			}
 
-			src->r = (src->r - ref->r) / src->a + ref->r;
-			src->g = (src->g - ref->g) / src->a + ref->g;
-			src->b = (src->b - ref->b) / src->a + ref->b;
+			src->red = (src->red - ref->red) / src->alpha + ref->red;
+			src->green = (src->green - ref->green) / src->alpha + ref->green;
+			src->blue = (src->blue - ref->blue) / src->alpha + ref->blue;
 
-			src->a *= alpha.a;
+			src->alpha *= alpha.alpha;
 		}
 
 	public:
@@ -99,9 +92,9 @@ class ColorAlphaTeste : public jgui::Window {
 			_fg = new jgui::BufferedImage("images/image.bmp");
 			_bg = new jgui::BufferedImage("images/tux-zombie.jpg");
 
-			_ref_color.r = 0x00;
-			_ref_color.g = 0x00;
-			_ref_color.b = 0x00;
+			_ref_color.red = 0x00;
+			_ref_color.green = 0x00;
+			_ref_color.blue = 0x00;
 		}
 
 		virtual ~ColorAlphaTeste()
@@ -120,13 +113,10 @@ class ColorAlphaTeste : public jgui::Window {
         elocation = event->GetLocation();
 			jgui::Graphics 
         *g = _fg->GetGraphics();
-			jgui::Color 
+			jgui::jcolor_t<float>
         color(g->GetRGB({elocation.x, elocation.y}));
 
-			_ref_color.a = 0xff/255.0;
-			_ref_color.r = color.GetRed()/255.0;
-			_ref_color.g = color.GetGreen()/255.0;
-			_ref_color.b = color.GetBlue()/255.0;
+      _ref_color = color;
 
 			Repaint();
 
@@ -149,25 +139,15 @@ class ColorAlphaTeste : public jgui::Window {
 			_fg->GetRGBArray(buffer, {0, 0, isize.width, isize.height});
 
 			for (int i=0; i<isize.width*isize.height; i++) {
-				color_t color;
 				int a = (buffer[i] >> 0x18) & 0xff;
 				int r = (buffer[i] >> 0x10) & 0xff;
 				int g = (buffer[i] >> 0x08) & 0xff;
 				int b = (buffer[i] >> 0x00) & 0xff;
-
-				color.a = a/255.0;
-				color.r = r/255.0;
-				color.g = g/255.0;
-				color.b = b/255.0;
+        jgui::jcolor_t<float> color(r, g, b, a);
 
 				Color2Alpha(&color, &_ref_color);
 
-				a = color.a * 255.0;
-				r = color.r * 255.0;
-				g = color.g * 255.0;
-				b = color.b * 255.0;
-
-				buffer[i] = (a << 0x18) | (r << 0x10) | (g << 0x08) | (b << 0x00);
+				buffer[i] = uint32_t(color);
 			}
 
 			g->DrawImage(_bg, {insets.left, insets.top, size.width-insets.left-insets.right, size.height-insets.top-insets.bottom});

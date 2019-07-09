@@ -138,7 +138,7 @@ class Primitives : public jgui::Window {
       delete path1;
       delete path;
 
-      jgui::Color pcolor(0xf0, 0xf0, 0xf0, 0x80),
+      jgui::jcolor_t<float> pcolor(0xf0, 0xf0, 0xf0, 0x80),
         ccolor(0x20, 0xf0, 0x20, 0x80),
         rcolor(0x00, 0x00, 0x00, 0x80);
       jgui::jpen_t pen = g->GetPen();
@@ -520,8 +520,8 @@ class Primitives : public jgui::Window {
 
       std::string text = "DrawString";
 
-      rcolor.SetAlpha(0x80);
-      pcolor.SetAlpha(0x80);
+      rcolor(3, 0x80);
+      pcolor(3, 0x80);
 
       g->SetColor(rcolor);
 
@@ -587,13 +587,13 @@ class Primitives : public jgui::Window {
     {
       jgui::Window::Paint(g);
 
-      jgui::Theme 
-        *theme = GetTheme();
-      jgui::Color 
-        fg = theme->GetIntegerParam("component.fg");
+      // jgui::Theme 
+        // *theme = GetTheme();
+      // jgui::jcolor_t<float>
+        // fg = theme->GetIntegerParam("component.fg");
 
       // draw lines
-      g->SetColor(jgui::Color::Green);
+      g->SetColor(jgui::jcolor_name_t::Green);
       g->MoveTo({0*(150+32)+32, 0*(150+32)+64});
       g->LineTo({0*(150+32)+32+150, 0*(150+32)+64+150});
       g->LineTo({0*(150+32)+32, 0*(150+32)+64+150});
@@ -605,14 +605,14 @@ class Primitives : public jgui::Window {
       g->Close();
       g->Stroke();
 
-      g->SetColor(jgui::Color::Gray);
+      g->SetColor(jgui::jcolor_name_t::Gray);
       g->MoveTo({2*(150+32)+32, 0*(150+32)+64});
       g->LineTo({2*(150+32)+32+150, 0*(150+32)+64+150});
       g->LineTo({2*(150+32)+32, 0*(150+32)+64+150});
       g->Close();
       g->Fill();
 
-      g->SetColor(jgui::Color::Gray);
+      g->SetColor(jgui::jcolor_name_t::Gray);
       g->MoveTo({3*(150+32)+32, 0*(150+32)+64});
       g->LineTo({3*(150+32)+32+150, 0*(150+32)+64+150});
       g->LineTo({3*(150+32)+32, 0*(150+32)+64+150});
@@ -624,11 +624,12 @@ class Primitives : public jgui::Window {
       pen.width = 16;
       g->SetPen(pen);
 
-      g->SetColor(jgui::Color::Green);
+      g->SetColor(jgui::jcolor_name_t::Green);
 
-      jgui::Color color = g->GetColor();
+      jgui::jcolor_t<float> color = g->GetColor();
 
-      color.SetAlpha(0x80);
+      color(3, 0x80);
+
       g->SetColor(color);
 
       g->MoveTo({3*(150+32)+32, 0*(150+32)+64});
@@ -638,10 +639,11 @@ class Primitives : public jgui::Window {
       g->Stroke();
 
       pen.width = 1;
+
       g->SetPen(pen);
 
       // draw arcs
-      g->SetColor(jgui::Color::Green);
+      g->SetColor(jgui::jcolor_name_t::Green);
       g->ArcTo({0*(150+32)+32+150/2, 1*(150+32)+64+150/2}, 150/2.0, M_PI/6.0, 3.0*M_PI/2.0);
       g->Stroke();
 
@@ -649,12 +651,12 @@ class Primitives : public jgui::Window {
       g->Close();
       g->Stroke();
 
-      g->SetColor(jgui::Color::Gray);
+      g->SetColor(jgui::jcolor_name_t::Gray);
       g->ArcTo({2*(150+32)+32+150/2, 1*(150+32)+64+150/2}, 150/2.0, M_PI/6.0, 3.0*M_PI/2.0);
       g->Close();
       g->Fill();
 
-      g->SetColor(jgui::Color::Gray);
+      g->SetColor(jgui::jcolor_name_t::Gray);
       g->ArcTo({3*(150+32)+32+150/2, 1*(150+32)+64+150/2}, 150/2.0, M_PI/6.0, 3.0*M_PI/2.0);
       g->Close();
       g->Fill();
@@ -664,11 +666,12 @@ class Primitives : public jgui::Window {
       pen.width = 16;
       g->SetPen(pen);
 
-      g->SetColor(jgui::Color::Green);
+      g->SetColor(jgui::jcolor_name_t::Green);
 
       color = g->GetColor();
 
-      color.SetAlpha(0x80);
+      color(3, 0x80);
+
       g->SetColor(color);
 
       g->ArcTo({3*(150+32)+32+150/2, 1*(150+32)+64+150/2}, 150/2.0, M_PI/6.0, 3.0*M_PI/2.0);
@@ -679,7 +682,7 @@ class Primitives : public jgui::Window {
       g->SetPen(pen);
 
       // draw curves
-      g->SetColor(jgui::Color::Green);
+      g->SetColor(jgui::jcolor_name_t::Green);
       g->CurveTo({0*(150+32)+32, 2*(150+32)+64}, {0*(150+32)+32+150, 2*(150+32)+64+0}, {0*(150+32)+32+150, 2*(150+32)+64+150});
       g->Stroke();
 
@@ -687,12 +690,12 @@ class Primitives : public jgui::Window {
       g->Close();
       g->Stroke();
 
-      g->SetColor(jgui::Color::Gray);
+      g->SetColor(jgui::jcolor_name_t::Gray);
       g->CurveTo({2*(150+32)+32, 2*(150+32)+64}, {2*(150+32)+32+150, 2*(150+32)+64+0}, {2*(150+32)+32+150, 2*(150+32)+64+150});
       g->Close();
       g->Fill();
 
-      g->SetColor(jgui::Color::Gray);
+      g->SetColor(jgui::jcolor_name_t::Gray);
       g->CurveTo({3*(150+32)+32, 2*(150+32)+64}, {3*(150+32)+32+150, 2*(150+32)+64+0}, {3*(150+32)+32+150, 2*(150+32)+64+150});
       g->Close();
       g->Fill();
@@ -702,11 +705,12 @@ class Primitives : public jgui::Window {
       pen.width = 16;
       g->SetPen(pen);
 
-      g->SetColor(jgui::Color::Green);
+      g->SetColor(jgui::jcolor_name_t::Green);
 
       color = g->GetColor();
 
-      color.SetAlpha(0x80);
+      color(3, 0x80);
+
       g->SetColor(color);
 
       g->CurveTo({3*(150+32)+32, 2*(150+32)+64}, {3*(150+32)+32+150, 2*(150+32)+64+0}, {3*(150+32)+32+150, 2*(150+32)+64+150});
@@ -724,7 +728,7 @@ class Primitives : public jgui::Window {
 
       std::string text = "Hello!";
 
-      g->SetColor(jgui::Color::Green);
+      g->SetColor(jgui::jcolor_name_t::Green);
       g->TextTo(text, {0*(150+32)+32, 3*(150+32)+64});
       g->Stroke();
 
@@ -732,12 +736,12 @@ class Primitives : public jgui::Window {
       g->Close();
       g->Stroke();
 
-      g->SetColor(jgui::Color::Gray);
+      g->SetColor(jgui::jcolor_name_t::Gray);
       g->TextTo(text, {2*(150+32)+32, 3*(150+32)+64});
       g->Close();
       g->Fill();
 
-      g->SetColor(jgui::Color::Gray);
+      g->SetColor(jgui::jcolor_name_t::Gray);
       g->TextTo(text, {3*(150+32)+32, 3*(150+32)+64});
       g->Close();
       g->Fill();
@@ -747,11 +751,12 @@ class Primitives : public jgui::Window {
       pen.width = 16;
       g->SetPen(pen);
 
-      g->SetColor(jgui::Color::Green);
+      g->SetColor(jgui::jcolor_name_t::Green);
 
       color = g->GetColor();
 
-      color.SetAlpha(0x80);
+      color(3, 0x80);
+
       g->SetColor(color);
 
       g->TextTo(text, {3*(150+32)+32, 3*(150+32)+64});
@@ -767,7 +772,7 @@ class Primitives : public jgui::Window {
       pen.width = 10;
       g->SetPen(pen);
 
-      g->SetColor(jgui::Color::Gray);
+      g->SetColor(jgui::jcolor_name_t::Gray);
       g->MoveTo({0*(150+32)+32, 3*(150+32)+72+96});
       g->LineTo({1*(150+32)+32, 4*(150+32)+72+32});
       g->LineTo({2*(150+32)+32, 4*(150+32)+72+32});
@@ -779,7 +784,7 @@ class Primitives : public jgui::Window {
       pen.width = 1;
       g->SetPen(pen);
 
-      g->SetColor(jgui::Color::Black);
+      g->SetColor(jgui::jcolor_name_t::Black);
       g->MoveTo({0*(150+32)+32, 3*(150+32)+72+96});
       g->LineTo({1*(150+32)+32, 4*(150+32)+72+32});
       g->LineTo({2*(150+32)+32, 4*(150+32)+72+32});

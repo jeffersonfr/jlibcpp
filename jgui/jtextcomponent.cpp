@@ -30,7 +30,7 @@ TextComponent::TextComponent(int x, int y, int width, int height):
 {
   jcommon::Object::SetClassName("jgui::TextComponent");
 
-  _caret_color = Color(0xff, 0x00, 0x00, 0xff);
+  _caret_color = jcolor_t<float>(0xff, 0x00, 0x00, 0xff);
 
   _halign = JHA_LEFT;
   _valign = JVA_CENTER;
@@ -49,17 +49,12 @@ TextComponent::~TextComponent()
 {
 }
 
-Color & TextComponent::GetCaretColor()
+jcolor_t<float> & TextComponent::GetCaretColor()
 {
   return _caret_color;
 }
 
-void TextComponent::SetCaretColor(int red, int green, int blue, int alpha)
-{
-  SetCaretColor(Color(red, green, blue, alpha));
-}
-
-void TextComponent::SetCaretColor(const Color &color)
+void TextComponent::SetCaretColor(const jcolor_t<float> &color)
 {
   _caret_color = color;
 

@@ -83,7 +83,7 @@ struct Shape {
 	std::vector<sNode> vecNodes;
 	uint32_t nMaxNodes = 0;
 
-  jgui::Color::jcolor_name_t col = jgui::Color::Green;
+  jgui::jcolor_t<float> col {jgui::jcolor_name_t::Green};
 
 	static float fWorldScale;
 	static jpoint3d_t<float> vWorldOffset;
@@ -128,7 +128,7 @@ struct Shape {
 		{
 			int sx, sy;
 			WorldToScreen(n.pos, sx, sy);
-      g->SetColor(jgui::Color::Red);
+      g->SetColor(jgui::jcolor_name_t::Red);
 			g->FillCircle({sx, sy}, 2);
 		}
 	}
@@ -354,7 +354,7 @@ class CAD : public jgui::Window {
         selectedNode = tempShape->GetNextNode(vCursor);
 
         if (selectedNode == nullptr) {
-          tempShape->col = jgui::Color::White;
+          tempShape->col = jgui::jcolor_name_t::White;
           listShapes.push_back(tempShape);
         }
       }
@@ -453,7 +453,7 @@ class CAD : public jgui::Window {
         }
       }
 
-      g->SetColor(jgui::Color::Gray);
+      g->SetColor(jgui::jcolor_name_t::Gray);
 
       WorldToScreen({ 0,vWorldTopLeft.y }, sx, sy);
       WorldToScreen({ 0,vWorldBottomRight.y }, ex, ey);
@@ -476,7 +476,7 @@ class CAD : public jgui::Window {
       }
 
       WorldToScreen(vCursor, sx, sy);
-      g->SetColor(jgui::Color::White);
+      g->SetColor(jgui::jcolor_name_t::White);
       g->DrawCircle({sx, sy}, 3);
 
       g->SetFont(GetTheme()->GetFont("window.font"));

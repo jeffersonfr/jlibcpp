@@ -1707,7 +1707,7 @@ class SortComponent : public jgui::Component, public jcommon::Observer {
 			jgui::Theme *theme = GetTheme();
 			jgui::Font *font = theme->GetFont("component.font");
 
-			g->SetColor(jgui::Color::White);
+			g->SetColor(jgui::jcolor_name_t::White);
 			g->SetFont(font);
 			g->DrawString(_algorithm->GetName(), {0, 0, size.width, size.height});
       

@@ -39,9 +39,9 @@ class Cell : public virtual jcommon::Object {
     /** \brief */
     Table *_table;
     /** \brief */
-    Color _cell_bgcolor;
+    jcolor_t<float> _cell_bgcolor;
     /** \brief */
-    Color _cell_fgcolor;
+    jcolor_t<float> _cell_fgcolor;
     /** \brief */
     std::string _value;
     /** \brief */
@@ -79,37 +79,25 @@ class Cell : public virtual jcommon::Object {
      * \brief
      *
      */
-    virtual Color & GetCellBackgroundColor();
+    virtual jcolor_t<float> & GetCellBackgroundColor();
 
     /**
      * \brief
      *
      */
-    virtual Color & GetCellForegroundColor();
+    virtual jcolor_t<float> & GetCellForegroundColor();
 
     /**
      * \brief
      *
      */
-    virtual void SetCellBackgroundColor(int red, int green, int blue, int alpha);
+    virtual void SetCellBackgroundColor(const jcolor_t<float> &color);
 
     /**
      * \brief
      *
      */
-    virtual void SetCellForegroundColor(int red, int green, int blue, int alpha);
-
-    /**
-     * \brief
-     *
-     */
-    virtual void SetCellBackgroundColor(const Color &color);
-
-    /**
-     * \brief
-     *
-     */
-    virtual void SetCellForegroundColor(const Color &color);
+    virtual void SetCellForegroundColor(const jcolor_t<float> &color);
 
     /**
      * \brief
@@ -147,17 +135,25 @@ class Table : public jgui::Component, public virtual jcommon::Object{
   friend class Cell;
 
   private:
-    std::vector<int> _row_size;
-    std::vector<int> _column_size;
-    std::vector<Cell *> _header;
-    std::vector<std::vector<Cell *> * > _cells;
-    Color _grid_color;
-    int _column,
-        _row;
-    int _columns,
-        _rows;
-    bool _header_visible,
-         _loop;
+    std::vector<int> 
+      _row_size;
+    std::vector<int> 
+      _column_size;
+    std::vector<Cell *> 
+      _header;
+    std::vector<std::vector<Cell *> *> 
+      _cells;
+    jcolor_t<float> 
+      _grid_color;
+    int 
+      _column,
+      _row;
+    int 
+      _columns,
+      _rows;
+    bool 
+      _header_visible,
+      _loop;
 
   public:
     /**
@@ -290,19 +286,13 @@ class Table : public jgui::Component, public virtual jcommon::Object{
      * \brief
      *
      */
-    virtual Color & GetGridColor();
+    virtual jcolor_t<float> & GetGridColor();
     
     /**
      * \brief
      *
      */
-    virtual void SetGridColor(int red, int green, int blue, int alpha);
-
-    /**
-     * \brief
-     *
-     */
-    virtual void SetGridColor(const Color &color);
+    virtual void SetGridColor(const jcolor_t<float> &color);
     
     /**
      * \brief

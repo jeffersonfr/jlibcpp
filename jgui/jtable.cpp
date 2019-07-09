@@ -76,38 +76,28 @@ std::string Cell::GetValue()
   return _value;
 }
 
-Color & Cell::GetCellBackgroundColor()
+jcolor_t<float> & Cell::GetCellBackgroundColor()
 {
   return _cell_bgcolor;
 }
 
-Color & Cell::GetCellForegroundColor()
+jcolor_t<float> & Cell::GetCellForegroundColor()
 {
   return _cell_fgcolor;
 }
 
-void Cell::SetCellBackgroundColor(const Color &color)
+void Cell::SetCellBackgroundColor(const jcolor_t<float> &color)
 {
   _cell_bgcolor = color;
   
   _table->Repaint();
 }
 
-void Cell::SetCellForegroundColor(const Color &color)
+void Cell::SetCellForegroundColor(const jcolor_t<float> &color)
 {
   _cell_fgcolor = color;
   
   _table->Repaint();
-}
-
-void Cell::SetCellBackgroundColor(int red, int green, int blue, int alpha)
-{
-  SetCellBackgroundColor(Color(red, green, blue, alpha));
-}
-
-void Cell::SetCellForegroundColor(int red, int green, int blue, int alpha)
-{
-  SetCellForegroundColor(Color(red, green, blue, alpha));
 }
 
 Table::Table(int x, int y, int width, int height):
@@ -386,21 +376,14 @@ void Table::SetCell(Cell *cell, int row, int column)
   Repaint();
 }
 
-Color & Table::GetGridColor()
+jcolor_t<float> & Table::GetGridColor()
 {
   return _grid_color;
 }
 
-void Table::SetGridColor(const Color &color)
+void Table::SetGridColor(const jcolor_t<float> &color)
 {
   _grid_color = color;
-}
-
-void Table::SetGridColor(int red, int green, int blue, int alpha)
-{
-  _grid_color = Color(red, green, blue, alpha);
-
-  Repaint();
 }
 
 void Table::SetColumnSize(int index, int size)
