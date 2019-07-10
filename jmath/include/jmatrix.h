@@ -401,7 +401,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
 
     bool IsSingular() const
     {
-      return Determinant() == 0.0f;
+      return Determinant() == 0.0;
     }
 
     bool IsDiagonal() const
@@ -465,11 +465,11 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
     double LUDecomposition(double m[R][C]) const
     {
 			if (R < 1 or C < 1) {
-				return 0.0f;
+				return 0.0;
 			}
 
       double 
-				det = 1.0f;
+				det = 1.0;
       int 
 				ri[R];
 
@@ -490,7 +490,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
         }
 
         if (m[ri[p - 1]][p - 1] == 0) {
-          return 0.0f;
+          return 0.0;
         }
 
         det = det*m[ri[p - 1]][p - 1];
@@ -566,7 +566,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
     {
       double d = Determinant();
 
-      if (d == 0.0f) {
+      if (d == 0.0) {
         throw jexception::RuntimeException("Matrix in not inversible");
       }
 
@@ -658,7 +658,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
 
     T Norm() const
     {
-      T norm = 0.0f;
+      T norm {0};
 
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C; i++) {

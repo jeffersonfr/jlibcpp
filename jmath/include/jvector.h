@@ -462,7 +462,7 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
 
     T Norm() const
     {
-      T norm = 0.0f;
+      T norm {0};
 
       for (size_t i=0; i<N; i++) {
         norm = norm + data[i]*data[i];

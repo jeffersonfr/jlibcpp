@@ -27,7 +27,7 @@
 
 #include <stdint.h>
 
-#define CLIP_COLOR(c) (((c) < 0.0f)?0.0f:((c) > 1.0f)?1.0f:(c))
+#define CLIP_COLOR(c) (((c) < T(0.0))?T(0.0):((c) > T(1.0))?T(1.0):(c))
 
 namespace jgui {
 
@@ -513,10 +513,10 @@ struct jcolor_t {
       b = (c >> 0x00) & 0xff,
       a = (c >> 0x18) & 0xff;
 
-    red = r/255.0f;
-    green = g/255.0f;
-    blue = b/255.0f;
-    alpha = a/255.0f;
+    red = r/T(255.0);
+    green = g/T(255.0);
+    blue = b/T(255.0);
+    alpha = a/T(255.0);
   }
 
   jcolor_t(jcolor_name_t color):
@@ -532,10 +532,10 @@ struct jcolor_t {
             b = (color >> 0x00) & 0xff,
             a = (color >> 0x18) & 0xff;
 
-        red = r/255.0f;
-        green = g/255.0f;
-        blue = b/255.0f;
-        alpha = a/255.0f;
+        red = r/T(255.0);
+        green = g/T(255.0);
+        blue = b/T(255.0);
+        alpha = a/T(255.0);
       }
 
   jcolor_t(T r, T g, T b, T a)
@@ -548,10 +548,10 @@ struct jcolor_t {
 
   template<typename U> jcolor_t(U r, U g, U b, U a = 255)
   {
-    red = r/255.0f;
-    green = g/255.0f;
-    blue = b/255.0f;
-    alpha = a/255.0f;
+    red = r/T(255.0);
+    green = g/T(255.0);
+    blue = b/T(255.0);
+    alpha = a/T(255.0);
   }
 
   template<typename U> operator jcolor_t<U>()
@@ -569,10 +569,10 @@ struct jcolor_t {
     jcolor_t<T> 
       clip = Clip();
     int
-      r = (int)(clip.red*255.0f),
-      g = (int)(clip.green*255.0f),
-      b = (int)(clip.blue*255.0f),
-      a = (int)(clip.alpha*255.0f);
+      r = (int)(clip.red*T(255.0)),
+      g = (int)(clip.green*T(255.0)),
+      b = (int)(clip.blue*T(255.0)),
+      a = (int)(clip.alpha*T(255.0));
 
     return (uint32_t)(a << 0x18 | r << 0x10 | g << 0x08 | b);
   }
@@ -584,12 +584,12 @@ struct jcolor_t {
     }
 
     switch (n) {
-      case 0: return (uint8_t)(blue*255.0f);
-      case 1: return (uint8_t)(green*255.0f);
-      case 2: return (uint8_t)(red*255.0f);
+      case 0: return (uint8_t)(blue*T(255.0));
+      case 1: return (uint8_t)(green*T(255.0));
+      case 2: return (uint8_t)(red*T(255.0));
     }
 
-    return (uint8_t)(alpha*255.0f);
+    return (uint8_t)(alpha*T(255.0));
   }
 
   template<typename U, typename = typename std::enable_if<std::is_integral<U>::value, U>::type> jcolor_t & operator()(size_t n, U value)
@@ -598,7 +598,7 @@ struct jcolor_t {
       throw jexception::OutOfBoundsException("Element index is out of bounds");
     }
 
-    T k = value/255.0f;
+    T k = value/T(255.0);
 
     switch (n) {
       case 0: blue = k; break;
@@ -756,10 +756,10 @@ struct jcolor_t {
   jcolor_t<T> Clip()
   {
     T
-      r = (red < 0.0)?0.0f:(red > 1.0f)?1.0f:red,
-      g = (green < 0.0f)?0.0f:(green > 1.0f)?1.0f:green,
-      b = (blue < 0.0f)?0.0f:(blue > 1.0f)?1.0f:blue,
-      a = (alpha < 0.0f)?0.0f:(alpha > 1.0f)?1.0f:alpha;
+      r = (red < T(0.0))?T(0.0):(red > T(1.0))?T(1.0):red,
+      g = (green < T(0.0))?T(0.0):(green > T(1.0))?T(1.0):green,
+      b = (blue < T(0.0))?T(0.0):(blue > T(1.0))?T(1.0):blue,
+      a = (alpha < T(0.0))?T(0.0):(alpha > T(1.0))?T(1.0):alpha;
 
     return {r, g, b, a};
   }
@@ -767,8 +767,8 @@ struct jcolor_t {
   jcolor_t<T> Normalize()
   {
     float
-      min = std::min(std::min(std::min(std::min(0.0f, red), green), blue), alpha),
-      max = std::max(std::max(std::max(std::max(1.0f, red), green), blue), alpha);
+      min = std::min(std::min(std::min(std::min(T(0.0), red), green), blue), alpha),
+      max = std::max(std::max(std::max(std::max(T(1.0), red), green), blue), alpha);
 
     return {
       (red - min)/(max - min),
@@ -791,7 +791,7 @@ struct jcolor_t {
    * default RGB model. 
    * <p>
    * The <code>saturation</code> and <code>brightness</code> components should be doubleing-point values between zero 
-   * and one (numbers in the range 0.0-1.0).  The <code>hue</code> component can be any doubleing-point number.  The floor 
+   * and one (numbers in the range T(0.0)-T(1.0)).  The <code>hue</code> component can be any doubleing-point number.  The floor 
    * of this number is subtracted from it to create a fraction between 0 and 1.  This fractional number is then multiplied 
    * by 360 to produce the hue angle in the HSB color model.
    * <p>
@@ -807,14 +807,14 @@ struct jcolor_t {
    */
   void FromHSB(T hue, T saturation, T brightness)
   {
-    if (saturation == 0.0) {
+    if (saturation == T(0.0)) {
       red = green = blue = brightness;
     } else {
       double h = (hue - std::floor(hue)) * 6.0;
       double f = h - std::floor(h);
-      double p = brightness * (1.0f - saturation);
-      double q = brightness * (1.0f - saturation * f);
-      double t = brightness * (1.0f - (saturation * (1.0f - f)));
+      double p = brightness * (T(1.0) - saturation);
+      double q = brightness * (T(1.0) - saturation * f);
+      double t = brightness * (T(1.0) - (saturation * (T(1.0) - f)));
 
       switch ((int)(h)) {
         case 0:
@@ -877,7 +877,7 @@ struct jcolor_t {
 
     brightness = cmax;
 
-    if (cmax != 0.0f) {
+    if (cmax != T(0.0)) {
       saturation = (cmax - cmin)/cmax;
 
       float
@@ -888,19 +888,19 @@ struct jcolor_t {
       if (red == cmax) {
         hue = bc - gc;
       } else if (green == cmax) {
-        hue = 2.0f + rc - bc;
+        hue = 2.0 + rc - bc;
       } else {
-        hue = 4.0f + gc - rc;
+        hue = 4.0 + gc - rc;
       }
 
-      hue = hue/6.0f;
+      hue = hue/6.0;
 
-      if (hue < 0.0f) {
-        hue = hue + 1.0f;
+      if (hue < T(0.0)) {
+        hue = hue + T(1.0);
       }
     } else {
-      saturation = 0.0f;
-      hue = 0.0f;
+      saturation = T(0.0);
+      hue = T(0.0);
     }
 
     hue = CLIP_COLOR(hue);
