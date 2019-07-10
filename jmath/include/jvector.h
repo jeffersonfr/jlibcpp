@@ -44,7 +44,7 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
   struct jvector_t {
     T data[N];
 
-    template<typename U> operator jvector_t<N, U>()
+    template<typename U> operator jvector_t<N, U>() const
     {
       jvector_t<N, U> v;
 
@@ -73,7 +73,7 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
       return data[n];
     }
 
-    bool operator==(const T &param)
+    bool operator==(const T &param) const
     {
       for (size_t i=0; i<N; i++) {
         if (data[i] != param) {
@@ -84,7 +84,7 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
       return true;
     }
 
-    bool operator!=(const T &param)
+    bool operator!=(const T &param) const
     {
       for (size_t i=0; i<N; i++) {
         if (data[i] != param) {
@@ -95,7 +95,7 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
       return false;
     }
 
-    bool operator==(const jvector_t<N, T> &param)
+    bool operator==(const jvector_t<N, T> &param) const
     {
       for (size_t i=0; i<N; i++) {
         if (data[i] != param.data[i]) {
@@ -106,7 +106,7 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
       return true;
     }
 
-    bool operator!=(const jvector_t<N, T> &param)
+    bool operator!=(const jvector_t<N, T> &param) const
     {
       for (size_t i=0; i<N; i++) {
         if (data[i] != param.data[i]) {
@@ -117,13 +117,15 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
       return false;
     }
 
-    jvector_t<N, T> & operator-()
+    jvector_t<N, T> operator-() const
     {
+      jvector_t<N, T> v;
+
       for (size_t i=0; i<N; i++) {
-        data[i] = -data[i];
+        v.data[i] = -data[i];
       }
 
-      return *this;
+      return v;
     }
  
     template<typename U> jvector_t<N, T> & operator=(const U &param)
@@ -135,7 +137,7 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
       return *this;
     }
 
-    template<typename U> jvector_t<N, T> operator+(const U &param)
+    template<typename U> jvector_t<N, T> operator+(const U &param) const
     {
       jvector_t<N, U> v;
 
@@ -146,7 +148,7 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
       return v;
     }
     
-    template<typename U> jvector_t<N, T> operator-(const U &param)
+    template<typename U> jvector_t<N, T> operator-(const U &param) const
     {
       jvector_t<N, U> v;
 
@@ -157,7 +159,7 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
       return v;
     }
     
-    template<typename U> jvector_t<N, T> operator*(const U &param)
+    template<typename U> jvector_t<N, T> operator*(const U &param) const
     {
       jvector_t<N, U> v;
 
@@ -168,7 +170,7 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
       return v;
     }
     
-    template<typename U> jvector_t<N, T> operator/(const U &param)
+    template<typename U> jvector_t<N, T> operator/(const U &param) const
     {
       jvector_t<N, U> v;
 
@@ -188,7 +190,7 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
       return *this;
     }
 
-    template<typename U> jvector_t<N, T> operator+(const jvector_t<N, U> &param)
+    template<typename U> jvector_t<N, T> operator+(const jvector_t<N, U> &param) const
     {
       jvector_t<N, U> v;
 
@@ -199,7 +201,7 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
       return v;
     }
     
-    template<typename U> jvector_t<N, T> operator-(const jvector_t<N, U> &param)
+    template<typename U> jvector_t<N, T> operator-(const jvector_t<N, U> &param) const
     {
       jvector_t<N, U> v;
 
@@ -210,7 +212,7 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
       return v;
     }
     
-    template<typename U> jvector_t<N, T> operator*(const jvector_t<N, U> &param)
+    template<typename U> jvector_t<N, T> operator*(const jvector_t<N, U> &param) const
     {
       jvector_t<N, U> v;
 
@@ -221,7 +223,7 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
       return v;
     }
     
-    template<typename U> jvector_t<N, T> operator/(const jvector_t<N, U> &param)
+    template<typename U> jvector_t<N, T> operator/(const jvector_t<N, U> &param) const
     {
       jvector_t<N, U> v;
 
@@ -252,7 +254,7 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
       return (*this = *this/param);
     }
     
-    template<typename U> T Scalar(const jvector_t<N, U> &param)
+    template<typename U> T Scalar(const jvector_t<N, U> &param) const
     {
       T n = 0;
 
@@ -263,7 +265,7 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
       return n;
     }
     
-    template<size_t M> jvector_t<M, T> SubVector(size_t n, size_t m)
+    template<size_t M> jvector_t<M, T> SubVector(size_t n, size_t m) const
     {
       if (n >= N or m > N) {
         throw jexception::OutOfBoundsException("Sub vector indexes are out of bounds");
@@ -402,12 +404,12 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
       return *this;
     }
 
-    size_t Size()
+    size_t Size() const
     {
       return N;
     }
 
-    T Sum()
+    T Sum() const
     {
       T sum = 0;
 
@@ -418,7 +420,7 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
       return sum;
     }
 
-    T Mul()
+    T Mul() const
     {
       T mul = 1;
 
@@ -429,7 +431,7 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
       return mul;
     }
 
-    T Mul(jvector_t<N, T> &param)
+    T Mul(jvector_t<N, T> &param) const
     {
       jvector_t<N, T> v;
 
@@ -440,7 +442,7 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
       return v;
     }
 
-    T Div(jvector_t<N, T> &param)
+    T Div(jvector_t<N, T> &param) const
     {
       jvector_t<N, T> v;
 
@@ -451,12 +453,14 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
       return v;
     }
 
-    T Norm1()
+    T Norm1() const
     {
-      return Abs().Sum();
+      jvector_t<N, T> v = *this;
+
+      return v.Abs().Sum();
     }
 
-    T Norm()
+    T Norm() const
     {
       T norm = 0.0f;
 
@@ -467,22 +471,24 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
       return norm;
     }
 
-    double EuclidianNorm()
+    double EuclidianNorm() const
     {
       return std::sqrt(Norm());
     }
 
     T NormInf()
     {
-      return Abs().Min();
+      jvector_t<N, T> v = *this;
+
+      return v.Abs().Min();
     }
 
-    jvector_t<N, double> Normalize()
+    jvector_t<N, double> Normalize() const
     {
       return jvector_t<N, double>(*this)/EuclidianNorm();
     }
  
-    std::optional<T &> Find(const T &param)
+    std::optional<T &> Find(const T &param) const
     {
       for (size_t i=0; i<N; i++) {
         if (data[i] == param) {
@@ -495,12 +501,12 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
       return *std::min_element(data, data + N);
     }
 
-    T Min()
+    T Min() const
     {
       return *std::min_element(data, data + N);
     }
 
-    T Max()
+    T Max() const
     {
       return *std::max_element(data, data + N);
     }

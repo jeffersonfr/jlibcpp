@@ -27,42 +27,42 @@ namespace jmath {
 
 static const int kWorkMax = 100;
 
-template<class T> int Math<T>::IsNaN(double x)
+template<typename T> int Math<T>::IsNaN(double x)
 {
 	return std::isnan(x); 
 }
 
-template<class T> double Math<T>::Sin(double x)
+template<typename T> double Math<T>::Sin(double x)
 {
 	return std::sin(x);
 }
 
-template<class T> double Math<T>::Cos(double x)
+template<typename T> double Math<T>::Cos(double x)
 {
 	return std::cos(x);
 }
 
-template<class T> double Math<T>::Tan(double x)
+template<typename T> double Math<T>::Tan(double x)
 {
 	return std::tan(x);
 }
 
-template<class T> double Math<T>::SinH(double x)
+template<typename T> double Math<T>::SinH(double x)
 {
 	return std::sinh(x); 
 }
 
-template<class T> double Math<T>::CosH(double x)
+template<typename T> double Math<T>::CosH(double x)
 {
 	return cosh(x); 
 }
 
-template<class T> double Math<T>::TanH(double x)
+template<typename T> double Math<T>::TanH(double x)
 {
 	return std::tanh(x); 
 }
 
-template<class T> double Math<T>::ASin(double x)
+template<typename T> double Math<T>::ASin(double x)
 {
 	if (x < -1)  {
 		return -Math<T>::PI/2.0;
@@ -75,7 +75,7 @@ template<class T> double Math<T>::ASin(double x)
 	return std::asin(x);
 }
 
-template<class T> double Math<T>::ACos(double x)
+template<typename T> double Math<T>::ACos(double x)
 {
 	if (x < -1.0) {
 		return Math<T>::PI;
@@ -88,12 +88,12 @@ template<class T> double Math<T>::ACos(double x)
 	return std::acos(x);
 }
 
-template<class T> double Math<T>::ATan(double x)
+template<typename T> double Math<T>::ATan(double x)
 {
 	return std::atan(x); 
 }
 
-template<class T> double Math<T>::ATan2(double x, double y)
+template<typename T> double Math<T>::ATan2(double x, double y)
 {
 	if (x != 0) {
 		return atan2(y, x);
@@ -110,107 +110,107 @@ template<class T> double Math<T>::ATan2(double x, double y)
   return -PI/2.0;
 }
 
-template<class T> int Math<T>::Finite(double x)
+template<typename T> int Math<T>::Finite(double x)
 {
 	return finite(x); 
 }
 
-template<class T> T Math<T>::NormCross(const T v1[3], const T v2[3], T out[3])
+template<typename T> T Math<T>::NormCross(const T v1[3], const T v2[3], T out[3])
 {
 	return Normalize(Cross(v1, v2, out));
 }
 
-template<class T>int64_t Math<T>::Hypot(int64_t x, int64_t y)
+template<typename T> int64_t Math<T>::Hypot(int64_t x, int64_t y)
 {
 	return (int64_t)(std::hypot((double)x, (double)y) + 0.5);
 }
 
-template<class T>T Math<T>::Abs(T d)
+template<typename T> T Math<T>::Abs(T d)
 {
 	return (d >= 0)?d:-d; 
 }
 
-template<class T>T Math<T>::Sign(T a, T b)
+template<typename T> T Math<T>::Sign(T a, T b)
 {
 	return (b >= 0)?Abs(a):-Abs(a); 
 }
 
-template<class T>bool Math<T>::Even(int64_t a)
+template<typename T> bool Math<T>::Even(int64_t a)
 {
 	return !(a & 1); 
 }
 
-template<class T>bool Math<T>::Odd(int64_t a)
+template<typename T> bool Math<T>::Odd(int64_t a)
 {
 	return (a & 1); 
 }
 
-template<class T>T Math<T>::Min(T a, T b)
+template<typename T> T Math<T>::Min(T a, T b)
 {
 	return (a <= b)?a:b; 
 }
 
-template<class T> T Math<T>::Max(T a, T b)
+template<typename T> T Math<T>::Max(T a, T b)
 {
 	return (a >= b)?a:b; 
 }
 
-template<class T>double Math<T>::ASinH(double x)
+template<typename T> double Math<T>::ASinH(double x)
 {
 	return std::asinh(x);
 }
 
-template<class T>double Math<T>::ACosH(double x)
+template<typename T> double Math<T>::ACosH(double x)
 {
 	return std::acosh(x);
 }
 
-template<class T>double Math<T>::ATanH(double x)
+template<typename T> double Math<T>::ATanH(double x)
 {
 	return std::atanh(x);
 }
 
-template<class T> double Math<T>::Hypot(double x, double y)
+template<typename T> double Math<T>::Hypot(double x, double y)
 {
 	return std::hypot(x, y);
 }
 
-template<class T> double Sqrt(double x)
+template<typename T> double Sqrt(double x)
 {
 	return std::sqrt(x);
 }
 
-template<class T> double Ceil(double x)
+template<typename T> double Ceil(double x)
 {
 	return std::ceil(x); 
 }
 
-template<class T> int CeilNint(double x)
+template<typename T> int CeilNint(double x)
 {
 	return Math<T>::Nint(ceil(x)); 
 }
 
-template<class T> double Floor(double x)
+template<typename T> double Floor(double x)
 {
 	return std::floor(x);
 }
 
-template<class T> int FloorNint(double x)
+template<typename T> int FloorNint(double x)
 {
 	return Math<T>::Nint(floor(x)); 
 }
 
-template<class T> double Exp(double x)
+template<typename T> double Exp(double x)
 {
 	return std::exp(x);
 }
 
-template<class T> double Ldexp(double x, int exp)
+template<typename T> double Ldexp(double x, int exp)
 {
 	return std::ldexp(x, exp); 
 }
 
-template<class T>int64_t Math<T>::NextPrime(int64_t x)
+template<typename T> int64_t Math<T>::NextPrime(int64_t x)
 {
 	if (x <= 2) {
 		return 2;
@@ -240,7 +240,7 @@ template<class T>int64_t Math<T>::NextPrime(int64_t x)
 	}
 }
 
-template<class T>int Math<T>::Nint(T x)
+template<typename T> int Math<T>::Nint(T x)
 {
 	int i;
 
@@ -261,7 +261,7 @@ template<class T>int Math<T>::Nint(T x)
 	return i;
 }
 
-template<class T>T *Math<T>::Cross(const T v1[3], const T v2[3], T out[3])
+template<typename T> T *Math<T>::Cross(const T v1[3], const T v2[3], T out[3])
 {
 	out[0] = v1[1] * v2[2] - v1[2] * v2[1];
 	out[1] = v1[2] * v2[0] - v1[0] * v2[2];
@@ -270,7 +270,7 @@ template<class T>T *Math<T>::Cross(const T v1[3], const T v2[3], T out[3])
 	return out;
 }
 
-template<class T>double Math<T>::DiLog(double x)
+template<typename T> double Math<T>::DiLog(double x)
 {
 	const double hf = 0.5;
 	const double pi = Math<T>::PI;
@@ -343,12 +343,12 @@ template<class T>double Math<T>::DiLog(double x)
 	return h;
 }
 
-template<class T>double Math<T>::Erf(double x)
+template<typename T> double Math<T>::Erf(double x)
 {
 	return (1 - Erfc(x));
 }
 
-template<class T>double Math<T>::Erfc(double x)
+template<typename T> double Math<T>::Erfc(double x)
 {
 	const double 
     a1 = -1.26551223, 
@@ -381,12 +381,12 @@ template<class T>double Math<T>::Erfc(double x)
 	return v;
 }
 
-template<class T> double Math<T>::ErfcInverse(double x)
+template<typename T> double Math<T>::ErfcInverse(double x)
 {
 	return ErfInverse(1.0 - x);
 }
 
-template<class T>double Math<T>::ErfInverse(double x)
+template<typename T> double Math<T>::ErfInverse(double x)
 {
 	// x must be < -1 < x < 1
 
@@ -438,7 +438,7 @@ template<class T>double Math<T>::ErfInverse(double x)
 	return 0; // did not converge
 }
 
-template<class T> double Math<T>::Factorial(int n)
+template<typename T> double Math<T>::Factorial(int n)
 {
 	// Compute factorial(n).
 	if (n <= 0) {
@@ -456,27 +456,27 @@ template<class T> double Math<T>::Factorial(int n)
 	return x;
 }
 
-template<class T> double Math<T>::Power(double x, double y)
+template<typename T> double Math<T>::Power(double x, double y)
 {
 	return std::pow(x, y); 
 }
 
-template<class T>double Math<T>::Log(double x)
+template<typename T> double Math<T>::Log(double x)
 {
 	return std::log(x);
 }
 
-template<class T>double Math<T>::Log2(double x)
+template<typename T> double Math<T>::Log2(double x)
 {
 	return std::log2(x);
 }
 
-template<class T>double Math<T>::Log10(double x)
+template<typename T> double Math<T>::Log10(double x)
 {
 	return std::log10(x); 
 }
 
-template<class T>double Math<T>::Freq(double x)
+template<typename T> double Math<T>::Freq(double x)
 {
 	// Freq(x) = (1/sqrt(2pi)) Integral(exp(-t^2/2))dt between -infinity and x.
 
@@ -579,7 +579,7 @@ template<class T>double Math<T>::Freq(double x)
   }
 }
 
-template<class T>double Math<T>::Gamma(double z)
+template<typename T> double Math<T>::Gamma(double z)
 {
 	if (z <= 0) {
     return 0;
@@ -590,7 +590,7 @@ template<class T>double Math<T>::Gamma(double z)
 	return Exp(v);
 }
 
-template<class T>double Math<T>::Gamma(double a,double x)
+template<typename T> double Math<T>::Gamma(double a,double x)
 {
 	if (a <= 0 || x <= 0) {
     return 0;
@@ -603,7 +603,7 @@ template<class T>double Math<T>::Gamma(double a,double x)
   }
 }
 
-template<class T>double Math<T>::GamCf(double a,double x)
+template<typename T> double Math<T>::GamCf(double a,double x)
 {
 	// Computation of the incomplete gamma function P(a,x)
 	// via its continued fraction representation.
@@ -658,7 +658,7 @@ template<class T>double Math<T>::GamCf(double a,double x)
 	return (1 - v);
 }
 
-template<class T>double Math<T>::GamSer(double a,double x)
+template<typename T> double Math<T>::GamSer(double a,double x)
 {
 	// Computation of the incomplete gamma function P(a,x)
 	// via its series representation.
@@ -694,7 +694,7 @@ template<class T>double Math<T>::GamSer(double a,double x)
 	return v;
 }
 
-template<class T>double Math<T>::BreitWigner(double x, double mean, double gamma)
+template<typename T> double Math<T>::BreitWigner(double x, double mean, double gamma)
 {
 	// Calculate a Breit Wigner function with mean and gamma.
 	double bw = gamma/((x - mean)*(x - mean) + gamma*gamma/4);
@@ -702,7 +702,7 @@ template<class T>double Math<T>::BreitWigner(double x, double mean, double gamma
 	return bw/(2.0*PI);
 }
 
-template<class T>double Math<T>::Gaussian(double x, double mean, double sigma, bool norm)
+template<typename T> double Math<T>::Gaussian(double x, double mean, double sigma, bool norm)
 {
 	// Calculate a gaussian function with mean and sigma.
 	// If norm=true (default is false) the result is divided
@@ -722,7 +722,7 @@ template<class T>double Math<T>::Gaussian(double x, double mean, double sigma, b
 	return res/(2.50662827463100024*sigma); // sqrt(2*Pi)=2.50662827463100024
 }
 
-template<class T>double Math<T>::Landau(double x, double mpv, double sigma, bool norm)
+template<typename T> double Math<T>::Landau(double x, double mpv, double sigma, bool norm)
 {
 	double p1[5] = {
     0.4259894875,
@@ -863,7 +863,7 @@ template<class T>double Math<T>::Landau(double x, double mpv, double sigma, bool
 	return den/sigma;
 }
 
-template<class T>float Math<T>::Normalize(float v[3])
+template<typename T> float Math<T>::Normalize(float v[3])
 {
 	// Normalize a vector v in place.
 	// Returns the norm of the original vector.
@@ -879,7 +879,7 @@ template<class T>float Math<T>::Normalize(float v[3])
 	return d;
 }
 
-template<class T>double Math<T>::Normalize(double v[3])
+template<typename T> double Math<T>::Normalize(double v[3])
 {
 	// Normalize a vector v in place.
 	// Returns the norm of the original vector.
@@ -929,7 +929,7 @@ template<class T>double Math<T>::Normalize(double v[3])
 	return d;
 }
 
-template<class T>T *Math<T>::Normal2Plane(const T p1[3],const T p2[3],const T p3[3], T normal[3])
+template<typename T> T *Math<T>::Normal2Plane(const T p1[3],const T p2[3],const T p3[3], T normal[3])
 {
 	// Calculate a normal vector of a plane.
 	//
@@ -954,7 +954,7 @@ template<class T>T *Math<T>::Normal2Plane(const T p1[3],const T p2[3],const T p3
 	return normal;
 }
 
-template<class T>double Math<T>::Poisson(double x, double par)
+template<typename T> double Math<T>::Poisson(double x, double par)
 {
 	if (x<0) {
 		return 0;
@@ -973,7 +973,7 @@ template<class T>double Math<T>::Poisson(double x, double par)
 	//   }
 }
 
-template<class T>double Math<T>::PoissonI(double x, double par)
+template<typename T> double Math<T>::PoissonI(double x, double par)
 {
 	// compute the Poisson distribution function for (x,par)
 	// This is a non-smooth function
@@ -999,7 +999,7 @@ template<class T>double Math<T>::PoissonI(double x, double par)
 	return gam/Math<T>::Exp(par);
 }
 
-template<class T>double Math<T>::Prob(double chi2, int ndf)
+template<typename T> double Math<T>::Prob(double chi2, int ndf)
 {
 	if (ndf <= 0) {
     return 0; // Set CL to zero in case ndf<=0
@@ -1032,7 +1032,7 @@ template<class T>double Math<T>::Prob(double chi2, int ndf)
 	return (1 - Gamma(0.5*ndf, 0.5*chi2));
 }
 
-template<class T>double Math<T>::KolmogorovProb(double z)
+template<typename T> double Math<T>::KolmogorovProb(double z)
 {
 	// Calculates the Kolmogorov distribution function,
 	// which gives the probability that Kolmogorov's test statistic will exceed
@@ -1097,7 +1097,7 @@ template<class T>double Math<T>::KolmogorovProb(double z)
 	return p;
 }
 
-template<class T>double Math<T>::Voigt(double xx, double sigma, double lg, int r)
+template<typename T> double Math<T>::Voigt(double xx, double sigma, double lg, int r)
 {
 	if ((sigma < 0 || lg < 0) || (sigma == 0 && lg == 0)) {
 		return 0;  // Not meant to be for those who want to be thinner than 0
@@ -1280,7 +1280,7 @@ template<class T>double Math<T>::Voigt(double xx, double sigma, double lg, int r
 	return k/2.506628/sigma; // Normalize by dividing by sqrt(2*pi)*sigma.
 }
 
-template<class T>bool Math<T>::RootsCubic(const double coef[4],double &a, double &b, double &c)
+template<typename T> bool Math<T>::RootsCubic(const double coef[4],double &a, double &b, double &c)
 {
 	// Calculates roots of polynomial of 3rd order a*x^3 + b*x^2 + c*x + d, where
 	// a == coef[3], b == coef[2], c == coef[1], d == coef[0]
@@ -1357,21 +1357,21 @@ template<class T>bool Math<T>::RootsCubic(const double coef[4],double &a, double
 	return complex;
 }
 
-template<class T>T Math<T>::MinElement(int64_t n, const T *a)
+template<typename T> T Math<T>::MinElement(int64_t n, const T *a)
 {
 	// Return minimum of array a of length n.
 
 	return *min_element(a,a+n);
 }
 
-template<class T>T Math<T>::MaxElement(int64_t n, const T *a)
+template<typename T> T Math<T>::MaxElement(int64_t n, const T *a)
 {
 	// Return maximum of array a of length n.
 
 	return *max_element(a,a+n);
 }
 
-template<class T>int64_t Math<T>::LocMin(int64_t n, const T *a)
+template<typename T> int64_t Math<T>::LocMin(int64_t n, const T *a)
 {
 	// Return index of array with the minimum element.
 	// If more than one element is minimum returns first found.
@@ -1393,7 +1393,7 @@ template<class T>int64_t Math<T>::LocMin(int64_t n, const T *a)
 	return loc;
 }
 
-template<class T>int64_t Math<T>::LocMax(int64_t n, const T *a)
+template<typename T> int64_t Math<T>::LocMax(int64_t n, const T *a)
 {
 	// Return index of array with the maximum element.
 	// If more than one element is maximum returns first found.
@@ -1415,7 +1415,7 @@ template<class T>int64_t Math<T>::LocMax(int64_t n, const T *a)
   return loc;
 }
 
-template<class T>double Math<T>::Mean(int64_t n, const T *a, const double *w)
+template<typename T> double Math<T>::Mean(int64_t n, const T *a, const double *w)
 {
 	// Return the weighted mean of an array a with length n.
 
@@ -1450,7 +1450,7 @@ template<class T>double Math<T>::Mean(int64_t n, const T *a, const double *w)
 	return sum/sumw;
 }
 
-template<class T>double Math<T>::GeometricMean(int64_t n, const T *a)
+template<typename T> double Math<T>::GeometricMean(int64_t n, const T *a)
 {
 	// Return the geometric mean of an array a with length n.
 	// geometric_mean = (Prod_i=0,n-1 |a[i]|)^1/n
@@ -1474,7 +1474,7 @@ template<class T>double Math<T>::GeometricMean(int64_t n, const T *a)
 	return Math<T>::Exp(logsum/n);
 }
 
-template<class T>double Math<T>::Median(int64_t n, const T *a, const double *w, int64_t *work)
+template<typename T> double Math<T>::Median(int64_t n, const T *a, const double *w, int64_t *work)
 {
 	// Return the median of the array a where each entry i has weight w[i] .
 	// Both arrays have a length of at least n . The median is a number obtained
@@ -1569,7 +1569,7 @@ template<class T>double Math<T>::Median(int64_t n, const T *a, const double *w, 
 	return median;
 }
 
-template<class T>T Math<T>::KOrdStat(int64_t n, const T *a, int64_t k, int64_t *work)
+template<typename T> T Math<T>::KOrdStat(int64_t n, const T *a, int64_t k, int64_t *work)
 {
 	// Returns k_th order statistic of the array a of size n
 	// (k_th smallest element out of n elements).
@@ -1686,7 +1686,7 @@ template<class T>T Math<T>::KOrdStat(int64_t n, const T *a, int64_t k, int64_t *
 	}
 }
 
-template<class T>void Math<T>::Quantiles(int n, int nprob, double *x, double *quantiles, double *prob, bool isSorted, int *index, int type)
+template<typename T> void Math<T>::Quantiles(int n, int nprob, double *x, double *quantiles, double *prob, bool isSorted, int *index, int type)
 {
 	if (type < 1 || type > 9) {
 		std::cout << "illegal value of type" << std::endl;
@@ -1821,12 +1821,12 @@ template<class T>void Math<T>::Quantiles(int n, int nprob, double *x, double *qu
   }
 }
 
-template<class T> T Math<T>::Range(T lb, T ub, T x)
+template<typename T> T Math<T>::Range(T lb, T ub, T x)
 {
 	return ((x<lb)?lb:(x > ub)?ub:x); 
 }
 
-template<class T>double Math<T>::RMS(int64_t n, const T *a)
+template<typename T> double Math<T>::RMS(int64_t n, const T *a)
 {
 	// Return the RMS of an array a with length n.
 
@@ -1848,7 +1848,7 @@ template<class T>double Math<T>::RMS(int64_t n, const T *a)
 	return rms;
 }
 
-template<class T>int64_t Math<T>::BinarySearch(int64_t n, const T *array, T value)
+template<typename T> int64_t Math<T>::BinarySearch(int64_t n, const T *array, T value)
 {
 	// Binary search in an array of n values to locate value.
 	//
@@ -1878,7 +1878,7 @@ template<class T>int64_t Math<T>::BinarySearch(int64_t n, const T *array, T valu
 	return nbelow-1;
 }
 
-template<class T>int64_t Math<T>::BinarySearch(int64_t n, const T **array, T value)
+template<typename T> int64_t Math<T>::BinarySearch(int64_t n, const T **array, T value)
 {
 	// Binary search in an array of n values to locate value.
 	//
@@ -1908,7 +1908,7 @@ template<class T>int64_t Math<T>::BinarySearch(int64_t n, const T **array, T val
 	return nbelow - 1;
 }
 
-template<class T>bool Math<T>::IsInside(T xp, T yp, int np, T *x, T *y)
+template<typename T> bool Math<T>::IsInside(T xp, T yp, int np, T *x, T *y)
 {
 	// Function which returns true if point xp,yp lies inside the
 	// polygon defined by the np points in arrays x and y, false otherwise
@@ -1946,7 +1946,7 @@ template<class T>bool Math<T>::IsInside(T xp, T yp, int np, T *x, T *y)
 	return false;
 }
 
-template<class T>void Math<T>::Sort(int n1, const T *a, int *index, bool down)
+template<typename T> void Math<T>::Sort(int n1, const T *a, int *index, bool down)
 {
 	// Sort the n1 elements of the int array a.
 	// In output the array index contains the indices of the sorted array.
@@ -1959,7 +1959,7 @@ template<class T>void Math<T>::Sort(int n1, const T *a, int *index, bool down)
 	SortImp(n1, a, index, down);
 }
 
-template<class T>void Math<T>::BubbleHigh(int Narr, double *arr1, int *arr2)
+template<typename T> void Math<T>::BubbleHigh(int Narr, double *arr1, int *arr2)
 {
 	// Bubble sort variant to obtain the order of an array's elements into
 	// an index in order to do more useful things than the standard built
@@ -2009,7 +2009,7 @@ template<class T>void Math<T>::BubbleHigh(int Narr, double *arr1, int *arr2)
 	delete [] localArr1;
 }
 
-template<class T>void Math<T>::BubbleLow(int Narr, double *arr1, int *arr2)
+template<typename T> void Math<T>::BubbleLow(int Narr, double *arr1, int *arr2)
 {
 	// Opposite ordering of the array arr2[] to that of BubbleHigh.
 	//
@@ -2053,7 +2053,7 @@ template<class T>void Math<T>::BubbleLow(int Narr, double *arr1, int *arr2)
 	delete [] localArr1;
 }
 
-template<class T>uint64_t Math<T>::Hash(const void *txt, int ntxt)
+template<typename T> uint64_t Math<T>::Hash(const void *txt, int ntxt)
 {
 	// Calculates hash index from any char string.
 	// Based on precalculated table of 256 specially selected numbers.
@@ -2140,12 +2140,12 @@ template<class T>uint64_t Math<T>::Hash(const void *txt, int ntxt)
 	return u.u;
 }
 
-template<class T>uint64_t Math<T>::Hash(const char *txt)
+template<typename T> uint64_t Math<T>::Hash(const char *txt)
 {
 	return Hash(txt, int(strlen(txt)));
 }
 
-template<class T>double Math<T>::BesselI0(double x)
+template<typename T> double Math<T>::BesselI0(double x)
 {
 	// Compute the modified Bessel function I_0(x) for any real x.
 	//
@@ -2187,7 +2187,7 @@ template<class T>double Math<T>::BesselI0(double x)
 	return result;
 }
 
-template<class T>double Math<T>::BesselK0(double x)
+template<typename T> double Math<T>::BesselK0(double x)
 {
 	// Compute the modified Bessel function K_0(x) for positive real x.
 	//
@@ -2230,7 +2230,7 @@ template<class T>double Math<T>::BesselK0(double x)
 	return result;
 }
 
-template<class T>double Math<T>::BesselI1(double x)
+template<typename T> double Math<T>::BesselI1(double x)
 {
 	// Compute the modified Bessel function I_1(x) for any real x.
 	//
@@ -2279,7 +2279,7 @@ template<class T>double Math<T>::BesselI1(double x)
 	return result;
 }
 
-template<class T>double Math<T>::BesselK1(double x)
+template<typename T> double Math<T>::BesselK1(double x)
 {
 	// Compute the modified Bessel function K_1(x) for positive real x.
 	//
@@ -2322,7 +2322,7 @@ template<class T>double Math<T>::BesselK1(double x)
 	return result;
 }
 
-template<class T>double Math<T>::BesselK(int n,double x)
+template<typename T> double Math<T>::BesselK(int n,double x)
 {
 	// Compute the Integer Order Modified Bessel function K_n(x)
 	// for n=0,1,2,... and positive real x.
@@ -2356,7 +2356,7 @@ template<class T>double Math<T>::BesselK(int n,double x)
 	return bk;
 }
 
-template<class T>double Math<T>::BesselI(int n,double x)
+template<typename T> double Math<T>::BesselI(int n,double x)
 {
 	// Compute the Integer Order Modified Bessel function I_n(x)
 	// for n=0,1,2,... and any real x.
@@ -2420,7 +2420,7 @@ template<class T>double Math<T>::BesselI(int n,double x)
 	return result;
 }
 
-template<class T>double Math<T>::BesselJ0(double x)
+template<typename T> double Math<T>::BesselJ0(double x)
 {
 	// Returns the Bessel function J0(x) for any real x.
 
@@ -2455,7 +2455,7 @@ template<class T>double Math<T>::BesselJ0(double x)
 	return result;
 }
 
-template<class T>double Math<T>::BesselJ1(double x)
+template<typename T> double Math<T>::BesselJ1(double x)
 {
 	// Returns the Bessel function J1(x) for any real x.
 
@@ -2494,7 +2494,7 @@ template<class T>double Math<T>::BesselJ1(double x)
 	return result;
 }
 
-template<class T>double Math<T>::BesselY0(double x)
+template<typename T> double Math<T>::BesselY0(double x)
 {
 	// Returns the Bessel function Y0(x) for positive x.
 
@@ -2529,7 +2529,7 @@ template<class T>double Math<T>::BesselY0(double x)
 	return result;
 }
 
-template<class T>double Math<T>::BesselY1(double x)
+template<typename T> double Math<T>::BesselY1(double x)
 {
 	// Returns the Bessel function Y1(x) for positive x.
 
@@ -2566,7 +2566,7 @@ template<class T>double Math<T>::BesselY1(double x)
 	return result;
 }
 
-template<class T>double Math<T>::StruveH0(double x)
+template<typename T> double Math<T>::StruveH0(double x)
 {
 	// Struve Functions of Order 0
 	//
@@ -2639,7 +2639,7 @@ template<class T>double Math<T>::StruveH0(double x)
 	return h;
 }
 
-template<class T>double Math<T>::StruveH1(double x)
+template<typename T> double Math<T>::StruveH1(double x)
 {
 	// Struve Functions of Order 1
 	//
@@ -2719,7 +2719,7 @@ template<class T>double Math<T>::StruveH1(double x)
 	return h;
 }
 
-template<class T>double Math<T>::StruveL0(double x)
+template<typename T> double Math<T>::StruveL0(double x)
 {
 	// Modified Struve Function of Order 0.
 	// By Kirill Filimonov.
@@ -2781,7 +2781,7 @@ template<class T>double Math<T>::StruveL0(double x)
 	return sl0;
 }
 
-template<class T>double Math<T>::StruveL1(double x)
+template<typename T> double Math<T>::StruveL1(double x)
 {
 	// Modified Struve Function of Order 1.
 	// By Kirill Filimonov.
@@ -2841,14 +2841,14 @@ template<class T>double Math<T>::StruveL1(double x)
 	return sl1;
 }
 
-template<class T>double Math<T>::Beta(double p, double q)
+template<typename T> double Math<T>::Beta(double p, double q)
 {
 	// Calculates Beta-function Gamma(p)*Gamma(q)/Gamma(p+q).
 
 	return Math<T>::Exp(Math<T>::LnGamma(p) + Math<T>::LnGamma(q)-Math<T>::LnGamma(p + q));
 }
 
-template<class T>double Math<T>::BetaCf(double x, double a, double b)
+template<typename T> double Math<T>::BetaCf(double x, double a, double b)
 {
 	// Continued fraction evaluation by modified Lentz's method
 	// used in calculation of incomplete Beta function.
@@ -2920,7 +2920,7 @@ template<class T>double Math<T>::BetaCf(double x, double a, double b)
 	return h;
 }
 
-template<class T>double Math<T>::BetaDist(double x, double p, double q)
+template<typename T> double Math<T>::BetaDist(double x, double p, double q)
 {
 	// Computes the probability density function of the Beta distribution
 	// (the distribution function is computed in BetaDistI).
@@ -2939,7 +2939,7 @@ template<class T>double Math<T>::BetaDist(double x, double p, double q)
 	return r;
 }
 
-template<class T>double Math<T>::BetaDistI(double x, double p, double q)
+template<typename T> double Math<T>::BetaDistI(double x, double p, double q)
 {
 	// Computes the distribution function of the Beta distribution.
 	// The first argument is the point, where the function will be
@@ -2956,7 +2956,7 @@ template<class T>double Math<T>::BetaDistI(double x, double p, double q)
   return betai;
 }
 
-template<class T>double Math<T>::BetaIncomplete(double x, double a, double b)
+template<typename T> double Math<T>::BetaIncomplete(double x, double a, double b)
 {
 	// Calculates the incomplete Beta-function.
 	//  -- implementation by Anna Kreshuk
@@ -2980,7 +2980,7 @@ template<class T>double Math<T>::BetaIncomplete(double x, double a, double b)
 	}
 }
 
-template<class T>double Math<T>::Binomial(int n,int k)
+template<typename T> double Math<T>::Binomial(int n,int k)
 {
 	// Calculate the binomial coefficient n over k.
 
@@ -3003,7 +3003,7 @@ template<class T>double Math<T>::Binomial(int n,int k)
 	return fact;
 }
 
-template<class T>double Math<T>::BinomialI(double p, int n, int k)
+template<typename T> double Math<T>::BinomialI(double p, int n, int k)
 {
 	// Suppose an event occurs with probability _p_ per trial
 	// Then the probability P of its occuring _k_ or more times
@@ -3019,7 +3019,7 @@ template<class T>double Math<T>::BinomialI(double p, int n, int k)
 	return BetaIncomplete(p, double(k), double(n - k + 1));
 }
 
-template<class T>double Math<T>::CauchyDist(double x, double t, double s)
+template<typename T> double Math<T>::CauchyDist(double x, double t, double s)
 {
 	// Computes the density of Cauchy distribution at point x
 	// by default, standard Cauchy distribution is used (t=0, s=1)
@@ -3045,7 +3045,7 @@ template<class T>double Math<T>::CauchyDist(double x, double t, double s)
 	return result;
 }
 
-template<class T>double Math<T>::ChisquareQuantile(double p, double ndf)
+template<typename T> double Math<T>::ChisquareQuantile(double p, double ndf)
 {
 	// Evaluate the quantiles of the chi-squared probability distribution function.
 	// Algorithm AS 91   Appl. Statist. (1975) Vol.24, P.35
@@ -3134,7 +3134,7 @@ template<class T>double Math<T>::ChisquareQuantile(double p, double ndf)
 	return ch;
 }
 
-template<class T>double Math<T>::FDist(double F, double N, double M)
+template<typename T> double Math<T>::FDist(double F, double N, double M)
 {
 	// Computes the density function of F-distribution
 	// (probability function, integral of density, is computed in FDistI).
@@ -3162,7 +3162,7 @@ template<class T>double Math<T>::FDist(double F, double N, double M)
 	}
 }
 
-template<class T>double Math<T>::FDistI(double F, double N, double M)
+template<typename T> double Math<T>::FDistI(double F, double N, double M)
 {
 	// Calculates the cumulative distribution function of F-distribution,
 	// this function occurs in the statistical test of whether two observed
@@ -3181,7 +3181,7 @@ template<class T>double Math<T>::FDistI(double F, double N, double M)
 	return fi;
 }
 
-template<class T>double Math<T>::GammaDist(double x, double gamma, double mu, double beta)
+template<typename T> double Math<T>::GammaDist(double x, double gamma, double mu, double beta)
 {
 	// Computes the density function of Gamma distribution at point x.
 	//   gamma - shape parameter
@@ -3203,7 +3203,7 @@ template<class T>double Math<T>::GammaDist(double x, double gamma, double mu, do
   return result;
 }
 
-template<class T>double Math<T>::LaplaceDist(double x, double alpha, double beta)
+template<typename T> double Math<T>::LaplaceDist(double x, double alpha, double beta)
 {
 	// Computes the probability density funciton of Laplace distribution
 	// at point x, with location parameter alpha and shape parameter beta.
@@ -3218,7 +3218,7 @@ template<class T>double Math<T>::LaplaceDist(double x, double alpha, double beta
 	return temp;
 }
 
-template<class T>double Math<T>::LaplaceDistI(double x, double alpha, double beta)
+template<typename T> double Math<T>::LaplaceDistI(double x, double alpha, double beta)
 {
 	// Computes the distribution funciton of Laplace distribution
 	// at point x, with location parameter alpha and shape parameter beta.
@@ -3238,7 +3238,7 @@ template<class T>double Math<T>::LaplaceDistI(double x, double alpha, double bet
 	return temp;
 }
 
-template<class T>double Math<T>::LnGamma(double z)
+template<typename T> double Math<T>::LnGamma(double z)
 {
 	if (z <= 0) {
     return 0;
@@ -3266,7 +3266,7 @@ template<class T>double Math<T>::LnGamma(double z)
   return v;
 }
 
-template<class T>double Math<T>::LogNormal(double x, double sigma, double theta, double m)
+template<typename T> double Math<T>::LogNormal(double x, double sigma, double theta, double m)
 {
 	// Computes the density of LogNormal distribution at point x.
 	// Variable X has lognormal distribution if Y=Ln(X) has normal distribution
@@ -3288,7 +3288,7 @@ template<class T>double Math<T>::LogNormal(double x, double sigma, double theta,
 	return temp1/temp2;
 }
 
-template<class T>double Math<T>::NormQuantile(double p)
+template<typename T> double Math<T>::NormQuantile(double p)
 {
 	// Computes quantiles for standard normal distribution N(0, 1)
 	// at probability p
@@ -3386,7 +3386,7 @@ template<class T>double Math<T>::NormQuantile(double p)
 	return quantile;
 }
 
-template<class T>bool Math<T>::Permute(int n, int *a)
+template<typename T> bool Math<T>::Permute(int n, int *a)
 {
 	// Simple recursive algorithm to find the permutations of
 	// n natural numbers, not necessarily all distinct
@@ -3435,7 +3435,7 @@ template<class T>bool Math<T>::Permute(int n, int *a)
 	return true;
 }
 
-template<class T>double Math<T>::Student(double t, double ndf)
+template<typename T> double Math<T>::Student(double t, double ndf)
 {
 	// Computes density function for Student's t- distribution
 	// (the probability function (integral of density) is computed in StudentI).
@@ -3476,7 +3476,7 @@ template<class T>double Math<T>::Student(double t, double ndf)
   return Math<T>::Gamma(rh1)/denom;
 }
 
-template<class T>double Math<T>::StudentI(double t, double ndf)
+template<typename T> double Math<T>::StudentI(double t, double ndf)
 {
 	// Calculates the cumulative distribution function of Student's
 	// t-distribution second parameter stands for number of degrees of freedom,
@@ -3491,7 +3491,7 @@ template<class T>double Math<T>::StudentI(double t, double ndf)
 	return si;
 }
 
-template<class T>double Math<T>::StudentQuantile(double p, double ndf, bool lower_tail)
+template<typename T> double Math<T>::StudentQuantile(double p, double ndf, bool lower_tail)
 {
 	// Computes quantiles of the Student's t-distribution
 	// 1st argument is the probability, at which the quantile is computed
@@ -3570,7 +3570,7 @@ template<class T>double Math<T>::StudentQuantile(double p, double ndf, bool lowe
 	return quantile;
 }
 
-template<class T>double Math<T>::Vavilov(double x, double kappa, double beta2)
+template<typename T> double Math<T>::Vavilov(double x, double kappa, double beta2)
 {
 	//Returns the value of the Vavilov density function
 	//Parameters: 1st - the point were the density function is evaluated
@@ -3600,7 +3600,7 @@ template<class T>double Math<T>::Vavilov(double x, double kappa, double beta2)
 	return v;
 }
 
-template<class T>double Math<T>::VavilovI(double x, double kappa, double beta2)
+template<typename T> double Math<T>::VavilovI(double x, double kappa, double beta2)
 {
 	//Returns the value of the Vavilov distribution function
 	//Parameters: 1st - the point were the density function is evaluated
@@ -3642,7 +3642,7 @@ template<class T>double Math<T>::VavilovI(double x, double kappa, double beta2)
   return v;
 }
 
-template<class T>double Math<T>::LandauI(double x)
+template<typename T> double Math<T>::LandauI(double x)
 {
 	//Returns the value of the Landau distribution function at point x.
 	//The algorithm was taken from the Cernlib function dislan(G110)
@@ -3695,7 +3695,7 @@ template<class T>double Math<T>::LandauI(double x)
 	return lan;
 }
 
-template<class T>void Math<T>::VavilovSet(double rkappa, double beta2, bool mode, double *WCM, double *AC, double *HC, int &itype, int &npt)
+template<typename T> void Math<T>::VavilovSet(double rkappa, double beta2, bool mode, double *WCM, double *AC, double *HC, int &itype, int &npt)
 {
 	//Internal function, called by Vavilov and VavilovI
 
@@ -3951,7 +3951,7 @@ template<class T>void Math<T>::VavilovSet(double rkappa, double beta2, bool mode
   }
 }
 
-template<class T>double Math<T>::VavilovDenEval(double rlam, double *AC, double *HC, int itype)
+template<typename T> double Math<T>::VavilovDenEval(double rlam, double *AC, double *HC, int itype)
 {
 	//Internal function, called by Vavilov and VavilovSet
 

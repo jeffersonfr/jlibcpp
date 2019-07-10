@@ -53,7 +53,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return m;
 		}
 
-    template<typename U> operator jvector_t<R*C, U>()
+    template<typename U> operator jvector_t<R*C, U>() const
     {
       jvector_t<R*C, U> v;
 
@@ -66,7 +66,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return v;
     }
 
-    template<typename U> operator jmatrix_t<R, C, U>()
+    template<typename U> operator jmatrix_t<R, C, U>() const
     {
       jmatrix_t<R, C, U> m;
 
@@ -115,7 +115,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return data[row][col];
     }
 
-    bool operator==(const T &param)
+    bool operator==(const T &param) const
     {
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C; i++) {
@@ -128,7 +128,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return true;
     }
 
-    bool operator!=(const T &param)
+    bool operator!=(const T &param) const
     {
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C; i++) {
@@ -141,7 +141,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return false;
     }
 
-    bool operator==(const jmatrix_t<R, C, T> &param)
+    bool operator==(const jmatrix_t<R, C, T> &param) const
     {
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C; i++) {
@@ -154,7 +154,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return true;
     }
 
-    bool operator!=(const jmatrix_t<R, C, T> &param)
+    bool operator!=(const jmatrix_t<R, C, T> &param) const
     {
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C; i++) {
@@ -167,15 +167,17 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return false;
     }
 
-    jmatrix_t<R, C, T> & operator-()
+    jmatrix_t<R, C, T> operator-() const
     {
+      jmatrix_t<R, C, T> m;
+
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C; i++) {
-          data[j][i] = -data[j][i];
+          m.data[j][i] = -data[j][i];
         }
       }
 
-      return *this;
+      return m;
     }
  
     template<typename U> jmatrix_t<R, C, T> & operator=(const U &param)
@@ -189,7 +191,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return *this;
     }
 
-    template<typename U> jmatrix_t<R, C, T> operator+(const U &param)
+    template<typename U> jmatrix_t<R, C, T> operator+(const U &param) const
     {
       jmatrix_t<R, C, T> m;
 
@@ -202,7 +204,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return m;
     }
     
-    template<typename U> jmatrix_t<R, C, T> operator-(const U &param)
+    template<typename U> jmatrix_t<R, C, T> operator-(const U &param) const
     {
       jmatrix_t<R, C, T> m;
 
@@ -215,7 +217,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return m;
     }
     
-    template<typename U> jmatrix_t<R, C, T> operator*(const U &param)
+    template<typename U> jmatrix_t<R, C, T> operator*(const U &param) const
     {
       jmatrix_t<R, C, T> m;
 
@@ -228,7 +230,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return m;
     }
     
-    template<typename U> jmatrix_t<R, C, T> operator/(const U &param)
+    template<typename U> jmatrix_t<R, C, T> operator/(const U &param) const
     {
       jmatrix_t<R, C, T> m;
 
@@ -252,7 +254,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return *this;
     }
 
-    template<typename U> jmatrix_t<R, C, T> operator+(const jmatrix_t<R, C, U> &param)
+    template<typename U> jmatrix_t<R, C, T> operator+(const jmatrix_t<R, C, U> &param) const
     {
       jmatrix_t<R, C, T> m;
 
@@ -265,7 +267,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return m;
     }
     
-    template<typename U> jmatrix_t<R, C, T> operator-(const jmatrix_t<R, C, U> &param)
+    template<typename U> jmatrix_t<R, C, T> operator-(const jmatrix_t<R, C, U> &param) const
     {
       jmatrix_t<R, C, T> m;
 
@@ -278,7 +280,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return m;
     }
     
-    template<size_t R1 = C, size_t C1, typename U> jmatrix_t<R, C1, T> operator*(const jmatrix_t<R1, C1, U> &param)
+    template<size_t R1 = C, size_t C1, typename U> jmatrix_t<R, C1, T> operator*(const jmatrix_t<R1, C1, U> &param) const
     {
       jmatrix_t<R, C1, T> m;
 
@@ -291,7 +293,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return m;
     }
     
-    template<typename U> jmatrix_t<R, C, T> operator/(const jmatrix_t<R, C, U> &param)
+    template<typename U> jmatrix_t<R, C, T> operator/(const jmatrix_t<R, C, U> &param) const
     {
 			return *this*param.Inverse();
     }
@@ -316,7 +318,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return (*this = *this/param);
     }
     
-    size_t Size()
+    size_t Size() const
     {
       return R*C;
     }
@@ -345,7 +347,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return v;
     }
 
-    template<size_t R1, size_t C1> jmatrix_t<R1, C1, T> SubMatrix(size_t r, size_t c)
+    template<size_t R1, size_t C1> jmatrix_t<R1, C1, T> SubMatrix(size_t r, size_t c) const
     {
       if (r >= R or (r + R1) > R or c >= C or (c + C1) > C) {
         throw jexception::OutOfBoundsException("Sub matrix indexes are out of bounds");
@@ -362,7 +364,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return m;
     }
 
-    template<size_t R1 = R - 1, size_t C1 = C - 1> double Cofactor(size_t r, size_t c)
+    template<size_t R1 = R - 1, size_t C1 = C - 1> double Cofactor(size_t r, size_t c) const
     {
       jmatrix_t<R1, C1, T> m;
 
@@ -375,7 +377,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return std::pow(-1, (r + c)&0x01)*m.Determinant();
     }
 
-    T Mean()
+    T Mean() const
 		{
       T count = 0;
 
@@ -388,17 +390,21 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return count/(R*C);
 		}
 
-    bool IsNormal()
+    bool IsNormal() const
     {
-      return (*this * this->Hermitan()) == (this->Hermitan() * *this);
+      jmatrix_t<R, C, T> 
+        m = *this,
+        h = this->Hermitian();
+
+      return (m*h == h*m);
     }
 
-    bool IsSingular()
+    bool IsSingular() const
     {
       return Determinant() == 0.0f;
     }
 
-    bool IsDiagonal()
+    bool IsDiagonal() const
     {
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C; i++) {
@@ -411,7 +417,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return true;
     }
 
-    bool IsIdentity()
+    bool IsIdentity() const
     {
       if (IsDiagonal() == false) {
         return false;
@@ -428,7 +434,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return true;
     }
 
-    bool IsScalar()
+    bool IsScalar() const
     {
       T ref = data[0][0];
 
@@ -443,7 +449,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return true;
     }
 
-    bool IsNull()
+    bool IsNull() const
     {
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C; i++) {
@@ -456,7 +462,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return true;
     }
 
-    double LUDecomposition(double m[R][C])
+    double LUDecomposition(double m[R][C]) const
     {
 			if (R < 1 or C < 1) {
 				return 0.0f;
@@ -500,7 +506,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return det*m[ri[R - 1]][R - 1];
     }
 
-    double Determinant()
+    double Determinant() const
     {
       static_assert(R == C, "Determinant needs a square matrix");
 
@@ -526,7 +532,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return *this;
     }
 
-    T Trace()
+    T Trace() const
 		{
       T sum = 0;
 
@@ -541,7 +547,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return sum;
 		}
 
-    jmatrix_t<R, C, T> Adjoint()
+    jmatrix_t<R, C, T> Adjoint() const
     {
       static_assert(R == C, "Determinant needs a square matrix");
 
@@ -556,7 +562,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
 			return m.Transpose();
     }
 
-    jmatrix_t<R, C, T> Inverse()
+    jmatrix_t<R, C, T> Inverse() const
     {
       double d = Determinant();
 
@@ -567,7 +573,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return Adjoint()/d;
     }
 
-    std::optional<T &> Find(const T &param)
+    std::optional<T &> Find(const T &param) const
     {
 			for (size_t j=0; j<R; j++) {
         std::optional<T &>
@@ -581,17 +587,17 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return std::nullopt;
     }
 
-    T Min()
+    T Min() const
     {
       return jvector_t<R*C, T>(*this).Min();
     }
 
-    T Max()
+    T Max() const
     {
       return jvector_t<R*C, T>(*this).Max();
     }
 
-    T Sum()
+    T Sum() const
     {
       T sum = 0;
 
@@ -604,7 +610,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return sum;
     }
 
-    T Mul()
+    T Mul() const
     {
       T mul = 1;
 
@@ -617,7 +623,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return mul;
     }
 
-    T Mul(const jmatrix_t<R, C, T> &param)
+    T Mul(const jmatrix_t<R, C, T> &param) const
     {
       jmatrix_t<R, C, T> m;
 
@@ -630,7 +636,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return m;
     }
 
-    T Div(const jmatrix_t<R, C, T> &param)
+    T Div(const jmatrix_t<R, C, T> &param) const
     {
       jmatrix_t<R, C, T> m;
 
@@ -643,12 +649,14 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return m;
     }
 
-    T Norm1()
+    T Norm1() const
     {
-      return Abs().Sum();
+      jmatrix_t<R, C, T> m = *this;
+
+      return m.Abs().Sum();
     }
 
-    T Norm()
+    T Norm() const
     {
       T norm = 0.0f;
 
@@ -661,17 +669,19 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return norm;
     }
 
-    double EuclidianNorm()
+    double EuclidianNorm() const
     {
       return std::sqrt(Norm());
     }
 
-    T NormInf()
+    T NormInf() const
     {
-      return Abs().Min();
+      jmatrix_t<R, C, T> m = *this;
+
+      return m.Abs().Min();
     }
 
-    jmatrix_t<R, C, double> Normalize()
+    jmatrix_t<R, C, double> Normalize() const
     {
       return jmatrix_t<R, C, double>(*this)/EuclidianNorm();
     }

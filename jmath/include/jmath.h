@@ -33,7 +33,7 @@ namespace jmath {
  * 
  * \author Jeff Ferr
  */
-template<class T>class Math : public virtual jcommon::Object {
+template<typename T> class Math : public virtual jcommon::Object {
 
   public:
     // Fundamental Constants
