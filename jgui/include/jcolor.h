@@ -20,6 +20,7 @@
 #ifndef J_COLOR_H
 #define J_COLOR_H
 
+#include "jmath/jvector.h"
 #include "jexception/joutofboundsexception.h"
 
 #include <iostream>
@@ -562,6 +563,45 @@ struct jcolor_t {
       (U)blue,
       (U)alpha
     };
+  }
+
+  operator jmath::jvector_t<3, T>()
+  {
+    return {
+      red,
+      green,
+      blue
+    };
+  }
+
+  jcolor_t & operator=(const jmath::jvector_t<3, T> &param)
+  {
+    red = param[0];
+    green = param[1];
+    blue = param[2];
+    alpha = 1.0f;
+
+    return *this;
+  }
+
+  operator jmath::jvector_t<4, T>()
+  {
+    return {
+      red,
+      green,
+      blue,
+      alpha
+    };
+  }
+
+  jcolor_t & operator=(const jmath::jvector_t<4, T> &param)
+  {
+    red = param[0];
+    green = param[1];
+    blue = param[2];
+    alpha = param[3];
+
+    return *this;
   }
 
   operator uint32_t()

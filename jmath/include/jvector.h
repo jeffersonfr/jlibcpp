@@ -476,7 +476,7 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
       return std::sqrt(Norm());
     }
 
-    T NormInf()
+    T NormInf() const
     {
       jvector_t<N, T> v = *this;
 
