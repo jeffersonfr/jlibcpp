@@ -574,16 +574,6 @@ struct jcolor_t {
     };
   }
 
-  jcolor_t & operator=(const jmath::jvector_t<3, T> &param)
-  {
-    red = param[0];
-    green = param[1];
-    blue = param[2];
-    alpha = 1.0f;
-
-    return *this;
-  }
-
   operator jmath::jvector_t<4, T>()
   {
     return {
@@ -592,16 +582,6 @@ struct jcolor_t {
       blue,
       alpha
     };
-  }
-
-  jcolor_t & operator=(const jmath::jvector_t<4, T> &param)
-  {
-    red = param[0];
-    green = param[1];
-    blue = param[2];
-    alpha = param[3];
-
-    return *this;
   }
 
   operator uint32_t()
@@ -845,50 +825,80 @@ struct jcolor_t {
    *
    * \return the RGB value of the color with the indicated hue, saturation, and brightness.
    */
-  void FromHSB(T hue, T saturation, T brightness)
+  void FromHSB(jmath::jvector_t<3, T> hsb)
   {
-    if (saturation == T(0.0)) {
-      red = green = blue = brightness;
+    if (hsb[1] == T(0.0)) {
+      red = green = blue = hsb[2];
     } else {
-      double h = (hue - std::floor(hue)) * 6.0;
+      double h = (hsb[0] - std::floor(hsb[0]))*6.0;
       double f = h - std::floor(h);
-      double p = brightness * (T(1.0) - saturation);
-      double q = brightness * (T(1.0) - saturation * f);
-      double t = brightness * (T(1.0) - (saturation * (T(1.0) - f)));
+      double p = hsb[2]*(T(1.0) - hsb[1]);
+      double q = hsb[2]*(T(1.0) - hsb[1]*f);
+      double t = hsb[2]*(T(1.0) - (hsb[1]*(T(1.0) - f)));
 
       switch ((int)(h)) {
         case 0:
-          red = brightness;
+          red = hsb[2];
           green = t;
           blue = p;
           break;
         case 1:
           red = q;
-          green = brightness;
+          green = hsb[2];
           blue = p;
           break;
         case 2:
           red = p;
-          green = brightness;
+          green = hsb[2];
           blue = t;
           break;
         case 3:
           red = p;
           green = q;
-          blue = brightness;
+          blue = hsb[2];
           break;
         case 4:
           red = t;
           green = p;
-          blue = brightness;
+          blue = hsb[2];
           break;
         case 5:
-          red = brightness;
+          red = hsb[2];
           green = p;
           blue = q;
           break;
       }
     }
+  }
+
+  void FromXYZ(jmath::jvector_t<3, T> xyz)
+  {
+    T
+      x = xyz[0],
+      y = xyz[1],
+      z = xyz[2];
+
+    x = 0.95047 * ((x * x * x > 0.008856) ? x * x * x : (x - 16/116) / 7.787);
+    y = 1.00000 * ((y * y * y > 0.008856) ? y * y * y : (y - 16/116) / 7.787);
+    z = 1.08883 * ((z * z * z > 0.008856) ? z * z * z : (z - 16/116) / 7.787);
+
+    red = x* 3.2406 - y*1.5372 - z*0.4986;
+    green = -x*0.9689 + y*1.8758 + z*0.0415;
+    blue = x*0.0557 - y*0.2040 + z*1.0570;
+
+    red = (red > 0.0031308)?(1.055 * std::pow(red, 1/2.4) - 0.055):(12.92*red);
+    green = (green > 0.0031308)?(1.055 * std::pow(green, 1/2.4) - 0.055):(12.92*green);
+    blue = (blue > 0.0031308)?(1.055 * std::pow(blue, 1/2.4) - 0.055):(12.92*blue);
+  }
+
+  void FromLab(jmath::jvector_t<3, T> lab)
+  {
+    T
+      y = (lab[0] + 16) / 116,
+      x = lab[1] / 500 + y,
+      z = y - lab[2] / 200;
+
+    FromXYZ({x, y, z});
   }
 
   T ToGray(float r = 0.30f, float g = 0.59f, float b = 0.11f)
@@ -909,13 +919,15 @@ struct jcolor_t {
    *
    * \return the HSB value of the color with the indicated red, green, blue.
    */
-  void ToHSB(T &hue, T &saturation, T &brightness)
+  jmath::jvector_t<3, T> ToHSB()
   {
     T 
       cmin = std::min(std::min(red, green), blue),
       cmax = std::max(std::max(red, green), blue);
-
-    brightness = cmax;
+    T 
+      hue, 
+      saturation, 
+      brightness = cmax;
 
     if (cmax != T(0.0)) {
       saturation = (cmax - cmin)/cmax;
@@ -943,9 +955,34 @@ struct jcolor_t {
       hue = T(0.0);
     }
 
-    hue = CLIP_COLOR(hue);
-    saturation = CLIP_COLOR(saturation);
-    brightness = CLIP_COLOR(brightness);
+    return {hue, saturation, brightness};
+  }
+
+  jmath::jvector_t<3, T> ToXYZ()
+  {
+    T x, y, z;
+
+    red = (red > 0.04045)?std::pow((red + 0.055)/1.055, 2.4):red/12.92;
+    green = (green > 0.04045)?std::pow((green + 0.055)/1.055, 2.4):green/12.92;
+    blue = (blue > 0.04045)?std::pow((blue + 0.055)/1.055, 2.4):blue/12.92;
+
+    x = (red*0.4124 + green*0.3576 + blue*0.1805)/0.95047;
+    y = (red*0.2126 + green*0.7152 + blue*0.0722)/1.00000;
+    z = (red*0.0193 + green*0.1192 + blue*0.9505)/1.08883;
+
+    x = (x > 0.008856)?std::pow(x, 1/3):(7.787*x) + 16/116;
+    y = (y > 0.008856)?std::pow(y, 1/3):(7.787*y) + 16/116;
+    z = (z > 0.008856)?std::pow(z, 1/3):(7.787*z) + 16/116;
+
+    return {x, y, z};
+  }
+
+  jmath::jvector_t<3, T> ToLab()
+  {
+    jmath::jvector_t<3, T>
+      xyz = ToXYZ();
+
+    return {(116*xyz[1]) - 16, 500*(xyz[0] - xyz[1]), 200*(xyz[1] - xyz[2])};
   }
 
   friend std::ostream & operator<<(std::ostream& out, const jcolor_t<T> &param)

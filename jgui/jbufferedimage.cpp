@@ -952,12 +952,13 @@ Image * BufferedImage::Colorize(jcolor_t<float> color)
 
   int stride = cairo_image_surface_get_stride(surface);
 
-  float hue, sat, bri;
+  jmath::jvector_t<3, float> 
+    hsb = color.ToHSB();
 
-  color.ToHSB(hue, sat, bri);
-
-  HSLColorSpace hsl(hue, sat, 0.0);
-  jgui::jsize_t<int> size = image->GetSize();
+  HSLColorSpace 
+    hsl(hsb[0], hsb[1], 0.0);
+  jgui::jsize_t<int> 
+    size = image->GetSize();
 
   if (image->GetPixelFormat() == JPF_ARGB) {
     for (int j=0; j<size.height; j++) {

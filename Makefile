@@ -132,6 +132,7 @@ OBJS_jmath += \
   jmathlib.o\
   jmatrix.o\
   jrandom.o\
+  jrational.o\
   juuid.o\
   jvector.o\
 

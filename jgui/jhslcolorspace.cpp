@@ -92,9 +92,9 @@ void HSLColorSpace::Initialize()
 
     double temp_light = (double)i/255.0;
 
-    jcolor_t<float> color;
+    jcolor_t<double> color;
     
-    color.FromHSB(temp_hue, temp_sat, temp_light);
+    color.FromHSB({temp_hue, temp_sat, temp_light});
 
     _final_red_lookup[i] = (int)(color[2]);
     _final_green_lookup[i] = (int)(color[1]);

@@ -488,6 +488,30 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
       return jvector_t<N, double>(*this)/EuclidianNorm();
     }
  
+    jvector_t<N, double> Equalize(T lo, T hi) const
+    {
+      jvector_t<N, T> v;
+
+      for (size_t i=0; i<N; i++) {
+        v.data[i] = (data[i] - lo)/(hi - lo);
+      }
+
+      return v;
+    }
+ 
+    jvector_t<N, double> Clip(T lo, T hi) const
+    {
+      jvector_t<N, T> v;
+
+      for (size_t i=0; i<N; i++) {
+        T e = data[i];
+
+        v.data[i] = (e < lo)?lo:(e > hi)?hi:e;
+      }
+
+      return v;
+    }
+ 
     std::optional<T &> Find(const T &param) const
     {
       for (size_t i=0; i<N; i++) {

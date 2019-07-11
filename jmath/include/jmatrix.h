@@ -686,6 +686,28 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return jmatrix_t<R, C, double>(*this)/EuclidianNorm();
     }
  
+    jmatrix_t<R, C, double> Equalize(T lo, T hi) const
+    {
+      jmatrix_t<R, C, T> m;
+
+      for (size_t j=0; j<R; j++) {
+        m.data[j] = data[j].Normalize(lo, hi);
+      }
+
+      return m;
+    }
+ 
+    jmatrix_t<R, C, double> Clip(T lo, T hi) const
+    {
+      jmatrix_t<R, C, T> m;
+
+      for (size_t j=0; j<R; j++) {
+        m.data[j] = data[j].Clip(lo, hi);
+      }
+
+      return m;
+    }
+ 
     jmatrix_t<R, C, T> & Pow(double e)
     {
       for (size_t j=0; j<R; j++) {

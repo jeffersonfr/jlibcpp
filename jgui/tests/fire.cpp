@@ -50,12 +50,12 @@ class Fire : public jgui::Window {
       for (int x=0; x<256; x++) {
         jgui::jcolor_t<float>
           color;
-        double 
-          h = (x/8.0)/255.0,
-          s = 255.0/255.0,
-          l = std::min(255.0, (x * 2)/255.0);
+        float
+          h = (x/8.0f)/255.0f,
+          s = 255.0f/255.0f,
+          l = std::min(255.0f, (x * 2)/255.0f);
 
-        color.FromHSB(h, s, l);
+        color.FromHSB({h, s, l});
 
         palette[x] = uint32_t(color);
       }

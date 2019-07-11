@@ -308,17 +308,13 @@ Image * IndexedImage::Colorize(jcolor_t<float> color)
 {
   jgui::jsize_t<int> 
     size = GetSize();
-  float
-    hue, 
-    sat, 
-    bri;
   uint32_t 
     palette[_palette_size];
-
-  color.ToHSB(hue, sat, bri);
+  jmath::jvector_t<3, float>
+    hsb = color.ToHSB();
 
   HSLColorSpace 
-    hsl(hue, sat, 0.0);
+    hsl(hsb[0], hsb[1], 0.0);
 
   for (int i=0; i<_palette_size; i++) {
     jgui::jcolor_t<float>
