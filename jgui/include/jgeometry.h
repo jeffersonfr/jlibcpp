@@ -70,6 +70,20 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return (left != param.left or top != param.top or right != param.right or bottom != param.bottom);
     }
 
+    friend std::ostream & operator<<(std::ostream& out, const jinsets_t<T> &param)
+    {
+      out << param.left << ", " << param.top << ", " << param.right << ", " << param.bottom;
+
+      return out;
+    }
+
+    friend std::istream & operator>>(std::istream& is, jinsets_t<T> &param) 
+    {
+      is >> param.left >> param.top >> param.right >> param.bottom;
+
+      return is;
+    }
+
   };
 
 /**
@@ -273,6 +287,20 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
     friend jpoint_t<T> operator/(T param, jpoint_t<T> thiz)
     {
       return {(T)(param/thiz.x), (T)(param/thiz.y)};
+    }
+
+    friend std::ostream & operator<<(std::ostream& out, const jpoint_t<T> &param)
+    {
+      out << param.x << ", " << param.y;
+
+      return out;
+    }
+
+    friend std::istream & operator>>(std::istream& is, jpoint_t<T> &param) 
+    {
+      is >> param.x >> param.y;
+
+      return is;
     }
 
   };
@@ -522,6 +550,20 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return {param/thiz.p0, param/thiz.p1};
     }
     
+    friend std::ostream & operator<<(std::ostream& out, const jline_t<T> &param)
+    {
+      out << std::string("(") << param.p0 << "), (" << param.p1 << ")";
+
+      return out;
+    }
+
+    friend std::istream & operator>>(std::istream& is, jline_t<T> &param) 
+    {
+      is >> param.p0.x >> param.p0.y >> param.p1.x >> param.p1.y;
+
+      return is;
+    }
+
   };
 
 /**
@@ -702,6 +744,20 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return {thiz.center - param, thiz.radius};
     }
     
+    friend std::ostream & operator<<(std::ostream& out, const jcircle_t<T> &param)
+    {
+      out << std::string("(") << param.center << "), " << param.radius;
+
+      return out;
+    }
+
+    friend std::istream & operator>>(std::istream& is, jcircle_t<T> &param) 
+    {
+      is >> param.center.x >> param.center.y >> param.radius;
+
+      return is;
+    }
+
   };
 
 /**
@@ -842,6 +898,20 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return {(T)(param/thiz.width), (T)(param/thiz.height)};
     }
     
+    friend std::ostream & operator<<(std::ostream& out, const jsize_t<T> &param)
+    {
+      out << param.width << ", " << param.height;
+
+      return out;
+    }
+
+    friend std::istream & operator>>(std::istream& is, jsize_t<T> &param) 
+    {
+      is >> param.width >> param.height;
+
+      return is;
+    }
+
   };
 
 /**
@@ -1127,6 +1197,20 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return {thiz.point, param - thiz.size};
     }
     
+    friend std::ostream & operator<<(std::ostream& out, const jrect_t<T> &param)
+    {
+      out << param.point << ", " << param.size;
+
+      return out;
+    }
+
+    friend std::istream & operator>>(std::istream& is, jrect_t<T> &param) 
+    {
+      is >> param.point.x >> param.point.y >> param.size.width >> param.height;
+
+      return is;
+    }
+
 };
 
 }
