@@ -29,6 +29,7 @@
 #include <complex>
 #include <algorithm>
 #include <optional>
+#include <random>
 
 namespace jmath {
 
@@ -43,6 +44,21 @@ template<class T>
 template<size_t N, typename T = float, typename = typename std::enable_if<std::is_arithmetic<T>::value || is_complex<T>::value, T>::type>
   struct jvector_t {
     T data[N];
+
+    static jvector_t<N, T> Random(double lo = 0.0, double hi = 1.0)
+    {
+      jvector_t<N, T> v;
+
+      std::random_device rd;  //Will be used to obtain a seed for the random number engine
+      std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+      std::uniform_real_distribution<> distribution(lo, hi);
+
+      for (size_t i=0; i<N; i++) {
+        v.data[i] = (T)distribution(gen);
+      }
+
+      return v;
+    }
 
     template<typename U> operator jvector_t<N, U>() const
     {

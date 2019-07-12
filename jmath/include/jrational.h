@@ -35,80 +35,80 @@ template <typename T, typename = typename std::enable_if<!std::is_signed<T>::val
       return (U)num/(U)den;
     }
     
-    jrational_t operator+()
+    jrational_t<T> operator+()
     {
       return *this;
     }
 
-    jrational_t operator-()
+    jrational_t<T> operator-()
     {
       return {-den, -num};
     }
 
-    jrational_t operator++()
+    jrational_t<T> operator++()
     {
       return *this = *this + 1;
     }
 
-    jrational_t operator++(int)
+    jrational_t<T> operator++(int)
     {
-      jrational_t r = *this;
+      jrational_t<T> r = *this;
 
       *this = *this + 1;
 
       return r;
     }
 
-    jrational_t operator--()
+    jrational_t<T> operator--()
     {
       return *this = *this + 1;
     }
 
-    jrational_t operator--(int)
+    jrational_t<T> operator--(int)
     {
-      jrational_t r = *this;
+      jrational_t<T> r = *this;
 
       *this = *this - 1;
 
       return r;
     }
 
-    jrational_t operator+(const T &param)
+    jrational_t<T> operator+(const T &param)
     {
       return *this + jrational_t<T>{param, 1};
     }
 
-    jrational_t operator-(const T &param)
+    jrational_t<T> operator-(const T &param)
     {
       return *this - jrational_t<T>{param, 1};
     }
 
-    jrational_t operator*(const T &param)
+    jrational_t<T> operator*(const T &param)
     {
       return *this*jrational_t<T>{param, 1};
     }
 
-    jrational_t operator/(const T &param)
+    jrational_t<T> operator/(const T &param)
     {
       return *this/jrational_t<T>{param, 1};
     }
 
-    jrational_t & operator+=(const T &param)
+    jrational_t<T> & operator+=(const T &param)
     {
       return *this = *this + jrational_t<T>{param, 1};
     }
 
-    jrational_t & operator-=(const T &param)
+    jrational_t<T> & operator-=(const T &param)
     {
       return *this = *this - jrational_t<T>{param, 1};
     }
 
-    jrational_t & operator*=(const T &param)
+    jrational_t<T> & operator*=(const T &param)
     {
       return *this = *this*jrational_t<T>{param, 1};
     }
 
-    jrational_t & operator/=(const T &param)
+    jrational_t<T> & operator/=(const T &param)
     {
       return *this = *this/jrational_t<T>{param, 1};
     }
@@ -143,57 +143,57 @@ template <typename T, typename = typename std::enable_if<!std::is_signed<T>::val
       return *this >= jrational_t<T>{param, 1};
     }
 
-    jrational_t operator+(const jrational_t &param)
+    jrational_t<T> operator+(const jrational_t<T> &param)
     {
       return {num*param.den + param.num*den, den*param.den};
     }
 
-    jrational_t operator-(const jrational_t &param)
+    jrational_t<T> operator-(const jrational_t<T> &param)
     {
       return {num*param.den - param.num*den, den*param.den};
     }
 
-    jrational_t operator*(const jrational_t &param)
+    jrational_t<T> operator*(const jrational_t<T> &param)
     {
       return {num*param.num, den*param.den};
     }
 
-    jrational_t operator/(const jrational_t &param)
+    jrational_t<T> operator/(const jrational_t<T> &param)
     {
       return {num*param.den, den*param.num};
     }
 
-    jrational_t & operator+=(const jrational_t &param)
+    jrational_t<T> & operator+=(const jrational_t<T> &param)
     {
       return (*this = *this + param);
     }
 
-    jrational_t & operator-=(const jrational_t &param)
+    jrational_t<T> & operator-=(const jrational_t<T> &param)
     {
       return (*this = *this - param);
     }
 
-    jrational_t & operator*=(const jrational_t &param)
+    jrational_t<T> & operator*=(const jrational_t<T> &param)
     {
       return (*this = *this*param);
     }
 
-    jrational_t & operator/=(const jrational_t &param)
+    jrational_t<T> & operator/=(const jrational_t<T> &param)
     {
       return (*this = *this/param);
     }
 
-    bool operator==(const jrational_t &param)
+    bool operator==(const jrational_t<T> &param)
     {
       return num == param.num and den == param.den;
     }
 
-    bool operator!=(const jrational_t &param)
+    bool operator!=(const jrational_t<T> &param)
     {
       return num != param.num or den != param.den;
     }
 
-    bool operator<(const jrational_t &param)
+    bool operator<(const jrational_t<T> &param)
     {
       if (*this == param) {
         return false;
@@ -202,14 +202,14 @@ template <typename T, typename = typename std::enable_if<!std::is_signed<T>::val
       return num*den < param.num*param.den;
     }
 
-    bool operator>(const jrational_t &param)
+    bool operator>(const jrational_t<T> &param)
     {
       if (*this < param or *this == param) {
         return false;
       }
     }
 
-    bool operator<=(const jrational_t &param)
+    bool operator<=(const jrational_t<T> &param)
     {
       if (*this > param) {
         return false;
@@ -218,7 +218,7 @@ template <typename T, typename = typename std::enable_if<!std::is_signed<T>::val
       return true;
     }
 
-    bool operator>=(const jrational_t &param)
+    bool operator>=(const jrational_t<T> &param)
     {
       if (*this < param) {
         return false;
@@ -227,7 +227,7 @@ template <typename T, typename = typename std::enable_if<!std::is_signed<T>::val
       return true;
     }
 
-    jrational_t & Simplify()
+    jrational_t<T> & Simplify()
     {
       T gcd = GCD(num, den);
 
@@ -237,7 +237,7 @@ template <typename T, typename = typename std::enable_if<!std::is_signed<T>::val
       return *this;
     }
 
-    jrational_t Abs()
+    jrational_t<T> Abs()
     {
       return {std::abs(num), std::abs(den)};
     }
@@ -266,14 +266,24 @@ template <typename T, typename = typename std::enable_if<!std::is_signed<T>::val
       return num*den/std::abs(num*den);
     }
 
-    friend std::ostream& operator<<(std::ostream &out, const jrational_t &param)
+    jrational_t<T> & Pow(double e)
+    {
+      return {std::pow(num), std::pow(den)};
+    }
+
+    jrational_t<T> & Sqrt()
+    {
+      return {std::sqrt(num), std::sqrt(den)};
+    }
+
+    friend std::ostream& operator<<(std::ostream &out, const jrational_t<T> &param)
     {
       out << param.num << "/" << param.den;
 
       return out;
     }
 
-    friend std::istream& operator>>(std::istream &in, jrational_t &param)
+    friend std::istream& operator>>(std::istream &in, jrational_t<T> &param)
     {
       in >> param.num;
 
@@ -290,52 +300,52 @@ template <typename T, typename = typename std::enable_if<!std::is_signed<T>::val
       return in;
     }
 
-    friend bool operator==(const T &lhs, const jrational_t &rhs)
+    friend bool operator==(const T &lhs, const jrational_t<T> &rhs)
     {
       return rhs == lhs;
     }
 
-    friend bool operator!=(const T &lhs, const jrational_t &rhs)
+    friend bool operator!=(const T &lhs, const jrational_t<T> &rhs)
     {
       return rhs != lhs;
     }
 
-    friend bool operator<(const T &lhs, const jrational_t &rhs)
+    friend bool operator<(const T &lhs, const jrational_t<T> &rhs)
     {
       return rhs >= lhs;
     }
 
-    friend bool operator>(const T &lhs, const jrational_t &rhs)
+    friend bool operator>(const T &lhs, const jrational_t<T> &rhs)
     {
       return rhs <= lhs;
     }
 
-    friend bool operator<=(const T &lhs, const jrational_t &rhs)
+    friend bool operator<=(const T &lhs, const jrational_t<T> &rhs)
     {
       return rhs > lhs;
     }
 
-    friend bool operator>=(const T &lhs, const jrational_t &rhs)
+    friend bool operator>=(const T &lhs, const jrational_t<T> &rhs)
     {
       return rhs < lhs;
     }
 
-    friend jrational_t operator+(const T &lhs, const jrational_t &rhs)
+    friend jrational_t<T> operator+(const T &lhs, const jrational_t<T> &rhs)
     {
       return rhs + lhs;
     }
 
-    friend jrational_t operator-(const T &lhs, const jrational_t &rhs)
+    friend jrational_t<T> operator-(const T &lhs, const jrational_t<T> &rhs)
     {
       return -rhs + lhs;
     }
 
-    friend jrational_t operator*(const T &lhs, const jrational_t &rhs)
+    friend jrational_t<T> operator*(const T &lhs, const jrational_t<T> &rhs)
     {
       return rhs*lhs;
     }
 
-    friend jrational_t operator/(const T &lhs, const jrational_t &rhs)
+    friend jrational_t<T> operator/(const T &lhs, const jrational_t<T> &rhs)
     {
       return lhs*jrational_t<T>{rhs.den, rhs.num};
     }
