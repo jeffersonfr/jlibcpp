@@ -29,6 +29,7 @@
 #include <fstream>
 #include <complex>
 #include <algorithm>
+#include <random>
 
 namespace jmath {
 
@@ -52,6 +53,56 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
 
       return m;
 		}
+
+    static jmatrix_t<R, C, T> Kernel(T sigma = 1)
+    {
+      static_assert(R == C, "Kernel needs a square matrix");
+
+      jmatrix_t<R, C, T> m;
+
+      // intialising standard deviation to 1.0
+      double s = 2.0*sigma*sigma, sum = 0.0;
+      int offset = R/2;
+
+      // generating kernel
+      for (int y=-offset; y<=offset; y++) {
+        for (int x=-offset; x<=offset; x++) {
+          double 
+            r = std::sqrt(x*x + y*y),
+            e = exp(-(r*r)/s)/(M_PI*s);
+          
+          m.data[y + offset][x + offset] = e;
+
+          sum = sum + e;
+        }
+      }
+
+      // normalising the kernel
+      for (size_t j=0; j<R; j++) {
+        for (size_t i=0; i<R; i++) {
+          m.data[j][i] = m.data[j][i]/sum;
+        }
+      }
+
+      return m;
+    }
+
+    static jmatrix_t<R, C, T> Random(double lo = 0.0, double hi = 1.0)
+    {
+      jmatrix_t<R, C, T> m;
+
+      std::random_device rd;  //Will be used to obtain a seed for the random number engine
+      std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+      std::uniform_real_distribution<> distribution(lo, hi);
+
+      for (size_t j=0; j<R; j++) {
+        for (size_t i=0; i<R; i++) {
+          m.data[i][j] = (T)distribution(gen);
+        }
+      }
+
+      return m;
+    }
 
     template<typename U> operator jvector_t<R*C, U>() const
     {

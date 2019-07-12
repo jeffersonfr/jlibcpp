@@ -51,7 +51,7 @@ class Grid : public jgui::Window {
 	private:
     jmath::jmatrix_t<3, 1, float>
       _rotate {+1.2f, +0.0f, +2.4f},
-      _camera {+1.0f, +1.0f, +1.0f};
+      _camera {+0.0f, +0.0f, +1.0f};
 		float
 			_scale = 100.0f;
 
