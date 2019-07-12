@@ -404,6 +404,55 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
       return *this;
     }
 
+    jvector_t<N, T> & Reverse(size_t lo = 0, size_t hi = N - 1)
+    {
+      if (lo < 0 or hi < 0 or lo >= N or hi >= N or lo > hi) {
+        throw jexception::OutOfBoundsException("Range index is out of bounds");
+      }
+
+      size_t length = hi - lo;
+
+      for (size_t i=0; i<=length/2; i++) {
+        std::swap(data[lo + i], data[hi - i]);
+      }
+
+      return *this;
+    }
+
+    jvector_t<N, T> & MoveLeft(size_t n)
+    {
+      jvector_t<N, T> v = *this;
+
+      n = n%N;
+
+      for (size_t i=0; i<N - n; i++) {
+        data[i] = v.data[n + i];
+      }
+
+      for (size_t i=0; i<n; i++) {
+        data[N - n + i] = v.data[i];
+      }
+
+      return *this;
+    }
+
+    jvector_t<N, T> & MoveRight(size_t n)
+    {
+      jvector_t<N, T> v = *this;
+
+      n = n%N;
+
+      for (size_t i=0; i<n; i++) {
+        data[i] = v.data[N - n + i];
+      }
+
+      for (size_t i=0; i<N - n; i++) {
+        data[n + i] = v.data[i];
+      }
+
+      return *this;
+    }
+
     size_t Size() const
     {
       return N;
@@ -544,6 +593,11 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
       }
 
       return *this;
+    }
+
+    jvector_t<N, T> Component(const jvector_t<N, T> &param)
+    {
+      return Scalar(param)/param.EuclidianNorm();
     }
 
     friend jvector_t<N, T> operator+(const T &param, const jvector_t<N, T> &thiz)

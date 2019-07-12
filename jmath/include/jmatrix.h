@@ -286,7 +286,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
 
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C1; i++) {
-          m.data[j][i] = Row(j).Scalar(param.Col(i));
+          m.data[j][i] = Row(j).Scalar(param.Column(i));
         }
       }
 
@@ -323,6 +323,16 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return R*C;
     }
 
+    size_t Rows() const
+    {
+      return R;
+    }
+
+    size_t Cols() const
+    {
+      return C;
+    }
+
     jvector_t<C, T> Row(size_t n) const
     {
       if (n >= R) {
@@ -332,10 +342,10 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return data[n];
     }
 
-    jvector_t<R, T> Col(size_t n) const
+    jvector_t<R, T> Column(size_t n) const
     {
       if (n >= C) {
-        throw jexception::OutOfBoundsException("Row index is out of bounds");
+        throw jexception::OutOfBoundsException("Column index is out of bounds");
       }
 
       jvector_t<R, T> v;
@@ -345,6 +355,67 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       }
 
       return v;
+    }
+
+    jmatrix_t<R, C, T> & SwapRow(size_t i, size_t j)
+    {
+      if (i >= R or j >= R) {
+        throw jexception::OutOfBoundsException("Row index is out of bounds");
+      }
+
+      if (i != j) {
+        jvector_t<C, T> v = Row(i);
+
+        Row(i, Row(j));
+        Row(j, v);
+      }
+        
+      return *this;
+    }
+
+    jmatrix_t<R, C, T> & SwapColumn(size_t i, size_t j)
+    {
+      if (i >= C or j >= C) {
+        throw jexception::OutOfBoundsException("Column index is out of bounds");
+      }
+
+      if (i != j) {
+        jvector_t<R, T> v = Column(i);
+
+        Column(i, Column(j));
+        Column(j, v);
+      }
+        
+      return *this;
+    }
+
+    jmatrix_t<R, C, T> & Row(size_t n, const jmath::jvector_t<C, T> &v)
+    {
+      data[n] = v;
+
+      return *this;
+    }
+
+    jvector_t<R, T> Column(size_t n, const jmath::jvector_t<R, T> &v)
+    {
+      for (size_t j=0; j<R; j++) {
+        data[j][n] = v[j];
+      }
+
+      return *this;
+    }
+
+    template<size_t R1, size_t C1> jmatrix_t<R1, C1, T> Format() const
+    {
+      static_assert(R*C == R1*C1, "Numbers of elements must be equal");
+
+      jmatrix_t<R1, C1, T> m;
+
+      for (size_t i=0; i<R*C; i++) {
+        m.data[i/C1][i%C1] = data[i/C][i%C];
+      }
+
+      return m;
     }
 
     template<size_t R1, size_t C1> jmatrix_t<R1, C1, T> SubMatrix(size_t r, size_t c) const
@@ -375,6 +446,43 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       }
 
       return std::pow(-1, (r + c)&0x01)*m.Determinant();
+    }
+
+    jmatrix_t<R, C, T> RowEchelonForm()
+    {
+      size_t lead = 0;
+
+      for (size_t row=0; row<R; row++) {
+        if (lead > (C - 1)) {
+          return *this;
+        }
+
+        size_t i = row;
+
+        while (data[i][lead] == 0) {
+          i = i + 1;
+
+          if (i > (R - 1)) {
+            i = row;
+            lead = lead + 1;
+
+            if (lead > (C - 1)) {
+              return *this;
+            }
+          }
+        }
+
+        SwapRow(i, row);
+        Row(row, data[row]/data[row][lead]);
+
+        for (i=0; i<R; i++) {
+          if (i != row) {
+            Row(i, Row(i) - Row(row)*data[i][lead]);
+          }
+        }
+      }
+
+      return *this;
     }
 
     T Mean() const
