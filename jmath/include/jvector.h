@@ -296,174 +296,203 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
       return v;
     }
 
-    jvector_t<N, T> & Pow(double e)
+    jvector_t<N, T> Pow(double e)
     {
+      jvector_t<N, T> v;
+
       for (size_t i=0; i<N; i++) {
-        data[i] = (T)std::pow(data[i], e);
+        v.data[i] = (T)std::pow(data[i], e);
       }
 
-      return *this;
+      return v;
     }
 
-    jvector_t<N, T> & Sqrt()
+    jvector_t<N, T> Sqrt()
     {
+      jvector_t<N, T> v;
+
       for (size_t i=0; i<N; i++) {
-        data[i] = (T)std::sqrt(data[i]);
+        v.data[i] = (T)std::sqrt(data[i]);
       }
 
-      return *this;
+      return v;
     }
 
-    jvector_t<N, T> & Abs()
+    jvector_t<N, T> Abs()
     {
+      jvector_t<N, T> v;
+
       for (size_t i=0; i<N; i++) {
-        data[i] = (T)std::abs(data[i]);
+        v.data[i] = (T)std::abs(data[i]);
       }
 
-      return *this;
+      return v;
     }
 
-    jvector_t<N, T> & Sin()
+    jvector_t<N, T> Sin()
     {
+      jvector_t<N, T> v;
+
       for (size_t i=0; i<N; i++) {
-        data[i] = (T)std::sin(data[i]);
+        v.data[i] = (T)std::sin(data[i]);
       }
 
-      return *this;
+      return v;
     }
 
-    jvector_t<N, T> & Cos()
+    jvector_t<N, T> Cos()
     {
+      jvector_t<N, T> v;
+
       for (size_t i=0; i<N; i++) {
-        data[i] = (T)std::cos(data[i]);
+        v.data[i] = (T)std::cos(data[i]);
       }
 
-      return *this;
+      return v;
     }
 
-    jvector_t<N, T> & Tan()
+    jvector_t<N, T> Tan()
     {
+      jvector_t<N, T> v;
+
       for (size_t i=0; i<N; i++) {
-        data[i] = (T)std::tan(data[i]);
+        v.data[i] = (T)std::tan(data[i]);
       }
 
-      return *this;
+      return v;
     }
 
-    jvector_t<N, T> & SinH()
+    jvector_t<N, T> SinH()
     {
+      jvector_t<N, T> v;
+
       for (size_t i=0; i<N; i++) {
-        data[i] = (T)std::sinh(data[i]);
+        v.data[i] = (T)std::sinh(data[i]);
       }
 
-      return *this;
+      return v;
     }
 
-    jvector_t<N, T> & CosH()
+    jvector_t<N, T> CosH()
     {
+      jvector_t<N, T> v;
+
       for (size_t i=0; i<N; i++) {
-        data[i] = (T)std::cosh(data[i]);
+        v.data[i] = (T)std::cosh(data[i]);
       }
 
-      return *this;
+      return v;
     }
 
-    jvector_t<N, T> & TanH()
+    jvector_t<N, T> TanH()
     {
+      jvector_t<N, T> v;
+
       for (size_t i=0; i<N; i++) {
-        data[i] = (T)std::tanh(data[i]);
+        v.data[i] = (T)std::tanh(data[i]);
       }
 
-      return *this;
+      return v;
     }
 
-    jvector_t<N, T> & Exp()
+    jvector_t<N, T> Exp()
     {
+      jvector_t<N, T> v;
+
       for (size_t i=0; i<N; i++) {
-        data[i] = (T)std::exp(data[i]);
+        v.data[i] = (T)std::exp(data[i]);
       }
 
-      return *this;
+      return v;
     }
 
-    jvector_t<N, T> & Log()
+    jvector_t<N, T> Log()
     {
+      jvector_t<N, T> v;
+
       for (size_t i=0; i<N; i++) {
-        data[i] = (T)std::log(data[i]);
+        v.data[i] = (T)std::log(data[i]);
       }
 
-      return *this;
+      return v;
     }
 
-    jvector_t<N, T> & Log2()
+    jvector_t<N, T> Log2()
     {
+      jvector_t<N, T> v;
+
       for (size_t i=0; i<N; i++) {
-        data[i] = (T)std::log2(data[i]);
+        v.data[i] = (T)std::log2(data[i]);
       }
 
-      return *this;
+      return v;
     }
 
-    jvector_t<N, T> & Log10()
+    jvector_t<N, T> Log10()
     {
+      jvector_t<N, T> v;
+
       for (size_t i=0; i<N; i++) {
-        data[i] = (T)std::log10(data[i]);
+        v.data[i] = (T)std::log10(data[i]);
       }
 
-      return *this;
+      return v;
     }
 
-    jvector_t<N, T> & Sort()
+    jvector_t<N, T> Sort()
     {
-      std::sort(data, data + N);
+      jvector_t<N, T> v = *this;
 
-      return *this;
+      std::sort(v.data, v.data + N);
+
+      return v;
     }
 
-    jvector_t<N, T> & Reverse(size_t lo = 0, size_t hi = N - 1)
+    jvector_t<N, T> Reverse(size_t lo = 0, size_t hi = N - 1)
     {
       if (lo < 0 or hi < 0 or lo >= N or hi >= N or lo > hi) {
         throw jexception::OutOfBoundsException("Range index is out of bounds");
       }
 
+      jvector_t<N, T> v = *this;
       size_t length = hi - lo;
 
       for (size_t i=0; i<=length/2; i++) {
-        std::swap(data[lo + i], data[hi - i]);
+        std::swap(v.data[lo + i], v.data[hi - i]);
       }
 
-      return *this;
+      return v;
     }
 
-    jvector_t<N, T> & MoveLeft(size_t n)
+    jvector_t<N, T> MoveLeft(size_t n)
     {
       jvector_t<N, T> v = *this;
 
       n = n%N;
 
       for (size_t i=0; i<N - n; i++) {
-        data[i] = v.data[n + i];
+        v.data[i] = data[n + i];
       }
 
       for (size_t i=0; i<n; i++) {
-        data[N - n + i] = v.data[i];
+        v.data[N - n + i] = data[i];
       }
 
-      return *this;
+      return v;
     }
 
-    jvector_t<N, T> & MoveRight(size_t n)
+    jvector_t<N, T> MoveRight(size_t n)
     {
       jvector_t<N, T> v = *this;
 
       n = n%N;
 
       for (size_t i=0; i<n; i++) {
-        data[i] = v.data[N - n + i];
+        v.data[i] = data[N - n + i];
       }
 
       for (size_t i=0; i<N - n; i++) {
-        data[n + i] = v.data[i];
+        v.data[n + i] = data[i];
       }
 
       return *this;
@@ -600,15 +629,17 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
       return *std::max_element(data, data + N);
     }
 
-    jvector_t<N, T> & Conjugate()
+    jvector_t<N, T> Conjugate()
     {
       static_assert(is_complex<T>::value, "T != std::complex<U>");
 
+      jvector_t<N, T> v;
+
       for (size_t i=0; i<N; i++) {
-        data[i] = std::conj(data[i]);
+        v.data[i] = std::conj(data[i]);
       }
 
-      return *this;
+      return v;
     }
 
     jvector_t<N, T> Component(const jvector_t<N, T> &param)

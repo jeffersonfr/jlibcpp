@@ -125,7 +125,6 @@ OBJS_jexception += \
 
 OBJS_jmath += \
   jbase64.o\
-  jcomplex.o\
   jcrc.o\
   jdigest.o\
   jmath.o\
