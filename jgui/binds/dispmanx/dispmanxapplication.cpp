@@ -636,8 +636,6 @@ void NativeApplication::InternalLoop()
         jevent::jkeyevent_symbol_t symbol = TranslateToNativeKeySymbol(ev.code, shift);
 
         sg_jgui_window->GetEventManager()->PostEvent(new jevent::KeyEvent(sg_jgui_window, type, mod, jevent::KeyEvent::GetCodeFromSymbol(symbol), symbol));
-
-        // continue;
       }
     }
 
@@ -685,9 +683,9 @@ void NativeApplication::InternalLoop()
       lastsg_mouse_state = buttonMask;
 
       sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, jevent::JMB_NONE, {sg_mouse_x + sg_jgui_cursor.hot_x, sg_mouse_y + sg_jgui_cursor.hot_y}, mouse_z));
-
-      continue;
     }
+
+    std::this_thread::yield();
   }
 
   sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_CLOSED));

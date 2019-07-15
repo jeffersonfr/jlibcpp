@@ -327,9 +327,7 @@ struct jcolor_t {
         color = jcolor_name_t::Indigo;
       } else if (name == jcommon::StringUtils::ToLower("Ivory")) {
         color = jcolor_name_t::Ivory;
-      }
-    } else if (name[0] > 'j' && name[0] <= 'p') {
-      if (name == jcommon::StringUtils::ToLower("Khaki")) {
+      } else if (name == jcommon::StringUtils::ToLower("Khaki")) {
         color = jcolor_name_t::Khaki;
       } else if (name == jcommon::StringUtils::ToLower("Lavender")) {
         color = jcolor_name_t::Lavender;
@@ -443,9 +441,7 @@ struct jcolor_t {
         color = jcolor_name_t::Plum;
       } else if (name == jcommon::StringUtils::ToLower("Purple")) {
         color = jcolor_name_t::Purple;
-      }
-    } else if (name[0] > 'p' && name[0] <= 'z') {
-      if (name == jcommon::StringUtils::ToLower("Red")) {
+      } else if (name == jcommon::StringUtils::ToLower("Red")) {
         color = jcolor_name_t::Red;
       } else if (name == jcommon::StringUtils::ToLower("RosyBrown")) {
         color = jcolor_name_t::RosyBrown;
@@ -529,15 +525,15 @@ struct jcolor_t {
   {
     uint8_t
       r = (color >> 0x10) & 0xff,
-        g = (color >> 0x08) & 0xff,
-            b = (color >> 0x00) & 0xff,
-            a = (color >> 0x18) & 0xff;
+      g = (color >> 0x08) & 0xff,
+      b = (color >> 0x00) & 0xff,
+      a = (color >> 0x18) & 0xff;
 
-        red = r/T(255.0);
-        green = g/T(255.0);
-        blue = b/T(255.0);
-        alpha = a/T(255.0);
-      }
+    red = r/T(255.0);
+    green = g/T(255.0);
+    blue = b/T(255.0);
+    alpha = a/T(255.0);
+  }
 
   jcolor_t(T r, T g, T b, T a)
   {

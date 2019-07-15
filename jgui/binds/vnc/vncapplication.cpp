@@ -458,6 +458,8 @@ void NativeApplication::InternalLoop()
     }
 
     rfbProcessEvents(sg_server, 1000000/100);
+
+    std::this_thread::yield();
   }
 
   /*

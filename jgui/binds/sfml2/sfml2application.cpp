@@ -548,6 +548,8 @@ void NativeApplication::InternalLoop()
         sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_CLOSED));
       }
 		}
+
+    std::this_thread::yield();
   }
   
   sg_jgui_window->SetVisible(false);

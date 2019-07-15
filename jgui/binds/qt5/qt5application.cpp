@@ -583,6 +583,8 @@ void NativeApplication::InternalLoop()
     }
 
     sg_application->processEvents();
+
+    std::this_thread::yield();
   } while (sg_quitting == false);
 
   sg_jgui_window->SetVisible(false);

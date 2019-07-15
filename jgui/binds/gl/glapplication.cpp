@@ -479,6 +479,8 @@ void OnDraw()
   sg_back_buffer->UnlockData();
 
   sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
+
+  std::this_thread::yield();
 }
 
 void OnShape(int w, int h)

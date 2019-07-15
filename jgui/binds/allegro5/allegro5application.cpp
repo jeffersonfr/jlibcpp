@@ -442,6 +442,8 @@ void NativeApplication::InternalLoop()
     }
 
     if (al_get_next_event(queue, &event) == false) {
+      std::this_thread::yield();
+
       continue;
     }
  
@@ -565,6 +567,8 @@ void NativeApplication::InternalLoop()
 
       sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, jevent::JMB_NONE, {sg_mouse_x, sg_mouse_y}, mouse_z));
     }
+
+    std::this_thread::yield();
   }
 
   al_destroy_event_queue(queue);

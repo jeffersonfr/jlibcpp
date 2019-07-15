@@ -456,6 +456,8 @@ static gboolean OnDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
 
   sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
 
+  std::this_thread::yield();
+
   return TRUE;
 }
 

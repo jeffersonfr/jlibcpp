@@ -488,6 +488,8 @@ static void paint_callback(const nana::paint::graphics& graph)
   sg_back_buffer->UnlockData();
 
   sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
+  
+  std::this_thread::yield();
 }
 
 NativeWindow::NativeWindow(int x, int y, int width, int height):

@@ -634,6 +634,8 @@ void NativeApplication::InternalLoop()
         sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, buttons, {sg_mouse_x, sg_mouse_y}, mouse_z));
       }
     }
+
+    std::this_thread::yield();
   }
 
   sg_quitting = true;

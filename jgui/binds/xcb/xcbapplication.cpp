@@ -547,6 +547,8 @@ void NativeApplication::InternalLoop()
 
       xcb_flush(sg_xcb_connection);
     }
+
+    std::this_thread::yield();
   }
 
   sg_jgui_window->SetVisible(false);

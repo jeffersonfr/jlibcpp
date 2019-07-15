@@ -615,6 +615,8 @@ void NativeApplication::InternalLoop()
             if (event.type == KeyRelease) {
               sg_lastsg_key_release_event = event;
 
+              std::this_thread::yield();
+
               continue;
             }
 
@@ -713,6 +715,8 @@ void NativeApplication::InternalLoop()
         sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, jevent::JMB_NONE, {sg_mouse_x, sg_mouse_y}, mouse_z));
       }
     }
+
+    std::this_thread::yield();
   }
 
   sg_jgui_window->SetVisible(false);

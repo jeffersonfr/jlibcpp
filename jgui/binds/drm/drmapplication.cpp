@@ -247,12 +247,14 @@ static int modeset_find_crtc(drmModeRes *res, drmModeConnector *conn, struct mod
     enc = drmModeGetEncoder(sg_handler, conn->encoders[i]);
     if (!enc) {
       fprintf(stderr, "cannot retrieve encoder %u:%u (%d): %m\n", i, conn->encoders[i], errno);
+
       continue;
     }
 
     for (j = 0; j < res->count_crtcs; ++j) {
-      if (!(enc->possible_crtcs & (1 << j)))
+      if (!(enc->possible_crtcs & (1 << j))) {
         continue;
+      }
 
       crtc = res->crtcs[j];
       for (iter = sg_modeset_list; iter; iter = iter->next) {
@@ -799,8 +801,6 @@ void NativeApplication::InternalLoop()
         jevent::jkeyevent_symbol_t symbol = TranslateToNativeKeySymbol(ev.code, shift);
 
         sg_jgui_window->GetEventManager()->PostEvent(new jevent::KeyEvent(sg_jgui_window, type, mod, jevent::KeyEvent::GetCodeFromSymbol(symbol), symbol));
-
-        // continue;
       }
     }
 
@@ -848,9 +848,9 @@ void NativeApplication::InternalLoop()
       last_mouse_state = buttonMask;
 
       sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, jevent::JMB_NONE, {sg_mouse_x + sg_cursor_params.hot_x, sg_mouse_y + sg_cursor_params.hot_y}, mouse_z));
-
-      continue;
     }
+
+    std::this_thread::yield();
   }
 
   sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_CLOSED));
