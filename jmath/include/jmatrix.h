@@ -46,7 +46,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C; i++) {
 					if (j == i) {
-          	m.data[i][j] = 1;
+          	m.data[j][i] = 1;
 					}
         }
       }
@@ -97,7 +97,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
 
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<R; i++) {
-          m.data[i][j] = (T)distribution(gen);
+          m.data[j][i] = (T)distribution(gen);
         }
       }
 
@@ -110,7 +110,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
 
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C; i++) {
-          v.data[j*C + i] = (U)data[j][i];
+          v.data[j*C + i] = (U)std::real(data[j][i]);
         }
       }
 
@@ -123,7 +123,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
 
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C; i++) {
-          m.data[j][i] = (U)data[j][i];
+          m.data[j][i] = (U)std::real(data[j][i]);
         }
       }
 
@@ -542,7 +542,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
 
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C; i++) {
-          count = count + data[i][j];
+          count = count + data[j][i];
         }
       }
 
@@ -700,7 +700,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C; i++) {
 					if (j == i) {
-          	sum = sum + data[i][j];
+          	sum = sum + data[j][i];
 					}
         }
       }

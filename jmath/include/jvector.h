@@ -65,7 +65,7 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
       jvector_t<N, U> v;
 
       for (size_t i=0; i<N; i++) {
-        v.data[i] = (U)data[i];
+        v.data[i] = (U)std::real(data[i]);
       }
 
       return v;
