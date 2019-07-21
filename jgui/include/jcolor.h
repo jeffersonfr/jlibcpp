@@ -821,7 +821,7 @@ struct jcolor_t {
    *
    * \return the RGB value of the color with the indicated hue, saturation, and brightness.
    */
-  void FromHSB(jmath::jvector_t<3, T> hsb)
+  void FromHSB(const jmath::jvector_t<3, T> &hsb)
   {
     if (hsb[1] == T(0.0)) {
       red = green = blue = hsb[2];
@@ -867,7 +867,7 @@ struct jcolor_t {
     }
   }
 
-  void FromXYZ(jmath::jvector_t<3, T> xyz)
+  void FromXYZ(const jmath::jvector_t<3, T> &xyz)
   {
     T
       x = xyz[0],
@@ -887,7 +887,7 @@ struct jcolor_t {
     blue = (blue > 0.0031308)?(1.055 * std::pow(blue, 1/2.4) - 0.055):(12.92*blue);
   }
 
-  void FromLab(jmath::jvector_t<3, T> lab)
+  void FromLab(const jmath::jvector_t<3, T> &lab)
   {
     T
       y = (lab[0] + 16) / 116,
