@@ -121,7 +121,7 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return *this;
     }
     
-    template<typename U> jpoint_t<T> & operator=(U param)
+    template<typename U> jpoint_t<T> & operator=(const U &param)
     {
       x = (T)param;
       y = (T)param;
@@ -129,24 +129,24 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return *this;
     }
 
-    template<typename U> jpoint_t<T> operator+(U param)
+    template<typename U> jpoint_t<typename std::common_type<T, U>::type> operator+(U param)
     {
-      return {(T)(x + param), (T)(y + param)};
+      return {(x + param), (y + param)};
     }
     
-    template<typename U> jpoint_t<T> operator-(U param)
+    template<typename U> jpoint_t<typename std::common_type<T, U>::type> operator-(U param)
     {
-      return {(T)(x - param), (T)(y - param)};
+      return {(x - param), (y - param)};
     }
     
-    template<typename U> jpoint_t<T> operator*(U param)
+    template<typename U> jpoint_t<typename std::common_type<T, U>::type> operator*(U param)
     {
-      return {(T)(x*param), (T)(y*param)};
+      return {(x*param), (y*param)};
     }
     
-    template<typename U> jpoint_t<T> operator/(U param)
+    template<typename U> jpoint_t<typename std::common_type<T, U>::type> operator/(U param)
     {
-      return {(T)(x/param), (T)(y/param)};
+      return {(x/param), (y/param)};
     }
 
     template<typename U> jpoint_t<T> & operator+=(U param)
@@ -169,24 +169,32 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return (*this = *this/param);
     }
     
-    template<typename U> jpoint_t<T> operator+(jpoint_t<U> param)
+    template<typename U> jpoint_t<T> & operator=(const jpoint_t<U> &param)
     {
-      return {(T)(x + param.x), (T)(y + param.y)};
+      x = (T)param.x;
+      y = (T)param.y;
+
+      return *this;
+    }
+
+    template<typename U> jpoint_t<typename std::common_type<T, U>::type> operator+(jpoint_t<U> param)
+    {
+      return {(x + param.x), (y + param.y)};
     }
     
-    template<typename U> jpoint_t<T> operator-(jpoint_t<U> param)
+    template<typename U> jpoint_t<typename std::common_type<T, U>::type> operator-(jpoint_t<U> param)
     {
-      return {(T)(x - param.x), (T)(y - param.y)};
+      return {(x - param.x), (y - param.y)};
     }
     
-    template<typename U> jpoint_t<T> operator*(jpoint_t<U> param)
+    template<typename U> jpoint_t<typename std::common_type<T, U>::type> operator*(jpoint_t<U> param)
     {
-      return {(T)(x*param.x), (T)(y*param.y)};
+      return {(x*param.x), (y*param.y)};
     }
     
-    template<typename U> jpoint_t<T> operator/(jpoint_t<U> param)
+    template<typename U> jpoint_t<typename std::common_type<T, U>::type> operator/(jpoint_t<U> param)
     {
-      return {(T)(x/param.x), (T)(y/param.y)};
+      return {(x/param.x), (y/param.y)};
     }
     
     template<typename U> jpoint_t<T> & operator+=(jpoint_t<U> param)
@@ -211,16 +219,16 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
     
     template<typename U> float Distance(jpoint_t<U> param)
     {
-      T
-        px = (T)(x - param.x),
-        py = (T)(y - param.y);
+      typename std::common_type<T, U>::type
+        px = (x - param.x),
+        py = (y - param.y);
 
       return std::sqrt(px*px + py*py);
     }
 
-    template<typename U> jpoint_t<T> Scalar(jpoint_t<U> param)
+    template<typename U> typename std::common_type<T, U>::type Scalar(jpoint_t<U> param)
     {
-      return {(T)(x*param.x), (T)(y*param.y)};
+      return (x*param.x) + (y*param.y);
     }
 
     float Norm()
@@ -233,9 +241,9 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return std::sqrt(Norm());
     }
 
-    jpoint_t<float> Normalize()
+    template<typename U, typename = typename std::enable_if<std::is_floating_point<U>::value, T>::type> jpoint_t<U> Normalize()
     {
-      return jpoint_t<float>(*this)/EuclidianNorm();
+      return jpoint_t<U>(*this)/EuclidianNorm();
     }
  
     float Angle()
@@ -269,24 +277,24 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return std::max<T>(x, y);
     }
 
-    friend jpoint_t<T> operator+(T param, jpoint_t<T> thiz)
+    template<typename U> friend jpoint_t<typename std::common_type<T, U>::type> operator+(U param, jpoint_t<T> thiz)
     {
-      return {(T)(param + thiz.x), (T)(param + thiz.y)};
+      return {(param + thiz.x), (param + thiz.y)};
     }
     
-    friend jpoint_t<T> operator-(T param, jpoint_t<T> thiz)
+    template<typename U> friend jpoint_t<typename std::common_type<T, U>::type> operator-(U param, jpoint_t<T> thiz)
     {
-      return {(T)(param - thiz.x), (T)(param - thiz.y)};
+      return {(param - thiz.x), (param - thiz.y)};
     }
     
-    friend jpoint_t<T> operator*(T param, jpoint_t<T> thiz)
+    template<typename U> friend jpoint_t<typename std::common_type<T, U>::type> operator*(U param, jpoint_t<T> thiz)
     {
-      return {(T)(param*thiz.x), (T)(param*thiz.y)};
+      return {(param*thiz.x), (param*thiz.y)};
     }
     
-    friend jpoint_t<T> operator/(T param, jpoint_t<T> thiz)
+    template<typename U> friend jpoint_t<typename std::common_type<T, U>::type> operator/(U param, jpoint_t<T> thiz)
     {
-      return {(T)(param/thiz.x), (T)(param/thiz.y)};
+      return {(param/thiz.x), (param/thiz.y)};
     }
 
     friend std::ostream & operator<<(std::ostream& out, const jpoint_t<T> &param)
@@ -340,7 +348,7 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return *this;
     }
 
-    jline_t<T> & operator=(T param)
+    template<typename U> jline_t<T> & operator=(U param)
     {
       p0 = param;
       p1 = param;
@@ -348,22 +356,22 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return *this;
     }
 
-    template<typename U> jline_t<T> operator+(U param)
+    template<typename U> jline_t<typename std::common_type<T, U>::type> operator+(U param)
     {
       return {p0 + param, p1 + param};
     }
     
-    template<typename U> jline_t<T> operator-(U param)
+    template<typename U> jline_t<typename std::common_type<T, U>::type> operator-(U param)
     {
       return {p0 - param, p1 - param};
     }
     
-    template<typename U> jline_t<T> operator*(U param)
+    template<typename U> jline_t<typename std::common_type<T, U>::type> operator*(U param)
     {
       return {p0*param, p1*param};
     }
     
-    template<typename U> jline_t<T> operator/(U param)
+    template<typename U> jline_t<typename std::common_type<T, U>::type> operator/(U param)
     {
       return {p0/param, p1/param};
     }
@@ -378,6 +386,16 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return (*this = *this - param);
     }
     
+    template<typename U> jline_t<T> & operator*=(U param)
+    {
+      return (*this = *this*param);
+    }
+    
+    template<typename U> jline_t<T> & operator/=(U param)
+    {
+      return (*this = *this/param);
+    }
+    
     template<typename U> jline_t<T> & operator=(jpoint_t<U> &param)
     {
       p0 = param;
@@ -386,32 +404,40 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return *this;
     }
 
-    template<typename U> jline_t<T> operator+(jpoint_t<U> param)
+    template<typename U> jline_t<typename std::common_type<T, U>::type> operator+(jpoint_t<U> param)
     {
       return {p0 + param, p1 + param};
     }
     
-    template<typename U> jline_t<T> operator-(jpoint_t<U> param)
+    template<typename U> jline_t<typename std::common_type<T, U>::type> operator-(jpoint_t<U> param)
     {
       return {p0 - param, p1 - param};
     }
     
-    template<typename U> jline_t<T> & operator+=(jpoint_t<U> param)
+    template<typename U> jline_t<typename std::common_type<T, U>::type> & operator+=(jpoint_t<U> param)
     {
       return (*this = *this + param);
     }
     
-    template<typename U> jline_t<T> & operator-=(jpoint_t<U> param)
+    template<typename U> jline_t<typename std::common_type<T, U>::type> & operator-=(jpoint_t<U> param)
     {
       return (*this = *this - param);
     }
     
-    template<typename U> jline_t<T> operator+(jline_t<U> param)
+    template<typename U> jline_t<T> & operator=(jline_t<U> param)
+    {
+      p0 = param.p0;
+      p1 = param.p1;
+
+      return *this;
+    }
+
+    template<typename U> jline_t<typename std::common_type<T, U>::type> operator+(jline_t<U> param)
     {
       return {p0 + param.p0, p1 + param.p1};
     }
     
-    template<typename U> jline_t<T> operator-(jline_t<U> param)
+    template<typename U> jline_t<typename std::common_type<T, U>::type> operator-(jline_t<U> param)
     {
       return {p0 - param.p0, p1 - param.p1};
     }
@@ -443,7 +469,7 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
 
     template<typename U> int Sign(jpoint_t<U> point)
     {
-      T
+      typename std::common_type<T, U>::type
         sign = (p1.x - p0.x)*(point.y - p0.y) - (p1.y - p0.y)*(point.x - p0.x);
 
       if (sign < 0) {
@@ -530,22 +556,22 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return atanf((m0 - m1)/den);
     }
 
-    friend jline_t<T> operator+(T param, jline_t<T> thiz)
+    template<typename U> friend jline_t<typename std::common_type<T, U>::type> operator+(U param, jline_t<T> thiz)
     {
       return {param + thiz.p0, param + thiz.p1};
     }
     
-    friend jline_t<T> operator-(T param, jline_t<T> thiz)
+    template<typename U> friend jline_t<typename std::common_type<T, U>::type> operator-(U param, jline_t<T> thiz)
     {
       return {param - thiz.p0, param - thiz.p1};
     }
     
-    friend jline_t<T> operator*(T param, jline_t<T> thiz)
+    template<typename U> friend jline_t<typename std::common_type<T, U>::type> operator*(U param, jline_t<T> thiz)
     {
       return {param*thiz.p0, param*thiz.p1};
     }
     
-    friend jline_t<T> operator/(T param, jline_t<T> thiz)
+    template<typename U> friend jline_t<typename std::common_type<T, U>::type> operator/(U param, jline_t<T> thiz)
     {
       return {param/thiz.p0, param/thiz.p1};
     }
@@ -600,31 +626,31 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return (center != param.center or radius != param.radius);
     }
 
-    jcircle_t<T> & operator=(T param)
+    template<typename U> jcircle_t<T> & operator=(U param)
     {
-      radius = param;
+      radius = (T)param;
 
       return *this;
     }
 
-    template<typename U> jline_t<T> operator+(U param)
+    template<typename U> jline_t<typename std::common_type<T, U>::type> operator+(U param)
     {
-      return {center, (T)(radius + param)};
+      return {center, (radius + param)};
     }
     
-    template<typename U> jline_t<T> operator-(U param)
+    template<typename U> jline_t<typename std::common_type<T, U>::type> operator-(U param)
     {
-      return {center, (T)(radius - param)};
+      return {center, (radius - param)};
     }
 
-    template<typename U> jline_t<T> operator*(U param)
+    template<typename U> jline_t<typename std::common_type<T, U>::type> operator*(U param)
     {
-      return {center, (T)(radius*param)};
+      return {center, (radius*param)};
     }
     
-    template<typename U> jline_t<T> operator/(U param)
+    template<typename U> jline_t<typename std::common_type<T, U>::type> operator/(U param)
     {
-      return {center, (T)(radius/param)};
+      return {center, (radius/param)};
     }
 
     template<typename U> jline_t<T> & operator+=(U param)
@@ -654,26 +680,34 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return *this;
     }
 
-    template<typename U> jcircle_t<T> operator+(jpoint_t<U> param)
+    template<typename U> jcircle_t<typename std::common_type<T, U>::type> operator+(jpoint_t<U> param)
     {
       return {center + param, radius};
     }
     
-    template<typename U> jcircle_t<T> operator-(jpoint_t<U> param)
+    template<typename U> jcircle_t<typename std::common_type<T, U>::type> operator-(jpoint_t<U> param)
     {
       return {center - param, radius};
     }
     
-    template<typename U> jcircle_t<T> & operator+=(jpoint_t<U> param)
+    template<typename U> jcircle_t<typename std::common_type<T, U>::type> & operator+=(jpoint_t<U> param)
     {
       return (*this = *this + param);
     }
     
-    template<typename U> jcircle_t<T> & operator-=(jpoint_t<U> param)
+    template<typename U> jcircle_t<typename std::common_type<T, U>::type> & operator-=(jpoint_t<U> param)
     {
       return (*this = *this - param);
     }
     
+    template<typename U> jcircle_t<T> & operator=(jcircle_t<U> &param)
+    {
+      center = param.center;
+			radius = param.radius;
+
+      return *this;
+    }
+
     T Size()
     {
         return 2*M_PI*radius;
@@ -714,32 +748,32 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return std::make_pair(jpoint_t<float>{line.p0.x + t0*dx, line.p0.y + t0*dy}, jpoint_t<float>{line.p0.x + t1*dx, line.p0.y + t1*dy});
     }
 
-    friend jcircle_t<T> operator+(T param, jcircle_t<T> thiz)
+    template<typename U> friend jcircle_t<typename std::common_type<T, U>::type> operator+(T param, jcircle_t<T> thiz)
     {
-      return {thiz.center, (T)(param + thiz.radius)};
+      return {thiz.center, (param + thiz.radius)};
     }
     
-    friend jcircle_t<T> operator-(T param, jcircle_t<T> thiz)
+    template<typename U> friend jcircle_t<typename std::common_type<T, U>::type> operator-(T param, jcircle_t<T> thiz)
     {
-      return {thiz.center, (T)(param - thiz.radius)};
+      return {thiz.center, (param - thiz.radius)};
     }
 
-    friend jcircle_t<T> operator*(T param, jcircle_t<T> thiz)
+    template<typename U> friend jcircle_t<typename std::common_type<T, U>::type> operator*(T param, jcircle_t<T> thiz)
     {
-      return {thiz.center, (T)(param*thiz.radius)};
+      return {thiz.center, (param*thiz.radius)};
     }
     
-    friend jcircle_t<T> operator/(T param, jcircle_t<T> thiz)
+    template<typename U> friend jcircle_t<typename std::common_type<T, U>::type> operator/(T param, jcircle_t<T> thiz)
     {
-      return {thiz.center, (T)(param/thiz.radius)};
+      return {thiz.center, (param/thiz.radius)};
     }
 
-    friend jcircle_t<T> operator+(jpoint_t<T> param, jcircle_t<T> thiz)
+    template<typename U> friend jcircle_t<typename std::common_type<T, U>::type> operator+(jpoint_t<T> param, jcircle_t<T> thiz)
     {
       return {thiz.center + param, thiz.radius};
     }
     
-    friend jcircle_t<T> operator-(jpoint_t<T> param, jcircle_t<T> thiz)
+    template<typename U> friend jcircle_t<typename std::common_type<T, U>::type> operator-(jpoint_t<T> param, jcircle_t<T> thiz)
     {
       return {thiz.center - param, thiz.radius};
     }
@@ -795,7 +829,7 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return (width != param.width or height != param.height);
     }
 
-    jsize_t<T> & operator=(T param)
+    template<typename U> jsize_t<T> & operator=(U param)
     {
       width = (T)param;
       height = (T)param;
@@ -803,24 +837,24 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return *this;
     }
 
-    template<typename U> jsize_t<T> operator+(U param)
+    template<typename U> jsize_t<typename std::common_type<T, U>::type> operator+(U param)
     {
-      return {(T)(width + param), (T)(height + param)};
+      return {(width + param), (height + param)};
     }
     
-    template<typename U> jsize_t<T> operator-(U param)
+    template<typename U> jsize_t<typename std::common_type<T, U>::type> operator-(U param)
     {
-      return {(T)(width - param), (T)(height - param)};
+      return {(width - param), (height - param)};
     }
     
-    template<typename U> jsize_t<T> operator*(U param)
+    template<typename U> jsize_t<typename std::common_type<T, U>::type> operator*(U param)
     {
-      return {(T)(width*param), (T)(height*param)};
+      return {(width*param), (height*param)};
     }
     
-    template<typename U> jsize_t<T> operator/(U param)
+    template<typename U> jsize_t<typename std::common_type<T, U>::type> operator/(U param)
     {
-      return {(T)(width/param), (T)(height/param)};
+      return {(width/param), (height/param)};
     }
 
     template<typename U> jsize_t<T> & operator+=(U param)
@@ -843,14 +877,22 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return (*this = *this/param);
     }
 
-    template<typename U> jsize_t<T> operator+(jsize_t<U> param)
+    template<typename U> jsize_t<T> & operator=(jsize_t<U> param)
     {
-      return {(T)(width + param.width), (T)(height + param.height)};
+      width = (T)param.width;
+      height = (T)param.height;
+
+      return *this;
+    }
+
+    template<typename U> jsize_t<typename std::common_type<T, U>::type> operator+(jsize_t<U> param)
+    {
+      return {(width + param.width), (height + param.height)};
     }
     
-    template<typename U> jsize_t<T> operator-(jsize_t<U> param)
+    template<typename U> jsize_t<typename std::common_type<T, U>::type> operator-(jsize_t<U> param)
     {
-      return {(T)(width - param.width), (T)(height - param.height)};
+      return {(width - param.width), (height - param.height)};
     }
     
     template<typename U> jsize_t<T> & operator+=(jsize_t<U> param)
@@ -878,24 +920,24 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return std::max<T>(width, height);
     }
 
-    friend jsize_t<T> operator+(T param, jsize_t<T> thiz)
+    template<typename U> friend jsize_t<typename std::common_type<T, U>::type> operator+(U param, jsize_t<T> thiz)
     {
-      return {(T)(param + thiz.width), (T)(param + thiz.height)};
+      return {(param + thiz.width), (param + thiz.height)};
     }
     
-    friend jsize_t<T> operator-(T param, jsize_t<T> thiz)
+    template<typename U> friend jsize_t<typename std::common_type<T, U>::type> operator-(U param, jsize_t<T> thiz)
     {
-      return {(T)(param - thiz.width), (T)(param - thiz.height)};
+      return {(param - thiz.width), (param - thiz.height)};
     }
     
-    friend jsize_t<T> operator*(T param, jsize_t<T> thiz)
+    template<typename U> friend jsize_t<typename std::common_type<T, U>::type> operator*(U param, jsize_t<T> thiz)
     {
-      return {(T)(param*thiz.width), (T)(param*thiz.height)};
+      return {(param*thiz.width), (param*thiz.height)};
     }
     
-    friend jsize_t<T> operator/(T param, jsize_t<T> thiz)
+    template<typename U> friend jsize_t<typename std::common_type<T, U>::type> operator/(U param, jsize_t<T> thiz)
     {
-      return {(T)(param/thiz.width), (T)(param/thiz.height)};
+      return {(param/thiz.width), (param/thiz.height)};
     }
     
     friend std::ostream & operator<<(std::ostream& out, const jsize_t<T> &param)
@@ -956,22 +998,22 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return *this;
     }
 
-    template<typename U> jrect_t<T> operator+(U param)
+    template<typename U> jrect_t<typename std::common_type<T, U>::type> operator+(U param)
     {
       return {point + param, size + param};
     }
     
-    template<typename U> jrect_t<T> operator-(U param)
+    template<typename U> jrect_t<typename std::common_type<T, U>::type> operator-(U param)
     {
       return {point - param, size - param};
     }
     
-    template<typename U> jrect_t<T> operator*(U param)
+    template<typename U> jrect_t<typename std::common_type<T, U>::type> operator*(U param)
     {
       return {point*param, size*param};
     }
     
-    template<typename U> jrect_t<T> operator/(U param)
+    template<typename U> jrect_t<typename std::common_type<T, U>::type> operator/(U param)
     {
       return {point/param, size/param};
     }
@@ -1003,22 +1045,22 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return *this;
     }
 
-    template<typename U> jline_t<T> operator+(jpoint_t<U> param)
+    template<typename U> jrect_t<typename std::common_type<T, U>::type> operator+(jpoint_t<U> param)
     {
       return {point + param, size};
     }
     
-    template<typename U> jline_t<T> operator-(jpoint_t<U> param)
+    template<typename U> jrect_t<typename std::common_type<T, U>::type> operator-(jpoint_t<U> param)
     {
       return {point - param, size};
     }
     
-    template<typename U> jline_t<T> & operator+=(jpoint_t<U> param)
+    template<typename U> jrect_t<T> & operator+=(jpoint_t<U> param)
     {
       return (*this = *this + param);
     }
     
-    template<typename U> jline_t<T> & operator-=(jpoint_t<U> param)
+    template<typename U> jrect_t<T> & operator-=(jpoint_t<U> param)
     {
       return (*this = *this - param);
     }
@@ -1030,32 +1072,40 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return *this;
     }
 
-    template<typename U> jline_t<T> operator+(jsize_t<U> param)
+    template<typename U> jrect_t<typename std::common_type<T, U>::type> operator+(jsize_t<U> param)
     {
       return {point, size + param};
     }
     
-    template<typename U> jline_t<T> operator-(jsize_t<U> param)
+    template<typename U> jrect_t<typename std::common_type<T, U>::type> operator-(jsize_t<U> param)
     {
       return {point, size + param};
     }
     
-    template<typename U> jline_t<T> & operator+=(jsize_t<U> param)
+    template<typename U> jrect_t<T> & operator+=(jsize_t<U> param)
     {
       return (*this = *this + param);
     }
     
-    template<typename U> jline_t<T> & operator-=(jsize_t<U> param)
+    template<typename U> jrect_t<T> & operator-=(jsize_t<U> param)
     {
       return (*this = *this - param);
     }
 
-    template<typename U> jrect_t<T> operator+(jrect_t<U> param)
+    template<typename U> jrect_t<T> & operator=(jrect_t<U> &param)
+    {
+			point = param.point;
+      size = param.size;
+
+      return *this;
+    }
+
+    template<typename U> jrect_t<typename std::common_type<T, U>::type> operator+(jrect_t<U> param)
     {
       return {point + param.point, size + param.size};
     }
     
-    template<typename U> jrect_t<T> operator-(jrect_t<U> param)
+    template<typename U> jrect_t<typename std::common_type<T, U>::type> operator-(jrect_t<U> param)
     {
       return {point - param.point, size - param.size};
     }
@@ -1157,42 +1207,42 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return {0, 0, 0, 0};
     }
 
-    friend jrect_t<T> operator+(T param, jrect_t<T> thiz)
+    template<typename U> friend jrect_t<typename std::common_type<T, U>::type> operator+(U param, jrect_t<T> thiz)
     {
       return {param + thiz.point, param + thiz.size};
     }
     
-    friend jrect_t<T> operator-(T param, jrect_t<T> thiz)
+    template<typename U> friend jrect_t<typename std::common_type<T, U>::type> operator-(U param, jrect_t<T> thiz)
     {
       return {param - thiz.point, param - thiz.size};
     }
     
-    friend jrect_t<T> operator*(T param, jrect_t<T> thiz)
+    template<typename U> friend jrect_t<typename std::common_type<T, U>::type> operator*(U param, jrect_t<T> thiz)
     {
       return {param*thiz.point, param*thiz.size};
     }
     
-    friend jrect_t<T> operator/(T param, jrect_t<T> thiz)
+    template<typename U> friend jrect_t<typename std::common_type<T, U>::type> operator/(U param, jrect_t<T> thiz)
     {
       return {param/thiz.point, param/thiz.size};
     }
     
-    friend jline_t<T> operator+(jpoint_t<T> param, jrect_t<T> thiz)
+    template<typename U> friend jline_t<typename std::common_type<T, U>::type> operator+(jpoint_t<U> param, jrect_t<T> thiz)
     {
       return {param + thiz.point, thiz.size};
     }
     
-    friend jline_t<T> operator-(jpoint_t<T> param, jrect_t<T> thiz)
+    template<typename U> friend jline_t<typename std::common_type<T, U>::type> operator-(jpoint_t<U> param, jrect_t<T> thiz)
     {
       return {param - thiz.point, thiz.size};
     }
     
-    friend jline_t<T> operator+(jsize_t<T> param, jrect_t<T> thiz)
+    template<typename U> friend jline_t<typename std::common_type<T, U>::type> operator+(jsize_t<U> param, jrect_t<T> thiz)
     {
       return {thiz.point, param + thiz.size};
     }
     
-    friend jline_t<T> operator-(jsize_t<T> param, jrect_t<T> thiz)
+    template<typename U> friend jline_t<typename std::common_type<T, U>::type> operator-(jsize_t<U> param, jrect_t<T> thiz)
     {
       return {thiz.point, param - thiz.size};
     }

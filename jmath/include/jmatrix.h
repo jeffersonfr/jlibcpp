@@ -1080,7 +1080,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return Transpose().Conjugate();
     }
 
-    template<typename U> friend jmatrix_t<R, C, typename std::common_type<T, U>::type> operator+(const T &param, const jmatrix_t<R, C, T> &thiz)
+    template<typename U> friend jmatrix_t<R, C, typename std::common_type<T, U>::type> operator+(const U &param, const jmatrix_t<R, C, T> &thiz)
     {
       jmatrix_t<R, C, typename std::common_type<T, U>::type> m;
 
@@ -1093,7 +1093,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return m;
     }
     
-    template<typename U> friend jmatrix_t<R, C, typename std::common_type<T, U>::type> operator-(const T &param, const jmatrix_t<R, C, T> &thiz)
+    template<typename U> friend jmatrix_t<R, C, typename std::common_type<T, U>::type> operator-(const U &param, const jmatrix_t<R, C, T> &thiz)
     {
       jmatrix_t<R, C, typename std::common_type<T, U>::type> m;
 
@@ -1106,7 +1106,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return m;
     }
     
-    template<typename U> friend jmatrix_t<R, C, typename std::common_type<T, U>::type> operator*(const T &param, const jmatrix_t<R, C, T> &thiz)
+    template<typename U> friend jmatrix_t<R, C, typename std::common_type<T, U>::type> operator*(const U &param, const jmatrix_t<R, C, T> &thiz)
     {
       jmatrix_t<R, C, typename std::common_type<T, U>::type> m;
 
@@ -1119,7 +1119,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return m;
     }
     
-    template<typename U> friend jmatrix_t<R, C, typename std::common_type<T, U>::type> operator/(const T &param, const jmatrix_t<R, C, T> &thiz)
+    template<typename U> friend jmatrix_t<R, C, typename std::common_type<T, U>::type> operator/(const U &param, const jmatrix_t<R, C, T> &thiz)
     {
       jmatrix_t<R, C, typename std::common_type<T, U>::type> m;
 

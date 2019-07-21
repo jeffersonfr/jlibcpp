@@ -669,7 +669,7 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
       return Scalar(param)/param.EuclidianNorm();
     }
 
-    template<typename U> friend jvector_t<N, typename std::common_type<T, U>::type> operator+(const T &param, const jvector_t<N, T> &thiz)
+    template<typename U> friend jvector_t<N, typename std::common_type<T, U>::type> operator+(const U &param, const jvector_t<N, T> &thiz)
     {
       jvector_t<N, typename std::common_type<T, U>::type> v;
 
@@ -680,7 +680,7 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
       return v;
     }
     
-    template<typename U> friend jvector_t<N, typename std::common_type<T, U>::type> operator-(const T &param, const jvector_t<N, T> &thiz)
+    template<typename U> friend jvector_t<N, typename std::common_type<T, U>::type> operator-(const U &param, const jvector_t<N, T> &thiz)
     {
       jvector_t<N, typename std::common_type<T, U>::type> v;
 
@@ -691,7 +691,7 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
       return v;
     }
     
-    template<typename U> friend jvector_t<N, typename std::common_type<T, U>::type> operator*(const T &param, const jvector_t<N, T> &thiz)
+    template<typename U> friend jvector_t<N, typename std::common_type<T, U>::type> operator*(const U &param, const jvector_t<N, T> &thiz)
     {
       jvector_t<N, typename std::common_type<T, U>::type> v;
 
@@ -702,7 +702,7 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
       return v;
     }
     
-    template<typename U> friend jvector_t<N, typename std::common_type<T, U>::type> operator/(const T &param, const jvector_t<N, T> &thiz)
+    template<typename U> friend jvector_t<N, typename std::common_type<T, U>::type> operator/(const U &param, const jvector_t<N, T> &thiz)
     {
       jvector_t<N, typename std::common_type<T, U>::type> v;
 
