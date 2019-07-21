@@ -1485,16 +1485,20 @@ void Graphics::SetRGBArray(uint32_t *rgb, jrect_t<int> rect)
         continue;
       }
 
+			if (x < 0) {
+				rect.size.width = rect.size.width + x;
+			}
+
+			if (x + rect.size.width > sw) {
+				rect.size.width = rect.size.width - x;
+			}
+
       uint8_t *src = (uint8_t *)(rgb + j * rect.size.width);
       uint8_t *dst = (uint8_t *)(data + (y + j) * stride + x*step);
       int si = 0;
       int di = 0;
 
       for (int i=0; i<rect.size.width; i++) {
-        if ((x + i) < 0 or (x + i) >= sw) {
-          continue;
-        }
-
         int a = *(src + si + 3);
         int r = *(src + si + 2);
         int g = *(src + si + 1);
@@ -1764,16 +1768,20 @@ void Graphics::SetRGBArray(uint32_t *rgb, jrect_t<int> rect)
         continue;
       }
 
-      uint32_t *src = (uint32_t *)(rgb + j * rect.size.width);
-      uint32_t *dst = (uint32_t *)(data + (y + j) * stride + x * step);
+			if (x < 0) {
+				rect.size.width = rect.size.width + x;
+			}
 
-      for (int i=0; i<rect.size.width; i++) {
-        if ((x + i) < 0 or (x + i) >= sw) {
-          continue;
-        }
+			if (x + rect.size.width > sw) {
+				rect.size.width = rect.size.width - x;
+			}
 
-        *dst++ = *src++;
-      }
+			if (rect.size.width > 0) {
+      	uint32_t *src = (uint32_t *)(rgb + j * rect.size.width);
+      	uint32_t *dst = (uint32_t *)(data + (y + j) * stride + x * step);
+
+			  memcpy(dst, src, rect.size.width*4);
+			}
     }
   } else if (_pixelformat == JPF_RGB16) {
     for (int j=0; j<rect.size.height; j++) {
@@ -1781,26 +1789,32 @@ void Graphics::SetRGBArray(uint32_t *rgb, jrect_t<int> rect)
         continue;
       }
 
-      uint8_t *src = (uint8_t *)(rgb + j * rect.size.width);
-      uint8_t *dst = (uint8_t *)(data + (y + j) * stride + x * step);
-      int si = 0;
-      int di = 0;
+			if (x < 0) {
+				rect.size.width = rect.size.width + x;
+			}
 
-      for (int i=0; i<rect.size.width; i++) {
-        if ((x + i) < 0 or (x + i) >= sw) {
-          continue;
-        }
+			if (x + rect.size.width > sw) {
+				rect.size.width = rect.size.width - x;
+			}
 
-        int r = *(src + si + 2) & 0xf8;
-        int g = *(src + si + 1) = 0xfc;
-        int b = *(src + si + 0) & 0xf8;
+			if (rect.size.width > 0) {
+				uint8_t *src = (uint8_t *)(rgb + j * rect.size.width);
+				uint8_t *dst = (uint8_t *)(data + (y + j) * stride + x * step);
+				int si = 0;
+				int di = 0;
 
-        *(dst + di + 1) = (r << 0x03 | g >> 0x05);
-        *(dst + di + 0) = (g << 0x03 | b >> 0x03);
+				for (int i=0; i<rect.size.width; i++) {
+					int r = *(src + si + 2) & 0xf8;
+					int g = *(src + si + 1) = 0xfc;
+					int b = *(src + si + 0) & 0xf8;
 
-        si = si + 4;
-        di = di + 2;
-      }
+					*(dst + di + 1) = (r << 0x03 | g >> 0x05);
+					*(dst + di + 0) = (g << 0x03 | b >> 0x03);
+
+					si = si + 4;
+					di = di + 2;
+				}
+			}
     }
   } else {
     throw jexception::InvalidArgumentException("Invalid pixel format");

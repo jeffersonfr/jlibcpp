@@ -21,16 +21,17 @@
 #define J_RATIONAL_H
 
 #include <iostream>
+#include <cmath>
 #include <cstdint>
 
 namespace jmath {
 
-template <typename T, typename = typename std::enable_if<!std::is_signed<T>::value, T>::type>
+template<typename T, typename = typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value, T>::type>
   struct jrational_t {
     T num = 0;
     T den = 1;
 
-    template <typename U> operator typename std::enable_if<!std::is_floating_point<T>::value, bool>::type() const 
+    template<typename U, typename = typename std::enable_if<std::is_arithmetic<U>::value, T>::type> operator U() const 
     {
       return (U)num/(U)den;
     }
