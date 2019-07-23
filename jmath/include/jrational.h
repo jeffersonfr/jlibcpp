@@ -196,40 +196,31 @@ template<typename T, typename = typename std::enable_if<std::is_integral<T>::val
 
     bool operator<(const jrational_t<T> &param)
     {
-      if (*this == param) {
-        return false;
-      }
-
-      return num*den < param.num*param.den;
+      return num*param.den < param.num*den;
     }
 
     bool operator>(const jrational_t<T> &param)
     {
-      if (*this < param or *this == param) {
-        return false;
-      }
+      return num*param.den > param.num*den;
     }
 
     bool operator<=(const jrational_t<T> &param)
     {
-      if (*this > param) {
-        return false;
-      }
-
-      return true;
+      return num*param.den <= param.num*den;
     }
 
     bool operator>=(const jrational_t<T> &param)
     {
-      if (*this < param) {
-        return false;
-      }
-
-      return true;
+      return num*param.den >= param.num*den;
     }
 
     jrational_t<T> & Simplify()
     {
+      if ((den < 0 and num < 0) or (den > 0 and num < 0)) {
+        den = -den;
+        num = -num;
+      }
+
       T gcd = GCD(num, den);
 
       num = num/gcd;
@@ -275,30 +266,6 @@ template<typename T, typename = typename std::enable_if<std::is_integral<T>::val
     jrational_t<T> & Sqrt()
     {
       return {std::sqrt(num), std::sqrt(den)};
-    }
-
-    friend std::ostream& operator<<(std::ostream &out, const jrational_t<T> &param)
-    {
-      out << param.num << "/" << param.den;
-
-      return out;
-    }
-
-    friend std::istream& operator>>(std::istream &in, jrational_t<T> &param)
-    {
-      in >> param.num;
-
-      if (in.get() != '/'){
-        param.den = 1;
-      } else {
-        in >> param.den;
-      }
-
-      if (param.den < 0) {
-        param = -param;
-      }
-
-      return in;
     }
 
     friend bool operator==(const T &lhs, const jrational_t<T> &rhs)
@@ -349,6 +316,30 @@ template<typename T, typename = typename std::enable_if<std::is_integral<T>::val
     friend jrational_t<T> operator/(const T &lhs, const jrational_t<T> &rhs)
     {
       return lhs*jrational_t<T>{rhs.den, rhs.num};
+    }
+
+    friend std::ostream& operator<<(std::ostream &out, const jrational_t<T> &param)
+    {
+      out << param.num << "/" << param.den;
+
+      return out;
+    }
+
+    friend std::istream& operator>>(std::istream &in, jrational_t<T> &param)
+    {
+      in >> param.num;
+
+      if (in.get() != '/'){
+        param.den = 1;
+      } else {
+        in >> param.den;
+      }
+
+      if (param.den < 0) {
+        param = -param;
+      }
+
+      return in;
     }
 
   };

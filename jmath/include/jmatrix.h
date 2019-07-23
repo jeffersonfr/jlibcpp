@@ -156,6 +156,24 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return m;
     }
 
+    T & operator[](size_t n)
+    {
+      if (n >= R*C) {
+        throw jexception::OutOfBoundsException("Element index is out of bounds");
+      }
+      
+      return data[n/C][n%C];
+    }
+
+    const T & operator[](size_t n) const
+    {
+      if (n >= R*C) {
+        throw jexception::OutOfBoundsException("Element index is out of bounds");
+      }
+      
+      return data[n/C][n%C];
+    }
+
     T & operator()(size_t n) 
     {
       if (n >= R*C) {

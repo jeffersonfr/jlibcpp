@@ -246,6 +246,15 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return jpoint_t<U>(*this)/EuclidianNorm();
     }
  
+    jpoint_t<T> Rotate(float angle)
+    {
+      floar
+        c = cosf(angle),
+        s = sinf(angle);
+
+      return {x*c - y*s, x*s + y*c};
+    }
+
     float Angle()
     {
       float

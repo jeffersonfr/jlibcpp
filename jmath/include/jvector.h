@@ -30,6 +30,7 @@
 #include <algorithm>
 #include <optional>
 #include <random>
+#include <iomanip>
 
 namespace jmath {
 
@@ -715,13 +716,24 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
     
     friend std::ostream & operator<<(std::ostream& out, const jvector_t<N, T> &param)
     {
+      std::ios_base::fmtflags flags = out.flags();
+
+      out.precision(2);
+      out.setf(std::ios_base::fixed);
+
+      out << "|";
+
       for (size_t i=0; i<N; i++) {
-        out << param.data[i];
+        out << std::setw(5) << /* std::showpos <<*/ param.data[i];
 
         if (i != (N - 1)) {
           out << ", ";
         }
       }
+
+      out << "|";
+
+      out.flags(flags);
 
       return out;
     }
