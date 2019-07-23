@@ -251,6 +251,12 @@ jcomposite_flags_t Graphics::GetCompositeFlags()
 
 void Graphics::Clear()
 {
+  cairo_save(_cairo_context);
+  cairo_set_operator(_cairo_context, CAIRO_OPERATOR_CLEAR);
+  cairo_paint(_cairo_context);
+  cairo_restore(_cairo_context);
+
+  /*
   int sw = cairo_image_surface_get_width(_cairo_surface);
   int sh = cairo_image_surface_get_height(_cairo_surface);
 
@@ -260,13 +266,22 @@ void Graphics::Clear()
   
   cairo_rectangle(_cairo_context, 0, 0, sw, sh);
   cairo_fill(_cairo_context);
-  // cairo_paint(_cairo_context);
   
   cairo_restore(_cairo_context);
+  */
 }
 
 void Graphics::Clear(jrect_t<int> rect)
 {
+  struct jpoint_t<int> t = Translate();
+
+  cairo_save(_cairo_context);
+  cairo_set_operator(_cairo_context, CAIRO_OPERATOR_CLEAR);
+  cairo_rectangle(_cairo_context, t.x + rect.point.x, t.y + rect.point.y, rect.size.width, rect.size.height);
+  cairo_fill(_cairo_context);
+  cairo_restore(_cairo_context);
+
+  /*
   struct jpoint_t<int> t = Translate();
 
   cairo_save(_cairo_context);
@@ -277,6 +292,7 @@ void Graphics::Clear(jrect_t<int> rect)
   cairo_fill(_cairo_context);
   
   cairo_restore(_cairo_context);
+  */
 }
 
 jcolor_t<float> & Graphics::GetColor()

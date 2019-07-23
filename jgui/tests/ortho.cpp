@@ -49,6 +49,8 @@ float sinT[sizeT + 1];
 class Grid : public jgui::Window {
 
 	private:
+    jmath::jmatrix_t<3, 3, float>
+      _transformation;
     jmath::jmatrix_t<3, 1, float>
       _rotate {+1.2f, +0.0f, +2.4f},
       _camera {+0.0f, +0.0f, +1.0f};
@@ -107,8 +109,8 @@ class Grid : public jgui::Window {
       return sinT[(int)(angle*M)];
     }
 
-    jgui::jpoint_t<float> Project(jmath::jmatrix_t<3, 1, float> p) 
-		{
+    void UpdateProjectionMatrix()
+    {
       float
         cx = Cos(_rotate(0, 0)),
         sx = Sin(_rotate(0, 0)),
@@ -134,7 +136,12 @@ class Grid : public jgui::Window {
           0.0f, 0.0f, 1.0f
         };
 
-      p = xrotation*yrotation*zrotation*(p - _camera);
+      _transformation = xrotation*yrotation*zrotation;
+    }
+
+    jgui::jpoint_t<float> Project(jmath::jmatrix_t<3, 1, float> p) 
+		{
+      p = _transformation*(p - _camera);
   
       jgui::jsize_t<int>
         size = GetSize();
@@ -247,7 +254,10 @@ class Grid : public jgui::Window {
 
 		void Paint(jgui::Graphics *g) 
 		{
-			jgui::Window::Paint(g);
+      static auto start0 = std::chrono::steady_clock::now();
+      static auto frame0 = 0;
+
+			g->Clear();
 
       jgui::Raster 
 				raster(g->GetCairoSurface());
@@ -262,6 +272,8 @@ class Grid : public jgui::Window {
 			}
 
       const float axis = 2.0f;
+
+      UpdateProjectionMatrix();
 
       jgui::jpoint_t<float> 
         px0 = Project({-axis, 0.0f, 0.0f}),
@@ -316,12 +328,24 @@ class Grid : public jgui::Window {
         *theme = GetTheme();
 
       g->SetFont(theme->GetFont("window.font"));
+      g->SetColor(0xffffffff);
       g->DrawString("rotate: [" + std::to_string(_rotate(0, 0)) + ", " + std::to_string(_rotate(1, 0)) + ", " + std::to_string(_rotate(2, 0)) + "]", jgui::jpoint_t<int>{10, 10});
       g->DrawString("camera: [" + std::to_string(_camera(0, 0)) + ", " + std::to_string(_camera(1, 0)) + ", " + std::to_string(_camera(2, 0)) + "]", jgui::jpoint_t<int>{10, 30});
 
-			Repaint();
+      auto count0 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start0).count();
 
-      Framerate(120);
+      if (count0 != 0) {
+        g->DrawString("fps: [" + std::to_string((++frame0*1000)/count0) + "]", jgui::jpoint_t<int>{10, 50});
+      }
+
+      if (frame0 == 1000) { // INFO:: reset frames per second
+        start0 = std::chrono::steady_clock::now();
+        frame0 = 0;
+      }
+
+      // Framerate(120);
+
+			Repaint();
 		}
 
 };

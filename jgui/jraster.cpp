@@ -198,13 +198,13 @@ void Raster::DrawTriangle(jgui::jpoint_t<int> v1, jgui::jpoint_t<int> v2, jgui::
   DrawLine(v3, v1);
 }
 
+static int EdgeFunction(const jgui::jpoint_t<int> &v1, const jgui::jpoint_t<int> &v2, const jgui::jpoint_t<int> &v3)
+{ 
+  return (v3.x - v1.x)*(v2.y - v1.y) - (v3.y - v1.y)*(v2.x - v1.x); 
+}
+
 void Raster::FillTriangle(jgui::jpoint_t<int> v1, jgui::jpoint_t<int> v2, jgui::jpoint_t<int> v3) 
 {
-	float
-		dx1 = 0,
-		dx2 = 0,
-		dx3 = 0;
-
 	// INFO:: sort by 'y'
 	if (v1.y > v2.y) {
 		std::swap(v1, v2);
@@ -217,74 +217,51 @@ void Raster::FillTriangle(jgui::jpoint_t<int> v1, jgui::jpoint_t<int> v2, jgui::
 	if (v2.y > v3.y) {
 		std::swap(v2, v3);
 	}
-	
-	if (v2.y - v1.y > 0) {
-		dx1 = (v2.x - v1.x)/(float)(v2.y - v1.y);
-	}
-	
-	if (v3.y - v1.y > 0) {
-		dx2 = (v3.x - v1.x)/(float)(v3.y - v1.y);
-	}
-	
-	if (v3.y - v2.y > 0) {
-		dx3 = (v3.x - v2.x)/(float)(v3.y - v2.y);
-	}
 
-	jgui::jpoint_t<float>
-		S = v1,
-		E = v1;
+  // INFO:: verify if isnt counter-clockwise and invert the order
+  jgui::jpoint_t<int> 
+    AToB = v2 - v1,
+    BToC = v3 - v2;
+  float 
+    crossz = AToB.x*BToC.y - AToB.y*BToC.x;
 
-	if (dx1 > dx2) {
-		if (S.y < 0) {
-			int d = -S.y;
+  if (crossz > 0.0f) {
+    std::swap(v1, v3);
+  }
 
-			S.x = S.x + d*dx2;
-			S.y = 0;
-			E.x = E.x + d*dx1;
-			E.y = E.y + d;
-		}
+  int
+    x0 = std::min(std::min(v1.x, v2.x), v3.x),
+    y0 = std::min(std::min(v1.y, v2.y), v3.y),
+    x1 = std::max(std::max(v1.x, v2.x), v3.x),
+    y1 = std::max(std::max(v1.y, v2.y), v3.y);
 
-		for (; S.y<=v2.y; S.y++, E.y++, S.x+=dx2, E.x+=dx1) {
-    	ScanLine(jgui::jpoint_t<float>{S.x, S.y}, E.x - S.x);
-		}
-		
-		E = jgui::jpoint_t<float>(v2);
-		
-		if (S.x < E.x) {
-			for (; S.y<v3.y and S.y<_size.height; S.y++, E.y++, S.x+=dx2, E.x+=dx3) {
-				ScanLine(jgui::jpoint_t<float>{S.x, S.y}, E.x - S.x);
-			}
-		} else {
-			for (; S.y<v3.y and S.y<_size.height; S.y++, E.y++, S.x+=dx2, E.x+=dx3) {
-				ScanLine(jgui::jpoint_t<float>{E.x, S.y}, S.x - E.x);
-			}
-		}
-	} else {
-		if (S.y < 0) {
-			int d = -S.y;
+  x0 = std::max(0, x0);
+  y0 = std::max(0, y0);
+  x1 = std::min(_size.width - 1, x1);
+  y1 = std::min(_size.height - 1, y1);
 
-			S.x = S.x + d*dx1;
-			S.y = 0;
-			E.x = E.x + d*dx2;
-			E.y = E.y + d;
-		}
+  jgui::jpoint_t<int> p;
 
-		for (; S.y<=v2.y; S.y++, E.y++, S.x+=dx1, E.x+=dx2) {
-    	ScanLine(jgui::jpoint_t<float>{S.x, S.y}, E.x - S.x);
-		}
-		
-		S = jgui::jpoint_t<float>(v2);
-		
-		if (S.x < E.x) {
-			for (; S.y<v3.y and S.y<_size.height; S.y++, E.y++, S.x+=dx3, E.x+=dx2) {
-				ScanLine(jgui::jpoint_t<float>{S.x, S.y}, E.x - S.x);
-			}
-		} else {
-			for (; S.y<v3.y and S.y<_size.height; S.y++, E.y++, S.x+=dx3, E.x+=dx2) {
-				ScanLine(jgui::jpoint_t<float>{E.x, S.y}, S.x - E.x);
-			}
-		}
-	}
+  for (p.y=y0; p.y<y1; p.y++) {
+    bool flag = false; // INFO:: just an optimization to breaks the loop if the scan line reached the end
+
+    for (p.x=x0; p.x<x1; p.x++) {
+      int
+        w0 = EdgeFunction(v2, v3, p),
+        w1 = EdgeFunction(v3, v1, p),
+        w2 = EdgeFunction(v1, v2, p);
+
+      if (w0 >= 0 && w1 >= 0 && w2 >= 0) {
+        flag = true;
+
+        SetPixel(p);
+      } else {
+        if (flag == true) {
+          break;
+        }
+      }
+    }
+  }
 }
 
 void Raster::DrawRectangle(jgui::jrect_t<int> rect)
@@ -575,7 +552,7 @@ void Raster::DrawArc(jgui::jpoint_t<int> v1, jgui::jsize_t<int> s1, float arc0, 
   int x0 = cos(arc0)*s1.width;
   int y0 = -sin(arc0)*s1.height;
 
-  for (float i=arc0 + 0.05; i<=arc1; i+=0.05) {
+  for (float i=arc0 + 0.1f; i<=arc1; i+=0.1f) {
     int x1 = cos(i)*s1.width;
     int y1 = -sin(i)*s1.height;
 
@@ -588,21 +565,31 @@ void Raster::DrawArc(jgui::jpoint_t<int> v1, jgui::jsize_t<int> s1, float arc0, 
 
 void Raster::FillArc(jgui::jpoint_t<int> v1, jgui::jsize_t<int> s1, float arc0, float arc1)
 {
-  std::vector<jgui::jpoint_t<int>> points;
+  arc0 = fmod(arc0, 2*M_PI);
+  arc1 = fmod(arc1, 2*M_PI);
 
-  // if ((arc0 + arc1) < 2*M_PI) {
-    points.push_back({0, 0});
-  // }
-
-  for (float i=arc0; i<=arc1; i+=0.05) {
-    points.push_back({(int)(cos(i)*s1.width), (int)(-sin(i)*s1.height)});
-  }
-  
-  if ((arc0 + arc1) < 2*M_PI) {
-    points.push_back({0, 0});
+  while (arc0 < 0) {
+    arc0 = arc0 + 2*M_PI;
   }
 
-  FillPolygon(v1, points, false);
+  while (arc1 < arc0) {
+    arc1 = arc1 + 2*M_PI;
+  }
+
+  arc0 = fmod(arc0, 2*M_PI);
+  arc1 = fmod(arc1, 2*M_PI);
+
+  jgui::jpoint_t<float>
+    p0 {v1.x + s1.width*cosf(arc0), v1.y - s1.height*sinf(arc0)};
+
+  for (float arc=arc0 + 0.1f; arc<=arc1; arc += 0.1f) {
+    jgui::jpoint_t<float>
+      p1 {v1.x + s1.width*cosf(arc), v1.y - s1.height*sinf(arc)};
+
+    FillTriangle(v1, p0, p1);
+
+    p0 = p1;
+  }
 }
 
 void FillPolygon0(jgui::Raster *raster, std::vector<jgui::jpoint_t<int>> points, jgui::jpoint_t<int> v1, jgui::jpoint_t<int> v2)

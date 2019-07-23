@@ -248,7 +248,7 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
  
     jpoint_t<T> Rotate(float angle)
     {
-      floar
+      float
         c = cosf(angle),
         s = sinf(angle);
 
