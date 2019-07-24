@@ -246,12 +246,7 @@ void Raster::FillTriangle(jgui::jpoint_t<int> v1, jgui::jpoint_t<int> v2, jgui::
     bool flag = false; // INFO:: just an optimization to breaks the loop if the scan line reached the end
 
     for (p.x=x0; p.x<x1; p.x++) {
-      int
-        w0 = EdgeFunction(v2, v3, p),
-        w1 = EdgeFunction(v3, v1, p),
-        w2 = EdgeFunction(v1, v2, p);
-
-      if (w0 >= 0 && w1 >= 0 && w2 >= 0) {
+      if (EdgeFunction(v2, v3, p) >= 0 and EdgeFunction(v3, v1, p) >= 0 and EdgeFunction(v1, v2, p) >= 0) {
         flag = true;
 
         SetPixel(p);
@@ -549,17 +544,30 @@ void Raster::FillEllipse(jgui::jpoint_t<int> v1, jgui::jsize_t<int> s1)
 
 void Raster::DrawArc(jgui::jpoint_t<int> v1, jgui::jsize_t<int> s1, float arc0, float arc1)
 {
-  int x0 = cos(arc0)*s1.width;
-  int y0 = -sin(arc0)*s1.height;
+  arc0 = fmod(arc0, 2*M_PI);
+  arc1 = fmod(arc1, 2*M_PI);
 
-  for (float i=arc0 + 0.1f; i<=arc1; i+=0.1f) {
-    int x1 = cos(i)*s1.width;
-    int y1 = -sin(i)*s1.height;
+  while (arc0 < 0) {
+    arc0 = arc0 + 2*M_PI;
+  }
 
-    DrawLine({v1.x + x0, v1.y + y0}, {v1.x + x1, v1.y + y1});
+  while (arc1 < arc0) {
+    arc1 = arc1 + 2*M_PI;
+  }
 
-    x0 = x1;
-    y0 = y1;
+  arc0 = fmod(arc0, 2*M_PI);
+  arc1 = fmod(arc1, 2*M_PI);
+
+  jgui::jpoint_t<float>
+    p0 {v1.x + s1.width*cosf(arc0), v1.y - s1.height*sinf(arc0)};
+
+  for (float arc=arc0 + 0.1f; arc<=arc1; arc += 0.1f) {
+    jgui::jpoint_t<float>
+      p1 {v1.x + s1.width*cosf(arc), v1.y - s1.height*sinf(arc)};
+
+    DrawLine(p0, p1);
+
+    p0 = p1;
   }
 }
 
