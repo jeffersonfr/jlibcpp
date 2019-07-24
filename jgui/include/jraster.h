@@ -60,7 +60,7 @@ class Raster : public jcommon::Object {
      * \brief
      *
      */
-    virtual void SetClip(const jrect_t<int> rect);
+    virtual void SetClip(const jrect_t<int> &rect);
 
     /**
      * \brief
@@ -102,103 +102,103 @@ class Raster : public jcommon::Object {
      * \brief
      *
      */
-    virtual void SetPixel(const jgui::jpoint_t<int> v1);
+    virtual void SetPixel(const jgui::jpoint_t<int> &v1);
 
     /**
      * \brief
      *
      */
-    virtual uint32_t GetPixel(const jgui::jpoint_t<int> v1);
+    virtual uint32_t GetPixel(const jgui::jpoint_t<int> &v1);
 
     /**
      * \brief
      *
      */
-    virtual void ScanLine(const jgui::jpoint_t<int> v1, int size);
+    virtual void ScanLine(jgui::jpoint_t<int> v1, int size);
 
     /**
      * \brief
      *
      */
-    virtual void DrawLine(const jpoint_t<int> p0, const jpoint_t<int> p1);
+    virtual void DrawLine(const jpoint_t<int> &p0, const jpoint_t<int> &p1);
 
     /**
      * \brief
      *
      */
-    virtual void DrawTriangle(const jgui::jpoint_t<int> v1, const jgui::jpoint_t<int> v2, const jgui::jpoint_t<int> v3);
+    virtual void DrawTriangle(const jgui::jpoint_t<int> &v1, const jgui::jpoint_t<int> &v2, const jgui::jpoint_t<int> &v3);
 
     /**
      * \brief
      *
      */
-    virtual void FillTriangle(const jgui::jpoint_t<int> v1, const jgui::jpoint_t<int> v2, const jgui::jpoint_t<int> v3);
+    virtual void FillTriangle(const jgui::jpoint_t<int> &v1, const jgui::jpoint_t<int> &v2, const jgui::jpoint_t<int> &v3);
 
     /**
      * \brief
      *
      */
-    virtual void DrawRectangle(const jgui::jrect_t<int> rect);
+    virtual void DrawRectangle(const jgui::jrect_t<int> &rect);
 
     /**
      * \brief
      *
      */
-    virtual void FillRectangle(const jgui::jrect_t<int> rect);
+    virtual void FillRectangle(const jgui::jrect_t<int> &rect);
 
     /**
      * \brief
      *
      */
-    virtual void DrawPolygon(const jgui::jpoint_t<int> v1, const std::vector<jgui::jpoint_t<int>> points);
+    virtual void DrawPolygon(const jgui::jpoint_t<int> &v1, const std::vector<jgui::jpoint_t<int>> &points);
 
     /**
      * \brief
      *
      */
-    virtual void DrawBezier(const jgui::jpoint_t<int> v1, const jgui::jpoint_t<int> v2, const jgui::jpoint_t<int> v3);
+    virtual void DrawBezier(const std::vector<jgui::jpoint_t<int>> &points);
 
     /**
      * \brief
      *
      */
-    virtual void DrawCircle(const jgui::jpoint_t<int> v1, int size);
+    virtual void DrawCircle(const jgui::jpoint_t<int> &v1, int size);
 
     /**
      * \brief
      *
      */
-    virtual void FillCircle(const jgui::jpoint_t<int> v1, int size);
+    virtual void FillCircle(const jgui::jpoint_t<int> &v1, int size);
 
     /**
      * \brief
      *
      */
-    virtual void DrawEllipse(const jgui::jpoint_t<int> v1, const jgui::jsize_t<int> s1);
+    virtual void DrawEllipse(const jgui::jpoint_t<int> &v1, const jgui::jsize_t<int> &s1);
 
     /**
      * \brief
      *
      */
-    virtual void FillEllipse(const jgui::jpoint_t<int> v1, const jgui::jsize_t<int> s1);
+    virtual void FillEllipse(const jgui::jpoint_t<int> &v1, const jgui::jsize_t<int> &s1);
 
     /**
      * \brief
      *
      */
-    virtual void DrawArc(const jgui::jpoint_t<int> v1, const jgui::jsize_t<int> s1, float arc0, float arc1);
+    virtual void DrawArc(const jgui::jpoint_t<int> &v1, const jgui::jsize_t<int> &s1, float arc0, float arc1);
 
     /**
      * \brief
      *
      */
-    virtual void FillArc(const jgui::jpoint_t<int> v1, const jgui::jsize_t<int> s1, float arc0, float arc1);
+    virtual void FillArc(const jgui::jpoint_t<int> &v1, const jgui::jsize_t<int> &s1, float arc0, float arc1);
 
     /**
      * \brief
      *
      */
-    virtual void FillPolygon(const jgui::jpoint_t<int> v1, const std::vector<jgui::jpoint_t<int>> points, bool holed);
+    virtual void FillPolygon(const jgui::jpoint_t<int> &v1, const std::vector<jgui::jpoint_t<int>> &points, bool holed);
 
     /**
      * \brief
@@ -210,13 +210,13 @@ class Raster : public jcommon::Object {
      * \brief
      *
      */
-    virtual void DrawString(std::string text, const jgui::jpoint_t<int> v1);
+    virtual void DrawString(std::string text, const jgui::jpoint_t<int> &v1);
 
     /**
      * \brief
      *
      */
-    virtual void DrawImage(jgui::Image *image, const jgui::jpoint_t<int> v1);
+    virtual void DrawImage(jgui::Image *image, const jgui::jpoint_t<int> &v1);
 
     /**
      * \brief

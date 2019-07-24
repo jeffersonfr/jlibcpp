@@ -61,7 +61,7 @@ Raster::~Raster()
 {
 }
 
-void Raster::SetClip(jrect_t<int> rect)
+void Raster::SetClip(const jrect_t<int> &rect)
 {
   _clip = rect;
 
@@ -121,7 +121,7 @@ void Raster::Clear()
   }
 }
 
-void Raster::SetPixel(jgui::jpoint_t<int> v1)
+void Raster::SetPixel(const jgui::jpoint_t<int> &v1)
 {
   if (v1.x < _clip.point.x or v1.y < _clip.point.y or v1.x >= _clip.size.width or v1.y >= _clip.size.height) {
     return;
@@ -130,7 +130,7 @@ void Raster::SetPixel(jgui::jpoint_t<int> v1)
   _buffer[v1.y*_size.width + v1.x] = _color;
 }
 
-uint32_t Raster::GetPixel(jgui::jpoint_t<int> v1)
+uint32_t Raster::GetPixel(const jgui::jpoint_t<int> &v1)
 {
   if (v1.x < 0 or v1.y < 0 or v1.x >= _size.width or v1.y >= _size.height) {
     return 0x00000000;
@@ -155,7 +155,7 @@ void Raster::ScanLine(jgui::jpoint_t<int> v1, int size)
   }
 }
 
-void Raster::DrawLine(jpoint_t<int> p0, jpoint_t<int> p1)
+void Raster::DrawLine(const jpoint_t<int> &p0, const jpoint_t<int> &p1)
 {
 	int 
 		shortLen = p1.y - p0.y,
@@ -191,7 +191,7 @@ void Raster::DrawLine(jpoint_t<int> p0, jpoint_t<int> p1)
 	}
 }
 
-void Raster::DrawTriangle(jgui::jpoint_t<int> v1, jgui::jpoint_t<int> v2, jgui::jpoint_t<int> v3)
+void Raster::DrawTriangle(const jgui::jpoint_t<int> &v1, const jgui::jpoint_t<int> &v2, const jgui::jpoint_t<int> &v3)
 {
   DrawLine(v1, v2);
   DrawLine(v2, v3);
@@ -203,37 +203,42 @@ static int EdgeFunction(const jgui::jpoint_t<int> &v1, const jgui::jpoint_t<int>
   return (v3.x - v1.x)*(v2.y - v1.y) - (v3.y - v1.y)*(v2.x - v1.x); 
 }
 
-void Raster::FillTriangle(jgui::jpoint_t<int> v1, jgui::jpoint_t<int> v2, jgui::jpoint_t<int> v3) 
+void Raster::FillTriangle(const jgui::jpoint_t<int> &v1, const jgui::jpoint_t<int> &v2, const jgui::jpoint_t<int> &v3) 
 {
+	jgui::jpoint_t<int>
+		a = v1, 
+		b = v2, 
+		c = v3;
+
 	// INFO:: sort by 'y'
-	if (v1.y > v2.y) {
-		std::swap(v1, v2);
+	if (a.y > b.y) {
+		std::swap(a, b);
 	}
 	
-	if (v1.y > v3.y) {
-		std::swap(v1, v3);
+	if (a.y > c.y) {
+		std::swap(a, c);
 	}
 	
-	if (v2.y > v3.y) {
-		std::swap(v2, v3);
+	if (b.y > c.y) {
+		std::swap(b, c);
 	}
 
   // INFO:: verify if isnt counter-clockwise and invert the order
   jgui::jpoint_t<int> 
-    AToB = v2 - v1,
-    BToC = v3 - v2;
+    AToB = b - a,
+    BToC = c - b;
   float 
     crossz = AToB.x*BToC.y - AToB.y*BToC.x;
 
   if (crossz > 0.0f) {
-    std::swap(v1, v3);
+    std::swap(a, c);
   }
 
   int
-    x0 = std::min(std::min(v1.x, v2.x), v3.x),
-    y0 = std::min(std::min(v1.y, v2.y), v3.y),
-    x1 = std::max(std::max(v1.x, v2.x), v3.x),
-    y1 = std::max(std::max(v1.y, v2.y), v3.y);
+    x0 = std::min(std::min(a.x, b.x), c.x),
+    y0 = std::min(std::min(a.y, b.y), c.y),
+    x1 = std::max(std::max(a.x, b.x), c.x),
+    y1 = std::max(std::max(a.y, b.y), c.y);
 
   x0 = std::max(0, x0);
   y0 = std::max(0, y0);
@@ -246,7 +251,7 @@ void Raster::FillTriangle(jgui::jpoint_t<int> v1, jgui::jpoint_t<int> v2, jgui::
     bool flag = false; // INFO:: just an optimization to breaks the loop if the scan line reached the end
 
     for (p.x=x0; p.x<x1; p.x++) {
-      if (EdgeFunction(v2, v3, p) >= 0 and EdgeFunction(v3, v1, p) >= 0 and EdgeFunction(v1, v2, p) >= 0) {
+      if (EdgeFunction(b, c, p) >= 0 and EdgeFunction(c, a, p) >= 0 and EdgeFunction(a, b, p) >= 0) {
         flag = true;
 
         SetPixel(p);
@@ -259,7 +264,7 @@ void Raster::FillTriangle(jgui::jpoint_t<int> v1, jgui::jpoint_t<int> v2, jgui::
   }
 }
 
-void Raster::DrawRectangle(jgui::jrect_t<int> rect)
+void Raster::DrawRectangle(const jgui::jrect_t<int> &rect)
 {
   jgui::jpoint_t<int>
     v1 {rect.point},
@@ -273,14 +278,14 @@ void Raster::DrawRectangle(jgui::jrect_t<int> rect)
   DrawLine(v4, v1);
 }
 
-void Raster::FillRectangle(jgui::jrect_t<int> rect)
+void Raster::FillRectangle(const jgui::jrect_t<int> &rect)
 {
   for (int j=0; j<rect.size.height; j++) {
     ScanLine({rect.point.x, rect.point.y + j}, rect.size.width);
   }
 }
 
-void Raster::DrawPolygon(jgui::jpoint_t<int> v1, std::vector<jgui::jpoint_t<int>> points)
+void Raster::DrawPolygon(const jgui::jpoint_t<int> &v1, const std::vector<jgui::jpoint_t<int>> &points)
 {
   if (points.size() == 0) {
     return;
@@ -297,80 +302,34 @@ void Raster::DrawPolygon(jgui::jpoint_t<int> v1, std::vector<jgui::jpoint_t<int>
   }
 }
 
-void Raster::DrawBezier(jgui::jpoint_t<int> v1, jgui::jpoint_t<int> v2, jgui::jpoint_t<int> v3)
+jgui::jpoint_t<int> BezierPoint(const std::vector<jgui::jpoint_t<int>> &points, float t)
 {
-  int sx = v1.x < v3.x ? 1 : -1;
-  int sy = v1.y < v3.y ? 1 : -1; // step direction
-  int cur = sx * sy *((v1.x - v2.x) * (v3.y - v2.y) - (v3.x - v2.x) * (v1.y - v2.y)); // curvature 
-  int x = v1.x - 2 * v2.x + v3.x, y = v1.y - 2 * v2.y +v3.y, xy = 2 * x * y * sx * sy;
-                                // compute error increments of P0
-  long dx = (1 - 2 * abs (v1.x - v2.x)) * y * y + abs (v1.y - v2.y) * xy - 2 * cur * abs (v1.y - v3.y);
-  long dy = (1 - 2 * abs (v1.y - v2.y)) * x * x + abs (v1.x - v2.x) * xy + 2 * cur * abs (v1.x - v3.x);
-                                // compute error increments of P2 
-  long ex = (1 - 2 * abs (v3.x - v2.x)) * y * y + abs (v3.y - v2.y) * xy + 2 * cur * abs (v1.y - v3.y);
-  long ey = (1 - 2 * abs (v3.y - v2.y)) * x * x + abs (v3.x - v2.x) * xy - 2 * cur * abs (v1.x - v3.x);
-                              // sign of gradient must not change 
-  // assert ((v1.x - v2.x) * (v3.x - v2.x) <= 0 && (v1.y - v2.y) * (v3.y - v2.y) <= 0); 
-  
-  if (cur == 0) { // straight line
-    DrawLine({v1.x, v1.y}, {v3.x, v3.y});
+	std::vector<jgui::jpoint_t<int>> tmp = points;
+	int i = tmp.size() - 1;
 
-    return;
-  }
+	while (i-- > 0) {
+		for (int k=0; k<i + 1; k++) {
+			tmp[k] = tmp[k] + t*(tmp[k + 1] - tmp[k]);
+		}
+	}
+	
+	return tmp[0];
+}
 
-  x *= 2 * x;
-  y *= 2 * y;
-  
-  if (cur < 0) { // negated curvature 
-    x = -x;
-    dx = -dx;
-    ex = -ex;
-    xy = -xy;
-    y = -y;
-    dy = -dy;
-    ey = -ey;
-  }
+void Raster::DrawBezier(const std::vector<jgui::jpoint_t<int>> &points)
+{
+	jgui::jpoint_t<int> p0 = BezierPoint(points, 0.0f);
 
-  // algorithm fails for almost straight line, check error values 
-  if (dx >= -y || dy <= -x || ex <= -y || ey >= -x) {        
-    DrawLine({v1.x, v1.y}, {v2.x, v2.y}); // simple approximation 
-    DrawLine({v2.x, v2.y}, {v3.x, v3.y});
+	for (float i=0.1f; i<1.0f; i+=0.1f) {
+		jgui::jpoint_t<int> p1 = BezierPoint(points, i);
 
-    return;
-  }
+		DrawLine(p0, p1);
 
-  dx -= xy;
-  ex = dx + dy;
-  dy -= xy; // error of 1.step 
-
-  for (;;) { // plot curve 
-    SetPixel(v1);
-
-    ey = 2 * ex - dy; // save value for test of y step 
-
-    if (2 * ex >= dx) { // x step 
-      if (v1.x == v3.x) {
-        break;
-      }
-
-      v1.x += sx;
-      dy -= xy;
-      ex += dx += y; 
-    }
-
-    if (ey <= 0) { // y step 
-      if (v1.y == v3.y) {
-        break;
-      }
-
-      v1.y += sy;
-      dx -= xy;
-      ex += dy += x; 
-    }
-  }
+		p0 = p1;
+	}
 } 
 
-void Raster::DrawCircle(jgui::jpoint_t<int> v1, int size)
+void Raster::DrawCircle(const jgui::jpoint_t<int> &v1, int size)
 {
   int x = 0, y = size; 
   int d = 3 - 2 * size; 
@@ -405,7 +364,7 @@ void Raster::DrawCircle(jgui::jpoint_t<int> v1, int size)
   }
 }
 
-void Raster::FillCircle(jgui::jpoint_t<int> v1, int size)
+void Raster::FillCircle(const jgui::jpoint_t<int> &v1, int size)
 {
   int x = 0, y = size; 
   int d = 3 - 2 * size; 
@@ -432,7 +391,7 @@ void Raster::FillCircle(jgui::jpoint_t<int> v1, int size)
   }
 }
 
-void Raster::DrawEllipse(jgui::jpoint_t<int> v1, jgui::jsize_t<int> s1)
+void Raster::DrawEllipse(const jgui::jpoint_t<int> &v1, const jgui::jsize_t<int> &s1)
 {
   int 
     x0 = v1.x - s1.width,
@@ -487,7 +446,7 @@ void Raster::DrawEllipse(jgui::jpoint_t<int> v1, jgui::jsize_t<int> s1)
   }
 }
 
-void Raster::FillEllipse(jgui::jpoint_t<int> v1, jgui::jsize_t<int> s1)
+void Raster::FillEllipse(const jgui::jpoint_t<int> &v1, const jgui::jsize_t<int> &s1)
 {
   int 
     x0 = v1.x - s1.width,
@@ -542,7 +501,7 @@ void Raster::FillEllipse(jgui::jpoint_t<int> v1, jgui::jsize_t<int> s1)
   */
 }
 
-void Raster::DrawArc(jgui::jpoint_t<int> v1, jgui::jsize_t<int> s1, float arc0, float arc1)
+void Raster::DrawArc(const jgui::jpoint_t<int> &v1, const jgui::jsize_t<int> &s1, float arc0, float arc1)
 {
   arc0 = fmod(arc0, 2*M_PI);
   arc1 = fmod(arc1, 2*M_PI);
@@ -571,7 +530,7 @@ void Raster::DrawArc(jgui::jpoint_t<int> v1, jgui::jsize_t<int> s1, float arc0, 
   }
 }
 
-void Raster::FillArc(jgui::jpoint_t<int> v1, jgui::jsize_t<int> s1, float arc0, float arc1)
+void Raster::FillArc(const jgui::jpoint_t<int> &v1, const jgui::jsize_t<int> &s1, float arc0, float arc1)
 {
   arc0 = fmod(arc0, 2*M_PI);
   arc1 = fmod(arc1, 2*M_PI);
@@ -643,7 +602,7 @@ void FillPolygon0(jgui::Raster *raster, std::vector<jgui::jpoint_t<int>> points,
 	}
 }
 
-void Raster::FillPolygon(jgui::jpoint_t<int> v1, std::vector<jgui::jpoint_t<int>> points, bool holed)
+void Raster::FillPolygon(const jgui::jpoint_t<int> &v1, const std::vector<jgui::jpoint_t<int>> &points, bool holed)
 {
 	if (points.size() == 0) {
 		return;
@@ -964,16 +923,18 @@ void Raster::DrawGlyph(int glyph, int xp, int yp)
 	}
 }
 
-void Raster::DrawString(std::string text, jgui::jpoint_t<int> v1)
+void Raster::DrawString(std::string text, const jgui::jpoint_t<int> &v1)
 {
-	for (int i=0; i<(int)text.size(); i++) {
-		DrawGlyph(text[i], v1.x, v1.y);
+	int x = v1.x;
 
-		v1.x = v1.x + 8 + 1;
+	for (int i=0; i<(int)text.size(); i++) {
+		DrawGlyph(text[i], x, v1.y);
+
+		x = x + 8 + 1;
 	}
 }
 
-void Raster::DrawImage(jgui::Image *image, jgui::jpoint_t<int> v1)
+void Raster::DrawImage(jgui::Image *image, const jgui::jpoint_t<int> &v1)
 {
   if (image == nullptr) {
     return;
