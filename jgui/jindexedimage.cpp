@@ -228,7 +228,7 @@ Image * IndexedImage::Rotate(double radians, bool resize)
       xo = ((i - dxc)*cosTheta - t1)/precision;
       yo = ((i - dxc)*sinTheta + t2)/precision;
 
-      if (xo >= -sxc && xo < sxc && yo >= -syc && yo < syc) {
+      if (xo >= -sxc && xo <= sxc && yo >= -syc && yo <= syc) {
         data[j*iw + i] = _data[(yo + syc)*isize.width + (xo + sxc)];
       } else {
         data[j*iw+i] = 0;

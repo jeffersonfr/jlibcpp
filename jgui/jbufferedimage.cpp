@@ -332,7 +332,7 @@ static void NearesNeighborRotate(uint32_t *src, int w, int h, uint32_t *dst, int
       xo = ((i-dxc)*cosTheta - t1)/precision;
       yo = ((i-dxc)*sinTheta + t2)/precision;
 
-      if (xo >= -sxc && xo < sxc && yo >= -syc && yo < syc) {
+      if (xo >= -sxc && xo <= sxc && yo >= -syc && yo <= syc) {
         *(ptr+i) = *(src + (yo+syc)*w + (xo+sxc));
       }
     }
