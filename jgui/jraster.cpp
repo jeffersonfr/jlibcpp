@@ -543,9 +543,6 @@ void Raster::FillArc(const jgui::jpoint_t<int> &v1, const jgui::jsize_t<int> &s1
     arc1 = arc1 + 2*M_PI;
   }
 
-  arc0 = fmod(arc0, 2*M_PI);
-  arc1 = fmod(arc1, 2*M_PI);
-
   jgui::jpoint_t<float>
     p0 {v1.x + s1.width*cosf(arc0), v1.y - s1.height*sinf(arc0)};
 
