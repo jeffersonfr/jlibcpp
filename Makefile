@@ -264,6 +264,7 @@ OBJS_jipc += \
   jsecureipcserver.o\
 
 OBJS_jthread += \
+  jbarrier.o\
   jchannel.o\
   jlatch.o\
   jsemaphore.o\
