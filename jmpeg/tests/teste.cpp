@@ -2205,7 +2205,7 @@ class SIData : public SI {
       for (std::vector<std::shared_ptr<struct module_info_t>>::iterator i=_modules.begin(); i!=_modules.end(); i++) {
         std::shared_ptr<struct module_info_t> module = (*i);
 
-        printf("\tmodule id:[%08d], module size:[%08d], module version:[%d], blocks:[", module->id, module->size, module->version);
+        printf("\tmodule id:[%016x], module size:[%08d], module version:[%d], blocks:[", module->id, module->size, module->version);
 
         for (int j=0; j<(int)module->blocks.size(); j++) {
           printf((module->blocks[j] == false)?".":"#");

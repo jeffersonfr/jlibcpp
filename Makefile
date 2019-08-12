@@ -263,6 +263,13 @@ OBJS_jipc += \
   jsecureipcclient.o\
   jsecureipcserver.o\
 
+OBJS_jthread += \
+  jchannel.o\
+  jlatch.o\
+  jsemaphore.o\
+  jspinlock.o\
+  jthreadlib.o\
+
 ifneq ($(ENABLE_GRAPHICS),none)
 
 OBJS_jgui += \
@@ -350,6 +357,7 @@ SRCS  = \
   $(addprefix jmpeg/,$(OBJS_jmpeg)) \
   $(addprefix jlogger/,$(OBJS_jlogger)) \
   $(addprefix jipc/,$(OBJS_jipc)) \
+  $(addprefix jthread/,$(OBJS_jthread)) \
   $(addprefix jgui/,$(OBJS_jgui)) \
   $(addprefix jmedia/,$(OBJS_jmedia)) \
 
@@ -412,6 +420,7 @@ ultraclean: clean uninstall
 	@cd jsecurity/tests && make clean && cd -
 	@cd jshared/tests && make clean && cd -
 	@cd jipc/tests && make clean && cd -
+	@cd jthread/tests && make clean && cd -
 	@cd jnetwork/tests && make clean && cd -
 	@cd jevent/tests && make clean && cd -
 	@cd jexception/tests && make clean && cd -

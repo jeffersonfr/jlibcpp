@@ -54,7 +54,7 @@ class RasterTest : public jgui::Window {
       raster.FillRectangle({100, 100, 100, 100});
       raster.FillCircle({200, 200}, 50);
       raster.FillEllipse({250, 300}, {50, 100});
-      raster.DrawBezier({350, 200}, {350, 150}, {400, 150});
+      raster.DrawBezier({{350, 200}, {350, 150}, {400, 150}});
       raster.FillPolygon({300, 300}, hourglass, false);
       raster.FillArc({500, 200}, {50, 50}, M_PI/4, 3*M_PI/2);
       
