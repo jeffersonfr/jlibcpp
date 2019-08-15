@@ -65,7 +65,7 @@ bool PrivateDemux::IsCRCFailed()
   return _is_crc_failed;
 }
 
-bool PrivateDemux::Append(const char *data, int data_length)
+bool PrivateDemux::Parse(const char *data, int data_length)
 {
   int table_id = TS_G8(data);
 

@@ -96,7 +96,7 @@ int Demux::GetPID()
   return _pid;
 }
 
-bool Demux::Append(const char *data, int data_length)
+bool Demux::Parse(const char *data, int data_length)
 {
   return false;
 }

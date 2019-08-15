@@ -135,7 +135,7 @@ void DemuxManager::ProcessRaw(const char *data, const int length)
       demux->DispatchDemuxEvent(new jevent::DemuxEvent(demux, jevent::JDET_DATA_NOT_FOUND, nullptr, 0, demux->GetPID()));
     } else {
       if (demux->GetPID() < 0 || demux->GetPID() == pid) {
-        if (demux->Append(data, length) == true) {
+        if (demux->Parse(data, length) == true) {
           demux->UpdateTimePoint();
 
           demux->DispatchDemuxEvent(new jevent::DemuxEvent(demux, jevent::JDET_DATA_ARRIVED, data, length, pid));
@@ -245,13 +245,13 @@ void DemuxManager::ProcessPSI(const char *data, const int length)
       demux->DispatchDemuxEvent(new jevent::DemuxEvent(demux, jevent::JDET_DATA_NOT_FOUND, nullptr, 0, demux->GetPID()));
     } else {
       if (demux->GetPID() < 0 || demux->GetPID() == pid) {
-        if (demux->Append(current.c_str(), current.size()) == true) {
+        if (demux->Parse(current.c_str(), current.size()) == true) {
           demux->UpdateTimePoint();
           demux->DispatchDemuxEvent(new jevent::DemuxEvent(demux, jevent::JDET_DATA_ARRIVED, current.data(), current.size(), pid));
         }
         
         if (previous.size() > 0) {
-          if (demux->Append(previous.c_str(), previous.size()) == true) {
+          if (demux->Parse(previous.c_str(), previous.size()) == true) {
             demux->UpdateTimePoint();
             demux->DispatchDemuxEvent(new jevent::DemuxEvent(demux, jevent::JDET_DATA_ARRIVED, previous.data(), previous.size(), pid));
           }
@@ -370,7 +370,7 @@ void DemuxManager::ProcessPES(const char *data, const int length)
       demux->DispatchDemuxEvent(new jevent::DemuxEvent(demux, jevent::JDET_DATA_NOT_FOUND, nullptr, 0, demux->GetPID()));
     } else {
       if (demux->GetPID() < 0 || demux->GetPID() == pid) {
-        if (demux->Append(current.c_str(), current.size()) == true) {
+        if (demux->Parse(current.c_str(), current.size()) == true) {
           demux->UpdateTimePoint();
           demux->DispatchDemuxEvent(new jevent::DemuxEvent(demux, jevent::JDET_DATA_ARRIVED, current.data(), current.size(), pid));
         }

@@ -65,7 +65,7 @@ bool PSIDemux::IsCRCFailed()
   return _is_crc_failed;
 }
 
-bool PSIDemux::Append(const char *data, int data_length)
+bool PSIDemux::Parse(const char *data, int data_length)
 {
   int table_id = TS_G8(data);
 

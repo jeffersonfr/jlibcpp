@@ -43,7 +43,7 @@ int RawDemux::GetPacketSize()
   return _packet_size;
 }
 
-bool RawDemux::Append(const char *data, int data_length)
+bool RawDemux::Parse(const char *data, int data_length)
 {
   if (_packet_size != data_length) {
     return false;

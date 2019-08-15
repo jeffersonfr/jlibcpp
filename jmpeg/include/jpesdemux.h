@@ -45,7 +45,7 @@ class PESDemux : public jmpeg::Demux {
      * \brief
      *
      */
-    virtual bool Append(const char *data, int data_length);
+    virtual bool Parse(const char *data, int data_length);
     
 };
 

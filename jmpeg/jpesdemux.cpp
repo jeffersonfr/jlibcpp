@@ -36,7 +36,7 @@ PESDemux::~PESDemux()
 {
 }
 
-bool PESDemux::Append(const char *data, int data_length)
+bool PESDemux::Parse(const char *data, int data_length)
 {
   if (data[0] != 0x00 or data[1] != 0x00 or data[2] != 0x01) {
     return false;

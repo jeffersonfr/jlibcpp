@@ -137,7 +137,7 @@ class Demux : public jcommon::Object {
      * \brief
      *
      */
-    virtual bool Append(const char *data, int data_length);
+    virtual bool Parse(const char *data, int data_length);
     
     /**
      * \brief
