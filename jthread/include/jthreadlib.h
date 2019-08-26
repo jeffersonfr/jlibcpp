@@ -20,4 +20,37 @@
 #ifndef J_THREADLIB_H
 #define J_THREADLIB_H
 
+#include <functional>
+#include <utility>
+
+#define defer(f) ScopeGuard (__defer__ ## __LINE__) = [&]() { f; }
+
+class ScopeGuard {
+
+  private:
+    std::function<void()> _function;
+
+  public:
+    template<typename Callable> ScopeGuard(Callable &&fn):
+      _function(std::forward<Callable>(fn))
+    {
+    }
+
+    ScopeGuard(ScopeGuard &&other):
+      _function(std::move(other._function))
+    {
+    }
+
+    virtual ~ScopeGuard()
+    {
+      if (_function) {
+        _function();
+      }
+    }
+
+    ScopeGuard(const ScopeGuard &) = delete;
+
+    void operator=(const ScopeGuard &) = delete;
+};
+
 #endif
