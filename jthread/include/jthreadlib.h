@@ -23,7 +23,10 @@
 #include <functional>
 #include <utility>
 
-#define defer(f) ScopeGuard (__defer__ ## __LINE__) = [&]() { f; }
+#define CONCAT_NAMES(a, b) a ## b
+#define UNIQUE_DEFER_VARIABLE(a, b) CONCAT_NAMES(a, b)
+
+#define defer(f) ScopeGuard UNIQUE_DEFER_VARIABLE(__defer__, __LINE__) = [&]() { f; }
 
 class ScopeGuard {
 
