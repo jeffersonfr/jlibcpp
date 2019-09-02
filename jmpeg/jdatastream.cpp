@@ -21,12 +21,21 @@
 #include "jmpeg/jmpeglib.h"
 #include "jexception/joverflowexception.h"
 #include "jexception/joutofboundsexception.h"
+#include "jexception/jinvalidargumentexception.h"
 
 namespace jmpeg {
 
 DataStream::DataStream(std::string &data, size_t lo, size_t hi):
 	DataStream(data)
 {
+  if (lo > hi) {
+    throw jexception::InvalidArgumentException("Higher index must be greater than lower index");
+  }
+
+  if (lo > _data.size() - 1 or hi > _data.size()) {
+    throw jexception::OutOfBoundsException("Lower and higher indexes must be in [0, data.size] range");
+  }
+
 	_data_index_lo = lo;
 	_data_index_hi = hi;
 }
@@ -238,11 +247,11 @@ size_t DataStream::GetAvailableBytes()
 
 uint8_t DataStream::GetRawByte(size_t index)
 {
-  if (index >= _data_index_hi) {
+  if ((_data_index_lo + index) >= _data_index_hi) {
     throw jexception::OverflowException("Skip overflow");
   }
 
-  return *((uint8_t *)_data.c_str() + index);
+  return *((uint8_t *)_data.c_str() + _data_index_lo + index);
 }
 
 std::string DataStream::GetRawBytes(size_t index, size_t n)
