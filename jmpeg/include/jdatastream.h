@@ -30,16 +30,31 @@ class DataStream : public jcommon::Object {
 
   private:
     /** \brief */
-    std::string _data;
+    std::string &_data;
     /** \brief */
     size_t _data_index;
+    size_t _data_index_lo;
+    size_t _data_index_hi;
 
+	private:
+    /**
+     * \brief
+     *
+     */
+    DataStream(std::string &data, size_t lo, size_t hi);
+    
   public:
     /**
      * \brief
      *
      */
-    DataStream(std::string data);
+    DataStream(std::string &data);
+    
+    /**
+     * \brief
+     *
+     */
+    DataStream(std::string &&data);
     
     /**
      * \brief
@@ -52,6 +67,12 @@ class DataStream : public jcommon::Object {
      *
      */
     virtual ~DataStream();
+    
+    /**
+     * \brief
+     *
+     */
+    DataStream Slice(size_t lo, size_t hi);
     
     /**
      * \brief
@@ -93,12 +114,6 @@ class DataStream : public jcommon::Object {
      * \brief
      *
      */
-    uint8_t GetRawByte(size_t index);
-    
-    /**
-     * \brief
-     *
-     */
     void Skip(size_t n);
     
     /**
@@ -118,6 +133,18 @@ class DataStream : public jcommon::Object {
      *
      */
     size_t GetAvailableBytes();
+    
+		/**
+     * \brief
+     *
+     */
+    uint8_t GetRawByte(size_t index);
+
+		/**
+     * \brief
+     *
+     */
+    std::string GetRawBytes(size_t index, size_t n);
 
 };
 

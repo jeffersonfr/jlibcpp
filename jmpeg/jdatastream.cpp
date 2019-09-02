@@ -24,28 +24,49 @@
 
 namespace jmpeg {
 
-DataStream::DataStream(std::string data)
+DataStream::DataStream(std::string &data, size_t lo, size_t hi):
+	DataStream(data)
 {
-  _data = data;
+	_data_index_lo = lo;
+	_data_index_hi = hi;
 }
 
-DataStream::DataStream(const char *data, int length)
+DataStream::DataStream(std::string &data):
+	_data(data)
+{
+	_data_index = 0;
+	_data_index_lo = 0;
+	_data_index_hi = data.size();
+}
+
+DataStream::DataStream(std::string &&data):
+	_data(data)
+{
+	_data_index = 0;
+	_data_index_lo = 0;
+	_data_index_hi = data.size();
+}
+
+DataStream::DataStream(const char *data, int length):
+  DataStream(std::string(data, length))
 {
   if (length < 0) {
     throw jexception::OutOfBoundsException("Data length must be greater than zero");
   }
-
-  _data = std::string(data, length);
-  _data_index = 0;
 }
 
 DataStream::~DataStream()
 {
 }
 
+DataStream DataStream::Slice(size_t lo, size_t hi)
+{
+	return DataStream(_data, lo, hi);
+}
+
 void DataStream::SetBits(uint64_t bits, size_t n)
 {
-  if ((_data_index + n) > (_data.size() << 3)) {
+  if ((_data_index + n) > (_data_index_hi << 3)) {
     throw jexception::OverflowException("Set overflow");
   }
 
@@ -87,7 +108,7 @@ void DataStream::SetBytes(std::string bytes)
 
 uint64_t DataStream::GetBits(size_t n)
 {
-  if ((_data_index + n) > (_data.size() << 3)) {
+  if ((_data_index + n) > (_data_index_hi << 3)) {
     throw jexception::OverflowException("Get overflow");
   }
 
@@ -191,18 +212,9 @@ std::string DataStream::GetBytes(size_t n)
   return bytes;
 }
 
-uint8_t DataStream::GetRawByte(size_t index)
-{
-  if (index >= _data.size()) {
-    throw jexception::OverflowException("Skip overflow");
-  }
-
-  return *((uint8_t *)_data.c_str() + index);
-}
-
 void DataStream::Skip(size_t n)
 {
-  if ((_data_index + n) > (_data.size() << 3)) {
+  if ((_data_index + n) > (_data_index_hi << 3)) {
     throw jexception::OverflowException("Skip overflow");
   }
 
@@ -211,17 +223,45 @@ void DataStream::Skip(size_t n)
 
 void DataStream::Reset()
 {
-  _data_index = 0;
+  _data_index = _data_index_lo;
 }
 
 size_t DataStream::GetAvailableBits()
 {
-  return (_data.size() << 8) - _data_index;
+  return (_data_index_hi << 8) - _data_index;
 }
 
 size_t DataStream::GetAvailableBytes()
 {
   return GetAvailableBits() >> 8;
+}
+
+uint8_t DataStream::GetRawByte(size_t index)
+{
+  if (index >= _data_index_hi) {
+    throw jexception::OverflowException("Skip overflow");
+  }
+
+  return *((uint8_t *)_data.c_str() + index);
+}
+
+std::string DataStream::GetRawBytes(size_t index, size_t n)
+{
+  std::string bytes;
+
+  if (n == 0) {
+    return bytes;
+  }
+
+  bytes.reserve(n);
+
+  for (size_t i=0; i<n; i++) {
+    uint8_t byte = GetRawByte(index + i);
+
+    bytes.append((const char *)&byte, 1);
+  }
+
+  return bytes;
 }
 
 }
