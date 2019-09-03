@@ -28,14 +28,6 @@ namespace jmpeg {
 DataStream::DataStream(std::string &data, size_t lo, size_t hi):
 	DataStream(data)
 {
-  if (lo > hi) {
-    throw jexception::InvalidArgumentException("Higher index must be greater than lower index");
-  }
-
-  if (lo > _data.size() - 1 or hi > _data.size()) {
-    throw jexception::OutOfBoundsException("Lower and higher indexes must be in [0, data.size] range");
-  }
-
 	_data_index_lo = lo;
 	_data_index_hi = hi;
 }
@@ -70,6 +62,17 @@ DataStream::~DataStream()
 
 DataStream DataStream::Slice(size_t lo, size_t hi)
 {
+	lo = _data_index_lo + lo;
+	hi = hi;
+
+  if (lo > hi) {
+    throw jexception::InvalidArgumentException("Higher index must be greater than lower index");
+  }
+
+	if (lo > (_data_index_hi - 1) or hi > _data_index_hi) {
+    throw jexception::OutOfBoundsException("Indexes are out of bounds");
+  }
+
 	return DataStream(_data, lo, hi);
 }
 
