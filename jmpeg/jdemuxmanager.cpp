@@ -190,19 +190,52 @@ void DemuxManager::ProcessPSI(const char *data, const int length)
 
     ptr = ptr + pointer_field + 1;
 
-    if (ptr < end) {
+    int length = end - ptr;
+
+    while (length > 0) {
       section_length = TS_PSI_G_SECTION_LENGTH(ptr) + 3;
 
-      if (section_length > 3) {
-        int length = end - ptr;
-        int chunk = section_length;
+      if (section_length < 3) {
+				break;
+			}
 
-        if (chunk > length) {
-          chunk = length;
-        }
+			if (section_length > length) {
+				// INFO:: section is greater than available bytes in packet
+				current = std::string(ptr, length);
 
-        current = std::string(ptr, chunk);
-      }
+				break;
+			} else {
+				// INFO:: section is available in one packet (just one loop)
+				current = std::string(ptr, section_length);
+
+				length = length - section_length;
+
+				std::chrono::steady_clock::time_point
+					timepoint = std::chrono::steady_clock::now();
+
+				// INFO:: process psi, private packets
+				for (std::vector<Demux *>::iterator i=_demuxes.begin(); i!=_demuxes.end(); i++) {
+					Demux *demux = (*i);
+
+					if (demux->GetType() != JDT_PSI and demux->GetType() != JDT_PRIVATE) {
+						continue;
+					}
+
+					if ((timepoint - demux->GetTimePoint()) > demux->GetTimeout()) {
+						demux->UpdateTimePoint();
+						demux->DispatchDemuxEvent(new jevent::DemuxEvent(demux, jevent::JDET_DATA_NOT_FOUND, nullptr, 0, demux->GetPID()));
+					} else {
+						if (demux->GetPID() < 0 || demux->GetPID() == pid) {
+							if (demux->Parse(current.c_str(), current.size()) == true) {
+								demux->UpdateTimePoint();
+								demux->DispatchDemuxEvent(new jevent::DemuxEvent(demux, jevent::JDET_DATA_ARRIVED, current.data(), current.size(), pid));
+							}
+						}
+					}
+				}
+					
+				ptr = ptr + section_length;
+			}
     }
   } else {
     current = timeline[pid];
