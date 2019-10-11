@@ -35,6 +35,8 @@ namespace jmath {
 
 template<size_t R, size_t C, typename T = float, typename = typename std::enable_if<std::is_arithmetic<T>::value || is_complex<T>::value, T>::type>
   struct jmatrix_t {
+    typedef T value_type;
+
     jvector_t<C, T> data[R];
 
     static jmatrix_t<R, C, T> Identity()
@@ -54,7 +56,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return m;
 		}
 
-    static jmatrix_t<R, C, T> Kernel(T sigma = 1)
+    static jmatrix_t<R, C, T> GaussianKernel(T sigma = 1)
     {
       static_assert(R == C, "Kernel needs a square matrix");
 
@@ -87,7 +89,7 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return m;
     }
 
-    static jmatrix_t<R, C, T> Random(double lo = 0.0, double hi = 1.0)
+    static jmatrix_t<R, C, T> UniformRandom(double lo = 0.0, double hi = 1.0)
     {
       jmatrix_t<R, C, T> m;
 
@@ -413,17 +415,17 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return (*this = *this/param);
     }
     
-    size_t Size() const
+    constexpr size_t Size() noexcept
     {
       return R*C;
     }
 
-    size_t Rows() const
+    constexpr size_t Rows() noexcept
     {
       return R;
     }
 
-    size_t Cols() const
+    constexpr size_t Cols() noexcept
     {
       return C;
     }
@@ -593,6 +595,11 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return count/(R*C);
 		}
 
+    bool IsSquare() const
+    {
+      return R == C;
+    }
+
     bool IsNormal() const
     {
       jmatrix_t<R, C, T> 
@@ -604,7 +611,12 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
 
     bool IsSingular() const
     {
-      return Determinant() == 0.0;
+      return Determinant() == 0;
+    }
+
+    bool IsInvertible()
+    {
+      return IsSingular() == false and IsSquare() == true;
     }
 
     bool IsDiagonal() const

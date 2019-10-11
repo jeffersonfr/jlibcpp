@@ -44,6 +44,8 @@ template<class T>
 
 template<size_t N, typename T = float, typename = typename std::enable_if<std::is_arithmetic<T>::value || is_complex<T>::value, T>::type>
   struct jvector_t {
+    typedef T value_type;
+
     T data[N];
 
     static jvector_t<N, T> Random(double lo = 0.0, double hi = 1.0)
@@ -521,7 +523,7 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
       return *this;
     }
 
-    size_t Size() const
+    constexpr size_t Size() noexcept
     {
       return N;
     }

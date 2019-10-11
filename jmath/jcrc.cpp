@@ -212,7 +212,7 @@ uint64_t CRC::Calculate64(const uint8_t *begin, int count)
     crc = (crc << 8) ^ crc_64[(crc >> 56) ^ ((uint8_t)(*begin++))];
   }
   
-  return ~crc;
+  return crc ^ 0xffffffffffffffffLL;
 }
 
 }
