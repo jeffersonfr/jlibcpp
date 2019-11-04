@@ -35,7 +35,7 @@ int main()
 		};
 
 	std::cout << m.Inverse().Inverse() << std::endl;
-	std::cout << c << std::endl;
+	std::cout << m*c.Real<decltype(m)::value_type>() << std::endl;
 
 	return 0;
 }

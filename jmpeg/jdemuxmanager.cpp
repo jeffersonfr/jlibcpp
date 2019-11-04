@@ -88,13 +88,15 @@ void DemuxManager::SetInputStream(jio::InputStream *is)
 
 void DemuxManager::Start()
 {
+  std::lock_guard<std::mutex> lock(_demux_mutex);
+
   if (_is_running == true) {
     return;
   }
 
-  _is_running = true;
-  
   _thread = std::thread(&DemuxManager::Run, this);
+
+  _is_running = true;
 
   // INFO:: grant some time to starts the thread
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -102,8 +104,12 @@ void DemuxManager::Start()
 
 void DemuxManager::Stop()
 {
+  std::unique_lock<std::mutex> lock(_demux_mutex);
+
   if (_is_running == true) {
     _is_running = false;
+
+    lock.unlock();
 
     _thread.join();
   }

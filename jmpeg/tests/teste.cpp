@@ -214,6 +214,69 @@ class Utils {
       return info;
     }
 
+    static std::string GetAreaCodeDescription(int code)
+    {
+      std::string info = "Reserved";
+
+      if (code == 0x01) {
+        info = "Rondônia";
+      } else if (code == 0x02) {
+        info = "Acre";
+      } else if (code == 0x03) {
+        info = "Amazonas";
+      } else if (code == 0x04) {
+        info = "Roraima";
+      } else if (code == 0x05) {
+        info = "Pará";
+      } else if (code == 0x06) {
+        info = "Amapá";
+      } else if (code == 0x07) {
+        info = "Tocantins";
+      } else if (code == 0x08) {
+        info = "Maranhão";
+      } else if (code == 0x09) {
+        info = "Piauí";
+      } else if (code == 0x0a) {
+        info = "Ceará";
+      } else if (code == 0x0b) {
+        info = "Rio Grande do Norte";
+      } else if (code == 0x0c) {
+        info = "Paraíba";
+      } else if (code == 0x0d) {
+        info = "Pernanbuco";
+      } else if (code == 0x0e) {
+        info = "Sergipe";
+      } else if (code == 0x0f) {
+        info = "Alagoas";
+      } else if (code == 0x10) {
+        info = "Bahia";
+      } else if (code == 0x11) {
+        info = "Minas Gerais";
+      } else if (code == 0x12) {
+        info = "Espirito Santo";
+      } else if (code == 0x13) {
+        info = "Rio de Janeiro";
+      } else if (code == 0x14) {
+        info = "São Paulo";
+      } else if (code == 0x15) {
+        info = "Paraná";
+      } else if (code == 0x16) {
+        info = "Santa Catarina";
+      } else if (code == 0x17) {
+        info = "Rio Grande do Sul";
+      } else if (code == 0x18) {
+        info = "Mato Grosso do Sul";
+      } else if (code == 0x19) {
+        info = "Mato Grosso";
+      } else if (code == 0x1a) {
+        info = "Goiás";
+      } else if (code == 0x1b) {
+        info = "Distrito Federal";
+      }
+
+      return info;
+    }
+
     static std::string GetLanguageUnicodeModeDescription(int mode)
     {
       std::string info = "Undefined";
@@ -2307,7 +2370,7 @@ class SISubtitle : public SI {
         } else if (byte == 0x1c) { // APS (active position set::[row, column])::(set the current position of cursor)
           uint8_t
             param1 = *code++,
-                   param2 = *code++;
+            param2 = *code++;
 
           printf("Closed Caption:: data unit: <APS>::[0x%02x, 0x%02x]\n", param1, param2);
         } else if (byte == 0x1d) { // SS3 (single shift 3)::(special characters escape [G3])
@@ -3239,7 +3302,7 @@ class PSIParser : public jevent::DemuxListener {
           param->Country(country);
         }
 
-        printf("\t\t:: country:[%s], country id:[%d], local time offset polarity:[%d], local time offset:[%d], time of change:[%02d%02d%02d-%02d%02d%02d], next time offset:[0x%04x]\n", country.c_str(), country_region_id, local_time_offset_polarity, local_time_offset, Y, M, D, h, m, s, next_time_offset);
+        printf("\t\t:: country:[%s], country id:[%d], local time offset polarity:[%d], local time offset:[%04x], time of change:[%02d%02d%02d-%02d%02d%02d], next time offset:[0x%04x]\n", country.c_str(), country_region_id, local_time_offset_polarity, local_time_offset, Y, M, D, h, m, s, next_time_offset);
         // printf(":: country:[%s], country id:[%d], local time offset polarity:[%d], local time offset:[%d], time of change:[%lu], next time offset:[0x%04x]\n", country.c_str(), country_region_id, local_time_offset_polarity, local_time_offset, time_of_change, next_time_offset);
       } else if (descriptor_tag == 0x59) { // subtitling descriptor
         int count = descriptor_length/8;
@@ -3608,7 +3671,7 @@ class PSIParser : public jevent::DemuxListener {
 
           ptr = ptr + 2;
         }
-      } else if (descriptor_tag == 0xfc) { // emergency information descriptor (EWBS)
+      } else if (descriptor_tag == 0xfc) { // emergency information descriptor (emergency warning broadcast system/EWBS)
         int service_id = TS_G16(ptr + 0);
         int start_end_flag = TS_GM8(ptr + 2, 0, 1);
         int signal_type = TS_GM8(ptr + 2, 1, 1);
@@ -3618,10 +3681,11 @@ class PSIParser : public jevent::DemuxListener {
         ptr = ptr + 4;
 
         for (int i=0; i<area_code_length/2; i++) {
-          int area_code = TS_GM16(ptr + 0, 0, 12);
+          int area_code = TS_GM16(ptr + 0, 0, 5); // INFO:: brazilan normative uses just the first five bits
+          // int area_code = TS_GM16(ptr + 0, 0, 12);
           // int reserved = TS_GM16(ptr + 0, 12, 4);
 
-          printf("\t\t:: service id:[0x%04x], start end flag:[%01x], signal type:[%01x], area code:[0x%04x]\n", service_id, start_end_flag, signal_type, area_code);
+          printf("\t\t:: service id:[0x%04x], start end flag:[%01x], signal type:[%01x], area code:[0x%04x/%s]\n", service_id, start_end_flag, signal_type, area_code, Utils::GetAreaCodeDescription(area_code).c_str());
 
           ptr = ptr + 2;
         }
