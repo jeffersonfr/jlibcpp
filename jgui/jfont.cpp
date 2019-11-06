@@ -233,17 +233,16 @@ int Font::GetStringWidth(std::string text)
 
 jrect_t<int> Font::GetStringExtends(std::string text)
 {
-  const char *utf8 = text.c_str();
-  int utf8_len = text.size();
+  std::string utf8 = text;
   cairo_text_extents_t t;
 
   if (GetEncoding() == JFE_ISO_8859_1) {
     jcommon::Charset charset;
 
-    utf8 = charset.Latin1ToUTF8(utf8, &utf8_len);
+    utf8 = charset.Latin1ToUTF8(text);
   }
 
-  cairo_scaled_font_text_extents(_scaled_font, utf8, &t);
+  cairo_scaled_font_text_extents(_scaled_font, utf8.c_str(), &t);
 
   jrect_t<int> 
     r {
@@ -252,10 +251,6 @@ jrect_t<int> Font::GetStringExtends(std::string text)
       (int)t.width, 
       (int)t.height
     };
-
-  if (GetEncoding() == JFE_ISO_8859_1) {
-    delete [] utf8;
-  }
 
   return r;
 }

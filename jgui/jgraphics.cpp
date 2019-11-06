@@ -1155,28 +1155,23 @@ void Graphics::DrawString(std::string text, jpoint_t<int> point)
   struct jpoint_t<int> t = Translate();
 
   Font *font = dynamic_cast<Font *>(_font);
-  const char *utf8 = text.c_str();
+  std::string utf8 = text;
   cairo_glyph_t *glyphs = nullptr;
-  int utf8_len = text.size();
   int glyphs_len = 0;
   cairo_status_t status;
 
   if (_font->GetEncoding() == JFE_ISO_8859_1) {
     jcommon::Charset charset;
 
-    utf8 = charset.Latin1ToUTF8(utf8, &utf8_len);
+    utf8 = charset.Latin1ToUTF8(text);
   }
 
   status = cairo_scaled_font_text_to_glyphs(
-      font->GetScaledFont(), point.x + t.x, point.y + t.y + _font->GetAscender(), utf8, utf8_len, &glyphs, &glyphs_len, nullptr, nullptr, nullptr);
+      font->GetScaledFont(), point.x + t.x, point.y + t.y + _font->GetAscender(), utf8.c_str(), utf8.size(), &glyphs, &glyphs_len, nullptr, nullptr, nullptr);
 
   if (status == CAIRO_STATUS_SUCCESS) {
     cairo_show_glyphs(_cairo_context, glyphs, glyphs_len);
     cairo_glyph_free(glyphs);
-  }
-
-  if (_font->GetEncoding() == JFE_ISO_8859_1) {
-    delete [] utf8;
   }
 
   cairo_stroke(_cairo_context);
@@ -2119,8 +2114,7 @@ void Graphics::TextTo(std::string text, jpoint_t<int> point)
   }
 
   struct jpoint_t<int> t = Translate();
-  const char *utf8 = text.c_str();
-  int utf8_len = text.size();
+  std::string utf8 = text;
   cairo_glyph_t *glyphs = nullptr;
   int glyphs_len = 0;
   cairo_status_t status;
@@ -2128,19 +2122,15 @@ void Graphics::TextTo(std::string text, jpoint_t<int> point)
   if (font->GetEncoding() == JFE_ISO_8859_1) {
     jcommon::Charset charset;
 
-    utf8 = charset.Latin1ToUTF8(utf8, &utf8_len);
+    utf8 = charset.Latin1ToUTF8(text);
   }
 
   status = cairo_scaled_font_text_to_glyphs(
-      font->GetScaledFont(), point.x + t.x, point.y + t.y + font->GetAscender(), utf8, utf8_len, &glyphs, &glyphs_len, nullptr, nullptr, nullptr);
+      font->GetScaledFont(), point.x + t.x, point.y + t.y + font->GetAscender(), utf8.c_str(), utf8.size(), &glyphs, &glyphs_len, nullptr, nullptr, nullptr);
 
   if (status == CAIRO_STATUS_SUCCESS) {
     cairo_glyph_path(_cairo_context, glyphs, glyphs_len);
     cairo_glyph_free(glyphs);
-  }
-
-  if (font->GetEncoding() == JFE_ISO_8859_1) {
-    delete [] utf8;
   }
 }
 

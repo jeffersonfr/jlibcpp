@@ -236,324 +236,70 @@ Char Charset::UTF8ToUnicode(const char *utf8)
   return ch;
 }
 
-int Charset::UTF8Length(const char *utf8)
+int Charset::UTF8Length(std::string utf8)
 {
+  const char *ptr = utf8.data();
   int length = 0;
 
-  while (*utf8 != '\0') {
+  while (*ptr != '\0') {
     length++;
-    if ((*utf8 & High2Bits) == High2Bits) {
-      utf8++;
-      while ((*utf8 & High2Bits) == ContinueBits)
-        utf8++;
+
+    if ((*ptr & High2Bits) == High2Bits) {
+      ptr++;
+
+      while ((*ptr & High2Bits) == ContinueBits) {
+        ptr++;
+      }
+    } else {
+      ptr++;
     }
-    else
-      utf8++;
   }
+
   return length;
 }
 
-int Charset::ReadUTF8(FILE *f, Char * dst)
+std::string Charset::Latin1ToUTF8(std::string latin1)
 {
-  jcharset_result_t result = JCR_OK;
-  Char ch;
-  unsigned short extra_bytes;
-  int c;
+  std::string utf8;
 
-  c = getc(f);
-  if (c == EOF) {
-    *dst = '\0';
-    return 4; // SourceExhausted;
-  }
-
-  extra_bytes = UTF8ExtraBytes[c];
-
-  ch = c;
-  if (extra_bytes) {
-    c = getc(f);
-    if (c == EOF) {
-      *dst = ch;
-      return 4; // SourceExhausted;
-    }
-    if ((c & High2Bits) == ContinueBits) {
-      ch &= FirstByteMask[extra_bytes];
-      do {
-        ch <<= 6;
-        ch |= (c & Low6Bits);
-        if (--extra_bytes == 0)
-          break;
-        c = getc(f);
-        if (c == EOF) {
-          result = JCR_SOURCE_EXHAUSTED;
-          break;
-        }
-        if ((c & High2Bits) != ContinueBits) {
-          ungetc(c, f);
-          result = JCR_SOURCE_CORRUPT;
-          break;
-        }
-      } while (1);
-    } else {
-      result = JCR_SOURCE_CORRUPT;
-    }
-  }
-
-  if (ch <= MaximumChar) {
-    *dst = ch;
-  } else {
-    *dst = ReplacementChar;
-  }
-  return result;
-}
-
-char * Charset::ReadLatin1File(FILE *f, int *nbytes, int *nchars, int stop)
-{
-  int pos, 
-    nch, 
-    max;
-  char *line;
-  char *c;
-  int ch;
-
-  if (feof(f)) {
-    *nbytes = 0;
-    *nchars = 0;
-    return nullptr;
-  }
-
-  pos = 0;
-  nch = 0;
-  max = 112; /* big enough for many input lines; not a power of 2 */
-  line = (char *)malloc(max);
-  c = & line[pos];
-
-  while ((ch = getc(f)) != EOF) {
-    if (ch & 0x80) {
-      /* character will occupy two bytes */
-      if (pos+2 >= max) {
-        /* realloc buffer twice the size */
-        max += max;
-        line = (char *)realloc(line, max);
-        c = & line[pos];
-      }
-      *c = (0xC0 | ((ch >> 6) & 0x03)); /* 110---xx */
-      c++;
-      pos++;
-
-      *c = (0x80 | (ch & 0x3F)); /* 10xxxxxx */
-      c++;
-      pos++;
-
-      nch++;
-    }
-    else {
-      /* character will only occupy one byte */
-      *c = (ch & 0x7F);
-      c++;
-      pos++;
-      if (pos == max) {
-        /* realloc buffer twice the size */
-        max += max;
-        line = (char *)realloc(line, max);
-        c = & line[pos];
-      }
-      nch++;
-    }
-
-    if (ch == stop) {
-      break;
-    }
-  }
-
-  /* shrink array to smallest required space */
-  line = (char *)realloc(line, pos+1);
-  line[pos] = '\0';
-
-  *nbytes = pos;
-  *nchars = nch;
-
-  return line;
-}
-
-char * Charset::ReadUTF8File(FILE *f, int *nbytes, int *nchars, int stop)
-{
-  int pos,
-      nch, 
-      max;
-  char *line;
-  char *c;
-  int ch;
-
-  if (feof(f)) {
-    *nbytes = 0;
-    *nchars = 0;
-    return nullptr;
-  }
-
-  pos = 0;
-  nch = 0;
-  max = 112; /* big enough for many input lines; not a power of 2 */
-  line = (char *)malloc(max);
-  c = & line[pos];
-
-  while ((ch = getc(f)) != EOF) {
-    *c = ch;
-    c++;
-    pos++;
-
-    if (pos == max) {
-      /* realloc buffer twice the size */
-      max += max;
-      line = (char *)realloc(line, max);
-      c = & line[pos];
-    }
-    
-    // i.e. not 10xxxxxx
-    if ((ch & 0xC0) != 0xC0) {
-      nch++;
-    }
-    
-    if (ch == (int)stop) {
-      break;
-    }
-  }
-
-  /* shrink array to smallest required space */
-  line = (char *)realloc(line, pos+1);
-  line[pos] = '\0';
-
-  *nbytes = pos;
-  *nchars = nch;
-  return line;
-}
-
-char *Charset::ReadLatin1Buffer(FILE *f, int *nbytes, int *nchars)
-{
-  return ReadLatin1File(f, nbytes, nchars, EOF);
-}
-
-char *Charset::ReadUTF8Buffer(FILE *f, int *nbytes, int *nchars)
-{
-  return ReadUTF8File(f, nbytes, nchars, EOF);
-}
-
-char *Charset::ReadLatin1Line(FILE *f, int *nbytes, int *nchars)
-{
-  return ReadLatin1File(f, nbytes, nchars, '\n');
-}
-
-char *Charset::ReadUTF8Line(FILE *f, int *nbytes, int *nchars)
-{
-  return ReadUTF8File(f, nbytes, nchars, '\n');
-}
-
-int Charset::WriteLatin1(FILE *f, const char *utf8, int nbytes)
-{
-  Char buf[1];
-  Char *bp;
-  char ch;
-  const char *sp;
-  size_t total = 0;
-
-  sp = utf8;
-  while (nbytes > 0) {
-    /* write one UTF-8 sequence into a Char buffer */
-    bp = buf;
-    UTF8ToUnicode(&sp, sp+7, &bp, bp+1);
-    /* determine what happened */
-    nbytes -= (int64_t) (sp - utf8);
-    utf8 = sp;
-    /* force Unicode Char into a Latin-1 char */
-    ch = (char) (buf[0] & 0x00FF);
-    putc(ch, f);
-    total++;
-  }
-
-  fflush(f);
-  
-  return total;
-}
-
-int Charset::WriteUTF8(FILE *f, const char *utf8, int nbytes)
-{
-  int n, 
-    total = 0;
-
-  while (nbytes > 256) {
-    n = (int64_t) fwrite(utf8, 1, 256, f);
-    total += n;
-    nbytes -= n;
-  }
-
-  total += fwrite(utf8, 1, nbytes, f);
-  
-  fflush(f);
-  
-  return total;
-}
-
-char * Charset::Latin1ToUTF8(const char *latin1, int *bytes)
-{
-  const char *str_c_str = latin1;
-  int length = *bytes;
-  char *utf8 = new char[2*length];
-  int k = 0;
-
-  for (int i=0; i<length; i++) {
-    uint8_t c = str_c_str[i];
+  for (int i=0; i<(int)latin1.size(); i++) {
+    uint8_t c = latin1[i];
 
     if (c >= 0x80 && c <= 0xbf) {
-      utf8[k++] = (char)0xc2;
-      utf8[k++] = c;
+      utf8.append(1, (char)0xc2);
+      utf8.append(1, (char)c);
     } else if (c >= 0xc0 && c <= 0xff) {
-      utf8[k++] = (char)0xc3;
-      utf8[k++] = c-0x40;
+      utf8.append(1, (char)0xc3);
+      utf8.append(1, (char)(c - 0x40));
     } else {
-      utf8[k++] = c;
+      utf8.append(1, (char)c);
     }
   }
-
-  *bytes = k;
-  utf8[k] = 0;
 
   return utf8;
 }
 
 
-char * Charset::UTF8ToLatin1(const char *utf8, int *bytes)
+std::string Charset::UTF8ToLatin1(std::string utf8)
 {
+  std::string latin1;
   Char buf[1];
   Char *bp;
-  const char *sp;
-  int total = 0,
-      nbytes = *bytes;
-  char *dp;
-  char *dest;
+  const char *sp = utf8.data();
+  int nbytes = utf8.size();
 
-  dest = (char *)malloc(nbytes + 1);
-  if (dest == nullptr) {
-    *bytes = 0;
-    return nullptr;
-  }
-  dp = dest;
-
-  sp = utf8;
   while (nbytes > 0) {
-    /* write one UTF-8 sequence into a Char buffer */
+    // write one UTF-8 sequence into a Char buffer
     bp = buf;
-    UTF8ToUnicode(&sp, sp+7, &bp, bp+1);
-    /* determine what happened */
-    nbytes -= (int64_t) (sp - utf8);
+    UTF8ToUnicode(&sp, sp + 7, &bp, bp + 1);
+    // determine what happened
+    nbytes -= (int64_t) (sp - utf8.data());
     utf8 = sp;
-    /* force Unicode Char into a Latin-1 char */
-    *dp++ = (char) (buf[0] & 0x00FF);
-    total++;
+    // force Unicode Char into a Latin-1 char
+    latin1.append(1, (char)(buf[0] & 0xff));
   }
 
-  *dp = '\0';
-  *bytes = total;
-
-  return dest;
+  return latin1;
 }
 
 char * Charset::CorrectUTF8(const char *s, int *bytes)

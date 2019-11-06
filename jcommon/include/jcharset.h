@@ -26,10 +26,10 @@
 #include <string.h>
 #include <stdlib.h>
 
-typedef uint32_t  UTF32;    // at least 32 bits 
-typedef uint16_t  UTF16;    // at least 16 bits 
-typedef uint8_t    UTF8;    // typically 8 bits 
-typedef uint32_t  Char;     // 0 or 1 
+typedef uint32_t UTF32; // at least 32 bits 
+typedef uint16_t UTF16; // at least 16 bits 
+typedef uint8_t UTF8; // typically 8 bits 
+typedef uint32_t Char; // 0 or 1 
 
 // Some fundamental constants 
 #define UNI_REPLACEMENT_CHAR (UTF32)0x0000FFFD
@@ -152,80 +152,13 @@ class Charset : public virtual jcommon::Object{
      * \brief Return the number of Unicode characters within a UTF-8 string.
      * For ASCII strings this will return the same number as strlen.
      */
-    int UTF8Length(const char *utf8);
-
-    /*
-     * \brief Read a Unicode value from a UTF-8 file. The file must be open in 
-     * binary mode to read. Errors are reported in the return value, as a charset_result_t.
-     */
-    int ReadUTF8(FILE *f, Char * dst);
-
-    /*
-     * \brief Read a file into a UTF-8 char array, up to and including
-     *  the 'stop' character (or an EOF will end input).
-     *  This function returns the alloc'd UTF-8 encoded string.
-     *  The number of bytes in the returned string is placed in *nbytes.
-     *  The number of characters in the returned string is placed in *nchars.
-     *  If EOF is encountered immediately, the function returns NULL.
-     *  If the 'stop' character is EOF, this function reads the
-     *  entire file.
-     */
-    char * ReadLatin1File(FILE *f, int *nbytes, int *nchars, int stop);
-
-    /**
-     * \brief
-     *
-     */
-    char * ReadUTF8File(FILE *f, int *nbytes, int *nchars, int stop);
-
-    /*
-     * \brief Read an entire file into a memory char array. Return NULL if the file is empty.
-     *
-     */
-    char * ReadLatin1Buffer(FILE *f, int *nbytes, int *nchars);
-    
-    /**
-     * \brief
-     *
-     */
-    char * ReadUTF8Buffer(FILE *f, int *nbytes, int *nchars);
-
-    /*
-     * \brief A function for reading one line of input from a file.
-     *  This function returns the alloc'd string, and any
-     *  terminating newline character is included in the line.
-     *  The length of the returned string is placed into *length.
-     *  If EOF is encountered immediately, the function returns NULL.
-     *  If EOF is encountered before a newline character, the string
-     *  is returned without any terminating newline.
-     *  Otherwise, a newline character will be the last character
-     *  in the char array.
-     */
-    char * ReadLatin1Line(FILE *f, int *nbytes, int *nchars);
-    
-    /**
-     * \brief
-     *
-     */
-    char * ReadUTF8Line(FILE *f, int *nbytes, int *nchars);
-
-    /*
-     * \brief Write a UTF-8 char array to a file as ISO Latin 1 (non ISO-Latin-1 characters 
-     * will be distorted by this process). Assume the UTF-8 char array is correct.
-     */
-    int WriteLatin1(FILE *f, const char *utf8, int nbytes);
-
-    /*
-     * \brief Write a UTF-8 char array to a file as UTF-8. Assume the UTF-8 char array is correct.
-     *
-     */
-    int WriteUTF8(FILE *f, const char *utf8, int nbytes);
+    int UTF8Length(std::string utf8);
 
     /**
      * Convert Latin 1 to UTF-8 charset;
      *
      */
-    char * Latin1ToUTF8(const char *latin1, int *bytes);
+    std::string Latin1ToUTF8(std::string latin1);
 
     /*
      *  Convert a UTF-8 char array to an ISO Latin 1 char array (non ISO Latin 1 characters 
@@ -233,7 +166,7 @@ class Charset : public virtual jcommon::Object{
      *  This function creates a new string containing the ISO Latin 1 data. It returns NULL 
      *  if it runs out of memory.
      */
-    char * UTF8ToLatin1(const char *utf8, int *bytes);
+    std::string UTF8ToLatin1(std::string utf8);
 
     /*
      * \brief Convert a (possibly ISO Latin 1) char array to a UTF-8 char array, as best we can. 
