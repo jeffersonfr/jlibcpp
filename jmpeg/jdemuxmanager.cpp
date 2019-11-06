@@ -94,6 +94,8 @@ void DemuxManager::Start()
     return;
   }
 
+  _is_running = true;
+
   _thread = std::thread(&DemuxManager::Run, this);
 
   // INFO:: grant some time to starts the thread
@@ -428,19 +430,15 @@ void DemuxManager::Run()
 {
    std::lock_guard<std::mutex> guard(_demux_sync_mutex);
 
-   _demux_mutex.lock();
-
-   _is_running = true;
-   
    if (_source == nullptr) {
+     _demux_mutex.lock();
+
      _is_running = false;
 
      _demux_mutex.unlock();
 
      return;
    }
-
-   _demux_mutex.unlock();
 
    struct jstream_counter_t {
      int continuity_counter;
