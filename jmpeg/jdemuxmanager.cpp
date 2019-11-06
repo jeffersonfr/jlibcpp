@@ -96,8 +96,6 @@ void DemuxManager::Start()
 
   _thread = std::thread(&DemuxManager::Run, this);
 
-  _is_running = true;
-
   // INFO:: grant some time to starts the thread
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
@@ -430,101 +428,109 @@ void DemuxManager::Run()
 {
    std::lock_guard<std::mutex> guard(_demux_sync_mutex);
 
-  if (_source == nullptr) {
-    return;
-  }
+   _demux_mutex.lock();
 
-  struct jstream_counter_t {
-    int continuity_counter;
-    std::map<int, std::string> packets;
-  };
+   _is_running = true;
+   
+   if (_source == nullptr) {
+     _is_running = false;
 
-  std::map<int, struct jstream_counter_t> counter;
+     _demux_mutex.unlock();
 
-  while (_is_running) {
-    _demux_mutex.lock();
+     return;
+   }
 
-    _demuxes = _sync_demuxes;
-  
-    _demux_mutex.unlock();
+   _demux_mutex.unlock();
 
-    char packet[TS_PACKET_LENGTH];
-    int length = TS_PACKET_LENGTH;
+   struct jstream_counter_t {
+     int continuity_counter;
+     std::map<int, std::string> packets;
+   };
 
-    if (_source->Read(packet, length) != length) {
-      break;
-    }
+   std::map<int, struct jstream_counter_t> counter;
+   char packet[TS_PACKET_LENGTH];
+   int length = TS_PACKET_LENGTH;
+   const char *data = packet;
 
-    // INFO:: processing transport stream
-    const char *data = packet;
+   while (_is_running) {
+     _demux_mutex.lock();
 
-    int sync_byte = TS_G8(data);
+     _demuxes = _sync_demuxes;
 
-    if (sync_byte != TS_SYNC_BYTE) {
-      continue;
-    }
+     _demux_mutex.unlock();
 
-    ProcessRaw(data, TS_PACKET_LENGTH);
+     if (_source->Read(packet, length) != length) {
+       break;
+     }
 
-    int transport_error_indicator = TS_GM8(data + 1, 0, 1);
-    // int payload_unit_start_indicator = TS_GM8(data + 1, 1, 1);
-    // int transport_priority = TS_GM8(data + 1, 2, 1);
-    int pid = TS_GM16(data + 1, 3, 13);
-    // int scrambling_control = TS_GM8(data + 3, 0, 2);
-    // int adaptation_field_exist = TS_GM8(data + 3, 2, 1);
-    int contains_payload = TS_GM8(data + 3, 3, 1);
-    int continuity_counter = TS_GM8(data + 3, 4, 4);
+     // INFO:: processing transport stream
+     int sync_byte = TS_G8(data);
 
-    _demux_mutex.lock();
+     if (sync_byte != TS_SYNC_BYTE) {
+       continue;
+     }
 
-    if (_pid_report.find(pid) == _pid_report.end()) {
-      _pid_report[pid] = 1;
-    }
+     ProcessRaw(data, TS_PACKET_LENGTH);
 
-    _pid_report[pid] += 1;
-  
-    _demux_mutex.unlock();
+     int transport_error_indicator = TS_GM8(data + 1, 0, 1);
+     // int payload_unit_start_indicator = TS_GM8(data + 1, 1, 1);
+     // int transport_priority = TS_GM8(data + 1, 2, 1);
+     int pid = TS_GM16(data + 1, 3, 13);
+     // int scrambling_control = TS_GM8(data + 3, 0, 2);
+     // int adaptation_field_exist = TS_GM8(data + 3, 2, 1);
+     int contains_payload = TS_GM8(data + 3, 3, 1);
+     int continuity_counter = TS_GM8(data + 3, 4, 4);
 
-    if (transport_error_indicator == 1) {
-      continue;
-    }
-    
-    if (pid == 0x1fff or pid == 0x1ff0) { // null packets, iip packets
-      continue;
-    }
+     _demux_mutex.lock();
 
-    // INFO:: process continuity counter
-    std::map<int, struct jstream_counter_t>::iterator i = counter.find(pid);
+     if (_pid_report.find(pid) == _pid_report.end()) {
+       _pid_report[pid] = 1;
+     }
 
-    if (i != counter.end()) {
-      int counter = (i->second.continuity_counter + 1)%16;
+     _pid_report[pid] += 1;
 
-      if (contains_payload == 0x01) {
-        if (continuity_counter != counter) {
-          i->second.packets[continuity_counter] = std::string(data, TS_PACKET_LENGTH);
-        } else {
-          std::string pkt = std::string(data, TS_PACKET_LENGTH);
+     _demux_mutex.unlock();
 
-          do {
-            ProcessPSI(pkt.c_str(), TS_PACKET_LENGTH);
-            ProcessPES(pkt.c_str(), TS_PACKET_LENGTH);
+     if (transport_error_indicator == 1) {
+       continue;
+     }
 
-            i->second.packets[i->second.continuity_counter].clear();
-            i->second.continuity_counter = (i->second.continuity_counter + 1)%16;
+     if (pid == 0x1fff or pid == 0x1ff0) { // null packets, iip packets
+       continue;
+     }
 
-            pkt = i->second.packets[i->second.continuity_counter];
-          } while (pkt.empty() == false);
-        }
-      }
-    } else {
-      counter[pid].continuity_counter = continuity_counter;
+     // INFO:: process continuity counter
+     std::map<int, struct jstream_counter_t>::iterator i = counter.find(pid);
 
-      ProcessPSI(data, TS_PACKET_LENGTH);
-      ProcessPES(data, TS_PACKET_LENGTH);
-    }
-  }
+     if (i != counter.end()) {
+       int counter = (i->second.continuity_counter + 1)%16;
 
-  _is_running = false;
+       if (contains_payload == 0x01) {
+         if (continuity_counter != counter) {
+           i->second.packets[continuity_counter] = std::string(data, TS_PACKET_LENGTH);
+         } else {
+           std::string pkt = std::string(data, TS_PACKET_LENGTH);
+
+           do {
+             ProcessPSI(pkt.c_str(), TS_PACKET_LENGTH);
+             ProcessPES(pkt.c_str(), TS_PACKET_LENGTH);
+
+             i->second.packets[i->second.continuity_counter].clear();
+             i->second.continuity_counter = (i->second.continuity_counter + 1)%16;
+
+             pkt = i->second.packets[i->second.continuity_counter];
+           } while (pkt.empty() == false);
+         }
+       }
+     } else {
+       counter[pid].continuity_counter = continuity_counter;
+
+       ProcessPSI(data, TS_PACKET_LENGTH);
+       ProcessPES(data, TS_PACKET_LENGTH);
+     }
+   }
+
+   _is_running = false;
 }
 
 }
