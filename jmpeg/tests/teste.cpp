@@ -2453,45 +2453,88 @@ class SISubtitle : public SI {
 
           std::string info = "unknown";
 
-          if (control == 0x42) {
+          if (control == 0x42) { // GSM
             info = "character deformation";
-          } else if (control == 0x53) {
+          } else if (control == 0x53) { // SWF
             info = "set writing form";
-          } else if (control == 0x54) {
+
+            if (params.size() > 0) {
+              int 
+                code = 0;
+              const char
+                *ptr = params.c_str();
+
+              do {
+                code = (code << 8) + (*ptr++ - 0x30);
+              } while (*ptr != 0x00 and *ptr != 0x3b);
+
+              if (code == 0) {
+                info += ":(horizontal)";
+              } else if (code == 1) {
+                info += ":(vertical)";
+              } else if (code == 2) {
+                info += ":(horizontal)";
+              } else if (code == 3) {
+                info += ":(vertical)";
+              } else if (code == 4) {
+                info += ":(horizontal)";
+              } else if (code == 5) {
+                info += ":(horizontal/1920x1080)";
+              } else if (code == 6) {
+                info += ":(vertical/1920x1080)";
+              } else if (code == 7) {
+                info += ":(horizontal/960x540)";
+              } else if (code == 8) {
+                info += ":(vertical/960x540)";
+              } else if (code == 9) {
+                info += ":(horizontal/720x480)";
+              } else if (code == 10) {
+                info += ":(vertical/720x480)";
+              } else if (code == 11) {
+                info += ":(horizontal/1280x720)";
+              } else if (code == 12) {
+                info += ":(vertical/1280x720)";
+              }
+            }
+          } else if (control == 0x54) { // CCC
             info = "composite character composition";
-          } else if (control == 0x56) {
-            info = "set display format";
-          } else if (control == 0x57) {
-            info = "character composite data designation";
-          } else if (control == 0x58) {
-            info = "set horizontal spacing";
-          } else if (control == 0x59) {
-            info = "set vertical spacing";
-          } else if (control == 0x5d) {
+          } else if (control == 0x56) { // SDF
+            info = "set display format:(" + params + ")";
+          } else if (control == 0x57) { // SSM
+            info = "character composite data designation:(" + params + ")";
+          } else if (control == 0x58) { // SHS
+            info = "set horizontal spacing:(" + params + ")";
+          } else if (control == 0x59) { // SVS
+            info = "set vertical spacing:(" + params + ")";
+          } else if (control == 0x5b) { // PLD
+            info = "partialy line down";
+          } else if (control == 0x5c) { // PLU
+            info = "partialy line up";
+          } else if (control == 0x5d) { // GAA
             info = "colouring block";
-          } else if (control == 0x5e) {
+          } else if (control == 0x5e) { // SRC
             info = "raster colour designation";
-          } else if (control == 0x5f) {
-            info = "set display position";
-          } else if (control == 0x61) {
+          } else if (control == 0x5f) { // SDP
+            info = "set display position:(" + params + ")";
+          } else if (control == 0x61) { // ACPS
             info = "active coordinate position set";
-          } else if (control == 0x62) {
+          } else if (control == 0x62) { // TCC
             info = "witch control";
-          } else if (control == 0x63) {
+          } else if (control == 0x63) { // ORN
             info = "ornament control";
-          } else if (control == 0x64) {
+          } else if (control == 0x64) { // MDF
             info = "font";
-          } else if (control == 0x65) {
+          } else if (control == 0x65) { // CFS
             info = "character font set";
-          } else if (control == 0x66) {
+          } else if (control == 0x66) { // XCS
             info = "external character set";
-          } else if (control == 0x68) {
+          } else if (control == 0x68) { // PRA
             info = "build-in sound replay";
-          } else if (control == 0x69) {
+          } else if (control == 0x69) { // ACS
             info = "alternative character set";
-          } else if (control == 0x6e) {
+          } else if (control == 0x6e) { // RCS
             info = "raster colour command";
-          } else if (control == 0x6f) {
+          } else if (control == 0x6f) { // SCS
             info = "skip character set";
           }
 

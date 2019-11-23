@@ -17,7 +17,6 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "binds/include/nativeapplication.h"
 #include "binds/include/nativewindow.h"
 
 #include "jgui/jbufferedimage.h"
@@ -256,17 +255,7 @@ static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(int symbol, bool sh
 	return jevent::JKS_UNKNOWN;
 }
 
-NativeApplication::NativeApplication():
-	jgui::Application()
-{
-	jcommon::Object::SetClassName("jgui::NativeApplication");
-}
-
-NativeApplication::~NativeApplication()
-{
-}
-
-void NativeApplication::InternalInit(int argc, char **argv)
+void Application::Init(int argc, char **argv)
 {
   cv = cucul_create_canvas(0, 0);
 
@@ -303,7 +292,7 @@ void NativeApplication::InternalInit(int argc, char **argv)
   sg_quitting = false;
 }
 
-void NativeApplication::InternalPaint()
+static void InternalPaint()
 {
 	if (sg_jgui_window == nullptr || sg_jgui_window->IsVisible() == false) {
 		return;
@@ -374,7 +363,7 @@ void NativeApplication::InternalPaint()
   sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
 }
 
-void NativeApplication::InternalLoop()
+void Application::Loop()
 {
   if (sg_jgui_window == nullptr) {
     return;
@@ -531,7 +520,7 @@ void NativeApplication::InternalLoop()
   sg_jgui_window->SetVisible(false);
 }
 
-void NativeApplication::InternalQuit()
+void Application::Quit()
 {
   sg_quitting = true;
 

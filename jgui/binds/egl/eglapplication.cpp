@@ -19,7 +19,6 @@
  ***************************************************************************/
 //#define RASPBERRY_PI
 
-#include "binds/include/nativeapplication.h"
 #include "binds/include/nativewindow.h"
 
 #include "jgui/jbufferedimage.h"
@@ -542,17 +541,7 @@ static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(xcb_keycode_t symbo
 
 #endif
 
-NativeApplication::NativeApplication():
-	jgui::Application()
-{
-	jcommon::Object::SetClassName("jgui::NativeApplication");
-}
-
-NativeApplication::~NativeApplication()
-{
-}
-
-void NativeApplication::InternalInit(int argc, char **argv)
+void Application::Init(int argc, char **argv)
 {
   EGLint num_config;
 
@@ -679,7 +668,7 @@ void NativeApplication::InternalInit(int argc, char **argv)
   sg_quitting = false;
 }
 
-void NativeApplication::InternalPaint()
+static void InternalPaint()
 {
 	if (sg_jgui_window == nullptr || sg_jgui_window->IsVisible() == false) {
 		return;
@@ -817,7 +806,7 @@ void NativeApplication::InternalPaint()
   sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
 }
 
-void NativeApplication::InternalLoop()
+void Application::Loop()
 {
   if (sg_jgui_window == nullptr) {
     return;
@@ -1104,7 +1093,12 @@ void NativeApplication::InternalLoop()
   sg_jgui_window->SetVisible(false);
 }
 
-void NativeApplication::InternalQuit()
+jsize_t<int> Application::GetScreenSize()
+{
+  return sg_screen;
+}
+
+void Application::Quit()
 {
   sg_quitting = true;
 

@@ -17,7 +17,6 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "binds/include/nativeapplication.h"
 #include "binds/include/nativewindow.h"
 
 #include "jgui/jbufferedimage.h"
@@ -290,17 +289,7 @@ static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(xcb_keycode_t symbo
 	return jevent::JKS_UNKNOWN;
 }
 
-NativeApplication::NativeApplication():
-	jgui::Application()
-{
-	jcommon::Object::SetClassName("jgui::NativeApplication");
-}
-
-NativeApplication::~NativeApplication()
-{
-}
-
-void NativeApplication::InternalInit(int argc, char **argv)
+void Application::Init(int argc, char **argv)
 {
   sg_xcb_connection = xcb_connect(nullptr,nullptr);
 
@@ -337,7 +326,7 @@ static xcb_visualtype_t * find_visual(xcb_connection_t *c, xcb_visualid_t visual
   return nullptr;
 }
 
-void NativeApplication::InternalPaint()
+static void InternalPaint()
 {
 	if (sg_jgui_window == nullptr || sg_jgui_window->IsVisible() == false) {
 		return;
@@ -414,7 +403,7 @@ void update_event_queue(){
   event_queue.next = xcb_poll_for_queued_event(sg_xcb_connection);
 }
 
-void NativeApplication::InternalLoop()
+void Application::Loop()
 {
   if (sg_jgui_window == nullptr) {
     return;
@@ -554,7 +543,12 @@ void NativeApplication::InternalLoop()
   sg_jgui_window->SetVisible(false);
 }
 
-void NativeApplication::InternalQuit()
+jsize_t<int> Application::GetScreenSize()
+{
+  return sg_screen;
+}
+
+void Application::Quit()
 {
   sg_quitting = true;
 

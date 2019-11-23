@@ -36,38 +36,7 @@ class Application : public jcommon::Object {
 
   private:
 
-  protected:
-    /**
-     * \brief
-     *
-     */
-    Application();
-  
-    /**
-     * \brief
-     *
-     */
-    virtual void InternalInit(int argc = 0, char **argv = nullptr);
-
-    /**
-     * \brief
-     *
-     */
-    virtual void InternalLoop();
-
-    /**
-     * \brief
-     *
-     */
-    virtual void InternalQuit();
-
   public:
-    /**
-     * \brief
-     *
-     */
-    virtual ~Application();
-
     /**
      * \brief
      *

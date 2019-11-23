@@ -17,7 +17,6 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "binds/include/nativeapplication.h"
 #include "binds/include/nativewindow.h"
 
 #include "jgui/jbufferedimage.h"
@@ -362,17 +361,7 @@ static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbolSpecial(int symbol)
 	return jevent::JKS_UNKNOWN;
 }
 
-NativeApplication::NativeApplication():
-	jgui::Application()
-{
-	jcommon::Object::SetClassName("jgui::NativeApplication");
-}
-
-NativeApplication::~NativeApplication()
-{
-}
-
-void NativeApplication::InternalInit(int argc, char **argv)
+void Application::Init(int argc, char **argv)
 {
 	XInitThreads();
 
@@ -386,7 +375,7 @@ void NativeApplication::InternalInit(int argc, char **argv)
   sg_quitting = false;
 }
 
-void NativeApplication::InternalLoop()
+void Application::Loop()
 {
   if (sg_jgui_window == nullptr) {
     return;
@@ -400,7 +389,12 @@ void NativeApplication::InternalLoop()
   sg_jgui_window->SetVisible(false);
 }
 
-void NativeApplication::InternalQuit()
+jsize_t<int> Application::GetScreenSize()
+{
+  return sg_screen;
+}
+
+void Application::Quit()
 {
   sg_quitting = true;
 
@@ -410,7 +404,7 @@ void NativeApplication::InternalQuit()
   sg_loop_mutex.unlock();
 }
 
-void OnDraw()
+static void OnDraw()
 {
 	if (sg_jgui_window == nullptr || sg_jgui_window->IsVisible() == false) {
 		return;

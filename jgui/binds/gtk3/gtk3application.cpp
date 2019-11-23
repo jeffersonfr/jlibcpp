@@ -17,7 +17,6 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "binds/include/nativeapplication.h"
 #include "binds/include/nativewindow.h"
 
 #include "jgui/jbufferedimage.h"
@@ -590,17 +589,7 @@ static void ConfigureApplication(GtkApplication *app, gpointer user_data)
   sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_OPENED));
 }
 
-NativeApplication::NativeApplication():
-	jgui::Application()
-{
-	jcommon::Object::SetClassName("jgui::NativeApplication");
-}
-
-NativeApplication::~NativeApplication()
-{
-}
-
-void NativeApplication::InternalInit(int argc, char **argv)
+void Application::Init(int argc, char **argv)
 {
   gtk_init(&argc, &argv);
 
@@ -617,12 +606,7 @@ void NativeApplication::InternalInit(int argc, char **argv)
   sg_quitting = false;
 }
 
-void NativeApplication::InternalPaint()
-{
-  // gtk_widget_queue_draw(sg_widget);
-}
-
-static void PaintThread(NativeApplication *app)
+static void InternalPaint()
 {
   while (sg_quitting == false) {
     if (sg_repaint.exchange(false) == true) {
@@ -631,7 +615,7 @@ static void PaintThread(NativeApplication *app)
   }
 }
 
-void NativeApplication::InternalLoop()
+void Application::Loop()
 {
   if (sg_jgui_window == nullptr) {
     return;
@@ -639,7 +623,7 @@ void NativeApplication::InternalLoop()
 
   std::lock_guard<std::mutex> lock(sg_loop_mutex);
 
-  std::thread thread = std::thread(PaintThread, this);
+  std::thread thread = std::thread(InternalPaint);
 
  	g_application_run(G_APPLICATION(sg_handler), 0, nullptr);
 
@@ -650,7 +634,12 @@ void NativeApplication::InternalLoop()
   sg_jgui_window->SetVisible(false);
 }
 
-void NativeApplication::InternalQuit()
+jsize_t<int> Application::GetScreenSize()
+{
+  return sg_screen;
+}
+
+void Application::Quit()
 {
   sg_quitting = true;
 
