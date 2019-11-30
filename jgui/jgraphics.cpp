@@ -1160,7 +1160,7 @@ void Graphics::DrawString(std::string text, jpoint_t<int> point)
   int glyphs_len = 0;
   cairo_status_t status;
 
-  if (_font->GetEncoding() != JFE_ISO_8859_1) {
+  if (_font->GetEncoding() == JFE_ISO_8859_1) {
     jcommon::Charset charset;
 
     utf8 = charset.Latin1ToUTF8(text);
