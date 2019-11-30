@@ -43,7 +43,7 @@ int main()
 
     jnetwork::SocketOptions *o = s.GetSocketOptions(); 
 	
-		o->SetReceiveTimeout(10*1000);
+		o->SetReceiveTimeout(std::chrono::seconds(10));
 		o->SetSendMaximumBuffer(10240);
 		o->SetReceiveMaximumBuffer(10240);
 	

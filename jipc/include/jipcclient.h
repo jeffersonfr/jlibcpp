@@ -23,6 +23,8 @@
 #include "jipc/jmethod.h"
 #include "jipc/jresponse.h"
 
+#include <thread>
+
 namespace jipc {
 
 /**
@@ -34,7 +36,7 @@ class IPCClient : public virtual jcommon::Object {
 
   protected:
     /** \brief */
-    int _call_timeout;
+    std::chrono::milliseconds _call_timeout;
 
   public:
     /**
@@ -59,7 +61,7 @@ class IPCClient : public virtual jcommon::Object {
      * \brief
      *
      */
-    virtual void SetRequestTimeout(int timeout);
+    virtual void SetRequestTimeout(std::chrono::milliseconds timeout);
 
 };
 

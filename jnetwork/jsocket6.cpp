@@ -30,7 +30,7 @@
 
 namespace jnetwork {
 
-Socket6::Socket6(InetAddress *addr_, int port_, int timeout_, int rbuf_, int wbuf_):
+Socket6::Socket6(InetAddress *addr_, int port_, std::chrono::milliseconds timeout_, int rbuf_, int wbuf_):
   jnetwork::Connection(JCT_TCP)
 {
   jcommon::Object::SetClassName("jnetwork::Socket");
@@ -50,7 +50,7 @@ Socket6::Socket6(InetAddress *addr_, int port_, int timeout_, int rbuf_, int wbu
   _is_closed = false;
 }
 
-Socket6::Socket6(InetAddress *addr_, int port_, InetAddress *local_addr_, int local_port_, int timeout_, int rbuf_, int wbuf_):
+Socket6::Socket6(InetAddress *addr_, int port_, InetAddress *local_addr_, int local_port_, std::chrono::milliseconds timeout_, int rbuf_, int wbuf_):
   jnetwork::Connection(JCT_TCP)
 {
   jcommon::Object::SetClassName("jnetwork::Socket");
@@ -71,7 +71,7 @@ Socket6::Socket6(InetAddress *addr_, int port_, InetAddress *local_addr_, int lo
   _is_closed = false;
 }
 
-Socket6::Socket6(std::string host_, int port_, int timeout_, int rbuf_, int wbuf_):
+Socket6::Socket6(std::string host_, int port_, std::chrono::milliseconds timeout_, int rbuf_, int wbuf_):
   jnetwork::Connection(JCT_TCP)
 {
   jcommon::Object::SetClassName("jnetwork::Socket");
@@ -93,7 +93,7 @@ Socket6::Socket6(std::string host_, int port_, int timeout_, int rbuf_, int wbuf
   _is_closed = false;
 }
 
-Socket6::Socket6(std::string host_, int port_, InetAddress *local_addr_, int local_port_, int timeout_, int rbuf_, int wbuf_):
+Socket6::Socket6(std::string host_, int port_, InetAddress *local_addr_, int local_port_, std::chrono::milliseconds timeout_, int rbuf_, int wbuf_):
   jnetwork::Connection(JCT_TCP)
 {
   jcommon::Object::SetClassName("jnetwork::Socket");
@@ -141,7 +141,7 @@ Socket6::~Socket6()
 
 /** Private */
 
-Socket6::Socket6(int fd_, struct sockaddr_in6 server_, int timeout_, int rbuf_, int wbuf_):
+Socket6::Socket6(int fd_, struct sockaddr_in6 server_, std::chrono::milliseconds timeout_, int rbuf_, int wbuf_):
   jnetwork::Connection(JCT_TCP)
 {
   jcommon::Object::SetClassName("jnetwork::Socket");
@@ -210,7 +210,7 @@ void Socket6::ConnectSocket(InetAddress *addr_, int port_)
 
   int r;
 
-  if (_timeout > 0) {
+  if (_timeout.count() > 0) {
     long arg;
 
     if( (arg = fcntl(_fd, F_GETFL, nullptr)) < 0) { 
@@ -232,8 +232,8 @@ void Socket6::ConnectSocket(InetAddress *addr_, int port_)
           struct timeval tv; 
           fd_set wset;
 
-          tv.tv_sec = _timeout/1000;
-          tv.tv_usec = (_timeout%1000)*1000;
+          tv.tv_sec = _timeout.count()/1000LL;
+          tv.tv_usec = (_timeout.count()%1000LL)*1000LL;
 
           FD_ZERO(&wset); 
           FD_SET(_fd, &wset); 
@@ -280,7 +280,7 @@ void Socket6::InitStreams(int64_t rbuf_, int64_t wbuf_)
 
 /** End */
 
-int Socket6::Send(const char *data_, int size_, int time_)
+int Socket6::Send(const char *data_, int size_, std::chrono::milliseconds timeout_)
 {
   if (_is_closed == true) {
     throw jexception::ConnectionException("Connection closed exception");
@@ -291,7 +291,7 @@ int Socket6::Send(const char *data_, int size_, int time_)
   ufds[0].fd = _fd;
   ufds[0].events = POLLOUT | POLLWRBAND;
 
-  int rv = poll(ufds, 1, time_);
+  int rv = poll(ufds, 1, timeout_.count());
 
   if (rv == -1) {
     throw jexception::ConnectionException("Invalid send parameters exception");
@@ -352,7 +352,7 @@ int Socket6::Send(const char *data_, int size_, bool block_)
   return n;
 }
 
-int Socket6::Receive(char *data_, int size_, int time_)
+int Socket6::Receive(char *data_, int size_, std::chrono::milliseconds timeout_)
 {
   if (_is_closed == true) {
     throw jexception::ConnectionException("Connection closed exception");
@@ -363,7 +363,7 @@ int Socket6::Receive(char *data_, int size_, int time_)
   ufds[0].fd = _fd;
   ufds[0].events = POLLIN | POLLRDBAND;
 
-  int rv = poll(ufds, 1, time_);
+  int rv = poll(ufds, 1, timeout_.count());
 
   if (rv == -1) {
     throw jexception::ConnectionException("Invalid receive parameters exception");

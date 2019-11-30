@@ -43,9 +43,10 @@ class HTTPRequest {
 		std::string 
       _host,
 			_resource;
+    std::chrono::milliseconds
+			_timeout;
 		int 
       _port,
-			_timeout,
 			_resource_size,
 			_code;
 		char 
@@ -261,7 +262,7 @@ class HTTPRequest {
 			_host = url->GetHost();
 			_port = url->GetPort();
 			_resource = url->GetQuery();
-			_timeout = -1;
+			_timeout = std::chrono::milliseconds(0);
 			_code = -1;
 			_resource_size = 0;
 			_resource_data = nullptr;
@@ -272,7 +273,7 @@ class HTTPRequest {
 		{
 		}
 
-		void Connect(int timeout = 1000)
+		void Connect(std::chrono::milliseconds timeout = std::chrono::milliseconds(1000))
 		{
 			_timeout = timeout;
 			

@@ -23,6 +23,8 @@
 #include "jio/jinputstream.h"
 #include "jio/joutputstream.h"
 
+#include <thread>
+
 #include <sys/socket.h>
 
 #define SOCK_RD_BUFFER_SIZE  65535
@@ -87,13 +89,13 @@ class Connection : public virtual jcommon::Object {
      * \brief Send bytes to a destination.
      *
      */
-    virtual int Send(const char *b_, int size_, bool block_ = true) = 0;
+    virtual int Send(const char *b, int size, bool block = true) = 0;
 
     /**
      * \brief Send bytes to a destination.
      *
      */
-    virtual int Send(const char *b_, int size_, int time_) = 0;
+    virtual int Send(const char *b, int size, std::chrono::milliseconds time) = 0;
 
     /**
      * \brief Receive bytes from a source.
@@ -103,7 +105,7 @@ class Connection : public virtual jcommon::Object {
      * \exception SocketException an error occurred.
      *
      */
-    virtual int Receive(char *data_, int data_length_, bool block_ = true) = 0;
+    virtual int Receive(char *data, int data_length, bool block = true) = 0;
 
     /**
      * \brief Receive bytes from a source.
@@ -113,7 +115,7 @@ class Connection : public virtual jcommon::Object {
      * \exception SocketException an error occurred.
      *
      */
-    virtual int Receive(char *data_, int data_length_, int time_) = 0;
+    virtual int Receive(char *data, int data_length, std::chrono::milliseconds time) = 0;
 
     /**
      * \brief 

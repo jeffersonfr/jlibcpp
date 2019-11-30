@@ -30,7 +30,7 @@
 
 namespace jnetwork {
 
-LocalDatagramSocket::LocalDatagramSocket(std::string server, int timeout_, int rbuf_, int wbuf_):
+LocalDatagramSocket::LocalDatagramSocket(std::string server, std::chrono::milliseconds timeout_, int rbuf_, int wbuf_):
   jnetwork::Connection(JCT_UDP)
 {
   jcommon::Object::SetClassName("jnetwork::DatagramSocket");
@@ -49,7 +49,7 @@ LocalDatagramSocket::LocalDatagramSocket(std::string server, int timeout_, int r
   _receive_bytes = 0;
 }
 
-LocalDatagramSocket::LocalDatagramSocket(std::string client, std::string server, int timeout_, int rbuf_, int wbuf_):
+LocalDatagramSocket::LocalDatagramSocket(std::string client, std::string server, std::chrono::milliseconds timeout_, int rbuf_, int wbuf_):
   jnetwork::Connection(JCT_UDP)
 {
   jcommon::Object::SetClassName("jnetwork::DatagramSocket");
@@ -169,7 +169,7 @@ jio::OutputStream * LocalDatagramSocket::GetOutputStream()
   return (jio::OutputStream *)_os;
 }
 
-int LocalDatagramSocket::Receive(char *data_, int size_, int time_)
+int LocalDatagramSocket::Receive(char *data_, int size_, std::chrono::milliseconds timeout_)
 {
   if (_is_closed == true) {
     throw jexception::ConnectionException("Connection closed exception");
@@ -180,7 +180,7 @@ int LocalDatagramSocket::Receive(char *data_, int size_, int time_)
   ufds[0].fd = _fd;
   ufds[0].events = POLLIN | POLLRDBAND;
 
-  int rv = poll(ufds, 1, time_);
+  int rv = poll(ufds, 1, timeout_.count());
 
   if (rv == -1) {
     throw jexception::ConnectionException("Invalid receive parameters exception");
@@ -254,7 +254,7 @@ int LocalDatagramSocket::Receive(char *data_, int size_, bool block_)
   return n;
 }
 
-int LocalDatagramSocket::Send(const char *data_, int size_, int time_)
+int LocalDatagramSocket::Send(const char *data_, int size_, std::chrono::milliseconds timeout_)
 {
   if (_is_closed == true) {
     throw jexception::ConnectionException("Connection closed exception");
@@ -265,7 +265,7 @@ int LocalDatagramSocket::Send(const char *data_, int size_, int time_)
   ufds[0].fd = _fd;
   ufds[0].events = POLLOUT | POLLWRBAND;
 
-  int rv = poll(ufds, 1, time_);
+  int rv = poll(ufds, 1, timeout_.count());
 
   if (rv == -1) {
     throw jexception::ConnectionException("Invalid send parameters exception");

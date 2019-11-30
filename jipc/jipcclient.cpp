@@ -25,7 +25,7 @@ namespace jipc {
 IPCClient::IPCClient():
   jcommon::Object()
 {
-  _call_timeout = -1;
+  _call_timeout = std::chrono::milliseconds(0);
 }
 
 IPCClient::~IPCClient()
@@ -37,7 +37,7 @@ void IPCClient::CallMethod(Method *method, Response **response)
   throw jexception::IPCException("IPCClient:: CallMethod wasn't implemented");
 }
 
-void IPCClient::SetRequestTimeout(int timeout)
+void IPCClient::SetRequestTimeout(std::chrono::milliseconds timeout)
 {
   _call_timeout = timeout;
 }

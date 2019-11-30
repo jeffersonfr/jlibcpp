@@ -61,7 +61,7 @@ class DatagramSocket : public jnetwork::Connection {
     /** \brief Connect or not ? */
     bool _stream;
     /** \brief */
-    int _timeout;
+    std::chrono::milliseconds _timeout;
 
     /**
      * \brief Create a new socket.
@@ -73,38 +73,38 @@ class DatagramSocket : public jnetwork::Connection {
      * \brief Bind socket.
      *
      */
-    void BindSocket(InetAddress *addr_, int local_port_);
+    void BindSocket(InetAddress *addr, int local_port);
 
     /**
      * \brief Connect socket.
      *
      */
-    void ConnectSocket(InetAddress *addr_, int port_);
+    void ConnectSocket(InetAddress *addr, int port);
 
     /**
      * \brief Init the stream.
      *
      */
-    void InitStream(int rbuf_, int wbuf_);
+    void InitStream(int rbuf, int wbuf);
 
   public:
     /**
      * \brief Construtor UDP client.
      *
      */
-    DatagramSocket(std::string addr_, int port_, bool stream_ = false, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
+    DatagramSocket(std::string addr, int port, bool stream = false, std::chrono::milliseconds timeout = std::chrono::milliseconds(0), int rbuf = SOCK_RD_BUFFER_SIZE, int wbuf = SOCK_WR_BUFFER_SIZE);
 
     /**
      * \brief Construtor UDP server.
      *
      */
-    DatagramSocket(int port_, bool stream_ = false, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
+    DatagramSocket(int port, bool stream = false, std::chrono::milliseconds timeout = std::chrono::milliseconds(0), int rbuf = SOCK_RD_BUFFER_SIZE, int wbuf = SOCK_WR_BUFFER_SIZE);
 
     /**
      * \brief Construtor UDP server.
      *
      */
-    DatagramSocket(InetAddress *addr_, int port_, bool stream_ = false, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
+    DatagramSocket(InetAddress *addr, int port, bool stream = false, std::chrono::milliseconds timeout = std::chrono::milliseconds(0), int rbuf = SOCK_RD_BUFFER_SIZE, int wbuf = SOCK_WR_BUFFER_SIZE);
 
     /**
      * \brief Destructor virtual.
@@ -128,25 +128,25 @@ class DatagramSocket : public jnetwork::Connection {
      * \brief Read data from a source.
      *
      */
-    virtual int Receive(char *data_, int size_, bool block_ = true);
+    virtual int Receive(char *data, int size, bool block = true);
 
     /**
      * \brief Read data from a source.
      *
      */
-    virtual int Receive(char *data_, int size_, int time_);
+    virtual int Receive(char *data, int size, std::chrono::milliseconds timeout);
 
     /**
      * \brief Write data to a source.
      *
      */
-    virtual int Send(const char *data_, int size_, bool block_ = true);
+    virtual int Send(const char *data, int size, bool block = true);
 
     /**
      * \brief Write data to a source.
      *
      */
-    virtual int Send(const char *data_, int size_, int time_);
+    virtual int Send(const char *data, int size, std::chrono::milliseconds timeout);
 
     /**
      * \brief Close the socket.

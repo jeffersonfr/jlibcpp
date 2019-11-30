@@ -33,7 +33,7 @@ namespace jnetwork {
 
 int DatagramSocket6::_used_port = 1024;
 
-DatagramSocket6::DatagramSocket6(std::string host_, int port_, bool stream_, int timeout_, int rbuf_, int wbuf_):
+DatagramSocket6::DatagramSocket6(std::string host_, int port_, bool stream_, std::chrono::milliseconds timeout_, int rbuf_, int wbuf_):
   jnetwork::Connection(JCT_UDP)
 {
   jcommon::Object::SetClassName("jnetwork::DatagramSocket6");
@@ -55,7 +55,7 @@ DatagramSocket6::DatagramSocket6(std::string host_, int port_, bool stream_, int
   _receive_bytes = 0;
 }
 
-DatagramSocket6::DatagramSocket6(int port_, bool stream_, int timeout_, int rbuf_, int wbuf_):
+DatagramSocket6::DatagramSocket6(int port_, bool stream_, std::chrono::milliseconds timeout_, int rbuf_, int wbuf_):
   jnetwork::Connection(JCT_UDP)
 {
   jcommon::Object::SetClassName("jnetwork::DatagramSocket6");
@@ -76,7 +76,7 @@ DatagramSocket6::DatagramSocket6(int port_, bool stream_, int timeout_, int rbuf
   InitStream(rbuf_, wbuf_);
 }
 
-DatagramSocket6::DatagramSocket6(InetAddress *addr_, int port_, bool stream_, int timeout_, int rbuf_, int wbuf_):
+DatagramSocket6::DatagramSocket6(InetAddress *addr_, int port_, bool stream_, std::chrono::milliseconds timeout_, int rbuf_, int wbuf_):
   jnetwork::Connection(JCT_UDP)
 {
   jcommon::Object::SetClassName("jnetwork::DatagramSocket6");
@@ -180,7 +180,7 @@ void DatagramSocket6::ConnectSocket(InetAddress *addr_, int port_)
   int r;
   
   if (_stream == true) {
-    if (_timeout > 0) {
+    if (_timeout.count() > 0) {
       long arg;
 
       if( (arg = fcntl(_fd, F_GETFL, nullptr)) < 0) { 
@@ -202,8 +202,8 @@ void DatagramSocket6::ConnectSocket(InetAddress *addr_, int port_)
             struct timeval tv; 
             fd_set wset;
 
-            tv.tv_sec = _timeout/1000;
-            tv.tv_usec = (_timeout%1000)*1000;
+            tv.tv_sec = _timeout.count()/1000LL;
+            tv.tv_usec = (_timeout.count()%1000LL)*1000LL;
 
             FD_ZERO(&wset); 
             FD_SET(_fd, &wset); 
@@ -266,7 +266,7 @@ jio::OutputStream * DatagramSocket6::GetOutputStream()
   return (jio::OutputStream *)_os;
 }
 
-int DatagramSocket6::Receive(char *data_, int size_, int time_)
+int DatagramSocket6::Receive(char *data_, int size_, std::chrono::milliseconds timeout_)
 {
   if (_is_closed == true) {
     throw jexception::ConnectionException("Connection closed exception");
@@ -277,7 +277,7 @@ int DatagramSocket6::Receive(char *data_, int size_, int time_)
   ufds[0].fd = _fd;
   ufds[0].events = POLLIN | POLLRDBAND;
 
-  int rv = poll(ufds, 1, time_);
+  int rv = poll(ufds, 1, timeout_.count());
 
   if (rv == -1) {
     throw jexception::ConnectionException("Invalid receive parameters exception");
@@ -348,7 +348,7 @@ int DatagramSocket6::Receive(char *data_, int size_, bool block_)
   return n;
 }
 
-int DatagramSocket6::Send(const char *data_, int size_, int time_)
+int DatagramSocket6::Send(const char *data_, int size_, std::chrono::milliseconds timeout_)
 {
   if (_is_closed == true) {
     throw jexception::ConnectionException("Connection closed exception");
@@ -359,7 +359,7 @@ int DatagramSocket6::Send(const char *data_, int size_, int time_)
   ufds[0].fd = _fd;
   ufds[0].events = POLLOUT | POLLWRBAND;
 
-  int rv = poll(ufds, 1, time_);
+  int rv = poll(ufds, 1, timeout_.count());
 
   if (rv == -1) {
     throw jexception::ConnectionException("Invalid send parameters exception");

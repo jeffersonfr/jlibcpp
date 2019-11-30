@@ -62,7 +62,7 @@ class ConnectionPipe : public jnetwork::Connection {
     /** \brief */
     bool _stream;
     /** \brief */
-    int _timeout;
+    std::chrono::milliseconds _timeout;
     /** \brief */
     bool _is_running;
     /** \brief */
@@ -93,7 +93,7 @@ class ConnectionPipe : public jnetwork::Connection {
      * \brief Construtor.
      *
      */
-    ConnectionPipe(Connection *conn, jconnection_pipe_t type_, int size_pipe_ = SOCK_WR_BUFFER_SIZE, int timeout_ = 0, bool stream_ = false);
+    ConnectionPipe(Connection *conn, jconnection_pipe_t type, int size_pipe = SOCK_WR_BUFFER_SIZE, std::chrono::milliseconds timeout = std::chrono::milliseconds(0), bool stream = false);
 
     /**
      * \brief Destructor virtual.
@@ -111,25 +111,25 @@ class ConnectionPipe : public jnetwork::Connection {
      * \brief Read data from a source.
      *
      */
-    int Receive(char *data_, int size_, bool block_ = true);
+    int Receive(char *data, int size, bool block = true);
 
     /**
      * \brief Read data from a source.
      *
      */
-    int Receive(char *data_, int size_, int time_);
+    int Receive(char *data, int size, std::chrono::milliseconds timeout);
 
     /**
      * \brief Write data to a source.
      *
      */
-    int Send(const char *data_, int size_, bool block_ = true);
+    int Send(const char *data, int size, bool block = true);
 
     /**
      * \brief Write data to a source.
      *
      */
-    int Send(const char *data_, int size_, int time_);
+    int Send(const char *data, int size, std::chrono::milliseconds timeout);
 
     /**
      * \brief Close the socket. The pipe would be interrupted before closed.

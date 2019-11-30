@@ -69,26 +69,26 @@ class MulticastSocket : public jnetwork::Connection {
      * \brief Bind socket
      *
      */
-    void BindSocket(InetAddress *addr_, int local_port_);
+    void BindSocket(InetAddress *addr, int local_port);
 
     /**
      * \brief Connect socket
      *
      */
-    void ConnectSocket(InetAddress *addr_, int port_);
+    void ConnectSocket(InetAddress *addr, int port);
 
     /**
      * \brief
      *
      */
-    void InitStream(int rbuf_, int wbuf_);
+    void InitStream(int rbuf, int wbuf);
 
   public:
     /**
      * \brief 
      *
      */
-    MulticastSocket(std::string addr_, int port_, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
+    MulticastSocket(std::string addr, int port, int rbuf = SOCK_RD_BUFFER_SIZE, int wbuf = SOCK_WR_BUFFER_SIZE);
 
     /**
      * \brief Destrutor virtual.
@@ -112,49 +112,49 @@ class MulticastSocket : public jnetwork::Connection {
      * \brief
      *
      */
-    virtual int Receive(char *data_, int size_, bool block_ = true);
+    virtual int Receive(char *data, int size, bool block = true);
 
     /**
      * \brief
      *
      */
-    virtual int Receive(char *data_, int size_, int time_);
+    virtual int Receive(char *data, int size, std::chrono::milliseconds timeout);
 
     /**
      * \brief
      *
      */
-    virtual int Send(const char *data_, int size_, bool block_ = true);
+    virtual int Send(const char *data, int size, bool block = true);
 
     /**
      * \brief
      *
      */
-    virtual int Send(const char *data_, int size_, int time_);
+    virtual int Send(const char *data, int size, std::chrono::milliseconds timeout);
 
     /**
      * \brief
      *
      */
-    void Join(std::string group_);
+    void Join(std::string group);
 
     /**
      * \brief
      *
      */
-    void Join(InetAddress *group_);
+    void Join(InetAddress *group);
 
     /**
      * \brief
      *
      */
-    void Leave(std::string group_);
+    void Leave(std::string group);
 
     /**
      * \brief
      *
      */
-    void Leave(InetAddress *group_);
+    void Leave(InetAddress *group);
 
     /**
      * \brief
@@ -190,7 +190,7 @@ class MulticastSocket : public jnetwork::Connection {
      * \brief
      *
      */
-    void SetMulticastTTL(char ttl_);
+    void SetMulticastTTL(char ttl);
 
     /**
      * \brief

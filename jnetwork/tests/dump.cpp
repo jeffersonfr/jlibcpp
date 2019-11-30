@@ -61,8 +61,8 @@ void dump_raw()
 
 		jnetwork::SocketOptions *opt = s.GetSocketOptions();
 
-		opt->SetSendTimeout(2000000);
-		opt->SetReceiveTimeout(2000000);
+		opt->SetSendTimeout(std::chrono::seconds(2));
+		opt->SetReceiveTimeout(std::chrono::seconds(2));
 		opt->SetReceiveMaximumBuffer(0x0200000);
 
 		delete opt;

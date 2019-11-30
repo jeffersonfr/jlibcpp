@@ -68,27 +68,24 @@ void SocketOptions::SetOutOfBandInLine(bool b_)
   }
 }
 
-void SocketOptions::SetSendTimeout(int time_)
+void SocketOptions::SetSendTimeout(std::chrono::milliseconds timeout_)
 {
   struct timespec t;
-  int time = time_;
 
-  t.tv_sec = (int64_t)(time/1000LL);
-  t.tv_nsec = (int64_t)(time%1000LL)*1000LL;
+  t.tv_sec = timeout_.count()/1000LL;
+  t.tv_nsec = (timeout_.count()%1000LL)*1000000LL;
   
   if (setsockopt(_fd, SOL_SOCKET, SO_SNDTIMEO, &t, sizeof(struct timespec)) < 0) {
     throw jexception::ConnectionException("Set send timeout error");
   }
 }
 
-void SocketOptions::SetReceiveTimeout(int time_)
+void SocketOptions::SetReceiveTimeout(std::chrono::milliseconds timeout_)
 {
   struct timespec t;
-
-  int time = time_;
     
-  t.tv_sec = (int64_t)(time/1000LL);
-  t.tv_nsec = (int64_t)(time%1000LL)*1000LL;
+  t.tv_sec = timeout_.count()/1000LL;
+  t.tv_nsec = (timeout_.count()%1000LL)*1000000LL;
   
   if (setsockopt(_fd, SOL_SOCKET, SO_RCVTIMEO, &t, sizeof(struct timespec)) < 0) {
     throw jexception::ConnectionException("Set receive timeout error");
@@ -283,7 +280,7 @@ void SocketOptions::SetHeaderInclude(bool b_)
   }
 }
 
-int64_t SocketOptions::GetTimeStamp()
+std::chrono::microseconds SocketOptions::GetTimeStamp()
 {
   struct timespec t;
 
@@ -291,7 +288,7 @@ int64_t SocketOptions::GetTimeStamp()
     throw jexception::ConnectionException("Get time stamp error");
   }
 
-  return (t.tv_sec*1000000000LL + t.tv_nsec);
+  return std::chrono::microseconds(t.tv_sec*1000000LL + t.tv_nsec/1000LL);
 }
 
 int SocketOptions::GetMaximunTransferUnit()

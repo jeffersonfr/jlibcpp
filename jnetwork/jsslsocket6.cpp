@@ -36,7 +36,7 @@
 
 namespace jnetwork {
 
-SSLSocket6::SSLSocket6(SSLContext *ctx, InetAddress *addr_, int port_, int timeout_, int rbuf_, int wbuf_):
+SSLSocket6::SSLSocket6(SSLContext *ctx, InetAddress *addr_, int port_, std::chrono::milliseconds timeout_, int rbuf_, int wbuf_):
   jnetwork::Connection(JCT_TCP)
 {
   jcommon::Object::SetClassName("jnetwork::SSLSocket6");
@@ -60,7 +60,7 @@ SSLSocket6::SSLSocket6(SSLContext *ctx, InetAddress *addr_, int port_, int timeo
   _is_closed = false;
 }
 
-SSLSocket6::SSLSocket6(SSLContext *ctx, InetAddress *addr_, int port_, InetAddress *local_addr_, int local_port_, int timeout_, int rbuf_, int wbuf_):
+SSLSocket6::SSLSocket6(SSLContext *ctx, InetAddress *addr_, int port_, InetAddress *local_addr_, int local_port_, std::chrono::milliseconds timeout_, int rbuf_, int wbuf_):
   jnetwork::Connection(JCT_TCP)
 {
   jcommon::Object::SetClassName("jnetwork::SSLSocket6");
@@ -85,7 +85,7 @@ SSLSocket6::SSLSocket6(SSLContext *ctx, InetAddress *addr_, int port_, InetAddre
   InitStreams(rbuf_, wbuf_);
 }
 
-SSLSocket6::SSLSocket6(SSLContext *ctx, std::string host_, int port_, int timeout_, int rbuf_, int wbuf_):
+SSLSocket6::SSLSocket6(SSLContext *ctx, std::string host_, int port_, std::chrono::milliseconds timeout_, int rbuf_, int wbuf_):
   jnetwork::Connection(JCT_TCP)
 {
   jcommon::Object::SetClassName("jnetwork::SSLSocket6");
@@ -111,7 +111,7 @@ SSLSocket6::SSLSocket6(SSLContext *ctx, std::string host_, int port_, int timeou
   _is_closed = false;
 }
 
-SSLSocket6::SSLSocket6(SSLContext *ctx, std::string host_, int port_, InetAddress *local_addr_, int local_port_, int timeout_, int rbuf_, int wbuf_):
+SSLSocket6::SSLSocket6(SSLContext *ctx, std::string host_, int port_, InetAddress *local_addr_, int local_port_, std::chrono::milliseconds timeout_, int rbuf_, int wbuf_):
   jnetwork::Connection(JCT_TCP)
 {
   jcommon::Object::SetClassName("jnetwork::SSLSocket6");
@@ -160,7 +160,7 @@ SSLSocket6::~SSLSocket6()
 
 /** Private */
 
-SSLSocket6::SSLSocket6(SSLContext *ctx, int fd_, SSL *ssl, sockaddr_in6 server_, int timeout_, int rbuf_, int wbuf_):
+SSLSocket6::SSLSocket6(SSLContext *ctx, int fd_, SSL *ssl, sockaddr_in6 server_, std::chrono::milliseconds timeout_, int rbuf_, int wbuf_):
   jnetwork::Connection(JCT_TCP)
 {
   jcommon::Object::SetClassName("jnetwork::SSLSocket6");
@@ -233,7 +233,7 @@ void SSLSocket6::ConnectSocket(InetAddress *addr_, int port_)
 
   int r = 0;
 
-  if (_timeout > 0) {
+  if (_timeout.count() > 0) {
     long arg;
 
     if( (arg = fcntl(_fd, F_GETFL, nullptr)) < 0) { 
@@ -255,8 +255,8 @@ void SSLSocket6::ConnectSocket(InetAddress *addr_, int port_)
           struct timeval tv; 
           fd_set wset;
 
-          tv.tv_sec = _timeout/1000;
-          tv.tv_usec = (_timeout%1000)*1000;
+          tv.tv_sec = _timeout.count()/1000LL;
+          tv.tv_usec = (_timeout.count()%1000LL)*1000LL;
 
           FD_ZERO(&wset); 
           FD_SET(_fd, &wset); 
@@ -332,7 +332,7 @@ SSLContext * SSLSocket6::GetContext()
   return _ctx;
 }
 
-int SSLSocket6::Send(const char *data_, int size_, int time_)
+int SSLSocket6::Send(const char *data_, int size_, std::chrono::milliseconds timeout_)
 {
   if (_is_closed == true) {
     throw jexception::ConnectionException("Connection closed exception");
@@ -344,7 +344,7 @@ int SSLSocket6::Send(const char *data_, int size_, int time_)
   ufds[0].events = POLLOUT;
 
   // milliseconds
-  int rv = poll(ufds, 1, time_);
+  int rv = poll(ufds, 1, timeout_.count());
 
   if (rv == -1) {
     throw jexception::ConnectionException("Invalid send parameters exception");
@@ -399,7 +399,7 @@ int SSLSocket6::Send(const char *data_, int size_, bool block_)
   return n;
 }
 
-int SSLSocket6::Receive(char *data_, int size_, int time_)
+int SSLSocket6::Receive(char *data_, int size_, std::chrono::milliseconds timeout_)
 {
   if (_is_closed == true) {
     throw jexception::ConnectionException("Connection closed exception");
@@ -410,7 +410,7 @@ int SSLSocket6::Receive(char *data_, int size_, int time_)
   ufds[0].fd = _fd;
   ufds[0].events = POLLIN | POLLPRI;
 
-  int rv = poll(ufds, 1, time_);
+  int rv = poll(ufds, 1, timeout_.count());
 
   if (rv == -1) {
     throw jexception::ConnectionException("Invalid receive parameters exception");

@@ -137,7 +137,7 @@ class RawSocket : public jnetwork::Connection {
     /** \brief Bytes received. */
     int64_t _receive_bytes;
     /** \brief */
-    int _timeout;
+    std::chrono::milliseconds _timeout;
     /** \brief */
     struct ifreq _ifr;
     /** \brief */
@@ -163,14 +163,14 @@ class RawSocket : public jnetwork::Connection {
      * \brief Init the stream.
      *
      */
-    void InitStream(int rbuf_, int wbuf_);
+    void InitStream(int rbuf, int wbuf);
 
   public:
     /**
      * \brief Construtor UDP client.
      *
      */
-    RawSocket(std::string device_ = "lo", bool promisc_ = true, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
+    RawSocket(std::string device = "lo", bool promisc = true, std::chrono::milliseconds timeout = std::chrono::milliseconds(0), int rbuf = SOCK_RD_BUFFER_SIZE, int wbuf = SOCK_WR_BUFFER_SIZE);
 
     /**
      * \brief Destructor virtual.
@@ -194,25 +194,25 @@ class RawSocket : public jnetwork::Connection {
      * \brief Read data from a source.
      *
      */
-    virtual int Receive(char *data_, int size_, int time_);
+    virtual int Receive(char *data, int size, std::chrono::milliseconds timeout);
 
     /**
      * \brief Read data from a source.
      *
      */
-    virtual int Receive(char *data_, int size_, bool block_ = true);
+    virtual int Receive(char *data, int size, bool block = true);
 
     /**
      * \brief Write data to a source.
      *
      */
-    virtual int Send(const char *data_, int size_, int time_);
+    virtual int Send(const char *data, int size, std::chrono::milliseconds timeout);
 
     /**
      * \brief Write data to a source.
      *
      */
-    virtual int Send(const char *data_, int size_, bool block_ = true);
+    virtual int Send(const char *data, int size, bool block = true);
 
     /**
      * \brief Close the socket.

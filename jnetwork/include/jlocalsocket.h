@@ -52,7 +52,7 @@ class LocalSocket : public jnetwork::Connection {
     /** \brief Bytes received. */
     int64_t _receive_bytes;
     /** \brief */
-    int _timeout;
+    std::chrono::milliseconds _timeout;
 
     /**
      * \brief Create a new socket.
@@ -70,21 +70,21 @@ class LocalSocket : public jnetwork::Connection {
      * \brief
      *
      */
-    void InitStreams(int64_t rbuf_, int64_t wbuf_);
+    void InitStreams(int64_t rbuf, int64_t wbuf);
 
    protected:
     /**
      * \brief Constructor.
      *
      */
-    LocalSocket(int handler_, std::string file_, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
+    LocalSocket(int handler, std::string file, std::chrono::milliseconds timeout = std::chrono::milliseconds(0), int rbuf = SOCK_RD_BUFFER_SIZE, int wbuf = SOCK_WR_BUFFER_SIZE);
 
    public:
     /**
      * \brief
      *
      */
-    LocalSocket(std::string file, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
+    LocalSocket(std::string file, std::chrono::milliseconds timeout = std::chrono::milliseconds(0), int rbuf = SOCK_RD_BUFFER_SIZE, int wbuf = SOCK_WR_BUFFER_SIZE);
 
     /**
      * \brief Destrutor virtual.
@@ -102,13 +102,13 @@ class LocalSocket : public jnetwork::Connection {
      * \brief Send bytes to a destination.
      *
      */
-    virtual int Send(const char *b_, int size_, bool block_ = true);
+    virtual int Send(const char *b, int size, bool block = true);
 
     /**
      * \brief Send bytes to a destination waiting a timeout.
      *
      */
-    virtual int Send(const char *b_, int size_, int time_);
+    virtual int Send(const char *b, int size, std::chrono::milliseconds timeout);
 
     /**
      * \brief Receive bytes from a source.
@@ -118,13 +118,13 @@ class LocalSocket : public jnetwork::Connection {
      * \exception SocketException an error occurred.
      *
      */
-    virtual int Receive(char *data_, int data_length_, bool block_ = true);
+    virtual int Receive(char *data, int data_length, bool block = true);
 
     /**
      * \brief Receive bytes from a source waiting a timeout.
      *
      */
-    virtual int Receive(char *data_, int data_length_, int time_);
+    virtual int Receive(char *data, int data_length, std::chrono::milliseconds timeout);
 
     /**
      * \brief Close the socket.

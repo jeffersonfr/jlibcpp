@@ -30,7 +30,7 @@ namespace jnetwork {
 
 int ConnectionPipe::_used_port = 1024;
 
-ConnectionPipe::ConnectionPipe(Connection *connection, jconnection_pipe_t type_, int size_pipe_, int timeout_, bool stream_):
+ConnectionPipe::ConnectionPipe(Connection *connection, jconnection_pipe_t type_, int size_pipe_, std::chrono::milliseconds timeout_, bool stream_):
   jnetwork::Connection(connection->GetType())
 {
   Connection::SetClassName("jnetwork::ConnectionPipe");
@@ -61,7 +61,7 @@ ConnectionPipe::~ConnectionPipe()
   Close();
 }
 
-int ConnectionPipe::Receive(char *data_, int size_, int time_)
+int ConnectionPipe::Receive(char *data_, int size_, std::chrono::milliseconds timeout_)
 {
   if (_is_closed == true) {
     throw jexception::ConnectionException("Connection closed exception");
@@ -72,7 +72,7 @@ int ConnectionPipe::Receive(char *data_, int size_, int time_)
   ufds[0].fd = _pipe[0];
   ufds[0].events = POLLOUT | POLLWRBAND;
 
-  int rv = poll(ufds, 1, time_);
+  int rv = poll(ufds, 1, timeout_.count());
 
   if (rv == -1) {
     throw jexception::ConnectionException("Connection parameters exception");
@@ -129,7 +129,7 @@ int ConnectionPipe::Receive(char *data_, int size_, bool block_)
   return n;
 }
 
-int ConnectionPipe::Send(const char *data_, int size_, int time_)
+int ConnectionPipe::Send(const char *data_, int size_, std::chrono::milliseconds timeout_)
 {
   if (_is_closed == true) {
     throw jexception::ConnectionException("Connection closed exception");
@@ -140,7 +140,7 @@ int ConnectionPipe::Send(const char *data_, int size_, int time_)
   ufds[0].fd = _pipe[1];
   ufds[0].events = POLLOUT | POLLWRBAND;
 
-  int rv = poll(ufds, 1, time_);
+  int rv = poll(ufds, 1, timeout_.count());
 
   if (rv == -1) {
     throw jexception::ConnectionException("Connection parameters exception");

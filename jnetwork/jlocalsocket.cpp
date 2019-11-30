@@ -29,7 +29,7 @@
 
 namespace jnetwork {
 
-LocalSocket::LocalSocket(std::string file, int timeout_, int rbuf_, int wbuf_):
+LocalSocket::LocalSocket(std::string file, std::chrono::milliseconds timeout_, int rbuf_, int wbuf_):
   jnetwork::Connection(JCT_TCP)
 {
   jcommon::Object::SetClassName("jnetwork::Socket");
@@ -70,7 +70,7 @@ LocalSocket::~LocalSocket()
 
 /** Private */
 
-LocalSocket::LocalSocket(int fd_, std::string file_, int timeout_, int rbuf_, int wbuf_):
+LocalSocket::LocalSocket(int fd_, std::string file_, std::chrono::milliseconds timeout_, int rbuf_, int wbuf_):
   jnetwork::Connection(JCT_TCP)
 {
   jcommon::Object::SetClassName("jnetwork::Socket");
@@ -102,7 +102,7 @@ void LocalSocket::ConnectSocket()
   int r,
       address_length = sizeof(_address.sun_family) + strnlen(_address.sun_path, length);
 
-  if (_timeout > 0) {
+  if (_timeout.count() > 0) {
     int opt = 1;
 
     ioctl(_fd, FIONBIO, &opt);
@@ -117,8 +117,8 @@ void LocalSocket::ConnectSocket()
       fd_set wset;
       struct timeval t;
 
-      t.tv_sec = _timeout/1000;
-      t.tv_usec = (_timeout%1000)*1000;
+      t.tv_sec = _timeout.count()/1000LL;
+      t.tv_usec = (_timeout.count()%1000LL)*1000LL;
 
       FD_ZERO(&wset);
       FD_SET(_fd, &wset);
@@ -177,7 +177,7 @@ std::string LocalSocket::GetLocalFile()
   return _file;
 }
 
-int LocalSocket::Send(const char *data_, int size_, int time_)
+int LocalSocket::Send(const char *data_, int size_, std::chrono::milliseconds timeout_)
 {
   if (_is_closed == true) {
     throw jexception::ConnectionException("Connection closed exception");
@@ -188,7 +188,7 @@ int LocalSocket::Send(const char *data_, int size_, int time_)
   ufds[0].fd = _fd;
   ufds[0].events = POLLOUT | POLLWRBAND;
 
-  int rv = poll(ufds, 1, time_);
+  int rv = poll(ufds, 1, timeout_.count());
 
   if (rv == -1) {
     throw jexception::ConnectionException("Invalid send parameters exception");
@@ -249,7 +249,7 @@ int LocalSocket::Send(const char *data_, int size_, bool block_)
   return n;
 }
 
-int LocalSocket::Receive(char *data_, int size_, int time_)
+int LocalSocket::Receive(char *data_, int size_, std::chrono::milliseconds timeout_)
 {
   if (_is_closed == true) {
     throw jexception::ConnectionException("Connection closed exception");
@@ -260,7 +260,7 @@ int LocalSocket::Receive(char *data_, int size_, int time_)
   ufds[0].fd = _fd;
   ufds[0].events = POLLIN | POLLRDBAND;
 
-  int rv = poll(ufds, 1, time_);
+  int rv = poll(ufds, 1, timeout_.count());
 
   if (rv == -1) {
     throw jexception::ConnectionException("Invalid receive parameters exception");

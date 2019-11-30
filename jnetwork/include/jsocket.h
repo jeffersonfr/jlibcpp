@@ -60,7 +60,7 @@ class Socket : public jnetwork::Connection {
     /** \brief Bytes received. */
     int64_t _receive_bytes;
     /** \brief */
-    int _timeout;
+    std::chrono::milliseconds _timeout;
 
     /**
      * \brief Create a new socket.
@@ -72,51 +72,51 @@ class Socket : public jnetwork::Connection {
      * \brief
      *
      */
-    void BindSocket(InetAddress *, int);
+    void BindSocket(InetAddress *addr, int);
 
     /**
      * \brief Connect the socket.
      *
      */
-    void ConnectSocket(InetAddress *, int);
+    void ConnectSocket(InetAddress *addr, int);
 
     /**
      * \brief
      *
      */
-    void InitStreams(int64_t rbuf_, int64_t wbuf_);
+    void InitStreams(int64_t rbuf, int64_t wbuf);
 
    protected:
     /**
      * \brief Constructor.
      *
      */
-    Socket(int fd_, struct sockaddr_in server_, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
+    Socket(int fd, struct sockaddr_in server, std::chrono::milliseconds timeout = std::chrono::milliseconds(0), int rbuf = SOCK_RD_BUFFER_SIZE, int wbuf = SOCK_WR_BUFFER_SIZE);
   
    public:
     /**
      * \brief Constructor.
      *
      */
-    Socket(InetAddress *addr_, int port_, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
+    Socket(InetAddress *addr, int port, std::chrono::milliseconds timeout = std::chrono::milliseconds(0), int rbuf = SOCK_RD_BUFFER_SIZE, int wbuf = SOCK_WR_BUFFER_SIZE);
 
     /**
      * \brief Constructor.
      *
      */
-    Socket(InetAddress *addr_, int port_, InetAddress *local_addr_, int local_port_, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
+    Socket(InetAddress *addr, int port, InetAddress *local_addr, int local_port, std::chrono::milliseconds timeout = std::chrono::milliseconds(0), int rbuf = SOCK_RD_BUFFER_SIZE, int wbuf = SOCK_WR_BUFFER_SIZE);
 
     /**
      * \brief
      *
      */
-    Socket(std::string host_, int port_, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
+    Socket(std::string host, int port, std::chrono::milliseconds timeout = std::chrono::milliseconds(0), int rbuf = SOCK_RD_BUFFER_SIZE, int wbuf = SOCK_WR_BUFFER_SIZE);
 
     /**
      * \brief Constructor.
      *
      */
-    Socket(std::string host_, int port_, InetAddress *local_addr_, int local_port_, int timeout_ = 0, int rbuf_ = SOCK_WR_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
+    Socket(std::string host, int port, InetAddress *local_addr, int local_port, std::chrono::milliseconds timeout = std::chrono::milliseconds(0), int rbuf = SOCK_WR_BUFFER_SIZE, int wbuf = SOCK_WR_BUFFER_SIZE);
 
     /**
      * \brief Destrutor virtual.
@@ -128,13 +128,13 @@ class Socket : public jnetwork::Connection {
      * \brief Send bytes to a destination.
      *
      */
-    virtual int Send(const char *b_, int size_, bool block_ = true);
+    virtual int Send(const char *b, int size, bool block = true);
 
     /**
      * \brief Send bytes to a destination waiting a timeout.
      *
      */
-    virtual int Send(const char *b_, int size_, int time_);
+    virtual int Send(const char *b, int size, std::chrono::milliseconds timeout);
 
     /**
      * \brief Receive bytes from a source.
@@ -144,13 +144,13 @@ class Socket : public jnetwork::Connection {
      * \exception SocketException an error occurred.
      *
      */
-    virtual int Receive(char *data_, int data_length_, bool block_ = true);
+    virtual int Receive(char *data, int data_length, bool block = true);
 
     /**
      * \brief Receive bytes from a source waiting a timeout.
      *
      */
-    virtual int Receive(char *data_, int data_length_, int time_);
+    virtual int Receive(char *data, int data_length, std::chrono::milliseconds timeout);
 
     /**
      * \brief Close the socket.

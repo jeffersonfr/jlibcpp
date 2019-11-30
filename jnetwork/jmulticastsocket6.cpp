@@ -129,7 +129,7 @@ jio::OutputStream * MulticastSocket6::GetOutputStream()
   return (jio::OutputStream *)_os;
 }
 
-int MulticastSocket6::Receive(char *data_, int size_, int time_)
+int MulticastSocket6::Receive(char *data_, int size_, std::chrono::milliseconds timeout_)
 {
   if (_is_closed == true) {
     throw jexception::ConnectionException("Connection closed exception");
@@ -140,7 +140,7 @@ int MulticastSocket6::Receive(char *data_, int size_, int time_)
   ufds[0].fd = _fdr;
   ufds[0].events = POLLIN | POLLRDBAND;
 
-  int rv = poll(ufds, 1, time_);
+  int rv = poll(ufds, 1, timeout_.count());
 
   if (rv == -1) {
     throw jexception::ConnectionException("Invalid receive parameters exception");
@@ -211,7 +211,7 @@ int MulticastSocket6::Receive(char *data_, int size_, bool block_)
   return n;
 }
 
-int MulticastSocket6::Send(const char *data, int size, int time_)
+int MulticastSocket6::Send(const char *data, int size, std::chrono::milliseconds timeout_)
 {
   if (_is_closed == true) {
     throw jexception::ConnectionException("Connection closed exception");
@@ -222,7 +222,7 @@ int MulticastSocket6::Send(const char *data, int size, int time_)
   ufds[0].fd = _fds;
   ufds[0].events = POLLOUT | POLLWRBAND;
 
-  int rv = poll(ufds, 1, time_);
+  int rv = poll(ufds, 1, timeout_.count());
 
   if (rv == -1) {
     throw jexception::ConnectionException("Invalid send parameters exception");
