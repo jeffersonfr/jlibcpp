@@ -187,7 +187,7 @@ class Font : public virtual jcommon::Object {
      * \brief
      *
      */
-    virtual void GetStringBreak(std::vector<std::string> *lines, std::string text, int wp, int hp, bool justify = true);
+    virtual void GetStringBreak(std::vector<std::string> *lines, std::string text, jsize_t<int> size);
     
     /**
      * \brief

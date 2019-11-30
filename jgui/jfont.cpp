@@ -274,9 +274,9 @@ jrect_t<int> Font::GetGlyphExtends(int symbol)
   };
 }
 
-void Font::GetStringBreak(std::vector<std::string> *lines, std::string text, int wp, int hp, bool justify)
+void Font::GetStringBreak(std::vector<std::string> *lines, std::string text, jsize_t<int> size)
 {
-  if (wp < 0 || hp < 0) {
+  if (size.width < 0 || size.height < 0) {
     return;
   }
 
@@ -284,102 +284,56 @@ void Font::GetStringBreak(std::vector<std::string> *lines, std::string text, int
 
   for (int i=0; i<token.GetSize(); i++) {
     std::vector<std::string> words;
-    
+
     std::string line = token.GetToken(i);
 
+    line = jcommon::StringUtils::ReplaceString(line, "\r", "");
     line = jcommon::StringUtils::ReplaceString(line, "\n", "");
     line = jcommon::StringUtils::ReplaceString(line, "\t", "    ");
-    
-    if (justify == true) {
-      jcommon::StringTokenizer line_token(line, " ", jcommon::JTT_STRING, false);
 
-      std::string temp,
-        previous;
+    jcommon::StringTokenizer line_token(line, " ", jcommon::JTT_STRING, true);
 
-      for (int j=0; j<line_token.GetSize(); j++) {
-        temp = jcommon::StringUtils::Trim(line_token.GetToken(j));
+    std::string temp,
+      previous;
 
-        if (GetStringWidth(temp) > wp) {
-          int p = 1;
+    for (int j=0; j<line_token.GetSize(); j++) {
+      temp = line_token.GetToken(j);
 
-          while (p < (int)temp.size()) {
-            if (GetStringWidth(temp.substr(0, ++p)) > wp) {
-              words.push_back(temp.substr(0, p-1));
+      if (GetStringWidth(temp) > size.width) {
+        int p = 1;
 
-              temp = temp.substr(p-1);
+        while (p < (int)temp.size()) {
+          if (GetStringWidth(temp.substr(0, ++p)) > size.width) {
+            words.push_back(temp.substr(0, p - 1));
 
-              p = 1;
-            }
+            temp = temp.substr(p - 1);
+
+            p = 1;
           }
-
-          if (temp != "") {
-            words.push_back(temp.substr(0, p));
-          }
-        } else {
-          words.push_back(temp);
         }
-      }
 
-      temp = words[0];
-
-      for (int j=1; j<(int)words.size(); j++) {
-        previous = temp;
-        temp += " " + words[j];
-
-        if (GetStringWidth(temp) > wp) {
-          temp = words[j];
-
-          lines->push_back(previous);
+        if (temp != "") {
+          words.push_back(temp.substr(0, p));
         }
+      } else {
+        words.push_back(temp);
       }
-
-      // lines->push_back(temp);
-      lines->push_back("\n" + temp);
-    } else {
-      jcommon::StringTokenizer line_token(line, " ", jcommon::JTT_STRING, true);
-
-      std::string temp,
-        previous;
-
-      for (int j=0; j<line_token.GetSize(); j++) {
-        temp = line_token.GetToken(j);
-
-        if (GetStringWidth(temp) > wp) {
-          int p = 1;
-
-          while (p < (int)temp.size()) {
-            if (GetStringWidth(temp.substr(0, ++p)) > wp) {
-              words.push_back(temp.substr(0, p-1));
-
-              temp = temp.substr(p-1);
-
-              p = 1;
-            }
-          }
-
-          if (temp != "") {
-            words.push_back(temp.substr(0, p));
-          }
-        } else {
-          words.push_back(temp);
-        }
-      }
-
-      temp = words[0];
-      
-      for (int j=1; j<(int)words.size(); j++) {
-        previous = temp;
-        temp += words[j];
-
-        if (GetStringWidth(temp.c_str()) > wp) {
-          temp = words[j];
-
-          lines->push_back(previous);
-        }
-      }
-
-      lines->push_back(temp);
     }
+
+    temp = words[0];
+
+    for (int j=1; j<(int)words.size(); j++) {
+      previous = temp;
+      temp += words[j];
+
+      if (GetStringWidth(temp.c_str()) > size.width) {
+        temp = words[j];
+
+        lines->push_back(previous);
+      }
+    }
+
+    lines->push_back(temp);
   }
 }
 

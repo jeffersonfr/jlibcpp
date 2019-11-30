@@ -126,7 +126,7 @@ jsize_t<int> Label::GetPreferredSize()
     if (wp > 0) {
       std::vector<std::string> lines;
 
-      font->GetStringBreak(&lines, _text, wp, INT_MAX, _halign);
+      font->GetStringBreak(&lines, _text, {wp, INT_MAX});
 
       t.height = lines.size()*hp + 2*gy;
     }

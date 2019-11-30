@@ -1160,7 +1160,7 @@ void Graphics::DrawString(std::string text, jpoint_t<int> point)
   int glyphs_len = 0;
   cairo_status_t status;
 
-  if (_font->GetEncoding() == JFE_ISO_8859_1) {
+  if (_font->GetEncoding() != JFE_ISO_8859_1) {
     jcommon::Charset charset;
 
     utf8 = charset.Latin1ToUTF8(text);
@@ -1211,46 +1211,103 @@ void Graphics::DrawString(std::string text, jrect_t<int> rect, jhorizontal_align
     return;
   }
 
+  struct line_t {
+    std::string text;
+    int dx;
+    int dy;
+    float sx;
+  };
+
   std::vector<std::string> 
-    words,
     lines;
+  std::vector<struct line_t>
+    words;
   int 
-    dx = 0,
-    dy = 0,
-    max_lines,
-    font_height = _font->GetSize();
+    height = _font->GetSize();
 
-  max_lines = rect.size.height/font_height;
+  _font->GetStringBreak(&lines, text, rect.size);
 
-  if (max_lines <= 0) {
-    max_lines = 1;
+  if (halign == JHA_LEFT) {
+    for (int i=0; i<(int)lines.size(); i++) {
+      words.push_back({
+          .text = lines[i],
+          .dx = 0,
+          .dy = i*height,
+          .sx = 0.0f
+          });
+    }
+  } else if (halign == JHA_CENTER) {
+    for (int i=0; i<(int)lines.size(); i++) {
+      words.push_back({
+          .text = lines[i],
+          .dx = (rect.size.width - _font->GetStringWidth(lines[i]))/2,
+          .dy = i*height,
+          .sx = 0.0f
+          });
+    }
+  } else if (halign == JHA_RIGHT) {
+    for (int i=0; i<(int)lines.size(); i++) {
+      words.push_back({
+          .text = lines[i],
+          .dx = rect.size.width - _font->GetStringWidth(lines[i]),
+          .dy = i*height,
+          .sx = 0.0f
+          });
+    }
+  } else if (halign == JHA_JUSTIFY) {
+    for (int i=0; i<(int)lines.size(); i++) {
+      jcommon::StringTokenizer token(jcommon::StringUtils::Trim(lines[i]), " ", jcommon::JTT_STRING, false);
+
+      if (token.GetSize() <= 1) {
+        words.push_back({
+            .text = lines[i],
+            .dx = 0,
+            .dy = i*height,
+            .sx = 0.0f
+            });
+      } else {
+        std::string str;
+
+        for (int i=0; i<token.GetSize(); i++) {
+          str = str + token.GetToken(i);
+        }
+
+        float d = (rect.size.width - _font->GetStringWidth(str))/(float)(token.GetSize() - 1);
+
+        words.push_back({
+            .text = lines[i],
+            .dx = 0,
+            .dy = i*height,
+            .sx = d
+            });
+      }
+    }
   }
 
-  _font->GetStringBreak(&lines, text, rect.size.width, rect.size.height, halign);
-
-  int line_space = 0,
-      line_yinit = 0,
-      line_ydiff = 0;
-
-  if (rect.size.height > (int)lines.size()*font_height) {
-    int nlines = (int)lines.size();
-
+  if (rect.size.height > (int)(lines.size()*height)) {
     if (valign == JVA_TOP) {
-      line_yinit = 0;
-      line_ydiff = 0;
+      // for (auto &line : words) {
+      // }
     } else if (valign == JVA_CENTER) {
-      line_yinit = (rect.size.height - nlines*font_height)/2;
-      line_ydiff = 0;
+      int d = (rect.size.height - lines.size()*height)/2;
+      
+      for (auto &line : words) {
+        line.dy = line.dy + d;
+      }
     } else if (valign == JVA_BOTTOM) {
-      line_yinit = rect.size.height - nlines*font_height;
-      line_ydiff = 0;
+      int d = rect.size.height - lines.size()*height;
+      
+      for (auto &line : words) {
+        line.dy = line.dy + d;
+      }
     } else if (valign == JVA_JUSTIFY) {
-      if (nlines == 1) {
-        line_yinit = (rect.size.height - nlines*font_height)/2;
-      } else {
-        line_space = (rect.size.height - nlines*font_height)/(nlines-1);
-        line_yinit = 0;
-        line_ydiff = (rect.size.height - nlines*font_height)%(nlines-1);
+      if (lines.size() > 1) {
+        float d = (rect.size.height - lines.size()*height)/(float)(lines.size() - 1);
+        int k = 0;
+
+        for (auto &line : words) {
+          line.dy = line.dy + d*k++;
+        }
       }
     }
   }
@@ -1261,79 +1318,21 @@ void Graphics::DrawString(std::string text, jrect_t<int> rect, jhorizontal_align
     ClipRect(rect);
   }
   
-  if (halign == JHA_JUSTIFY) {
-    std::string token_trim;
-      
-    dy = line_yinit;
+  for (auto &line : words) {
+    if (line.sx == 0.0f) {
+      DrawString(line.text, jpoint_t<int>{rect.point.x + line.dx, rect.point.y + line.dy});
+    } else {
+      jcommon::StringTokenizer token(jcommon::StringUtils::Trim(line.text), " ", jcommon::JTT_STRING, false);
+      float d = 0.0f;
 
-    for (int i=0; i<(int)lines.size() && i<max_lines; i++) {
-      jcommon::StringTokenizer token(lines[i], " ", jcommon::JTT_STRING, false);
+      for (int i=0; i<token.GetSize(); i++) {
+        DrawString(token.GetToken(i), jpoint_t<int>{rect.point.x + line.dx + (int)d, rect.point.y + line.dy});
 
-
-      if (lines[i].find("\n") == 0) {
-        // INFO:: eh soh uma maneira de informar a ultima linha de cada linha terminada com '\n'
-        DrawString(lines[i].substr(1), jpoint_t<int>{rect.point.x, rect.point.y + dy});
-      } else {
-        int size = 0,
-            space = 0,
-            diff = 0;
-
-        dx = 0;
-
-        if (token.GetSize() > 1) {
-          for (int j=0; j<token.GetSize(); j++) {
-            size = size + _font->GetStringWidth(jcommon::StringUtils::Trim(token.GetToken(j)));
-          }
-
-          space = (rect.size.width - size)/(token.GetSize() - 1);
-          diff = (rect.size.width - size)%(token.GetSize() - 1);
-        }
-
-        for (int j=0; j<token.GetSize(); j++) {
-          std::string word = jcommon::StringUtils::Trim(token.GetToken(j));
-
-          DrawString(word, jpoint_t<int>{rect.point.x + dx, rect.point.y + dy});
-
-          dx = dx + space + _font->GetStringWidth(word);
-
-          if (diff-- > 0) {
-            dx++;
-          }
-        }
-      }
-
-      dy = dy+line_space+font_height;
-
-      if (line_ydiff-- > 0) {
-        dy++;
-      }
-    }
-  } else {
-    dy = line_yinit;
-
-    for (int i=0; i<(int)lines.size() && i<max_lines; i++) {
-      std::string text = jcommon::StringUtils::Trim(lines[i]);
-      
-      int size = _font->GetStringWidth(text);
-
-      if (halign == JHA_LEFT) {
-        dx = 0;
-      } else if (halign == JHA_CENTER) {
-        dx = (rect.size.width - size)/2;
-      } else if (halign == JHA_RIGHT) {
-        dx = rect.size.width - size;
-      }
-
-      DrawString(text, jpoint_t<int>{rect.point.x + dx, rect.point.y + dy});
-
-      dy = dy + line_space + font_height;
-
-      if (line_ydiff-- > 0) {
-        dy++;
+        d = d + _font->GetStringWidth(token.GetToken(i)) + line.sx;
       }
     }
   }
-  
+
   if (clipped == true) {
     SetClip(clip);
   }

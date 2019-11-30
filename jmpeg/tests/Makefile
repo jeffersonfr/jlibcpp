@@ -15,9 +15,15 @@ LDFLAGS		+= \
 OBJS_teste = \
 	   teste.o\
 
-all: teste
+OBJS_204to188 = \
+	   204to188.o\
+
+all: teste 204to188
 	
 teste: $(OBJS_teste)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
+        
+204to188: $(OBJS_204to188)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
 .cpp.o: $<  
@@ -27,4 +33,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *~ teste  
+	@rm -rvf *.o *~ teste 204to188
