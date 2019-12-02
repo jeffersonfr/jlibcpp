@@ -38,6 +38,7 @@ DemuxManager::DemuxManager():
     
 DemuxManager::~DemuxManager()
 {
+  Stop();
 }
 
 DemuxManager * DemuxManager::GetInstance()
