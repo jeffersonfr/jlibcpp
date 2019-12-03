@@ -144,11 +144,9 @@ Font::Font(std::string name, jfont_attributes_t attributes, int size):
 
   // INFO:: intializing the first 256 characters withs
   for (int i=0; i<256; i++) {
-    jrect_t<int> bounds;
+    jfont_extends_t t = Font::GetGlyphExtends(i);
 
-    bounds = Font::GetGlyphExtends(i);
-
-    _widths[i] = bounds.point.x + bounds.size.width;
+    _widths[i] = t.bearing.x + t.size.width;
   }
 }
 
@@ -226,12 +224,12 @@ int Font::GetLeading()
 
 int Font::GetStringWidth(std::string text)
 {
-  jrect_t<int> t = GetStringExtends(text);
+  jfont_extends_t t = GetStringExtends(text);
 
-  return t.point.x + t.size.width;
+  return (int)(t.bearing.x + t.size.width);
 }
 
-jrect_t<int> Font::GetStringExtends(std::string text)
+jfont_extends_t Font::GetStringExtends(std::string text)
 {
   std::string utf8 = text;
   cairo_text_extents_t t;
@@ -244,18 +242,23 @@ jrect_t<int> Font::GetStringExtends(std::string text)
 
   cairo_scaled_font_text_extents(_scaled_font, utf8.c_str(), &t);
 
-  jrect_t<int> 
-    r {
-      (int)t.x_bearing, 
-      (int)t.y_bearing, 
-      (int)t.width, 
-      (int)t.height
-    };
-
-  return r;
+  return jfont_extends_t {
+    .bearing {
+      (float)t.x_bearing, 
+      (float)t.y_bearing
+    },
+    .advance {
+      (float)t.x_advance, 
+      (float)t.y_advance
+    },
+    .size {
+      (float)t.width, 
+      (float)t.height
+    }
+  };
 }
 
-jrect_t<int> Font::GetGlyphExtends(int symbol)
+jfont_extends_t Font::GetGlyphExtends(int symbol)
 {
   cairo_glyph_t glyph;
   cairo_text_extents_t t;
@@ -266,11 +269,19 @@ jrect_t<int> Font::GetGlyphExtends(int symbol)
 
   cairo_scaled_font_glyph_extents(_scaled_font, &glyph, 1, &t);
 
-  return {
-    (int)t.x_bearing, 
-    (int)t.y_bearing, 
-    (int)t.width, 
-    (int)t.height
+  return jfont_extends_t {
+    .bearing {
+      (float)t.x_bearing, 
+      (float)t.y_bearing
+    },
+    .advance {
+      (float)t.x_advance, 
+      (float)t.y_advance
+    },
+    .size {
+      (float)t.width, 
+      (float)t.height
+    }
   };
 }
 

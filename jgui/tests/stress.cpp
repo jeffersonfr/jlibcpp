@@ -151,13 +151,13 @@ class GraphicPanel : public jgui::Window {
     //////////////////////////////////////////////
 		DrawString("Rotate String");
 
-		jgui::jrect_t 
-      region = font->GetStringExtends("Rotate String");
+		jgui::jfont_extends_t 
+      extends = font->GetStringExtends("Rotate String");
 		double 
       angle = 0.1;
 		int 
-      sw = region.point.x + region.size.width,
-			sh = region.point.x + region.size.height;
+      sw = extends.bearing.x + extends.size.width,
+			sh = extends.bearing.x + extends.size.height;
 
 		x = (t.width - sw)/2;
 		y = (t.height + sh)/2;

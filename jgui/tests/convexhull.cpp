@@ -44,7 +44,7 @@ class ConvexHull : public jgui::Window {
 
       _left_most = _points[0];
 
-      for (int i=1; i<_points.size(); i++) {
+      for (int i=1; i<(int)_points.size(); i++) {
         if (_points[i].x < _left_most.x) {
           _left_most = _points[i];
         }
@@ -54,7 +54,7 @@ class ConvexHull : public jgui::Window {
       _convexhull.push_back(_left_most);
       
       std::cout << "point: ";
-      for (int i=0; i<_points.size(); i++) {
+      for (int i=0; i<(int)_points.size(); i++) {
         std::cout << "(" << _points[i] << ") "; 
       }
       std::cout << std::endl;
@@ -87,7 +87,7 @@ class ConvexHull : public jgui::Window {
       // INFO:: draw points
       g->SetColor(0xffffffff);
 
-      for (int i=0; i<_points.size(); i++) {
+      for (int i=0; i<(int)_points.size(); i++) {
         g->DrawCircle(_points[i], 3);
       }
 
@@ -99,7 +99,7 @@ class ConvexHull : public jgui::Window {
       jgui::jpoint_t<int> 
         next = _left_most;
 
-      for (int i=0; i<_points.size(); i++) {
+      for (int i=0; i<(int)_points.size(); i++) {
         g->SetColor(0xff00ff00);
         g->DrawLine(*_convexhull.rbegin(), next);
         // g->SetColor(0xffffff00);
@@ -121,7 +121,7 @@ class ConvexHull : public jgui::Window {
 
       g->SetColor(0xff0000ff);
 
-      for (int i=1; i<_convexhull.size(); i++) {
+      for (int i=1; i<(int)_convexhull.size(); i++) {
         g->DrawLine(_convexhull[i - 1], _convexhull[i]);
       }
 

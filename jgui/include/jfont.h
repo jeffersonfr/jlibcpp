@@ -39,6 +39,12 @@ enum jfont_encoding_t {
   JFE_ISO_8859_1
 };
 
+struct jfont_extends_t {
+  jgui::jpoint_t<float> bearing;
+  jgui::jpoint_t<float> advance;
+  jgui::jsize_t<float> size;
+};
+
 /**
  * \brief
  *
@@ -175,13 +181,13 @@ class Font : public virtual jcommon::Object {
      * \brief
      *
      */
-    virtual jrect_t<int> GetStringExtends(std::string text);
+    virtual jfont_extends_t GetStringExtends(std::string text);
 
     /**
      * \brief
      *
      */
-    virtual jrect_t<int> GetGlyphExtends(int symbol);
+    virtual jfont_extends_t GetGlyphExtends(int symbol);
 
     /**
      * \brief
