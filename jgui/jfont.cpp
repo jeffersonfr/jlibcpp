@@ -53,7 +53,7 @@ int InternalCreateFont(std::string name, cairo_font_face_t **font)
   return 0;
 }
 
-Font::Font(std::string name, jfont_attributes_t attributes, int size):
+Font::Font(std::string name, jfont_attributes_t attributes, int size, const jmath::jmatrix_t<3, 2, float> &m):
   jcommon::Object()
 {
   jcommon::Object::SetClassName("jgui::Font");
@@ -136,6 +136,10 @@ Font::Font(std::string name, jfont_attributes_t attributes, int size):
 
   cairo_get_matrix(_context_ref, &tm);
   cairo_get_font_matrix(_context_ref, &fm);
+
+  fm.xx *= m(0, 0); fm.yx *= m(0, 1);
+  fm.xy *= m(1, 0); fm.yy *= m(1, 1);
+  fm.x0 = m(2, 0); fm.y0 = m(2, 1);
 
   _scaled_font = cairo_scaled_font_create(font_face, &fm, &tm, _options);
 

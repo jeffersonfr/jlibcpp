@@ -21,6 +21,7 @@
 #define J_FONT_H
 
 #include "jgui/jgraphics.h"
+#include "jmath/jmatrix.h"
 
 #include <cairo-ft.h>
 
@@ -91,7 +92,7 @@ class Font : public virtual jcommon::Object {
      * \brief
      *
      */
-    Font(std::string name, jfont_attributes_t attributes, int size);
+    Font(std::string name, jfont_attributes_t attributes, int size, const jmath::jmatrix_t<3, 2, float> &m = {1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f});
     
     /**
      * \brief
