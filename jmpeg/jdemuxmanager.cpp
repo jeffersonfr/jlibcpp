@@ -114,10 +114,7 @@ void DemuxManager::Stop()
 
     _thread.join();
   }
-}
-
-void DemuxManager::WaitSync()
-{
+  
   std::lock_guard<std::mutex> guard(_demux_sync_mutex);
 }
 

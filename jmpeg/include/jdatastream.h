@@ -72,8 +72,20 @@ class DataStream : public jcommon::Object {
      * \brief
      *
      */
-    DataStream Slice(size_t lo, size_t hi);
+    DataStream Slice(size_t lo, size_t hi = 0);
     
+    /**
+     * \brief
+     *
+     */
+    uint64_t operator()(size_t bits);
+    
+    /**
+     * \brief
+     *
+     */
+    uint64_t operator()(size_t skip, size_t bits);
+
     /**
      * \brief
      *
@@ -114,13 +126,19 @@ class DataStream : public jcommon::Object {
      * \brief
      *
      */
-    void Skip(size_t n);
+    void SkipBits(size_t n);
     
     /**
      * \brief
      *
      */
     void Reset();
+    
+    /**
+     * \brief
+     *
+     */
+    size_t GetSizeInBits();
     
     /**
      * \brief

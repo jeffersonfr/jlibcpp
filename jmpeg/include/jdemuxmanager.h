@@ -133,12 +133,6 @@ class DemuxManager : public jcommon::Object {
      * \brief
      *
      */
-    virtual void WaitSync();
-    
-    /**
-     * \brief
-     *
-     */
     virtual std::map<int, int> GetPidReport();
     
 };

@@ -41,6 +41,7 @@
 #include <utility>
 #include <sstream>
 #include <iomanip>
+#include <condition_variable>
 
 #include <string.h>
 #include <math.h>
@@ -5704,6 +5705,8 @@ class PSIParser : public jevent::DemuxListener {
 
 };
 
+static std::mutex mutex;
+static std::condition_variable condition;
 static bool cancel = false;
 
 class ISDBTFileInputStream : public jio::InputStream {
@@ -5752,6 +5755,10 @@ class ISDBTFileInputStream : public jio::InputStream {
       _stream->Skip(_rgap);
 
       if (r <= 0 or cancel == true) {
+        std::lock_guard<std::mutex> lock(mutex);
+
+        condition.notify_one();
+
         return -1LL;
       }
 
@@ -5792,6 +5799,10 @@ class ISDBTDatagramInputStream : public jio::InputStream {
         r = _stream->Read(data, _lgap + size + _rgap);
 
       if (r <= 0 or cancel == true) {
+        std::lock_guard<std::mutex> lock(mutex);
+
+        condition.notify_one();
+
         return -1LL;
       }
 
@@ -6135,6 +6146,10 @@ exit:
       int r = read(_dvr_fd, data, _lgap + size + _rgap);
 
       if (r != (_lgap + size + _rgap) or cancel == true) {
+        std::lock_guard<std::mutex> lock(mutex);
+
+        condition.notify_one();
+
         return -1LL;
       }
       
@@ -6248,7 +6263,11 @@ int main(int argc, char **argv)
   }
 
   manager->Start();
-  manager->WaitSync();
+
+  std::unique_lock<std::mutex> lock(mutex);
+
+  condition.wait(lock);
+
   manager->Stop();
 
   delete stream;
