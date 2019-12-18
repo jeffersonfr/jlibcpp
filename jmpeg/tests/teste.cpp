@@ -5709,6 +5709,17 @@ static std::mutex mutex;
 static std::condition_variable condition;
 static bool cancel = false;
 
+class EndOfStreamWaiter : public jevent::EndOfStreamListener {
+
+  public:
+    virtual void EndOfStreamReached(jevent::EndOfStreamEvent *event)
+    {
+      std::lock_guard<std::mutex> lock(mutex);
+
+      condition.notify_one();
+    }
+};
+
 class ISDBTFileInputStream : public jio::InputStream {
 
   private:
@@ -5755,10 +5766,6 @@ class ISDBTFileInputStream : public jio::InputStream {
       _stream->Skip(_rgap);
 
       if (r <= 0 or cancel == true) {
-        std::lock_guard<std::mutex> lock(mutex);
-
-        condition.notify_one();
-
         return -1LL;
       }
 
@@ -5799,10 +5806,6 @@ class ISDBTDatagramInputStream : public jio::InputStream {
         r = _stream->Read(data, _lgap + size + _rgap);
 
       if (r <= 0 or cancel == true) {
-        std::lock_guard<std::mutex> lock(mutex);
-
-        condition.notify_one();
-
         return -1LL;
       }
 
@@ -6146,10 +6149,6 @@ exit:
       int r = read(_dvr_fd, data, _lgap + size + _rgap);
 
       if (r != (_lgap + size + _rgap) or cancel == true) {
-        std::lock_guard<std::mutex> lock(mutex);
-
-        condition.notify_one();
-
         return -1LL;
       }
       
@@ -6195,6 +6194,8 @@ int main(int argc, char **argv)
     *manager = jmpeg::DemuxManager::GetInstance();
   jio::InputStream 
     *stream = nullptr;
+  EndOfStreamWaiter
+    waiter;
   jnetwork::URL
     url(argv[1]);
 
@@ -6215,7 +6216,8 @@ int main(int argc, char **argv)
   signal(SIGINT, catch_signal);
 
   manager->SetInputStream(stream);
-  
+  manager->RegisterStreamListener(&waiter);
+
   PSIParser 
     test;
 

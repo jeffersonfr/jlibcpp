@@ -20,6 +20,7 @@
 #include "jmpeg/jdemuxmanager.h"
 #include "jmpeg/jdemux.h"
 #include "jmpeg/jmpeglib.h"
+#include "jevent/jendofstreamevent.h"
 
 #include <algorithm>
 
@@ -456,6 +457,16 @@ void DemuxManager::Run()
      _demux_mutex.unlock();
 
      if (_source->Read(packet, length) != length) {
+       jevent::EndOfStreamEvent event(this);
+
+       _stream_listener_mutex.lock();
+
+       for (std::vector<jevent::EndOfStreamListener *>::iterator i=_stream_listeners.begin(); i!=_stream_listeners.end(); i++) {
+         (*i)->EndOfStreamReached(&event);
+       }
+       
+       _stream_listener_mutex.unlock();
+       
        break;
      }
 
@@ -527,6 +538,30 @@ void DemuxManager::Run()
    }
 
    _is_running = false;
+}
+
+void DemuxManager::RegisterStreamListener(jevent::EndOfStreamListener *listener)
+{
+  if (listener == nullptr) {
+    return;
+  }
+
+   std::lock_guard<std::mutex> guard(_stream_listener_mutex);
+
+  if (std::find(_stream_listeners.begin(), _stream_listeners.end(), listener) == _stream_listeners.end()) {
+    _stream_listeners.push_back(listener);
+  }
+}
+
+void DemuxManager::RemoveStreamListener(jevent::EndOfStreamListener *listener)
+{
+  if (listener == nullptr) {
+    return;
+  }
+
+   std::lock_guard<std::mutex> guard(_stream_listener_mutex);
+
+  _stream_listeners.erase(std::remove(_stream_listeners.begin(), _stream_listeners.end(), listener), _stream_listeners.end());
 }
 
 }

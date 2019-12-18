@@ -21,6 +21,7 @@
 #define J_DEMUXMANAGER_H
 
 #include "jio/jinputstream.h"
+#include "jevent/jendofstreamlistener.h"
 
 #include <map>
 #include <thread>
@@ -39,17 +40,21 @@ class DemuxManager : public jcommon::Object {
     static DemuxManager *_instance;
 
     /** \brief */
-    std::map<int, int> _pid_report;
+    std::vector<jevent::EndOfStreamListener *> _stream_listeners;
     /** \brief */
     std::vector<Demux *> _demuxes;
     /** \brief */
     std::vector<Demux *> _sync_demuxes;
+    /** \brief */
+    std::map<int, int> _pid_report;
     /** \brief */
     std::thread _thread;
     /** \brief */
     std::mutex _demux_mutex;
     /** \brief */
     std::mutex _demux_sync_mutex;
+    /** \brief */
+    std::mutex _stream_listener_mutex;
     /** \brief */
     jio::InputStream *_source;
     /** \brief */
@@ -135,6 +140,18 @@ class DemuxManager : public jcommon::Object {
      */
     virtual std::map<int, int> GetPidReport();
     
+    /**
+     * \brief
+     *
+     */
+    virtual void RegisterStreamListener(jevent::EndOfStreamListener *listener);
+
+    /**
+     * \brief
+     *
+     */
+    virtual void RemoveStreamListener(jevent::EndOfStreamListener *listener);
+
 };
 
 }

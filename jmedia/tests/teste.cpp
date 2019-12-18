@@ -222,7 +222,7 @@ class PlayerTest : public jgui::Window, public jevent::PlayerListener, public je
 			jgui::Image *image = (jgui::Image *)event->GetSource();
 			jgui::Graphics *g = image->GetGraphics();
 
-			g->SetColor(jgui::Color::Blue);
+			g->SetColor(jgui::jcolor_name_t::Blue);
 			g->FillRectangle({4, 4, 12, 12});
 		}
 

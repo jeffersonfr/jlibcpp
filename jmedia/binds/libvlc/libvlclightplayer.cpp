@@ -554,6 +554,13 @@ LibVLCLightPlayer::LibVLCLightPlayer(jnetwork::URL url):
 
 	media = libvlc_media_new_path(_engine, _file.c_str());
 
+  libvlc_media_add_option(media, ":network-caching=1000"); // 1000ms
+  libvlc_media_add_option(media, ":avcodec-hw=vdpau_decoder"); // vlc --list | grep "video decoder"
+  // libvlc_media_add_option(media, ":avcodec-hurry-up=false"); // partialy decode or skip frame to keep framerate
+  libvlc_media_add_option(media, ":avcodec-fast=true");
+  libvlc_media_add_option(media, ":avcodec-skiploopfilter=true");
+  libvlc_media_add_option(media, ":avcodec-threads=2");
+
 	_provider = libvlc_media_player_new_from_media(media);
 
  	libvlc_media_track_t **tracks = nullptr;
