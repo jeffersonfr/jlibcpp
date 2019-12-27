@@ -253,21 +253,7 @@ uint8_t DataStream::GetRawByte(size_t index)
 
 std::string DataStream::GetRawBytes(size_t index, size_t n)
 {
-  std::string bytes;
-
-  if (n == 0) {
-    return bytes;
-  }
-
-  bytes.reserve(n);
-
-  for (size_t i=0; i<n; i++) {
-    uint8_t byte = GetRawByte(index + i);
-
-    bytes.append((const char *)&byte, 1);
-  }
-
-  return bytes;
+  return _data.substr(_data_index_lo, n);
 }
 
 }

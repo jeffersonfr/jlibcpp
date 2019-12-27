@@ -1518,8 +1518,8 @@ class SIData : public SI {
     {
       std::ostringstream o;
 
-      o << std::hex << std::setw(16) << std::setfill('0') << carousel << ".";
-      o << std::hex << std::setw(16) << std::setfill('0') << module << ".";
+      o << std::hex << std::setw(8) << std::setfill('0') << carousel << ".";
+      o << std::hex << std::setw(8) << std::setfill('0') << module << ".";
 
       for (int i=0; i<(int)key.size(); i++) {
         o << std::hex << std::setw(2) << std::setfill('0') << (int)(key[i] & 0xff);
@@ -2269,7 +2269,7 @@ class SIData : public SI {
       for (std::vector<std::shared_ptr<struct module_info_t>>::iterator i=_modules.begin(); i!=_modules.end(); i++) {
         std::shared_ptr<struct module_info_t> module = (*i);
 
-        printf("\tmodule id:[%016x], module size:[%08d], module version:[%d], blocks:[", module->id, module->size, module->version);
+        printf("\tmodule id:[%04x], module size:[%08d], module version:[%d], blocks:[", module->id, module->size, module->version);
 
         for (int j=0; j<(int)module->blocks.size(); j++) {
           printf((module->blocks[j] == false)?".":"#");
@@ -3817,7 +3817,7 @@ class PSIParser : public jevent::DemuxListener {
         if (demux->GetType() == jmpeg::JDT_PSI) {
           jmpeg::PSIDemux *d = dynamic_cast<jmpeg::PSIDemux *>(demux);
 
-          if (d->IsCRCFailed() == true) {
+          if (d->IsCRCFailed() == true and d->IsCRCCheckEnabled() == true) {
             printf("PSI Section:...: <CRC error>\n\n");
 
             return;
@@ -3825,7 +3825,7 @@ class PSIParser : public jevent::DemuxListener {
         } else if (demux->GetType() == jmpeg::JDT_PRIVATE) {
           jmpeg::PrivateDemux *d = dynamic_cast<jmpeg::PrivateDemux *>(demux);
 
-          if (d->IsCRCFailed() == true) {
+          if (d->IsCRCFailed() == true and d->IsCRCCheckEnabled() == true) {
             printf("Private Section:...: <CRC error>\n\n");
 
             return;
