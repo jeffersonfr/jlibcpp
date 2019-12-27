@@ -42,15 +42,15 @@
 
 // INFO:: set bits with mask
 #define TS_SM8(data, offset, value, count) (((uint8_t *)(data))[0] = ((((uint8_t *)(data))[0] & ~TS_M8(offset, count)) | (((value) << (8 - offset - count)) & TS_M8(offset, count))))
-#define TS_SM16(data, offset, value, count) (((uint16_t *)(data))[0] = ((htobe16(value) & ~TS_M16(offset, count)) | ((htobe16(value) << (16 - offset - count)) & TS_M16(offset, count))))
-#define TS_SM32(data, offset, value, count) (((uint32_t *)(data))[0] = ((htobe16(value) & ~TS_M32(offset, count)) | ((htobe16(value) << (32 - offset - count)) & TS_M32(offset, count))))
-#define TS_SM64(data, offset, value, count) (((uint64_t *)(data))[0] = ((htobe16(value) & ~TS_M64(offset, count)) | ((htobe16(value) << (64 - offset - count)) & TS_M64(offset, count))))
+#define TS_SM16(data, offset, value, count) (((uint16_t *)(data))[0] = ((((uint16_t *)(data))[0] & ~TS_M16(offset, count)) | ((htobe16(value) << (16 - offset - count)) & TS_M16(offset, count))))
+#define TS_SM32(data, offset, value, count) (((uint32_t *)(data))[0] = ((((uint32_t *)(data))[0] & ~TS_M32(offset, count)) | ((htobe32(value) << (32 - offset - count)) & TS_M32(offset, count))))
+#define TS_SM64(data, offset, value, count) (((uint64_t *)(data))[0] = ((((uint64_t *)(data))[0] & ~TS_M64(offset, count)) | ((htobe64(value) << (64 - offset - count)) & TS_M64(offset, count))))
 
 // INFO:: set bits
-#define TS_S8(data, value) (((uint8_t *)(data))[0] = ((uint8_t)((value) & 0xff)))
-#define TS_S16(data, value) (((uint16_t *)(data))[0] = ((uint16_t)((value) & 0xffff)))
-#define TS_S32(data, value) (((uint32_t *)(data))[0] = ((uint32_t)((value) & 0xffffffff)))
-#define TS_S64(data, value) (((uint64_t *)(data))[0] = ((uint64_t)((value) & 0xffffffffffffffff)))
+#define TS_S8(data, value) (((uint8_t *)(data))[0] = uint8_t((value) & 0xff))
+#define TS_S16(data, value) (((uint16_t *)(data))[0] = uint16_t(htobe16(value) & 0xffff))
+#define TS_S32(data, value) (((uint32_t *)(data))[0] = uint32_t(htobe32(value) & 0xffffffff))
+#define TS_S64(data, value) (((uint64_t *)(data))[0] = uint64_t(htobe64(value) & 0xffffffffffffffff))
 
 // INFO:: clear bits with mask
 #define TS_CM8(data, offset, count) TS_SM8(data, offset, count, 0x00)
