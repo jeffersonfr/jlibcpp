@@ -248,12 +248,12 @@ uint8_t DataStream::GetRawByte(size_t index)
     throw jexception::OverflowException("Skip overflow");
   }
 
-  return *((uint8_t *)_data.data() + _data_index_lo + index);
+  return *((uint8_t *)_data.data() + (_data_index_lo >> 3) + index);
 }
 
 std::string DataStream::GetRawBytes(size_t index, size_t n)
 {
-  return _data.substr(_data_index_lo, n);
+  return _data.substr((_data_index_lo >> 3) + index, n);
 }
 
 }
