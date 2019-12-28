@@ -110,7 +110,7 @@ void DataStream::SetBits(uint64_t bits, size_t n)
       d = bits;
     }
 
-    TS_SM8(ptr + ((_data_index_lo + _data_index) >> 3), r, d, (uint8_t)stream.GetBits(d));
+    TS_SM8(ptr + ((_data_index_lo + _data_index) >> 3), r, (uint8_t)stream.GetBits(d), d);
 
     _data_index = _data_index + d;
   }
