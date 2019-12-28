@@ -101,7 +101,7 @@ void DataStream::SetBits(uint64_t bits, size_t n)
   uint8_t 
     *ptr = (uint8_t *)_data.data();
 
-  while (GetAvailableBits() > 0) {
+  while (stream.GetAvailableBits() > 0) {
     int 
       r = (_data_index_lo + _data_index)%8,
       d = 8 - r;
