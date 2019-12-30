@@ -3750,9 +3750,9 @@ class PSIParser : public jevent::DemuxListener {
         printf("\t\t:: dmf:[0x%02x], timing:[0x%02x]\n", dmf, timing);
         */
       } else if (descriptor_tag == 0xfe) { // system management descriptor [ABNTNBR 15608-3-2008]
-        int system_management_id = TS_G16(ptr + 0);
-        int broadcasting_flag = TS_GM8(ptr, 0, 2);
-        int broadcasting_identifier = TS_GM8(ptr, 2, 6);
+        int system_management_id = TS_GM16(ptr + 0, 0, 8);
+        int broadcasting_flag = TS_GM16(ptr + 0, 8, 2);
+        int broadcasting_identifier = TS_GM16(ptr + 0, 10, 6);
 
         std::string flag;
         std::string identifier;
@@ -3781,7 +3781,7 @@ class PSIParser : public jevent::DemuxListener {
           identifier = "Not specified";
         }
 
-        printf("\t\t:: system management id:[0x%04x] {broadcasting_id:[%s], broadcasting identified:[%s]}\n", system_management_id, flag.c_str(), identifier.c_str());
+        printf("\t\t:: system management id:[0x%02x] {broadcasting_id:[%s], broadcasting identified:[%s]}\n", system_management_id, flag.c_str(), identifier.c_str());
 
         int count = (descriptor_length - 2);
 
