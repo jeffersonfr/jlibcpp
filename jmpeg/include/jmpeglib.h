@@ -82,6 +82,7 @@
 #define TS_SDTT_PID 0x23
 #define TS_BIT_PID 0x24
 #define TS_CDT_PID 0x29
+#define TS_NULL_PID 0x1fff
 
 #define TS_PSI_HEADER_LENGTH 8
 
