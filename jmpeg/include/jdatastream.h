@@ -114,6 +114,12 @@ class DataStream : public jcommon::Object {
      * \brief
      *
      */
+    std::vector<uint8_t> GetBitsAsArray(size_t n);
+
+    /**
+     * \brief
+     *
+     */
     std::string GetBitsAsString(size_t n);
     
     /**

@@ -177,6 +177,53 @@ uint64_t DataStream::GetBits(size_t n)
   return bits;
 }
 
+std::vector<uint8_t> DataStream::GetBitsAsArray(size_t n)
+{
+  if ((_data_index + _data_index_lo + n) > _data_index_hi) {
+    throw jexception::OverflowException("Get overflow");
+  }
+
+  if (n > 64L) {
+    throw jexception::OutOfBoundsException("Maximum limit was exceded");
+  }
+
+  if (n == 0) {
+    return {};
+  }
+
+  std::vector<uint8_t>
+    bits;
+  uint8_t 
+    *ptr = (uint8_t *)_data.data();
+  size_t 
+    start = 0,
+    end = 0;
+
+  do {
+    start = (_data_index_lo + _data_index) >> 3;
+    end = (_data_index_lo + _data_index + n - 1) >> 3;
+
+    if (start == end) {
+      bits.push_back(TS_GM8(ptr + start, (_data_index_lo + _data_index)%8, n));
+
+      _data_index = _data_index + n;
+
+      n = 0;
+    } else {
+      size_t 
+        d = 8 - (_data_index_lo + _data_index%8);
+
+      bits.push_back(TS_GM8(ptr + start, (_data_index_lo + _data_index)%8, d));
+
+      _data_index = _data_index + d;
+
+      n = n - d;
+    }
+  } while (n > 0);
+
+  return bits;
+}
+
 std::string DataStream::GetBitsAsString(size_t n)
 {
   std::string bits;

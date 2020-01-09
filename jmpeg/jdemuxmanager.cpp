@@ -181,7 +181,7 @@ void DemuxManager::ProcessPSI(const char *data, const int length)
   std::string previous;
   int section_length = -1;
 
-  // INFO:: the second part of if fixed a problem with some generated dsmcc-data
+  // INFO:: the second part of this "if" fixed a problem with some generated dsmcc-data
   if (payload_unit_start_indicator == 1 or timeline[pid].size() == 0) {
     int pointer_field = TS_G8(ptr);
 

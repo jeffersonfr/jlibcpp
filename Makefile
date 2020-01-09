@@ -57,6 +57,8 @@ OBJS_jevent += \
   jdatalistener.o\
   jdemuxevent.o\
   jdemuxlistener.o\
+	jendofstreamevent.o\
+	jendofstreamlistener.o\
   jeventobject.o\
   jfocusevent.o\
   jfocuslistener.o\
