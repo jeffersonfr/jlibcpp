@@ -846,6 +846,8 @@ std::string GetDescriptorName(int descriptor_tag)
     return "reserved";
   } else if (descriptor_tag >= 0x80 && descriptor_tag <= 0xcf) {
     if (descriptor_tag == 0xa3) {
+      return "logical channel descriptor";
+    } else if (descriptor_tag == 0xa3) {
       return "component name descriptor - ATSC A/65A, ATSC Working Draft";
     }
 

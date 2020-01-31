@@ -58,8 +58,12 @@ NetworkInterface::NetworkInterface(NetworkInterface *parent, std::string name, i
   
   req.ifr_ifindex = _index;
 
+  if (_name.size() >= 16) {
+    _name = _name.substr(0, 16);
+  }
+
   // mac address
-  strncpy(req.ifr_name, _name.c_str(), 16);
+  strcpy(req.ifr_name, _name.c_str());
   if (ioctl(sock, SIOCGIFHWADDR, &req) >= 0) {
     uint8_t *hwaddr = (uint8_t *)req.ifr_hwaddr.sa_data;
 
@@ -69,25 +73,25 @@ NetworkInterface::NetworkInterface(NetworkInterface *parent, std::string name, i
   }
     
   // set or get MTU  (usa ifr_name)
-  strncpy(req.ifr_name, _name.c_str(), 16);
+  strcpy(req.ifr_name, _name.c_str());
   if (ioctl(sock, SIOCGIFMTU, &req) >= 0) {
     _mtu = req.ifr_mtu;
   }
 
   // CHANGE:: set or get queue (usa ifr_name)
-  strncpy(req.ifr_name, _name.c_str(), 16);
+  strcpy(req.ifr_name, _name.c_str());
   if (ioctl(sock, SIOCGIFTXQLEN, &req) >= 0) {
     // int queue_length = req.ifr_qlen;
   }
 
   // CHANGE:: set or get metric (usa ifr_name)
-  strncpy(req.ifr_name, _name.c_str(), 16);
+  strcpy(req.ifr_name, _name.c_str());
   if (ioctl(sock, SIOCGIFMETRIC, &req) >= 0) {
     _metric = req.ifr_metric;
   }
 
   // CHANGE:: set or get map (usa ifr_name)
-  strncpy(req.ifr_name, _name.c_str(), 16);
+  strcpy(req.ifr_name, _name.c_str());
   if (ioctl(sock, SIOCGIFMAP, &req) >= 0) {
     _dma = req.ifr_map.dma;
     // int port = req.ifr_map.port;
@@ -96,7 +100,7 @@ NetworkInterface::NetworkInterface(NetworkInterface *parent, std::string name, i
   }
 
   // CHANGE:: set or get Flags  (usa ifr_name)
-  strncpy(req.ifr_name, _name.c_str(), 16);
+  strcpy(req.ifr_name, _name.c_str());
   if (ioctl(sock, SIOCGIFFLAGS, &req) >= 0) {
     _flags = req.ifr_flags;
   }

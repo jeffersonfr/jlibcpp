@@ -3381,6 +3381,15 @@ class PSIParser : public jevent::DemuxListener {
         if (private_length > 0) {
           DumpBytes("Additional Info", ptr, private_length);
         }
+      } else if (descriptor_tag == 0x83) { // logical channel descriptor
+        for (int i=0; i<descriptor_length/4; i++) {
+          int service_id = TS_G16(ptr + 0);
+          int channel_number = TS_G16(ptr + 2);
+
+          printf("\t\t:: service id:[0x%04x], channel number:[%04d]\n", service_id, channel_number);
+
+          ptr = ptr + 4;
+        }
       } else if (descriptor_tag == 0xa3) { // component name descriptor [ATSC A/65A, ATSC Working Draft]
         // int reserved = TS_GM8(ptr + 0, 0, 4);
         int number_strings = TS_G8(ptr + 0);
@@ -5303,11 +5312,15 @@ class PSIParser : public jevent::DemuxListener {
             
         param->DownloadID(download_id);
 
+        size_t module_size_total = 0;
+
         for (int i=0; i<number_of_modules; i++) {
           int module_id = TS_G16(ptr + 0);
           uint32_t module_size = TS_G32(ptr + 2);
           int module_version = TS_G8(ptr + 6);
           // int module_info_length = TS_G8(ptr + 7);
+
+          module_size_total = module_size_total + module_size;
 
           param->Module(download_id, module_id, module_size, module_version, block_size);
 
@@ -5349,6 +5362,8 @@ class PSIParser : public jevent::DemuxListener {
 
           ptr = ptr + 1 + user_info_length;
         }
+
+        printf("DSMCC:DownloadInfoIndication<DII>: module size total: %lu\n", module_size_total);
 
         int private_data_length = TS_G16(ptr + 0);
 

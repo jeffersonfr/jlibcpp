@@ -127,8 +127,9 @@ void Demux::DispatchDemuxEvent(jevent::DemuxEvent *event)
     return;
   }
 
-  int k = 0,
-      size = (int)_demux_listeners.size();
+  int 
+    k = 0,
+    size = (int)_demux_listeners.size();
 
   while (k++ < (int)_demux_listeners.size() && event->IsConsumed() == false) {
     jevent::DemuxListener *listener = _demux_listeners[k-1];

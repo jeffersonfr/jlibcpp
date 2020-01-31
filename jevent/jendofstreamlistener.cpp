@@ -17,42 +17,22 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jmpeg/jpesdemux.h"
-#include "jmpeg/jdemuxmanager.h"
-#include "jmpeg/jmpeglib.h"
-#include "jmath/jcrc.h"
+#include "jevent/jendofstreamlistener.h"
 
-#include <algorithm>
+namespace jevent {
 
-namespace jmpeg {
-
-PESDemux::PESDemux():
-  jmpeg::Demux(JDT_PES)
+EndOfStreamListener::EndOfStreamListener():
+  jcommon::Object()
 {
-  jcommon::Object::SetClassName("jmpeg::PESDemux");
+  jcommon::Object::SetClassName("jevent::EndOfStreamListener");
 }
-    
-PESDemux::~PESDemux()
+
+EndOfStreamListener::~EndOfStreamListener()
 {
 }
 
-bool PESDemux::Parse(const char *data, int data_length)
+void EndOfStreamListener::EndOfStreamReached(EndOfStreamEvent *event)
 {
-  if (data_length < 5) {
-    return false;
-  }
-
-  if (data[0] != 0x00 or data[1] != 0x00 or data[2] != 0x01) {
-    return false;
-  }
-
-  uint16_t length = TS_G16(data + 4) + 6;
-
-  if (data_length < length) {
-    return false;
-  }
-
-  return true;
 }
 
 }

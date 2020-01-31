@@ -185,7 +185,7 @@ static bool xpm_load(jio::InputStream *stream, uint8_t **image, int *width, int 
 					char code[chars_per_pixel+1];
 
 					for (int i=0; i<(int)columns_tot; i++) {
-						strncpy(code, buffer+i*chars_per_pixel, chars_per_pixel);
+						strncpy(code, buffer + i*chars_per_pixel, chars_per_pixel);
 
 						code[chars_per_pixel] = '\0';
 						data[rows*columns_tot + i] = palette[code];

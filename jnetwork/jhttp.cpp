@@ -418,7 +418,7 @@ bool HTTP::Parsear()
           r.codigo = 414;
           return true;
         }
-        strncpy(&arquivo[filetam++], " ", 1);
+        strcpy(&arquivo[filetam++], " ");
         strncpy(&arquivo[filetam], lexeme, lextam);
         filetam += lextam;
         arquivo[filetam] = 0;
