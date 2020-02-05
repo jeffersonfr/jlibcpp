@@ -312,6 +312,10 @@ void VideoGrabber::Configure(int width, int height)
 
 void VideoGrabber::ReleaseDevice()
 {
+  if (_buffers == nullptr) {
+    return;
+  }
+
 	unsigned int i;
 
 	switch (_method) {
@@ -332,6 +336,8 @@ void VideoGrabber::ReleaseDevice()
 	}
 
 	free(_buffers);
+
+  _buffers = nullptr;
 
 	if (-1 == close(_handler))
 		ExceptionHandler("close");
@@ -532,11 +538,18 @@ void VideoGrabber::Resume()
 
 void VideoGrabber::Stop()
 {
+  if (_running == false) {
+    return;
+  }
+
 	enum v4l2_buf_type type;
 
 	_running = false;
 
-  _thread.join();
+  try {
+    _thread.join();
+  } catch (std::system_error &e) {
+  }
 
 	switch (_method) {
 		case IO_METHOD_READ:
