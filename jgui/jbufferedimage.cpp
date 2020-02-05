@@ -617,12 +617,10 @@ Image * BufferedImage::Flip(jflip_flags_t mode)
   cairo_set_source_surface(context, _cairo_surface, 0, 0);
   cairo_paint(context);
 
-  cairo_destroy(context);
-  // TODO:: cairo_surface_destroy(surface);
-
   jgui::Image *tmp = new BufferedImage(surface);
 
   cairo_destroy(context);
+  cairo_surface_destroy(surface);
 
   return tmp;
 }
