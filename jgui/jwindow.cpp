@@ -43,18 +43,13 @@ Window::Window(Window *window):
   _instance = nullptr;
 }
 
-Window::Window(int width, int height):
-  Window(0, 0, width, height)
-{
-}
-
-Window::Window(int x, int y, int width, int height):
-  Container(x, y, width, height)
+Window::Window(jgui::jsize_t<int> size, jgui::jpoint_t<int> point):
+  Container({point, size})
 {
   jcommon::Object::SetClassName("jgui::Window");
 
 #ifdef JGUI_UI
-  _instance = new NativeWindow(x, y, width, height);
+  _instance = new NativeWindow(point.x, point.y, size.width, size.height);
 #endif
   
   _instance->SetParent(this);

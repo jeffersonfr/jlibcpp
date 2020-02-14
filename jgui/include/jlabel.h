@@ -49,7 +49,7 @@ class Label : public jgui::Component {
      * \brief
      *
      */
-    Label(std::string text, int x = 0, int y = 0, int width = DEFAULT_COMPONENT_WIDTH, int height = DEFAULT_COMPONENT_HEIGHT);
+    Label(std::string text, jgui::jrect_t<int> bounds = {0, 0, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT});
     
     /**
      * \brief

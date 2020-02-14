@@ -25,7 +25,7 @@
 namespace jgui {
 
 CalendarDialog::CalendarDialog(Container *parent):
-  jgui::Dialog(parent, "Calendar")
+  jgui::Dialog("Calendar", parent)
 {
   jcommon::Object::SetClassName("jgui::CalendarDialog");
 
@@ -46,7 +46,7 @@ CalendarDialog::CalendarDialog(Container *parent):
     dx = DEFAULT_COMPONENT_HEIGHT + 2,
     dy = DEFAULT_COMPONENT_HEIGHT + 2;
 
-  _syear = new Spin(insets.left, insets.top + 0*dy, 7*dx - 2, DEFAULT_COMPONENT_HEIGHT);
+  _syear = new Spin({insets.left, insets.top + 0*dy, 7*dx - 2, DEFAULT_COMPONENT_HEIGHT});
 
   for (int i=1900; i<2199; i++) {
     sprintf(tmp, "%d", i);
@@ -57,7 +57,7 @@ CalendarDialog::CalendarDialog(Container *parent):
   _syear->SetLoop(true);
   _syear->RegisterSelectListener(this);
 
-  _smonth = new Spin(insets.left, insets.top + 1*dy, 7*dx - 2, DEFAULT_COMPONENT_HEIGHT);
+  _smonth = new Spin({insets.left, insets.top + 1*dy, 7*dx - 2, DEFAULT_COMPONENT_HEIGHT});
 
   _smonth->AddTextItem("Janeiro");
   _smonth->AddTextItem("Fevereiro");
@@ -75,13 +75,13 @@ CalendarDialog::CalendarDialog(Container *parent):
   _smonth->SetLoop(true);
   _smonth->RegisterSelectListener(this);
 
-  _ldom = new Label("D", insets.left + 0*dx, insets.top + 2*dy, DEFAULT_COMPONENT_HEIGHT, DEFAULT_COMPONENT_HEIGHT);
-  _lseg = new Label("S", insets.left + 1*dx, insets.top + 2*dy, DEFAULT_COMPONENT_HEIGHT, DEFAULT_COMPONENT_HEIGHT);
-  _lter = new Label("T", insets.left + 2*dx, insets.top + 2*dy, DEFAULT_COMPONENT_HEIGHT, DEFAULT_COMPONENT_HEIGHT);
-  _lqua = new Label("Q", insets.left + 3*dx, insets.top + 2*dy, DEFAULT_COMPONENT_HEIGHT, DEFAULT_COMPONENT_HEIGHT);
-  _lqui = new Label("Q", insets.left + 4*dx, insets.top + 2*dy, DEFAULT_COMPONENT_HEIGHT, DEFAULT_COMPONENT_HEIGHT);
-  _lsex = new Label("S", insets.left + 5*dx, insets.top + 2*dy, DEFAULT_COMPONENT_HEIGHT, DEFAULT_COMPONENT_HEIGHT);
-  _lsab = new Label("S", insets.left + 6*dx, insets.top + 2*dy, DEFAULT_COMPONENT_HEIGHT, DEFAULT_COMPONENT_HEIGHT);
+  _ldom = new Label("D", {insets.left + 0*dx, insets.top + 2*dy, DEFAULT_COMPONENT_HEIGHT, DEFAULT_COMPONENT_HEIGHT});
+  _lseg = new Label("S", {insets.left + 1*dx, insets.top + 2*dy, DEFAULT_COMPONENT_HEIGHT, DEFAULT_COMPONENT_HEIGHT});
+  _lter = new Label("T", {insets.left + 2*dx, insets.top + 2*dy, DEFAULT_COMPONENT_HEIGHT, DEFAULT_COMPONENT_HEIGHT});
+  _lqua = new Label("Q", {insets.left + 3*dx, insets.top + 2*dy, DEFAULT_COMPONENT_HEIGHT, DEFAULT_COMPONENT_HEIGHT});
+  _lqui = new Label("Q", {insets.left + 4*dx, insets.top + 2*dy, DEFAULT_COMPONENT_HEIGHT, DEFAULT_COMPONENT_HEIGHT});
+  _lsex = new Label("S", {insets.left + 5*dx, insets.top + 2*dy, DEFAULT_COMPONENT_HEIGHT, DEFAULT_COMPONENT_HEIGHT});
+  _lsab = new Label("S", {insets.left + 6*dx, insets.top + 2*dy, DEFAULT_COMPONENT_HEIGHT, DEFAULT_COMPONENT_HEIGHT});
 
   jgui::Theme
     *theme = jgui::Theme::GetDefaultTheme();
@@ -332,7 +332,7 @@ void CalendarDialog::BuildCalendar()
 
     sprintf(tmp, "%d", (i+1));
 
-    button = new Button(tmp, insets.left + dx*first_day, insets.top + dy*k + 16, DEFAULT_COMPONENT_HEIGHT, DEFAULT_COMPONENT_HEIGHT);
+    button = new Button(tmp, {insets.left + dx*first_day, insets.top + dy*k + 16, DEFAULT_COMPONENT_HEIGHT, DEFAULT_COMPONENT_HEIGHT});
 
     first_day = ((first_day + 1)%7);
 

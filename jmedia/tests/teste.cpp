@@ -82,7 +82,7 @@ class PlayerTest : public jgui::Window, public jevent::PlayerListener, public je
 
 	public:
 		PlayerTest(std::string file):
-			jgui::Window(720, 480)
+			jgui::Window({720, 480})
 		{
 			jgui::jsize_t size = GetSize();
 

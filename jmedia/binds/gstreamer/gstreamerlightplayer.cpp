@@ -50,7 +50,7 @@ class GStreamerPlayerComponentImpl : public jgui::Component {
 
 	public:
 		GStreamerPlayerComponentImpl(Player *player, int x, int y, int width, int height):
-			jgui::Component(x, y, width, height)
+			jgui::Component({x, y, width, height})
 		{
 			_buffer = nullptr;
 			

@@ -245,7 +245,7 @@ class Component : public jevent::KeyListener, public jevent::MouseListener {
      * \brief
      *
      */
-    Component(int x = 0, int y = 0, int width = 0, int height = 0);
+    Component(jgui::jrect_t<int> bounds = {0, 0, 0, 0});
     
     /**
      * \brief

@@ -36,7 +36,7 @@ class ScreenLayer : public jgui::Container {
 
 	public:
 		ScreenLayer():
-			jgui::Container(0, 0, 1920, 1080)
+			jgui::Container({0, 0, 1920, 1080})
 		{
       _theme.SetIntegerParam("component.bg", uint32_t(jgui::jcolor_name_t::Black));
 
@@ -174,11 +174,11 @@ class GraphicLayer : public ScreenLayer {
       jgui::jsize_t
         t = GetSize();
 
-			_user_container = new jgui::Container(0, 0, t.width, t.height);
+			_user_container = new jgui::Container({0, 0, t.width, t.height});
 			_user_container->SetParent(this);
 			_user_container->SetBackgroundVisible(false);
 			
-			_system_container = new jgui::Container(0, 0, t.width, t.height);
+			_system_container = new jgui::Container({0, 0, t.width, t.height});
 			_system_container->SetParent(this);
 			_system_container->SetBackgroundVisible(false);
 		}
@@ -246,7 +246,7 @@ class LayersManager : public jgui::Window {
 
 	private:
 		LayersManager():
-			jgui::Window(0, 0, 1920, 1080)
+			jgui::Window({1920, 1080})
 		{
 			_background_layer = new BackgroundLayer();
 			_video_layer = new VideoLayer();
@@ -345,7 +345,7 @@ class Scene : public jgui::Container {
 
 	public:
 		Scene(int x, int y, int width, int height):
-			jgui::Container(x, y, width, height)
+			jgui::Container({x, y, width, height})
 		{
 			LayersManager::GetInstance()->GetGraphicLayer()->GetUserContainer()->Add(this);
 			
@@ -493,13 +493,13 @@ class MenuTest : public Scene {
 			_malpha = 0.0;
 			_mstate = 0;
 			
-			Add(_label = new jgui::Label("Reposicionamento do Video", 10, 10, 960-2*10, 100));
+			Add(_label = new jgui::Label("Reposicionamento do Video", {10, 10, 960-2*10, 100}));
 
 			_label->SetBackgroundVisible(false);
 
-			Add(_button1 = new jgui::Button("Full Screen", (960-400)/2, 0*(100+10)+180, 400, 100));
-			Add(_button2 = new jgui::Button("Stretched Screen", (960-400)/2, 1*(100+10)+180, 400, 100));
-			Add(_button3 = new jgui::Button("Exit", (960-400)/2, 2*(100+10)+180, 400, 100));
+			Add(_button1 = new jgui::Button("Full Screen", {(960-400)/2, 0*(100+10)+180, 400, 100}));
+			Add(_button2 = new jgui::Button("Stretched Screen", {(960-400)/2, 1*(100+10)+180, 400, 100}));
+			Add(_button3 = new jgui::Button("Exit", {(960-400)/2, 2*(100+10)+180, 400, 100}));
 		}
 
 		virtual ~MenuTest()

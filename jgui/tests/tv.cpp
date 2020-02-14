@@ -28,7 +28,7 @@ class TV : public jgui::Window {
 
 	public:
 		TV():
-			jgui::Window(0, 0, 320, 240)
+			jgui::Window({320, 240})
 		{
 		}
 

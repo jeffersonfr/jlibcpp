@@ -33,7 +33,7 @@ class PorterTeste : public jgui::Window {
 
 	public:
 		PorterTeste():
-			jgui::Window(/*"Porter Teste", */0, 0, 1280, 960)
+			jgui::Window(/*"Porter Teste", */ {1280, 960})
 		{
 			_is_drawimage = true;
 

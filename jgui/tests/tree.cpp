@@ -214,7 +214,7 @@ class Tree : public jgui::Window {
 
   public:
     Tree():
-      jgui::Window(1600, 900)
+      jgui::Window(jgui::jsize_t<int>{1600, 900})
     {
     }
 

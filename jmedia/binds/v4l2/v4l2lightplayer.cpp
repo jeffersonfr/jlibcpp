@@ -55,7 +55,7 @@ class V4l2PlayerComponentImpl : public jgui::Component {
 
 	public:
 		V4l2PlayerComponentImpl(Player *player, int x, int y, int w, int h):
-			jgui::Component(x, y, w, h)
+			jgui::Component({x, y, w, h})
 		{
 			_buffer = nullptr;
 

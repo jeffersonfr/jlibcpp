@@ -417,7 +417,7 @@ class Render3D : public jgui::Window {
 
 	public:
 		Render3D(std::string path):
-			jgui::Window(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
+			jgui::Window({SCREEN_WIDTH, SCREEN_HEIGHT})
 		{
       LoadIt(path);
 

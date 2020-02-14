@@ -81,7 +81,7 @@ class TextComponent : public jgui::Component {
      * \brief
      *
      */
-    TextComponent(int x, int y, int width, int height);
+    TextComponent(jgui::jrect_t<int> bounds = {0, 0, 0, 0});
     
     /**
      * \brief

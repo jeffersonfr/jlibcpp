@@ -81,7 +81,7 @@ class Mines : public jgui::Window {
 };
 
 Mines::Mines(int x, int y):
-	jgui::Window(720, 480)
+	jgui::Window(jgui::jsize_t<int>{720, 480})
 {
 	srand((int)time(nullptr));
 

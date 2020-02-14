@@ -64,7 +64,7 @@ class SliderComponent : public jgui::Component {
      * \brief
      *
      */
-    SliderComponent(int x, int y, int width, int height);
+    SliderComponent(jgui::jrect_t<int> bounds = {0, 0, 0, 0});
     
     /**
      * \brief

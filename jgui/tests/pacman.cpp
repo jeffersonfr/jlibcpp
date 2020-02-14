@@ -115,7 +115,7 @@ class PacMan : public jgui::Window {
 	public:
 
 	PacMan():
-		jgui::Window(720, 720)
+		jgui::Window(jgui::jsize_t<int>{720, 720})
 	{
 		goff = nullptr;
 		ii = nullptr;

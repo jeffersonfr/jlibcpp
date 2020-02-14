@@ -166,7 +166,7 @@ class Test : public jgui::Window {
 
 	public:
 		Test():
-			jgui::Window(/*"Hough Test", */0, 0, 960, 540)
+			jgui::Window(/*"Hough Test", */ {960, 540})
 		{
 			_binary_threshold = 195;
 			_lines_threshold = 195;

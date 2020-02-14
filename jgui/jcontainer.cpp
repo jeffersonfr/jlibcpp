@@ -28,8 +28,8 @@
 
 namespace jgui {
 
-Container::Container(int x, int y, int width, int height):
-  jgui::Component(x, y, width, height)
+Container::Container(jgui::jrect_t<int> bounds):
+  jgui::Component(bounds)
 {
   jcommon::Object::SetClassName("jgui::Container");
 

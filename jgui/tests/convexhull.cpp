@@ -29,7 +29,7 @@ class ConvexHull : public jgui::Window {
 
 	public:
 		ConvexHull():
-			jgui::Window(0, 0, 720, 480)
+			jgui::Window({720, 480})
 		{
       srand(time(NULL));
 

@@ -54,7 +54,7 @@ class Mandelbrot : public jgui::Window {
 
 	public:
 		Mandelbrot():
-			jgui::Window(0, 0, MAX_WIDTH, MAX_HEIGHT)
+			jgui::Window({MAX_WIDTH, MAX_HEIGHT})
 		{
     	center = START_POS;
     	zoom = START_ZOOM;

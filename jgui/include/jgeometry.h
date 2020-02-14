@@ -113,12 +113,9 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return (x != param.x or y != param.y);
     }
 
-    jpoint_t<T> & operator-()
+    jpoint_t<T> operator-()
     {
-      x = -x;
-      y = -y;
-
-      return *this;
+      return {-x, -y};
     }
     
     template<typename U> jpoint_t<T> & operator=(const U &param)
@@ -349,12 +346,9 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return (p0 != param.p0 or p1 != param.p1);
     }
 
-    jline_t<T> & operator-()
+    jline_t<T> operator-()
     {
-      p0 = -p0;
-      p1 = -p1;
-
-      return *this;
+      return {-p0, -p1};
     }
 
     template<typename U> jline_t<T> & operator=(const U &param)
@@ -618,11 +612,9 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       };
     }
 
-    jcircle_t<T> & operator-()
+    jcircle_t<T> operator-()
     {
-      center = -center;
-
-      return *this;
+      return {-center, radius};
     }
 
     bool operator==(const jcircle_t<T> &param)
@@ -820,12 +812,9 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       };
     }
 
-    jsize_t<T> & operator-()
+    jsize_t<T> operator-()
     {
-      width = -width;
-      height = -height;
-
-      return *this;
+      return {-width, -height};
     }
     
     bool operator==(const jsize_t<T> &param)
@@ -992,12 +981,9 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return (point != param.point or size != param.size);
     }
 
-    jrect_t<T> & operator-()
+    jrect_t<T> operator-()
     {
-      point = -point;
-      size = -size;
-
-      return *this;
+      return {-point, -size};
     }
     
     jrect_t<T> & operator=(T param)

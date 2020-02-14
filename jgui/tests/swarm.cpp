@@ -49,7 +49,7 @@ class Main : public jgui::Window {
 
 	public:
 		Main(int n, int p):
-			jgui::Window(/*"Swarm Colony", */0, 0, 720, 480)
+			jgui::Window(/*"Swarm Colony", */ {720, 480})
 		{
       jgui::jsize_t
         size = GetSize();

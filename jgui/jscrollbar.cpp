@@ -22,8 +22,8 @@
 
 namespace jgui {
 
-ScrollBar::ScrollBar(int x, int y, int width, int height):
-  SliderComponent(x, y, width, height)
+ScrollBar::ScrollBar(jgui::jrect_t<int> bounds):
+  SliderComponent(bounds)
 {
   jcommon::Object::SetClassName("jgui::ScrollBar");
 

@@ -43,7 +43,7 @@ class Main : public jgui::Window {
 
 	public:
 		Main(int n, int p):
-			jgui::Window(720, 480)
+			jgui::Window(jgui::jsize_t<int>{720, 480})
 		{
 			_running = true;
 			_tx = 200;

@@ -25,7 +25,7 @@ class RectangleContainer : public jgui::Container {
 
 	public:
 		RectangleContainer(int x, int y, int w, int h):
-			jgui::Container(x, y, w, h)
+			jgui::Container({x, y, w, h})
 		{
 		}
 
@@ -59,11 +59,11 @@ class Main : public jgui::Window {
 
 	public:
 		Main(std::string title, int w, int h):
-			jgui::Window(/*title, */0, 0, w, h)
+			jgui::Window(/*title, */ {w, h})
 		{
 			_container1 = new RectangleContainer(100, 100, 400, 400);
 			_container2 = new RectangleContainer(100, 100, 400, 400);
-			_button1 = new jgui::Button("Testing Clipping", 200, 100, 300, 100);
+			_button1 = new jgui::Button("Testing Clipping", {200, 100, 300, 100});
 
 			_container2->Add(_button1);
 			_container1->Add(_container2);

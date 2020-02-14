@@ -30,7 +30,7 @@ class GraphicPanel : public jgui::Window {
 
 	public:
 		GraphicPanel():
-			jgui::Window(0, 0, 1600, 900)
+			jgui::Window({1600, 900})
 	{
 		srand(time(nullptr));
 

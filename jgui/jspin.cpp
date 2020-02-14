@@ -22,8 +22,8 @@
 
 namespace jgui {
 
-Spin::Spin(int x, int y, int width, int height):
-  Component(x, y, width, height),
+Spin::Spin(jgui::jrect_t<int> bounds):
+  Component(bounds),
   ItemComponent()
 {
   jcommon::Object::SetClassName("jgui::Spin");

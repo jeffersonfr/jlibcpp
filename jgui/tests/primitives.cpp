@@ -30,7 +30,7 @@ class Primitives : public jgui::Window {
 
 	public:
 		Primitives():
-			jgui::Window(1920, 1080)
+			jgui::Window(jgui::jsize_t<int>{1920, 1080})
 		{
       _index = 0;
 		}

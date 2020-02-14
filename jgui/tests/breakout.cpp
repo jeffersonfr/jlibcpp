@@ -67,7 +67,7 @@ class Breakout : public jgui::Window {
 
 	public:
 		Breakout():
-			jgui::Window(/*"BreakOut", */0, 0, 720, 480)
+			jgui::Window(/*"BreakOut", */ {720, 480})
 		{
 			off = nullptr;
 			goff = nullptr;

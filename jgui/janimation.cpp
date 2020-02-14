@@ -23,8 +23,8 @@
 
 namespace jgui {
 
-Animation::Animation(int x, int y, int width, int height):
-   Component(x, y, width, height)
+Animation::Animation(jgui::jrect_t<int> bounds):
+   Component(bounds)
 {
   SetClassName("jgui::Animation");
 

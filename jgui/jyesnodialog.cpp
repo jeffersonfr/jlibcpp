@@ -23,7 +23,7 @@
 namespace jgui {
 
 YesNoDialog::YesNoDialog(Container *parent, std::string title, std::string msg):
-  jgui::Dialog(parent, title, 0, 0, 560, 280)
+  jgui::Dialog(title, parent, {0, 0, 560, 280})
 {
   jcommon::Object::SetClassName("jgui::YesNoDialog");
 
@@ -32,14 +32,14 @@ YesNoDialog::YesNoDialog(Container *parent, std::string title, std::string msg):
   jgui::jinsets_t 
     insets = GetInsets();
 
-  _label = new Label(msg, insets.left, insets.top, size.width - insets.left - insets.right, 180);
+  _label = new Label(msg, {insets.left, insets.top, size.width - insets.left - insets.right, 180});
 
   _label->SetWrap(true);
   _label->SetHorizontalAlign(JHA_JUSTIFY);
   _label->SetVerticalAlign(JVA_TOP);
 
-  _no = new Button("No", size.width - insets.right - DEFAULT_COMPONENT_WIDTH, insets.top + 180 + 8, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
-  _yes = new Button("Yes", size.width - insets.right - 2*DEFAULT_COMPONENT_WIDTH - 8, insets.top + 180 + 8, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT);
+  _no = new Button("No", {size.width - insets.right - DEFAULT_COMPONENT_WIDTH, insets.top + 180 + 8, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT});
+  _yes = new Button("Yes", {size.width - insets.right - 2*DEFAULT_COMPONENT_WIDTH - 8, insets.top + 180 + 8, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT});
   
   _yes->RegisterActionListener(this);
   _no->RegisterActionListener(this);

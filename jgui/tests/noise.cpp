@@ -290,7 +290,7 @@ class Noise : public jgui::Window {
 
   public:
     Noise():
-      jgui::Window(1280, 720),
+      jgui::Window(jgui::jsize_t<int>{1280, 720}),
       net(6, 1)
     {
       srand(time(nullptr));

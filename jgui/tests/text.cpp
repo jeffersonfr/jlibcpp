@@ -5,7 +5,7 @@ class Text : public jgui::Window {
 
   public:
     Text():
-      jgui::Window(1600, 900)
+      jgui::Window(jgui::jsize_t<int>{1600, 900})
     {
     }
 

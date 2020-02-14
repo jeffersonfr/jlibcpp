@@ -23,8 +23,8 @@
 
 namespace jgui {
 
-TreeListView::TreeListView(int x, int y, int width, int height):
-  Component(x, y, width, height),
+TreeListView::TreeListView(jgui::jrect_t<int> bounds):
+  Component(bounds),
   ItemComponent()
 {
   jcommon::Object::SetClassName("jgui::TreeListView");

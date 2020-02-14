@@ -24,8 +24,8 @@
 
 namespace jgui {
 
-TextArea::TextArea(int x, int y, int width, int height):
-  jgui::TextComponent(x, y, width, height)
+TextArea::TextArea(jgui::jrect_t<int> bounds):
+  jgui::TextComponent(bounds)
 {
   jcommon::Object::SetClassName("jgui::TextArea");
 

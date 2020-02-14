@@ -22,8 +22,8 @@
 
 namespace jgui {
 
-Slider::Slider(int x, int y, int width, int height):
-     SliderComponent(x, y, width, height)
+Slider::Slider(jgui::jrect_t<int> bounds):
+     SliderComponent(bounds)
 {
   jcommon::Object::SetClassName("jgui::Slider");
 

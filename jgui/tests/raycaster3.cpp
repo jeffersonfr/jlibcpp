@@ -174,7 +174,7 @@ class GraphicsTeste : public jgui::Window {
 
 	public:
 		GraphicsTeste():
-			jgui::Window(/*"Graphics Teste", */0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
+			jgui::Window(/*"Graphics Teste", */ {SCREEN_WIDTH, SCREEN_HEIGHT})
 		{
 			posX = 22.0;
 			posY = 11.5; //x and y start position

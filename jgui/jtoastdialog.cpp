@@ -24,7 +24,7 @@
 namespace jgui {
 
 ToastDialog::ToastDialog(Container *parent, std::string msg, bool wrap):
-  jgui::Dialog(parent, 0, 0, 560, 280)
+  jgui::Dialog(parent, {0, 0, 560, 280})
 {
   jcommon::Object::SetClassName("jgui::ToastDialog");
 
@@ -33,7 +33,7 @@ ToastDialog::ToastDialog(Container *parent, std::string msg, bool wrap):
   jgui::jinsets_t 
     insets = GetInsets();
 
-  _label = new Label(msg, insets.left, insets.top, size.width - insets.left - insets.right, 180);
+  _label = new Label(msg, {insets.left, insets.top, size.width - insets.left - insets.right, 180});
 
   _label->SetWrap(true);
   _label->SetHorizontalAlign(JHA_JUSTIFY);

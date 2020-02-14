@@ -172,7 +172,7 @@ class RayTracer : public jgui::Window {
 
   public:
     RayTracer():
-      jgui::Window(0, 0, 720, 480)
+      jgui::Window({720, 480})
   {
     spheres.push_back(Sphere{v3f{-3.0f, 0.0f, -16.0f}, 2.0f, ivory});
     spheres.push_back(Sphere{v3f{-1.0f, -1.5f, -12.0f}, 2.0f, glass});

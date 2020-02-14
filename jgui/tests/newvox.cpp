@@ -193,7 +193,7 @@ class NewVox : public jgui::Window {
 
 	public:
 		NewVox():
-			jgui::Window(0, 0, MAXW, MAXH)
+			jgui::Window({MAXW, MAXH})
 		{
 			done = false;
 			a = 0; 

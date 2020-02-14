@@ -31,7 +31,7 @@ class RectangleContainer : public jgui::Container {
 
 	public:
 		RectangleContainer(int x, int y, int w, int h):
-			jgui::Container(x, y, w, h)
+			jgui::Container({x, y, w, h})
 		{
 		}
 
@@ -78,7 +78,7 @@ class Main : public jgui::Window, public jevent::ActionListener {
 
 	public:
 		Main():
-			jgui::Window(1280, 720)
+			jgui::Window({1280, 720})
 		{
 			SetLayout(_main = new jgui::GridLayout(2, 3));
 		
@@ -92,7 +92,7 @@ class Main : public jgui::Window, public jevent::ActionListener {
 			for (int i=0; i<6; i++) {
 				// _b.push_back(new jgui::Container(0, 0, 0, 0));
 				_b.push_back(new RectangleContainer(0, 0, 0, 0));
-				_c.push_back(new jgui::Container(0, 0, 0, 0));
+				_c.push_back(new jgui::Container());
 
 				_b[i]->SetLayout(new jgui::BorderLayout());
 				_b[i]->Add(_c[i], jgui::JBLA_CENTER);
@@ -108,36 +108,36 @@ class Main : public jgui::Window, public jevent::ActionListener {
 			_c[5]->SetLayout(_null);
 
 			// flowlayout
-			_c[0]->Add(new jgui::Button("Button 1", 0, 0, 100, 100));
-			_c[0]->Add(new jgui::Button("Button 2", 0, 0, 100, 100));
-			_c[0]->Add(new jgui::Button("Button 3", 0, 0, 100, 100));
-			_c[0]->Add(new jgui::Button("Button 4", 0, 0, 100, 100));
-			_c[0]->Add(new jgui::Button("Button 5", 0, 0, 100, 100));
+			_c[0]->Add(new jgui::Button("Button 1", {0, 0, 100, 100}));
+			_c[0]->Add(new jgui::Button("Button 2", {0, 0, 100, 100}));
+			_c[0]->Add(new jgui::Button("Button 3", {0, 0, 100, 100}));
+			_c[0]->Add(new jgui::Button("Button 4", {0, 0, 100, 100}));
+			_c[0]->Add(new jgui::Button("Button 5", {0, 0, 100, 100}));
 			
 			// gridlayout
-			_c[1]->Add(new jgui::Button("Button 1", 0, 0, 100, 100));
-			_c[1]->Add(new jgui::Button("Button 2", 0, 0, 100, 100));
-			_c[1]->Add(new jgui::Button("Button 3", 0, 0, 100, 100));
-			_c[1]->Add(new jgui::Button("Button 4", 0, 0, 100, 100));
-			_c[1]->Add(new jgui::Button("Button 5", 0, 0, 100, 100));
+			_c[1]->Add(new jgui::Button("Button 1", {0, 0, 100, 100}));
+			_c[1]->Add(new jgui::Button("Button 2", {0, 0, 100, 100}));
+			_c[1]->Add(new jgui::Button("Button 3", {0, 0, 100, 100}));
+			_c[1]->Add(new jgui::Button("Button 4", {0, 0, 100, 100}));
+			_c[1]->Add(new jgui::Button("Button 5", {0, 0, 100, 100}));
 
 			// gridlayout
-			_c[2]->Add(new jgui::Button("Button 1", 0, 0, 100, 100), jgui::JBLA_NORTH);
-			_c[2]->Add(new jgui::Button("Button 2", 0, 0, 100, 100), jgui::JBLA_SOUTH);
-			_c[2]->Add(new jgui::Button("Button 3", 0, 0, 100, 100), jgui::JBLA_WEST);
-			_c[2]->Add(new jgui::Button("Button 4", 0, 0, 100, 100), jgui::JBLA_EAST);
-			_c[2]->Add(new jgui::Button("Button 5", 0, 0, 100, 100), jgui::JBLA_CENTER);
+			_c[2]->Add(new jgui::Button("Button 1", {0, 0, 100, 100}), jgui::JBLA_NORTH);
+			_c[2]->Add(new jgui::Button("Button 2", {0, 0, 100, 100}), jgui::JBLA_SOUTH);
+			_c[2]->Add(new jgui::Button("Button 3", {0, 0, 100, 100}), jgui::JBLA_WEST);
+			_c[2]->Add(new jgui::Button("Button 4", {0, 0, 100, 100}), jgui::JBLA_EAST);
+			_c[2]->Add(new jgui::Button("Button 5", {0, 0, 100, 100}), jgui::JBLA_CENTER);
 
 			// cardlayout
-			_c.push_back(new jgui::Container(0, 0, 0, 0));
-			_c.push_back(new jgui::Container(0, 0, 0, 0));
+			_c.push_back(new jgui::Container());
+			_c.push_back(new jgui::Container());
 
 			_c[6]->SetLayout(new jgui::FlowLayout());
 
-			_first = new jgui::Button("First", 0, 0, 0, 0);
-			_next = new jgui::Button("Next", 0, 0, 0, 0);
-			_previous = new jgui::Button("Previous", 0, 0, 0, 0);
-			_last = new jgui::Button("Last", 0, 0, 0, 0);
+			_first = new jgui::Button("First");
+			_next = new jgui::Button("Next");
+			_previous = new jgui::Button("Previous");
+			_last = new jgui::Button("Last");
 
 			_c[6]->Add(_first);
 			_c[6]->Add(_next);
@@ -150,10 +150,10 @@ class Main : public jgui::Window, public jevent::ActionListener {
 			_last->RegisterActionListener(this);
 
 			_c[7]->SetLayout(new jgui::CardLayout());
-			_c[7]->Add(new jgui::Button("First Screen", 0, 0, 100, 100), "01");
-			_c[7]->Add(new jgui::Button("Second Screen", 0, 0, 100, 100), "02");
-			_c[7]->Add(new jgui::Button("Third Screen", 0, 0, 100, 100), "03");
-			_c[7]->Add(new jgui::Button("Last Screen", 0, 0, 100, 100), "04");
+			_c[7]->Add(new jgui::Button("First Screen", {0, 0, 100, 100}), "01");
+			_c[7]->Add(new jgui::Button("Second Screen", {0, 0, 100, 100}), "02");
+			_c[7]->Add(new jgui::Button("Third Screen", {0, 0, 100, 100}), "03");
+			_c[7]->Add(new jgui::Button("Last Screen", {0, 0, 100, 100}), "04");
 
 			_b[3]->Add(_c[6], jgui::JBLA_EAST);
 			_b[3]->Add(_c[7], jgui::JBLA_CENTER);
@@ -212,19 +212,19 @@ class Main : public jgui::Window, public jevent::ActionListener {
 			_c[4]->Add(new jgui::Button("Button 5"), c);
 
 			// nulllayout
-			_c[5]->Add(new jgui::Button("Button 1", 0*40, 0*(DEFAULT_COMPONENT_HEIGHT+10)));
-			_c[5]->Add(new jgui::Button("Button 2", 1*40, 1*(DEFAULT_COMPONENT_HEIGHT+10)));
-			_c[5]->Add(new jgui::Button("Button 3", 2*40, 2*(DEFAULT_COMPONENT_HEIGHT+10)));
-			_c[5]->Add(new jgui::Button("Button 4", 3*40, 3*(DEFAULT_COMPONENT_HEIGHT+10)));
-			_c[5]->Add(new jgui::Button("Button 5", 4*40, 4*(DEFAULT_COMPONENT_HEIGHT+10)));
+			_c[5]->Add(new jgui::Button("Button 1", {0*40, 0*(DEFAULT_COMPONENT_HEIGHT+10)}));
+			_c[5]->Add(new jgui::Button("Button 2", {1*40, 1*(DEFAULT_COMPONENT_HEIGHT+10)}));
+			_c[5]->Add(new jgui::Button("Button 3", {2*40, 2*(DEFAULT_COMPONENT_HEIGHT+10)}));
+			_c[5]->Add(new jgui::Button("Button 4", {3*40, 3*(DEFAULT_COMPONENT_HEIGHT+10)}));
+			_c[5]->Add(new jgui::Button("Button 5", {4*40, 4*(DEFAULT_COMPONENT_HEIGHT+10)}));
 			
 			// adicionando a legenda nos containers
-			jgui::Label *l1 = new jgui::Label("FlowLayout", 0, 0, 0, 0),
-				*l2 = new jgui::Label("GridLayout", 0, 0, 0, 0),
-				*l3 = new jgui::Label("BorderLayout", 0, 0, 0, 0),
-				*l4 = new jgui::Label("CardLayout", 0, 0, 0, 0),
-				*l5 = new jgui::Label("GridBagLayout", 0, 0, 0, 0),
-				*l6 = new jgui::Label("NullLayout", 0, 0, 0, 0);
+			jgui::Label *l1 = new jgui::Label("FlowLayout"),
+				*l2 = new jgui::Label("GridLayout"),
+				*l3 = new jgui::Label("BorderLayout"),
+				*l4 = new jgui::Label("CardLayout"),
+				*l5 = new jgui::Label("GridBagLayout"),
+				*l6 = new jgui::Label("NullLayout");
 			
 			_theme.SetIntegerParam("component.bg", 0xff404040);
 			

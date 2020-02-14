@@ -25,8 +25,8 @@
 
 namespace jgui {
 
-TextComponent::TextComponent(int x, int y, int width, int height):
-  jgui::Component(x, y, width, height)
+TextComponent::TextComponent(jgui::jrect_t<int> bounds):
+  jgui::Component(bounds)
 {
   jcommon::Object::SetClassName("jgui::TextComponent");
 

@@ -164,7 +164,7 @@ class Scene : public jgui::Window {
 
   public:
     Scene():
-      jgui::Window(0, 0, 720, 480)
+      jgui::Window({720, 480})
     {
       _barriers.emplace_back(jgui::jline_t<int>{{0, 0}, {720, 0}});
       _barriers.emplace_back(jgui::jline_t<int>{{720, 0}, {720, 480}});

@@ -33,7 +33,7 @@ class Terrain : public jgui::Window {
 
 	public:
 		Terrain():
-			jgui::Window(0, 0, 720, 480)
+			jgui::Window({720, 480})
 		{
       _buffer = new jgui::BufferedImage(jgui::JPF_RGB32, {720, 480});
 		}

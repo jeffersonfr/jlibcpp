@@ -22,8 +22,8 @@
 
 namespace jgui {
 
-ProgressBar::ProgressBar(int x, int y, int width, int height, jscroll_orientation_t type):
-     Component(x, y, width, height)
+ProgressBar::ProgressBar(jgui::jrect_t<int> bounds, jscroll_orientation_t type):
+     Component(bounds)
 {
   jcommon::Object::SetClassName("jgui::ProgressBar");
 

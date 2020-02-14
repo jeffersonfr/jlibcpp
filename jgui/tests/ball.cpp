@@ -197,7 +197,7 @@ class BallDrop : public jgui::Window {
 
 	public:
 		BallDrop():
-			jgui::Window(0, 0, 720, 480)
+			jgui::Window({720, 480})
 		{
 			jgui::Image 
         *image;

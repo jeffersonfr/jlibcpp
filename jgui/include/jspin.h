@@ -48,7 +48,7 @@ class Spin : public jgui::Component, public jgui::ItemComponent {
      * \brief
      *
      */
-    Spin(int x = 0, int y = 0, int width = DEFAULT_COMPONENT_WIDTH, int height = DEFAULT_COMPONENT_HEIGHT);
+    Spin(jgui::jrect_t<int> bounds = {0, 0, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT});
     
     /**
      * \brief

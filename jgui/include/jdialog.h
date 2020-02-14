@@ -53,13 +53,13 @@ class Dialog : public jgui::Container {
      * \brief
      *
      */
-    Dialog(Container *parent, int x = 0, int y = 0, int width = 0, int height = 0);
+    Dialog(Container *parent, jgui::jrect_t<int> bounds = {0, 0, 0, 0});
     
     /**
      * \brief
      *
      */
-    Dialog(Container *parent, std::string title, int x = 0, int y = 0, int width = 0, int height = 0);
+    Dialog(std::string title, Container *parent, jgui::jrect_t<int> bounds = {0, 0, 0, 0});
     
     /**
      * \brief

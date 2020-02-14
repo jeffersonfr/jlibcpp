@@ -360,7 +360,7 @@ void DemuxManager::ProcessPES(const char *data, const int length)
         stream_id != 0b11111000) { // ITU-T Rec. H.222.1 type E stream
       section_length = section_length + pes_packet_length;
     } else if (stream_id == 0b10111110) { // padding_stream
-      // section_length = section_length + padding bytes;
+      section_length = section_length + (end - ptr - 5);
     }
 
     if (section_length > 0) {

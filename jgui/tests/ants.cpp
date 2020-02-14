@@ -80,7 +80,7 @@ class Main : public jgui::Window {
 		Main(int r)
 #else
 		Main(int r):
-			jgui::Window(/* "Ant Colony", */ 0, 0, MAX_COLS*(BLOCK_WIDTH+BLOCK_GAP), MAX_ROWS*(BLOCK_HEIGHT+BLOCK_GAP))
+			jgui::Window(/* "Ant Colony", */ {MAX_COLS*(BLOCK_WIDTH+BLOCK_GAP), MAX_ROWS*(BLOCK_HEIGHT+BLOCK_GAP)})
 #endif
 		{
 #if ENABLE_GUI == 1

@@ -40,13 +40,13 @@ class Panel : public Container {
      * \brief
      *
      */
-    Panel(int x = 0, int y = 0, int width = 0, int height = 0);
+    Panel(jgui::jrect_t<int> bounds = {0, 0, 0, 0});
     
     /**
      * \brief
      *
      */
-    Panel(std::string title, int x = 0, int y = 0, int width = 0, int height = 0);
+    Panel(std::string title, jgui::jrect_t<int> bounds = {0, 0, 0, 0});
     
     /**
      * \brief

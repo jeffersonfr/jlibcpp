@@ -72,7 +72,7 @@ class Tetris : public jgui::Window {
 
   public:
 		Tetris():
-			jgui::Window(0, 0, 320, 480)
+			jgui::Window({320, 480})
 		{
       s1 = new jgui::BufferedImage("images/tetris/tiles.png");
       s2 = new jgui::BufferedImage("images/tetris/background.png");

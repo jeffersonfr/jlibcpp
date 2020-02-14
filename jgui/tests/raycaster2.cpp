@@ -67,7 +67,7 @@ class GraphicsTeste : public jgui::Window {
 
 	public:
 		GraphicsTeste():
-			jgui::Window(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
+			jgui::Window({SCREEN_WIDTH, SCREEN_HEIGHT})
 		{
 			posX = 22;
 			posY = 12;

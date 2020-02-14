@@ -45,7 +45,7 @@ class Icon : public jgui::Component {
      * \brief
      *
      */
-    Icon(jgui::Image *image, int x = 0, int y = 0, int width = 0, int height = 0);
+    Icon(jgui::Image *image, jgui::jrect_t<int> bounds = {0, 0, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT});
     
     /**
      * \brief

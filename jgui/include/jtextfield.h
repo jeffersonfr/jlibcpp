@@ -38,7 +38,7 @@ class TextField : public jgui::TextComponent {
      * \brief
      *
      */
-    TextField(int x = 0, int y = 0, int width = DEFAULT_COMPONENT_WIDTH, int height = DEFAULT_COMPONENT_HEIGHT);
+    TextField(jgui::jrect_t<int> bounds = {0, 0, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT});
     
     /**
      * \brief

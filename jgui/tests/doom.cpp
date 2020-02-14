@@ -25,7 +25,7 @@ class Doom : public jgui::Window {
 
   public:
     Doom():
-      jgui::Window(SCREEN_WIDTH, SCREEN_HEIGHT)
+      jgui::Window(jgui::jsize_t<int>{SCREEN_WIDTH, SCREEN_HEIGHT})
     {
       srand(time(NULL));
 

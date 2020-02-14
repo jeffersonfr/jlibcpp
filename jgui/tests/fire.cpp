@@ -32,7 +32,7 @@ class Fire : public jgui::Window {
 
   public:
     Fire():
-      jgui::Window(720, 480)
+      jgui::Window(jgui::jsize_t<int>{720, 480})
     {
       jgui::jsize_t 
         size = GetSize();

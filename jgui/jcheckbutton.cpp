@@ -24,8 +24,8 @@
 
 namespace jgui {
 
-CheckButton::CheckButton(jcheckbox_type_t type, std::string text, int x, int y, int width, int height):
-  Component(x, y, width, height)
+CheckButton::CheckButton(jcheckbox_type_t type, std::string text, jgui::jrect_t<int> bounds):
+  Component(bounds)
 {
   jcommon::Object::SetClassName("jgui::CheckButton");
 

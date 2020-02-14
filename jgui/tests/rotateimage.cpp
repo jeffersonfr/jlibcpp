@@ -31,7 +31,7 @@ class Main : public jgui::Window {
 
 	public:
 		Main():
-			jgui::Window(/*"Image Test", */0, 0, 1280, 720)
+			jgui::Window(/*"Image Test", */ {1280, 720})
 		{
 			_angle = M_PI/6;
 

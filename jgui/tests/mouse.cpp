@@ -34,7 +34,7 @@ class GraphicsTeste : public jgui::Window {
 
 	public:
 		GraphicsTeste():
-			jgui::Window(0, 0, 720, 480)
+			jgui::Window({720, 480})
 		{
 			jgui::jsize_t
 				size = GetSize();

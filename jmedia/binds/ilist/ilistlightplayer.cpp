@@ -56,7 +56,7 @@ class IlistPlayerComponentImpl : public jgui::Component {
 
 	public:
 		IlistPlayerComponentImpl(Player *player, int x, int y, int w, int h):
-			jgui::Component(x, y, w, h)
+			jgui::Component({x, y, w, h})
 		{
 			_image = nullptr;
 			_player = player;

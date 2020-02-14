@@ -242,7 +242,7 @@ class UserWindow: public jgui::Window {
 
 	public:
 		UserWindow(int x, int y, int width, int height):
-      jgui::Window(x, y, width, height)
+      jgui::Window({width, height}, {x, y})
 		{
 			_last_mouse_move = 0LL;
 			_last_mouse_location.x = 0LL;

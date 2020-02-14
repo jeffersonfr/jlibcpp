@@ -210,7 +210,7 @@ class SignalMetter : public jgui::Component {
 
   public:
     SignalMetter(int x, int y, int w, int h):
-      Component(x, y, w, h)
+      Component({x, y, w, h})
   {
     _interval = 20;
     _horizontal_lines = true;
@@ -313,7 +313,7 @@ class Plotter : public jgui::Window {
 
 	public:
 		Plotter():
-			Window(0, 0, 320, 320) {
+			Window({320, 320}) {
 			_signal = new SignalMetter(0, 0, 320, 320);
 
 			_counter = 1000;

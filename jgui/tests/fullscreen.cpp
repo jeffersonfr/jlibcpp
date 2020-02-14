@@ -29,7 +29,7 @@ class Fullscreen : public jgui::Window {
 
 	public:
 		Fullscreen():
-			jgui::Window(720, 480)
+			jgui::Window(jgui::jsize_t<int>{720, 480})
 		{
 			_bg = new jgui::BufferedImage("images/background.png");
 		}

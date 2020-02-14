@@ -23,8 +23,8 @@
 
 namespace jgui {
 
-ListBox::ListBox(int x, int y, int width, int height):
-  Component(x, y, width, height),
+ListBox::ListBox(jgui::jrect_t<int> bounds):
+  Component(bounds),
   ItemComponent()
 {
   jcommon::Object::SetClassName("jgui::ListBox");

@@ -30,7 +30,7 @@ class ColorChooser : public jgui::Component {
 
 	public:
 		ColorChooser(int x, int y, int width, int height):
-			jgui::Component(x, y, width, height)
+			jgui::Component({x, y, width, height})
 		{
 			jgui::jsize_t
 				size = GetSize();
@@ -151,7 +151,7 @@ class FrameTest : public jgui::Window {
 
 	public:
 		FrameTest():
-			jgui::Window(0, 0, 360, 360)
+			jgui::Window({360, 360})
 		{
 			jgui::jsize_t
 				size = GetSize();

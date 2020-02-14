@@ -32,7 +32,8 @@ class Graph : public jgui::Window {
 
 	public:
 		Graph():
-			jgui::Window(0, 0, 600, 600), nodes(100)
+			jgui::Window({600, 600}), 
+      nodes(100)
 		{
       jgui::jsize_t
         size = GetSize();

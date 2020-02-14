@@ -1552,7 +1552,7 @@ class SortComponent : public jgui::Component, public jcommon::Observer {
 
 	public:
 		SortComponent(int size, int x, int y, int w, int h):
-			jgui::Component(x, y, w, h)
+			jgui::Component({x, y, w, h})
 		{
 			_algorithm = nullptr;
 
@@ -1723,7 +1723,7 @@ class SortFrame : public jgui::Window {
 
 	public:
 		SortFrame():
-			jgui::Window(/*"Sort Algorithms", */0, 0, 1280, 720)
+			jgui::Window(/*"Sort Algorithms", */ {1280, 720})
 		{
       jgui::jsize_t
         size = GetSize();

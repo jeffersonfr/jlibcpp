@@ -107,7 +107,7 @@ class SOM : public jgui::Window {
 
 	public:
 		SOM():
-			jgui::Window(/*"SOM", */0, 0, 400, 400)
+			jgui::Window(/*"SOM", */ {400, 400})
 		{
 			kohonenInit();
 		}

@@ -22,8 +22,8 @@
 
 namespace jgui {
 
-Icon::Icon(jgui::Image *image, int x, int y, int width, int height):
-  Component(x, y, width, height)
+Icon::Icon(jgui::Image *image, jgui::jrect_t<int> bounds):
+  Component(bounds)
 {
   jcommon::Object::SetClassName("jgui::Icon");
 

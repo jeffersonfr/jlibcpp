@@ -22,8 +22,8 @@
 
 namespace jgui {
 
-Panel::Panel(int x, int y, int width, int height):
-  Container(x, y, width, height)
+Panel::Panel(jgui::jrect_t<int> bounds):
+  Container(bounds)
 {
   jcommon::Object::SetClassName("jgui::Panel");
   
@@ -40,8 +40,8 @@ Panel::Panel(int x, int y, int width, int height):
   SetBackgroundVisible(true);
 }
 
-Panel::Panel(std::string title, int x, int y, int width, int height):
-  Container(x, y, width, height)
+Panel::Panel(std::string title, jgui::jrect_t<int> bounds):
+  Container(bounds)
 {
   jcommon::Object::SetClassName("jgui::Panel");
   

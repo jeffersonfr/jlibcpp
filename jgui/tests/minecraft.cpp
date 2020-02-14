@@ -47,7 +47,7 @@ class Minecraft : public jgui::Window {
 
   public:
     Minecraft():
-      jgui::Window(512, 512)
+      jgui::Window(jgui::jsize_t<int>{512, 512})
     {
 	    MakeTextures();
       MakeMap();

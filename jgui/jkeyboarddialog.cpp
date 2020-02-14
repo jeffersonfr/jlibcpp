@@ -71,7 +71,7 @@ class KeyButton : public Button {
 
   public:
     KeyButton(std::string label1, std::string label2, jevent::ActionListener *listener, int width, int height):
-      Button(label1, 0, 0, 0, 0) 
+      Button(label1) 
     {
       jcommon::Object::SetClassName("KeyButton");
 
@@ -89,7 +89,7 @@ class KeyButton : public Button {
 };
 
 KeyboardDialog::KeyboardDialog(Container *parent, jkeyboard_type_t type, bool text_visible, bool is_password):
-   jgui::Dialog(parent, "Keyboard")
+   jgui::Dialog("Keyboard", parent)
 {
   jcommon::Object::SetClassName("jgui::KeyboardDialog");
 

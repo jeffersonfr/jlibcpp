@@ -112,7 +112,7 @@ class Container : public jgui::Component {
      * \brief
      *
      */
-    Container(int x = 0, int y = 0, int width = 0, int height = 0);
+    Container(jgui::jrect_t<int> bounds = {0, 0, 0, 0});
     
     /**
      * \brief

@@ -42,18 +42,18 @@ class Dialogs : public jgui::Window, public jevent::ActionListener {
 
 	public:
 		Dialogs():
-			jgui::Window(0, 0, 1280, 720)
+			jgui::Window({1280, 720})
 	{
     jgui::jinsets_t
       insets = GetInsets();
 
-    _button1 = new jgui::Button("Calendar", insets.left, insets.top + 0*(96 + 16), 196, 96);
-    _button2 = new jgui::Button("File Chooser", insets.left, insets.top + 1*(96 + 16), 196, 96);
-    _button3 = new jgui::Button("Input", insets.left, insets.top + 2*(96 + 16), 196, 96);
-    _button4 = new jgui::Button("Keyboard", insets.left, insets.top + 3*(96 + 16), 196, 96);
-    _button5 = new jgui::Button("Message", insets.left, insets.top + 4*(96 + 16), 196, 96);
-    _button6 = new jgui::Button("Toast", insets.left, insets.top + 5*(96 + 16), 196, 96);
-    _button7 = new jgui::Button("Yes/No", insets.left, insets.top + 6*(96 + 16), 196, 96);
+    _button1 = new jgui::Button("Calendar", {insets.left, insets.top + 0*(96 + 16), 196, 96});
+    _button2 = new jgui::Button("File Chooser", {insets.left, insets.top + 1*(96 + 16), 196, 96});
+    _button3 = new jgui::Button("Input", {insets.left, insets.top + 2*(96 + 16), 196, 96});
+    _button4 = new jgui::Button("Keyboard", {insets.left, insets.top + 3*(96 + 16), 196, 96});
+    _button5 = new jgui::Button("Message", {insets.left, insets.top + 4*(96 + 16), 196, 96});
+    _button6 = new jgui::Button("Toast", {insets.left, insets.top + 5*(96 + 16), 196, 96});
+    _button7 = new jgui::Button("Yes/No", {insets.left, insets.top + 6*(96 + 16), 196, 96});
 
     _button1->RegisterActionListener(this);
     _button2->RegisterActionListener(this);

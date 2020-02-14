@@ -324,7 +324,7 @@ class Game2048 : public jgui::Window {
 
 	public:
 		Game2048():
-			jgui::Window(400, 400)
+			jgui::Window(jgui::jsize_t<int>{400, 400})
 		{
 			_is_done = false;
 			_is_win = false;

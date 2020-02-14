@@ -25,7 +25,7 @@
 
 namespace jgui {
 
-Component::Component(int x, int y, int width, int height):
+Component::Component(jgui::jrect_t<int> bounds):
   jevent::KeyListener(),
   jevent::MouseListener()
 {
@@ -58,10 +58,10 @@ Component::Component(int x, int y, int width, int height):
   _alignment_x = JCA_CENTER;
   _alignment_y = JCA_CENTER;
 
-  _location.x = x;
-  _location.y = y;
-  _size.width = width;
-  _size.height = height;
+  _location.x = bounds.point.x;
+  _location.y = bounds.point.y;
+  _size.width = bounds.size.width;
+  _size.height = bounds.size.height;
 
   _scroll_location.x = 0;
   _scroll_location.y = 0;

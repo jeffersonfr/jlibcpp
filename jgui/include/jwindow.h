@@ -126,13 +126,7 @@ class Window : public jgui::Container {
      * \brief
      *
      */
-    Window(int width, int height);
-    
-    /**
-     * \brief
-     *
-     */
-    Window(int x, int y, int width, int height);
+    Window(jgui::jsize_t<int> size, jgui::jpoint_t<int> point = {0, 0});
     
     /**
      * \brief

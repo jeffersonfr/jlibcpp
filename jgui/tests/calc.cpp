@@ -44,7 +44,7 @@ class Display : public jgui::Component {
 };
 
 Display::Display(int x, int y, int width, int height):
-   	jgui::Component(x, y, width, height)
+   	jgui::Component({x, y, width, height})
 {
 }
 
@@ -122,7 +122,7 @@ class Calculator : public jgui::Window, public jevent::ActionListener {
 };
 
 Calculator::Calculator():
-	jgui::Window(/*"Calculator", */0, 0, 500, 400)
+	jgui::Window(/*"Calculator", */ {500, 400})
 {
 	_number0 = "";
 	_number1 = "";

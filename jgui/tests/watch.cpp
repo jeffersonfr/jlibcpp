@@ -32,7 +32,7 @@ class WatchTeste : public jgui::Window {
 
 	public:
 		WatchTeste():
-			jgui::Window(/*"Watch Teste", */0, 0, 320, 320)
+			jgui::Window(/*"Watch Teste", */ {320, 320})
 		{
 			_filled = false; // true;
 		}

@@ -38,7 +38,7 @@ class Main : public jgui::Window {
 
 	public:
 		Main():
-			jgui::Window(0, 0, 1280, 720)
+			jgui::Window({1280, 720})
 		{
       LoadImage("bmp");
       // LoadImage("gif");

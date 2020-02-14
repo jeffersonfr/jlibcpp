@@ -44,7 +44,7 @@ class BorderTest : public jgui::Window {
 
 	public:
 		BorderTest():
-			jgui::Window(/*"Border Test", */0, 0, 720, 480)
+			jgui::Window(/*"Border Test", */ {720, 480})
 		{
       jgui::Theme 
         *theme = GetTheme();
@@ -61,17 +61,17 @@ class BorderTest : public jgui::Window {
 			gapx = gapx/2;
 			gapy = gapy/3;
 
-			_components.push_back(new jgui::Button("Empty", dx + 0*(w + gapx) + 2*gapx, dy + 0*(h + gapy) + gapy, w, h));
-			_components.push_back(new jgui::Button("Line", dx + 1*(w + gapx) + 2*gapx, dy + 0*(h + gapy) + gapy, w, h));
-			_components.push_back(new jgui::Button("Bevel", dx + 2*(w + gapx) + 2*gapx, dy + 0*(h + gapy) + gapy, w, h));
-			_components.push_back(new jgui::Button("Round", dx + 3*(w + gapx) + 2*gapx, dy + 0*(h + gapy) + gapy, w, h));
-			_components.push_back(new jgui::Button("Raised Gradient", dx+4*(w + gapx) + 2*gapx, dy + 0*(h + gapy)+gapy, w, h));
+			_components.push_back(new jgui::Button("Empty", {dx + 0*(w + gapx) + 2*gapx, dy + 0*(h + gapy) + gapy, w, h}));
+			_components.push_back(new jgui::Button("Line", {dx + 1*(w + gapx) + 2*gapx, dy + 0*(h + gapy) + gapy, w, h}));
+			_components.push_back(new jgui::Button("Bevel", {dx + 2*(w + gapx) + 2*gapx, dy + 0*(h + gapy) + gapy, w, h}));
+			_components.push_back(new jgui::Button("Round", {dx + 3*(w + gapx) + 2*gapx, dy + 0*(h + gapy) + gapy, w, h}));
+			_components.push_back(new jgui::Button("Raised Gradient", {dx+4*(w + gapx) + 2*gapx, dy + 0*(h + gapy)+gapy, w, h}));
 			
-			_components.push_back(new jgui::Button("Lowered Gradient", dx + 0*(w + gapx) + 2*gapx, dy + 1*(h + gapy) + gapy, w, h));
-			_components.push_back(new jgui::Button("Raised Bevel", dx + 1*(w + gapx) + 2*gapx, dy + 1*(h + gapy) + gapy, w, h));
-			_components.push_back(new jgui::Button("Lowered Bevel", dx + 2*(w + gapx) + 2*gapx, dy + 1*(h + gapy) + gapy, w, h));
-			_components.push_back(new jgui::Button("Raised Etched", dx + 3*(w + gapx) + 2*gapx, dy + 1*(h + gapy) + gapy, w, h));
-			_components.push_back(new jgui::Button("Lowered Etched", dx + 4*(w + gapx) + 2*gapx, dy + 1*(h + gapy) + gapy, w, h));
+			_components.push_back(new jgui::Button("Lowered Gradient", {dx + 0*(w + gapx) + 2*gapx, dy + 1*(h + gapy) + gapy, w, h}));
+			_components.push_back(new jgui::Button("Raised Bevel", {dx + 1*(w + gapx) + 2*gapx, dy + 1*(h + gapy) + gapy, w, h}));
+			_components.push_back(new jgui::Button("Lowered Bevel", {dx + 2*(w + gapx) + 2*gapx, dy + 1*(h + gapy) + gapy, w, h}));
+			_components.push_back(new jgui::Button("Raised Etched", {dx + 3*(w + gapx) + 2*gapx, dy + 1*(h + gapy) + gapy, w, h}));
+			_components.push_back(new jgui::Button("Lowered Etched", {dx + 4*(w + gapx) + 2*gapx, dy + 1*(h + gapy) + gapy, w, h}));
 
       // INFO:: need to get the some atributes, like the fonts 
 			_theme0 = *theme;

@@ -46,9 +46,13 @@ bool PESDemux::Parse(const char *data, int data_length)
     return false;
   }
 
-  uint16_t length = TS_G16(data + 4) + 6;
+  uint16_t length = TS_G16(data + 4);
 
-  if (data_length < length) {
+  if (length == 0) {
+    return false;
+  }
+
+  if (data_length < (length + 6)) {
     return false;
   }
 

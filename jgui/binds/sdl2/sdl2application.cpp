@@ -370,6 +370,9 @@ void Application::Init(int argc, char **argv)
 
 static void InternalPaint()
 {
+  // TODO:: dispose on quit
+  static SDL_Surface *surface = nullptr;
+
 	if (sg_jgui_window == nullptr || sg_jgui_window->IsVisible() == false) {
 		return;
 	}
@@ -389,54 +392,39 @@ static void InternalPaint()
 
   if (sg_back_buffer == nullptr) {
     sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, bounds.size);
+
+    if (surface != nullptr) {
+      SDL_FreeSurface(surface);
+      surface = nullptr;
+    }
   }
 
   jgui::Graphics 
     *g = sg_back_buffer->GetGraphics();
 
   g->Reset();
-  g->SetCompositeFlags(jgui::JCF_SRC_OVER);
+  g->SetCompositeFlags(jgui::JCF_SRC);
 
 	sg_jgui_window->DoLayout();
   sg_jgui_window->Paint(g);
 
   g->Flush();
-
-  uint32_t *data = (uint32_t *)sg_back_buffer->LockData();
-
-  SDL_Surface *surface = SDL_CreateRGBSurfaceFrom(data, bounds.size.width, bounds.size.height, 32, bounds.size.width*4, 0, 0, 0, 0);
-  SDL_Texture *texture = SDL_CreateTextureFromSurface(sg_renderer, surface);
-
-  if (texture == nullptr) {
-    SDL_FreeSurface(surface);
-
-    return;
+  
+  if (surface == nullptr) {
+    uint32_t *data = (uint32_t *)sg_back_buffer->LockData();
+    
+    surface = SDL_CreateRGBSurfaceFrom(data, bounds.size.width, bounds.size.height, 32, bounds.size.width*4, 0, 0, 0, 0);
+  
+    sg_back_buffer->UnlockData();
   }
 
+  SDL_Texture *texture = SDL_CreateTextureFromSurface(sg_renderer, surface);
+  
   SDL_RenderCopy(sg_renderer, texture, nullptr, nullptr);
-
-  /* INFO:: dirty region
-   SDL_Rect src, dst;
-
-   src.x = _region.x;
-   src.y = _region.y;
-   src.w = _region.width;
-   src.h = _region.height;
-
-   dst.x = _region.x;
-   dst.y = _region.y;
-   dst.w = _region.width;
-   dst.h = _region.height;
-
-   SDL_RenderCopy(sg_renderer, texture, &src, &dst);
-   */
-
   SDL_RenderPresent(sg_renderer);
+  
   SDL_DestroyTexture(texture);
-  SDL_FreeSurface(surface);
-
-  sg_back_buffer->UnlockData();
-
+  
   sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
 }
 

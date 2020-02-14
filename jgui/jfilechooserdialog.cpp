@@ -36,7 +36,7 @@ struct ascending_sort {
 };
 
 FileChooserDialog::FileChooserDialog(Container *parent, std::string title, std::string directory, jfilechooser_type_t type):
-  jgui::Dialog(parent, title, 0, 0, 720, 480)
+  jgui::Dialog(title, parent, {0, 0, 720, 480})
 {
   jcommon::Object::SetClassName("jgui::FileChooserDialogBox");
 
@@ -59,12 +59,12 @@ FileChooserDialog::FileChooserDialog(Container *parent, std::string title, std::
   _image_folder = new jgui::BufferedImage(_DATA_PREFIX"/images/folder.png");
 
   if (_type == JFCT_SAVE_FILE_DIALOG) {
-    _list = new jgui::ListBox(insets.left, insets.top, dw, size.height - insets.top - insets.bottom - 1*(DEFAULT_COMPONENT_HEIGHT + 8) - 8);
-    _file = new jgui::TextField(insets.left, size.height - insets.bottom - 1*(DEFAULT_COMPONENT_HEIGHT + 8), dw, DEFAULT_COMPONENT_HEIGHT);
+    _list = new jgui::ListBox({insets.left, insets.top, dw, size.height - insets.top - insets.bottom - 1*(DEFAULT_COMPONENT_HEIGHT + 8) - 8});
+    _file = new jgui::TextField({insets.left, size.height - insets.bottom - 1*(DEFAULT_COMPONENT_HEIGHT + 8), dw, DEFAULT_COMPONENT_HEIGHT});
 
     Add(_file);
   } else {
-    _list = new jgui::ListBox(insets.left, insets.top, dw, size.height - insets.top - insets.bottom);
+    _list = new jgui::ListBox({insets.left, insets.top, dw, size.height - insets.top - insets.bottom});
   }
 
   Add(_list);

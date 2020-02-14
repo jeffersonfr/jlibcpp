@@ -24,8 +24,8 @@
 
 namespace jgui {
 
-Label::Label(std::string text, int x, int y, int width, int height):
-   Component(x, y, width, height)
+Label::Label(std::string text, jgui::jrect_t<int> bounds):
+   Component(bounds)
 {
   jcommon::Object::SetClassName("jgui::Label");
 

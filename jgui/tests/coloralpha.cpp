@@ -87,7 +87,7 @@ class ColorAlphaTeste : public jgui::Window {
 
 	public:
 		ColorAlphaTeste():
-			jgui::Window(/*"Color Alpha Teste", */0, 0, 320, 320)
+			jgui::Window(/*"Color Alpha Teste", */ {320, 320})
 		{
 			_fg = new jgui::BufferedImage("images/image.bmp");
 			_bg = new jgui::BufferedImage("images/tux-zombie.jpg");

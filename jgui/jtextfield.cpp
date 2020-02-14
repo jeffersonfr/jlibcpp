@@ -23,8 +23,8 @@
 
 namespace jgui {
 
-TextField::TextField(int x, int y, int width, int height):
-  jgui::TextComponent(x, y, width, height)
+TextField::TextField(jgui::jrect_t<int> bounds):
+  jgui::TextComponent(bounds)
 {
   jcommon::Object::SetClassName("jgui::TextField");
 

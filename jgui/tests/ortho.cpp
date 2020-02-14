@@ -81,7 +81,7 @@ class Grid : public jgui::Window {
 
 	public:
 		Grid():
-			jgui::Window(0, 0, 720, 480)
+			jgui::Window({720, 480})
 		{
       float step = 2*M_PI/sizeT;
 

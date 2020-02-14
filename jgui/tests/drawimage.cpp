@@ -649,7 +649,7 @@ class Picture : public jgui::Component {
 
 	public:
 		Picture(int x, int y, int w, int h):
-			jgui::Component(x, y, w, h)
+			jgui::Component({x, y, w, h})
 		{
 			_image = nullptr;
 		}
@@ -947,7 +947,7 @@ class Main : public jgui::Window {
 
 	public:
 		Main():
-			jgui::Window(0, 0, 960, 540)
+			jgui::Window({960, 540})
 		{
       jgui::jsize_t
         size = GetSize();

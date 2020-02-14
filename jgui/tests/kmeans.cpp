@@ -224,7 +224,7 @@ class SOM : public jgui::Window {
 
 	public:
 		SOM(int ninputs, int neurons):
-			jgui::Window(3*240, 3*128)
+			jgui::Window(jgui::jsize_t<int>{3*240, 3*128})
 		{
       _train_input = nullptr;
       _train_input_size = 0;

@@ -26,8 +26,8 @@
 
 namespace jgui {
 
-Marquee::Marquee(std::string text, int x, int y, int width, int height):
-   Component(x, y, width, height)
+Marquee::Marquee(std::string text, jgui::jrect_t<int> bounds):
+   Component(bounds)
 {
   jcommon::Object::SetClassName("jgui::Marquee");
 

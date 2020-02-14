@@ -24,13 +24,13 @@
 
 namespace jgui {
 
-Dialog::Dialog(Container *parent, int x, int y, int width, int height):
-  Dialog(parent, "", x, y, width, height)
+Dialog::Dialog(Container *parent, jgui::jrect_t<int> bounds):
+  Dialog("", parent, bounds)
 {
 }
 
-Dialog::Dialog(Container *parent, std::string title, int x, int y, int width, int height):
-  jgui::Container(x, y, width, height)
+Dialog::Dialog(std::string title, Container *parent, jgui::jrect_t<int> bounds):
+  jgui::Container(bounds)
 {
   if (parent == nullptr) {
     throw jexception::NullPointerException("Parent must be a valid pointer");

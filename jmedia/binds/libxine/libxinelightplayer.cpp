@@ -54,7 +54,7 @@ class XinePlayerComponentImpl : public jgui::Component {
 
 	public:
 		XinePlayerComponentImpl(Player *player, int x, int y, int w, int h):
-			jgui::Component(x, y, w, h)
+			jgui::Component({x, y, w, h})
 		{
 			_buffer = nullptr;
 

@@ -603,7 +603,7 @@ class BitMaskTeste : public jgui::Window {
 
 	public:
 		BitMaskTeste():
-			jgui::Window(0, 0, 320, 320)
+			jgui::Window({320, 320})
 		{
 			_pacman_location.x = 0;
 			_pacman_location.y = 0;

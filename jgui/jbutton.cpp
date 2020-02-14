@@ -25,22 +25,13 @@
 
 namespace jgui {
 
-Button::Button(std::string text, int x, int y, int width, int height):
-  Component(x, y, width, height)
+Button::Button(std::string text, jgui::jrect_t<int> bounds):
+  Button(text, nullptr, bounds)
 {
-  jcommon::Object::SetClassName("jgui::Button");
-
-  _halign = JHA_CENTER;
-  _valign = JVA_CENTER;
-
-  _text = text;
-  _image = nullptr;
-
-  SetFocusable(true);
 }
 
-Button::Button(std::string text, jgui::Image *image, int x, int y, int width, int height):
-  Component(x, y, width, height)
+Button::Button(std::string text, jgui::Image *image, jgui::jrect_t<int> bounds):
+  Component(bounds)
 {
   jcommon::Object::SetClassName("jgui::Button");
 
