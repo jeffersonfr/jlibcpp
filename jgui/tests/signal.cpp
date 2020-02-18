@@ -203,19 +203,22 @@ class PerlinNoise {
 class SignalMetter : public jgui::Component {
 
   private:
-    std::vector<int> _points;
-    int _interval;
-    bool _horizontal_lines,
-         _vertical_lines;
+    std::vector<int> 
+      _points;
+    int 
+      _interval;
+    bool 
+      _horizontal_lines,
+      _vertical_lines;
 
   public:
     SignalMetter(int x, int y, int w, int h):
       Component({x, y, w, h})
-  {
-    _interval = 20;
-    _horizontal_lines = true;
-    _vertical_lines = true;
-  }
+    {
+      _interval = 20;
+      _horizontal_lines = true;
+      _vertical_lines = true;
+    }
 
     virtual ~SignalMetter()
     {
@@ -308,12 +311,19 @@ class SignalMetter : public jgui::Component {
 class Plotter : public jgui::Window {
 
 	private:
-		SignalMetter *_signal;
-		int _counter;
+    std::mutex
+      _mutex;
+		SignalMetter 
+      *_signal;
+		int 
+      _counter;
 
 	public:
 		Plotter():
-			Window({320, 320}) {
+			Window({320, 320}) 
+    {
+      SetFramesPerSecond(30);
+
 			_signal = new SignalMetter(0, 0, 320, 320);
 
 			_counter = 1000;
@@ -321,7 +331,6 @@ class Plotter : public jgui::Window {
 			Add(_signal);
 
 			SetScrollable(false);
-
 			Pack(true);
 		}
 
@@ -329,24 +338,10 @@ class Plotter : public jgui::Window {
 		{
 			_counter = 0;
 
+      _mutex.unlock();
+
       delete _signal;
 		}
-
-    void Framerate(int fps)
-    {
-      static auto begin = std::chrono::steady_clock::now();
-      static int index = 0;
-
-      std::chrono::time_point<std::chrono::steady_clock> timestamp = begin + std::chrono::milliseconds(index++*(1000/fps));
-      std::chrono::time_point<std::chrono::steady_clock> current = std::chrono::steady_clock::now();
-      std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - current);
-
-      if (diff.count() < 0) {
-        return;
-      }
-
-      std::this_thread::sleep_for(diff);
-    }
 
 		virtual void ShowApp()
 		{
@@ -366,7 +361,9 @@ class Plotter : public jgui::Window {
 
           index = index + 0.2;
 
-          Framerate(25);
+          Repaint();
+
+          _mutex.lock();
 				} while (IsHidden() == false && _counter-- >= 0);
 
 				s.Close();
@@ -374,6 +371,13 @@ class Plotter : public jgui::Window {
 				std::cout << "error dump_raw" << std::endl;
 			}
 		}
+
+    virtual void Paint(jgui::Graphics *g)
+    {
+      jgui::Window::Paint(g);
+
+      _mutex.unlock();
+    }
 
 };
 

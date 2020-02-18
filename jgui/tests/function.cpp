@@ -32,40 +32,35 @@
 class Function : public jgui::Window {
 
 	private:
-    jgui::Image *_buffer;
-    std::mutex _mutex;
-
-    float cx;
-    float cy;
-
-    float fx;
-    float fy;
-
-    float Rho;
-    float Scale;
-
-    float Theta;
-
-    float snt;
-    float cst;
-
-    float Phi;
-
-    float snp;
-    float csp;
-
-    float tx;
-    float ty;
-
-    float incremented;
-    float increment;
-
-    float dr;
+    std::mutex 
+      _mutex;
+    jgui::Image 
+      *_buffer;
+    float 
+      cx,
+      cy,
+      fx,
+      fy,
+      Rho,
+      Scale,
+      Theta,
+      snt,
+      cst,
+      Phi,
+      snp,
+      csp,
+      tx,
+      ty,
+      incremented,
+      increment,
+      dr;
 
 	public:
 		Function():
 			jgui::Window({720, 480})
 		{
+      SetFramesPerSecond(60);
+
       _buffer = new jgui::BufferedImage(jgui::JPF_RGB32, {960, 720});
     
       jgui::jsize_t<int>
@@ -100,25 +95,11 @@ class Function : public jgui::Window {
 
 		virtual ~Function()
 		{
+      _mutex.unlock();
+
       delete _buffer;
       _buffer = nullptr;
 		}
-
-    void Framerate(int fps)
-    {
-      static auto begin = std::chrono::steady_clock::now();
-      static int index = 0;
-
-      std::chrono::time_point<std::chrono::steady_clock> timestamp = begin + std::chrono::milliseconds(index++*(1000/fps));
-      std::chrono::time_point<std::chrono::steady_clock> current = std::chrono::steady_clock::now();
-      std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - current);
-
-      if (diff.count() < 0) {
-        return;
-      }
-
-      std::this_thread::sleep_for(diff);
-    }
 
 		virtual void ShowApp() 
 		{
@@ -128,8 +109,6 @@ class Function : public jgui::Window {
         size = _buffer->GetSize();
 
 			do {
-        _mutex.lock();
-
         g->Clear();
 
         for (float x=-15; x<15; x+=0.125) {
@@ -150,9 +129,9 @@ class Function : public jgui::Window {
           }
         }
 
-        _mutex.unlock();
-
         Repaint();
+
+        _mutex.lock();
 
         incremented = incremented + increment * dr;
 
@@ -165,8 +144,6 @@ class Function : public jgui::Window {
           incremented = -5;
           dr = dr * -1;
         }
-
-        Framerate(25);
       } while (IsHidden() == false);
     }
 
@@ -174,8 +151,6 @@ class Function : public jgui::Window {
 		{
       jgui::jsize_t<int>
         size = GetSize();
-
-      _mutex.lock();
 
       g->DrawImage(_buffer, {0, 0, size.width, size.height});
       

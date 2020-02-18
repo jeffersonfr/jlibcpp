@@ -58,8 +58,6 @@ class Container : public jgui::Component {
     /** \brief */
     std::mutex _dialogs_mutex;
     /** \brief */
-    Layout *_default_layout;
-    /** \brief */
     Layout *_layout;
     /** \brief */
     jinsets_t<int> _insets;
@@ -131,12 +129,6 @@ class Container : public jgui::Component {
      *
      */
     virtual jgui::Layout * GetLayout();
-
-    /**
-     * \brief
-     *
-     */
-    virtual const jgui::Layout * GetDefaultLayout();
 
     /**
      * \brief

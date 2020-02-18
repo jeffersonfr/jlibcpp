@@ -46,7 +46,7 @@ class TabbedPane : public jgui::Container {
      * \brief
      *
      */
-    TabbedPane(jgui::jrect_t<int> bounds = {0, 0, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT});
+    TabbedPane();
     
     /**
      * \brief

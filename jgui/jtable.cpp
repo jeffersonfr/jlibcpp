@@ -100,8 +100,8 @@ void Cell::SetCellForegroundColor(const jcolor_t<float> &color)
   _table->Repaint();
 }
 
-Table::Table(jgui::jrect_t<int> bounds):
-  Component(bounds)
+Table::Table():
+  Component()
 {
   jcommon::Object::SetClassName("jgui::Table");
 

@@ -22,8 +22,8 @@
 
 namespace jgui {
 
-Spin::Spin(jgui::jrect_t<int> bounds):
-  Component(bounds),
+Spin::Spin():
+  Component(),
   ItemComponent()
 {
   jcommon::Object::SetClassName("jgui::Spin");
@@ -145,20 +145,13 @@ bool Spin::MousePressed(jevent::MouseEvent *event)
     return true;
   }
 
-  Theme 
-    *theme = GetTheme();
-
-  if (theme == nullptr) {
-    return false;
-  }
-
   jgui::jpoint_t<int>
     elocation = event->GetLocation();
   jgui::jsize_t<int>
     size = GetSize();
   int
-    x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
-    y = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
+    x = GetTheme().GetIntegerParam("component.hgap") + GetTheme().GetIntegerParam("component.border.size"),
+    y = GetTheme().GetIntegerParam("component.vgap") + GetTheme().GetIntegerParam("component.border.size"),
     // w = size.width - 2*x,
     h = size.height - 2*y;
   bool 
@@ -282,24 +275,18 @@ void Spin::Paint(Graphics *g)
 
   Component::Paint(g);
 
-  Theme *theme = GetTheme();
-  
-  if (theme == nullptr) {
-    return;
-  }
-
   jgui::Font 
-    *font = theme->GetFont("component.font");
+    *font = GetTheme().GetFont("component.font");
   jgui::jcolor_t<float>
-    // bg = theme->GetIntegerParam("component.bg"),
-    fg = theme->GetIntegerParam("component.fg"),
-    fgfocus = theme->GetIntegerParam("component.fg.focus"),
-    fgdisable = theme->GetIntegerParam("component.fg.disable");
+    // bg = GetTheme().GetIntegerParam("component.bg"),
+    fg = GetTheme().GetIntegerParam("component.fg"),
+    fgfocus = GetTheme().GetIntegerParam("component.fg.focus"),
+    fgdisable = GetTheme().GetIntegerParam("component.fg.disable");
   jgui::jsize_t<int>
     size = GetSize();
   int
-    x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
-    y = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
+    x = GetTheme().GetIntegerParam("component.hgap") + GetTheme().GetIntegerParam("component.border.size"),
+    y = GetTheme().GetIntegerParam("component.vgap") + GetTheme().GetIntegerParam("component.border.size"),
     w = size.width - 2*x,
     h = size.height - 2*y;
   int

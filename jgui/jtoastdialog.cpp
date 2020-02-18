@@ -28,50 +28,38 @@ ToastDialog::ToastDialog(Container *parent, std::string msg, bool wrap):
 {
   jcommon::Object::SetClassName("jgui::ToastDialog");
 
-  jgui::jsize_t
-    size = GetSize();
-  jgui::jinsets_t 
-    insets = GetInsets();
+  _label.SetText(msg);
 
-  _label = new Label(msg, {insets.left, insets.top, size.width - insets.left - insets.right, 180});
+  _label.SetWrap(true);
+  _label.SetHorizontalAlign(JHA_LEFT);
 
-  _label->SetWrap(true);
-  _label->SetHorizontalAlign(JHA_JUSTIFY);
-  _label->SetVerticalAlign(JVA_TOP);
-
-  Add(_label);
+  Add(&_label, jgui::JBLA_CENTER);
 
   _timeout = 0;
-
-  Pack(false);
 }
 
 ToastDialog::~ToastDialog() 
 {
-  if (_label != nullptr) {
-    delete _label;
-    _label = nullptr;
-  }
 }
 
 void ToastDialog::SetHorizontalAlign(jhorizontal_align_t align)
 {
-  _label->SetHorizontalAlign(align);
+  _label.SetHorizontalAlign(align);
 }
 
 jhorizontal_align_t ToastDialog::GetHorizontalAlign()
 {
-  return _label->GetHorizontalAlign();
+  return _label.GetHorizontalAlign();
 }
 
 void ToastDialog::SetVerticalAlign(jvertical_align_t align)
 {
-  _label->SetVerticalAlign(align);
+  _label.SetVerticalAlign(align);
 }
 
 jvertical_align_t ToastDialog::GetVerticalAlign()
 {
-  return _label->GetVerticalAlign();
+  return _label.GetVerticalAlign();
 }
 
 void ToastDialog::Exec(bool modal)
@@ -102,41 +90,6 @@ void ToastDialog::SetTimeout(int timeout)
 int ToastDialog::GetTimeout()
 {
   return _timeout;
-}
-
-bool ToastDialog::KeyPressed(jevent::KeyEvent *event)
-{
-  return false;
-}
-
-bool ToastDialog::KeyReleased(jevent::KeyEvent *event)
-{
-  return false;
-}
-
-bool ToastDialog::KeyTyped(jevent::KeyEvent *event)
-{
-  return false;
-}
-
-bool ToastDialog::MousePressed(jevent::MouseEvent *event)
-{
-  return false;
-}
-
-bool ToastDialog::MouseReleased(jevent::MouseEvent *event)
-{
-  return false;
-}
-
-bool ToastDialog::MouseMoved(jevent::MouseEvent *event)
-{
-  return false;
-}
-
-bool ToastDialog::MouseWheel(jevent::MouseEvent *event)
-{
-  return false;
 }
 
 }

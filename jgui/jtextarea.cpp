@@ -24,8 +24,8 @@
 
 namespace jgui {
 
-TextArea::TextArea(jgui::jrect_t<int> bounds):
-  jgui::TextComponent(bounds)
+TextArea::TextArea():
+  jgui::TextComponent()
 {
   jcommon::Object::SetClassName("jgui::TextArea");
 
@@ -94,20 +94,6 @@ void TextArea::Delete()
   _rows_string = true;
 
   TextComponent::Delete();
-}
-
-void TextArea::SetSize(int width, int height)
-{
-  _rows_string = true;
-
-  TextComponent::SetSize(width, height);
-}
-
-void TextArea::SetBounds(int x, int y, int w, int h)
-{
-  _rows_string = true;
-
-  TextComponent::SetBounds(x, y, w, h);
 }
 
 bool TextArea::KeyPressed(jevent::KeyEvent *event)
@@ -335,10 +321,8 @@ void TextArea::IncrementLines(int lines)
     return;
   }
 
-  jgui::Theme 
-    *theme = GetTheme();
   jgui::Font 
-    *font = theme->GetFont("component.font");
+    *font = GetTheme().GetFont("component.font");
   int 
     current_length = 0;
 
@@ -375,15 +359,8 @@ void TextArea::DecrementLines(int lines)
     return;
   }
 
-  Theme 
-    *theme = GetTheme();
-
-  if (theme == nullptr) {
-    return;
-  }
-
   jgui::Font 
-    *font = theme->GetFont("component.font");
+    *font = GetTheme().GetFont("component.font");
   jgui::jsize_t<int>
     size = GetSize();
   int 
@@ -418,15 +395,8 @@ void TextArea::DecrementLines(int lines)
 
 void TextArea::InitRowsString()
 {
-  Theme
-    *theme = GetTheme();
-
-  if (theme == nullptr) {
-    return;
-  }
-
   jgui::Font 
-    *font = theme->GetFont("component.font");
+    *font = GetTheme().GetFont("component.font");
 
   if (font == nullptr) {
     return;
@@ -435,8 +405,8 @@ void TextArea::InitRowsString()
   jgui::jsize_t<int>
     size = GetSize();
   int
-    x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
-    // y = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
+    x = GetTheme().GetIntegerParam("component.hgap") + GetTheme().GetIntegerParam("component.border.size"),
+    // y = GetTheme().GetIntegerParam("component.vgap") + GetTheme().GetIntegerParam("component.border.size"),
     w = size.width - 2*x;
 
   std::string 
@@ -537,22 +507,16 @@ void TextArea::Paint(Graphics *g)
 
   Component::Paint(g);
 
-  Theme *theme = GetTheme();
-  
-  if (theme == nullptr) {
-    return;
-  }
-
   Font 
-    *font = theme->GetFont("component.font");
+    *font = GetTheme().GetFont("component.font");
   jcolor_t<float>
-    // bg = theme->GetIntegerParam("component.bg"),
-    fg = theme->GetIntegerParam("component.fg"),
-    fgfocus = theme->GetIntegerParam("component.fg.focus"),
-    fgdisable = theme->GetIntegerParam("component.fg.disable");
+    // bg = GetTheme().GetIntegerParam("component.bg"),
+    fg = GetTheme().GetIntegerParam("component.fg"),
+    fgfocus = GetTheme().GetIntegerParam("component.fg.focus"),
+    fgdisable = GetTheme().GetIntegerParam("component.fg.disable");
   int
-    x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
-    y = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size");
+    x = GetTheme().GetIntegerParam("component.hgap") + GetTheme().GetIntegerParam("component.border.size"),
+    y = GetTheme().GetIntegerParam("component.vgap") + GetTheme().GetIntegerParam("component.border.size");
   jpoint_t 
     slocation = GetScrollLocation();
 
@@ -670,21 +634,13 @@ int TextArea::GetCurrentRow()
 
 jsize_t<int> TextArea::GetScrollDimension()
 {
-  Theme *theme = GetTheme();
-  
-  jsize_t<int> t {0, 0};
-
-  if (theme == nullptr) {
-    return t;
-  }
-
   jgui::Font 
-    *font = theme->GetFont("component.font");
+    *font = GetTheme().GetFont("component.font");
+  jsize_t<int> 
+    t = GetSize();
   int 
-    // hg = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
-    vg = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size");
-
-  t = GetSize();
+    // hg = GetTheme().GetIntegerParam("component.hgap") + GetTheme().GetIntegerParam("component.border.size"),
+    vg = GetTheme().GetIntegerParam("component.vgap") + GetTheme().GetIntegerParam("component.border.size");
 
   if (font == nullptr) {
     return t;

@@ -199,6 +199,8 @@ class BallDrop : public jgui::Window {
 		BallDrop():
 			jgui::Window({720, 480})
 		{
+      SetFramesPerSecond(60);
+
 			jgui::Image 
         *image;
       jgui::jsize_t<int>
@@ -266,22 +268,6 @@ class BallDrop : public jgui::Window {
       delete ball;
 		}
 
-    void Framerate(int fps)
-    {
-      static auto begin = std::chrono::steady_clock::now();
-      static int index = 0;
-
-      std::chrono::time_point<std::chrono::steady_clock> timestamp = begin + std::chrono::milliseconds(index++*(1000/fps));
-      std::chrono::time_point<std::chrono::steady_clock> current = std::chrono::steady_clock::now();
-      std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - current);
-
-      if (diff.count() < 0) {
-        return;
-      }
-
-      std::this_thread::sleep_for(diff);
-    }
-
 		void Paint(jgui::Graphics *g) 
 		{
       jgui::jsize_t<int>
@@ -298,7 +284,7 @@ class BallDrop : public jgui::Window {
 				backGraphics = backImage->GetGraphics();
 
 				// Erase the previous image.
-				backGraphics->SetColor(GetTheme()->GetIntegerParam("window.bg"));
+				backGraphics->SetColor(GetTheme().GetIntegerParam("window.bg"));
 				backGraphics->FillRectangle({0, 0, size.width, size.height});
 				backGraphics->SetColor({0x00, 0x00, 0x00, 0xff});
 
@@ -320,9 +306,7 @@ class BallDrop : public jgui::Window {
 			}
 
 			g->DrawImage(offImage, jgui::jpoint_t<int>{0, 0});
-
-       Framerate(60);
-
+      
 			Repaint();
 		}
 

@@ -53,7 +53,7 @@ class ProgressBar : public jgui::Component {
      * \brief
      *
      */
-    ProgressBar(jgui::jrect_t<int> bounds = {0, 0, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT}, jscroll_orientation_t type = JSO_HORIZONTAL);
+    ProgressBar(jscroll_orientation_t type = JSO_HORIZONTAL);
     
     /**
      * \brief

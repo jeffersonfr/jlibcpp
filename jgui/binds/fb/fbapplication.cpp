@@ -421,6 +421,8 @@ static void InternalPaint()
 
 	sg_back_buffer->UnlockData();
 
+  Application::FrameRate(sg_jgui_window->GetFramesPerSecond());
+
   sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
 }
 
@@ -569,8 +571,6 @@ void Application::Loop()
 
       sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, jevent::JMB_NONE, {sg_mouse_x + sg_cursor_params.hot_x, sg_mouse_y + sg_cursor_params.hot_y}, mouse_z));
     }
-
-    std::this_thread::yield();
   }
 
   sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_CLOSED));

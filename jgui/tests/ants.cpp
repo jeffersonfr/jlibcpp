@@ -300,6 +300,8 @@ class Main : public jgui::Window {
 				size = GetSize();
 			char tmp[255];
 
+      g->SetCompositeFlags(jgui::JCF_SRC_OVER);
+
 			if (foffscreen == nullptr) {
 				foffscreen = new jgui::BufferedImage(jgui::JPF_RGB32, size);
 			
@@ -310,7 +312,7 @@ class Main : public jgui::Window {
 				jgui::Window::Paint(goff);
 
 				goff->SetColor({0x00, 0x00, 0x00, 0xff});
-				goff->DrawString(tmp, jgui::jpoint_t<int>{0, size.height - 50});
+				goff->DrawString(tmp, jgui::jpoint_t<int>{0, size.height - 32});
 
 				goff->SetFont(fweights);
 

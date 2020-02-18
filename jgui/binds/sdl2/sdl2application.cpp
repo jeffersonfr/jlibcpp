@@ -370,9 +370,6 @@ void Application::Init(int argc, char **argv)
 
 static void InternalPaint()
 {
-  // TODO:: dispose on quit
-  static SDL_Surface *surface = nullptr;
-
 	if (sg_jgui_window == nullptr || sg_jgui_window->IsVisible() == false) {
 		return;
 	}
@@ -392,11 +389,6 @@ static void InternalPaint()
 
   if (sg_back_buffer == nullptr) {
     sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, bounds.size);
-
-    if (surface != nullptr) {
-      SDL_FreeSurface(surface);
-      surface = nullptr;
-    }
   }
 
   jgui::Graphics 
@@ -410,21 +402,22 @@ static void InternalPaint()
 
   g->Flush();
   
-  if (surface == nullptr) {
-    uint32_t *data = (uint32_t *)sg_back_buffer->LockData();
+  uint32_t *data = (uint32_t *)sg_back_buffer->LockData();
     
-    surface = SDL_CreateRGBSurfaceFrom(data, bounds.size.width, bounds.size.height, 32, bounds.size.width*4, 0, 0, 0, 0);
-  
-    sg_back_buffer->UnlockData();
-  }
-
+  SDL_Surface *surface = SDL_CreateRGBSurfaceFrom(data, bounds.size.width, bounds.size.height, 32, bounds.size.width*4, 0, 0, 0, 0);
   SDL_Texture *texture = SDL_CreateTextureFromSurface(sg_renderer, surface);
   
+  sg_back_buffer->UnlockData();
+  
+  // SDL_RenderClear(sg_renderer);
   SDL_RenderCopy(sg_renderer, texture, nullptr, nullptr);
   SDL_RenderPresent(sg_renderer);
   
   SDL_DestroyTexture(texture);
-  
+  SDL_FreeSurface(surface);
+
+  Application::FrameRate(sg_jgui_window->GetFramesPerSecond());
+
   sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
 }
 
@@ -575,8 +568,6 @@ void Application::Loop()
         break;
       }
     }
-
-    std::this_thread::yield();
   }
 
   sg_jgui_window->SetVisible(false);
@@ -629,7 +620,7 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 		throw jexception::RuntimeException("Cannot create a window");
 	}
 
-	sg_renderer = SDL_CreateRenderer(sg_window, 0, SDL_RENDERER_ACCELERATED); // | SDL_RENDERER_PRESENTVSYNC);
+	sg_renderer = SDL_CreateRenderer(sg_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	// sg_renderer = SDL_CreateRenderer(sg_window, 0, SDL_RENDERER_SOFTWARE);
 
 	if (sg_renderer == nullptr) {

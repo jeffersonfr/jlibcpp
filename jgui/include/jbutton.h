@@ -58,13 +58,13 @@ class Button : public Component {
      * \brief
      *
      */
-    Button(std::string label, jgui::jrect_t<int> bounds = {0, 0, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT});
+    Button(std::string label);
     
     /**
      * \brief
      *
      */
-    Button(std::string label, jgui::Image *image, jgui::jrect_t<int> bounds = {0, 0, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT});
+    Button(std::string label, jgui::Image *image);
     
     /**
      * \brief

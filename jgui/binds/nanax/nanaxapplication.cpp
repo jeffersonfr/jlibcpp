@@ -274,6 +274,8 @@ static void InternalPaint()
     
     dw->update();
 
+    Application::FrameRate(sg_jgui_window->GetFramesPerSecond());
+
     sg_paint_condition.wait_for(lock, std::chrono::milliseconds(1));
   }
 }

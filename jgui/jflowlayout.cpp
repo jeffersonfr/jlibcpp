@@ -167,11 +167,13 @@ jsize_t<int> FlowLayout::GetMinimumLayoutSize(Container *target)
   jsize_t<int> t = {0, 0};
 
   // WARN:: sync parent
-  int nmembers = target->GetComponentCount(),
-      maxAscent = 0,
-      maxDescent = 0;
-  bool useBaseline = GetAlignOnBaseline(),
-       firstVisibleComponent = true;
+  int 
+    nmembers = target->GetComponentCount(),
+    maxAscent = 0,
+    maxDescent = 0;
+  bool 
+    useBaseline = GetAlignOnBaseline(),
+    firstVisibleComponent = true;
 
   for (int i = 0 ; i < nmembers ; i++) {
     Component *m = target->GetComponents()[i];
@@ -224,17 +226,19 @@ jsize_t<int> FlowLayout::GetPreferredLayoutSize(Container *target)
   jsize_t<int> t = {0, 0};
 
   // WARN:: sync parent
-  int nmembers = target->GetComponentCount(),
-      maxAscent = 0,
-      maxDescent = 0;
-  bool firstVisibleComponent = true,
-       useBaseline = GetAlignOnBaseline();
+  int 
+    nmembers = target->GetComponentCount(),
+    maxAscent = 0,
+    maxDescent = 0;
+  bool 
+    firstVisibleComponent = true,
+    useBaseline = GetAlignOnBaseline();
 
   for (int i = 0 ; i < nmembers ; i++) {
     Component *m = target->GetComponents()[i];
 
     if (m->IsVisible()) {
-      jsize_t<int> d = m->GetMinimumSize();
+      jsize_t<int> d = m->GetPreferredSize();
 
       t.height = jmath::Math<int>::Max(t.height, d.height);
 

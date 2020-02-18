@@ -109,11 +109,11 @@ class Window : public jgui::Container {
     /** \brief */
     Window *_instance;
     /** \brief */
-    Font *_font;
-    /** \brief */
     EventManager *_event_manager;
     /** \brief */
     Component *_focus_owner;
+    /** \brief */
+    int _fps;
 
   public:
     /**
@@ -168,17 +168,32 @@ class Window : public jgui::Container {
      * \brief
      *
      */
+    void SetFramesPerSecond(int fps);
+
+    /**
+     * \brief
+     *
+     */
+    int GetFramesPerSecond();
+    
+    /**
+     * \brief
+     *
+     */
     jgui::Component * GetFocusOwner();
+    
     /**
      * \brief
      *
      */
     void RequestComponentFocus(jgui::Component *c);
+    
     /**
      * \brief
      *
      */
     void ReleaseComponentFocus(jgui::Component *c);
+    
     /**
      * \brief
      *

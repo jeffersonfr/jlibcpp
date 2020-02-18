@@ -83,24 +83,18 @@ void Panel::Paint(Graphics *g)
 
 void Panel::PaintGlassPane(Graphics *g)
 {
-  Theme *theme = GetTheme();
-
-  if (theme == nullptr) {
-    return;
-  }
-
   jgui::Font 
-    *font = theme->GetFont("window.font");
+    *font = GetTheme().GetFont("window.font");
   jgui::jcolor_t<float>
-    bg = theme->GetIntegerParam("window.bg"),
-    fg = theme->GetIntegerParam("window.fg"),
-    scroll = theme->GetIntegerParam("window.scroll");
+    bg = GetTheme().GetIntegerParam("window.bg"),
+    fg = GetTheme().GetIntegerParam("window.fg"),
+    scroll = GetTheme().GetIntegerParam("window.scroll");
   jgui::jsize_t<int>
     size = GetSize();
   jinsets_t<int>
     insets = GetInsets();
   int 
-    bs = theme->GetIntegerParam("window.border.size");
+    bs = GetTheme().GetIntegerParam("window.border.size");
 
   if (_title != "") {
     g->SetGradientStop(0.0, bg);

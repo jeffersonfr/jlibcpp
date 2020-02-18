@@ -21,9 +21,12 @@
 #include "jgui/jwindow.h"
 #include "jgui/jbufferedimage.h"
 
+#include <mutex>
+
 class Main : public jgui::Window {
 
 	private:
+    std::mutex _mutex;
 		jgui::Image *_image;
 		jgui::Image *_tiles;
 		double _tx;
@@ -45,6 +48,8 @@ class Main : public jgui::Window {
 		Main(int n, int p):
 			jgui::Window(jgui::jsize_t<int>{720, 480})
 		{
+      SetFramesPerSecond(30);
+
 			_running = true;
 			_tx = 200;
 			_ty = 200;
@@ -77,7 +82,11 @@ class Main : public jgui::Window {
 
 		virtual ~Main()
 		{
+      SetVisible(false);
+
 			_running = false;
+
+      _mutex.unlock();
 
 			delete _image;
 			delete _tiles;
@@ -108,23 +117,9 @@ class Main : public jgui::Window {
 			g->DrawImage(image, jgui::jpoint_t<int>{(int)_tx - isize.width/2, (int)_ty - isize.height/2});
 
 			delete image;
+
+      _mutex.unlock();
 		}
-
-    void Framerate(int fps)
-    {
-      static auto begin = std::chrono::steady_clock::now();
-      static int index = 0;
-
-      std::chrono::time_point<std::chrono::steady_clock> timestamp = begin + std::chrono::milliseconds(index++*(1000/fps));
-      std::chrono::time_point<std::chrono::steady_clock> current = std::chrono::steady_clock::now();
-      std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - current);
-
-      if (diff.count() < 0) {
-        return;
-      }
-
-      std::this_thread::sleep_for(diff);
-    }
 
 		virtual void ShowApp() 
 		{
@@ -158,9 +153,9 @@ class Main : public jgui::Window {
 					_has_bullet = false;
 				}
 
-        Framerate(25);
-
 				Repaint();
+
+        _mutex.lock();
 			}
 		}
 

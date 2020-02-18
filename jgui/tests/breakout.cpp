@@ -69,6 +69,8 @@ class Breakout : public jgui::Window {
 		Breakout():
 			jgui::Window(/*"BreakOut", */ {720, 480})
 		{
+      SetFramesPerSecond(60);
+
 			off = nullptr;
 			goff = nullptr;
 
@@ -168,22 +170,6 @@ class Breakout : public jgui::Window {
 		}
 		*/
 
-    void Framerate(int fps)
-    {
-      static auto begin = std::chrono::steady_clock::now();
-      static int index = 0;
-
-      std::chrono::time_point<std::chrono::steady_clock> timestamp = begin + std::chrono::milliseconds(index++*(1000/fps));
-      std::chrono::time_point<std::chrono::steady_clock> current = std::chrono::steady_clock::now();
-      std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - current);
-
-      if (diff.count() < 0) {
-        return;
-      }
-
-      std::this_thread::sleep_for(diff);
-    }
-
 		virtual void Paint(jgui::Graphics *g)
 		{
       jgui::jsize_t<int>
@@ -199,7 +185,7 @@ class Breakout : public jgui::Window {
 				return;
 			}
 
-			goff->SetColor(GetTheme()->GetIntegerParam("window.bg"));
+			goff->SetColor(GetTheme().GetIntegerParam("window.bg"));
 			goff->FillRectangle({0, 0, size.width, size.height});
 
 			if (ingame) {
@@ -209,8 +195,6 @@ class Breakout : public jgui::Window {
 			}
 
 			g->DrawImage(off, jgui::jpoint_t<int>{0, 0});
-
-      Framerate(60);
 
       Repaint();
 		}
@@ -243,8 +227,7 @@ class Breakout : public jgui::Window {
 				showtitle = !showtitle;
 			}
 			
-			jgui::Theme *theme = GetTheme();
-			jgui::Font *font = theme->GetFont("widget");
+			jgui::Font *font = GetTheme().GetFont("widget");
 			jgui::jsize_t<int> size = GetSize();
 
 			if (font != nullptr) {
@@ -297,10 +280,8 @@ class Breakout : public jgui::Window {
 
 		void ShowScore()
 		{
-			jgui::Theme 
-        *theme = GetTheme();
 			jgui::Font 
-        *font = theme->GetFont("widget");
+        *font = GetTheme().GetFont("widget");
       jgui::jsize_t<int>
         size = GetSize();
 

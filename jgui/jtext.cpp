@@ -17,17 +17,17 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jgui/jlabel.h"
+#include "jgui/jtext.h"
 #include "jcommon/jstringtokenizer.h"
 #include "jcommon/jstringutils.h"
 #include "jlogger/jloggerlib.h"
 
 namespace jgui {
 
-Label::Label(std::string text, jgui::jrect_t<int> bounds):
-   Component(bounds)
+Text::Text(std::string text):
+   Component()
 {
-  jcommon::Object::SetClassName("jgui::Label");
+  jcommon::Object::SetClassName("jgui::Text");
 
   _halign = JHA_CENTER;
   _valign = JVA_CENTER;
@@ -36,11 +36,11 @@ Label::Label(std::string text, jgui::jrect_t<int> bounds):
   _is_wrap = false;
 }
 
-Label::~Label()
+Text::~Text()
 {
 }
 
-void Label::SetWrap(bool b)
+void Text::SetWrap(bool b)
 {
   if (_is_wrap == b) {
     return;
@@ -51,24 +51,24 @@ void Label::SetWrap(bool b)
   Repaint();
 }
 
-bool Label::IsWrap()
+bool Text::IsWrap()
 {
   return _is_wrap;
 }
 
-std::string Label::GetText()
+std::string Text::GetText()
 {
   return _text;
 }
 
-void Label::SetText(std::string text)
+void Text::SetText(std::string text)
 {
   _text = text;
 
   Repaint();
 }
 
-void Label::SetHorizontalAlign(jhorizontal_align_t align)
+void Text::SetHorizontalAlign(jhorizontal_align_t align)
 {
   if (_halign != align) {
     _halign = align;
@@ -77,12 +77,12 @@ void Label::SetHorizontalAlign(jhorizontal_align_t align)
   }
 }
 
-jhorizontal_align_t Label::GetHorizontalAlign()
+jhorizontal_align_t Text::GetHorizontalAlign()
 {
   return _halign;
 }
 
-void Label::SetVerticalAlign(jvertical_align_t align)
+void Text::SetVerticalAlign(jvertical_align_t align)
 {
   if (_valign != align) {
     _valign = align;
@@ -91,32 +91,25 @@ void Label::SetVerticalAlign(jvertical_align_t align)
   }
 }
 
-jvertical_align_t Label::GetVerticalAlign()
+jvertical_align_t Text::GetVerticalAlign()
 {
   return _valign;
 }
 
-jsize_t<int> Label::GetPreferredSize()
+jsize_t<int> Text::GetPreferredSize()
 {
-  Theme 
-    *theme = GetTheme();
-
   jsize_t<int> 
     t = {
       0, 0
     };
 
-  if (theme == nullptr) {
-    return t;
-  }
-
   jgui::Font 
-    *font = theme->GetFont("component.font");
+    *font = GetTheme().GetFont("component.font");
   jgui::jsize_t<int>
     size = GetSize();
   int
-    gx = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
-    gy = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size");
+    gx = GetTheme().GetIntegerParam("component.hgap") + GetTheme().GetIntegerParam("component.border.size"),
+    gy = GetTheme().GetIntegerParam("component.vgap") + GetTheme().GetIntegerParam("component.border.size");
 
   if (font != nullptr) {
     int 
@@ -135,30 +128,24 @@ jsize_t<int> Label::GetPreferredSize()
   return t;
 }
 
-void Label::Paint(Graphics *g)
+void Text::Paint(Graphics *g)
 {
   JDEBUG(JINFO, "paint\n");
 
   Component::Paint(g);
 
-  Theme *theme = GetTheme();
-  
-  if (theme == nullptr) {
-    return;
-  }
-
   jgui::Font 
-    *font = theme->GetFont("component.font");
+    *font = GetTheme().GetFont("component.font");
   jgui::jcolor_t<float>
-    // bg = theme->GetIntegerParam("component.bg"),
-    fg = theme->GetIntegerParam("component.fg"),
-    fgfocus = theme->GetIntegerParam("component.fg.focus"),
-    fgdisable = theme->GetIntegerParam("component.fg.disable");
+    // bg = GetTheme().GetIntegerParam("component.bg"),
+    fg = GetTheme().GetIntegerParam("component.fg"),
+    fgfocus = GetTheme().GetIntegerParam("component.fg.focus"),
+    fgdisable = GetTheme().GetIntegerParam("component.fg.disable");
   jgui::jsize_t<int>
     size = GetSize();
   int
-    x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
-    y = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
+    x = GetTheme().GetIntegerParam("component.hgap") + GetTheme().GetIntegerParam("component.border.size"),
+    y = GetTheme().GetIntegerParam("component.vgap") + GetTheme().GetIntegerParam("component.border.size"),
     w = size.width - 2*x,
     h = size.height - 2*y;
 

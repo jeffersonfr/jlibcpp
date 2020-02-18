@@ -25,54 +25,43 @@ class Main : public jgui::Window {
 
 	private:
 		jgui::Container 
-      *_container1,
-			*_container2;
+      _container1 = {{100, 100, 960, 540}},
+			_container2 = {{-200, 200, 960, 540}};
 		jgui::Button 
-      *_button1,
-			*_button2,
-			*_button3,
-			*_button4,
-			*_button5;
+      _button1 = {"Button 1"},
+			_button2 = {"Button 2"},
+			_button3 = {"Button 3"},
+			_button4 = {"Button 4"},
+			_button5 = {"Button 5"};
 
 	public:
-		Main(std::string title, int w, int h):
-			jgui::Window(/*title, */ {w, h})
+		Main(std::string title, int width, int height):
+			jgui::Window({width, height})
 		{
-			int ws = 120,
-					hs = 60;
+			int 
+        ws = 128,
+				hs = 48;
 
-			_container1 = new Container({100, 100, 960, 540});
-			_container2 = new Container({-200, 200, 960, 540});
+			_button1.SetBounds({50, 100, ws, hs});
+			_button2.SetBounds({100, 100, ws, hs});
+			_button3.SetBounds({400, 100, ws, hs});
+			_button4.SetBounds({800, 100, ws, hs});
+			_button5.SetBounds({100, 800, ws, hs});
 
-			_button1 = new jgui::Button("Button 1", {50, 100, ws, hs});
-			_button2 = new jgui::Button("Button 2", {100, 100, ws, hs});
-			_button3 = new jgui::Button("Button 3", {400, 100, ws, hs});
-			_button4 = new jgui::Button("Button 4", {800, 100, ws, hs});
-			_button5 = new jgui::Button("Button 5", {100, 800, ws, hs});
+			_container1.Add(&_button1);
+			_container1.Add(&_button5);
+			_container1.Add(&_container2);
 
-			_container1->Add(_button1);
-			_container1->Add(_button5);
-			_container1->Add(_container2);
+			_container2.Add(&_button2);
+			_container2.Add(&_button3);
+			_container2.Add(&_button4);
 
-			_container2->Add(_button2);
-			_container2->Add(_button3);
-			_container2->Add(_button4);
-
-			Add(_container1);
+			Add(&_container1);
 		}
 
 		virtual ~Main()
 		{
 			RemoveAll();
-
-			delete _button1;
-			delete _button2;
-			delete _button3;
-			delete _button4;
-			delete _button5;
-
-			delete _container2;
-			delete _container1;
 		}
 
 };

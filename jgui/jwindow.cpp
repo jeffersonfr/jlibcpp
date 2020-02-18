@@ -37,9 +37,9 @@ Window::Window(Window *window):
 {
   jcommon::Object::SetClassName("jgui::Window");
 
+  _fps = 30;
   _focus_owner = nullptr;
   _event_manager = nullptr;
-  _font = nullptr;
   _instance = nullptr;
 }
 
@@ -55,22 +55,11 @@ Window::Window(jgui::jsize_t<int> size, jgui::jpoint_t<int> point):
   _instance->SetParent(this);
 
   _focus_owner = nullptr;
+  _fps = 30;
 
   _event_manager = new EventManager(this);
 
-  jgui::jinsets_t<int> insets = {8, 8, 8, 8};
-
-  SetInsets(insets);
-
-  jgui::Theme
-    *theme = jgui::Theme::GetDefaultTheme();
-
-  _font = new Font(_DATA_PREFIX"/fonts/default.ttf", (jfont_attributes_t)(JFA_NORMAL), DEFAULT_FONT_SIZE);
-
-  theme->SetFont("component.font", _font);
-  theme->SetFont("container.font", _font);
-  theme->SetFont("window.font", _font);
-
+  SetInsets({8, 8, 8, 8});
   SetTitle("Main");
   SetLayout(nullptr);
   SetBackgroundVisible(true);
@@ -87,11 +76,6 @@ Window::~Window()
   if (_event_manager != nullptr) {
     delete _event_manager;
     _event_manager = nullptr;
-  }
-
-  if (_font != nullptr) {
-    delete _font;
-    _font = nullptr;
   }
 
   delete _instance;
@@ -288,17 +272,10 @@ void Window::PaintGlassPane(Graphics *g)
 {
   Container::PaintGlassPane(g);
 
-  Theme 
-    *theme = GetTheme();
-
-  if (theme == nullptr) {
-    return;
-  }
-
   jgui::Font 
-    *font = theme->GetFont("window.font");
+    *font = GetTheme().GetFont("window.font");
   jgui::jcolor_t<float>
-    fg = theme->GetIntegerParam("window.fg");
+    fg = GetTheme().GetIntegerParam("window.fg");
   jgui::jsize_t
     size = GetSize();
   jgui::jinsets_t
@@ -335,12 +312,11 @@ void Window::PaintGlassPane(Graphics *g)
     return;
   }
 
-  Theme *theme = GetTheme();
-  jgui::Font *font = theme->GetFont("window.font");
-  Color bg = theme->GetColor("widget.bg");
-  Color fg = theme->GetColor("widget.fg");
-  Color scroll = theme->GetColor("widget.scroll");
-  int bordersize = theme->GetBorderSize("widget");
+  jgui::Font *font = GetTheme().GetFont("window.font");
+  Color bg = GetTheme().GetColor("widget.bg");
+  Color fg = GetTheme().GetColor("widget.fg");
+  Color scroll = GetTheme().GetColor("widget.scroll");
+  int bordersize = GetTheme().GetBorderSize("widget");
   
   jinsets_t insets = GetInsets();
 
@@ -400,6 +376,16 @@ void Window::PaintGlassPane(Graphics *g)
     }
   }
   */
+}
+
+void Window::SetFramesPerSecond(int fps)
+{
+  _fps = fps;
+}
+
+int Window::GetFramesPerSecond()
+{
+  return _fps;
 }
 
 void Window::Paint(jgui::Graphics *g)

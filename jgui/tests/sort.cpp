@@ -1704,8 +1704,7 @@ class SortComponent : public jgui::Component, public jcommon::Observer {
 				g->DrawRectangle({0, _algorithm->GetIndex1()*hsize, size.width, hsize});
 			}
 
-			jgui::Theme *theme = GetTheme();
-			jgui::Font *font = theme->GetFont("component.font");
+			jgui::Font *font = GetTheme().GetFont("component.font");
 
 			g->SetColor(jgui::jcolor_name_t::White);
 			g->SetFont(font);

@@ -34,28 +34,14 @@ class WatchTeste : public jgui::Window {
 		WatchTeste():
 			jgui::Window(/*"Watch Teste", */ {320, 320})
 		{
+      SetFramesPerSecond(1);
+
 			_filled = false; // true;
 		}
 
 		virtual ~WatchTeste()
 		{
 		}
-
-    void Framerate(int fps)
-    {
-      static auto begin = std::chrono::steady_clock::now();
-      static int index = 0;
-
-      std::chrono::time_point<std::chrono::steady_clock> timestamp = begin + std::chrono::milliseconds(index++*(1000/fps));
-      std::chrono::time_point<std::chrono::steady_clock> current = std::chrono::steady_clock::now();
-      std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - current);
-
-      if (diff.count() < 0) {
-        return;
-      }
-
-      std::this_thread::sleep_for(diff);
-    }
 
 		virtual void Paint(jgui::Graphics *g)
 		{
@@ -113,8 +99,7 @@ class WatchTeste : public jgui::Window {
 				// g->DrawLine({(int)(xc+(vs+10)*cos(teta)), (int)(yc+(vs+10)*sin(teta))}, {(int)(xc+(vs+10+10)*cos(teta)), (int)(yc+(vs+10+10)*sin(teta))});
 			}
 
-			jgui::Theme *theme = GetTheme();
-			jgui::Font *font = theme->GetFont("component");
+			jgui::Font *font = GetTheme().GetFont("component");
 
 			g->SetColor(jgui::jcolor_name_t::White);
 			g->SetFont(font);
@@ -166,12 +151,10 @@ class WatchTeste : public jgui::Window {
 
       o << std::setw(2) << std::setfill('0') << lt->tm_mday;
 
-      g->SetFont(GetTheme()->GetFont("component.font"));
+      g->SetFont(GetTheme().GetFont("component.font"));
       g->SetColor(jgui::jcolor_name_t::White);
       g->DrawRectangle({92, 92, 34, 34});
       g->DrawString(o.str(), jgui::jpoint_t<int>{100, 100});
-
-      Framerate(1);
 
       Repaint();
 		}

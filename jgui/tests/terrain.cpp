@@ -28,35 +28,24 @@
 class Terrain : public jgui::Window {
 
 	private:
-    jgui::Image *_buffer;
-    std::mutex _mutex;
+    std::mutex 
+      _mutex;
+    jgui::Image 
+      *_buffer;
 
 	public:
 		Terrain():
 			jgui::Window({720, 480})
 		{
+      SetFramesPerSecond(30);
+
       _buffer = new jgui::BufferedImage(jgui::JPF_RGB32, {720, 480});
 		}
 
 		virtual ~Terrain()
 		{
+      _mutex.unlock();
 		}
-
-    void Framerate(int fps)
-    {
-      static auto begin = std::chrono::steady_clock::now();
-      static int index = 0;
-
-      std::chrono::time_point<std::chrono::steady_clock> timestamp = begin + std::chrono::milliseconds(index++*(1000/fps));
-      std::chrono::time_point<std::chrono::steady_clock> current = std::chrono::steady_clock::now();
-      std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - current);
-
-      if (diff.count() < 0) {
-        return;
-      }
-
-      std::this_thread::sleep_for(diff);
-    }
 
 		virtual void ShowApp() 
 		{
@@ -65,8 +54,6 @@ class Terrain : public jgui::Window {
 
 			do {
         for (float t=1; t<60 and IsHidden() == false; t+=0.3) {
-          _mutex.lock();
-
           g->Clear();
 
           for (int y1=0; y1<24 and IsHidden() == false; y1++) {
@@ -128,11 +115,9 @@ class Terrain : public jgui::Window {
             }
           }
 
-          _mutex.unlock();
-
-          Framerate(25);
-          
           Repaint();
+          
+          _mutex.lock();
         }
 			} while (IsHidden() == false);
       
@@ -142,8 +127,6 @@ class Terrain : public jgui::Window {
 
 		void Paint(jgui::Graphics *g) 
 		{
-      _mutex.lock();
-
       g->DrawImage(_buffer, jgui::jpoint_t<int>{0, 0});
       
       _mutex.unlock();

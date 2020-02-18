@@ -50,7 +50,7 @@ class ScrollBar : public jgui::SliderComponent {
      * \brief
      *
      */
-    ScrollBar(jgui::jrect_t<int> bounds = {0, 0, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT});
+    ScrollBar();
     
     /**
      * \brief

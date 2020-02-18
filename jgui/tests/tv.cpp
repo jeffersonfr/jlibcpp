@@ -30,27 +30,12 @@ class TV : public jgui::Window {
 		TV():
 			jgui::Window({320, 240})
 		{
+      SetFramesPerSecond(30);
 		}
 
 		virtual ~TV()
 		{
 		}
-
-    void Framerate(int fps)
-    {
-      static auto begin = std::chrono::steady_clock::now();
-      static int index = 0;
-
-      std::chrono::time_point<std::chrono::steady_clock> timestamp = begin + std::chrono::milliseconds(index++*(1000/fps));
-      std::chrono::time_point<std::chrono::steady_clock> current = std::chrono::steady_clock::now();
-      std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - current);
-
-      if (diff.count() < 0) {
-        return;
-      }
-
-      std::this_thread::sleep_for(diff);
-    }
 
 		void Paint(jgui::Graphics *g) 
 		{
@@ -82,8 +67,6 @@ class TV : public jgui::Window {
       }
 
       g->SetRGBArray(buffer, {0, 0, size.width, size.height});
-
-      Framerate(25);
 
       Repaint();
     }

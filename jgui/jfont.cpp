@@ -28,6 +28,12 @@ namespace jgui {
 
 static FT_Library _ft_library;
 
+Font Font::TINY(_DATA_PREFIX"/fonts/default.ttf", (jfont_attributes_t)(JFA_NORMAL), 8);
+Font Font::SMALL(_DATA_PREFIX"/fonts/default.ttf", (jfont_attributes_t)(JFA_NORMAL), 12);
+Font Font::NORMAL(_DATA_PREFIX"/fonts/default.ttf", (jfont_attributes_t)(JFA_NORMAL), 16);
+Font Font::BIG(_DATA_PREFIX"/fonts/default.ttf", (jfont_attributes_t)(JFA_NORMAL), 20);
+Font Font::HUGE(_DATA_PREFIX"/fonts/default.ttf", (jfont_attributes_t)(JFA_NORMAL), 24);
+
 int InternalCreateFont(std::string name, cairo_font_face_t **font)
 {
   static bool init = false;

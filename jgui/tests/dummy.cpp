@@ -5,7 +5,7 @@ class Dummy : public jgui::Window {
 
   public:
     Dummy():
-      jgui::Window(100, 100)
+      jgui::Window({100, 100})
     {
     }
 

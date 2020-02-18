@@ -105,17 +105,11 @@ void Animation::Paint(Graphics *g)
 
   Component::Paint(g);
 
-  Theme *theme = GetTheme();
-
-  if (theme == nullptr) {
-    return;
-  }
-
   jgui::jsize_t
     size = GetSize();
   int 
-    x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
-    y = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
+    x = GetTheme().GetIntegerParam("component.hgap") + GetTheme().GetIntegerParam("component.border.size"),
+    y = GetTheme().GetIntegerParam("component.vgap") + GetTheme().GetIntegerParam("component.border.size"),
     w = size.width - 2*x,
     h = size.height - 2*y;
 

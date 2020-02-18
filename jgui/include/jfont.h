@@ -88,6 +88,13 @@ class Font : public virtual jcommon::Object {
     jfont_encoding_t _encoding;
 
   public:
+    static Font TINY;
+    static Font SMALL;
+    static Font NORMAL;
+    static Font BIG;
+    static Font HUGE;
+
+  public:
     /**
      * \brief
      *

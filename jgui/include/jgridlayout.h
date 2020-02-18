@@ -46,7 +46,7 @@ class GridLayout : public Layout {
      * \brief
      *
      */
-    GridLayout(int rows = 1, int cols = 1, int hgap = 10, int vgap = 10);
+    GridLayout(int rows = 1, int cols = 1, int hgap = 8, int vgap = 8);
     
     /**
      * \brief

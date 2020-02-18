@@ -23,8 +23,8 @@
 
 namespace jgui {
 
-ListBox::ListBox(jgui::jrect_t<int> bounds):
-  Component(bounds),
+ListBox::ListBox():
+  Component(),
   ItemComponent()
 {
   jcommon::Object::SetClassName("jgui::ListBox");
@@ -105,20 +105,13 @@ void ListBox::SetCurrentIndex(int i)
     throw jexception::OutOfBoundsException("Index out of bounds exception");
   }
 
-  jgui::Theme 
-    *theme = GetTheme();
-
   _index = i;
-
-  if (theme == nullptr) {
-    return;
-  }
 
   jgui::jpoint_t<int>
     slocation = GetScrollLocation();
   int 
-    is = theme->GetIntegerParam("item.size"),
-    ig = theme->GetIntegerParam("item.gap");
+    is = GetTheme().GetIntegerParam("item.size"),
+    ig = GetTheme().GetIntegerParam("item.gap");
 
   SetScrollLocation(slocation.x, _index*(is + ig));
 }
@@ -224,20 +217,13 @@ int ListBox::GetSelectedIndex()
 
 jsize_t<int> ListBox::GetPreferredSize()
 {
-  Theme 
-    *theme = GetTheme();
-
-  if (theme == nullptr) {
-    return jgui::jsize_t<int> {0, 0};
-  }
-
   jgui::jsize_t<int> 
     t = GetSize();
   int
-    // gx = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
-    gy = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
-    is = theme->GetIntegerParam("item.size"),
-    ig = theme->GetIntegerParam("item.gap");
+    // gx = GetTheme().GetIntegerParam("component.hgap") + GetTheme().GetIntegerParam("component.border.size"),
+    gy = GetTheme().GetIntegerParam("component.vgap") + GetTheme().GetIntegerParam("component.border.size"),
+    is = GetTheme().GetIntegerParam("item.size"),
+    ig = GetTheme().GetIntegerParam("item.gap");
 
   // t.width = t.width;
   t.height = 2*gy + _items.size()*(is + ig) - ig;
@@ -255,23 +241,16 @@ bool ListBox::KeyPressed(jevent::KeyEvent *event)
     return false;
   }
 
-  Theme 
-    *theme = GetTheme();
-
-  if (theme == nullptr) {
-    return false;
-  }
-  
   jgui::jsize_t<int>
     size = GetSize();
   jevent::jkeyevent_symbol_t 
     action = event->GetSymbol();
   int
-    bs = theme->GetIntegerParam("component.border.size"),
-    is = theme->GetIntegerParam("item.size"),
-    ig = theme->GetIntegerParam("item.gap"),
-    // hp = theme->GetIntegerParam("component.hgap"),
-    vg = theme->GetIntegerParam("component.vgap");
+    bs = GetTheme().GetIntegerParam("component.border.size"),
+    is = GetTheme().GetIntegerParam("item.size"),
+    ig = GetTheme().GetIntegerParam("item.gap"),
+    // hp = GetTheme().GetIntegerParam("component.hgap"),
+    vg = GetTheme().GetIntegerParam("component.vgap");
   bool 
     catched = false;
 
@@ -345,17 +324,10 @@ bool ListBox::MouseWheel(jevent::MouseEvent *event)
     return true;
   }
   
-  Theme 
-    *theme = GetTheme();
-
-  if (theme == nullptr) {
-    return false;
-  }
-  
   jgui::jpoint_t<int>
     slocation = GetScrollLocation();
 
-  SetScrollLocation(slocation.x, slocation.y + theme->GetIntegerParam("item.size")*event->GetClicks());
+  SetScrollLocation(slocation.x, slocation.y + GetTheme().GetIntegerParam("item.size")*event->GetClicks());
 
   Repaint();
 
@@ -368,43 +340,37 @@ void ListBox::Paint(Graphics *g)
 
   Component::Paint(g);
 
-  Theme *theme = GetTheme();
-  
-  if (theme == nullptr) {
-    return;
-  }
-  
   jgui::Font 
-    *font = theme->GetFont("component.font");
+    *font = GetTheme().GetFont("component.font");
   jgui::jcolor_t<float>
-    // bg = theme->GetIntegerParam("component.bg"),
-    // fg = theme->GetIntegerParam("component.fg"),
-    // fgfocus = theme->GetIntegerParam("component.fg.focus"),
-    // fgdisable = theme->GetIntegerParam("component.fg.disable"),
-    itembg = theme->GetIntegerParam("item.bg"),
-    itemfg = theme->GetIntegerParam("item.fg"),
-    itembgselect = theme->GetIntegerParam("item.bg.select"),
-    itembgdisable = theme->GetIntegerParam("item.bg.disable"),
-    itemfgdisable = theme->GetIntegerParam("item.fg.disable"),
-    itembgfocus = theme->GetIntegerParam("item.bg.focus"),
-    itemfgfocus = theme->GetIntegerParam("item.fg.focus");
+    // bg = GetTheme().GetIntegerParam("component.bg"),
+    // fg = GetTheme().GetIntegerParam("component.fg"),
+    // fgfocus = GetTheme().GetIntegerParam("component.fg.focus"),
+    // fgdisable = GetTheme().GetIntegerParam("component.fg.disable"),
+    itembg = GetTheme().GetIntegerParam("item.bg"),
+    itemfg = GetTheme().GetIntegerParam("item.fg"),
+    itembgselect = GetTheme().GetIntegerParam("item.bg.select"),
+    itembgdisable = GetTheme().GetIntegerParam("item.bg.disable"),
+    itemfgdisable = GetTheme().GetIntegerParam("item.fg.disable"),
+    itembgfocus = GetTheme().GetIntegerParam("item.bg.focus"),
+    itemfgfocus = GetTheme().GetIntegerParam("item.fg.focus");
   jpoint_t<int> 
     scroll_location = GetScrollLocation();
   jgui::jsize_t<int>
     size = GetSize();
   // int 
-    // bs = theme->GetIntegerParam("component.border.size"),
-    // ss = theme->GetIntegerParam("component.scroll.size"),
-    // sg = theme->GetIntegerParam("component.scroll.gap");
+    // bs = GetTheme().GetIntegerParam("component.border.size"),
+    // ss = GetTheme().GetIntegerParam("component.scroll.size"),
+    // sg = GetTheme().GetIntegerParam("component.scroll.gap");
   int 
-    is = theme->GetIntegerParam("item.size"),
-    ig = theme->GetIntegerParam("item.gap");
+    is = GetTheme().GetIntegerParam("item.size"),
+    ig = GetTheme().GetIntegerParam("item.gap");
   int
-    hg = theme->GetIntegerParam("component.hgap");
-    // vg = theme->GetIntegerParam("component.vgap");
+    hg = GetTheme().GetIntegerParam("component.hgap");
+    // vg = GetTheme().GetIntegerParam("component.vgap");
   int
-    x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
-    y = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
+    x = GetTheme().GetIntegerParam("component.hgap") + GetTheme().GetIntegerParam("component.border.size"),
+    y = GetTheme().GetIntegerParam("component.vgap") + GetTheme().GetIntegerParam("component.border.size"),
     w = size.width - 2*x;
     // h = size.height - 2*y;
   int 
@@ -507,16 +473,9 @@ void ListBox::IncrementLines(int lines)
     return;
   }
 
-  Theme 
-    *theme = GetTheme();
-  
-  if (theme == nullptr) {
-    return;
-  }
-  
   int 
-    is = theme->GetIntegerParam("item.size"),
-    ig = theme->GetIntegerParam("item.gap"),
+    is = GetTheme().GetIntegerParam("item.size"),
+    ig = GetTheme().GetIntegerParam("item.gap"),
     old_index = _index;
 
   _index = _index - lines;
@@ -556,16 +515,9 @@ void ListBox::DecrementLines(int lines)
     return;
   }
 
-  Theme 
-    *theme = GetTheme();
-  
-  if (theme == nullptr) {
-    return;
-  }
-  
   int 
-    is = theme->GetIntegerParam("item.size"),
-    ig = theme->GetIntegerParam("item.gap"),
+    is = GetTheme().GetIntegerParam("item.size"),
+    ig = GetTheme().GetIntegerParam("item.gap"),
     old_index = _index;
 
   _index = _index + lines;
@@ -605,20 +557,14 @@ void ListBox::DecrementLines(int lines)
 
 jsize_t<int> ListBox::GetScrollDimension()
 {
-  Theme *theme = GetTheme();
-
-  if (theme == nullptr) {
-    return jgui::jsize_t<int> {0, 0};
-  }
-
   jsize_t<int> 
     t = GetSize();
   int 
-    bs = theme->GetIntegerParam("component.border.size"),
-    is = theme->GetIntegerParam("item.size"),
-    ig = theme->GetIntegerParam("item.gap"),
-    // hg = theme->GetIntegerParam("component.hgap"),
-    vg = theme->GetIntegerParam("component.vgap");
+    bs = GetTheme().GetIntegerParam("component.border.size"),
+    is = GetTheme().GetIntegerParam("item.size"),
+    ig = GetTheme().GetIntegerParam("item.gap"),
+    // hg = GetTheme().GetIntegerParam("component.hgap"),
+    vg = GetTheme().GetIntegerParam("component.vgap");
 
   // t.width = t.width;
   t.height = _items.size()*(is + ig) + 2*(vg + bs);

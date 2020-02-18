@@ -27,6 +27,8 @@ class Doom : public jgui::Window {
     Doom():
       jgui::Window(jgui::jsize_t<int>{SCREEN_WIDTH, SCREEN_HEIGHT})
     {
+      SetFramesPerSecond(30);
+
       srand(time(NULL));
 
       for (int j=0; j<SCREEN_HEIGHT; j++) {
@@ -38,22 +40,6 @@ class Doom : public jgui::Window {
 
     virtual ~Doom()
     {
-    }
-
-    void Framerate(int fps)
-    {
-      static auto begin = std::chrono::steady_clock::now();
-      static int index = 0;
-
-      std::chrono::time_point<std::chrono::steady_clock> timestamp = begin + std::chrono::milliseconds(index++*(1000/fps));
-      std::chrono::time_point<std::chrono::steady_clock> current = std::chrono::steady_clock::now();
-      std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - current);
-
-      if (diff.count() < 0) {
-        return;
-      }
-
-      std::this_thread::sleep_for(diff);
     }
 
     virtual void Paint(jgui::Graphics *g) 
@@ -80,8 +66,6 @@ class Doom : public jgui::Window {
 			g->DrawImage(&image, {0, 0, size.width, size.height});
 
       Repaint();
-
-      Framerate(30);
     }
 
 };

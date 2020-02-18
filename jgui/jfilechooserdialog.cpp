@@ -48,29 +48,23 @@ FileChooserDialog::FileChooserDialog(Container *parent, std::string title, std::
   _filter = JFCF_FILE_AND_DIRECTORY;
   _extension_ignorecase = true;
 
-  jsize_t
-    size = GetSize();
-  jinsets_t 
-    insets = GetInsets();
-  int 
-    dw = size.width - insets.left - insets.right;
-
   _image_file = new jgui::BufferedImage(_DATA_PREFIX"/images/file.png");
   _image_folder = new jgui::BufferedImage(_DATA_PREFIX"/images/folder.png");
 
   if (_type == JFCT_SAVE_FILE_DIALOG) {
-    _list = new jgui::ListBox({insets.left, insets.top, dw, size.height - insets.top - insets.bottom - 1*(DEFAULT_COMPONENT_HEIGHT + 8) - 8});
-    _file = new jgui::TextField({insets.left, size.height - insets.bottom - 1*(DEFAULT_COMPONENT_HEIGHT + 8), dw, DEFAULT_COMPONENT_HEIGHT});
+    _list = new jgui::ListBox();
+    _file = new jgui::TextField();
 
-    Add(_file);
+    Add(_file, jgui::JBLA_NORTH);
+    Add(_list, jgui::JBLA_CENTER);
   } else {
-    _list = new jgui::ListBox({insets.left, insets.top, dw, size.height - insets.top - insets.bottom});
+    _list = new jgui::ListBox();
+  
+    Add(_list, jgui::JBLA_CENTER);
   }
 
-  Add(_list);
-
-  _list->RequestFocus();
   _list->RegisterSelectListener(this);
+  _list->RequestFocus();
 
   ShowFiles(_current_dir);
 

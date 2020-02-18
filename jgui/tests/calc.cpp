@@ -27,9 +27,11 @@
 class Display : public jgui::Component {
 
 		private:
-				std::string _text,
-						_operation;
-				int draw;
+				std::string 
+          _text,
+					_operation;
+				int 
+          _draw;
 
 		public:
 				Display(int x, int y, int width, int height);
@@ -46,6 +48,9 @@ class Display : public jgui::Component {
 Display::Display(int x, int y, int width, int height):
    	jgui::Component({x, y, width, height})
 {
+  SetPreferredSize({0, 64});
+
+  GetTheme().SetFont("component.font", GetTheme().GetFont("window.font"));
 }
 
 Display::~Display()
@@ -54,49 +59,47 @@ Display::~Display()
 
 void Display::SetText(std::string text)
 {
-		_text = text;
-		draw = 0;
+  _text = text;
+  _draw = 0;
 
-		Repaint();
+  Repaint();
 } 
 
 void Display::Paint(jgui::Graphics *g)
 {
-	if ((void *)g == nullptr) {
-		return;
-	}
+  if ((void *)g == nullptr) {
+    return;
+  }
 
-	jgui::Component::Paint(g);
+  jgui::Component::Paint(g);
 
-	jgui::Theme 
-    *theme = GetTheme();
-	jgui::Font 
-    *font = theme->GetFont("component.font");
+  jgui::Font 
+    *font = GetTheme().GetFont("component.font");
 
-	g->SetColor({0xf0, 0xf0, 0xf0, 0xff});
+  g->SetColor({0xf0, 0xf0, 0xf0, 0xff});
 
-	if (font != nullptr) {
-		g->SetFont(font);
-	}
+  if (font != nullptr) {
+    g->SetFont(font);
+  }
 
-	jgui::jsize_t 
-		size = GetSize();
+  jgui::jsize_t 
+    size = GetSize();
 
-	g->DrawString(_text, {0, (size.height - font->GetSize())/2, size.width - 10, size.height}, jgui::JHA_RIGHT, jgui::JVA_CENTER);
-	g->DrawString(_operation, {10, (size.height - font->GetSize())/2, 30, size.height - 4}, jgui::JHA_LEFT, jgui::JVA_CENTER);
+  g->DrawString(_text, {-8, 0, size}, jgui::JHA_RIGHT, jgui::JVA_CENTER);
+  g->DrawString(_operation, {8, 0, size}, jgui::JHA_LEFT, jgui::JVA_CENTER);
 }
 
 void Display::SetOperation(std::string text)
 {
-		_operation = text;
-		draw = 1;
+  _operation = text;
+  _draw = 1;
 
-		Repaint();
+  Repaint();
 }
 
 void Display::Clear()
 {
-		SetText("0");
+  SetText("0");
 }
 
 class Calculator : public jgui::Window, public jevent::ActionListener {

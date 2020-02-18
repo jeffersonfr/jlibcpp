@@ -803,6 +803,8 @@ static void InternalPaint()
   
   sg_back_buffer->UnlockData();
 
+  Application::FrameRate(sg_jgui_window->GetFramesPerSecond());
+
   sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
 }
 
@@ -1086,8 +1088,6 @@ void Application::Loop()
     }
     
 #endif
-
-    std::this_thread::yield();
   }
 
   sg_jgui_window->SetVisible(false);

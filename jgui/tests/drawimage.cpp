@@ -662,10 +662,8 @@ class Picture : public jgui::Component {
 		{
 			jgui::Component::Paint(g);
 
-			jgui::Theme 
-				*theme = GetTheme();
 			jgui::Font 
-				*font = theme->GetFont("component.font");
+				*font = GetTheme().GetFont("component.font");
 			jgui::jsize_t
 				size = GetSize();
 			int 

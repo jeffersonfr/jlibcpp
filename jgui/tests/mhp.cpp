@@ -40,7 +40,7 @@ class ScreenLayer : public jgui::Container {
 		{
       _theme.SetIntegerParam("component.bg", uint32_t(jgui::jcolor_name_t::Black));
 
-      SetTheme(&_theme);
+      SetTheme(_theme);
 			
       SetVisible(true);
 		}
@@ -351,14 +351,12 @@ class Scene : public jgui::Container {
 			
       _is_animated = false;
 
-      jgui::Theme
-        *theme = GetTheme();
       jgui::Font
         *font = new jgui::Font("Sans Serif", (jgui::jfont_attributes_t)(jgui::JFA_NORMAL), DEFAULT_FONT_SIZE);
 
-      theme->SetFont("component.font", font);
-      theme->SetFont("container.font", font);
-      theme->SetFont("window.font", font);
+      GetTheme().SetFont("component.font", font);
+      GetTheme().SetFont("container.font", font);
+      GetTheme().SetFont("window.font", font);
 
 			SetBackgroundVisible(true);
       SetVisible(true);
@@ -476,11 +474,11 @@ class MenuTest : public Scene {
 
 	private:
 		jgui::Button 
-      *_button1,
-			*_button2,
-			*_button3;
-		jgui::Label 
-      *_label;
+      _button1 = {"Full Screen"},
+			_button2 = {"Stretched Screen"},
+			_button3 = {"Exit"};
+    jgui::GridLayout
+      _layout = {3, 1};
 		double 
       _malpha;
 		int 
@@ -488,18 +486,18 @@ class MenuTest : public Scene {
 
 	public:
 		MenuTest():
-			Scene((1920-960)/2, -540, 960, 540)
+			Scene((1920 - 640)/2, -360, 640, 360)
 		{
 			_malpha = 0.0;
 			_mstate = 0;
 			
-			Add(_label = new jgui::Label("Reposicionamento do Video", {10, 10, 960-2*10, 100}));
+      SetLayout(&_layout);
 
-			_label->SetBackgroundVisible(false);
+      SetInsets({64, 64, 64, 64});
 
-			Add(_button1 = new jgui::Button("Full Screen", {(960-400)/2, 0*(100+10)+180, 400, 100}));
-			Add(_button2 = new jgui::Button("Stretched Screen", {(960-400)/2, 1*(100+10)+180, 400, 100}));
-			Add(_button3 = new jgui::Button("Exit", {(960-400)/2, 2*(100+10)+180, 400, 100}));
+			Add(&_button1);
+			Add(&_button2);
+			Add(&_button3);
 		}
 
 		virtual ~MenuTest()
@@ -507,26 +505,12 @@ class MenuTest : public Scene {
       Stop();
 
 			RemoveAll();
-
-			delete _label;
-      _label = nullptr;
-
-			delete _button1;
-      _button1 = nullptr;
-
-			delete _button2;
-      _button2 = nullptr;
-
-			delete _button3;
-      _button3 = nullptr;
 		}
 
 		virtual bool Animate()
 		{
-      jgui::Theme
-        *theme = GetTheme();
 			jgui::jcolor_t<float>
-        color = theme->GetIntegerParam("component.bg");
+        color = GetTheme().GetIntegerParam("component.bg");
       jgui::jpoint_t 
         t = GetLocation();
 
@@ -538,7 +522,7 @@ class MenuTest : public Scene {
 
 					_mstate = 2;
 			
-					_button1->RequestFocus();
+					_button1.RequestFocus();
 				}
 	
 				SetLocation(t.x, y);
@@ -549,7 +533,7 @@ class MenuTest : public Scene {
 
 				color(3, 0x80 + (int)(64.0*sin(_malpha)));
 
-	      theme->SetIntegerParam("component.bg", uint32_t(color));
+	      GetTheme().SetIntegerParam("component.bg", uint32_t(color));
 
 				return true;
 			} else if (_mstate == 3) {
@@ -593,29 +577,29 @@ class MenuTest : public Scene {
 			} else if (event->GetSymbol() == jevent::JKS_CURSOR_DOWN) {
         Start();
 
-				if (GetFocusOwner() == _button1) {
-					_button2->RequestFocus();
-				} else if (GetFocusOwner() == _button2) {
-					_button3->RequestFocus();
+				if (GetFocusOwner() == &_button1) {
+					_button2.RequestFocus();
+				} else if (GetFocusOwner() == &_button2) {
+					_button3.RequestFocus();
 				}
 			} else if (event->GetSymbol() == jevent::JKS_CURSOR_UP) {
         Start();
 
-				if (GetFocusOwner() == _button2) {
-					_button1->RequestFocus();
-				} else if (GetFocusOwner() == _button3) {
-					_button2->RequestFocus();
+				if (GetFocusOwner() == &_button2) {
+					_button1.RequestFocus();
+				} else if (GetFocusOwner() == &_button3) {
+					_button2.RequestFocus();
 				}
 			} else if (event->GetSymbol() == jevent::JKS_ENTER) {
         Start();
 
 				LayersManager *layers = LayersManager::GetInstance();
 
-				if (GetFocusOwner() == _button1) {
+				if (GetFocusOwner() == &_button1) {
 					layers->GetVideoLayer()->SetBounds(0, 0, 1920, 1080);
-				} else if (GetFocusOwner() == _button2) {
+				} else if (GetFocusOwner() == &_button2) {
 					layers->GetVideoLayer()->SetBounds(100, 100, 720, 480);
-				} else if (GetFocusOwner() == _button3) {
+				} else if (GetFocusOwner() == &_button3) {
           jgui::Application::Quit();
 				}
 			}

@@ -70,7 +70,7 @@ class ListBox : public jgui::Component, public jgui::ItemComponent {
      * \brief
      *
      */
-    ListBox(jgui::jrect_t<int> bounds = {0, 0, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT});
+    ListBox();
     
     /**
      * \brief

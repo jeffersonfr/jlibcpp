@@ -22,7 +22,7 @@
 
 #include "jgui/jdialog.h"
 #include "jgui/jlistbox.h"
-#include "jgui/jlabel.h"
+#include "jgui/jtext.h"
 #include "jgui/jtextfield.h"
 #include "jgui/jbufferedimage.h"
 #include "jevent/jselectlistener.h"
@@ -66,7 +66,7 @@ class FileChooserDialog : public jgui::Dialog, public jevent::SelectListener {
     /** \brief */
     std::vector<std::string> _extensions;
     /** \brief */
-    jgui::Label *_label;
+    jgui::Text *_label;
     /** \brief */
     jgui::ListBox *_list;
     /** \brief */

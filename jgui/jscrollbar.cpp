@@ -22,8 +22,8 @@
 
 namespace jgui {
 
-ScrollBar::ScrollBar(jgui::jrect_t<int> bounds):
-  SliderComponent(bounds)
+ScrollBar::ScrollBar():
+  SliderComponent()
 {
   jcommon::Object::SetClassName("jgui::ScrollBar");
 
@@ -123,20 +123,13 @@ bool ScrollBar::MousePressed(jevent::MouseEvent *event)
     return true;
   }
 
-  jgui::Theme 
-    *theme = GetTheme();
-
-  if (theme == nullptr) {
-    return false;
-  }
-
   jgui::jpoint_t
     elocation = event->GetLocation();
   jgui::jsize_t<int>
     size = GetSize();
   int
-    x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
-    y = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
+    x = GetTheme().GetIntegerParam("component.hgap") + GetTheme().GetIntegerParam("component.border.size"),
+    y = GetTheme().GetIntegerParam("component.vgap") + GetTheme().GetIntegerParam("component.border.size"),
     w = size.width - 2*x,
     h = size.height - 2*y;
   int 
@@ -219,20 +212,13 @@ bool ScrollBar::MouseMoved(jevent::MouseEvent *event)
     return true;
   }
   
-  Theme 
-    *theme = GetTheme();
-
-  if (theme == nullptr) {
-    return false;
-  }
-
   jgui::jpoint_t
     elocation = event->GetLocation();
   jgui::jsize_t<int>
     size = GetSize();
   int
-    x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
-    y = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
+    x = GetTheme().GetIntegerParam("component.hgap") + GetTheme().GetIntegerParam("component.border.size"),
+    y = GetTheme().GetIntegerParam("component.vgap") + GetTheme().GetIntegerParam("component.border.size"),
     w = size.width - 2*x,
     h = size.height - 2*y;
   int 
@@ -283,26 +269,20 @@ void ScrollBar::Paint(Graphics *g)
 
   Component::Paint(g);
 
-  Theme *theme = GetTheme();
-  
-  if (theme == nullptr) {
-    return;
-  }
-
   jgui::jcolor_t<float>
-    // bg = theme->GetIntegerParam("component.bg"),
-    // fg = theme->GetIntegerParam("component.fg"),
-    fgfocus = theme->GetIntegerParam("component.fg.focus"),
-    // fgdisable = theme->GetIntegerParam("component.fg.disable"),
-    scroll = theme->GetIntegerParam("component.scroll");
+    // bg = GetTheme().GetIntegerParam("component.bg"),
+    // fg = GetTheme().GetIntegerParam("component.fg"),
+    fgfocus = GetTheme().GetIntegerParam("component.fg.focus"),
+    // fgdisable = GetTheme().GetIntegerParam("component.fg.disable"),
+    scroll = GetTheme().GetIntegerParam("component.scroll");
   jgui::jsize_t<int>
     size = GetSize();
   int
-    hg = theme->GetIntegerParam("component.hgap"),
-    vg = theme->GetIntegerParam("component.vgap");
+    hg = GetTheme().GetIntegerParam("component.hgap"),
+    vg = GetTheme().GetIntegerParam("component.vgap");
   int
-    x = hg + theme->GetIntegerParam("component.border.size"),
-    y = vg + theme->GetIntegerParam("component.border.size"),
+    x = hg + GetTheme().GetIntegerParam("component.border.size"),
+    y = vg + GetTheme().GetIntegerParam("component.border.size"),
     w = size.width - 2*x,
     h = size.height - 2*y;
 

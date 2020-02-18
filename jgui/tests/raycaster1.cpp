@@ -69,6 +69,8 @@ class GraphicsTeste : public jgui::Window {
 		GraphicsTeste():
 			jgui::Window({SCREEN_WIDTH, SCREEN_HEIGHT})
 		{
+      SetFramesPerSecond(30);
+
 			posX = 22;
 			posY = 12;
 			dirX = -1;
@@ -80,22 +82,6 @@ class GraphicsTeste : public jgui::Window {
 		virtual ~GraphicsTeste()
 		{
 		}
-
-    void Framerate(int fps)
-    {
-      static auto begin = std::chrono::steady_clock::now();
-      static int index = 0;
-
-      std::chrono::time_point<std::chrono::steady_clock> timestamp = begin + std::chrono::milliseconds(index++*(1000/fps));
-      std::chrono::time_point<std::chrono::steady_clock> current = std::chrono::steady_clock::now();
-      std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - current);
-
-      if (diff.count() < 0) {
-        return;
-      }
-
-      std::this_thread::sleep_for(diff);
-    }
 
 		virtual void Paint(jgui::Graphics *g)
 		{
@@ -232,8 +218,6 @@ class GraphicsTeste : public jgui::Window {
       g->FillCircle({(int)((posX + dirX) * block_size), (int)((posY + dirY) * block_size)}, 4);
 
       Repaint();
-
-      Framerate(30);
 		}
 
 };

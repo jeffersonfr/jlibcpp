@@ -20,6 +20,7 @@
 #include "jgui/japplication.h"
 #include "jgui/jwindow.h"
 #include "jgui/jbutton.h"
+#include "jgui/jflowlayout.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,111 +30,58 @@ class BorderTest : public jgui::Window {
 
 	private:
 		std::vector<jgui::Component *> 
-      _components;
-		jgui::Theme
-			_theme0,
-			_theme1,
-			_theme2,
-			_theme3,
-			_theme4,
-			_theme5,
-			_theme6,
-			_theme7,
-			_theme8,
-			_theme9;
+      _buttons;
+    jgui::Container 
+      _top,
+      _bottom;
+    jgui::FlowLayout
+      _layout;
 
 	public:
 		BorderTest():
-			jgui::Window(/*"Border Test", */ {720, 480})
+			jgui::Window({720, 480})
 		{
-      jgui::Theme 
-        *theme = GetTheme();
-      jgui::jsize_t
-        size = GetSize();
-			int 
-        gapx = 32,
-	  		gapy = 320,
-		  	w = (size.width - 4*gapx)/5,
-			  h = (size.height - 1*gapy)/2,
-  			dx = (size.width - 5*w - 4*gapx)/2,
-	  		dy = (size.height - 2*h - 1*gapy)/2;
-
-			gapx = gapx/2;
-			gapy = gapy/3;
-
-			_components.push_back(new jgui::Button("Empty", {dx + 0*(w + gapx) + 2*gapx, dy + 0*(h + gapy) + gapy, w, h}));
-			_components.push_back(new jgui::Button("Line", {dx + 1*(w + gapx) + 2*gapx, dy + 0*(h + gapy) + gapy, w, h}));
-			_components.push_back(new jgui::Button("Bevel", {dx + 2*(w + gapx) + 2*gapx, dy + 0*(h + gapy) + gapy, w, h}));
-			_components.push_back(new jgui::Button("Round", {dx + 3*(w + gapx) + 2*gapx, dy + 0*(h + gapy) + gapy, w, h}));
-			_components.push_back(new jgui::Button("Raised Gradient", {dx+4*(w + gapx) + 2*gapx, dy + 0*(h + gapy)+gapy, w, h}));
+			_buttons.push_back(new jgui::Button("Empty"));
+			_buttons.push_back(new jgui::Button("Line"));
+			_buttons.push_back(new jgui::Button("Bevel"));
+			_buttons.push_back(new jgui::Button("Round"));
+			_buttons.push_back(new jgui::Button("Raised Gradient"));
 			
-			_components.push_back(new jgui::Button("Lowered Gradient", {dx + 0*(w + gapx) + 2*gapx, dy + 1*(h + gapy) + gapy, w, h}));
-			_components.push_back(new jgui::Button("Raised Bevel", {dx + 1*(w + gapx) + 2*gapx, dy + 1*(h + gapy) + gapy, w, h}));
-			_components.push_back(new jgui::Button("Lowered Bevel", {dx + 2*(w + gapx) + 2*gapx, dy + 1*(h + gapy) + gapy, w, h}));
-			_components.push_back(new jgui::Button("Raised Etched", {dx + 3*(w + gapx) + 2*gapx, dy + 1*(h + gapy) + gapy, w, h}));
-			_components.push_back(new jgui::Button("Lowered Etched", {dx + 4*(w + gapx) + 2*gapx, dy + 1*(h + gapy) + gapy, w, h}));
+			_buttons.push_back(new jgui::Button("Lowered Gradient"));
+			_buttons.push_back(new jgui::Button("Raised Bevel"));
+			_buttons.push_back(new jgui::Button("Lowered Bevel"));
+			_buttons.push_back(new jgui::Button("Raised Etched"));
+			_buttons.push_back(new jgui::Button("Lowered Etched"));
 
-      // INFO:: need to get the some atributes, like the fonts 
-			_theme0 = *theme;
-			_theme1 = *theme;
-			_theme2 = *theme;
-			_theme3 = *theme;
-			_theme4 = *theme;
-			_theme5 = *theme;
-			_theme6 = *theme;
-			_theme7 = *theme;
-			_theme8 = *theme;
-			_theme9 = *theme;
+      _top.SetLayout(&_layout);
+      _bottom.SetLayout(&_layout);
 
-			_theme0.SetIntegerParam("component.border.style", jgui::JCB_EMPTY);
-			_theme1.SetIntegerParam("component.border.style", jgui::JCB_LINE);
-			_theme2.SetIntegerParam("component.border.style", jgui::JCB_BEVEL);
-			_theme3.SetIntegerParam("component.border.style", jgui::JCB_ROUND);
-			_theme4.SetIntegerParam("component.border.style", jgui::JCB_RAISED_GRADIENT);
-			_theme5.SetIntegerParam("component.border.style", jgui::JCB_LOWERED_GRADIENT);
-			_theme6.SetIntegerParam("component.border.style", jgui::JCB_RAISED_BEVEL);
-			_theme7.SetIntegerParam("component.border.style", jgui::JCB_LOWERED_BEVEL);
-			_theme8.SetIntegerParam("component.border.style", jgui::JCB_RAISED_ETCHED);
-			_theme9.SetIntegerParam("component.border.style", jgui::JCB_LOWERED_ETCHED);
+			for (int i=0; i<(int)_buttons.size(); i++) {
+        jgui::Component *cmp = _buttons[i];
 
-			_theme0.SetIntegerParam("component.border.size", 8);
-			_theme1.SetIntegerParam("component.border.size", 8);
-			_theme2.SetIntegerParam("component.border.size", 8);
-			_theme3.SetIntegerParam("component.border.size", 8);
-			_theme4.SetIntegerParam("component.border.size", 8);
-			_theme5.SetIntegerParam("component.border.size", 8);
-			_theme6.SetIntegerParam("component.border.size", 8);
-			_theme7.SetIntegerParam("component.border.size", 8);
-			_theme8.SetIntegerParam("component.border.size", 8);
-			_theme9.SetIntegerParam("component.border.size", 8);
+			  cmp->GetTheme().SetIntegerParam("component.border.style", jgui::jcomponent_border_t(i));
+			  cmp->GetTheme().SetIntegerParam("component.border.size", 8);
 
-			_components[0]->SetTheme(&_theme0);
-			_components[1]->SetTheme(&_theme1);
-			_components[2]->SetTheme(&_theme2);
-			_components[3]->SetTheme(&_theme3);
-			_components[4]->SetTheme(&_theme4);
-			_components[5]->SetTheme(&_theme5);
-			_components[6]->SetTheme(&_theme6);
-			_components[7]->SetTheme(&_theme7);
-			_components[8]->SetTheme(&_theme8);
-			_components[9]->SetTheme(&_theme9);
-
-			for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
-				Add(*i);
+        if (i < (int)_buttons.size()/2) {
+  				_top.Add(cmp);
+        } else {
+  				_bottom.Add(cmp);
+        }
 			}
-		}
+  		
+      _top.SetPreferredSize(_layout.GetPreferredLayoutSize(&_top));
+      _bottom.SetPreferredSize(_layout.GetPreferredLayoutSize(&_bottom));
+
+      Add(&_top, jgui::JBLA_NORTH);
+      Add(&_bottom, jgui::JBLA_SOUTH);
+    }
 
 		virtual ~BorderTest()
 		{
 			RemoveAll();
 
-			for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
-        jgui::Component *c = (*i);
-
-        c->SetTheme(nullptr);
-
-				delete c;
-        c = nullptr;
+			for (std::vector<jgui::Component *>::iterator i=_buttons.begin(); i!=_buttons.end(); i++) {
+        delete (*i);
 			}
 		}
 

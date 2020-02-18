@@ -474,7 +474,7 @@ static void OnDraw()
 
   sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
 
-  std::this_thread::yield();
+  Application::FrameRate(sg_jgui_window->GetFramesPerSecond());
 }
 
 void OnShape(int w, int h)

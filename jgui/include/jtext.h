@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef  J_LABEL_H
-#define J_LABEL_H
+#ifndef J_TEXT_H
+#define J_TEXT_H
 
 #include "jgui/jcomponent.h"
 
@@ -32,7 +32,7 @@ class ButtonEvent;
  *
  * \author Jeff Ferr
  */
-class Label : public jgui::Component {
+class Text : public jgui::Component {
 
   private:
     /** \brief */
@@ -49,13 +49,13 @@ class Label : public jgui::Component {
      * \brief
      *
      */
-    Label(std::string text, jgui::jrect_t<int> bounds = {0, 0, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT});
+    Text(std::string text = {""});
     
     /**
      * \brief
      *
      */
-    virtual ~Label();
+    virtual ~Text();
 
     /**
      * \brief

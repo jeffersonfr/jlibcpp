@@ -605,6 +605,8 @@ class BitMaskTeste : public jgui::Window {
 		BitMaskTeste():
 			jgui::Window({320, 320})
 		{
+      SetFramesPerSecond(30);
+
 			_pacman_location.x = 0;
 			_pacman_location.y = 0;
 
@@ -661,22 +663,6 @@ class BitMaskTeste : public jgui::Window {
 			return true;
 		}
 
-    void Framerate(int fps)
-    {
-      static auto begin = std::chrono::steady_clock::now();
-      static int index = 0;
-
-      std::chrono::time_point<std::chrono::steady_clock> timestamp = begin + std::chrono::milliseconds(index++*(1000/fps));
-      std::chrono::time_point<std::chrono::steady_clock> current = std::chrono::steady_clock::now();
-      std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - current);
-
-      if (diff.count() < 0) {
-        return;
-      }
-
-      std::this_thread::sleep_for(diff);
-    }
-
 		virtual void Paint(jgui::Graphics *g)
 		{
 			jgui::Window::Paint(g);
@@ -706,8 +692,6 @@ class BitMaskTeste : public jgui::Window {
 			bmbg->DrawTo(g, _insets.left, _insets.top);
 			bmbg->BlitXor(bmpacman, _pacman_location.x, _pacman_location.y, 0*size.width/2, index*size.height/3, size.width/2, size.height/3);
 			*/
-
-      Framerate(25);
 
       Repaint();
 		}

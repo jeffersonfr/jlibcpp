@@ -21,7 +21,7 @@
 #define J_TOASTDIALOG_H
 
 #include "jgui/jdialog.h"
-#include "jgui/jlabel.h"
+#include "jgui/jtext.h"
 
 #include <string>
 
@@ -31,7 +31,7 @@ class ToastDialog : public jgui::Dialog {
 
   private:
     /** \brief */
-    Label *_label;
+    Text _label;
     /** \brief */
     int _timeout;
 
@@ -90,47 +90,6 @@ class ToastDialog : public jgui::Dialog {
      */
     virtual void Exec(bool modal = false);
     
-    /**
-     * \brief
-     *
-     */
-    virtual bool KeyPressed(jevent::KeyEvent *event);
-
-    /**
-     * \brief
-     *
-     */
-    virtual bool KeyReleased(jevent::KeyEvent *event);
-
-    /**
-     * \brief
-     *
-     */
-    virtual bool KeyTyped(jevent::KeyEvent *event);
-
-    /**
-     * \brief
-     *
-     */
-    virtual bool MousePressed(jevent::MouseEvent *event);
-    
-    /**
-     * \brief
-     *
-     */
-    virtual bool MouseReleased(jevent::MouseEvent *event);
-    
-    /**
-     * \brief
-     *
-     */
-    virtual bool MouseMoved(jevent::MouseEvent *event);
-    
-    /**
-     * \brief
-     *
-     */
-    virtual bool MouseWheel(jevent::MouseEvent *event);
 };
 
 }

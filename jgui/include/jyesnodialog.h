@@ -22,7 +22,8 @@
 
 #include "jgui/jdialog.h"
 #include "jgui/jbutton.h"
-#include "jgui/jlabel.h"
+#include "jgui/jtext.h"
+#include "jgui/jflowlayout.h"
 #include "jevent/jactionlistener.h"
 
 #include <string>
@@ -42,11 +43,15 @@ class YesNoDialog : public jgui::Dialog, public jevent::ActionListener {
 
   private:
     /** \brief */
-    Label *_label;
+    Text _label = {"Yes or No ?"};
     /** \brief */
-    Button *_yes;
+    Button _yes = {"Yes"};
     /** \brief */
-    Button *_no;
+    Button _no = {"No"};
+    /** \brief */
+    jgui::Container _buttons_container;
+    /** \brief */
+    jgui::FlowLayout _buttons_layout;
 
   public:
     /**

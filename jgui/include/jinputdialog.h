@@ -21,9 +21,10 @@
 #define J_INPUTDIALOG_H
 
 #include "jgui/jbutton.h"
-#include "jgui/jlabel.h"
+#include "jgui/jtext.h"
 #include "jgui/jtextfield.h"
 #include "jgui/jdialog.h"
+#include "jgui/jflowlayout.h"
 #include "jevent/jactionlistener.h"
 
 #include <string>
@@ -43,13 +44,17 @@ class InputDialog : public jgui::Dialog, public jevent::ActionListener {
 
   private:
     /** \brief */
-    TextField *_field;
+    Text _label = {"Input"};
     /** \brief */
-    Label *_label;
+    TextField _field;
     /** \brief */
-    Button *_ok;
+    Button _ok = {"Ok"};
     /** \brief */
-    Button *_cancel;
+    Button _cancel = {"Cancel"};
+    /** \brief */
+    jgui::Container _buttons_container;
+    /** \brief */
+    jgui::FlowLayout _buttons_layout;
 
   public:
     /**

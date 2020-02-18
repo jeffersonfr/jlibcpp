@@ -22,8 +22,8 @@
 
 namespace jgui {
 
-ProgressBar::ProgressBar(jgui::jrect_t<int> bounds, jscroll_orientation_t type):
-     Component(bounds)
+ProgressBar::ProgressBar(jscroll_orientation_t type):
+  Component()
 {
   jcommon::Object::SetClassName("jgui::ProgressBar");
 
@@ -92,28 +92,21 @@ void ProgressBar::Paint(Graphics *g)
 
   Component::Paint(g);
 
-  Theme 
-    *theme = GetTheme();
-  
-  if (theme == nullptr) {
-    return;
-  }
-
   jgui::Font 
-    *font = theme->GetFont("component.font");
+    *font = GetTheme().GetFont("component.font");
   jgui::jcolor_t<float>
-    // bg = theme->GetIntegerParam("component.bg"),
-    fg = theme->GetIntegerParam("component.fg"),
-    fgfocus = theme->GetIntegerParam("component.fg.focus"),
-    fgdisable = theme->GetIntegerParam("component.fg.disable"),
-    scroll = theme->GetIntegerParam("component.scroll");
+    // bg = GetTheme().GetIntegerParam("component.bg"),
+    fg = GetTheme().GetIntegerParam("component.fg"),
+    fgfocus = GetTheme().GetIntegerParam("component.fg.focus"),
+    fgdisable = GetTheme().GetIntegerParam("component.fg.disable"),
+    scroll = GetTheme().GetIntegerParam("component.scroll");
   jgui::jsize_t<int>
     size = GetSize();
   std::string 
     text;
   int
-    x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
-    y = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
+    x = GetTheme().GetIntegerParam("component.hgap") + GetTheme().GetIntegerParam("component.border.size"),
+    y = GetTheme().GetIntegerParam("component.vgap") + GetTheme().GetIntegerParam("component.border.size"),
     w = size.width - 2*x,
     h = size.height - 2*y;
 

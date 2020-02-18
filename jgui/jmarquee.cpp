@@ -26,8 +26,8 @@
 
 namespace jgui {
 
-Marquee::Marquee(std::string text, jgui::jrect_t<int> bounds):
-   Component(bounds)
+Marquee::Marquee(std::string text):
+   Component()
 {
   jcommon::Object::SetClassName("jgui::Marquee");
 
@@ -106,24 +106,18 @@ void Marquee::Paint(Graphics *g)
 
   Component::Paint(g);
 
-  Theme *theme = GetTheme();
-  
-  if (theme == nullptr) {
-    return;
-  }
-
   jgui::Font 
-    *font = theme->GetFont("component.font");
+    *font = GetTheme().GetFont("component.font");
   jgui::jcolor_t<float>
-    // bg = theme->GetIntegerParam("component.bg"),
-    fg = theme->GetIntegerParam("component.fg"),
-    fgfocus = theme->GetIntegerParam("component.fg.focus"),
-    fgdisable = theme->GetIntegerParam("component.fg.disable");
+    // bg = GetTheme().GetIntegerParam("component.bg"),
+    fg = GetTheme().GetIntegerParam("component.fg"),
+    fgfocus = GetTheme().GetIntegerParam("component.fg.focus"),
+    fgdisable = GetTheme().GetIntegerParam("component.fg.disable");
   jgui::jsize_t<int>
     size = GetSize();
   int
-    x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
-    y = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
+    x = GetTheme().GetIntegerParam("component.hgap") + GetTheme().GetIntegerParam("component.border.size"),
+    y = GetTheme().GetIntegerParam("component.vgap") + GetTheme().GetIntegerParam("component.border.size"),
     w = size.width - 2*x,
     h = size.height - 2*y;
 
@@ -178,23 +172,8 @@ void Marquee::Paint(Graphics *g)
 
 void Marquee::Run()
 {
-  do {
-    if (_running == false) {
-      return;
-    }
-    
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-  } while (GetTheme() == nullptr);
-
-  Theme 
-    *theme = GetTheme();
-
-  if (theme == nullptr) {
-    return;
-  }
-
   jgui::Font 
-    *font = theme->GetFont("component.font");
+    *font = GetTheme().GetFont("component.font");
   
   if (font == nullptr) {
     return;
@@ -203,7 +182,7 @@ void Marquee::Run()
   jgui::jsize_t<int>
     size = GetSize();
   int 
-    hg = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size");
+    hg = GetTheme().GetIntegerParam("component.hgap") + GetTheme().GetIntegerParam("component.border.size");
 
   while (_running == true) {
     if (_type == JMM_BOUNCE) {

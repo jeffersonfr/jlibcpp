@@ -68,7 +68,7 @@ class Marquee : public Component {
      * \brief
      *
      */
-    Marquee(std::string text, jgui::jrect_t<int> bounds = {0, 0, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT});
+    Marquee(std::string text);
     
     /**
      * \brief

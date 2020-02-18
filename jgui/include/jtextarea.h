@@ -68,7 +68,7 @@ class TextArea : public jgui::TextComponent {
      * \brief
      *
      */
-    TextArea(jgui::jrect_t<int> bounds = {0, 0, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT});
+    TextArea();
     
     /**
      * \brief
@@ -165,18 +165,6 @@ class TextArea : public jgui::TextComponent {
      *
      */
     virtual void Paint(Graphics *g);
-    
-    /**
-     * \brief
-     *
-     */
-    virtual void SetSize(int width, int height);
-    
-    /**
-     * \brief
-     *
-     */
-    virtual void SetBounds(int x, int y, int w, int h);
     
     /**
      * \brief

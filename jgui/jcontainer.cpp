@@ -28,14 +28,14 @@
 
 namespace jgui {
 
+static BorderLayout sg_default_layout;
+
 Container::Container(jgui::jrect_t<int> bounds):
   jgui::Component(bounds)
 {
   jcommon::Object::SetClassName("jgui::Container");
 
-  _default_layout = new BorderLayout();
-
-  _layout = _default_layout;
+  _layout = &sg_default_layout;
 
   _is_focus_cycle_root = false;
   _orientation = JCO_LEFT_TO_RIGHT;
@@ -53,10 +53,9 @@ Container::Container(jgui::jrect_t<int> bounds):
 
 Container::~Container()
 {
-  if (_default_layout != nullptr) {
-    delete _default_layout;
-    _default_layout = nullptr;
-  }
+  _layout = nullptr;
+
+  RemoveAll();
 }
 
 bool Container::MoveScrollTowards(Component *next, jevent::jkeyevent_symbol_t symbol)
@@ -187,21 +186,14 @@ void Container::InternalRemoveDialog(Dialog *dialog)
 
 jsize_t<int> Container::GetScrollDimension()
 {
-  jgui::Theme 
-    *theme = GetTheme();
   int 
     p1x = 0,
     p2x = 0,
     p1y = 0,
     p2y = 0;
-  int 
-    ss = 0,
-    sg = 0;
-  
-  if (theme != nullptr) {
-    ss = theme->GetIntegerParam("component.scroll.size");
-    sg = theme->GetIntegerParam("component.scroll.gap");
-  }
+  int
+    ss = GetTheme().GetIntegerParam("component.scroll.size"),
+    sg = GetTheme().GetIntegerParam("component.scroll.gap");
 
   jgui::jsize_t<int>
     size = GetSize();
@@ -317,11 +309,6 @@ void Container::SetLayout(jgui::Layout *layout)
   _layout = layout;
 }
 
-const jgui::Layout * Container::GetDefaultLayout()
-{
-  return _default_layout;
-}
-
 jgui::Layout * Container::GetLayout()
 {
   return _layout;
@@ -431,24 +418,17 @@ void Container::PaintBackground(Graphics *g)
     return;
   }
   
-  jgui::Theme 
-    *theme = GetTheme();
-
-  if (theme == nullptr) {
-    return;
-  }
-
   jgui::jcolor_t<float>
-    bg = theme->GetIntegerParam("container.bg"),
-    bgfocus = theme->GetIntegerParam("container.bg.focus"),
-    bgdisable = theme->GetIntegerParam("container.bg.disable");
+    bg = GetTheme().GetIntegerParam("container.bg"),
+    bgfocus = GetTheme().GetIntegerParam("container.bg.focus"),
+    bgdisable = GetTheme().GetIntegerParam("container.bg.disable");
   jgui::jsize_t<int>
     size = GetSize();
   jcomponent_border_t 
-    bordertype = (jcomponent_border_t)theme->GetIntegerParam("container.border.style");
+    bordertype = (jcomponent_border_t)GetTheme().GetIntegerParam("container.border.style");
   int
-    x = theme->GetIntegerParam("container.hgap") + theme->GetIntegerParam("container.border.size"),
-    y = theme->GetIntegerParam("container.vgap") + theme->GetIntegerParam("container.border.size"),
+    x = GetTheme().GetIntegerParam("container.hgap") + GetTheme().GetIntegerParam("container.border.size"),
+    y = GetTheme().GetIntegerParam("container.vgap") + GetTheme().GetIntegerParam("container.border.size"),
     w = size.width - 2*x,
     h = size.height - 2*y;
 
@@ -473,15 +453,8 @@ void Container::PaintBackground(Graphics *g)
 
 void Container::PaintBorders(Graphics *g)
 {
-  jgui::Theme 
-    *theme = GetTheme();
-
-  if (theme == nullptr) {
-    return;
-  }
-
   jcomponent_border_t 
-    bordertype = (jcomponent_border_t)theme->GetIntegerParam("container.border.style");
+    bordertype = (jcomponent_border_t)GetTheme().GetIntegerParam("container.border.style");
 
   if (bordertype == JCB_EMPTY) {
     return;
@@ -489,13 +462,13 @@ void Container::PaintBorders(Graphics *g)
 
   jgui::jcolor_t<float>
     color,
-    border = theme->GetIntegerParam("container.border"),
-    borderfocus = theme->GetIntegerParam("container.border.focus"),
-    borderdisable = theme->GetIntegerParam("container.border.disable");
+    border = GetTheme().GetIntegerParam("container.border"),
+    borderfocus = GetTheme().GetIntegerParam("container.border.focus"),
+    borderdisable = GetTheme().GetIntegerParam("container.border.disable");
   jgui::jsize_t<int>
     size = GetSize();
   int 
-    bs = theme->GetIntegerParam("container.border.size");
+    bs = GetTheme().GetIntegerParam("container.border.size");
   int 
     xp = 0, 
     yp = 0,
@@ -813,7 +786,9 @@ void Container::Add(Component *c, GridBagConstraints *constraints)
       layout->AddLayoutComponent(c, constraints);
     }
   }
-  
+ 
+  DoLayout();
+
   DispatchContainerEvent(new jevent::ContainerEvent(c, jevent::JCET_COMPONENT_ADDED));
 }
 
@@ -828,6 +803,8 @@ void Container::Add(jgui::Component *c, std::string id)
       layout->AddLayoutComponent(id, c);
     }
   }
+
+  DoLayout();
 
   DispatchContainerEvent(new jevent::ContainerEvent(c, jevent::JCET_COMPONENT_ADDED));
 }
@@ -844,6 +821,8 @@ void Container::Add(jgui::Component *c, jborderlayout_align_t align)
     }
   }
   
+  DoLayout();
+
   DispatchContainerEvent(new jevent::ContainerEvent(c, jevent::JCET_COMPONENT_ADDED));
 }
 
@@ -945,7 +924,7 @@ void Container::RemoveAll()
 
   _components.clear();
 
-   _container_mutex.unlock();
+  _container_mutex.unlock();
 
   SetPreferredSize(GetSize());
 

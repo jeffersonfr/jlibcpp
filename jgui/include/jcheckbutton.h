@@ -64,7 +64,7 @@ class CheckButton : public Component {
      * \brief
      *
      */
-    CheckButton(jcheckbox_type_t type, std::string text, jgui::jrect_t<int> bounds = {0, 0, DEFAULT_COMPONENT_WIDTH, DEFAULT_COMPONENT_HEIGHT});
+    CheckButton(jcheckbox_type_t type, std::string text);
   
     /**
      * \brief

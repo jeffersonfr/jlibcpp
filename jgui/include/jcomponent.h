@@ -33,9 +33,6 @@
 #include <vector>
 #include <mutex>
 
-#define DEFAULT_COMPONENT_WIDTH    128
-#define DEFAULT_COMPONENT_HEIGHT  32
-
 namespace jgui {
 
 enum jcomponent_alignment_t {
@@ -146,7 +143,7 @@ class Component : public jevent::KeyListener, public jevent::MouseListener {
     /** \brief */
     jgui::KeyMap *_keymap;
     /** \brief */
-    jgui::Theme *_theme;
+    jgui::Theme _theme;
     /** \brief */
     std::string _name;
     /** \brief */
@@ -461,13 +458,13 @@ class Component : public jevent::KeyListener, public jevent::MouseListener {
      * \brief
      *
      */
-    virtual Theme * GetTheme();
+    virtual Theme & GetTheme();
 
     /**
      * \brief
      *
      */
-    virtual void SetTheme(Theme *theme);
+    virtual void SetTheme(Theme theme);
 
     /**
      * \brief

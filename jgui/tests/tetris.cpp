@@ -74,6 +74,8 @@ class Tetris : public jgui::Window {
 		Tetris():
 			jgui::Window({320, 480})
 		{
+      SetFramesPerSecond(30);
+
       s1 = new jgui::BufferedImage("images/tetris/tiles.png");
       s2 = new jgui::BufferedImage("images/tetris/background.png");
       s3 = new jgui::BufferedImage("images/tetris/frame.png");
@@ -102,22 +104,6 @@ class Tetris : public jgui::Window {
       delete s1;
       delete s2;
       delete s3;
-    }
-
-    void Framerate(int fps)
-    {
-      static auto begin = std::chrono::steady_clock::now();
-      static int index = 0;
-
-      std::chrono::time_point<std::chrono::steady_clock> timestamp = begin + std::chrono::milliseconds(index++*(1000/fps));
-      std::chrono::time_point<std::chrono::steady_clock> current = std::chrono::steady_clock::now();
-      std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - current);
-
-      if (diff.count() < 0) {
-        return;
-      }
-
-      std::this_thread::sleep_for(diff);
     }
 
     bool KeyPressed(jevent::KeyEvent *event)
@@ -152,6 +138,8 @@ class Tetris : public jgui::Window {
 
 		void Paint(jgui::Graphics *g) 
 		{
+      g->SetCompositeFlags(jgui::JCF_SRC_OVER);
+
       //// <- Move -> ///
       for (int i=0; i<4; i++)  { 
         b[i] = a[i]; 
@@ -250,8 +238,6 @@ class Tetris : public jgui::Window {
       g->DrawImage(s3, jgui::jpoint_t<int>{0, 0});
 
       Repaint();
-
-      Framerate(25);
     }
 
 };

@@ -23,7 +23,7 @@
 #include "jgui/jdialog.h"
 #include "jgui/jbutton.h"
 #include "jgui/jspin.h"
-#include "jgui/jlabel.h"
+#include "jgui/jtext.h"
 #include "jevent/jselectlistener.h"
 #include "jevent/jactionlistener.h"
 
@@ -34,7 +34,7 @@ namespace jgui {
  *
  */
 struct jcalendar_warnning_t {
-  jgui::Theme *theme;
+  jgui::Theme theme;
   int day;
   int month;
   int year;
@@ -57,19 +57,19 @@ class CalendarDialog : public jgui::Dialog, public jevent::ActionListener, publi
     /** \brief */
     jgui::Theme _selected_theme;
     /** \brief */
-    Label *_ldom;
+    Text *_ldom;
     /** \brief */
-    Label *_lseg;
+    Text *_lseg;
     /** \brief */
-    Label *_lter;
+    Text *_lter;
     /** \brief */
-    Label *_lqua;
+    Text *_lqua;
     /** \brief */
-    Label *_lqui;
+    Text *_lqui;
     /** \brief */
-    Label *_lsex;
+    Text *_lsex;
     /** \brief */
-    Label *_lsab;
+    Text *_lsab;
     /** \brief */
     Spin *_syear;
     /** \brief */
@@ -151,7 +151,7 @@ class CalendarDialog : public jgui::Dialog, public jevent::ActionListener, publi
      * \brief
      *
      */
-    virtual void AddWarnning(jgui::Theme *theme, int day, int month, int year);
+    virtual void AddWarnning(jgui::Theme theme, int day, int month, int year);
     
     /**
      * \brief

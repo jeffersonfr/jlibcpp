@@ -21,6 +21,7 @@
 #include "jgui/jwindow.h"
 
 #include <iostream>
+#include <mutex>
 
 #define VMAX 100
 
@@ -40,17 +41,25 @@ struct particle_t {
 class Main : public jgui::Window {
 
 	private:
-		struct point_t *_objects;
-		struct particle_t _gbest,
-				*_particles;
-		int _size_objects,
-				_size_particles;
-		bool _active;
+    std::mutex
+      _mutex;
+		struct point_t 
+      *_objects;
+		struct particle_t 
+      _gbest,
+			*_particles;
+		int 
+      _size_objects,
+			_size_particles;
+		bool 
+      _active;
 
 	public:
 		Main(int n, int p):
 			jgui::Window(/*"Swarm Colony", */ {720, 480})
 		{
+      SetFramesPerSecond(30);
+
       jgui::jsize_t
         size = GetSize();
 
@@ -99,6 +108,10 @@ class Main : public jgui::Window {
 
 		virtual ~Main()
 		{
+      SetVisible(false);
+
+      _mutex.unlock();
+
 			_active = false;
 			
       delete [] _objects;
@@ -115,22 +128,6 @@ class Main : public jgui::Window {
 
 			return k;
 		}
-
-    void Framerate(int fps)
-    {
-      static auto begin = std::chrono::steady_clock::now();
-      static int index = 0;
-
-      std::chrono::time_point<std::chrono::steady_clock> timestamp = begin + std::chrono::milliseconds(index++*(1000/fps));
-      std::chrono::time_point<std::chrono::steady_clock> current = std::chrono::steady_clock::now();
-      std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - current);
-
-      if (diff.count() < 0) {
-        return;
-      }
-
-      std::this_thread::sleep_for(diff);
-    }
 
 		virtual void ShowApp()
 		{
@@ -298,9 +295,9 @@ class Main : public jgui::Window {
 					}
 				}
 
-        Framerate(25);
-
 				Repaint();
+
+        _mutex.lock();
 			}
 		}
 
@@ -320,6 +317,8 @@ class Main : public jgui::Window {
 
 			g->SetColor({0xff, 0x00, 0x00, 0xff});
 			g->FillRectangle({_gbest.xi.x, _gbest.xi.y, 4, 4});
+
+      _mutex.unlock();
 		}
 
 };

@@ -23,13 +23,6 @@
 
 namespace jgui {
 
-Theme * Theme::_default_theme = new Theme();
-
-Theme * Theme::GetDefaultTheme()
-{
-  return _default_theme;
-}
-
 Theme::Theme():
   jcommon::Object()
 {
@@ -60,7 +53,7 @@ Theme::Theme():
   SetIntegerParam("component.hgap", 0);
   SetIntegerParam("component.vgap", 0);
 
-  _fonts["component.font"] = nullptr;
+  _fonts["component.font"] = &Font::SMALL;
 
   // INFO:: container
   SetIntegerParam("container.bg", GetIntegerParam("component.bg"));
@@ -87,7 +80,7 @@ Theme::Theme():
   SetIntegerParam("container.hgap", 0);
   SetIntegerParam("container.vgap", 0);
 
-  _fonts["container.font"] = nullptr;
+  _fonts["container.font"] = &Font::NORMAL;
 
   // INFO:: window
   SetIntegerParam("window.bg", GetIntegerParam("component.bg"));
@@ -114,7 +107,7 @@ Theme::Theme():
   SetIntegerParam("window.hgap", 0);
   SetIntegerParam("window.vgap", 0);
 
-  _fonts["window.font"] = nullptr;
+  _fonts["window.font"] = &Font::BIG;
 
   // INFO:: item
   SetIntegerParam("item.bg", 0xff000000);
@@ -129,10 +122,9 @@ Theme::Theme():
   SetIntegerParam("item.bg.disable", 0xff101010);
   SetIntegerParam("item.fg.disable", 0xfff0f0f0);
   
-  SetIntegerParam("item.size", DEFAULT_COMPONENT_HEIGHT);
+  SetIntegerParam("item.size", 32);
   SetIntegerParam("item.hgap", 4);
   SetIntegerParam("item.vgap", 4);
-
 }
 
 Theme::~Theme()

@@ -23,15 +23,15 @@
 
 namespace jgui {
 
-TreeListView::TreeListView(jgui::jrect_t<int> bounds):
-  Component(bounds),
+TreeListView::TreeListView():
+  Component(),
   ItemComponent()
 {
   jcommon::Object::SetClassName("jgui::TreeListView");
 
   _item_gap = 4;
   _pressed = false;
-  _item_size = DEFAULT_COMPONENT_HEIGHT;
+  _item_size = 32;
   _selected_index = -1;
 
   SetFocusable(true);
@@ -329,32 +329,26 @@ void TreeListView::Paint(Graphics *g)
 
   Component::Paint(g);
 
-  Theme *theme = GetTheme();
-  
-  if (theme == nullptr) {
-    return;
-  }
-
   jgui::Font 
-    *font = theme->GetFont("component.font");
+    *font = GetTheme().GetFont("component.font");
   jgui::jcolor_t<float>
-    // bg = theme->GetIntegerParam("component.bg"),
-    fg = theme->GetIntegerParam("component.fg"),
-    fgfocus = theme->GetIntegerParam("component.fg.focus"),
-    fgdisable = theme->GetIntegerParam("component.fg.disable");
+    // bg = GetTheme().GetIntegerParam("component.bg"),
+    fg = GetTheme().GetIntegerParam("component.fg"),
+    fgfocus = GetTheme().GetIntegerParam("component.fg.focus"),
+    fgdisable = GetTheme().GetIntegerParam("component.fg.disable");
   jgui::jsize_t<int>
     size = GetSize();
   int
-    hg = theme->GetIntegerParam("component.hgap"),
-    vg = theme->GetIntegerParam("component.vgap");
+    hg = GetTheme().GetIntegerParam("component.hgap"),
+    vg = GetTheme().GetIntegerParam("component.vgap");
   int
-    x = hg + theme->GetIntegerParam("component.border.size"),
-    y = vg + theme->GetIntegerParam("component.border.size"),
+    x = hg + GetTheme().GetIntegerParam("component.border.size"),
+    y = vg + GetTheme().GetIntegerParam("component.border.size"),
     w = size.width - 2*x;
     // h = size.height - 2*y;
   int
-    is = theme->GetIntegerParam("item.size"),
-    ig = theme->GetIntegerParam("item.gap");
+    is = GetTheme().GetIntegerParam("item.size"),
+    ig = GetTheme().GetIntegerParam("item.gap");
   jpoint_t scroll_location = GetScrollLocation();
   int 
     scrollx = (IsScrollableX() == true)?scroll_location.x:0,
@@ -384,23 +378,23 @@ void TreeListView::Paint(Graphics *g)
     Item *item = _items[i];
 
     if (item->IsEnabled() == true) {
-      g->SetColor(theme->GetIntegerParam("item.fg"));
+      g->SetColor(GetTheme().GetIntegerParam("item.fg"));
     } else {
-      g->SetColor(theme->GetIntegerParam("item.fg.disable"));
+      g->SetColor(GetTheme().GetIntegerParam("item.fg.disable"));
     }
 
     if (_index != i) {
       if (_selected_index == i) {  
-        g->SetColor(theme->GetIntegerParam("item.fg.select"));
+        g->SetColor(GetTheme().GetIntegerParam("item.fg.select"));
       }
     } else {
-      g->SetColor(theme->GetIntegerParam("item.fg.focus"));
+      g->SetColor(GetTheme().GetIntegerParam("item.fg.focus"));
     }
 
     g->FillRectangle({x, y+(is + ig)*i, w, is});
 
     if (_selected_index == i) {
-      g->SetColor(theme->GetIntegerParam("item.fg.select"));
+      g->SetColor(GetTheme().GetIntegerParam("item.fg.select"));
     }
 
     if (_items[i]->GetType() == JIT_EMPTY) {
@@ -518,24 +512,16 @@ void TreeListView::DecrementLines(int lines)
 
 jsize_t<int> TreeListView::GetScrollDimension()
 {
-  Theme *theme = GetTheme();
-
-  jsize_t<int> t {0, 0};
-
-  if (theme == nullptr) {
-    return t;
-  }
-
+  jsize_t<int> 
+    t = GetSize();
   int
-    bs = theme->GetIntegerParam("component.border.size");
+    bs = GetTheme().GetIntegerParam("component.border.size");
   int
-    // hg = theme->GetIntegerParam("component.hgap"),
-    vg = theme->GetIntegerParam("component.vgap");
+    // hg = GetTheme().GetIntegerParam("component.hgap"),
+    vg = GetTheme().GetIntegerParam("component.vgap");
   int
-    is = theme->GetIntegerParam("item.size"),
-    ig = theme->GetIntegerParam("item.gap");
-
-  t = GetSize();
+    is = GetTheme().GetIntegerParam("item.size"),
+    ig = GetTheme().GetIntegerParam("item.gap");
 
   // t.width = t.width;
   t.height = _items.size()*(is + ig) + 2*(vg + bs);

@@ -21,8 +21,8 @@
 
 namespace jgui {
 
-TabbedPane::TabbedPane(jgui::jrect_t<int> bounds):
-  jgui::Container(bounds)
+TabbedPane::TabbedPane():
+  jgui::Container()
 {
   jcommon::Object::SetClassName("jgui::TabbedPane");
 

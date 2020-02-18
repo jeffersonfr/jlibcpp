@@ -117,6 +117,8 @@ class PacMan : public jgui::Window {
 	PacMan():
 		jgui::Window(jgui::jsize_t<int>{720, 720})
 	{
+    SetFramesPerSecond(60);
+
 		goff = nullptr;
 		ii = nullptr;
 	
@@ -225,7 +227,7 @@ class PacMan : public jgui::Window {
 
 		d = region;
 
-		SetTheme(&_theme);
+		SetTheme(_theme);
 		
 		ghostx = new int[maxghosts];
 		ghostdx = new int[maxghosts];
@@ -371,22 +373,6 @@ class PacMan : public jgui::Window {
 		return true;
 	}
 
-  void Framerate(int fps)
-  {
-    static auto begin = std::chrono::steady_clock::now();
-    static int index = 0;
-
-    std::chrono::time_point<std::chrono::steady_clock> timestamp = begin + std::chrono::milliseconds(index++*(1000/fps));
-    std::chrono::time_point<std::chrono::steady_clock> current = std::chrono::steady_clock::now();
-    std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - current);
-
-    if (diff.count() < 0) {
-      return;
-    }
-
-    std::this_thread::sleep_for(diff);
-  }
-
 	virtual void Paint(jgui::Graphics *g)
 	{
 		Window::Paint(g);
@@ -420,8 +406,6 @@ class PacMan : public jgui::Window {
 		}
 
 		g->DrawImage(ii, jgui::jpoint_t<int>{2, 2});
-
-    Framerate(60);
 
     Repaint();
 	}
@@ -733,7 +717,7 @@ class PacMan : public jgui::Window {
 
 		sprintf(tmp, "Score: %d", score);
 		
-		goff->SetFont(GetTheme()->GetFont("window"));
+		goff->SetFont(GetTheme().GetFont("window"));
 		goff->SetColor({96, 128, 255, 0xff});
 		goff->DrawString(tmp, jgui::jpoint_t<int>{size.width - 180, scrsize + 16});
 

@@ -386,6 +386,8 @@ static void InternalPaint()
 
   xcb_flush(sg_xcb_connection);
 
+  Application::FrameRate(sg_jgui_window->GetFramesPerSecond());
+
   sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
 }
 

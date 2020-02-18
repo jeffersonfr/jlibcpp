@@ -27,64 +27,49 @@
 #include "jgui/jmessagedialog.h"
 #include "jgui/jtoastdialog.h"
 #include "jgui/jyesnodialog.h"
+#include "jgui/jflowlayout.h"
 
 class Dialogs : public jgui::Window, public jevent::ActionListener {
 
 	private:
 		jgui::Button 
-			*_button1,
-			*_button2,
-			*_button3,
-			*_button4,
-			*_button5,
-			*_button6,
-			*_button7;
+			_button1 = {"Calendar"},
+			_button2 = {"FileChooser"},
+			_button3 = {"Input"},
+			_button4 = {"Keyboard"},
+			_button5 = {"Messsage"},
+			_button6 = {"Toast"},
+			_button7 = {"Yes/No"};
+    jgui::FlowLayout
+      _layout;
 
 	public:
 		Dialogs():
 			jgui::Window({1280, 720})
 	{
-    jgui::jinsets_t
-      insets = GetInsets();
+    SetLayout(&_layout);
 
-    _button1 = new jgui::Button("Calendar", {insets.left, insets.top + 0*(96 + 16), 196, 96});
-    _button2 = new jgui::Button("File Chooser", {insets.left, insets.top + 1*(96 + 16), 196, 96});
-    _button3 = new jgui::Button("Input", {insets.left, insets.top + 2*(96 + 16), 196, 96});
-    _button4 = new jgui::Button("Keyboard", {insets.left, insets.top + 3*(96 + 16), 196, 96});
-    _button5 = new jgui::Button("Message", {insets.left, insets.top + 4*(96 + 16), 196, 96});
-    _button6 = new jgui::Button("Toast", {insets.left, insets.top + 5*(96 + 16), 196, 96});
-    _button7 = new jgui::Button("Yes/No", {insets.left, insets.top + 6*(96 + 16), 196, 96});
+    _button1.RegisterActionListener(this);
+    _button2.RegisterActionListener(this);
+    _button3.RegisterActionListener(this);
+    _button4.RegisterActionListener(this);
+    _button5.RegisterActionListener(this);
+    _button6.RegisterActionListener(this);
+    _button7.RegisterActionListener(this);
 
-    _button1->RegisterActionListener(this);
-    _button2->RegisterActionListener(this);
-    _button3->RegisterActionListener(this);
-    _button4->RegisterActionListener(this);
-    _button5->RegisterActionListener(this);
-    _button6->RegisterActionListener(this);
-    _button7->RegisterActionListener(this);
+    Add(&_button1);
+    Add(&_button2);
+    Add(&_button3);
+    Add(&_button4);
+    Add(&_button5);
+    Add(&_button6);
+    Add(&_button7);
 
-		Add(_button1);
-		Add(_button2);
-		Add(_button3);
-		Add(_button4);
-		Add(_button5);
-		Add(_button6);
-		Add(_button7);
-
-		_button1->RequestFocus();
+		_button1.RequestFocus();
 	}
 
 	virtual ~Dialogs()
 	{
-    RemoveAll();
-
-		delete _button1;
-		delete _button2;
-		delete _button3;
-		delete _button4;
-		delete _button5;
-		delete _button6;
-		delete _button7;
 	}
 
 	virtual void ActionPerformed(jevent::ActionEvent *event)
@@ -96,23 +81,23 @@ class Dialogs : public jgui::Window, public jevent::ActionListener {
       dialog = nullptr;
     }
 
-		if (event->GetSource() == _button1) {
+		if (event->GetSource() == &_button1) {
       dialog = new jgui::CalendarDialog(this);
-		} else if (event->GetSource() == _button2) {
+		} else if (event->GetSource() == &_button2) {
       dialog = new jgui::FileChooserDialog(this, "File Chooser", "/tmp", jgui::JFCT_SAVE_FILE_DIALOG);
-		} else if (event->GetSource() == _button3) {
-      dialog = new jgui::InputDialog(this, "Input", "Aviso");
-		} else if (event->GetSource() == _button4) {
+		} else if (event->GetSource() == &_button3) {
+      dialog = new jgui::InputDialog(this, "Input", "Warning");
+		} else if (event->GetSource() == &_button4) {
       dialog = new jgui::KeyboardDialog(this, jgui::JKT_QWERTY);
-		} else if (event->GetSource() == _button5) {
-      dialog = new jgui::MessageDialog(this, "Message", "Mensagem");
-		} else if (event->GetSource() == _button6) {
+		} else if (event->GetSource() == &_button5) {
+      dialog = new jgui::MessageDialog(this, "Message", "Some message ...");
+		} else if (event->GetSource() == &_button6) {
       jgui::ToastDialog *toast = new jgui::ToastDialog(this, "Toast");
 
       toast->SetTimeout(2000);
 
       dialog = toast;
-		} else if (event->GetSource() == _button7) {
+		} else if (event->GetSource() == &_button7) {
       dialog = new jgui::YesNoDialog(this, "Yes/No", "Si or no ?");
 		}
 

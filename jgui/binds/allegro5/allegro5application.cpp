@@ -402,6 +402,8 @@ static void InternalPaint()
 
   sg_back_buffer->UnlockData();
 
+  Application::FrameRate(sg_jgui_window->GetFramesPerSecond());
+
   sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
 }
 
@@ -430,134 +432,128 @@ void Application::Loop()
       InternalPaint();
     }
 
-    if (al_get_next_event(queue, &event) == false) {
-      std::this_thread::yield();
+    if (al_get_next_event(queue, &event) == true) {
+      al_drop_next_event(queue);
 
-      continue;
-    }
- 
-    al_drop_next_event(queue);
+      // al_wait_for_event(queue, &event);
 
-    // al_wait_for_event(queue, &event);
+      if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
+        sg_quitting = true;
 
-		if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
-      sg_quitting = true;
+        sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_CLOSED));
+      } else if (event.type == ALLEGRO_EVENT_MOUSE_ENTER_DISPLAY) {
+        // SDL_CaptureMouse(true);
+        // void SDL_SetWindowGrab(SDL_Window* window, SDL_bool grabbed);
+        // SDL_GrabMode SDL_WM_GrabInput(SDL_GrabMode mode); // <SDL_GRAB_ON, SDL_GRAB_OFF>
 
-      sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_CLOSED));
-    } else if (event.type == ALLEGRO_EVENT_MOUSE_ENTER_DISPLAY) {
-      // SDL_CaptureMouse(true);
-      // void SDL_SetWindowGrab(SDL_Window* window, SDL_bool grabbed);
-      // SDL_GrabMode SDL_WM_GrabInput(SDL_GrabMode mode); // <SDL_GRAB_ON, SDL_GRAB_OFF>
+        // SetCursor(GetCursor());
 
-      // SetCursor(GetCursor());
+        sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_ENTERED));
+      } else if (event.type == ALLEGRO_EVENT_MOUSE_LEAVE_DISPLAY) {
+        // SDL_CaptureMouse(false);
+        // void SDL_SetWindowGrab(SDL_Window* window, SDL_bool grabbed);
+        // SDL_GrabMode SDL_WM_GrabInput(SDL_GrabMode mode); // <SDL_GRAB_ON, SDL_GRAB_OFF>
 
-      sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_ENTERED));
-    } else if (event.type == ALLEGRO_EVENT_MOUSE_LEAVE_DISPLAY) {
-      // SDL_CaptureMouse(false);
-      // void SDL_SetWindowGrab(SDL_Window* window, SDL_bool grabbed);
-      // SDL_GrabMode SDL_WM_GrabInput(SDL_GrabMode mode); // <SDL_GRAB_ON, SDL_GRAB_OFF>
+        // SetCursor(JCS_DEFAULT);
 
-      // SetCursor(JCS_DEFAULT);
+        sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_LEAVED));
+      } else if (event.type == ALLEGRO_EVENT_DISPLAY_RESIZE) {
+        InternalPaint();
 
-      sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_LEAVED));
-    } else if (event.type == ALLEGRO_EVENT_DISPLAY_RESIZE) {
-      InternalPaint();
+        sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_RESIZED));
+      } else if (event.type == ALLEGRO_EVENT_DISPLAY_EXPOSE) {
+        InternalPaint();
+      } else if (event.type == ALLEGRO_EVENT_KEY_CHAR || event.type == ALLEGRO_EVENT_KEY_DOWN || event.type == ALLEGRO_EVENT_KEY_UP) {
+        jevent::jkeyevent_type_t type;
+        jevent::jkeyevent_modifiers_t mod;
 
-      sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_RESIZED));
-    } else if (event.type == ALLEGRO_EVENT_DISPLAY_EXPOSE) {
-      InternalPaint();
-    } else if (event.type == ALLEGRO_EVENT_KEY_CHAR || event.type == ALLEGRO_EVENT_KEY_DOWN || event.type == ALLEGRO_EVENT_KEY_UP) {
-      jevent::jkeyevent_type_t type;
-      jevent::jkeyevent_modifiers_t mod;
+        mod = jevent::JKM_NONE;
 
-      mod = jevent::JKM_NONE;
+        switch (event.keyboard.keycode) {
+          case ALLEGRO_KEY_LSHIFT:
+          case ALLEGRO_KEY_RSHIFT:
+          case ALLEGRO_KEY_LCTRL:
+          case ALLEGRO_KEY_RCTRL:
+          case ALLEGRO_KEY_ALT:
+          case ALLEGRO_KEY_ALTGR:
+          case ALLEGRO_KEY_LWIN:
+          case ALLEGRO_KEY_RWIN:
+          case ALLEGRO_KEY_MENU:
+          case ALLEGRO_KEY_SCROLLLOCK:
+          case ALLEGRO_KEY_NUMLOCK:
+          case ALLEGRO_KEY_CAPSLOCK:
+            sg_key_modifiers[event.keyboard.keycode] = (event.type == ALLEGRO_EVENT_KEY_DOWN)?true:false;
+          default:
+            break;
+        };
 
-      switch (event.keyboard.keycode) {
-        case ALLEGRO_KEY_LSHIFT:
-        case ALLEGRO_KEY_RSHIFT:
-        case ALLEGRO_KEY_LCTRL:
-        case ALLEGRO_KEY_RCTRL:
-        case ALLEGRO_KEY_ALT:
-        case ALLEGRO_KEY_ALTGR:
-        case ALLEGRO_KEY_LWIN:
-        case ALLEGRO_KEY_RWIN:
-        case ALLEGRO_KEY_MENU:
-        case ALLEGRO_KEY_SCROLLLOCK:
-        case ALLEGRO_KEY_NUMLOCK:
-        case ALLEGRO_KEY_CAPSLOCK:
-          sg_key_modifiers[event.keyboard.keycode] = (event.type == ALLEGRO_EVENT_KEY_DOWN)?true:false;
-        default:
-          break;
-      };
-
-      if (sg_key_modifiers[ALLEGRO_KEY_LSHIFT] == true) {
-        mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_SHIFT);
-      } else if (sg_key_modifiers[ALLEGRO_KEY_RSHIFT] == true) {
-        mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_SHIFT);
-      } else if (sg_key_modifiers[ALLEGRO_KEY_LCTRL] == true) {
-        mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_CONTROL);
-      } else if (sg_key_modifiers[ALLEGRO_KEY_RCTRL] == true) {
-        mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_CONTROL);
-      } else if (sg_key_modifiers[ALLEGRO_KEY_ALT] == true) {
-        mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_ALT);
-      } else if (sg_key_modifiers[ALLEGRO_KEY_ALTGR] == true) {
-        mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_ALTGR);
-      } else if (sg_key_modifiers[ALLEGRO_KEY_LWIN] == true) {
-        mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_META);
-      } else if (sg_key_modifiers[ALLEGRO_KEY_RWIN] == true) {
-        // mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_RMETA);
-      }
-
-      type = jevent::JKT_UNKNOWN;
-
-      if (event.type == ALLEGRO_EVENT_KEY_CHAR || event.type == ALLEGRO_EVENT_KEY_DOWN) {
-        type = jevent::JKT_PRESSED;
-      } else if (event.type == ALLEGRO_EVENT_KEY_UP) {
-        type = jevent::JKT_RELEASED;
-      }
-
-      int shift = sg_key_modifiers[ALLEGRO_KEY_LSHIFT] | sg_key_modifiers[ALLEGRO_KEY_RSHIFT];
-      int capslock = sg_key_modifiers[ALLEGRO_KEY_CAPSLOCK];
-
-      jevent::jkeyevent_symbol_t symbol = TranslateToNativeKeySymbol(event.keyboard.keycode, (shift != 0 && capslock == 0) || (shift == 0 && capslock != 0));
-
-      sg_jgui_window->GetEventManager()->PostEvent(new jevent::KeyEvent(sg_jgui_window, type, mod, jevent::KeyEvent::GetCodeFromSymbol(symbol), symbol));
-    } else if (event.type == ALLEGRO_EVENT_MOUSE_AXES || event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN || event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP || event.type == ALLEGRO_EVENT_MOUSE_WARPED) {
-      jevent::jmouseevent_button_t button = jevent::JMB_NONE;
-      jevent::jmouseevent_type_t type = jevent::JMT_UNKNOWN;
-      int mouse_z = 0;
-
-      sg_mouse_x = event.mouse.x;
-      sg_mouse_y = event.mouse.y;
-
-      sg_mouse_x = CLAMP(sg_mouse_x, 0, sg_screen.width - 1);
-      sg_mouse_y = CLAMP(sg_mouse_y, 0, sg_screen.height - 1);
-
-      if (event.type == ALLEGRO_EVENT_MOUSE_AXES) {
-        type = jevent::JMT_MOVED;
-      } else if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN || event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
-        if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
-          type = jevent::JMT_PRESSED;
-        } else if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
-          type = jevent::JMT_RELEASED;
+        if (sg_key_modifiers[ALLEGRO_KEY_LSHIFT] == true) {
+          mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_SHIFT);
+        } else if (sg_key_modifiers[ALLEGRO_KEY_RSHIFT] == true) {
+          mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_SHIFT);
+        } else if (sg_key_modifiers[ALLEGRO_KEY_LCTRL] == true) {
+          mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_CONTROL);
+        } else if (sg_key_modifiers[ALLEGRO_KEY_RCTRL] == true) {
+          mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_CONTROL);
+        } else if (sg_key_modifiers[ALLEGRO_KEY_ALT] == true) {
+          mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_ALT);
+        } else if (sg_key_modifiers[ALLEGRO_KEY_ALTGR] == true) {
+          mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_ALTGR);
+        } else if (sg_key_modifiers[ALLEGRO_KEY_LWIN] == true) {
+          mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_META);
+        } else if (sg_key_modifiers[ALLEGRO_KEY_RWIN] == true) {
+          // mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_RMETA);
         }
 
-        if (event.mouse.button == 1) {
-          button = jevent::JMB_BUTTON1;
-        } else if (event.mouse.button == 2) {
-          button = jevent::JMB_BUTTON2;
-        } else if (event.mouse.button == 3) {
-          button = jevent::JMB_BUTTON3;
+        type = jevent::JKT_UNKNOWN;
+
+        if (event.type == ALLEGRO_EVENT_KEY_CHAR || event.type == ALLEGRO_EVENT_KEY_DOWN) {
+          type = jevent::JKT_PRESSED;
+        } else if (event.type == ALLEGRO_EVENT_KEY_UP) {
+          type = jevent::JKT_RELEASED;
         }
-      } else if (event.type == ALLEGRO_EVENT_MOUSE_WARPED) {
-        type = jevent::JMT_ROTATED;
-        mouse_z = event.mouse.dz;
+
+        int shift = sg_key_modifiers[ALLEGRO_KEY_LSHIFT] | sg_key_modifiers[ALLEGRO_KEY_RSHIFT];
+        int capslock = sg_key_modifiers[ALLEGRO_KEY_CAPSLOCK];
+
+        jevent::jkeyevent_symbol_t symbol = TranslateToNativeKeySymbol(event.keyboard.keycode, (shift != 0 && capslock == 0) || (shift == 0 && capslock != 0));
+
+        sg_jgui_window->GetEventManager()->PostEvent(new jevent::KeyEvent(sg_jgui_window, type, mod, jevent::KeyEvent::GetCodeFromSymbol(symbol), symbol));
+      } else if (event.type == ALLEGRO_EVENT_MOUSE_AXES || event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN || event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP || event.type == ALLEGRO_EVENT_MOUSE_WARPED) {
+        jevent::jmouseevent_button_t button = jevent::JMB_NONE;
+        jevent::jmouseevent_type_t type = jevent::JMT_UNKNOWN;
+        int mouse_z = 0;
+
+        sg_mouse_x = event.mouse.x;
+        sg_mouse_y = event.mouse.y;
+
+        sg_mouse_x = CLAMP(sg_mouse_x, 0, sg_screen.width - 1);
+        sg_mouse_y = CLAMP(sg_mouse_y, 0, sg_screen.height - 1);
+
+        if (event.type == ALLEGRO_EVENT_MOUSE_AXES) {
+          type = jevent::JMT_MOVED;
+        } else if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN || event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
+          if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
+            type = jevent::JMT_PRESSED;
+          } else if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
+            type = jevent::JMT_RELEASED;
+          }
+
+          if (event.mouse.button == 1) {
+            button = jevent::JMB_BUTTON1;
+          } else if (event.mouse.button == 2) {
+            button = jevent::JMB_BUTTON2;
+          } else if (event.mouse.button == 3) {
+            button = jevent::JMB_BUTTON3;
+          }
+        } else if (event.type == ALLEGRO_EVENT_MOUSE_WARPED) {
+          type = jevent::JMT_ROTATED;
+          mouse_z = event.mouse.dz;
+        }
+
+        sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, jevent::JMB_NONE, {sg_mouse_x, sg_mouse_y}, mouse_z));
       }
-
-      sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, jevent::JMB_NONE, {sg_mouse_x, sg_mouse_y}, mouse_z));
     }
-
-    std::this_thread::yield();
   }
 
   al_destroy_event_queue(queue);

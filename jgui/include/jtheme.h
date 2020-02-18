@@ -34,10 +34,6 @@ class Theme : public virtual jcommon::ParamMapper {
 
   private:
     /** \brief */
-    static Theme *_default_theme;
-
-  private:
-    /** \brief */
     std::map<std::string, jgui::Font *> _fonts;
 
   public:
@@ -53,12 +49,6 @@ class Theme : public virtual jcommon::ParamMapper {
      */
     virtual ~Theme();
 
-    /**
-     * \brief
-     *
-     */
-    static Theme * GetDefaultTheme();
-    
     /**
      * \brief
      *

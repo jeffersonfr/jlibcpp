@@ -49,6 +49,8 @@ class Minecraft : public jgui::Window {
     Minecraft():
       jgui::Window(jgui::jsize_t<int>{512, 512})
     {
+      SetFramesPerSecond(30);
+
 	    MakeTextures();
       MakeMap();
     }
@@ -166,22 +168,6 @@ class Minecraft : public jgui::Window {
       int _b = (((a    ) & 0xff) * b) >> 8;
 
       return (0xff << 24) | (_r<<16) | (_g<<8) | _b;
-    }
-
-    void Framerate(int fps)
-    {
-      static auto begin = std::chrono::steady_clock::now();
-      static int index = 0;
-
-      std::chrono::time_point<std::chrono::steady_clock> timestamp = begin + std::chrono::milliseconds(index++*(1000/fps));
-      std::chrono::time_point<std::chrono::steady_clock> current = std::chrono::steady_clock::now();
-      std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - current);
-
-      if (diff.count() < 0) {
-        return;
-      }
-
-      std::this_thread::sleep_for(diff);
     }
 
     virtual void Paint(jgui::Graphics *g)
@@ -304,8 +290,6 @@ class Minecraft : public jgui::Window {
       }
 
       g->SetRGBArray(buffer, {0, 0, size.width, size.height});
-
-      Framerate(25);
 
       Repaint();
     }
