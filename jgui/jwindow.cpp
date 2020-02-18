@@ -277,8 +277,6 @@ void Window::PaintGlassPane(Graphics *g)
 
   jgui::Font 
     *font = GetTheme().GetFont();
-  jgui::jcolor_t<float>
-    fg = GetTheme().GetIntegerParam("fg");
   jgui::jsize_t
     size = GetSize();
   jgui::jinsets_t
@@ -294,7 +292,7 @@ void Window::PaintGlassPane(Graphics *g)
       if (font != nullptr) {
         count += font->GetStringWidth((*i).subtitle.c_str());
 
-        g->SetColor(fg);
+        g->SetColor(GetTheme().GetIntegerParam("fg"));
         g->DrawString((*i).subtitle, jgui::jpoint_t<int>{size.width-count, size.height-insets.bottom+(SUBTITLE_SIZE-font->GetSize())/2+8});
       }
 

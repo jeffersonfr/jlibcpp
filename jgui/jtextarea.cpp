@@ -509,11 +509,6 @@ void TextArea::Paint(Graphics *g)
 
   Font 
     *font = GetTheme().GetFont();
-  jcolor_t<float>
-    // bg = GetTheme().GetIntegerParam("bg"),
-    fg = GetTheme().GetIntegerParam("fg"),
-    fgfocus = GetTheme().GetIntegerParam("fg.focus"),
-    fgdisable = GetTheme().GetIntegerParam("fg.disable");
   int
     x = GetTheme().GetIntegerParam("hgap") + GetTheme().GetIntegerParam("border.size"),
     y = GetTheme().GetIntegerParam("vgap") + GetTheme().GetIntegerParam("border.size");
@@ -547,12 +542,12 @@ void TextArea::Paint(Graphics *g)
 
     if (IsEnabled() == true) {
       if (HasFocus() == true) {
-        g->SetColor(fgfocus);
+        g->SetColor(GetTheme().GetIntegerParam("fg.focus"));
       } else {
-        g->SetColor(fg);
+        g->SetColor(GetTheme().GetIntegerParam("fg"));
       }
     } else {
-      g->SetColor(fgdisable);
+      g->SetColor(GetTheme().GetIntegerParam("fg.disable"));
     }
 
     g->DrawString(s, jgui::jpoint_t<int>{x, y+k*fs});

@@ -94,12 +94,6 @@ void ProgressBar::Paint(Graphics *g)
 
   jgui::Font 
     *font = GetTheme().GetFont();
-  jgui::jcolor_t<float>
-    // bg = GetTheme().GetIntegerParam("bg"),
-    fg = GetTheme().GetIntegerParam("fg"),
-    fgfocus = GetTheme().GetIntegerParam("fg.focus"),
-    fgdisable = GetTheme().GetIntegerParam("fg.disable"),
-    scroll = GetTheme().GetIntegerParam("scroll");
   jgui::jsize_t<int>
     size = GetSize();
   std::string 
@@ -120,7 +114,7 @@ void ProgressBar::Paint(Graphics *g)
       d = w;
     }
 
-    g->SetColor(scroll);
+    g->SetColor(GetTheme().GetIntegerParam("scroll"));
     g->FillRectangle({x, y, (int)d, h});
 
     snprintf(t, 255-1, "%d %%", _value);
@@ -136,7 +130,7 @@ void ProgressBar::Paint(Graphics *g)
       d = h;
     }
 
-    g->SetColor(scroll);
+    g->SetColor(GetTheme().GetIntegerParam("scroll"));
     g->FillRectangle({x, y, w, (int)d});
 
     snprintf(t, 255-1, "%d %%", _value);
@@ -146,12 +140,12 @@ void ProgressBar::Paint(Graphics *g)
 
   if (IsEnabled() == true) {
     if (HasFocus() == true) {
-      g->SetColor(fgfocus);
+      g->SetColor(GetTheme().GetIntegerParam("fg.focus"));
     } else {
-      g->SetColor(fg);
+      g->SetColor(GetTheme().GetIntegerParam("fg"));
     }
   } else {
-    g->SetColor(fgdisable);
+    g->SetColor(GetTheme().GetIntegerParam("fg.disable"));
   }
 
   // if (_wrap == false) {

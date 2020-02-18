@@ -277,10 +277,6 @@ void Spin::Paint(Graphics *g)
 
   jgui::Font 
     *font = GetTheme().GetFont();
-  jgui::jcolor_t<float>
-    fg = GetTheme().GetIntegerParam("fg"),
-    fgfocus = GetTheme().GetIntegerParam("fg.focus"),
-    fgdisable = GetTheme().GetIntegerParam("fg.disable");
   jgui::jsize_t<int>
     size = GetSize();
   int
@@ -296,9 +292,9 @@ void Spin::Paint(Graphics *g)
 
     if (_loop == true || (_index < ((int)_items.size()-1))) {
       if (HasFocus() == true) {
-        g->SetColor(fgfocus);
+        g->SetColor(GetTheme().GetIntegerParam("fg.focus"));
       } else {
-        g->SetColor(fg);
+        g->SetColor(GetTheme().GetIntegerParam("fg"));
       }
 
       g->FillTriangle({w, y + arrow_size + offset}, {x + w - arrow_size, y + offset}, {x + w - arrow_size, y + 2*arrow_size + offset});
@@ -306,9 +302,9 @@ void Spin::Paint(Graphics *g)
 
     if (_loop == true || (_index > 0 && _items.size() > 0)) {
       if (HasFocus() == true) {
-        g->SetColor(fgfocus);
+        g->SetColor(GetTheme().GetIntegerParam("fg.focus"));
       } else {
-        g->SetColor(fg);
+        g->SetColor(GetTheme().GetIntegerParam("fg"));
       }
 
       g->FillTriangle({x, y + arrow_size + offset}, {x + arrow_size, y + offset}, {x + arrow_size, y + 2*arrow_size + offset});
@@ -320,12 +316,12 @@ void Spin::Paint(Graphics *g)
 
         if (IsEnabled() == true) {
           if (HasFocus() == true) {
-            g->SetColor(fgfocus);
+            g->SetColor(GetTheme().GetIntegerParam("fg.focus"));
           } else {
-            g->SetColor(fg);
+            g->SetColor(GetTheme().GetIntegerParam("fg"));
           }
         } else {
-          g->SetColor(fgdisable);
+          g->SetColor(GetTheme().GetIntegerParam("fg.disable"));
         }
 
         std::string text = _items[_index]->GetValue();
@@ -342,9 +338,9 @@ void Spin::Paint(Graphics *g)
 
     if (_loop == true || (_index < ((int)_items.size()-1))) {
       if (HasFocus() == true) {
-        g->SetColor(fgfocus);
+        g->SetColor(GetTheme().GetIntegerParam("fg.focus"));
       } else {
-        g->SetColor(fg);
+        g->SetColor(GetTheme().GetIntegerParam("fg"));
       }
     }
 
@@ -352,9 +348,9 @@ void Spin::Paint(Graphics *g)
 
     if (_loop == true || (_index > 0 && _items.size() > 0)) {
       if (HasFocus() == true) {
-        g->SetColor(fgfocus);
+        g->SetColor(GetTheme().GetIntegerParam("fg.focus"));
       } else {
-        g->SetColor(fg);
+        g->SetColor(GetTheme().GetIntegerParam("fg"));
       }
     }
 
@@ -367,12 +363,12 @@ void Spin::Paint(Graphics *g)
 
         if (IsEnabled() == true) {
           if (HasFocus() == true) {
-            g->SetColor(fgfocus);
+            g->SetColor(GetTheme().GetIntegerParam("fg.focus"));
           } else {
-            g->SetColor(fg);
+            g->SetColor(GetTheme().GetIntegerParam("fg"));
           }
         } else {
-          g->SetColor(fgdisable);
+          g->SetColor(GetTheme().GetIntegerParam("fg.disable"));
         }
 
         std::string text = _items[_index]->GetValue();

@@ -423,9 +423,6 @@ void Component::PaintScrollbars(Graphics *g)
     return;
   }
 
-  jgui::jcolor_t<float>
-    bg = GetTheme().GetIntegerParam("bg"),
-    fg = GetTheme().GetIntegerParam("fg");
   jgui::jpoint_t<int> 
     slocation = GetScrollLocation();
   jgui::jsize_t<int>
@@ -443,10 +440,10 @@ void Component::PaintScrollbars(Graphics *g)
       offset = (int)(size.width*offset_ratio),
       block_size = (int)(size.width*block_size_ratio);
 
-    g->SetColor(fg);
+    g->SetColor(GetTheme().GetIntegerParam("fg"));
     g->FillRectangle({bs, size.height - ss - bs, size.width - 2*bs, ss});
-    g->SetGradientStop(0.0, fg);
-    g->SetGradientStop(1.0, bg);
+    g->SetGradientStop(0.0, GetTheme().GetIntegerParam("fg"));
+    g->SetGradientStop(1.0, GetTheme().GetIntegerParam("bg"));
     g->FillLinearGradient({offset, size.height - ss - bs, block_size, ss}, {0, 0}, {0, ss});
     g->ResetGradientStop();
   }
@@ -459,11 +456,11 @@ void Component::PaintScrollbars(Graphics *g)
       offset = (int)(size.height*offset_ratio),
       block_size = (int)(size.height*block_size_ratio);
 
-    g->SetColor(fg);
+    g->SetColor(GetTheme().GetIntegerParam("fg"));
     g->FillRectangle({size.width - ss - bs, bs, ss, size.height});
 
-    g->SetGradientStop(0.0, fg);
-    g->SetGradientStop(1.0, bg);
+    g->SetGradientStop(0.0, GetTheme().GetIntegerParam("fg"));
+    g->SetGradientStop(1.0, GetTheme().GetIntegerParam("bg"));
     g->FillLinearGradient({size.width - ss - bs, offset, ss, block_size}, {0, 0}, {ss, 0});
     g->ResetGradientStop();
   }
@@ -473,8 +470,8 @@ void Component::PaintScrollbars(Graphics *g)
       radius = ss,
       radius2 = radius/2;
 
-    g->SetGradientStop(0.0, bg);
-    g->SetGradientStop(1.0, fg);
+    g->SetGradientStop(0.0, GetTheme().GetIntegerParam("bg"));
+    g->SetGradientStop(1.0, GetTheme().GetIntegerParam("fg"));
     g->FillRadialGradient({size.width-radius2, size.height-radius2}, {radius, radius}, {0, 0}, 0);
     g->ResetGradientStop();
   }
@@ -500,10 +497,6 @@ void Component::PaintBackground(Graphics *g)
     return;
   }
   
-  jgui::jcolor_t<float>
-    bg = GetTheme().GetIntegerParam("bg"),
-    bgfocus = GetTheme().GetIntegerParam("bg.focus"),
-    bgdisable = GetTheme().GetIntegerParam("bg.disable");
   jgui::jsize_t<int>
     size = GetSize();
   jcomponent_border_t 
@@ -516,12 +509,12 @@ void Component::PaintBackground(Graphics *g)
 
   if (IsEnabled() == true) {
     if (HasFocus() == true) {
-      g->SetColor(bgfocus);
+      g->SetColor(GetTheme().GetIntegerParam("bg.focus"));
     } else {
-      g->SetColor(bg);
+      g->SetColor(GetTheme().GetIntegerParam("bg"));
     }
   } else {
-    g->SetColor(bgdisable);
+    g->SetColor(GetTheme().GetIntegerParam("bg.disable"));
   }
 
   if (bordertype == JCB_ROUND) {

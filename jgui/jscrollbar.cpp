@@ -269,9 +269,6 @@ void ScrollBar::Paint(Graphics *g)
 
   Component::Paint(g);
 
-  jgui::jcolor_t<float>
-    fgfocus = GetTheme().GetIntegerParam("fg.focus"),
-    scroll = GetTheme().GetIntegerParam("scroll");
   jgui::jsize_t<int>
     size = GetSize();
   int
@@ -295,9 +292,9 @@ void ScrollBar::Paint(Graphics *g)
     }
 
     if (HasFocus() == true) {
-      g->SetColor(fgfocus);
+      g->SetColor(GetTheme().GetIntegerParam("fg.focus"));
     } else {
-      g->SetColor(scroll);
+      g->SetColor(GetTheme().GetIntegerParam("scroll"));
     }
 
     g->FillRectangle({(int)d + arrow_size + x + hg, y, _stone_size, h});
@@ -316,9 +313,9 @@ void ScrollBar::Paint(Graphics *g)
     }
 
     if (HasFocus() == true) {
-      g->SetColor(fgfocus);
+      g->SetColor(GetTheme().GetIntegerParam("fg.focus"));
     } else {
-      g->SetColor(scroll);
+      g->SetColor(GetTheme().GetIntegerParam("scroll"));
     }
 
     g->FillRectangle({x, (int) d + arrow_size + y + vg, w, _stone_size});

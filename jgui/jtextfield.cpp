@@ -252,11 +252,6 @@ void TextField::Paint(Graphics *g)
     return;
   }
 
-  jgui::jcolor_t<float>
-    // bg = GetTheme().GetIntegerParam("bg"),
-    fg = GetTheme().GetIntegerParam("fg"),
-    fgfocus = GetTheme().GetIntegerParam("fg.focus"),
-    fgdisable = GetTheme().GetIntegerParam("fg.disable");
   jgui::jsize_t<int>
     size = GetSize();
   int
@@ -284,12 +279,12 @@ void TextField::Paint(Graphics *g)
 
   if (IsEnabled() == true) {
     if (HasFocus() == true) {
-      g->SetColor(fgfocus);
+      g->SetColor(GetTheme().GetIntegerParam("fg.focus"));
     } else {
-      g->SetColor(fg);
+      g->SetColor(GetTheme().GetIntegerParam("fg"));
     }
   } else {
-    g->SetColor(fgdisable);
+    g->SetColor(GetTheme().GetIntegerParam("fg.disable"));
   }
 
   current_text_size = 0;

@@ -108,11 +108,6 @@ void Marquee::Paint(Graphics *g)
 
   jgui::Font 
     *font = GetTheme().GetFont();
-  jgui::jcolor_t<float>
-    // bg = GetTheme().GetIntegerParam("bg"),
-    fg = GetTheme().GetIntegerParam("fg"),
-    fgfocus = GetTheme().GetIntegerParam("fg.focus"),
-    fgdisable = GetTheme().GetIntegerParam("fg.disable");
   jgui::jsize_t<int>
     size = GetSize();
   int
@@ -126,12 +121,12 @@ void Marquee::Paint(Graphics *g)
 
     if (IsEnabled() == true) {
       if (HasFocus() == true) {
-        g->SetColor(fgfocus);
+        g->SetColor(GetTheme().GetIntegerParam("fg.focus"));
       } else {
-        g->SetColor(fg);
+        g->SetColor(GetTheme().GetIntegerParam("fg"));
       }
     } else {
-      g->SetColor(fgdisable);
+      g->SetColor(GetTheme().GetIntegerParam("fg.disable"));
     }
 
     std::string text = _text;

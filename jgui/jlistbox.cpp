@@ -217,10 +217,8 @@ jsize_t<int> ListBox::GetPreferredSize()
   jgui::jsize_t<int> 
     t = GetSize();
   int
-    // gx = GetTheme().GetIntegerParam("hgap") + GetTheme().GetIntegerParam("border.size"),
     gy = GetTheme().GetIntegerParam("vgap") + GetTheme().GetIntegerParam("border.size");
 
-  // t.width = t.width;
   t.height = 2*gy + _items.size()*(GetItemSize() + GetItemGap()) - GetItemGap();
 
   return t;
@@ -242,7 +240,6 @@ bool ListBox::KeyPressed(jevent::KeyEvent *event)
     action = event->GetSymbol();
   int
     bs = GetTheme().GetIntegerParam("border.size"),
-    // hp = GetTheme().GetIntegerParam("hgap"),
     vg = GetTheme().GetIntegerParam("vgap");
   bool 
     catched = false;
@@ -335,15 +332,6 @@ void ListBox::Paint(Graphics *g)
 
   jgui::Font 
     *font = GetTheme().GetFont();
-  jgui::jcolor_t<float>
-    itembg = GetTheme().GetIntegerParam("bg"),
-    itembgselect = GetTheme().GetIntegerParam("bg.select"),
-    itembgdisable = GetTheme().GetIntegerParam("bg.disable"),
-    itembgfocus = GetTheme().GetIntegerParam("bg.focus"),
-    itemfg = GetTheme().GetIntegerParam("fg"),
-    itemfgselect = GetTheme().GetIntegerParam("fg.select"),
-    itemfgdisable = GetTheme().GetIntegerParam("fg.disable"),
-    itemfgfocus = GetTheme().GetIntegerParam("fg.focus");
   jpoint_t<int> 
     scroll_location = GetScrollLocation();
   jgui::jsize_t<int>
@@ -385,23 +373,23 @@ void ListBox::Paint(Graphics *g)
     Item *item = _items[i];
 
     if (item->IsEnabled() == true) {
-      g->SetColor(itembg);
+      g->SetColor(GetTheme().GetIntegerParam("bg"));
     } else {
-      g->SetColor(itembgdisable);
+      g->SetColor(GetTheme().GetIntegerParam("bg.disable"));
     }
 
     if (_index != i) {
       if (_mode == JLBM_SINGLE_SELECTION) {  
         if (_selected_index == i) {  
-          g->SetColor(itembgselect);
+          g->SetColor(GetTheme().GetIntegerParam("bg.select"));
         }
       } else if (_mode == JLBM_MULTI_SELECTION) {  
         if (item->IsSelected() == true) {  
-          g->SetColor(itembgselect);
+          g->SetColor(GetTheme().GetIntegerParam("bg.select"));
         }
       }
     } else {
-      g->SetColor(itembgfocus);
+      g->SetColor(GetTheme().GetIntegerParam("bg.focus"));
     }
 
     g->FillRectangle({x, y + (GetItemSize() + GetItemGap())*i, w, GetItemSize()});
@@ -410,23 +398,23 @@ void ListBox::Paint(Graphics *g)
       g->SetFont(font);
 
       if (item->IsEnabled() == true) {
-        g->SetColor(itemfg);
+        g->SetColor(GetTheme().GetIntegerParam("fg"));
       } else {
-        g->SetColor(itemfgdisable);
+        g->SetColor(GetTheme().GetIntegerParam("fg.disable"));
       }
 
       if (_index != i) {
         if (_mode == JLBM_SINGLE_SELECTION) {  
           if (_selected_index == i) {  
-            g->SetColor(itemfgselect);
+            g->SetColor(GetTheme().GetIntegerParam("fg.select"));
           }
         } else if (_mode == JLBM_MULTI_SELECTION) {  
           if (item->IsSelected() == true) {  
-            g->SetColor(itemfgselect);
+            g->SetColor(GetTheme().GetIntegerParam("fg.select"));
           }
         }
       } else {
-        g->SetColor(itemfgfocus);
+        g->SetColor(GetTheme().GetIntegerParam("fg.focus"));
       }
 
       std::string text = _items[i]->GetValue();

@@ -92,8 +92,6 @@ void Icon::Paint(Graphics *g)
 
   Component::Paint(g);
 
-  jgui::jcolor_t<float> 
-    bg = GetTheme().GetIntegerParam("bg");
   jgui::jsize_t
     size = GetSize();
   int
@@ -105,7 +103,7 @@ void Icon::Paint(Graphics *g)
   if (_image != nullptr) {
     g->DrawImage(_image, {x, y, w, h});
   } else {
-    g->SetColor(bg);
+    g->SetColor(GetTheme().GetIntegerParam("bg"));
     g->FillRectangle({x, y, w, h});
   }
 }

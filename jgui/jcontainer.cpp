@@ -420,10 +420,6 @@ void Container::PaintBackground(Graphics *g)
     return;
   }
   
-  jgui::jcolor_t<float>
-    bg = GetTheme().GetIntegerParam("bg"),
-    bgfocus = GetTheme().GetIntegerParam("bg.focus"),
-    bgdisable = GetTheme().GetIntegerParam("bg.disable");
   jgui::jsize_t<int>
     size = GetSize();
   jcomponent_border_t 
@@ -436,12 +432,12 @@ void Container::PaintBackground(Graphics *g)
 
   if (IsEnabled() == true) {
     if (HasFocus() == true) {
-      g->SetColor(bgfocus);
+      g->SetColor(GetTheme().GetIntegerParam("bg.focus"));
     } else {
-      g->SetColor(bg);
+      g->SetColor(GetTheme().GetIntegerParam("bg"));
     }
   } else {
-    g->SetColor(bgdisable);
+    g->SetColor(GetTheme().GetIntegerParam("bg.disable"));
   }
 
   if (bordertype == JCB_ROUND) {

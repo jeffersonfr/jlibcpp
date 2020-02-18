@@ -231,9 +231,6 @@ void Slider::Paint(Graphics *g)
 
   Component::Paint(g);
 
-  jgui::jcolor_t<float>
-    fgfocus = GetTheme().GetIntegerParam("fg.focus"),
-    scroll = GetTheme().GetIntegerParam("scroll");
   jgui::jsize_t<int>
     size = GetSize();
   int
@@ -251,9 +248,9 @@ void Slider::Paint(Graphics *g)
     }
 
     if (HasFocus() == true) {
-      g->SetColor(fgfocus);
+      g->SetColor(GetTheme().GetIntegerParam("fg.focus"));
     } else {
-      g->SetColor(scroll);
+      g->SetColor(GetTheme().GetIntegerParam("scroll"));
     }
     
     g->FillRectangle({x, (h-4)/2+y, w, 4});
@@ -288,9 +285,9 @@ void Slider::Paint(Graphics *g)
     }
 
     if (HasFocus() == true) {
-      g->SetColor(fgfocus);
+      g->SetColor(GetTheme().GetIntegerParam("fg.focus"));
     } else {
-      g->SetColor(scroll);
+      g->SetColor(GetTheme().GetIntegerParam("scroll"));
     }
     
     g->FillRectangle({(w-10)/2+x, y, 10, h});
