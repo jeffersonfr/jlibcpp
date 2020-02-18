@@ -59,6 +59,9 @@ Window::Window(jgui::jsize_t<int> size, jgui::jpoint_t<int> point):
 
   _event_manager = new EventManager(this);
 
+  GetTheme().SetIntegerParam("border.style", JCB_RAISED_GRADIENT);
+  GetTheme().SetFont("primary", &jgui::Font::BIG);
+
   SetInsets({8, 8, 8, 8});
   SetTitle("Main");
   SetLayout(nullptr);
@@ -273,9 +276,9 @@ void Window::PaintGlassPane(Graphics *g)
   Container::PaintGlassPane(g);
 
   jgui::Font 
-    *font = GetTheme().GetFont("window.font");
+    *font = GetTheme().GetFont();
   jgui::jcolor_t<float>
-    fg = GetTheme().GetIntegerParam("window.fg");
+    fg = GetTheme().GetIntegerParam("fg");
   jgui::jsize_t
     size = GetSize();
   jgui::jinsets_t
@@ -306,76 +309,6 @@ void Window::PaintGlassPane(Graphics *g)
       count += 20;
     }
   }
-
-  /*
-  if (_is_undecorated == true) {
-    return;
-  }
-
-  jgui::Font *font = GetTheme().GetFont("window.font");
-  Color bg = GetTheme().GetColor("widget.bg");
-  Color fg = GetTheme().GetColor("widget.fg");
-  Color scroll = GetTheme().GetColor("widget.scroll");
-  int bordersize = GetTheme().GetBorderSize("widget");
-  
-  jinsets_t insets = GetInsets();
-
-  if (_title != "") {
-    g->SetGradientStop(0.0, bg);
-    g->SetGradientStop(1.0, scroll);
-    g->FillLinearGradient(bordersize, bordersize, size.width-2*bordersize, insets.top-2*bordersize, 0, 0, 0, insets.top-2*bordersize);
-    g->ResetGradientStop();
-
-    if (font != nullptr) {
-      int y = (insets.top-font->GetSize())/2;
-
-      if (y < 0) {
-        y = 0;
-      }
-
-      std::string text = _title;
-      
-      // if (_wrap == false) {
-        text = font->TruncateString(text, "...", (size.width-insets.left-insets.right));
-      // }
-
-      g->SetFont(font);
-      g->SetColor(fg);
-      g->DrawString(text, insets.left+(size.width-insets.left-insets.right-font->GetStringWidth(text))/2, y);
-    }
-  }
-
-  if (_icon_image != nullptr) {
-    int h = (insets.top-20);
-
-    if (h > 0) {
-      g->DrawImage(_icon_image, insets.left, 10, h, h);
-    }
-  }
-
-  if (_subtitles.size() > 0) {
-    int count = insets.right;
-
-    for (std::vector<frame_subtitle_t>::iterator i=_subtitles.begin(); i!=_subtitles.end(); i++) {
-      if (font != nullptr) {
-        count += font->GetStringWidth((*i).subtitle.c_str());
-
-        g->SetColor(fg);
-        g->DrawString((*i).subtitle, size.width-count, size.height-insets.bottom+(SUBTITLE_SIZE-font->GetSize())/2+8);
-      }
-
-      count += 8;
-
-      if ((*i).image != nullptr) {
-        count += SUBTITLE_SIZE;
-
-        g->DrawImage((*i).image, size.width-count, size.height-insets.bottom+8, SUBTITLE_SIZE, SUBTITLE_SIZE);
-      }
-
-      count += 20;
-    }
-  }
-  */
 }
 
 void Window::SetFramesPerSecond(int fps)

@@ -20,7 +20,7 @@
 #include "jgui/japplication.h"
 #include "jgui/jwindow.h"
 #include "jgui/jbutton.h"
-#include "jgui/jlabel.h"
+#include "jgui/jtext.h"
 #include "jgui/jcardlayout.h"
 #include "jgui/jgridlayout.h"
 #include "jgui/jborderlayout.h"
@@ -231,12 +231,12 @@ class Main : public jgui::Window, public jevent::ActionListener {
 			_c[5]->Add(b05);
 			
 			// adicionando a legenda nos containers
-			jgui::Label *l1 = new jgui::Label("FlowLayout"),
-				*l2 = new jgui::Label("GridLayout"),
-				*l3 = new jgui::Label("BorderLayout"),
-				*l4 = new jgui::Label("CardLayout"),
-				*l5 = new jgui::Label("GridBagLayout"),
-				*l6 = new jgui::Label("NullLayout");
+			jgui::Text *l1 = new jgui::Text("FlowLayout"),
+				*l2 = new jgui::Text("GridLayout"),
+				*l3 = new jgui::Text("BorderLayout"),
+				*l4 = new jgui::Text("CardLayout"),
+				*l5 = new jgui::Text("GridBagLayout"),
+				*l6 = new jgui::Text("NullLayout");
 			
 			_theme.SetIntegerParam("component.bg", 0xff404040);
 			

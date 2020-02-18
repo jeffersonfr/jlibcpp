@@ -150,8 +150,8 @@ bool Spin::MousePressed(jevent::MouseEvent *event)
   jgui::jsize_t<int>
     size = GetSize();
   int
-    x = GetTheme().GetIntegerParam("component.hgap") + GetTheme().GetIntegerParam("component.border.size"),
-    y = GetTheme().GetIntegerParam("component.vgap") + GetTheme().GetIntegerParam("component.border.size"),
+    x = GetTheme().GetIntegerParam("hgap") + GetTheme().GetIntegerParam("border.size"),
+    y = GetTheme().GetIntegerParam("vgap") + GetTheme().GetIntegerParam("border.size"),
     // w = size.width - 2*x,
     h = size.height - 2*y;
   bool 
@@ -276,36 +276,32 @@ void Spin::Paint(Graphics *g)
   Component::Paint(g);
 
   jgui::Font 
-    *font = GetTheme().GetFont("component.font");
+    *font = GetTheme().GetFont();
   jgui::jcolor_t<float>
-    // bg = GetTheme().GetIntegerParam("component.bg"),
-    fg = GetTheme().GetIntegerParam("component.fg"),
-    fgfocus = GetTheme().GetIntegerParam("component.fg.focus"),
-    fgdisable = GetTheme().GetIntegerParam("component.fg.disable");
+    fg = GetTheme().GetIntegerParam("fg"),
+    fgfocus = GetTheme().GetIntegerParam("fg.focus"),
+    fgdisable = GetTheme().GetIntegerParam("fg.disable");
   jgui::jsize_t<int>
     size = GetSize();
   int
-    x = GetTheme().GetIntegerParam("component.hgap") + GetTheme().GetIntegerParam("component.border.size"),
-    y = GetTheme().GetIntegerParam("component.vgap") + GetTheme().GetIntegerParam("component.border.size"),
+    x = GetTheme().GetIntegerParam("hgap") + GetTheme().GetIntegerParam("border.size"),
+    y = GetTheme().GetIntegerParam("vgap") + GetTheme().GetIntegerParam("border.size"),
     w = size.width - 2*x,
     h = size.height - 2*y;
   int
-      arrow_size = h/2;
+    arrow_size = 8;
 
   if (_type == JSO_HORIZONTAL) {
-    // arrow_size = h/2;
-  } else if (_type == JSO_VERTICAL) {
-    arrow_size = (h-8)/2;
-  }
+    int offset = (size.height - 2*arrow_size)/2;
 
-  if (_type == JSO_HORIZONTAL) {
     if (_loop == true || (_index < ((int)_items.size()-1))) {
       if (HasFocus() == true) {
         g->SetColor(fgfocus);
       } else {
         g->SetColor(fg);
       }
-      g->FillTriangle({x+w, y+arrow_size}, {x+w-arrow_size, y}, {x+w-arrow_size, y+2*arrow_size});
+
+      g->FillTriangle({w, y + arrow_size + offset}, {x + w - arrow_size, y + offset}, {x + w - arrow_size, y + 2*arrow_size + offset});
     }
 
     if (_loop == true || (_index > 0 && _items.size() > 0)) {
@@ -314,7 +310,8 @@ void Spin::Paint(Graphics *g)
       } else {
         g->SetColor(fg);
       }
-      g->FillTriangle({x, y+arrow_size}, {x+arrow_size, y}, {x+arrow_size, y+2*arrow_size});
+
+      g->FillTriangle({x, y + arrow_size + offset}, {x + arrow_size, y + offset}, {x + arrow_size, y + 2*arrow_size + offset});
     }
 
     if (_items.size() > 0) {
@@ -341,6 +338,8 @@ void Spin::Paint(Graphics *g)
       }
     }
   } else if (_type == JSO_VERTICAL) {
+    int offset = (size.height/2 - arrow_size)/2;
+
     if (_loop == true || (_index < ((int)_items.size()-1))) {
       if (HasFocus() == true) {
         g->SetColor(fgfocus);
@@ -349,7 +348,7 @@ void Spin::Paint(Graphics *g)
       }
     }
 
-    g->FillTriangle({size.width-2*arrow_size-x, y+arrow_size}, {size.width-x, y+arrow_size}, {size.width-arrow_size-x, y});
+    g->FillTriangle({size.width - 2*arrow_size - x, y + arrow_size + offset}, {size.width - x, y + arrow_size + offset}, {size.width - arrow_size - x, y + offset});
 
     if (_loop == true || (_index > 0 && _items.size() > 0)) {
       if (HasFocus() == true) {
@@ -359,7 +358,8 @@ void Spin::Paint(Graphics *g)
       }
     }
 
-    g->FillTriangle({size.width-2*arrow_size-x, y+arrow_size+8}, {size.width-x, y+arrow_size+8}, {size.width-arrow_size-x, y+h});
+    g->FillTriangle({size.width - 2*arrow_size - x, y + arrow_size + size.height/2}, {size.width - x, y + arrow_size + size.height/2}, {size.width - arrow_size - x, y + size.height - offset});
+
 
     if (_items.size() > 0) {
       if (font != nullptr) {

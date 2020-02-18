@@ -175,17 +175,17 @@ void Button::Paint(Graphics *g)
   Component::Paint(g);
 
   Font 
-    *font = GetTheme().GetFont("component.font");
+    *font = GetTheme().GetFont();
   jcolor_t<float> 
-    // bg = GetTheme().GetIntegerParam("component.bg"),
-    fg = GetTheme().GetIntegerParam("component.fg"),
-    fgfocus = GetTheme().GetIntegerParam("component.fg.focus"),
-    fgdisable = GetTheme().GetIntegerParam("component.fg.disable");
+    // bg = GetTheme().GetIntegerParam("bg"),
+    fg = GetTheme().GetIntegerParam("fg"),
+    fgfocus = GetTheme().GetIntegerParam("fg.focus"),
+    fgdisable = GetTheme().GetIntegerParam("fg.disable");
   jgui::jsize_t<int>
     size = GetSize();
   int
-    x = GetTheme().GetIntegerParam("component.hgap") + GetTheme().GetIntegerParam("component.border.size"),
-    y = GetTheme().GetIntegerParam("component.vgap") + GetTheme().GetIntegerParam("component.border.size"),
+    x = GetTheme().GetIntegerParam("hgap") + GetTheme().GetIntegerParam("border.size"),
+    y = GetTheme().GetIntegerParam("vgap") + GetTheme().GetIntegerParam("border.size"),
     w = size.width - 2*x,
     h = size.height - 2*y;
 

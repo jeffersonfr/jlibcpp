@@ -27,7 +27,7 @@
 #include "jgui/jprogressbar.h"
 #include "jgui/jspin.h"
 #include "jgui/jslider.h"
-#include "jgui/jlabel.h"
+#include "jgui/jtext.h"
 #include "jgui/jcheckbutton.h"
 #include "jgui/jcheckbuttongroup.h"
 #include "jgui/jlistbox.h"
@@ -70,7 +70,7 @@ class Widgets : public jgui::Window, public jevent::ActionListener, public jeven
 			*_radio3;
 		jgui::CheckButtonGroup 
 			*_group;
-		jgui::Label 
+		jgui::Text 
 			*_label1,
 			*_label2;
 		jgui::ListBox 
@@ -193,7 +193,7 @@ class Widgets : public jgui::Window, public jevent::ActionListener, public jeven
 
 			_spin = new jgui::Spin();
       
-      _spin->SetBounds({insets.left+0*(32+16), region.point.y + region.size.height + 8, 196});
+      _spin->SetBounds({insets.left+0*(32+16), region.point.y + region.size.height + 8, 196, 48});
 
 			_spin->AddTextItem("loop");
 			_spin->AddTextItem("bounce");
@@ -204,7 +204,7 @@ class Widgets : public jgui::Window, public jevent::ActionListener, public jeven
 		{
 			_marquee = new jgui::Marquee("Marquee Test");
       
-      _marquee->SetBounds({insets.left + 196 + 16, insets.top, size.width - 2*(196 + 16) - insets.left - insets.right});
+      _marquee->SetBounds({insets.left + 196 + 16, insets.top, size.width - 2*(196 + 16) - insets.left - insets.right, 48});
 
 			_marquee->SetType(jgui::JMM_LOOP);
     
@@ -219,9 +219,9 @@ class Widgets : public jgui::Window, public jevent::ActionListener, public jeven
 			_slider = new jgui::Slider();
 			_scroll = new jgui::ScrollBar();
       
-      _progress->SetBounds({insets.left + 196 + 16, region.point.y + 1*(region.size.height + 8), size.width - 2*(196 + 16) - insets.left - insets.right});
-      _slider->SetBounds({insets.left + 196 + 16, region.point.y + 2*(region.size.height + 8), size.width - 2*(196 + 16) - insets.left - insets.right});
-      _scroll->SetBounds({insets.left + 196 + 16, region.point.y + 3*(region.size.height + 8), size.width - 2*(196 + 16) - insets.left - insets.right});
+      _progress->SetBounds({insets.left + 196 + 16, region.point.y + 1*(region.size.height + 8), size.width - 2*(196 + 16) - insets.left - insets.right, 48});
+      _slider->SetBounds({insets.left + 196 + 16, region.point.y + 2*(region.size.height + 8), size.width - 2*(196 + 16) - insets.left - insets.right, 48});
+      _scroll->SetBounds({insets.left + 196 + 16, region.point.y + 3*(region.size.height + 8), size.width - 2*(196 + 16) - insets.left - insets.right, 48});
 
 			_progress->SetValue(20.0);
 			_slider->SetValue(20.0);
@@ -234,7 +234,7 @@ class Widgets : public jgui::Window, public jevent::ActionListener, public jeven
 
 			_textfield = new jgui::TextField();
       
-      _textfield->SetBounds({insets.left + 196 + 16, region.point.y + 4*(region.size.height + 8), size.width - 2*(196 + 16) - insets.left - insets.right});
+      _textfield->SetBounds({insets.left + 196 + 16, region.point.y + 4*(region.size.height + 8), size.width - 2*(196 + 16) - insets.left - insets.right, 48});
 
 			_textfield->Insert("Text Field");
 		}
@@ -254,15 +254,15 @@ class Widgets : public jgui::Window, public jevent::ActionListener, public jeven
       jgui::jrect_t
         region = _textarea->GetVisibleBounds();
 
-			_label1 = new jgui::Label("Label Test 1");
+			_label1 = new jgui::Text("Text Test 1");
       
-      _label1->SetBounds({insets.left + 196 + 16, region.point.y + region.size.height + 8, (region.size.width - 16)/2});
+      _label1->SetBounds({insets.left + 196 + 16, region.point.y + region.size.height + 8, (region.size.width - 16)/2, 48});
       
       region = _label1->GetVisibleBounds();
 
-			_label2 = new jgui::Label("Label Test 2");
+			_label2 = new jgui::Text("Text Test 2");
       
-      _label2->SetBounds({region.point.x + region.size.width + 16, region.point.y, region.size.width});
+      _label2->SetBounds({region.point.x + region.size.width + 16, region.point.y, region.size.width, 48});
 		}
 
 		{
@@ -273,9 +273,9 @@ class Widgets : public jgui::Window, public jevent::ActionListener, public jeven
 			_check2 = new jgui::CheckButton(jgui::JCBT_CHECK, "Password");
 			_check3 = new jgui::CheckButton(jgui::JCBT_CHECK, "Hide");
       
-      _check1->SetBounds({region.point.x, region.point.y + 1*(region.size.height + 8), region.size.width});
-      _check2->SetBounds({region.point.x, region.point.y + 2*(region.size.height + 8), region.size.width});
-      _check3->SetBounds({region.point.x, region.point.y + 3*(region.size.height + 8), region.size.width});
+      _check1->SetBounds({region.point.x, region.point.y + 1*(region.size.height + 8), region.size.width, 48});
+      _check2->SetBounds({region.point.x, region.point.y + 2*(region.size.height + 8), region.size.width, 48});
+      _check3->SetBounds({region.point.x, region.point.y + 3*(region.size.height + 8), region.size.width, 48});
 
 			_check1->SetSelected(true);
 
@@ -292,9 +292,9 @@ class Widgets : public jgui::Window, public jevent::ActionListener, public jeven
 			_radio2 = new jgui::CheckButton(jgui::JCBT_RADIO, "Center");
 			_radio3 = new jgui::CheckButton(jgui::JCBT_RADIO, "Right");
       
-      _radio1->SetBounds({region.point.x, region.point.y + 1*(region.size.height + 8), region.size.width});
-      _radio2->SetBounds({region.point.x, region.point.y + 2*(region.size.height + 8), region.size.width});
-      _radio3->SetBounds({region.point.x, region.point.y + 3*(region.size.height + 8), region.size.width});
+      _radio1->SetBounds({region.point.x, region.point.y + 1*(region.size.height + 8), region.size.width, 48});
+      _radio2->SetBounds({region.point.x, region.point.y + 2*(region.size.height + 8), region.size.width, 48});
+      _radio3->SetBounds({region.point.x, region.point.y + 3*(region.size.height + 8), region.size.width, 48});
 
 			_group = new jgui::CheckButtonGroup();
 

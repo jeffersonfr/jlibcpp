@@ -48,6 +48,8 @@ Container::Container(jgui::jrect_t<int> bounds):
   _insets.top = 0;
   _insets.bottom = 0;
 
+  GetTheme().SetIntegerParam("border.style", JCB_EMPTY);
+
   SetBackgroundVisible(false);
 }
 
@@ -192,8 +194,8 @@ jsize_t<int> Container::GetScrollDimension()
     p1y = 0,
     p2y = 0;
   int
-    ss = GetTheme().GetIntegerParam("component.scroll.size"),
-    sg = GetTheme().GetIntegerParam("component.scroll.gap");
+    ss = GetTheme().GetIntegerParam("scroll.size"),
+    sg = GetTheme().GetIntegerParam("scroll.gap");
 
   jgui::jsize_t<int>
     size = GetSize();
@@ -419,16 +421,16 @@ void Container::PaintBackground(Graphics *g)
   }
   
   jgui::jcolor_t<float>
-    bg = GetTheme().GetIntegerParam("container.bg"),
-    bgfocus = GetTheme().GetIntegerParam("container.bg.focus"),
-    bgdisable = GetTheme().GetIntegerParam("container.bg.disable");
+    bg = GetTheme().GetIntegerParam("bg"),
+    bgfocus = GetTheme().GetIntegerParam("bg.focus"),
+    bgdisable = GetTheme().GetIntegerParam("bg.disable");
   jgui::jsize_t<int>
     size = GetSize();
   jcomponent_border_t 
-    bordertype = (jcomponent_border_t)GetTheme().GetIntegerParam("container.border.style");
+    bordertype = (jcomponent_border_t)GetTheme().GetIntegerParam("border.style");
   int
-    x = GetTheme().GetIntegerParam("container.hgap") + GetTheme().GetIntegerParam("container.border.size"),
-    y = GetTheme().GetIntegerParam("container.vgap") + GetTheme().GetIntegerParam("container.border.size"),
+    x = GetTheme().GetIntegerParam("hgap") + GetTheme().GetIntegerParam("border.size"),
+    y = GetTheme().GetIntegerParam("vgap") + GetTheme().GetIntegerParam("border.size"),
     w = size.width - 2*x,
     h = size.height - 2*y;
 
@@ -454,7 +456,7 @@ void Container::PaintBackground(Graphics *g)
 void Container::PaintBorders(Graphics *g)
 {
   jcomponent_border_t 
-    bordertype = (jcomponent_border_t)GetTheme().GetIntegerParam("container.border.style");
+    bordertype = (jcomponent_border_t)GetTheme().GetIntegerParam("border.style");
 
   if (bordertype == JCB_EMPTY) {
     return;
@@ -462,13 +464,13 @@ void Container::PaintBorders(Graphics *g)
 
   jgui::jcolor_t<float>
     color,
-    border = GetTheme().GetIntegerParam("container.border"),
-    borderfocus = GetTheme().GetIntegerParam("container.border.focus"),
-    borderdisable = GetTheme().GetIntegerParam("container.border.disable");
+    border = GetTheme().GetIntegerParam("border"),
+    borderfocus = GetTheme().GetIntegerParam("border.focus"),
+    borderdisable = GetTheme().GetIntegerParam("border.disable");
   jgui::jsize_t<int>
     size = GetSize();
   int 
-    bs = GetTheme().GetIntegerParam("container.border.size");
+    bs = GetTheme().GetIntegerParam("border.size");
   int 
     xp = 0, 
     yp = 0,

@@ -33,7 +33,6 @@ namespace jgui {
 class Theme : public virtual jcommon::ParamMapper {
 
   private:
-    /** \brief */
     std::map<std::string, jgui::Font *> _fonts;
 
   public:
@@ -53,7 +52,7 @@ class Theme : public virtual jcommon::ParamMapper {
      * \brief
      *
      */
-    virtual jgui::Font * GetFont(std::string id);
+    virtual jgui::Font * GetFont(std::string id = std::string("primary"));
     
     /**
      * \brief

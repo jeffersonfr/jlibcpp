@@ -46,7 +46,7 @@ class CustomContainer : public jgui::Container {
 			}
 
       jgui::jcolor_t<float>
-        scroll = GetTheme().GetIntegerParam("component.scroll");
+        scroll = GetTheme().GetIntegerParam("scroll");
       jgui::jsize_t 
         scroll_dimension = GetScrollDimension();
       jgui::jsize_t
@@ -54,8 +54,8 @@ class CustomContainer : public jgui::Container {
       jgui::jpoint_t 
         scroll_location = GetScrollLocation();
 			int 
-        bs = GetTheme().GetIntegerParam("component.border.size"),
-			  ss = GetTheme().GetIntegerParam("component.scroll.size");
+        bs = GetTheme().GetIntegerParam("border.size"),
+			  ss = GetTheme().GetIntegerParam("scroll.size");
 			int 
         scrollx = (IsScrollableX() == true)?scroll_location.x:0,
 				scrolly = (IsScrollableY() == true)?scroll_location.y:0;

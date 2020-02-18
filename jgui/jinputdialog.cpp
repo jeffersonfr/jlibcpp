@@ -27,10 +27,9 @@ InputDialog::InputDialog(Container *parent, std::string title, std::string msg):
 {
   jcommon::Object::SetClassName("jgui::InputDialog");
 
+  _label.GetTheme().SetFont("primary", &jgui::Font::BIG);
+
   _label.SetText(msg);
-
-  _label.GetTheme().SetFont("component.font", _label.GetTheme().GetFont("container.font"));
-
   _label.SetWrap(true);
   _label.SetHorizontalAlign(JHA_LEFT);
   

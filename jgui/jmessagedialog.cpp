@@ -27,7 +27,6 @@ MessageDialog::MessageDialog(Container *parent, std::string title, std::string m
   jcommon::Object::SetClassName("jgui::MessageDialog");
 
   _label.SetText(msg);
-
   _label.SetWrap(true);
   _label.SetHorizontalAlign(JHA_LEFT);
 

@@ -224,17 +224,12 @@ void CheckButton::Paint(Graphics *g)
   Component::Paint(g);
 
   Font 
-    *font = GetTheme().GetFont("component.font");
-  jcolor_t<float> 
-    // bg = GetTheme().GetIntegerParam("component.bg"),
-    fg = GetTheme().GetIntegerParam("component.fg"),
-    fgfocus = GetTheme().GetIntegerParam("component.fg.focus"),
-    fgdisable = GetTheme().GetIntegerParam("component.fg.disable");
+    *font = GetTheme().GetFont();
   jgui::jsize_t<int>
     size = GetSize();
   int
-    x = GetTheme().GetIntegerParam("component.hgap") + GetTheme().GetIntegerParam("component.border.size"),
-    y = GetTheme().GetIntegerParam("component.vgap") + GetTheme().GetIntegerParam("component.border.size"),
+    x = GetTheme().GetIntegerParam("hgap") + GetTheme().GetIntegerParam("border.size"),
+    y = GetTheme().GetIntegerParam("vgap") + GetTheme().GetIntegerParam("border.size"),
     w = size.width - 2*x,
     h = size.height - 2*y;
   int
@@ -242,31 +237,23 @@ void CheckButton::Paint(Graphics *g)
     minor = 4,
     cs = (std::min(size.width, size.height) - major)/2;
 
-  if (HasFocus() == true) {
-    g->SetColor(fgfocus);
-  } else {
-    g->SetColor(fg);
-  }
-
   x = x + 8;
 
+  g->SetColor(GetTheme().GetIntegerParam("border.select"));
+
   if (_type == JCBT_CHECK) {
-    g->FillRectangle({x, y + (size.height - cs)/2, cs, cs});
+    g->FillRectangle({x, y + (size.height - cs)/2, major, major});
   } else if (_type == JCBT_RADIO) {
-    g->FillCircle({x + cs/2, size.height/2}, cs);
+    g->FillCircle({x + major/2, size.height/2}, major/2);
   }
 
   if (IsSelected() == true) {
-    if (HasFocus() == true) {
-      g->SetColor(fg);
-    } else {
-      g->SetColor(fgfocus);
-    }
+    g->SetColor(GetTheme().GetIntegerParam("border"));
 
     if (_type == JCBT_CHECK) {
-      g->FillRectangle({x + minor, y + (size.height - cs)/2 + minor, cs - 2*minor, cs - 2*minor});
+      g->FillRectangle({x + minor, y + (size.height - cs)/2 + minor, 2*minor, 2*minor});
     } else {
-      g->FillCircle({x + cs/2, size.height/2}, minor);
+      g->FillCircle({x + major/2, size.height/2}, minor);
     }
   }
 
@@ -277,12 +264,12 @@ void CheckButton::Paint(Graphics *g)
 
     if (IsEnabled() == true) {
       if (HasFocus() == true) {
-        g->SetColor(fgfocus);
+        g->SetColor(GetTheme().GetIntegerParam("fg.focus"));
       } else {
-        g->SetColor(fg);
+        g->SetColor(GetTheme().GetIntegerParam("fg"));
       }
     } else {
-      g->SetColor(fgdisable);
+      g->SetColor(GetTheme().GetIntegerParam("fg.disable"));
     }
 
     std::string text = GetText();

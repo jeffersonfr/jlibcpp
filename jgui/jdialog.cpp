@@ -76,7 +76,7 @@ void Dialog::SetTitle(std::string title)
 
   if (_title.empty() == false) {
     jgui::Font 
-      *font = GetTheme().GetFont("container.font");
+      *font = GetTheme().GetFont();
 
     if (font != nullptr) {
       insets.top = font->GetSize() + 16;
@@ -97,14 +97,14 @@ void Dialog::Paint(Graphics *g)
 
   if (_title.empty() == false) {
     jgui::Font 
-      *font = GetTheme().GetFont("container.font");
+      *font = GetTheme().GetFont();
   
     if (font != nullptr) {
       jgui::jsize_t<int>
         size = GetSize();
 
       g->SetFont(font);
-      g->SetColor(GetTheme().GetIntegerParam("container.fg"));
+      g->SetColor(GetTheme().GetIntegerParam("fg"));
       g->DrawString(_title, {0, 8, size.width, font->GetSize()}, jgui::JHA_CENTER, jgui::JVA_CENTER);
     }
   }

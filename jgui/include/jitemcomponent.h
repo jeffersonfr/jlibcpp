@@ -243,6 +243,10 @@ class ItemComponent : public virtual jcommon::Object {
     /** \brief */
     int _index;
     /** \brief */
+    int _item_size;
+    /** \brief */
+    int _item_gap;
+    /** \brief */
     bool _loop;
 
   protected:
@@ -265,7 +269,31 @@ class ItemComponent : public virtual jcommon::Object {
      * \brief
      *
      */
-    virtual int GetItemsSize();
+    virtual int GetItemSize();
+
+    /**
+     * \brief
+     *
+     */
+    virtual int GetItemGap();
+
+    /**
+     * \brief
+     *
+     */
+    virtual void SetItemSize(int size);
+
+    /**
+     * \brief
+     *
+     */
+    virtual void SetItemGap(int gap);
+
+    /**
+     * \brief
+     *
+     */
+    virtual int GetItemsCount();
 
     /**
      * \brief

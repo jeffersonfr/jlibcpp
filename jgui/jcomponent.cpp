@@ -234,7 +234,7 @@ bool Component::IsCyclicFocus()
 
 bool Component::IsOpaque()
 {
-  return (IsBackgroundVisible() == true) && ((GetTheme().GetIntegerParam("component.bg") & 0xff000000) == 0xff000000);
+  return (IsBackgroundVisible() == true) && ((GetTheme().GetIntegerParam("bg") & 0xff000000) == 0xff000000);
 }
 
 int Component::GetBaseline(int width, int height)
@@ -424,16 +424,16 @@ void Component::PaintScrollbars(Graphics *g)
   }
 
   jgui::jcolor_t<float>
-    bg = GetTheme().GetIntegerParam("component.bg"),
-    fg = GetTheme().GetIntegerParam("component.fg");
+    bg = GetTheme().GetIntegerParam("bg"),
+    fg = GetTheme().GetIntegerParam("fg");
   jgui::jpoint_t<int> 
     slocation = GetScrollLocation();
   jgui::jsize_t<int>
     size = GetSize(),
     sdimention = GetScrollDimension();
   int 
-    bs = GetTheme().GetIntegerParam("component.border.size"),
-    ss = GetTheme().GetIntegerParam("component.scroll.size");
+    bs = GetTheme().GetIntegerParam("border.size"),
+    ss = GetTheme().GetIntegerParam("scroll.size");
 
   if (IsScrollableX() == true) {
     double 
@@ -501,16 +501,16 @@ void Component::PaintBackground(Graphics *g)
   }
   
   jgui::jcolor_t<float>
-    bg = GetTheme().GetIntegerParam("component.bg"),
-    bgfocus = GetTheme().GetIntegerParam("component.bg.focus"),
-    bgdisable = GetTheme().GetIntegerParam("component.bg.disable");
+    bg = GetTheme().GetIntegerParam("bg"),
+    bgfocus = GetTheme().GetIntegerParam("bg.focus"),
+    bgdisable = GetTheme().GetIntegerParam("bg.disable");
   jgui::jsize_t<int>
     size = GetSize();
   jcomponent_border_t 
-    bordertype = (jcomponent_border_t)GetTheme().GetIntegerParam("component.border.style");
+    bordertype = (jcomponent_border_t)GetTheme().GetIntegerParam("border.style");
   int
-    x = GetTheme().GetIntegerParam("component.hgap") + GetTheme().GetIntegerParam("component.border.size"),
-    y = GetTheme().GetIntegerParam("component.vgap") + GetTheme().GetIntegerParam("component.border.size"),
+    x = GetTheme().GetIntegerParam("hgap") + GetTheme().GetIntegerParam("border.size"),
+    y = GetTheme().GetIntegerParam("vgap") + GetTheme().GetIntegerParam("border.size"),
     w = size.width - 2*x,
     h = size.height - 2*y;
 
@@ -536,7 +536,7 @@ void Component::PaintBackground(Graphics *g)
 void Component::PaintBorders(Graphics *g)
 {
   jcomponent_border_t 
-    bordertype = (jcomponent_border_t)GetTheme().GetIntegerParam("component.border.style");
+    bordertype = (jcomponent_border_t)GetTheme().GetIntegerParam("border.style");
 
   if (bordertype == JCB_EMPTY) {
     return;
@@ -544,13 +544,13 @@ void Component::PaintBorders(Graphics *g)
 
   jgui::jcolor_t<float>
     color,
-    border = GetTheme().GetIntegerParam("component.border"),
-    borderfocus = GetTheme().GetIntegerParam("component.border.focus"),
-    borderdisable = GetTheme().GetIntegerParam("component.border.disable");
+    border = GetTheme().GetIntegerParam("border"),
+    borderfocus = GetTheme().GetIntegerParam("border.focus"),
+    borderdisable = GetTheme().GetIntegerParam("border.disable");
   jgui::jsize_t<int>
     size = GetSize();
   int 
-    bs = GetTheme().GetIntegerParam("component.border.size");
+    bs = GetTheme().GetIntegerParam("border.size");
   int 
     xp = 0, 
     yp = 0,
@@ -1187,8 +1187,8 @@ bool Component::MousePressed(jevent::MouseEvent *event)
   jpoint_t<int> 
     elocation = event->GetLocation();
   int
-    bs = GetTheme().GetIntegerParam("component.border.size"),
-    ss = GetTheme().GetIntegerParam("component.scroll.size");
+    bs = GetTheme().GetIntegerParam("border.size"),
+    ss = GetTheme().GetIntegerParam("scroll.size");
 
   if (IsFocusable() == true) {
     RequestFocus();

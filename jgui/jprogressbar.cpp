@@ -93,20 +93,20 @@ void ProgressBar::Paint(Graphics *g)
   Component::Paint(g);
 
   jgui::Font 
-    *font = GetTheme().GetFont("component.font");
+    *font = GetTheme().GetFont();
   jgui::jcolor_t<float>
-    // bg = GetTheme().GetIntegerParam("component.bg"),
-    fg = GetTheme().GetIntegerParam("component.fg"),
-    fgfocus = GetTheme().GetIntegerParam("component.fg.focus"),
-    fgdisable = GetTheme().GetIntegerParam("component.fg.disable"),
-    scroll = GetTheme().GetIntegerParam("component.scroll");
+    // bg = GetTheme().GetIntegerParam("bg"),
+    fg = GetTheme().GetIntegerParam("fg"),
+    fgfocus = GetTheme().GetIntegerParam("fg.focus"),
+    fgdisable = GetTheme().GetIntegerParam("fg.disable"),
+    scroll = GetTheme().GetIntegerParam("scroll");
   jgui::jsize_t<int>
     size = GetSize();
   std::string 
     text;
   int
-    x = GetTheme().GetIntegerParam("component.hgap") + GetTheme().GetIntegerParam("component.border.size"),
-    y = GetTheme().GetIntegerParam("component.vgap") + GetTheme().GetIntegerParam("component.border.size"),
+    x = GetTheme().GetIntegerParam("hgap") + GetTheme().GetIntegerParam("border.size"),
+    y = GetTheme().GetIntegerParam("vgap") + GetTheme().GetIntegerParam("border.size"),
     w = size.width - 2*x,
     h = size.height - 2*y;
 

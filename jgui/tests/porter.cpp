@@ -79,7 +79,7 @@ class PorterTeste : public jgui::Window {
 			g->SetCompositeFlags(jgui::JCF_SRC_OVER);
 			g->DrawImage(image, jgui::jpoint_t<int>{x, y});
 			
-			jgui::Font *font = GetTheme().GetFont("component.font");
+			jgui::Font *font = GetTheme().GetFont();
 
 			g->SetColor(jgui::jcolor_name_t::White);
 			g->SetFont(font);
@@ -116,7 +116,7 @@ class PorterTeste : public jgui::Window {
       
 			g->DrawImage(_bg, {0, 0, size.width, size.height});
 
-			jgui::Font *font = GetTheme().GetFont("component.font");
+			jgui::Font *font = GetTheme().GetFont();
 
 			g->SetColor(jgui::jcolor_name_t::White);
 			g->SetFont(font);

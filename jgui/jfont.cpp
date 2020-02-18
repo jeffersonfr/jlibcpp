@@ -28,11 +28,25 @@ namespace jgui {
 
 static FT_Library _ft_library;
 
-Font Font::TINY(_DATA_PREFIX"/fonts/default.ttf", (jfont_attributes_t)(JFA_NORMAL), 8);
-Font Font::SMALL(_DATA_PREFIX"/fonts/default.ttf", (jfont_attributes_t)(JFA_NORMAL), 12);
-Font Font::NORMAL(_DATA_PREFIX"/fonts/default.ttf", (jfont_attributes_t)(JFA_NORMAL), 16);
-Font Font::BIG(_DATA_PREFIX"/fonts/default.ttf", (jfont_attributes_t)(JFA_NORMAL), 20);
-Font Font::HUGE(_DATA_PREFIX"/fonts/default.ttf", (jfont_attributes_t)(JFA_NORMAL), 24);
+#define DEFAULT_FONT_NAME "default"
+
+Font Font::TINY(DEFAULT_FONT_NAME, (jfont_attributes_t)(JFA_NORMAL), 8);
+Font Font::SMALL(DEFAULT_FONT_NAME, (jfont_attributes_t)(JFA_NORMAL), 12);
+Font Font::NORMAL(DEFAULT_FONT_NAME, (jfont_attributes_t)(JFA_NORMAL), 16);
+Font Font::BIG(DEFAULT_FONT_NAME, (jfont_attributes_t)(JFA_NORMAL), 20);
+Font Font::HUGE(DEFAULT_FONT_NAME, (jfont_attributes_t)(JFA_NORMAL), 24);
+
+Font Font::SIZE8(DEFAULT_FONT_NAME, (jfont_attributes_t)(JFA_NORMAL), 8);
+Font Font::SIZE12(DEFAULT_FONT_NAME, (jfont_attributes_t)(JFA_NORMAL), 12);
+Font Font::SIZE16(DEFAULT_FONT_NAME, (jfont_attributes_t)(JFA_NORMAL), 16);
+Font Font::SIZE20(DEFAULT_FONT_NAME, (jfont_attributes_t)(JFA_NORMAL), 20);
+Font Font::SIZE24(DEFAULT_FONT_NAME, (jfont_attributes_t)(JFA_NORMAL), 24);
+Font Font::SIZE28(DEFAULT_FONT_NAME, (jfont_attributes_t)(JFA_NORMAL), 28);
+Font Font::SIZE32(DEFAULT_FONT_NAME, (jfont_attributes_t)(JFA_NORMAL), 32);
+Font Font::SIZE36(DEFAULT_FONT_NAME, (jfont_attributes_t)(JFA_NORMAL), 36);
+Font Font::SIZE40(DEFAULT_FONT_NAME, (jfont_attributes_t)(JFA_NORMAL), 40);
+Font Font::SIZE44(DEFAULT_FONT_NAME, (jfont_attributes_t)(JFA_NORMAL), 44);
+Font Font::SIZE48(DEFAULT_FONT_NAME, (jfont_attributes_t)(JFA_NORMAL), 48);
 
 int InternalCreateFont(std::string name, cairo_font_face_t **font)
 {

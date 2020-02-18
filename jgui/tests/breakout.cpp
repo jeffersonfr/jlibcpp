@@ -185,7 +185,7 @@ class Breakout : public jgui::Window {
 				return;
 			}
 
-			goff->SetColor(GetTheme().GetIntegerParam("window.bg"));
+			goff->SetColor(GetTheme().GetIntegerParam("bg"));
 			goff->FillRectangle({0, 0, size.width, size.height});
 
 			if (ingame) {

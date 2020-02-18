@@ -127,8 +127,8 @@ bool Slider::MousePressed(jevent::MouseEvent *event)
   jgui::jsize_t<int>
     size = GetSize();
   int
-    dx = GetTheme().GetIntegerParam("component.hgap") + GetTheme().GetIntegerParam("component.border.size"),
-    dy = GetTheme().GetIntegerParam("component.vgap") + GetTheme().GetIntegerParam("component.border.size"),
+    dx = GetTheme().GetIntegerParam("hgap") + GetTheme().GetIntegerParam("border.size"),
+    dy = GetTheme().GetIntegerParam("vgap") + GetTheme().GetIntegerParam("border.size"),
     dw = size.width - 2*dx - _stone_size,
     dh = size.height - 2*dy - _stone_size;
   bool 
@@ -192,8 +192,8 @@ bool Slider::MouseMoved(jevent::MouseEvent *event)
   jgui::jsize_t<int>
     size = GetSize();
   int
-    dx = GetTheme().GetIntegerParam("component.hgap") + GetTheme().GetIntegerParam("component.border.size"),
-    dy = GetTheme().GetIntegerParam("component.vgap") + GetTheme().GetIntegerParam("component.border.size"),
+    dx = GetTheme().GetIntegerParam("hgap") + GetTheme().GetIntegerParam("border.size"),
+    dy = GetTheme().GetIntegerParam("vgap") + GetTheme().GetIntegerParam("border.size"),
     dw = size.width - 2*dx - _stone_size,
     dh = size.height - 2*dy - _stone_size;
 
@@ -232,16 +232,13 @@ void Slider::Paint(Graphics *g)
   Component::Paint(g);
 
   jgui::jcolor_t<float>
-    // bg = GetTheme().GetIntegerParam("component.bg"),
-    // fg = GetTheme().GetIntegerParam("component.fg"),
-    fgfocus = GetTheme().GetIntegerParam("component.fg.focus"),
-    // fgdisable = GetTheme().GetIntegerParam("component.fg.disable"),
-    scroll = GetTheme().GetIntegerParam("component.scroll");
+    fgfocus = GetTheme().GetIntegerParam("fg.focus"),
+    scroll = GetTheme().GetIntegerParam("scroll");
   jgui::jsize_t<int>
     size = GetSize();
   int
-    x = GetTheme().GetIntegerParam("component.hgap") + GetTheme().GetIntegerParam("component.border.size"),
-    y = GetTheme().GetIntegerParam("component.vgap") + GetTheme().GetIntegerParam("component.border.size"),
+    x = GetTheme().GetIntegerParam("hgap") + GetTheme().GetIntegerParam("border.size"),
+    y = GetTheme().GetIntegerParam("vgap") + GetTheme().GetIntegerParam("border.size"),
     w = size.width - 2*x,
     h = size.height - 2*y;
 

@@ -67,7 +67,7 @@ class Game2048 : public jgui::Window {
 
 			jgui::jinsets_t<int> t = {4, 4, 0, 0}; // GetInsets();
 
-			jgui::Font *font = GetTheme().GetFont("component");
+			jgui::Font *font = GetTheme().GetFont();
 
 			g->SetColor(jgui::jcolor_name_t::White);
 			g->SetFont(font);

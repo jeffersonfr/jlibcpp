@@ -21,7 +21,6 @@
 #include "jgui/jwindow.h"
 #include "jgui/jbufferedimage.h"
 #include "jgui/jbutton.h"
-#include "jgui/jlabel.h"
 #include "jcommon/jobservable.h"
 #include "jmedia/jplayermanager.h"
 #include "jevent/jframegrabberlistener.h"
@@ -351,12 +350,7 @@ class Scene : public jgui::Container {
 			
       _is_animated = false;
 
-      jgui::Font
-        *font = new jgui::Font("Sans Serif", (jgui::jfont_attributes_t)(jgui::JFA_NORMAL), DEFAULT_FONT_SIZE);
-
-      GetTheme().SetFont("component.font", font);
-      GetTheme().SetFont("container.font", font);
-      GetTheme().SetFont("window.font", font);
+      GetTheme().SetFont("primary", &jgui::Font::NORMAL);
 
 			SetBackgroundVisible(true);
       SetVisible(true);
@@ -510,7 +504,7 @@ class MenuTest : public Scene {
 		virtual bool Animate()
 		{
 			jgui::jcolor_t<float>
-        color = GetTheme().GetIntegerParam("component.bg");
+        color = GetTheme().GetIntegerParam("bg");
       jgui::jpoint_t 
         t = GetLocation();
 
@@ -533,7 +527,7 @@ class MenuTest : public Scene {
 
 				color(3, 0x80 + (int)(64.0*sin(_malpha)));
 
-	      GetTheme().SetIntegerParam("component.bg", uint32_t(color));
+	      GetTheme().SetIntegerParam("bg", uint32_t(color));
 
 				return true;
 			} else if (_mstate == 3) {

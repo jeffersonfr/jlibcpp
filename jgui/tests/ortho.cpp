@@ -310,9 +310,9 @@ class Grid : public jgui::Window {
 				}
 			}
 
-      int fsize = GetTheme().GetFont("window.font")->GetSize();
+      int fsize = GetTheme().GetFont()->GetSize();
 
-      g->SetFont(GetTheme().GetFont("window.font"));
+      g->SetFont(GetTheme().GetFont());
       g->SetColor(0xffffffff);
 
       g->DrawString("rotate: [" + std::to_string(_rotate(0, 0)) + ", " + std::to_string(_rotate(1, 0)) + ", " + std::to_string(_rotate(2, 0)) + "]", jgui::jpoint_t<int>{10, 0*fsize + 8});

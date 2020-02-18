@@ -234,6 +234,8 @@ ItemComponent::ItemComponent():
 
   _index = 0;
   _loop = false;
+  _item_size = 32;
+  _item_gap = 2;
 }
 
 ItemComponent::~ItemComponent()
@@ -252,7 +254,27 @@ void ItemComponent::AddInternalItem(Item *item)
   }
 }
 
-int ItemComponent::GetItemsSize()
+int ItemComponent::GetItemSize()
+{
+  return _item_size;
+}
+
+int ItemComponent::GetItemGap()
+{
+  return _item_gap;
+}
+
+void ItemComponent::SetItemSize(int size)
+{
+  _item_size = size;
+}
+
+void ItemComponent::SetItemGap(int gap)
+{
+  _item_gap = gap;
+}
+
+int ItemComponent::GetItemsCount()
 {
   return _items.size();
 }

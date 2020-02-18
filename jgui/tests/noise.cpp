@@ -408,7 +408,7 @@ class Noise : public jgui::Window {
     virtual void Paint(jgui::Graphics *g)
     {
       jgui::Font 
-        *font = GetTheme().GetFont("component.font");
+        *font = GetTheme().GetFont();
       double 
         scalex = 8.0,
         scaley = 64.0,
@@ -424,7 +424,7 @@ class Noise : public jgui::Window {
 
 
       g->SetFont(font);
-      g->SetColor(GetTheme().GetIntegerParam("component.fg"));
+      g->SetColor(GetTheme().GetIntegerParam("fg"));
 
       g->DrawString("Sinal Original", jgui::jpoint_t<int>{dx+40, dy-200});
       g->DrawString("Sinal Ruidoso", jgui::jpoint_t<int>{dx+40, dy-150});

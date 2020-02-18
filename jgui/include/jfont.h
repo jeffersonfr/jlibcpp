@@ -93,6 +93,18 @@ class Font : public virtual jcommon::Object {
     static Font NORMAL;
     static Font BIG;
     static Font HUGE;
+    
+    static Font SIZE8;
+    static Font SIZE12;
+    static Font SIZE16;
+    static Font SIZE20;
+    static Font SIZE24;
+    static Font SIZE28;
+    static Font SIZE32;
+    static Font SIZE36;
+    static Font SIZE40;
+    static Font SIZE44;
+    static Font SIZE48;
 
   public:
     /**

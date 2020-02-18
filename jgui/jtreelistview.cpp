@@ -330,25 +330,21 @@ void TreeListView::Paint(Graphics *g)
   Component::Paint(g);
 
   jgui::Font 
-    *font = GetTheme().GetFont("component.font");
+    *font = GetTheme().GetFont();
   jgui::jcolor_t<float>
-    // bg = GetTheme().GetIntegerParam("component.bg"),
-    fg = GetTheme().GetIntegerParam("component.fg"),
-    fgfocus = GetTheme().GetIntegerParam("component.fg.focus"),
-    fgdisable = GetTheme().GetIntegerParam("component.fg.disable");
+    fg = GetTheme().GetIntegerParam("fg"),
+    fgfocus = GetTheme().GetIntegerParam("fg.focus"),
+    fgdisable = GetTheme().GetIntegerParam("fg.disable");
   jgui::jsize_t<int>
     size = GetSize();
   int
-    hg = GetTheme().GetIntegerParam("component.hgap"),
-    vg = GetTheme().GetIntegerParam("component.vgap");
+    hg = GetTheme().GetIntegerParam("hgap"),
+    vg = GetTheme().GetIntegerParam("vgap");
   int
-    x = hg + GetTheme().GetIntegerParam("component.border.size"),
-    y = vg + GetTheme().GetIntegerParam("component.border.size"),
+    x = hg + GetTheme().GetIntegerParam("border.size"),
+    y = vg + GetTheme().GetIntegerParam("border.size"),
     w = size.width - 2*x;
     // h = size.height - 2*y;
-  int
-    is = GetTheme().GetIntegerParam("item.size"),
-    ig = GetTheme().GetIntegerParam("item.gap");
   jpoint_t scroll_location = GetScrollLocation();
   int 
     scrollx = (IsScrollableX() == true)?scroll_location.x:0,
@@ -358,7 +354,7 @@ void TreeListView::Paint(Graphics *g)
 
   for (std::vector<jgui::Item *>::iterator i=_items.begin(); i!=_items.end(); i++) {
     if ((*i)->GetType() == JIT_IMAGE) {
-      offset += is + 8;
+      offset += GetItemSize() + 8;
 
       break;
     }
@@ -369,39 +365,39 @@ void TreeListView::Paint(Graphics *g)
   y = y - scrolly;
 
   for (int i=0; i<(int)_items.size(); i++) {
-    int dy = y+(is + ig)*i;
+    int dy = y + (GetItemSize() + GetItemGap())*i;
 
-    if ((dy + is) < 0 || dy > size.height) {
+    if ((dy + GetItemSize()) < 0 || dy > size.height) {
       continue;
     }
 
     Item *item = _items[i];
 
     if (item->IsEnabled() == true) {
-      g->SetColor(GetTheme().GetIntegerParam("item.fg"));
+      g->SetColor(GetTheme().GetIntegerParam("fg"));
     } else {
-      g->SetColor(GetTheme().GetIntegerParam("item.fg.disable"));
+      g->SetColor(GetTheme().GetIntegerParam("fg.disable"));
     }
 
     if (_index != i) {
       if (_selected_index == i) {  
-        g->SetColor(GetTheme().GetIntegerParam("item.fg.select"));
+        g->SetColor(GetTheme().GetIntegerParam("fg.select"));
       }
     } else {
-      g->SetColor(GetTheme().GetIntegerParam("item.fg.focus"));
+      g->SetColor(GetTheme().GetIntegerParam("fg.focus"));
     }
 
-    g->FillRectangle({x, y+(is + ig)*i, w, is});
+    g->FillRectangle({x, y+(GetItemSize() + GetItemGap())*i, w, GetItemSize()});
 
     if (_selected_index == i) {
-      g->SetColor(GetTheme().GetIntegerParam("item.fg.select"));
+      g->SetColor(GetTheme().GetIntegerParam("fg.select"));
     }
 
     if (_items[i]->GetType() == JIT_EMPTY) {
     } else if (_items[i]->GetType() == JIT_TEXT) {
     } else if (_items[i]->GetType() == JIT_IMAGE) {
       if (_items[i]->GetImage() != nullptr) {
-        g->DrawImage(_items[i]->GetImage(), {hg, y + (is + ig)*i, is, is});
+        g->DrawImage(_items[i]->GetImage(), {hg, y + (GetItemSize() + GetItemGap())*i, GetItemSize(), GetItemSize()});
       }
     }
 
@@ -424,7 +420,7 @@ void TreeListView::Paint(Graphics *g)
         text = font->TruncateString(text, "...", w - offset);
       // }
 
-      g->DrawString(text, {x + offset, y + (is + ig)*i, w - offset, is}, _items[i]->GetHorizontalAlign(), _items[i]->GetVerticalAlign());
+      g->DrawString(text, {x + offset, y + (GetItemSize() + GetItemGap())*i, w - offset, GetItemSize()}, _items[i]->GetHorizontalAlign(), _items[i]->GetVerticalAlign());
     }
   }
 }
@@ -515,16 +511,13 @@ jsize_t<int> TreeListView::GetScrollDimension()
   jsize_t<int> 
     t = GetSize();
   int
-    bs = GetTheme().GetIntegerParam("component.border.size");
+    bs = GetTheme().GetIntegerParam("border.size");
   int
-    // hg = GetTheme().GetIntegerParam("component.hgap"),
-    vg = GetTheme().GetIntegerParam("component.vgap");
-  int
-    is = GetTheme().GetIntegerParam("item.size"),
-    ig = GetTheme().GetIntegerParam("item.gap");
+    // hg = GetTheme().GetIntegerParam("hgap"),
+    vg = GetTheme().GetIntegerParam("vgap");
 
   // t.width = t.width;
-  t.height = _items.size()*(is + ig) + 2*(vg + bs);
+  t.height = _items.size()*(GetItemSize() + GetItemGap()) + 2*(vg + bs);
 
   return  t;
 }

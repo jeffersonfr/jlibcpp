@@ -50,7 +50,7 @@ Display::Display(int x, int y, int width, int height):
 {
   SetPreferredSize({0, 64});
 
-  GetTheme().SetFont("component.font", GetTheme().GetFont("window.font"));
+  GetTheme().SetFont("primary", &jgui::Font::BIG);
 }
 
 Display::~Display()
@@ -74,7 +74,7 @@ void Display::Paint(jgui::Graphics *g)
   jgui::Component::Paint(g);
 
   jgui::Font 
-    *font = GetTheme().GetFont("component.font");
+    *font = GetTheme().GetFont();
 
   g->SetColor({0xf0, 0xf0, 0xf0, 0xff});
 

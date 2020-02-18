@@ -39,7 +39,7 @@ class CheckButtonGroup : public jevent::ToggleListener {
     /** \brief */
     std::vector<CheckButton *> _buttons;
     /** \brief */
-    std::mutex _group_mutex;
+    std::recursive_mutex _group_mutex;
 
   protected:
     /**

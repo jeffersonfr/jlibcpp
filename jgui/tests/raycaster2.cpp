@@ -57,6 +57,8 @@ int worldMap[mapWidth][mapHeight]=
 class GraphicsTeste : public jgui::Window {
 
 	private:
+    std::map<jevent::jkeyevent_symbol_t, bool>
+      _keys;
 		double 
       posX,
 			posY, // x and y start position
@@ -90,6 +92,46 @@ class GraphicsTeste : public jgui::Window {
 			int 
         w = size.width,
 				h = size.height;
+
+      // process events
+			double frameTime = 0.1;	//frameTime is the time this frame has taken, in seconds
+			//speed modifiers
+			double moveSpeed = frameTime * 1.0;			//the constant value is in squares/second
+			double rotSpeed = frameTime * 1.0;			//the constant value is in radians/second
+
+			if (_keys[jevent::JKS_CURSOR_UP]) {
+				if (worldMap[int(posX + dirX * moveSpeed)][int(posY)] == false) {
+					posX += dirX * moveSpeed;
+				}
+				if (worldMap[int(posX)][int(posY + dirY * moveSpeed)] == false) {
+					posY += dirY * moveSpeed;
+				}
+			} else if (_keys[jevent::JKS_CURSOR_DOWN]) {
+				if (worldMap[int(posX - dirX * moveSpeed)][int(posY)] == false) {
+					posX -= dirX * moveSpeed;
+				}
+				if (worldMap[int(posX)][int(posY - dirY * moveSpeed)] == false) {
+					posY -= dirY * moveSpeed;
+				}
+      }
+
+			if (_keys[jevent::JKS_CURSOR_LEFT]) {
+				//both camera direction and camera plane must be rotated
+				double oldDirX = dirX;
+				dirX = dirX * cos(rotSpeed) - dirY * sin(rotSpeed);
+				dirY = oldDirX * sin(rotSpeed) + dirY * cos(rotSpeed);
+				double oldPlaneX = planeX;
+				planeX = planeX * cos(rotSpeed) - planeY * sin(rotSpeed);
+				planeY = oldPlaneX * sin(rotSpeed) + planeY * cos(rotSpeed);
+			} else if (_keys[jevent::JKS_CURSOR_RIGHT]) {
+				//both camera direction and camera plane must be rotated
+				double oldDirX = dirX;
+				dirX = dirX * cos(-rotSpeed) - dirY * sin(-rotSpeed);
+				dirY = oldDirX * sin(-rotSpeed) + dirY * cos(-rotSpeed);
+				double oldPlaneX = planeX;
+				planeX = planeX * cos(-rotSpeed) - planeY * sin(-rotSpeed);
+				planeY = oldPlaneX * sin(-rotSpeed) + planeY * cos(-rotSpeed);
+			}
 
 			// screen(512, 384, 0, "Raycaster");
 			for(int x = 0; x < w; x++) {
@@ -182,6 +224,8 @@ class GraphicsTeste : public jgui::Window {
 				g->SetColor(color);
 				g->DrawLine({x, drawStart}, {x, drawEnd});
 			}
+
+      Repaint();
 		}
 
 		virtual bool KeyPressed(jevent::KeyEvent *event)
@@ -190,47 +234,22 @@ class GraphicsTeste : public jgui::Window {
 				return true;
 			}
 
-			double frameTime = 0.1;	//frameTime is the time this frame has taken, in seconds
-			//speed modifiers
-			double moveSpeed = frameTime * 1.0;			//the constant value is in squares/second
-			double rotSpeed = frameTime * 1.0;			//the constant value is in radians/second
+      _keys[event->GetSymbol()] = true;
 
-			if (event->GetSymbol() == jevent::JKS_CURSOR_UP) {
-				if (worldMap[int(posX + dirX * moveSpeed)][int(posY)] == false) {
-					posX += dirX * moveSpeed;
-				}
-				if (worldMap[int(posX)][int(posY + dirY * moveSpeed)] == false) {
-					posY += dirY * moveSpeed;
-				}
-			} else if (event->GetSymbol() == jevent::JKS_CURSOR_DOWN) {
-				if (worldMap[int(posX - dirX * moveSpeed)][int(posY)] == false) {
-					posX -= dirX * moveSpeed;
-				}
-				if (worldMap[int(posX)][int(posY - dirY * moveSpeed)] == false) {
-					posY -= dirY * moveSpeed;
-				}
-			} else if (event->GetSymbol() == jevent::JKS_CURSOR_LEFT) {
-				//both camera direction and camera plane must be rotated
-				double oldDirX = dirX;
-				dirX = dirX * cos(rotSpeed) - dirY * sin(rotSpeed);
-				dirY = oldDirX * sin(rotSpeed) + dirY * cos(rotSpeed);
-				double oldPlaneX = planeX;
-				planeX = planeX * cos(rotSpeed) - planeY * sin(rotSpeed);
-				planeY = oldPlaneX * sin(rotSpeed) + planeY * cos(rotSpeed);
-			} else if (event->GetSymbol() == jevent::JKS_CURSOR_RIGHT) {
-				//both camera direction and camera plane must be rotated
-				double oldDirX = dirX;
-				dirX = dirX * cos(-rotSpeed) - dirY * sin(-rotSpeed);
-				dirY = oldDirX * sin(-rotSpeed) + dirY * cos(-rotSpeed);
-				double oldPlaneX = planeX;
-				planeX = planeX * cos(-rotSpeed) - planeY * sin(-rotSpeed);
-				planeY = oldPlaneX * sin(-rotSpeed) + planeY * cos(-rotSpeed);
+      return true;
+    }
+
+		virtual bool KeyReleased(jevent::KeyEvent *event)
+		{
+			if (jgui::Window::KeyReleased(event) == true) {
+				return true;
 			}
 
-			Repaint();
+      _keys[event->GetSymbol()] = false;
 
-			return true;
-		}
+      return true;
+    }
+
 };
 
 int main( int argc, char *argv[] )

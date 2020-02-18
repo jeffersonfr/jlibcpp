@@ -30,14 +30,14 @@ CheckButtonGroup::CheckButtonGroup()
 
 CheckButtonGroup::~CheckButtonGroup()
 {
-   std::lock_guard<std::mutex> guard(_group_mutex);
+   std::lock_guard<std::recursive_mutex> guard(_group_mutex);
 
   // INFO:: the user must remove listeners manually
 }
 
 void CheckButtonGroup::Add(CheckButton *button)
 {
-   std::lock_guard<std::mutex> guard(_group_mutex);
+   std::lock_guard<std::recursive_mutex> guard(_group_mutex);
 
   if (std::find(_buttons.begin(), _buttons.end(), button) != _buttons.end()) {
     return;
@@ -50,7 +50,7 @@ void CheckButtonGroup::Add(CheckButton *button)
 
 void CheckButtonGroup::Remove(CheckButton *button)
 {
-   std::lock_guard<std::mutex> guard(_group_mutex);
+   std::lock_guard<std::recursive_mutex> guard(_group_mutex);
 
   for (std::vector<CheckButton *>::iterator i=_buttons.begin(); i!=_buttons.end(); i++) {
     if (button == (*i)) {
@@ -65,7 +65,7 @@ void CheckButtonGroup::Remove(CheckButton *button)
 
 void CheckButtonGroup::StateChanged(jevent::ToggleEvent *event)
 {
-   std::lock_guard<std::mutex> guard(_group_mutex);
+   std::lock_guard<std::recursive_mutex> guard(_group_mutex);
 
   CheckButton *cb = (CheckButton *)event->GetSource();
 
@@ -82,7 +82,7 @@ void CheckButtonGroup::StateChanged(jevent::ToggleEvent *event)
 
 CheckButton * CheckButtonGroup::GetSelected()
 {
-   std::lock_guard<std::mutex> guard(_group_mutex);
+   std::lock_guard<std::recursive_mutex> guard(_group_mutex);
 
   for (std::vector<CheckButton *>::iterator i=_buttons.begin(); i!=_buttons.end(); i++) {
     if ((*i)->IsSelected() == true) {

@@ -142,7 +142,7 @@ void Mines::Paint(jgui::Graphics *g)
 	jgui::Window::Paint(g);
 
 	jgui::Font 
-    *font = GetTheme().GetFont("component.font");
+    *font = GetTheme().GetFont();
   jgui::jinsets_t
     insets = GetInsets();
 	int 
@@ -182,7 +182,7 @@ void Mines::Paint(jgui::Graphics *g)
 		}
 	}
 
-	g->SetColor(GetTheme().GetIntegerParam("component.fg"));
+	g->SetColor(GetTheme().GetIntegerParam("fg"));
 
 	jgui::jsize_t
 		size = GetSize();

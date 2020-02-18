@@ -58,8 +58,6 @@ class Main : public jgui::Window {
 #if ENABLE_GUI == 1
 		jgui::Image 
       *foffscreen;
-		jgui::Font 
-      *fweights;
     std::mutex
       _mutex;
 #endif
@@ -85,8 +83,6 @@ class Main : public jgui::Window {
 		{
 #if ENABLE_GUI == 1
 			foffscreen = nullptr;
-
-      fweights = new jgui::Font("default", jgui::JFA_NORMAL, 8);
 #endif
 
 			board = new path_t[MAX_COLS*MAX_ROWS];
@@ -275,9 +271,6 @@ class Main : public jgui::Window {
       try_solutions = nullptr;
 
 #if ENABLE_GUI == 1
-			delete fweights;
-      fweights = nullptr;
-
       delete foffscreen;
       foffscreen = nullptr;
 #endif
@@ -314,7 +307,7 @@ class Main : public jgui::Window {
 				goff->SetColor({0x00, 0x00, 0x00, 0xff});
 				goff->DrawString(tmp, jgui::jpoint_t<int>{0, size.height - 32});
 
-				goff->SetFont(fweights);
+				goff->SetFont(&jgui::Font::SIZE8);
 
 				for (int i=0; i<MAX_COLS*MAX_ROWS; i++) {
 					sprintf(tmp, "%d", board[i].value);

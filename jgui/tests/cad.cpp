@@ -465,7 +465,7 @@ class CAD : public jgui::Window {
       g->SetColor(jgui::jcolor_name_t::White);
       g->DrawCircle({sx, sy}, 3);
 
-      g->SetFont(GetTheme().GetFont("window.font"));
+      g->SetFont(GetTheme().GetFont());
       g->DrawString("X:[" + std::to_string(vCursor.x) + "], Y:[" + std::to_string(vCursor.y) + "]", jgui::jpoint_t<int>{10, 10});
 
       Repaint();

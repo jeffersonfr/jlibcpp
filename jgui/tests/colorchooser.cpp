@@ -19,7 +19,7 @@
  ***************************************************************************/
 #include "jgui/japplication.h"
 #include "jgui/jwindow.h"
-#include "jgui/jlabel.h"
+#include "jgui/jtext.h"
 #include "jgui/jbufferedimage.h"
 
 class ColorChooser : public jgui::Component {
@@ -130,7 +130,7 @@ class ColorChooser : public jgui::Component {
 
       jgui::Graphics *g = _image->GetGraphics();
 
-			GetTheme().SetIntegerParam("component.bg", g->GetRGB({elocation.x, elocation.y}));
+			GetTheme().SetIntegerParam("bg", g->GetRGB({elocation.x, elocation.y}));
 
       Repaint();
 
@@ -143,8 +143,8 @@ class FrameTest : public jgui::Window {
 
 	private:
 		ColorChooser *_color_chooser;
-		jgui::Label *_label;
-		jgui::Label *_color;
+		jgui::Text *_label;
+		jgui::Text *_color;
 
 	public:
 		FrameTest():

@@ -59,8 +59,8 @@ class BorderTest : public jgui::Window {
 			for (int i=0; i<(int)_buttons.size(); i++) {
         jgui::Component *cmp = _buttons[i];
 
-			  cmp->GetTheme().SetIntegerParam("component.border.style", jgui::jcomponent_border_t(i));
-			  cmp->GetTheme().SetIntegerParam("component.border.size", 8);
+			  cmp->GetTheme().SetIntegerParam("border.style", jgui::jcomponent_border_t(i));
+			  cmp->GetTheme().SetIntegerParam("border.size", 8);
 
         if (i < (int)_buttons.size()/2) {
   				_top.Add(cmp);

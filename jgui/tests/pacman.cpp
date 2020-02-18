@@ -717,7 +717,7 @@ class PacMan : public jgui::Window {
 
 		sprintf(tmp, "Score: %d", score);
 		
-		goff->SetFont(GetTheme().GetFont("window"));
+		goff->SetFont(GetTheme().GetFont());
 		goff->SetColor({96, 128, 255, 0xff});
 		goff->DrawString(tmp, jgui::jpoint_t<int>{size.width - 180, scrsize + 16});
 

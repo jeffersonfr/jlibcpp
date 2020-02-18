@@ -28,7 +28,6 @@ YesNoDialog::YesNoDialog(Container *parent, std::string title, std::string msg):
   jcommon::Object::SetClassName("jgui::YesNoDialog");
 
   _label.SetText(msg);
-
   _label.SetWrap(true);
   _label.SetHorizontalAlign(JHA_LEFT);
 

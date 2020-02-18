@@ -284,7 +284,7 @@ class BallDrop : public jgui::Window {
 				backGraphics = backImage->GetGraphics();
 
 				// Erase the previous image.
-				backGraphics->SetColor(GetTheme().GetIntegerParam("window.bg"));
+				backGraphics->SetColor(GetTheme().GetIntegerParam("bg"));
 				backGraphics->FillRectangle({0, 0, size.width, size.height});
 				backGraphics->SetColor({0x00, 0x00, 0x00, 0xff});
 
