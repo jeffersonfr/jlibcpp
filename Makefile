@@ -307,7 +307,6 @@ OBJS_jgui += \
   jitemcomponent.o\
   jkeyboarddialog.o\
   jkeymap.o\
-  jlabel.o\
   jlayout.o\
   jlistbox.o\
   jmarquee.o\
@@ -322,6 +321,7 @@ OBJS_jgui += \
   jspin.o\
   jtabbedpane.o\
   jtable.o\
+  jtext.o\
   jtextarea.o\
   jtextcomponent.o\
   jtoastdialog.o\
