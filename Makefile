@@ -278,6 +278,7 @@ ifneq ($(ENABLE_GRAPHICS),none)
 OBJS_jgui += \
   janimation.o\
   japplication.o\
+  jborder.o\
   jborderlayout.o\
   jbufferedimage.o\
   jbutton.o\

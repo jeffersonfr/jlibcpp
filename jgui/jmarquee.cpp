@@ -110,11 +110,6 @@ void Marquee::Paint(Graphics *g)
     *font = GetTheme().GetFont();
   jgui::jsize_t<int>
     size = GetSize();
-  jgui::Border
-    border = GetTheme().GetBorder();
-  int
-    w = size.width - GetHorizontalPadding(),
-    h = size.height - GetVerticalPadding();
 
   if (font != nullptr) {
     g->SetFont(font);
@@ -129,39 +124,7 @@ void Marquee::Paint(Graphics *g)
       g->SetColor(GetTheme().GetIntegerParam("fg.disable"));
     }
 
-    std::string text = _text;
-
-    if (_type == JMM_BOUNCE && size.width >= font->GetStringWidth(_text.c_str())) {
-      text = (char *)(_text.c_str());
-    }
-
-    jrect_t 
-      clip = g->GetClip();
-    int 
-      cx = GetPadding().left,
-      cy = GetPadding().top,
-      cw = w,
-      ch = h;
-
-    if (cx > clip.size.width) {
-      cx = clip.size.width;
-    }
-
-    if (cy > clip.size.height) {
-      cy = clip.size.height;
-    }
-
-    if (cw > (clip.size.width - cx)) {
-      cw = clip.size.width - cx;
-    }
-
-    if (ch > (clip.size.height - cy)) {
-      ch = clip.size.height - cy;
-    }
-
-    g->ClipRect({cx, cy, cw - 1, ch - 1});
-    g->DrawString(text, jrect_t<int>{GetPadding().left + _position, GetPadding().top, cw, ch});
-    g->SetClip(clip);
+    g->DrawString(GetText(), jpoint_t<int>{_position, (size.height - font->GetSize())/2});
   }
 }
 
@@ -176,8 +139,6 @@ void Marquee::Run()
 
   jgui::jsize_t<int>
     size = GetSize();
-  jgui::Border
-    border = GetTheme().GetBorder();
 
   while (_running == true) {
     if (_type == JMM_BOUNCE) {
