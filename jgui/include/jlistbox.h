@@ -64,6 +64,12 @@ class ListBox : public jgui::Component, public jgui::ItemComponent {
      *
      */
     void DecrementLines(int lines);
+    
+    /**
+     * \brief
+     *
+     */
+    void UpdatePreferredSize();
 
   public:
     /**
@@ -151,12 +157,6 @@ class ListBox : public jgui::Component, public jgui::ItemComponent {
      */
     virtual void SetCurrentIndex(int i);
     
-    /**
-     * \brief
-     *
-     */
-    virtual jsize_t<int> GetPreferredSize();
-
     /**
      * \brief
      *

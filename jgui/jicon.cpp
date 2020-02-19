@@ -94,17 +94,15 @@ void Icon::Paint(Graphics *g)
 
   jgui::jsize_t
     size = GetSize();
+  jgui::Border
+    border = GetTheme().GetBorder();
   int
-    x = GetTheme().GetIntegerParam("hgap") + GetTheme().GetIntegerParam("border.size"),
-    y = GetTheme().GetIntegerParam("vgap") + GetTheme().GetIntegerParam("border.size"),
-    w = size.width - 2*x,
-    h = size.height - 2*y;
+    w = size.width - GetHorizontalPadding(),
+    h = size.height - GetVerticalPadding();
 
   if (_image != nullptr) {
-    g->DrawImage(_image, {x, y, w, h});
-  } else {
-    g->SetColor(GetTheme().GetIntegerParam("bg"));
-    g->FillRectangle({x, y, w, h});
+    // TODO:: add contains, cover, ....
+    g->DrawImage(_image, {GetPadding().left, GetPadding().top, w, h});
   }
 }
 

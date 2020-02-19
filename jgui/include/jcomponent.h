@@ -50,19 +50,6 @@ enum jcomponent_orientation_t {
   JCO_BOTTOM_TO_UP,
 };
 
-enum jcomponent_border_t {
-  JCB_EMPTY,
-  JCB_LINE,
-  JCB_BEVEL,
-  JCB_ROUND,
-  JCB_RAISED_GRADIENT,
-  JCB_LOWERED_GRADIENT,
-  JCB_RAISED_BEVEL,
-  JCB_LOWERED_BEVEL,
-  JCB_RAISED_ETCHED,
-  JCB_LOWERED_ETCHED
-};
-
 // component baseline resize behavior
 enum jcomponent_behavior_t {
   // Indicates the baseline remains fixed relative to the y-origin.  That is, <code>getBaseline</code> returns
@@ -171,13 +158,7 @@ class Component : public jevent::KeyListener, public jevent::MouseListener {
     /** \brief */
     int _gradient_level;
     /** \brief */
-    int _relative_mouse_x;
-    /** \brief */
-    int _relative_mouse_y;
-    /** \brief */
-    int _relative_mouse_w;
-    /** \brief */
-    int _relative_mouse_h;
+    jgui::jpoint_t<int> _relative_mouse;
     /** \brief */
     int _component_state;
     /** \brief */
@@ -204,6 +185,8 @@ class Component : public jevent::KeyListener, public jevent::MouseListener {
     bool _is_scroll_visible;
     /** \brief */
     bool _is_smooth_scroll;
+    /** \brief */
+    jgui::jinsets_t<int> _padding;
 
   protected:
     /**
@@ -249,6 +232,30 @@ class Component : public jevent::KeyListener, public jevent::MouseListener {
      *
      */
     virtual ~Component();
+
+    /**
+     * \brief
+     *
+     */
+    void SetPadding(jgui::jinsets_t<int> padding);
+
+    /**
+     * \brief
+     *
+     */
+    jgui::jinsets_t<int> GetPadding();
+
+    /**
+     * \brief
+     *
+     */
+    int GetHorizontalPadding();
+
+    /**
+     * \brief
+     *
+     */
+    int GetVerticalPadding();
 
     /**
      * \brief

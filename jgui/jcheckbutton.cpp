@@ -227,37 +227,39 @@ void CheckButton::Paint(Graphics *g)
     *font = GetTheme().GetFont();
   jgui::jsize_t<int>
     size = GetSize();
+  jgui::Border
+    border = GetTheme().GetBorder();
   int
-    x = GetTheme().GetIntegerParam("hgap") + GetTheme().GetIntegerParam("border.size"),
-    y = GetTheme().GetIntegerParam("vgap") + GetTheme().GetIntegerParam("border.size"),
-    w = size.width - 2*x,
-    h = size.height - 2*y;
+    w = size.width - GetHorizontalPadding(),
+    h = size.height - GetVerticalPadding();
   int
     major = 16,
     minor = 4,
     cs = (std::min(size.width, size.height) - major)/2;
+  int
+    offset = GetPadding().left;
 
-  x = x + 8;
+  offset = offset + 8;
 
   g->SetColor(GetTheme().GetIntegerParam("border.select"));
 
   if (_type == JCBT_CHECK) {
-    g->FillRectangle({x, y + (size.height - cs)/2, major, major});
+    g->FillRectangle({offset, GetPadding().top + (size.height - cs)/2, major, major});
   } else if (_type == JCBT_RADIO) {
-    g->FillCircle({x + major/2, size.height/2}, major/2);
+    g->FillCircle({offset + major/2, size.height/2}, major/2);
   }
 
   if (IsSelected() == true) {
     g->SetColor(GetTheme().GetIntegerParam("border"));
 
     if (_type == JCBT_CHECK) {
-      g->FillRectangle({x + minor, y + (size.height - cs)/2 + minor, 2*minor, 2*minor});
+      g->FillRectangle({offset + minor, GetPadding().top + (size.height - cs)/2 + minor, 2*minor, 2*minor});
     } else {
-      g->FillCircle({x + major/2, size.height/2}, minor);
+      g->FillCircle({offset + major/2, size.height/2}, minor);
     }
   }
 
-  x = x + major + 8;
+  offset = offset + major + 8;
 
   if (font != nullptr) {
     g->SetFont(font);
@@ -278,7 +280,7 @@ void CheckButton::Paint(Graphics *g)
       text = font->TruncateString(text, "...", w);
     }
 
-    g->DrawString(text, {x, y, w, h}, _halign, _valign);
+    g->DrawString(text, {offset, GetPadding().top, w, h}, _halign, _valign);
   }
 }
 

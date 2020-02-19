@@ -192,10 +192,13 @@ OBJS_convexhull = \
 OBJS_text = \
 		text.o\
 
+OBJS_platform = \
+		platform.o\
+
 OBJS_dummy = \
 		dummy.o\
 
-all: primitives border ball breakout skull raycaster1 raycaster2 raycaster3 clip custom calc mines ants swarm mouse watch tank pacman tetris signal layouts stress mhp drawimage drawtypes rotateimage sort noise kmeans som events colorchooser scroll hough 2048 newvox mandelbrot porter fire minecraft fullscreen coloralpha bitmask widgets tree terrain surface function graph dialogs cad cairo raytracer tv doom raster caster ortho convexhull text dummy
+all: primitives border ball breakout skull raycaster1 raycaster2 raycaster3 clip custom calc mines ants swarm mouse watch tank pacman tetris signal layouts stress mhp drawimage drawtypes rotateimage sort noise kmeans som events colorchooser scroll hough 2048 newvox mandelbrot porter fire minecraft fullscreen coloralpha bitmask widgets tree terrain surface function graph dialogs cad cairo raytracer tv doom raster caster ortho convexhull text platform dummy
 	
 primitives: $(OBJS_primitives)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
@@ -380,6 +383,9 @@ convexhull: $(OBJS_convexhull)
 text: $(OBJS_text)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
 
+platform: $(OBJS_platform)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
+
 dummy: $(OBJS_dummy)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
 
@@ -390,4 +396,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *.xml *~ primitives border ball breakout clip custom calc mines ants raycaster1 raycaster2 raycaster3 skull swarm mouse watch tank pacman tetris signal stress layouts mhp drawimage drawtypes rotateimage sort noise kmeans som events colorchooser scroll hough 2048 newvox mandelbrot porter fire minecraft fullscreen coloralpha bitmask widgets tree terrain surface function graph opentube dialogs cad cairo raytracer tv doom raster caster ortho convexhull text dummy
+	@rm -rvf *.o *.xml *~ primitives border ball breakout clip custom calc mines ants raycaster1 raycaster2 raycaster3 skull swarm mouse watch tank pacman tetris signal stress layouts mhp drawimage drawtypes rotateimage sort noise kmeans som events colorchooser scroll hough 2048 newvox mandelbrot porter fire minecraft fullscreen coloralpha bitmask widgets tree terrain surface function graph opentube dialogs cad cairo raytracer tv doom raster caster ortho convexhull text platform dummy

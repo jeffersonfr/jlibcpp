@@ -254,11 +254,11 @@ void TextField::Paint(Graphics *g)
 
   jgui::jsize_t<int>
     size = GetSize();
+  jgui::Border
+    border = GetTheme().GetBorder();
   int
-    x = GetTheme().GetIntegerParam("hgap") + GetTheme().GetIntegerParam("border.size"),
-    y = GetTheme().GetIntegerParam("vgap") + GetTheme().GetIntegerParam("border.size"),
-    w = size.width - 2*x,
-    h = size.height - 2*y;
+    w = size.width - GetHorizontalPadding(),
+    h = size.height - GetVerticalPadding();
   std::string 
     paint_text = _text,
     text = paint_text,
@@ -355,14 +355,14 @@ void TextField::Paint(Graphics *g)
       current_text_size = font->GetStringWidth(text.substr(0, _caret_position));
     }
 
-    g->DrawString(text, {x+offset, y, w, h}, JHA_LEFT, _valign);
+    g->DrawString(text, {GetPadding().left+offset, GetPadding().top, w, h}, JHA_LEFT, _valign);
 
     if (_caret_visible == true) {
       if (HasFocus() == true && IsEditable() == true) {
         g->SetColor(_caret_color);
       }
 
-      g->DrawString(cursor, {x+current_text_size+offset, y, w, h}, JHA_LEFT, _valign);
+      g->DrawString(cursor, {GetPadding().left+current_text_size+offset, GetPadding().top, w, h}, JHA_LEFT, _valign);
     }
   }
 }

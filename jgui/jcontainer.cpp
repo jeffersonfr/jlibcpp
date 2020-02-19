@@ -43,12 +43,21 @@ Container::Container(jgui::jrect_t<int> bounds):
   _is_visible = true;
   _optimized_paint = false;
 
-  _insets.left = 0;
-  _insets.right = 0;
-  _insets.top = 0;
-  _insets.bottom = 0;
+  _insets = {
+    .left = 0,
+    .top = 0,
+    .right = 0,
+    .bottom = 0
+  };
 
-  GetTheme().SetIntegerParam("border.style", JCB_EMPTY);
+  _padding = {
+    .left = 0,
+    .top = 0,
+    .right = 0,
+    .bottom = 0
+  };
+
+  GetTheme().GetBorder().SetStyle(JBS_EMPTY);
 
   SetBackgroundVisible(false);
 }
@@ -414,188 +423,6 @@ void Container::PaintGlassPane(Graphics *g)
 {
 }
 
-void Container::PaintBackground(Graphics *g)
-{
-  if (IsBackgroundVisible() == false) {
-    return;
-  }
-  
-  jgui::jsize_t<int>
-    size = GetSize();
-  jcomponent_border_t 
-    bordertype = (jcomponent_border_t)GetTheme().GetIntegerParam("border.style");
-  int
-    x = GetTheme().GetIntegerParam("hgap") + GetTheme().GetIntegerParam("border.size"),
-    y = GetTheme().GetIntegerParam("vgap") + GetTheme().GetIntegerParam("border.size"),
-    w = size.width - 2*x,
-    h = size.height - 2*y;
-
-  if (IsEnabled() == true) {
-    if (HasFocus() == true) {
-      g->SetColor(GetTheme().GetIntegerParam("bg.focus"));
-    } else {
-      g->SetColor(GetTheme().GetIntegerParam("bg"));
-    }
-  } else {
-    g->SetColor(GetTheme().GetIntegerParam("bg.disable"));
-  }
-
-  if (bordertype == JCB_ROUND) {
-    g->FillRoundRectangle({x, y, w, h});
-  } else if (bordertype == JCB_BEVEL) {
-    g->FillBevelRectangle({x, y, w, h});
-  } else {
-    g->FillRectangle({x, y, w, h});
-  }
-}
-
-void Container::PaintBorders(Graphics *g)
-{
-  jcomponent_border_t 
-    bordertype = (jcomponent_border_t)GetTheme().GetIntegerParam("border.style");
-
-  if (bordertype == JCB_EMPTY) {
-    return;
-  }
-
-  jgui::jcolor_t<float>
-    color,
-    border = GetTheme().GetIntegerParam("border"),
-    borderfocus = GetTheme().GetIntegerParam("border.focus"),
-    borderdisable = GetTheme().GetIntegerParam("border.disable");
-  jgui::jsize_t<int>
-    size = GetSize();
-  int 
-    bs = GetTheme().GetIntegerParam("border.size");
-  int 
-    xp = 0, 
-    yp = 0,
-    wp = size.width,
-    hp = size.height;
-  int 
-    step = 0x20;
-
-  if (IsEnabled() == true) {
-    if (HasFocus() == true) {
-      color = borderfocus;
-    } else {
-      color = border;
-    }
-  } else {
-    color = borderdisable;
-  }
-
-  int 
-    dr = color[2],
-    dg = color[1],
-    db = color[0],
-    da = color[3];
-  jpen_t 
-    pen = g->GetPen();
-  int 
-    width = pen.width;
-
-  if (bordertype == JCB_LINE) {
-    g->SetColor({dr, dg, db, da});
-    pen.width = -bs;
-    g->SetPen(pen);
-    g->DrawRectangle({xp, yp, wp, hp});
-  } else if (bordertype == JCB_BEVEL) {
-    g->SetColor({dr, dg, db, da});
-    pen.width = -bs;
-    g->SetPen(pen);
-    g->DrawBevelRectangle({xp, yp, wp, hp});
-  } else if (bordertype == JCB_ROUND) {
-    g->SetColor({dr, dg, db, da});
-    pen.width = -bs;
-    g->SetPen(pen);
-    g->DrawRoundRectangle({xp, yp, wp, hp});
-  } else if (bordertype == JCB_RAISED_GRADIENT) {
-    for (int i=0; i<bs && i<wp && i<hp; i++) {
-      g->SetColor({dr+step*(bs-i), dg+step*(bs-i), db+step*(bs-i)});
-      g->DrawLine({xp+i, yp+i}, {xp+wp-i, yp+i}); //cima
-      g->SetColor({dr-step*(bs-i), dg-step*(bs-i), db-step*(bs-i)});
-      g->DrawLine({xp+i, yp+hp-i}, {xp+wp-i, yp+hp-i}); //baixo
-    }
-
-    for (int i=0; i<bs && i<wp && i<hp; i++) {
-      g->SetColor({dr+step*(bs-i), dg+step*(bs-i), db+step*(bs-i)});
-      g->DrawLine({xp+i, yp+i}, {xp+i, yp+hp-i}); //esquerda
-      g->SetColor({dr-step*(bs-i), dg-step*(bs-i), db-step*(bs-i)});
-      g->DrawLine({xp+wp-i, yp+i}, {xp+wp-i, yp+hp-i}); //direita
-    }
-  } else if (bordertype == JCB_LOWERED_GRADIENT) {
-    for (int i=0; i<bs && i<wp && i<hp; i++) {
-      g->SetColor({dr-step*(bs-i), dg-step*(bs-i), db-step*(bs-i)});
-      g->DrawLine({xp+i, yp+i}, {xp+wp-i, yp+i}); //cima
-      g->SetColor({dr+step*(bs-i), dg+step*(bs-i), db+step*(bs-i)});
-      g->DrawLine({xp+i, yp+hp-i}, {xp+wp-i, yp+hp-i}); //baixo
-    }
-
-    for (int i=0; i<bs && i<wp && i<hp; i++) {
-      g->SetColor({dr-step*(bs-i), dg-step*(bs-i), db-step*(bs-i)});
-      g->DrawLine({xp+i, yp+i}, {xp+i, yp+hp-i}); //esquerda
-      g->SetColor({dr+step*(bs-i), dg+step*(bs-i), db+step*(bs-i)});
-      g->DrawLine({xp+wp-i, yp+i}, {xp+wp-i, yp+hp-i}); //direita
-    }
-  } else if (bordertype == JCB_RAISED_BEVEL) {
-    for (int i=0; i<bs && i<wp && i<hp; i++) {
-      g->SetColor({dr+step, dg+step, db+step});
-      g->DrawLine({xp+i, yp+i}, {xp+wp-i, yp+i}); //cima
-      g->SetColor({dr-step, dg-step, db-step});
-      g->DrawLine({xp+i, yp+hp-i}, {xp+wp-i, yp+hp-i}); //baixo
-    }
-
-    for (int i=0; i<bs && i<wp && i<hp; i++) {
-      g->SetColor({dr+step, dg+step, db+step});
-      g->DrawLine({xp+i, yp+i}, {xp+i, yp+hp-i}); //esquerda
-      g->SetColor({dr-step, dg-step, db-step});
-      g->DrawLine({xp+wp-i, yp+i}, {xp+wp-i, yp+hp-i}); //direita
-    }
-  } else if (bordertype == JCB_LOWERED_BEVEL) {
-    for (int i=0; i<bs && i<wp && i<hp; i++) {
-      g->SetColor({dr-step, dg-step, db-step});
-      g->DrawLine({xp+i, yp+i}, {xp+wp-i, yp+i}); //cima
-      g->SetColor({dr+step, dg+step, db+step});
-      g->DrawLine({xp+i, yp+hp-i}, {xp+wp-i, yp+hp-i}); //baixo
-    }
-
-    for (int i=0; i<bs && i<wp && i<hp; i++) {
-      g->SetColor({dr-step, dg-step, db-step});
-      g->DrawLine({xp+i, yp+i}, {xp+i, yp+hp-i}); //esquerda
-      g->SetColor({dr+step, dg+step, db+step});
-      g->DrawLine({xp+wp-i, yp+i}, {xp+wp-i, yp+hp-i}); //direita
-    }
-  } else if (bordertype == JCB_RAISED_ETCHED) {
-    g->SetColor({dr+step, dg+step, db+step, da});
-    pen.width = -bs;
-    g->SetPen(pen);
-    g->DrawRectangle({xp, yp, wp, hp});
-    
-    g->SetColor({dr-step, dg-step, db-step, da});
-    pen.width = -bs/2;
-    g->SetPen(pen);
-    g->DrawRectangle({xp, yp, wp-bs/2, hp-bs/2});
-  } else if (bordertype == JCB_LOWERED_ETCHED) {
-    g->SetColor({dr-step, dg-step, db-step, da});
-    pen.width = -bs;
-    g->SetPen(pen);
-    g->DrawRectangle({xp, yp, wp, hp});
-    
-    g->SetColor({dr+step, dg+step, db+step, da});
-    pen.width = -bs/2;
-    g->DrawRectangle({xp, yp, wp-bs/2, hp-bs/2});
-  }
-
-  pen.width = width;
-  g->SetPen(pen);
-
-  if (_is_enabled == false) {
-    g->SetColor({0x00, 0x00, 0x00, 0x80});
-    g->FillRectangle({0, 0, size.width, size.height});
-  }
-}
-
 void Container::Paint(Graphics *g)
 {
   // JDEBUG(JINFO, "paint\n");
@@ -622,6 +449,8 @@ void Container::Paint(Graphics *g)
         cl = c->GetLocation();
       jgui::jsize_t<int> 
         cs = c->GetSize();
+      jgui::jinsets_t<int>
+        padding = c->GetPadding();
       int 
         cx = cl.x - slocation.x,
         cy = cl.y - slocation.y,
@@ -639,9 +468,16 @@ void Container::Paint(Graphics *g)
           c->PaintBackground(g);
         }
 
+        jrect_t 
+          clip2 = g->GetClip();
+
+        g->ClipRect({padding.left, padding.top, cw - c->GetHorizontalPadding(), ch - c->GetVerticalPadding()});
+        
         g->Reset(); 
         c->Paint(g);
         
+        g->SetClip(clip2);
+
         if (flag == false && c->IsScrollVisible() == true) {
           g->Reset(); 
           c->PaintScrollbars(g);

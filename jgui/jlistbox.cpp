@@ -40,6 +40,21 @@ ListBox::~ListBox()
 {
 }
 
+void ListBox::UpdatePreferredSize()
+{
+  jgui::jsize_t<int> 
+    t = GetSize();
+  jgui::Border
+    border = GetTheme().GetBorder();
+
+  // TODO:: list all items to see the largest width [+ image.width + gap] 
+
+  t.width = t.width + GetHorizontalPadding() + 2*border.GetSize();
+  t.height = _items.size()*(GetItemSize() + GetItemGap()) - GetItemGap() + GetVerticalPadding() + 2*border.GetSize();
+
+  SetPreferredSize(t);
+}
+
 void ListBox::SetSelectionType(jlistbox_mode_t type)
 {
   if (_mode == type) {
@@ -67,6 +82,8 @@ void ListBox::AddEmptyItem()
     
   AddInternalItem(item);
   AddItem(item);
+
+  UpdatePreferredSize();
 }
 
 void ListBox::AddTextItem(std::string text)
@@ -77,6 +94,8 @@ void ListBox::AddTextItem(std::string text)
     
   AddInternalItem(item);
   AddItem(item);
+  
+  UpdatePreferredSize();
 }
 
 void ListBox::AddImageItem(std::string text, jgui::Image *image)
@@ -87,6 +106,8 @@ void ListBox::AddImageItem(std::string text, jgui::Image *image)
     
   AddInternalItem(item);
   AddItem(item);
+
+  UpdatePreferredSize();
 }
 
 void ListBox::AddCheckedItem(std::string text, bool checked)
@@ -97,6 +118,8 @@ void ListBox::AddCheckedItem(std::string text, bool checked)
     
   AddInternalItem(item);
   AddItem(item);
+
+  UpdatePreferredSize();
 }
 
 void ListBox::SetCurrentIndex(int i)
@@ -212,18 +235,6 @@ int ListBox::GetSelectedIndex()
   return _selected_index;
 }
 
-jsize_t<int> ListBox::GetPreferredSize()
-{
-  jgui::jsize_t<int> 
-    t = GetSize();
-  int
-    gy = GetTheme().GetIntegerParam("vgap") + GetTheme().GetIntegerParam("border.size");
-
-  t.height = 2*gy + _items.size()*(GetItemSize() + GetItemGap()) - GetItemGap();
-
-  return t;
-}
-
 bool ListBox::KeyPressed(jevent::KeyEvent *event)
 {
   if (Component::KeyPressed(event) == true) {
@@ -236,11 +247,10 @@ bool ListBox::KeyPressed(jevent::KeyEvent *event)
 
   jgui::jsize_t<int>
     size = GetSize();
+  jgui::Border
+    border = GetTheme().GetBorder();
   jevent::jkeyevent_symbol_t 
     action = event->GetSymbol();
-  int
-    bs = GetTheme().GetIntegerParam("border.size"),
-    vg = GetTheme().GetIntegerParam("vgap");
   bool 
     catched = false;
 
@@ -249,7 +259,7 @@ bool ListBox::KeyPressed(jevent::KeyEvent *event)
     
     catched = true;
   } else if (action == jevent::JKS_PAGE_UP) {
-    IncrementLines((size.height-2*(bs + vg))/(GetItemSize() + GetItemGap()));
+    IncrementLines((size.height-GetVerticalPadding())/(GetItemSize() + GetItemGap()));
     
     catched = true;
   } else if (action == jevent::JKS_CURSOR_DOWN) {
@@ -257,7 +267,7 @@ bool ListBox::KeyPressed(jevent::KeyEvent *event)
 
     catched = true;
   } else if (action == jevent::JKS_PAGE_DOWN) {
-    DecrementLines((size.height-2*(bs + vg))/(GetItemSize() + GetItemGap()));
+    DecrementLines((size.height-GetVerticalPadding())/(GetItemSize() + GetItemGap()));
 
     catched = true;
   } else if (action == jevent::JKS_HOME) {
@@ -336,14 +346,12 @@ void ListBox::Paint(Graphics *g)
     scroll_location = GetScrollLocation();
   jgui::jsize_t<int>
     size = GetSize();
+  jgui::Border
+    border = GetTheme().GetBorder();
+  jgui::jinsets_t
+    padding = GetPadding();
   int
-    hg = GetTheme().GetIntegerParam("hgap");
-    // vg = GetTheme().GetIntegerParam("vgap");
-  int
-    x = GetTheme().GetIntegerParam("hgap") + GetTheme().GetIntegerParam("border.size"),
-    y = GetTheme().GetIntegerParam("vgap") + GetTheme().GetIntegerParam("border.size"),
-    w = size.width - 2*x;
-    // h = size.height - 2*y;
+    w = size.width - GetHorizontalPadding();
   int 
     scrollx = (IsScrollableX() == true)?scroll_location.x:0,
     scrolly = (IsScrollableY() == true)?scroll_location.y:0;
@@ -359,12 +367,11 @@ void ListBox::Paint(Graphics *g)
     }
   }
 
-  // CHANGE:: try enhance scroll behaviour
-  x = x - scrollx;
-  y = y - scrolly;
+  padding.left = padding.left - scrollx;
+  padding.top = padding.top - scrolly;
 
   for (int i=0; i<(int)_items.size(); i++) {
-    int dy = y + (GetItemSize() + GetItemGap())*i;
+    int dy = padding.top + (GetItemSize() + GetItemGap())*i;
 
     if ((dy + GetItemSize()) < 0 || dy > size.height) {
       continue;
@@ -392,7 +399,7 @@ void ListBox::Paint(Graphics *g)
       g->SetColor(GetTheme().GetIntegerParam("bg.focus"));
     }
 
-    g->FillRectangle({x, y + (GetItemSize() + GetItemGap())*i, w, GetItemSize()});
+    g->FillRectangle({padding.left, padding.top + (GetItemSize() + GetItemGap())*i, w, GetItemSize()});
 
     if (font != nullptr) {
       g->SetFont(font);
@@ -423,14 +430,14 @@ void ListBox::Paint(Graphics *g)
         text = font->TruncateString(text, "...", w - offset);
       // }
 
-      g->DrawString(text, {x + offset, y + (GetItemSize() + GetItemGap())*i, w - offset, GetItemSize()}, _items[i]->GetHorizontalAlign(), _items[i]->GetVerticalAlign());
+      g->DrawString(text, {padding.left + offset, padding.top + (GetItemSize() + GetItemGap())*i, w - offset, GetItemSize()}, _items[i]->GetHorizontalAlign(), _items[i]->GetVerticalAlign());
     }
     
     if (_items[i]->GetType() == JIT_EMPTY) {
     } else if (_items[i]->GetType() == JIT_TEXT) {
     } else if (_items[i]->GetType() == JIT_IMAGE) {
       if (_items[i]->GetImage() != nullptr) {
-        g->DrawImage(_items[i]->GetImage(), {hg, y + (GetItemSize() + GetItemGap())*i, GetItemSize(), GetItemSize()});
+        g->DrawImage(_items[i]->GetImage(), {GetHorizontalPadding(), padding.top + (GetItemSize() + GetItemGap())*i, GetItemSize(), GetItemSize()});
       }
     }
 
@@ -525,13 +532,11 @@ jsize_t<int> ListBox::GetScrollDimension()
 {
   jsize_t<int> 
     t = GetSize();
-  int 
-    bs = GetTheme().GetIntegerParam("border.size"),
-    // hg = GetTheme().GetIntegerParam("hgap"),
-    vg = GetTheme().GetIntegerParam("vgap");
+  jgui::Border
+    border = GetTheme().GetBorder();
 
   // t.width = t.width;
-  t.height = _items.size()*(GetItemSize() + GetItemGap()) + 2*(vg + bs);
+  t.height = _items.size()*(GetItemSize() + GetItemGap()) + GetVerticalPadding();
 
   return t;
 }

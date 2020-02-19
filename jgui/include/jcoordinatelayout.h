@@ -100,7 +100,7 @@ class CoordinateLayout : public Layout {
      * \brief
      *
      */
-    virtual jsize_t<int> GetPreferredSize(Container *target);
+    virtual jsize_t<int> GetPreferredLayoutSize(Container *target);
 
     /**
      * \brief

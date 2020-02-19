@@ -404,10 +404,10 @@ void TextArea::InitRowsString()
 
   jgui::jsize_t<int>
     size = GetSize();
+  jgui::Border
+    border = GetTheme().GetBorder();
   int
-    x = GetTheme().GetIntegerParam("hgap") + GetTheme().GetIntegerParam("border.size"),
-    // y = GetTheme().GetIntegerParam("vgap") + GetTheme().GetIntegerParam("border.size"),
-    w = size.width - 2*x;
+    w = size.width - GetVerticalPadding();
 
   std::string 
     text = _text;
@@ -509,9 +509,10 @@ void TextArea::Paint(Graphics *g)
 
   Font 
     *font = GetTheme().GetFont();
-  int
-    x = GetTheme().GetIntegerParam("hgap") + GetTheme().GetIntegerParam("border.size"),
-    y = GetTheme().GetIntegerParam("vgap") + GetTheme().GetIntegerParam("border.size");
+  jgui::Border
+    border = GetTheme().GetBorder();
+  jgui::jinsets_t<int>
+    padding = GetPadding();
   jpoint_t 
     slocation = GetScrollLocation();
 
@@ -527,8 +528,8 @@ void TextArea::Paint(Graphics *g)
       current_length = _caret_position,
       fs = font->GetSize()+_rows_gap;
 
-  x = x - slocation.x;
-  y = y - slocation.y;
+  padding.left = padding.left - slocation.x;
+  padding.top = padding.top - slocation.y;
 
   // INFO:: Draw text
   for (int i=0, k=0; i<=(int)_lines.size()-1; i++) {
@@ -550,7 +551,7 @@ void TextArea::Paint(Graphics *g)
       g->SetColor(GetTheme().GetIntegerParam("fg.disable"));
     }
 
-    g->DrawString(s, jgui::jpoint_t<int>{x, y+k*fs});
+    g->DrawString(s, jgui::jpoint_t<int>{padding.left, padding.top+k*fs});
 
     if (_caret_visible == true && current_length < (int)s.size() && current_length >= 0) {
       std::string cursor;
@@ -569,7 +570,7 @@ void TextArea::Paint(Graphics *g)
         g->SetColor(_caret_color);
       }
 
-      g->DrawString(cursor, jgui::jpoint_t<int>{x+current_text_size, y+k*fs});
+      g->DrawString(cursor, jgui::jpoint_t<int>{padding.left+current_text_size, padding.top+k*fs});
 
       current_length = -1;
     }
@@ -633,8 +634,8 @@ jsize_t<int> TextArea::GetScrollDimension()
     *font = GetTheme().GetFont();
   jsize_t<int> 
     t = GetSize();
-  int 
-    vg = GetTheme().GetIntegerParam("vgap") + GetTheme().GetIntegerParam("border.size");
+  jgui::Border
+    border = GetTheme().GetBorder();
 
   if (font == nullptr) {
     return t;
@@ -645,7 +646,7 @@ jsize_t<int> TextArea::GetScrollDimension()
     // t.height = t.height;
   } else {
     // t.width = t.width;
-    t.height = GetRows()*(font->GetSize()) + 2*vg;
+    t.height = GetRows()*(font->GetSize()) + GetVerticalPadding();
   }
 
   return  t;

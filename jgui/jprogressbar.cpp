@@ -96,13 +96,13 @@ void ProgressBar::Paint(Graphics *g)
     *font = GetTheme().GetFont();
   jgui::jsize_t<int>
     size = GetSize();
+  jgui::Border
+    border = GetTheme().GetBorder();
   std::string 
     text;
   int
-    x = GetTheme().GetIntegerParam("hgap") + GetTheme().GetIntegerParam("border.size"),
-    y = GetTheme().GetIntegerParam("vgap") + GetTheme().GetIntegerParam("border.size"),
-    w = size.width - 2*x,
-    h = size.height - 2*y;
+    w = size.width - GetHorizontalPadding(),
+    h = size.height - GetVerticalPadding();
 
   if (_type == JSO_HORIZONTAL) {
     double 
@@ -115,7 +115,7 @@ void ProgressBar::Paint(Graphics *g)
     }
 
     g->SetColor(GetTheme().GetIntegerParam("scroll"));
-    g->FillRectangle({x, y, (int)d, h});
+    g->FillRectangle({GetPadding().left, GetPadding().top, (int)d, h});
 
     snprintf(t, 255-1, "%d %%", _value);
 
@@ -131,7 +131,7 @@ void ProgressBar::Paint(Graphics *g)
     }
 
     g->SetColor(GetTheme().GetIntegerParam("scroll"));
-    g->FillRectangle({x, y, w, (int)d});
+    g->FillRectangle({GetPadding().left, GetPadding().top, w, (int)d});
 
     snprintf(t, 255-1, "%d %%", _value);
 
@@ -148,12 +148,7 @@ void ProgressBar::Paint(Graphics *g)
     g->SetColor(GetTheme().GetIntegerParam("fg.disable"));
   }
 
-  // if (_wrap == false) {
-  text = font->TruncateString(text, "...", w);
-  x = x + (w - font->GetStringWidth(text))/2;
-  // }
-
-  g->DrawString(text, {x, y, w, h});
+  g->DrawString(text, {GetPadding().left + (w - font->GetStringWidth(font->TruncateString(text, "...", w)))/2, GetPadding().top, w, h});
 }
 
 }

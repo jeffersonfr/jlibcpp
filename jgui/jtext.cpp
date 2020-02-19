@@ -29,10 +29,9 @@ Text::Text(std::string text):
 {
   jcommon::Object::SetClassName("jgui::Text");
 
+  _text = text;
   _halign = JHA_CENTER;
   _valign = JVA_CENTER;
-
-  _text = text;
   _is_wrap = false;
 }
 
@@ -40,15 +39,57 @@ Text::~Text()
 {
 }
 
-void Text::SetWrap(bool b)
+void Text::UpdatePreferredSize()
 {
-  if (_is_wrap == b) {
-    return;
+  jsize_t<int> 
+    t = {
+      0, 0
+    };
+
+  jgui::Border
+    border = GetTheme().GetBorder();
+  jgui::Font 
+    *font = GetTheme().GetFont();
+
+  if (font != nullptr) {
+    if (IsWrap() == false) {
+      jgui::jfont_extends_t 
+        extends = font->GetStringExtends(GetText());
+
+      t.width = int(extends.size.width - extends.bearing.x);
+      t.height = int(extends.size.height - extends.bearing.y);
+    } else {
+      jgui::jsize_t<int>
+        size = GetSize();
+
+      size.width = size.width;
+      size.height = 0;
+
+      if (size.width < 0) {
+        size.width = 0;
+      }
+
+      if (size.width > 0) {
+        std::vector<std::string> lines;
+
+        font->GetStringBreak(&lines, GetText(), {size.width, INT_MAX});
+
+        t.height = lines.size()*font->GetSize();
+      }
+    }
   }
 
-  _is_wrap = b;
+  SetPreferredSize(t + jgui::jsize_t<int>{GetHorizontalPadding() + 2*border.GetSize(), GetVerticalPadding() + 2*border.GetSize()});
+}
 
-  Repaint();
+void Text::SetWrap(bool wrap)
+{
+  if (_is_wrap == wrap) {
+    _is_wrap = wrap;
+
+    UpdatePreferredSize();
+    Repaint();
+  }
 }
 
 bool Text::IsWrap()
@@ -63,9 +104,12 @@ std::string Text::GetText()
 
 void Text::SetText(std::string text)
 {
-  _text = text;
+  if (_text != text) {
+    _text = text;
 
-  Repaint();
+    UpdatePreferredSize();
+    Repaint();
+  }
 }
 
 void Text::SetHorizontalAlign(jhorizontal_align_t align)
@@ -96,38 +140,6 @@ jvertical_align_t Text::GetVerticalAlign()
   return _valign;
 }
 
-jsize_t<int> Text::GetPreferredSize()
-{
-  jsize_t<int> 
-    t = {
-      0, 0
-    };
-
-  jgui::Font 
-    *font = GetTheme().GetFont();
-  jgui::jsize_t<int>
-    size = GetSize();
-  int
-    gx = GetTheme().GetIntegerParam("hgap") + GetTheme().GetIntegerParam("border.size"),
-    gy = GetTheme().GetIntegerParam("vgap") + GetTheme().GetIntegerParam("border.size");
-
-  if (font != nullptr) {
-    int 
-      wp = size.width - 2*gx,
-      hp = font->GetSize();
-
-    if (wp > 0) {
-      std::vector<std::string> lines;
-
-      font->GetStringBreak(&lines, _text, {wp, INT_MAX});
-
-      t.height = lines.size()*hp + 2*gy;
-    }
-  }
-
-  return t;
-}
-
 void Text::Paint(Graphics *g)
 {
   JDEBUG(JINFO, "paint\n");
@@ -138,11 +150,11 @@ void Text::Paint(Graphics *g)
     *font = GetTheme().GetFont();
   jgui::jsize_t<int>
     size = GetSize();
+  jgui::Border
+    border = GetTheme().GetBorder();
   int
-    x = GetTheme().GetIntegerParam("hgap") + GetTheme().GetIntegerParam("border.size"),
-    y = GetTheme().GetIntegerParam("vgap") + GetTheme().GetIntegerParam("border.size"),
-    w = size.width - 2*x,
-    h = size.height - 2*y;
+    w = size.width - GetHorizontalPadding(),
+    h = size.height - GetVerticalPadding();
 
   if (font != nullptr) {
     g->SetFont(font);
@@ -163,7 +175,7 @@ void Text::Paint(Graphics *g)
       text = font->TruncateString(text, "...", w);
     }
 
-    g->DrawString(text, {x, y, w, h}, _halign, _valign);
+    g->DrawString(text, {GetPadding().left, GetPadding().top, w, h}, _halign, _valign);
   }
 }
 

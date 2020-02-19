@@ -29,7 +29,7 @@ CoordinateLayout::CoordinateLayout(int width, int height, jcoordinatelayout_orie
   jcommon::Object::SetClassName("jgui::CoordinateLayout");
 
   if (width <= 0 || height <= 0) {
-    // throw jexception::OutOfBoundsException("CoordinateLayout cannot work with limits lower than zero");
+    throw jexception::OutOfBoundsException("CoordinateLayout cannot work with limits lower than zero");
   }
 
   _size.width = width;
@@ -75,7 +75,7 @@ jsize_t<int> CoordinateLayout::GetMaximumLayoutSize(Container *parent)
   return t;
 }
 
-jsize_t<int> CoordinateLayout::GetPreferredSize(Container *target) 
+jsize_t<int> CoordinateLayout::GetPreferredLayoutSize(Container *target) 
 {
   if ((void *)target == nullptr) {
     jsize_t<int> t = {0, 0};

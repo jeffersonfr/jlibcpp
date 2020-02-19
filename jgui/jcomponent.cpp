@@ -31,9 +31,20 @@ Component::Component(jgui::jrect_t<int> bounds):
 {
   jcommon::Object::SetClassName("jgui::Component");
 
-  _preferred_size = {128, 32};
-  _minimum_size = {16, 16};
-  _maximum_size = {16384, 16384};
+  _preferred_size = {
+    .width = 128, 
+    .height = 32
+  };
+  
+  _minimum_size = {
+    .width = 16, 
+    .height = 16
+  };
+  
+  _maximum_size = {
+    .width = 16384, 
+    .height = 16384
+  };
 
   _is_cyclic_focus = false;
   _is_navigation_enabled = true;
@@ -65,11 +76,19 @@ Component::Component(jgui::jrect_t<int> bounds):
   _scroll_minor_increment = 8;
   _scroll_major_increment = 64;
 
-  _relative_mouse_x = 0;
-  _relative_mouse_y = 0;
-  _relative_mouse_w = 0;
-  _relative_mouse_h = 0;
   _component_state = 0;
+
+  _relative_mouse = {
+    .x = 0,
+    .y = 0
+  };
+
+  _padding = {
+    .left = 2,
+    .top = 2,
+    .right = 2,
+    .bottom = 2
+  };
 }
 
 Component::~Component()
@@ -190,6 +209,26 @@ void Component::ScrollToVisibleArea(jrect_t<int> rect, Component *coordinateSpac
           {GetAbsoluteLocation().x - parent->GetAbsoluteLocation().x + rect.point.x, GetAbsoluteLocation().y - parent->GetAbsoluteLocation().y + rect.point.y, rect.size.width, rect.size.height}, parent);
     }
   }
+}
+
+void Component::SetPadding(jgui::jinsets_t<int> padding)
+{
+  _padding = padding;
+}
+
+jgui::jinsets_t<int> Component::GetPadding()
+{
+  return _padding;
+}
+
+int Component::GetHorizontalPadding()
+{
+  return _padding.left + _padding.right;
+}
+
+int Component::GetVerticalPadding()
+{
+  return _padding.top + _padding.bottom;
 }
 
 void Component::SetName(std::string name)
@@ -428,8 +467,9 @@ void Component::PaintScrollbars(Graphics *g)
   jgui::jsize_t<int>
     size = GetSize(),
     sdimention = GetScrollDimension();
+  jgui::Border
+    border = GetTheme().GetBorder();
   int 
-    bs = GetTheme().GetIntegerParam("border.size"),
     ss = GetTheme().GetIntegerParam("scroll.size");
 
   if (IsScrollableX() == true) {
@@ -441,10 +481,10 @@ void Component::PaintScrollbars(Graphics *g)
       block_size = (int)(size.width*block_size_ratio);
 
     g->SetColor(GetTheme().GetIntegerParam("fg"));
-    g->FillRectangle({bs, size.height - ss - bs, size.width - 2*bs, ss});
+    g->FillRectangle({0, size.height - ss, size.width, ss});
     g->SetGradientStop(0.0, GetTheme().GetIntegerParam("fg"));
     g->SetGradientStop(1.0, GetTheme().GetIntegerParam("bg"));
-    g->FillLinearGradient({offset, size.height - ss - bs, block_size, ss}, {0, 0}, {0, ss});
+    g->FillLinearGradient({offset, size.height - ss, block_size, ss}, {0, 0}, {0, ss});
     g->ResetGradientStop();
   }
   
@@ -457,11 +497,11 @@ void Component::PaintScrollbars(Graphics *g)
       block_size = (int)(size.height*block_size_ratio);
 
     g->SetColor(GetTheme().GetIntegerParam("fg"));
-    g->FillRectangle({size.width - ss - bs, bs, ss, size.height});
+    g->FillRectangle({size.width - ss, 0, ss, size.height});
 
     g->SetGradientStop(0.0, GetTheme().GetIntegerParam("fg"));
     g->SetGradientStop(1.0, GetTheme().GetIntegerParam("bg"));
-    g->FillLinearGradient({size.width - ss - bs, offset, ss, block_size}, {0, 0}, {ss, 0});
+    g->FillLinearGradient({size.width - ss, offset, ss, block_size}, {0, 0}, {ss, 0});
     g->ResetGradientStop();
   }
 
@@ -476,12 +516,13 @@ void Component::PaintScrollbars(Graphics *g)
     g->ResetGradientStop();
   }
 
+  /*
   jpen_t 
     pen = g->GetPen();
   int 
     width = pen.width;
 
-  pen.width = -bs;
+  pen.width = -border.GetSize();
   g->SetPen(pen);
 
   g->DrawRectangle({0, 0, size.width, size.height});
@@ -489,23 +530,17 @@ void Component::PaintScrollbars(Graphics *g)
   pen.width = width;
 
   g->SetPen(pen);
+  */
 }
 
 void Component::PaintBackground(Graphics *g)
 {
-  if (_is_background_visible == false) {
+  if (IsBackgroundVisible() == false) {
     return;
   }
   
-  jgui::jsize_t<int>
-    size = GetSize();
-  jcomponent_border_t 
-    bordertype = (jcomponent_border_t)GetTheme().GetIntegerParam("border.style");
-  int
-    x = GetTheme().GetIntegerParam("hgap") + GetTheme().GetIntegerParam("border.size"),
-    y = GetTheme().GetIntegerParam("vgap") + GetTheme().GetIntegerParam("border.size"),
-    w = size.width - 2*x,
-    h = size.height - 2*y;
+  jgui::Border
+    border = GetTheme().GetBorder();
 
   if (IsEnabled() == true) {
     if (HasFocus() == true) {
@@ -517,33 +552,31 @@ void Component::PaintBackground(Graphics *g)
     g->SetColor(GetTheme().GetIntegerParam("bg.disable"));
   }
 
-  if (bordertype == JCB_ROUND) {
-    g->FillRoundRectangle({x, y, w, h});
-  } else if (bordertype == JCB_BEVEL) {
-    g->FillBevelRectangle({x, y, w, h});
+  if (border.GetStyle() == JBS_ROUND) {
+    g->FillRoundRectangle({0, 0, GetSize()});
+  } else if (border.GetStyle() == JBS_BEVEL) {
+    g->FillBevelRectangle({0, 0, GetSize()});
   } else {
-    g->FillRectangle({x, y, w, h});
+    g->FillRectangle({0, 0, GetSize()});
   }
 }
 
 void Component::PaintBorders(Graphics *g)
 {
-  jcomponent_border_t 
-    bordertype = (jcomponent_border_t)GetTheme().GetIntegerParam("border.style");
+  jgui::Border
+    border = GetTheme().GetBorder();
 
-  if (bordertype == JCB_EMPTY) {
+  if (border.GetStyle() == JBS_EMPTY) {
     return;
   }
 
   jgui::jcolor_t<float>
     color,
-    border = GetTheme().GetIntegerParam("border"),
+    bordercolor = GetTheme().GetIntegerParam("border"),
     borderfocus = GetTheme().GetIntegerParam("border.focus"),
     borderdisable = GetTheme().GetIntegerParam("border.disable");
   jgui::jsize_t<int>
     size = GetSize();
-  int 
-    bs = GetTheme().GetIntegerParam("border.size");
   int 
     xp = 0, 
     yp = 0,
@@ -556,7 +589,7 @@ void Component::PaintBorders(Graphics *g)
     if (HasFocus() == true) {
       color = borderfocus;
     } else {
-      color = border;
+      color = bordercolor;
     }
   } else {
     color = borderdisable;
@@ -572,96 +605,96 @@ void Component::PaintBorders(Graphics *g)
   int 
     width = pen.width;
 
-  if (bordertype == JCB_LINE) {
+  if (border.GetStyle() == JBS_LINE) {
     g->SetColor({dr, dg, db, da});
-    pen.width = -bs;
+    pen.width = -border.GetSize();
     g->SetPen(pen);
     g->DrawRectangle({xp, yp, wp, hp});
-  } else if (bordertype == JCB_BEVEL) {
+  } else if (border.GetStyle() == JBS_BEVEL) {
     g->SetColor({dr, dg, db, da});
-    pen.width = -bs;
+    pen.width = -border.GetSize();
     g->SetPen(pen);
     g->DrawBevelRectangle({xp, yp, wp, hp});
-  } else if (bordertype == JCB_ROUND) {
+  } else if (border.GetStyle() == JBS_ROUND) {
     g->SetColor({dr, dg, db, da});
-    pen.width = -bs;
+    pen.width = -border.GetSize();
     g->SetPen(pen);
     g->DrawRoundRectangle({xp, yp, wp, hp});
-  } else if (bordertype == JCB_RAISED_GRADIENT) {
-    for (int i=0; i<bs && i<wp && i<hp; i++) {
-      g->SetColor({dr+step*(bs-i), dg+step*(bs-i), db+step*(bs-i)});
+  } else if (border.GetStyle() == JBS_RAISED_GRADIENT) {
+    for (int i=0; i<border.GetSize() && i<wp && i<hp; i++) {
+      g->SetColor({dr+step*(border.GetSize()-i), dg+step*(border.GetSize()-i), db+step*(border.GetSize()-i)});
       g->DrawLine({xp+i, yp+i}, {xp+wp-i, yp+i}); //cima
-      g->SetColor({dr-step*(bs-i), dg-step*(bs-i), db-step*(bs-i)});
+      g->SetColor({dr-step*(border.GetSize()-i), dg-step*(border.GetSize()-i), db-step*(border.GetSize()-i)});
       g->DrawLine({xp+i, yp+hp-i}, {xp+wp-i, yp+hp-i}); //baixo
     }
 
-    for (int i=0; i<bs && i<wp && i<hp; i++) {
-      g->SetColor({dr+step*(bs-i), dg+step*(bs-i), db+step*(bs-i)});
+    for (int i=0; i<border.GetSize() && i<wp && i<hp; i++) {
+      g->SetColor({dr+step*(border.GetSize()-i), dg+step*(border.GetSize()-i), db+step*(border.GetSize()-i)});
       g->DrawLine({xp+i, yp+i}, {xp+i, yp+hp-i}); //esquerda
-      g->SetColor({dr-step*(bs-i), dg-step*(bs-i), db-step*(bs-i)});
+      g->SetColor({dr-step*(border.GetSize()-i), dg-step*(border.GetSize()-i), db-step*(border.GetSize()-i)});
       g->DrawLine({xp+wp-i, yp+i}, {xp+wp-i, yp+hp-i}); //direita
     }
-  } else if (bordertype == JCB_LOWERED_GRADIENT) {
-    for (int i=0; i<bs && i<wp && i<hp; i++) {
-      g->SetColor({dr-step*(bs-i), dg-step*(bs-i), db-step*(bs-i)});
+  } else if (border.GetStyle() == JBS_LOWERED_GRADIENT) {
+    for (int i=0; i<border.GetSize() && i<wp && i<hp; i++) {
+      g->SetColor({dr-step*(border.GetSize()-i), dg-step*(border.GetSize()-i), db-step*(border.GetSize()-i)});
       g->DrawLine({xp+i, yp+i}, {xp+wp-i, yp+i}); //cima
-      g->SetColor({dr+step*(bs-i), dg+step*(bs-i), db+step*(bs-i)});
+      g->SetColor({dr+step*(border.GetSize()-i), dg+step*(border.GetSize()-i), db+step*(border.GetSize()-i)});
       g->DrawLine({xp+i, yp+hp-i}, {xp+wp-i, yp+hp-i}); //baixo
     }
 
-    for (int i=0; i<bs && i<wp && i<hp; i++) {
-      g->SetColor({dr-step*(bs-i), dg-step*(bs-i), db-step*(bs-i)});
+    for (int i=0; i<border.GetSize() && i<wp && i<hp; i++) {
+      g->SetColor({dr-step*(border.GetSize()-i), dg-step*(border.GetSize()-i), db-step*(border.GetSize()-i)});
       g->DrawLine({xp+i, yp+i}, {xp+i, yp+hp-i}); //esquerda
-      g->SetColor({dr+step*(bs-i), dg+step*(bs-i), db+step*(bs-i)});
+      g->SetColor({dr+step*(border.GetSize()-i), dg+step*(border.GetSize()-i), db+step*(border.GetSize()-i)});
       g->DrawLine({xp+wp-i, yp+i}, {xp+wp-i, yp+hp-i}); //direita
     }
-  } else if (bordertype == JCB_RAISED_BEVEL) {
-    for (int i=0; i<bs && i<wp && i<hp; i++) {
+  } else if (border.GetStyle() == JBS_RAISED_BEVEL) {
+    for (int i=0; i<border.GetSize() && i<wp && i<hp; i++) {
       g->SetColor({dr+step, dg+step, db+step});
       g->DrawLine({xp+i, yp+i}, {xp+wp-i, yp+i}); //cima
       g->SetColor({dr-step, dg-step, db-step});
       g->DrawLine({xp+i, yp+hp-i}, {xp+wp-i, yp+hp-i}); //baixo
     }
 
-    for (int i=0; i<bs && i<wp && i<hp; i++) {
+    for (int i=0; i<border.GetSize() && i<wp && i<hp; i++) {
       g->SetColor({dr+step, dg+step, db+step});
       g->DrawLine({xp+i, yp+i}, {xp+i, yp+hp-i}); //esquerda
       g->SetColor({dr-step, dg-step, db-step});
       g->DrawLine({xp+wp-i, yp+i}, {xp+wp-i, yp+hp-i}); //direita
     }
-  } else if (bordertype == JCB_LOWERED_BEVEL) {
-    for (int i=0; i<bs && i<wp && i<hp; i++) {
+  } else if (border.GetStyle() == JBS_LOWERED_BEVEL) {
+    for (int i=0; i<border.GetSize() && i<wp && i<hp; i++) {
       g->SetColor({dr-step, dg-step, db-step});
       g->DrawLine({xp+i, yp+i}, {xp+wp-i, yp+i}); //cima
       g->SetColor({dr+step, dg+step, db+step});
       g->DrawLine({xp+i, yp+hp-i}, {xp+wp-i, yp+hp-i}); //baixo
     }
 
-    for (int i=0; i<bs && i<wp && i<hp; i++) {
+    for (int i=0; i<border.GetSize() && i<wp && i<hp; i++) {
       g->SetColor({dr-step, dg-step, db-step});
       g->DrawLine({xp+i, yp+i}, {xp+i, yp+hp-i}); //esquerda
       g->SetColor({dr+step, dg+step, db+step});
       g->DrawLine({xp+wp-i, yp+i}, {xp+wp-i, yp+hp-i}); //direita
     }
-  } else if (bordertype == JCB_RAISED_ETCHED) {
+  } else if (border.GetStyle() == JBS_RAISED_ETCHED) {
     g->SetColor({dr+step, dg+step, db+step, da});
-    pen.width = -bs;
+    pen.width = -border.GetSize();
     g->SetPen(pen);
     g->DrawRectangle({xp, yp, wp, hp});
     
     g->SetColor({dr-step, dg-step, db-step, da});
-    pen.width = -bs/2;
+    pen.width = -border.GetSize()/2;
     g->SetPen(pen);
-    g->DrawRectangle({xp, yp, wp-bs/2, hp-bs/2});
-  } else if (bordertype == JCB_LOWERED_ETCHED) {
+    g->DrawRectangle({xp, yp, wp-border.GetSize()/2, hp-border.GetSize()/2});
+  } else if (border.GetStyle() == JBS_LOWERED_ETCHED) {
     g->SetColor({dr-step, dg-step, db-step, da});
-    pen.width = -bs;
+    pen.width = -border.GetSize();
     g->SetPen(pen);
     g->DrawRectangle({xp, yp, wp, hp});
     
     g->SetColor({dr+step, dg+step, db+step, da});
-    pen.width = -bs/2;
-    g->DrawRectangle({xp, yp, wp-bs/2, hp-bs/2});
+    pen.width = -border.GetSize()/2;
+    g->DrawRectangle({xp, yp, wp-border.GetSize()/2, hp-border.GetSize()/2});
   }
 
   pen.width = width;
@@ -935,7 +968,7 @@ jsize_t<int> Component::GetMaximumSize()
 
 jsize_t<int> Component::GetPreferredSize()
 {
-  return _preferred_size;
+  return _preferred_size + jgui::jsize_t<int>{GetHorizontalPadding(), GetVerticalPadding()};
 }
 
 void Component::Move(int x, int y)
@@ -1179,15 +1212,16 @@ bool Component::MousePressed(jevent::MouseEvent *event)
     slocation = GetScrollLocation();
   jpoint_t<int> 
     elocation = event->GetLocation();
+  jgui::Border
+    border = GetTheme().GetBorder();
   int
-    bs = GetTheme().GetIntegerParam("border.size"),
     ss = GetTheme().GetIntegerParam("scroll.size");
 
   if (IsFocusable() == true) {
     RequestFocus();
   }
 
-  if (IsScrollableY() && elocation.x > (size.width - ss - bs)) {
+  if (IsScrollableY() && elocation.x > (size.width - ss)) {
     double 
       offset_ratio = (double)slocation.y/(double)sdimention.height,
       block_size_ratio = (double)size.height/(double)sdimention.height;
@@ -1197,8 +1231,8 @@ bool Component::MousePressed(jevent::MouseEvent *event)
 
     if (elocation.y > offset && elocation.y < (offset+block_size)) {
       _component_state = 10;
-      _relative_mouse_x = elocation.x;
-      _relative_mouse_y = elocation.y;
+      _relative_mouse.x = elocation.x;
+      _relative_mouse.y = elocation.y;
     } else if (elocation.y < offset) {
       SetScrollLocation(slocation.x, slocation.y - _scroll_major_increment);
     } else if (elocation.y > (offset + block_size)) {
@@ -1206,7 +1240,7 @@ bool Component::MousePressed(jevent::MouseEvent *event)
     }
 
     return true;
-  } else if (IsScrollableX() && elocation.y > (size.height - ss - bs)) {
+  } else if (IsScrollableX() && elocation.y > (size.height - ss)) {
     double 
       offset_ratio = (double)slocation.x/(double)sdimention.width,
       block_size_ratio = (double)size.width/(double)sdimention.width;
@@ -1216,8 +1250,8 @@ bool Component::MousePressed(jevent::MouseEvent *event)
 
     if (elocation.x > offset && elocation.x < (offset + block_size)) {
       _component_state = 11;
-      _relative_mouse_x = elocation.x;
-      _relative_mouse_y = elocation.y;
+      _relative_mouse.x = elocation.x;
+      _relative_mouse.y = elocation.y;
     } else if (elocation.x < offset) {
       SetScrollLocation(slocation.x - _scroll_major_increment, slocation.y);
     } else if (elocation.x > (offset + block_size)) {
@@ -1262,16 +1296,15 @@ bool Component::MouseMoved(jevent::MouseEvent *event)
     sdimention = GetScrollDimension();
 
   if (_component_state == 10) {
-  printf("Mouse move:1: %d, %d, %d, %d, %d, %d, %d\n", elocation.x, elocation.y, slocation.x, slocation.y, sdimention.height, size.height, slocation.y + (int)((elocation.y - _relative_mouse_y)*((double)sdimention.height/(double)size.height)));
-    SetScrollLocation(slocation.x, slocation.y + (int)((elocation.y - _relative_mouse_y)*((double)sdimention.height/(double)size.height)));
+    SetScrollLocation(slocation.x, slocation.y + (int)((elocation.y - _relative_mouse.y)*((double)sdimention.height/(double)size.height)));
     
-    _relative_mouse_y = elocation.y;
+    _relative_mouse.y = elocation.y;
 
     return true;
   } else if (_component_state == 11) {
-    SetScrollLocation(slocation.x + (int)((elocation.x - _relative_mouse_x)*((double)sdimention.width/(double)size.width)), slocation.y);
+    SetScrollLocation(slocation.x + (int)((elocation.x - _relative_mouse.x)*((double)sdimention.width/(double)size.width)), slocation.y);
 
-    _relative_mouse_x = elocation.x;
+    _relative_mouse.x = elocation.x;
 
     return true;
   }

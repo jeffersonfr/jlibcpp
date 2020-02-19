@@ -155,6 +155,8 @@ class Main : public jgui::Window, public jevent::ActionListener {
 			_c[7]->Add(new jgui::Button("Third Screen"), "03");
 			_c[7]->Add(new jgui::Button("Last Screen"), "04");
 
+      _c[6]->SetPreferredSize(_c[6]->GetComponents()[0]->GetPreferredSize());
+
 			_b[3]->Add(_c[6], jgui::JBLA_EAST);
 			_b[3]->Add(_c[7], jgui::JBLA_CENTER);
 

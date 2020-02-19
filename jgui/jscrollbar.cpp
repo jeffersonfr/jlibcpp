@@ -127,15 +127,15 @@ bool ScrollBar::MousePressed(jevent::MouseEvent *event)
     elocation = event->GetLocation();
   jgui::jsize_t<int>
     size = GetSize();
+  jgui::Border
+    border = GetTheme().GetBorder();
   int
-    x = GetTheme().GetIntegerParam("hgap") + GetTheme().GetIntegerParam("border.size"),
-    y = GetTheme().GetIntegerParam("vgap") + GetTheme().GetIntegerParam("border.size"),
-    w = size.width - 2*x,
-    h = size.height - 2*y;
+    w = size.width - GetHorizontalPadding(),
+    h = size.height - GetVerticalPadding();
   int 
     arrow_size,
-    dx = x,
-    dy = y,
+    dx = GetPadding().left,
+    dy = GetPadding().right,
     dw = size.width - 2*dx-_stone_size,
     dh = size.height - 2*dy-_stone_size;
   bool 
@@ -216,15 +216,15 @@ bool ScrollBar::MouseMoved(jevent::MouseEvent *event)
     elocation = event->GetLocation();
   jgui::jsize_t<int>
     size = GetSize();
+  jgui::Border
+    border = GetTheme().GetBorder();
   int
-    x = GetTheme().GetIntegerParam("hgap") + GetTheme().GetIntegerParam("border.size"),
-    y = GetTheme().GetIntegerParam("vgap") + GetTheme().GetIntegerParam("border.size"),
-    w = size.width - 2*x,
-    h = size.height - 2*y;
+    w = size.width - GetHorizontalPadding(),
+    h = size.height - GetHorizontalPadding();
   int 
     arrow_size,
-    dx = x,
-    dy = y,
+    dx = GetPadding().left,
+    dy = GetPadding().right,
     dw = size.width - 2*dx - _stone_size,
     dh = size.height - 2*dy - _stone_size;
 
@@ -271,21 +271,18 @@ void ScrollBar::Paint(Graphics *g)
 
   jgui::jsize_t<int>
     size = GetSize();
+  jgui::Border
+    border = GetTheme().GetBorder();
   int
-    hg = GetTheme().GetIntegerParam("hgap"),
-    vg = GetTheme().GetIntegerParam("vgap");
-  int
-    x = hg + GetTheme().GetIntegerParam("border.size"),
-    y = vg + GetTheme().GetIntegerParam("border.size"),
-    w = size.width - 2*x,
-    h = size.height - 2*y;
+    w = size.width - GetHorizontalPadding(),
+    h = size.height - GetVerticalPadding();
 
   if (_type == JSO_HORIZONTAL) {
     int
       arrow_size = h/2,
-      limit = w - _stone_size - 2*arrow_size - 2*hg;
+      limit = w - _stone_size - 2*arrow_size;
     double 
-      d = (_value*limit)/(GetMaximum()-GetMinimum());
+      d = (_value*limit)/(GetMaximum() - GetMinimum());
 
     if (d > limit) {
       d = limit;
@@ -297,14 +294,14 @@ void ScrollBar::Paint(Graphics *g)
       g->SetColor(GetTheme().GetIntegerParam("scroll"));
     }
 
-    g->FillRectangle({(int)d + arrow_size + x + hg, y, _stone_size, h});
+    g->FillRectangle({(int)d + arrow_size + GetPadding().left, GetPadding().top, _stone_size, h});
 
-    g->FillTriangle({x+w, y+arrow_size}, {x+w-arrow_size, y}, {x+w-arrow_size, y+2*arrow_size});
-    g->FillTriangle({x, y+arrow_size}, {x+arrow_size, y}, {x+arrow_size, y+2*arrow_size});
+    g->FillTriangle({GetPadding().left+w, GetPadding().top+arrow_size}, {GetPadding().left+w-arrow_size, GetPadding().top}, {GetPadding().left+w-arrow_size, GetPadding().top+2*arrow_size});
+    g->FillTriangle({GetPadding().left, GetPadding().top+arrow_size}, {GetPadding().left+arrow_size, GetPadding().top}, {GetPadding().left+arrow_size, GetPadding().top+2*arrow_size});
   } else if (_type == JSO_VERTICAL) {
     int 
       arrow_size = w/2,
-      limit = h - _stone_size - 2*arrow_size - 2*vg;
+      limit = h - _stone_size - 2*arrow_size - GetVerticalPadding();
     double 
       d = (_value*limit)/(GetMaximum()-GetMinimum());
 
@@ -318,9 +315,9 @@ void ScrollBar::Paint(Graphics *g)
       g->SetColor(GetTheme().GetIntegerParam("scroll"));
     }
 
-    g->FillRectangle({x, (int) d + arrow_size + y + vg, w, _stone_size});
-    g->FillTriangle({x, y+arrow_size}, {x+w/2, y}, {x+w, y+arrow_size});
-    g->FillTriangle({x, y+h-arrow_size}, {x+w/2, y+h}, {x+w, y+h-arrow_size});
+    g->FillRectangle({GetPadding().left, (int)d + arrow_size + GetPadding().top + GetVerticalPadding(), w, _stone_size});
+    g->FillTriangle({GetPadding().left, GetPadding().top+arrow_size}, {GetPadding().left+w/2, GetPadding().top}, {GetPadding().left+w, GetPadding().top+arrow_size});
+    g->FillTriangle({GetPadding().left, GetPadding().top+h-arrow_size}, {GetPadding().left+w/2, GetPadding().top+h}, {GetPadding().left+w, GetPadding().top+h-arrow_size});
   }
 }
 

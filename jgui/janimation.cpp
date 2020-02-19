@@ -107,16 +107,16 @@ void Animation::Paint(Graphics *g)
 
   jgui::jsize_t
     size = GetSize();
+  jgui::Border
+    border = GetTheme().GetBorder();
   int 
-    x = GetTheme().GetIntegerParam("hgap") + GetTheme().GetIntegerParam("border.size"),
-    y = GetTheme().GetIntegerParam("vgap") + GetTheme().GetIntegerParam("border.size"),
-    w = size.width - 2*x,
-    h = size.height - 2*y;
+    w = size.width - GetHorizontalPadding(),
+    h = size.height - GetVerticalPadding();
 
   if (_images.size() != 0) {
     Image *image = _images[_index];
 
-    g->DrawImage(image, {x, y, w, h});
+    g->DrawImage(image, {GetPadding().left, GetPadding().top, w, h});
   }
 }
 

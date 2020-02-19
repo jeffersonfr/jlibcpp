@@ -333,19 +333,17 @@ void TreeListView::Paint(Graphics *g)
     *font = GetTheme().GetFont();
   jgui::jsize_t<int>
     size = GetSize();
+  jgui::Border
+    border = GetTheme().GetBorder();
+  jpoint_t 
+    scroll_location = GetScrollLocation();
+  jgui::jinsets_t
+    padding = GetPadding();
   int
-    hg = GetTheme().GetIntegerParam("hgap"),
-    vg = GetTheme().GetIntegerParam("vgap");
-  int
-    x = hg + GetTheme().GetIntegerParam("border.size"),
-    y = vg + GetTheme().GetIntegerParam("border.size"),
-    w = size.width - 2*x;
-    // h = size.height - 2*y;
-  jpoint_t scroll_location = GetScrollLocation();
+    w = size.width - GetHorizontalPadding();
   int 
     scrollx = (IsScrollableX() == true)?scroll_location.x:0,
     scrolly = (IsScrollableY() == true)?scroll_location.y:0;
-    // scrollw = (IsScrollableY() == true)?(ss + sg):0;
   int offset = 4;
 
   for (std::vector<jgui::Item *>::iterator i=_items.begin(); i!=_items.end(); i++) {
@@ -356,12 +354,11 @@ void TreeListView::Paint(Graphics *g)
     }
   }
 
-  // TODO:: tentar ajeitar
-  x = x - scrollx;
-  y = y - scrolly;
+  padding.left = padding.left - scrollx;
+  padding.top = padding.top - scrolly;
 
   for (int i=0; i<(int)_items.size(); i++) {
-    int dy = y + (GetItemSize() + GetItemGap())*i;
+    int dy = padding.top + (GetItemSize() + GetItemGap())*i;
 
     if ((dy + GetItemSize()) < 0 || dy > size.height) {
       continue;
@@ -383,7 +380,7 @@ void TreeListView::Paint(Graphics *g)
       g->SetColor(GetTheme().GetIntegerParam("fg.focus"));
     }
 
-    g->FillRectangle({x, y+(GetItemSize() + GetItemGap())*i, w, GetItemSize()});
+    g->FillRectangle({padding.left, padding.top+(GetItemSize() + GetItemGap())*i, w, GetItemSize()});
 
     if (_selected_index == i) {
       g->SetColor(GetTheme().GetIntegerParam("fg.select"));
@@ -393,7 +390,7 @@ void TreeListView::Paint(Graphics *g)
     } else if (_items[i]->GetType() == JIT_TEXT) {
     } else if (_items[i]->GetType() == JIT_IMAGE) {
       if (_items[i]->GetImage() != nullptr) {
-        g->DrawImage(_items[i]->GetImage(), {hg, y + (GetItemSize() + GetItemGap())*i, GetItemSize(), GetItemSize()});
+        g->DrawImage(_items[i]->GetImage(), {GetHorizontalPadding(), padding.top + (GetItemSize() + GetItemGap())*i, GetItemSize(), GetItemSize()});
       }
     }
 
@@ -416,7 +413,7 @@ void TreeListView::Paint(Graphics *g)
         text = font->TruncateString(text, "...", w - offset);
       // }
 
-      g->DrawString(text, {x + offset, y + (GetItemSize() + GetItemGap())*i, w - offset, GetItemSize()}, _items[i]->GetHorizontalAlign(), _items[i]->GetVerticalAlign());
+      g->DrawString(text, {padding.left + offset, padding.top + (GetItemSize() + GetItemGap())*i, w - offset, GetItemSize()}, _items[i]->GetHorizontalAlign(), _items[i]->GetVerticalAlign());
     }
   }
 }
@@ -506,14 +503,11 @@ jsize_t<int> TreeListView::GetScrollDimension()
 {
   jsize_t<int> 
     t = GetSize();
-  int
-    bs = GetTheme().GetIntegerParam("border.size");
-  int
-    // hg = GetTheme().GetIntegerParam("hgap"),
-    vg = GetTheme().GetIntegerParam("vgap");
+  jgui::Border
+    border = GetTheme().GetBorder();
 
   // t.width = t.width;
-  t.height = _items.size()*(GetItemSize() + GetItemGap()) + 2*(vg + bs);
+  t.height = _items.size()*(GetItemSize() + GetItemGap()) + GetVerticalPadding();
 
   return  t;
 }

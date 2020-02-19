@@ -52,33 +52,69 @@ Button::~Button()
   }
 }
 
-void Button::SetText(std::string text)
+void Button::UpdatePreferredSize()
 {
-  _text = text;
+  jsize_t<int> 
+    t = {
+      0, 0
+    };
 
-  Repaint();
-}
+  jgui::Border
+    border = GetTheme().GetBorder();
+  jgui::Font 
+    *font = GetTheme().GetFont();
 
-void Button::SetImage(jgui::Image *image)
-{
   if (_image != nullptr) {
-    delete _image;
-    _image = nullptr;
+    jgui::jsize_t<int>
+      size = _image->GetSize();
+
+    t.width = t.width + size.width;
+    t.height = t.height + size.height;
+
+    if (font != nullptr and GetText().empty() == false) {
+      t.width = t.width + 4;
+    }
   }
 
-  _image = image;
+  if (font != nullptr) {
+    jgui::jfont_extends_t 
+      extends = font->GetStringExtends(GetText());
 
-  Repaint();
+    t.width = t.width + int(extends.size.width - extends.bearing.x);
+    t.height = t.height + int(extends.size.height - extends.bearing.y);
+  }
+
+  SetPreferredSize(t + jgui::jsize_t<int>{GetHorizontalPadding() + 2*border.GetSize(), GetVerticalPadding() + 2*border.GetSize()});
 }
 
-jgui::Image * Button::GetImage()
+void Button::SetText(std::string text)
 {
-  return _image;
+  if (_text != text) {
+    _text = text;
+
+    UpdatePreferredSize();
+    Repaint();
+  }
 }
 
 std::string Button::GetText()
 {
   return _text;
+}
+
+void Button::SetImage(jgui::Image *image)
+{
+  if (_image != image) {
+    _image = image;
+
+    UpdatePreferredSize();
+    Repaint();
+  }
+}
+
+jgui::Image * Button::GetImage()
+{
+  return _image;
 }
 
 void Button::SetHorizontalAlign(jhorizontal_align_t align)
@@ -178,19 +214,21 @@ void Button::Paint(Graphics *g)
     *font = GetTheme().GetFont();
   jgui::jsize_t<int>
     size = GetSize();
+  jgui::Border
+    border = GetTheme().GetBorder();
+  jgui::jinsets_t
+    padding = GetPadding();
   int
-    x = GetTheme().GetIntegerParam("hgap") + GetTheme().GetIntegerParam("border.size"),
-    y = GetTheme().GetIntegerParam("vgap") + GetTheme().GetIntegerParam("border.size"),
-    w = size.width - 2*x,
-    h = size.height - 2*y;
+    w = size.width - GetHorizontalPadding(),
+    h = size.height - GetVerticalPadding();
 
   if (_image != nullptr) {
     jgui::jsize_t<int>
       size = _image->GetSize();
 
-    x = x + size.width + 8;;
+    g->DrawImage(_image, jpoint_t<int>{padding.left, padding.top});
 
-    g->DrawImage(_image, jpoint_t<int>{8, 8});
+    padding.left = padding.left + size.width + 4;
   }
 
   if (font != nullptr) {
@@ -208,7 +246,7 @@ void Button::Paint(Graphics *g)
 
     std::string text = font->TruncateString(GetText(), "...", w);
 
-    g->DrawString(text, {x, y, w, h}, _halign, _valign);
+    g->DrawString(text, {padding.left, padding.top, w, h}, _halign, _valign);
   }
 }
 

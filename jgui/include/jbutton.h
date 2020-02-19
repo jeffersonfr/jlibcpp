@@ -53,6 +53,13 @@ class Button : public Component {
     /** \brief */
     bool _is_pressed;
 
+  private:
+    /**
+     * \brief
+     *
+     */
+    void UpdatePreferredSize();
+
   public:
     /**
      * \brief

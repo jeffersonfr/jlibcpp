@@ -17,63 +17,79 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_THEME_H
-#define J_THEME_H
+#ifndef J_BORDER_H
+#define J_BORDER_H
 
-#include "jcommon/jparammapper.h"
-#include "jgui/jfont.h"
-#include "jgui/jborder.h"
+#include "jgui/jgraphics.h"
+
+#include <vector>
+#include <mutex>
 
 namespace jgui {
+
+enum jborder_style_t {
+  JBS_EMPTY,
+  JBS_LINE,
+  JBS_BEVEL,
+  JBS_ROUND,
+  JBS_RAISED_GRADIENT,
+  JBS_LOWERED_GRADIENT,
+  JBS_RAISED_BEVEL,
+  JBS_LOWERED_BEVEL,
+  JBS_RAISED_ETCHED,
+  JBS_LOWERED_ETCHED
+};
 
 /**
  * \brief
  *
  * \author Jeff Ferr
  */
-class Theme : public virtual jcommon::ParamMapper {
+class Border : public virtual jcommon::Object {
 
   private:
-    std::map<std::string, jgui::Font *> _fonts;
-    Border _border;
+    /** \brief */
+    int _size;
+    /** \brief */
+    jborder_style_t _style;
 
   public:
     /**
      * \brief
      *
      */
-    Theme();
+    Border();
     
     /**
      * \brief
      *
      */
-    virtual ~Theme();
+    virtual ~Border();
 
     /**
      * \brief
      *
      */
-    virtual jgui::Border & GetBorder();
-    
+    void SetSize(int size);
+
     /**
      * \brief
      *
      */
-    virtual void SetBorder(const Border &border);
-    
+    int GetSize();
+
     /**
      * \brief
      *
      */
-    virtual void SetFont(std::string id, jgui::Font *font);
-    
+    void SetStyle(jborder_style_t style);
+
     /**
      * \brief
      *
      */
-    virtual jgui::Font * GetFont(std::string id = std::string("primary"));
-    
+    jborder_style_t GetStyle();
+
 };
 
 }

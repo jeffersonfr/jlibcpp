@@ -110,11 +110,11 @@ void Marquee::Paint(Graphics *g)
     *font = GetTheme().GetFont();
   jgui::jsize_t<int>
     size = GetSize();
+  jgui::Border
+    border = GetTheme().GetBorder();
   int
-    x = GetTheme().GetIntegerParam("hgap") + GetTheme().GetIntegerParam("border.size"),
-    y = GetTheme().GetIntegerParam("vgap") + GetTheme().GetIntegerParam("border.size"),
-    w = size.width - 2*x,
-    h = size.height - 2*y;
+    w = size.width - GetHorizontalPadding(),
+    h = size.height - GetVerticalPadding();
 
   if (font != nullptr) {
     g->SetFont(font);
@@ -138,8 +138,8 @@ void Marquee::Paint(Graphics *g)
     jrect_t 
       clip = g->GetClip();
     int 
-      cx = x,
-      cy = y,
+      cx = GetPadding().left,
+      cy = GetPadding().top,
       cw = w,
       ch = h;
 
@@ -160,7 +160,7 @@ void Marquee::Paint(Graphics *g)
     }
 
     g->ClipRect({cx, cy, cw - 1, ch - 1});
-    g->DrawString(text, jrect_t<int>{x + _position, y, cw, ch});
+    g->DrawString(text, jrect_t<int>{GetPadding().left + _position, GetPadding().top, cw, ch});
     g->SetClip(clip);
   }
 }
@@ -176,26 +176,26 @@ void Marquee::Run()
 
   jgui::jsize_t<int>
     size = GetSize();
-  int 
-    hg = GetTheme().GetIntegerParam("hgap") + GetTheme().GetIntegerParam("border.size");
+  jgui::Border
+    border = GetTheme().GetBorder();
 
   while (_running == true) {
     if (_type == JMM_BOUNCE) {
       int 
         tw = font->GetStringWidth(_text.c_str()),
-        td = (size.width - 2*hg - tw);
+        td = (size.width - GetHorizontalPadding() - tw);
 
       if (td > 0) {
-        td = hg;
+        td = GetHorizontalPadding();
       } else {
-        td = -td + hg;
+        td = -td + GetHorizontalPadding();
       }
 
       _position = _position - _step;
 
       if (_position < -td) {
         _step = -_step;
-      } else if (_position > (size.width - 2*hg - tw + td)) {
+      } else if (_position > (size.width - GetHorizontalPadding() - tw + td)) {
         _step = -_step;
       }
     } else {
@@ -208,7 +208,7 @@ void Marquee::Run()
       _position = _position - _step;
 
       if (_position <= -width) {
-        _position = size.width - 2*hg;
+        _position = size.width - GetHorizontalPadding();
       }
     }
 

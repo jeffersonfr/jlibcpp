@@ -17,66 +17,45 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_THEME_H
-#define J_THEME_H
-
-#include "jcommon/jparammapper.h"
-#include "jgui/jfont.h"
 #include "jgui/jborder.h"
 
 namespace jgui {
 
-/**
- * \brief
- *
- * \author Jeff Ferr
- */
-class Theme : public virtual jcommon::ParamMapper {
+Border::Border()
+{
+  jcommon::Object::SetClassName("jgui::Border");
 
-  private:
-    std::map<std::string, jgui::Font *> _fonts;
-    Border _border;
-
-  public:
-    /**
-     * \brief
-     *
-     */
-    Theme();
-    
-    /**
-     * \brief
-     *
-     */
-    virtual ~Theme();
-
-    /**
-     * \brief
-     *
-     */
-    virtual jgui::Border & GetBorder();
-    
-    /**
-     * \brief
-     *
-     */
-    virtual void SetBorder(const Border &border);
-    
-    /**
-     * \brief
-     *
-     */
-    virtual void SetFont(std::string id, jgui::Font *font);
-    
-    /**
-     * \brief
-     *
-     */
-    virtual jgui::Font * GetFont(std::string id = std::string("primary"));
-    
-};
-
+  _size = 1;
+  _style = JBS_LINE;
 }
 
-#endif
+Border::~Border()
+{
+}
+
+void Border::SetSize(int size)
+{
+  _size = size;
+
+  if (_size < 0) {
+    _size = 0;
+  }
+}
+
+int Border::GetSize()
+{
+  return _size;
+}
+
+void Border::SetStyle(jborder_style_t style)
+{
+  _style = style;
+}
+
+jborder_style_t Border::GetStyle()
+{
+  return _style;
+}
+
+}
 

@@ -59,7 +59,7 @@ Window::Window(jgui::jsize_t<int> size, jgui::jpoint_t<int> point):
 
   _event_manager = new EventManager(this);
 
-  GetTheme().SetIntegerParam("border.style", JCB_RAISED_GRADIENT);
+  GetTheme().GetBorder().SetStyle(JBS_RAISED_GRADIENT);
   GetTheme().SetFont("primary", &jgui::Font::BIG);
 
   SetInsets({8, 8, 8, 8});

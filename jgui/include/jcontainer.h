@@ -236,18 +236,6 @@ class Container : public jgui::Component {
      * \brief
      *
      */
-    void PaintBackground(Graphics *g);
-
-    /**
-     * \brief
-     *
-     */
-    void PaintBorders(Graphics *g);
-
-    /**
-     * \brief
-     *
-     */
     virtual void Paint(Graphics *g);
     
     /**

@@ -126,11 +126,11 @@ bool Slider::MousePressed(jevent::MouseEvent *event)
     elocation = event->GetLocation();
   jgui::jsize_t<int>
     size = GetSize();
+  jgui::Border
+    border = GetTheme().GetBorder();
   int
-    dx = GetTheme().GetIntegerParam("hgap") + GetTheme().GetIntegerParam("border.size"),
-    dy = GetTheme().GetIntegerParam("vgap") + GetTheme().GetIntegerParam("border.size"),
-    dw = size.width - 2*dx - _stone_size,
-    dh = size.height - 2*dy - _stone_size;
+    dw = size.width - GetHorizontalPadding() - _stone_size,
+    dh = size.height - GetVerticalPadding() - _stone_size;
   bool 
     catched = false;
 
@@ -143,11 +143,11 @@ bool Slider::MousePressed(jevent::MouseEvent *event)
 
         _pressed = false;
 
-        if (elocation.x > (dx) && elocation.x < (dx+d)) {
+        if (elocation.x > GetPadding().left && elocation.x < (GetPadding().left+d)) {
           SetValue(_value-_maximum_tick);
-        } else if (elocation.x > (dx+d+_stone_size) && elocation.x < (size.width)) {
+        } else if (elocation.x > (GetPadding().left+d+_stone_size) && elocation.x < (size.width)) {
           SetValue(_value+_maximum_tick);
-        } else if (elocation.x > (dx+d) && elocation.x < (dx+d+_stone_size)) {
+        } else if (elocation.x > (GetPadding().left+d) && elocation.x < (GetPadding().left+d+_stone_size)) {
           _pressed = true;
         }
       }
@@ -157,9 +157,9 @@ bool Slider::MousePressed(jevent::MouseEvent *event)
 
         _pressed = false;
 
-        if (elocation.y > (dy) && elocation.y < (dy+d)) {
+        if (elocation.y > GetPadding().top && elocation.y < (GetPadding().top+d)) {
           SetValue(_value-_maximum_tick);
-        } else if (elocation.y > (dy+d+_stone_size) && elocation.y < (size.height)) {
+        } else if (elocation.y > (GetPadding().top+d+_stone_size) && elocation.y < (size.height)) {
           SetValue(_value+_maximum_tick);
         }
       }
@@ -191,11 +191,11 @@ bool Slider::MouseMoved(jevent::MouseEvent *event)
     elocation = event->GetLocation();
   jgui::jsize_t<int>
     size = GetSize();
+  jgui::Border
+    border = GetTheme().GetBorder();
   int
-    dx = GetTheme().GetIntegerParam("hgap") + GetTheme().GetIntegerParam("border.size"),
-    dy = GetTheme().GetIntegerParam("vgap") + GetTheme().GetIntegerParam("border.size"),
-    dw = size.width - 2*dx - _stone_size,
-    dh = size.height - 2*dy - _stone_size;
+    dw = size.width - GetHorizontalPadding() - _stone_size,
+    dh = size.height - GetVerticalPadding() - _stone_size;
 
   if (_pressed == true) {
     int diff = GetMaximum()-GetMinimum();
@@ -233,11 +233,11 @@ void Slider::Paint(Graphics *g)
 
   jgui::jsize_t<int>
     size = GetSize();
+  jgui::Border
+    border = GetTheme().GetBorder();
   int
-    x = GetTheme().GetIntegerParam("hgap") + GetTheme().GetIntegerParam("border.size"),
-    y = GetTheme().GetIntegerParam("vgap") + GetTheme().GetIntegerParam("border.size"),
-    w = size.width - 2*x,
-    h = size.height - 2*y;
+    w = size.width - GetHorizontalPadding(),
+    h = size.height - GetVerticalPadding();
 
   if (_type == JSO_HORIZONTAL) {
     int 
@@ -253,7 +253,7 @@ void Slider::Paint(Graphics *g)
       g->SetColor(GetTheme().GetIntegerParam("scroll"));
     }
     
-    g->FillRectangle({x, (h-4)/2+y, w, 4});
+    g->FillRectangle({GetPadding().left, GetPadding().top+(h-4)/2, w, 4});
 
     if (_inverted == false) {
       std::vector<jgui::jpoint_t<int>> p = {
@@ -264,7 +264,7 @@ void Slider::Paint(Graphics *g)
         {0, (int)(h*0.4)}
       };
 
-      g->FillPolygon({(int)d+x, y}, p, 5);
+      g->FillPolygon({(int)d+GetPadding().left, GetPadding().top}, p, 5);
     } else {
       std::vector<jgui::jpoint_t<int>> p = {
         {_stone_size/2, 0},
@@ -274,7 +274,7 @@ void Slider::Paint(Graphics *g)
         {0, (int)(h*0.6)}
       };
 
-      g->FillPolygon({(int)d+x, y}, p);
+      g->FillPolygon({(int)d+GetPadding().left, GetPadding().top}, p);
     }
   } else if (_type == JSO_VERTICAL) {
     int 
@@ -290,7 +290,7 @@ void Slider::Paint(Graphics *g)
       g->SetColor(GetTheme().GetIntegerParam("scroll"));
     }
     
-    g->FillRectangle({(w-10)/2+x, y, 10, h});
+    g->FillRectangle({(w-10)/2+GetPadding().left, GetPadding().top, 10, h});
 
     if (_inverted == false) {
       std::vector<jgui::jpoint_t<int>> p = {
@@ -301,7 +301,7 @@ void Slider::Paint(Graphics *g)
         {0, _stone_size}
       };
 
-      g->FillPolygon({x, (int)d+y}, p);
+      g->FillPolygon({GetPadding().left, (int)d+GetPadding().top}, p);
     } else {
       std::vector<jgui::jpoint_t<int>> p = {
         {0, _stone_size/2},
@@ -311,7 +311,7 @@ void Slider::Paint(Graphics *g)
         {(int)(size.width*0.6), _stone_size}
       };
 
-      g->FillPolygon({x, (int)d+y}, p);
+      g->FillPolygon({GetPadding().left, (int)d+GetPadding().top}, p);
     }
   }
 }

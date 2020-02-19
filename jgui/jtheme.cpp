@@ -49,21 +49,25 @@ Theme::Theme():
   SetIntegerParam("scroll.disable", 0xff404040);
   SetIntegerParam("scroll.select", 0xff404040);
 
-  SetIntegerParam("border.style", JCB_LINE);
-  SetIntegerParam("border.size", 1);
-  
   SetIntegerParam("scroll.size", 16);
   SetIntegerParam("scroll.gap", 4);
   
-  SetIntegerParam("hgap", 0);
-  SetIntegerParam("vgap", 0);
-
   SetFont("primary", &Font::SMALL);
   SetFont("secondary", &Font::TINY);
 }
 
 Theme::~Theme()
 {
+}
+
+jgui::Border & Theme::GetBorder()
+{
+  return _border;
+}
+
+void Theme::SetBorder(const Border &border)
+{
+  _border = border;
 }
 
 jgui::Font * Theme::GetFont(std::string id)

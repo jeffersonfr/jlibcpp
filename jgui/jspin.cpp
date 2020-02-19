@@ -149,11 +149,10 @@ bool Spin::MousePressed(jevent::MouseEvent *event)
     elocation = event->GetLocation();
   jgui::jsize_t<int>
     size = GetSize();
+  jgui::Border
+    border = GetTheme().GetBorder();
   int
-    x = GetTheme().GetIntegerParam("hgap") + GetTheme().GetIntegerParam("border.size"),
-    y = GetTheme().GetIntegerParam("vgap") + GetTheme().GetIntegerParam("border.size"),
-    // w = size.width - 2*x,
-    h = size.height - 2*y;
+    h = size.height - GetVerticalPadding();
   bool 
     catched = false;
 
@@ -172,18 +171,18 @@ bool Spin::MousePressed(jevent::MouseEvent *event)
     RequestFocus();
 
     if (_type == JSO_HORIZONTAL) {
-      if (elocation.y > (y) && elocation.y < (y+size.height)) {
-        if (elocation.x > (size.width-arrow_size-x) && elocation.x < (size.width-x)) {
+      if (elocation.y > GetPadding().top && elocation.y < (GetPadding().top+size.height)) {
+        if (elocation.x > (size.width-arrow_size-GetPadding().left) && elocation.x < (size.width-GetPadding().left)) {
           NextItem();
-        } else if (elocation.x > (x) && elocation.x < (x+arrow_size)) {
+        } else if (elocation.x > GetPadding().left && elocation.x < (GetPadding().left+arrow_size)) {
           PreviousItem();
         }
       }
     } else if (_type == JSO_VERTICAL) {
-      if (elocation.x > (size.width-2*arrow_size-x) && elocation.x < (size.width-x)) {
-        if (elocation.y > (y) && elocation.y < (h/2)) {
+      if (elocation.x > (size.width-2*arrow_size-GetPadding().left) && elocation.x < (size.width-GetPadding().left)) {
+        if (elocation.y > GetPadding().top && elocation.y < (h/2)) {
           PreviousItem();
-        } else if (elocation.y > (y+h/2) && elocation.y < (y+h)) {
+        } else if (elocation.y > (GetPadding().top+h/2) && elocation.y < (GetPadding().top+h)) {
           NextItem();
         }
       }
@@ -279,11 +278,11 @@ void Spin::Paint(Graphics *g)
     *font = GetTheme().GetFont();
   jgui::jsize_t<int>
     size = GetSize();
+  jgui::Border
+    border = GetTheme().GetBorder();
   int
-    x = GetTheme().GetIntegerParam("hgap") + GetTheme().GetIntegerParam("border.size"),
-    y = GetTheme().GetIntegerParam("vgap") + GetTheme().GetIntegerParam("border.size"),
-    w = size.width - 2*x,
-    h = size.height - 2*y;
+    w = size.width - GetHorizontalPadding(),
+    h = size.height - GetVerticalPadding();
   int
     arrow_size = 8;
 
@@ -297,7 +296,7 @@ void Spin::Paint(Graphics *g)
         g->SetColor(GetTheme().GetIntegerParam("fg"));
       }
 
-      g->FillTriangle({w, y + arrow_size + offset}, {x + w - arrow_size, y + offset}, {x + w - arrow_size, y + 2*arrow_size + offset});
+      g->FillTriangle({w, GetPadding().top + arrow_size + offset}, {GetPadding().left + w - arrow_size, GetPadding().top + offset}, {GetPadding().left + w - arrow_size, GetPadding().top + 2*arrow_size + offset});
     }
 
     if (_loop == true || (_index > 0 && _items.size() > 0)) {
@@ -307,7 +306,7 @@ void Spin::Paint(Graphics *g)
         g->SetColor(GetTheme().GetIntegerParam("fg"));
       }
 
-      g->FillTriangle({x, y + arrow_size + offset}, {x + arrow_size, y + offset}, {x + arrow_size, y + 2*arrow_size + offset});
+      g->FillTriangle({GetPadding().left, GetPadding().top + arrow_size + offset}, {GetPadding().left + arrow_size, GetPadding().top + offset}, {GetPadding().left + arrow_size, GetPadding().top + 2*arrow_size + offset});
     }
 
     if (_items.size() > 0) {
@@ -330,7 +329,7 @@ void Spin::Paint(Graphics *g)
           text = font->TruncateString(text, "...", w);
         // }
 
-        g->DrawString(text, {x, y, w, h}, _items[_index]->GetHorizontalAlign(), _items[_index]->GetVerticalAlign());
+        g->DrawString(text, {GetPadding().left, GetPadding().top, w, h}, _items[_index]->GetHorizontalAlign(), _items[_index]->GetVerticalAlign());
       }
     }
   } else if (_type == JSO_VERTICAL) {
@@ -344,7 +343,7 @@ void Spin::Paint(Graphics *g)
       }
     }
 
-    g->FillTriangle({size.width - 2*arrow_size - x, y + arrow_size + offset}, {size.width - x, y + arrow_size + offset}, {size.width - arrow_size - x, y + offset});
+    g->FillTriangle({size.width - 2*arrow_size - GetPadding().left, GetPadding().top + arrow_size + offset}, {size.width - GetPadding().left, GetPadding().top + arrow_size + offset}, {size.width - arrow_size - GetPadding().left, GetPadding().top + offset});
 
     if (_loop == true || (_index > 0 && _items.size() > 0)) {
       if (HasFocus() == true) {
@@ -354,7 +353,7 @@ void Spin::Paint(Graphics *g)
       }
     }
 
-    g->FillTriangle({size.width - 2*arrow_size - x, y + arrow_size + size.height/2}, {size.width - x, y + arrow_size + size.height/2}, {size.width - arrow_size - x, y + size.height - offset});
+    g->FillTriangle({size.width - 2*arrow_size - GetPadding().left, GetPadding().top + arrow_size + size.height/2}, {size.width - GetPadding().left, GetPadding().top + arrow_size + size.height/2}, {size.width - arrow_size - GetPadding().left, GetPadding().top + size.height - offset});
 
 
     if (_items.size() > 0) {
@@ -377,7 +376,7 @@ void Spin::Paint(Graphics *g)
           text = font->TruncateString(text, "...", w);
         // }
 
-        g->DrawString(text, {x, y, w, h}, _items[_index]->GetHorizontalAlign(), _items[_index]->GetVerticalAlign());
+        g->DrawString(text, {GetPadding().left, GetPadding().top, w, h}, _items[_index]->GetHorizontalAlign(), _items[_index]->GetVerticalAlign());
       }
     }
   }

@@ -89,13 +89,13 @@ void Panel::PaintGlassPane(Graphics *g)
     size = GetSize();
   jinsets_t<int>
     insets = GetInsets();
-  int 
-    bs = GetTheme().GetIntegerParam("border.size");
+  jgui::Border
+    border = GetTheme().GetBorder();
 
   if (_title != "") {
     g->SetGradientStop(0.0, GetTheme().GetIntegerParam("bg"));
     g->SetGradientStop(1.0, GetTheme().GetIntegerParam("scroll"));
-    g->FillLinearGradient({bs, bs, size.width - 2*bs, insets.top - 2*bs}, {0, 0}, {0, insets.top - 2*bs});
+    g->FillLinearGradient({0, 0, size.width, insets.top}, {0, 0}, {0, insets.top});
     g->ResetGradientStop();
 
     if (font != nullptr) {

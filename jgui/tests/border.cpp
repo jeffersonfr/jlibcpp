@@ -39,7 +39,7 @@ class BorderTest : public jgui::Window {
 
 	public:
 		BorderTest():
-			jgui::Window({720, 480})
+			jgui::Window({960, 540})
 		{
 			_buttons.push_back(new jgui::Button("Empty"));
 			_buttons.push_back(new jgui::Button("Line"));
@@ -59,8 +59,10 @@ class BorderTest : public jgui::Window {
 			for (int i=0; i<(int)_buttons.size(); i++) {
         jgui::Component *cmp = _buttons[i];
 
-			  cmp->GetTheme().SetIntegerParam("border.style", jgui::jcomponent_border_t(i));
-			  cmp->GetTheme().SetIntegerParam("border.size", 8);
+        cmp->SetPadding({16, 16, 16, 16});
+
+			  cmp->GetTheme().GetBorder().SetSize(8);
+			  cmp->GetTheme().GetBorder().SetStyle(jgui::jborder_style_t(i));
 
         if (i < (int)_buttons.size()/2) {
   				_top.Add(cmp);

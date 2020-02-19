@@ -44,6 +44,13 @@ class Text : public jgui::Component {
     /** \brief */
     bool _is_wrap;
 
+  private:
+    /**
+     * \brief
+     *
+     */
+    void UpdatePreferredSize();
+
   public:
     /**
      * \brief
@@ -105,12 +112,6 @@ class Text : public jgui::Component {
      */
     virtual  jvertical_align_t GetVerticalAlign();
     
-    /**
-     * \brief
-     *
-     */
-    virtual jsize_t<int> GetPreferredSize();
-
     /**
      * \brief
      *
