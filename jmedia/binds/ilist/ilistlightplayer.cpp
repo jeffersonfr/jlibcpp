@@ -116,6 +116,10 @@ class IlistPlayerComponentImpl : public jgui::Component {
       jgui::jsize_t<int>
         size = GetSize();
 
+	    g->SetAntialias(jgui::JAM_NONE);
+	    g->SetCompositeFlags(jgui::JCF_SRC);
+	    g->SetBlittingFlags(jgui::JBF_NEAREST);
+
       if (_src.point.x == 0 and _src.point.y == 0 and _src.size.width == _frame_size.width and _src.size.height == _frame_size.height) {
 			  g->DrawImage(_image, {0, 0, size.width, size.height});
       } else {

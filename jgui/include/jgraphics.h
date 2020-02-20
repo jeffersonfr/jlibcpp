@@ -78,6 +78,17 @@ enum jpixelformat_t {
  * \brief
  *
  */
+enum jantialias_mode_t {
+  JAM_NONE,
+  JAM_FAST,
+  JAM_NORMAL,
+  JAM_GOOD
+};
+
+/**
+ * \brief
+ *
+ */
 enum jcomposite_flags_t {
   // INFO:: Composition Modes
   //
@@ -120,11 +131,13 @@ enum jcomposite_flags_t {
  * \brief
  *
  */
-enum jantialias_mode_t {
-  JAM_NONE,
-  JAM_FAST,
-  JAM_NORMAL,
-  JAM_GOOD
+enum jblitting_flags_t {
+  JBF_FAST,
+  JBF_GOOD,
+  JBF_BEST,
+  JBF_NEAREST,
+  JBF_BILINEAR,
+  JBF_GAUSSIAN,
 };
 
 /**
@@ -228,6 +241,8 @@ class Graphics : public virtual jcommon::Object {
     struct jrect_t<int> _internal_clip;
     /** \brief */
     jcomposite_flags_t _composite_flags;
+    /** \brief */
+    jblitting_flags_t _blitting_flags;
     /** \brief */
     jpixelformat_t _pixelformat;
     /** \brief */
@@ -363,6 +378,18 @@ class Graphics : public virtual jcommon::Object {
      *
      */
     virtual void SetCompositeFlags(jcomposite_flags_t t);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual jblitting_flags_t GetBlittingFlags();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetBlittingFlags(jblitting_flags_t t);
     
     /**
      * \brief

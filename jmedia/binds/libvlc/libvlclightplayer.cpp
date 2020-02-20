@@ -167,11 +167,6 @@ class LibvlcPlayerComponentImpl : public jgui::Component {
 			return _frame_size;
 		}
 
-		virtual void UpdateComponent()
-		{
-      Repaint();
-		}
-
 		virtual void Paint(jgui::Graphics *g)
 		{
 			// jgui::Component::Paint(g);
@@ -186,6 +181,8 @@ class LibvlcPlayerComponentImpl : public jgui::Component {
 			_player->DispatchFrameGrabberEvent(new jevent::FrameGrabberEvent(image, jevent::JFE_GRABBED));
 
 	    g->SetAntialias(jgui::JAM_NONE);
+	    g->SetCompositeFlags(jgui::JCF_SRC);
+	    g->SetBlittingFlags(jgui::JBF_NEAREST);
 
       if (_src.point.x == 0 and _src.point.y == 0 and _src.size.width == _frame_size.width and _src.size.height == _frame_size.height) {
 			  g->DrawImage(image, {0, 0, size.width, size.height});
@@ -225,7 +222,7 @@ static void UnlockMediaSurface(void *data, void *id, void *const *p_pixels)
 
 static void DisplayMediaSurface(void *data, void *id)
 {
-	reinterpret_cast<LibvlcPlayerComponentImpl *>(data)->UpdateComponent();
+	reinterpret_cast<LibvlcPlayerComponentImpl *>(data)->Repaint();
 }
 
 static void MediaEventsCallback(const libvlc_event_t *event, void *data)
@@ -586,7 +583,7 @@ LibVLCLightPlayer::LibVLCLightPlayer(jnetwork::URL url):
       libvlc_media_player_pause(_provider);
 
       // waits 5 seconds to get video size
-      for (int i=0; i<50; i++) {
+      for (int i=0; i<5*10; i++) {
         libvlc_video_get_size(_provider, 0, &iw, &ih);
 
         if (iw > 0 && ih > 0) {
@@ -706,7 +703,7 @@ LibVLCLightPlayer::~LibVLCLightPlayer()
 
 	_controls.clear();
 
-	libvlc_release(_engine);
+	// libvlc_release(_engine);
 }
 
 void LibVLCLightPlayer::Run()

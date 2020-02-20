@@ -1187,16 +1187,18 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return (((point.x > (param.point.x + param.size.width)) or ((point.x + size.width) < param.point.x) or (point.y > (param.point.y + param.size.height)) or ((point.y + size.height) < param.point.y)) == 0);
     }
 
-    template<typename U> jrect_t<T> Intersection(const jrect_t<U> &param) const
+    template<typename U> jrect_t<typename std::common_type<T, U>::type> Intersection(const jrect_t<U> &param) const
     {
-      int 
-        left = std::max(point.x, param.point.x),
-        top = std::max(point.y, param.point.y),
-        right = std::min(point.x + size.width, param.point.x + param.size.width),
-        bottom = std::min(point.y + size.height, param.point.y + param.size.height);
+      jinsets_t<typename std::common_type<T, U>::type>
+        insets {
+          .left = std::max(point.x, param.point.x),
+          .top = std::max(point.y, param.point.y),
+          .right = std::min(point.x + size.width, param.point.x + param.size.width),
+          .bottom = std::min(point.y + size.height, param.point.y + param.size.height)
+        };
 
-      if (right > left and bottom > top) {
-        return {{left, top}, {right - left, bottom - top}};
+      if (insets.right > insets.left and insets.bottom > insets.top) {
+        return {{insets.left, insets.top}, {insets.right - insets.left, insets.bottom - insets.top}};
       }
 
       return {0, 0, 0, 0};

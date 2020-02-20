@@ -1,5 +1,6 @@
 #include "jgui/japplication.h"
 #include "jgui/jwindow.h"
+#include "jgui/jbufferedimage.h"
 
 const jgui::jsize_t<int> SCREEN_SIZE = {
   .width = 640,
@@ -18,22 +19,22 @@ const float GRAVITY = 1.6;
 const float INITIAL_VELOCITY = 32;
 
 const std::vector<std::string> scene = {
-  "################################################",
-  "#..............................................#",
-  "#..............................................#",
-  "#..............................................#",
-  "#..............................................#",
-  "#..............................................#",
-  "#..............................................#",
-  "#..............................................#",
-  "#.......#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#........#",
-  "#......#...............................#.......#",
-  "#.....#.................................#......#",
-  "#....#...................................#.....#",
-  "#...#.....................................#....#",
-  "#..#.......................................#...#",
-  "#.#.........................................#..#",
-  "################################################",
+  "................................................",
+  "................................................",
+  "................................................",
+  "................................................",
+  "................................................",
+  "................................................",
+  "................................................",
+  "................................................",
+  "........#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.#.........",
+  ".......#...............................#........",
+  "......#.................................#.......",
+  ".....#...................................#......",
+  "....#.....................................#.....",
+  "...#.......................................#....",
+  "..#.........................................#...",
+  "________________________________________________",
 };
 
 class Dummy : public jgui::Window {
@@ -75,9 +76,19 @@ class Dummy : public jgui::Window {
       return true;
     }
 
+    bool Collide(const jgui::jrect_t<int> &r1, const jgui::jrect_t<int> &r2)
+    {
+      return r1.Intersects(r2);
+    }
+
     virtual void Paint(jgui::Graphics *g) 
     {
+      static jgui::Image *tiles = new jgui::BufferedImage("images/mario.png");
+
       jgui::Window::Paint(g);
+
+      jgui::jpoint_t
+        old_player_position = _player_position;
 
       if (_keys[jevent::JKS_SPACE]) {
         if (_v == 0.0) {
@@ -131,17 +142,32 @@ class Dummy : public jgui::Window {
       }
 
       // draw scene
+      g->SetCompositeFlags(jgui::JCF_SRC);
+      g->SetBlittingFlags(jgui::JBF_NEAREST);
+
       for (int j=0; j<(int)scene.size(); j++) {
         for (int i=0; i<(int)scene[j].size(); i++) {
+          jgui::jrect_t<int>
+            src {
+              .point = {0, 0},
+              .size = {0, 0}
+            },
+            dst {
+              .point = {i*BLOCK_SIZE.width - offset.x, j*BLOCK_SIZE.height - offset.y}, 
+              .size = BLOCK_SIZE
+            };
+
           char block = scene[j][i];
 
           if (block == '.') {
-            g->SetColor(jgui::jcolor_name_t::Red);
-            g->FillRectangle({i*BLOCK_SIZE.width - offset.x, j*BLOCK_SIZE.height - offset.y, BLOCK_SIZE});
+            src = {81, 423, 16, 16};
           } else if (block == '#') {
-            g->SetColor(jgui::jcolor_name_t::Blue);
-            g->FillRectangle({i*BLOCK_SIZE.width - offset.x, j*BLOCK_SIZE.height - offset.y, BLOCK_SIZE});
+            src = {123, 516, 16, 16};
+          } else if (block == '_') {
+            src = {444, 202, 16, 16};
           }
+            
+          g->DrawImage(tiles, src, dst);
         }
       }
 

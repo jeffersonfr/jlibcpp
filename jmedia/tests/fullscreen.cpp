@@ -28,6 +28,8 @@
 
 #define CLIP(x) ((x < 0) ? 0.0 : (x > 1.0) ? 1.0 : x)
 
+uint8_t grayPixels[7680*4320]; // width*height (8k)
+
 class PlayerTest : public jgui::Window, public jevent::PlayerListener, public jevent::FrameGrabberListener {
 
 	private:
@@ -226,8 +228,15 @@ class PlayerTest : public jgui::Window, public jevent::PlayerListener, public je
 
 		virtual void FrameGrabbed(jevent::FrameGrabberEvent *event)
 		{
-			jgui::Image *image = reinterpret_cast<jgui::BufferedImage *>(event->GetSource());
+			jgui::Image *image = reinterpret_cast<jgui::Image *>(event->GetSource());
+      jgui::Graphics *g = image->GetGraphics();
 
+      if (g != nullptr) {
+        g->SetColor(jgui::jcolor_name_t::Red);
+        g->FillRectangle({64, 64, 128, 128});
+      }
+
+      /*
       jgui::jsize_t<int> size = image->GetSize();
       uint8_t grayPixels[size.width*size.height];
 
@@ -291,6 +300,7 @@ class PlayerTest : public jgui::Window, public jevent::PlayerListener, public je
       image->GetGraphics()->DrawImage(flipped, jgui::jpoint_t<int>{0, 0});
 
       delete flipped;
+      */
 		}
 
 		virtual void MediaStarted(jevent::PlayerEvent *event)

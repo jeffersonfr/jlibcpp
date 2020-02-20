@@ -121,17 +121,23 @@ class LibavPlayerComponentImpl : public jgui::Component {
         return;
       }
 
-      jgui::BufferedImage image(_surface);
+      jgui::Image *image = new jgui::BufferedImage(_surface);
 
-			_player->DispatchFrameGrabberEvent(new jevent::FrameGrabberEvent(&image, jevent::JFE_GRABBED));
+			_player->DispatchFrameGrabberEvent(new jevent::FrameGrabberEvent(image, jevent::JFE_GRABBED));
 
 			cairo_surface_mark_dirty(_surface);
 
+	    g->SetAntialias(jgui::JAM_NONE);
+	    g->SetCompositeFlags(jgui::JCF_SRC);
+	    g->SetBlittingFlags(jgui::JBF_NEAREST);
+
       if (_src.point.x == 0 and _src.point.y == 0 and _src.size.width == _frame_size.width and _src.size.height == _frame_size.height) {
-			  g->DrawImage(&image, {0, 0, size.width, size.height});
+			  g->DrawImage(image, {0, 0, size.width, size.height});
       } else {
-			  g->DrawImage(&image, _src, {0, 0, size.width, size.height});
+			  g->DrawImage(image, _src, {0, 0, size.width, size.height});
       }
+
+      delete image;
 
       cairo_surface_destroy(_surface);
 

@@ -37,7 +37,7 @@ class BufferedImage : public virtual jgui::Image {
     /** \brief */
     Graphics *_graphics;
     /** \brief */
-    std::mutex _mutex;
+    std::recursive_mutex _mutex;
     /** \brief */
     cairo_surface_t *_cairo_surface;
 

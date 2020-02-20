@@ -81,6 +81,8 @@ Graphics::Graphics(cairo_surface_t *surface):
     cairo_image_surface_get_height(surface)
   };
 
+  _internal_clip = _clip;
+
   _cairo_context = cairo_create(_cairo_surface);
 
   SetAntialias(JAM_NORMAL);
@@ -88,6 +90,7 @@ Graphics::Graphics(cairo_surface_t *surface):
   SetColor(0x00000000);
   ResetGradientStop();
   SetCompositeFlags(JCF_SRC_OVER);
+  SetBlittingFlags(JBF_BILINEAR);
 }
 
 Graphics::~Graphics()
@@ -247,6 +250,34 @@ void Graphics::SetCompositeFlags(jcomposite_flags_t t)
 jcomposite_flags_t Graphics::GetCompositeFlags()
 {
   return _composite_flags;
+}
+
+jblitting_flags_t Graphics::GetBlittingFlags()
+{
+  return _blitting_flags;
+}
+
+void Graphics::SetBlittingFlags(jblitting_flags_t t)
+{
+  cairo_filter_t o = CAIRO_FILTER_FAST;
+
+  _blitting_flags = t;
+
+  if (_blitting_flags == JBF_FAST) {
+    o = CAIRO_FILTER_FAST;
+  } else  if (_blitting_flags == JBF_GOOD) {
+    o = CAIRO_FILTER_GOOD;
+  } else  if (_blitting_flags == JBF_BEST) {
+    o = CAIRO_FILTER_BEST;
+  } else  if (_blitting_flags == JBF_NEAREST) {
+    o = CAIRO_FILTER_NEAREST;
+  } else  if (_blitting_flags == JBF_BILINEAR) {
+    o = CAIRO_FILTER_BILINEAR;
+  } else  if (_blitting_flags == JBF_GAUSSIAN) {
+    o = CAIRO_FILTER_GAUSSIAN;
+  }
+
+  cairo_pattern_set_filter(cairo_get_source(_cairo_context), o);
 }
 
 void Graphics::Clear()
@@ -1144,6 +1175,7 @@ void Graphics::FillLinearGradient(jrect_t<int> rect, jpoint_t<int> p0, jpoint_t<
   cairo_pattern_destroy(pattern);
   
   SetCompositeFlags(_composite_flags);
+  SetBlittingFlags(_blitting_flags);
 }
 
 void Graphics::DrawString(std::string text, jpoint_t<int> point)
@@ -1842,13 +1874,19 @@ bool Graphics::DrawImage(Image *img, jpoint_t<int> point)
   Graphics *g = img->GetGraphics();
 
   if (g != nullptr) {
-    struct jpoint_t<int> t = Translate();
+    jgui::jsize_t<int> isize = img->GetSize();
+    jgui::jpoint_t<int> t = Translate();
 
     cairo_surface_t *cairo_surface = g->GetCairoSurface();
 
     cairo_save(_cairo_context);
-    cairo_set_source_surface(_cairo_context, cairo_surface, point.x + t.x, point.y + t.y);
-    cairo_paint(_cairo_context);
+    cairo_translate(_cairo_context, point.x + t.x, point.y + t.y);
+    cairo_set_source_surface(_cairo_context, cairo_surface, 0, 0);
+  
+    SetBlittingFlags(_blitting_flags);
+  	
+    cairo_rectangle(_cairo_context, 0, 0, isize.width, isize.height);
+  	cairo_fill(_cairo_context);
     cairo_restore(_cairo_context);
   } else {
     jsize_t<int> size = img->GetSize();
@@ -1871,22 +1909,23 @@ bool Graphics::DrawImage(Image *img, jrect_t<int> dst)
   Graphics *g = img->GetGraphics();
 
   if (g != nullptr) {
-    struct jpoint_t<int> t = Translate();
-
-    cairo_surface_t *cairo_surface = g->GetCairoSurface();
-
     jgui::jsize_t<int> isize = img->GetSize();
+    jgui::jpoint_t<int> t = Translate();
 
     float dx = dst.size.width/(float)isize.width;
     float dy = dst.size.height/(float)isize.height;
-    
+
     cairo_save(_cairo_context);
-    cairo_translate(_cairo_context, dst.point.x + t.x, dst.point.y + t.y);
+    cairo_surface_t *cairo_surface = g->GetCairoSurface();
+		cairo_translate(_cairo_context, dst.point.x + t.x, dst.point.y + t.y);
     cairo_scale(_cairo_context, dx, dy);
     cairo_set_source_surface(_cairo_context, cairo_surface, 0, 0);
-    cairo_paint(_cairo_context);
-    //cairo_rectangle(_cairo_context, 0, 0, dst.size.width, dst.size.height);
-    //cairo_fill(_cairo_context);
+    
+    SetBlittingFlags(_blitting_flags);
+    
+    cairo_scale(_cairo_context, 1.0f/dx, 1.0f/dy);
+  	cairo_rectangle(_cairo_context, 0, 0, dst.size.width, dst.size.height);
+  	cairo_fill(_cairo_context);
     cairo_restore(_cairo_context);
   } else {
     jgui::Image *scl = img->Scale(dst.size);
@@ -1927,29 +1966,21 @@ bool Graphics::DrawImage(Image *img, jrect_t<int> src, jrect_t<int> dst)
   if (g != nullptr) {
     struct jpoint_t<int> t = Translate();
 
-    cairo_surface_t *cairo_surface = g->GetCairoSurface();
-
     float dx = dst.size.width/(float)src.size.width;
     float dy = dst.size.height/(float)src.size.height;
 
+    cairo_surface_t *cairo_surface = g->GetCairoSurface();
+
     cairo_save(_cairo_context);
-
-    // crop
-    cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, src.size.width, src.size.height);
-    cairo_t *context = cairo_create(surface);
-
-    cairo_set_source_surface(context, cairo_surface, -src.point.x, -src.point.y);
-    cairo_paint(context);
-
-    // scale
-    cairo_translate(_cairo_context, dst.point.x + t.x, dst.point.y + t.y);
+		cairo_translate(_cairo_context, dst.point.x + t.x, dst.point.y + t.y);
     cairo_scale(_cairo_context, dx, dy);
-    cairo_set_source_surface(_cairo_context, surface, 0, 0);
-    cairo_paint(_cairo_context);
+    cairo_set_source_surface(_cairo_context, cairo_surface, -src.point.x, -src.point.y);
 
-    cairo_surface_destroy(surface);
-    cairo_destroy(context);
+    SetBlittingFlags(_blitting_flags);
 
+    cairo_scale(_cairo_context, 1.0f/dx, 1.0f/dy);
+  	cairo_rectangle(_cairo_context, 0, 0, dst.size.width, dst.size.height);
+  	cairo_fill(_cairo_context);
     cairo_restore(_cairo_context);
   } else {
     jgui::Image *aux = img->Crop({src.point, src.size});
@@ -2162,6 +2193,8 @@ void Graphics::SetSource(Image *image)
   }
 
   cairo_set_source_surface(_cairo_context, image->GetGraphics()->GetCairoSurface(), 0, 0);
+  
+  SetBlittingFlags(_blitting_flags);
 }
 
 void Graphics::SetMask(Image *image)
@@ -2198,6 +2231,7 @@ void Graphics::Reset()
   SetColor(0x00000000);
   ResetGradientStop();
   SetCompositeFlags(JCF_SRC_OVER);
+  SetBlittingFlags(JBF_BILINEAR);
 }
 
 void Graphics::SetVerticalSyncEnabled(bool enabled)
