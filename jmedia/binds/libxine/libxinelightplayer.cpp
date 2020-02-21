@@ -537,7 +537,7 @@ LibXineLightPlayer::LibXineLightPlayer(jnetwork::URL url):
 
 	memset(&t, 0, sizeof(t));
 
-	t.supported_formats = (int)(XINE_VORAW_RGB); // | XINE_VORAW_YV12 | XINE_VORAW_YUY2);
+	t.supported_formats = (int)(XINE_VORAW_RGB | XINE_VORAW_YV12 | XINE_VORAW_YUY2);
 	t.raw_output_cb = render_callback;
 	t.raw_overlay_cb = overlay_callback;
 	t.user_data = _component;

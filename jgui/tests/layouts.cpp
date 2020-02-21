@@ -58,6 +58,11 @@ class RectangleContainer : public jgui::Container {
 class Main : public jgui::Window, public jevent::ActionListener {
 
 	private:
+		std::vector<jgui::Container *> 
+      _b,
+			_c;
+		std::vector<jgui::Button *> 
+      _buttons;
 		jgui::Layout *_main,
 			*_flow,
 			*_grid,
@@ -70,11 +75,6 @@ class Main : public jgui::Window, public jevent::ActionListener {
 			*_previous,
 			*_next;
 		jgui::Theme _theme;
-		std::vector<jgui::Container *> 
-      _b,
-			_c;
-		std::vector<jgui::Button *> 
-      _buttons;
 
 	public:
 		Main():

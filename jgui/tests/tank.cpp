@@ -98,6 +98,8 @@ class Main : public jgui::Window {
 
 			KeyPressed();
 
+      g->SetBlittingFlags(jgui::JBF_NEAREST);
+
 			for (int j=0; j<8; j++) {
 				for (int i=0; i<10; i++) {
 					g->DrawImage(_tiles,

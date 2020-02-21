@@ -12,9 +12,14 @@ const jgui::jsize_t<int> BLOCK_SIZE = {
   .height = 32
 };
 
-const int PLAYER_STEP = 5;
+jgui::jpoint_t<int> BLOCK_DIVISOR {
+  .x = BLOCK_SIZE.width, 
+  .y = BLOCK_SIZE.height
+};
 
-const float GRAVITY = 1.6;
+const int PLAYER_STEP = 8;
+
+const float GRAVITY = 1.0;
 
 const float INITIAL_VELOCITY = 32;
 
@@ -76,9 +81,24 @@ class Dummy : public jgui::Window {
       return true;
     }
 
-    bool Collide(const jgui::jrect_t<int> &r1, const jgui::jrect_t<int> &r2)
+    bool Collide(jgui::jpoint_t<int> p)
     {
-      return r1.Intersects(r2);
+      p = p/BLOCK_DIVISOR;
+
+      jgui::jpoint_t<int>
+        p0 = {p + jgui::jpoint_t<int>{0, 0}},
+        p1 = {p + jgui::jpoint_t<int>{0, 1}},
+        p2 = {p + jgui::jpoint_t<int>{1, 0}},
+        p3 = {p + jgui::jpoint_t<int>{1, 1}};
+
+      if ((scene[p0.y][p0.x] == '.') and
+          (scene[p1.y][p1.x] == '.') and
+          (scene[p2.y][p2.x] == '.') and
+          (scene[p3.y][p3.x] == '.')) {
+        return false;
+      }
+
+      return true;
     }
 
     virtual void Paint(jgui::Graphics *g) 
@@ -102,6 +122,14 @@ class Dummy : public jgui::Window {
         if (_player_position.x < 0) {
           _player_position.x = 0;
         }
+ 
+        // collision
+        jgui::jpoint_t<int>
+          index = _player_position/BLOCK_DIVISOR;
+
+        if (scene[index.y][index.x - 1] != '.') {
+          _player_position = index*BLOCK_DIVISOR;
+        }
       }
 
       if (_keys[jevent::JKS_CURSOR_RIGHT]) {
@@ -110,10 +138,25 @@ class Dummy : public jgui::Window {
         if (_player_position.x > (int)(scene[0].size()*BLOCK_SIZE.width - BLOCK_SIZE.width)) {
           _player_position.x = (int)(scene[0].size()*BLOCK_SIZE.width - BLOCK_SIZE.width);
         }
+
+        jgui::jpoint_t<int>
+          index = _player_position/BLOCK_DIVISOR;
+
+        if (scene[index.y][index.x + 1] != '.') {
+          _player_position = index*BLOCK_DIVISOR;
+        }
       }
 
       _player_position.y = _player_position.y - _v;
       _v = _v - GRAVITY;
+
+      if (_v < -BLOCK_SIZE.height/2) {
+        _v = -BLOCK_SIZE.height/2;
+      }
+
+      if (_v > BLOCK_SIZE.height/2) {
+        _v = BLOCK_SIZE.height/2;
+      }
 
       if (_player_position.y > (int)(scene.size()*BLOCK_SIZE.height - BLOCK_SIZE.height)) {
         _v = 0.0;

@@ -628,7 +628,7 @@ GStreamerLightPlayer::GStreamerLightPlayer(jnetwork::URL url):
     }
 
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
-  } while (counter > 0);
+  } while (counter-- > 0);
 
   gst_element_set_state(_pipeline, GST_STATE_READY);
 
@@ -642,10 +642,10 @@ GStreamerLightPlayer::GStreamerLightPlayer(jnetwork::URL url):
     _controls.push_back(new GStreamerVideoFormatControlImpl (this));
   }
   
-  g_object_get(G_OBJECT(_pipeline), "sample", &sample, NULL);
+  int iw = -1;
+  int ih = -1;
 
-  int iw = 1280;
-  int ih = 720;
+  g_object_get(G_OBJECT(_pipeline), "sample", &sample, NULL);
 
   if (sample != nullptr) {
     GstCaps *caps = gst_sample_get_caps(sample);

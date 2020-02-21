@@ -109,20 +109,22 @@ void ColorConversion::GetRGB32FromYV12(uint8_t **y_array, uint8_t **u_array, uin
   height = height - 1;
 
   int size = width*height;
-  int width_2 = width/2;
-  int i;
+  int width2 = width/2;
 
   int py = 0;
   int px = 0;
 
-  for (i=0; i<size; i+=2) {
+  int line = 0;
+  int line2 = 0;
+
+  for (int i=0; i<size; i+=2) {
     int y, u, v;
     int C, D, E;
 
     // pixel 1
-    y = ybuf[2*(py*width+px)+0];
-    u = ubuf[py * width_2 + px];
-    v = vbuf[py * width_2 + px];
+    y = ybuf[(line + px) << 1];
+    u = ubuf[line2 + px];
+    v = vbuf[line2 + px];
 
     C = y - 16;
     D = u - 128;
@@ -132,15 +134,27 @@ void ColorConversion::GetRGB32FromYV12(uint8_t **y_array, uint8_t **u_array, uin
       D = E = 0;
     }
 
+    /*
     rgb[2] = CLAMP((298 * C + 409 * E + 128) >> 8, 0, 255);
     rgb[1] = CLAMP((298 * C - 100 * D - 208 * E + 128) >> 8, 0, 255);
     rgb[0] = CLAMP((298 * C + 516 * D + 128) >> 8, 0, 255);
+    rgb[3] = 0xff;
+    */
+
+    int16_t
+      r = ((298 * C + 409 * E + 128) >> 8),
+      g = ((298 * C - 100 * D - 208 * E + 128) >> 8),
+      b = ((298 * C + 516 * D + 128) >> 8);
+
+    rgb[0] = (b & 0x8000)?0:(b & 0xff00)?0xff:b;
+    rgb[1] = (g & 0x8000)?0:(g & 0xff00)?0xff:g;
+    rgb[2] = (r & 0x8000)?0:(r & 0xff00)?0xff:r;
     rgb[3] = 0xff;
 
     rgb = rgb + 4;
 
     // pixel 2
-    y = ybuf[2*(py*width+px)+1];
+    y = ybuf[((line + px) << 1) + 1];
     // u = ubuf[py * width_2 + px];
     // v = vbuf[py * width_2 + px];
 
@@ -152,9 +166,20 @@ void ColorConversion::GetRGB32FromYV12(uint8_t **y_array, uint8_t **u_array, uin
       D = E = 0;
     }
 
+    /*
     rgb[2] = CLAMP((298 * C + 409 * E + 128) >> 8, 0, 255);
     rgb[1] = CLAMP((298 * C - 100 * D - 208 * E + 128) >> 8, 0, 255);
     rgb[0] = CLAMP((298 * C + 516 * D + 128) >> 8, 0, 255);
+    rgb[3] = 0xff;
+    */
+    
+    r = CLAMP((298 * C + 409 * E + 128) >> 8, 0, 255);
+    g = CLAMP((298 * C - 100 * D - 208 * E + 128) >> 8, 0, 255);
+    b = CLAMP((298 * C + 516 * D + 128) >> 8, 0, 255);
+
+    rgb[0] = (b & 0x8000)?0:(b & 0xff00)?0xff:b;
+    rgb[1] = (g & 0x8000)?0:(g & 0xff00)?0xff:g;
+    rgb[2] = (r & 0x8000)?0:(r & 0xff00)?0xff:r;
     rgb[3] = 0xff;
 
     rgb = rgb + 4;
@@ -164,6 +189,8 @@ void ColorConversion::GetRGB32FromYV12(uint8_t **y_array, uint8_t **u_array, uin
 
     if (px == 0) {
       py = py + 1;
+      line = line + width;
+      line2 = line2 + width2;
     }
   }
 }
