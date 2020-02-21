@@ -130,21 +130,15 @@ void ColorConversion::GetRGB32FromYV12(uint8_t **y_array, uint8_t **u_array, uin
     D = u - 128;
     E = v - 128;      
 
+    int r, g, b;
+
     if (y == 0) {
-      D = E = 0;
-    }
-
-    /*
-    rgb[2] = CLAMP((298 * C + 409 * E + 128) >> 8, 0, 255);
-    rgb[1] = CLAMP((298 * C - 100 * D - 208 * E + 128) >> 8, 0, 255);
-    rgb[0] = CLAMP((298 * C + 516 * D + 128) >> 8, 0, 255);
-    rgb[3] = 0xff;
-    */
-
-    int16_t
-      r = ((298 * C + 409 * E + 128) >> 8),
-      g = ((298 * C - 100 * D - 208 * E + 128) >> 8),
+      r = g = b = ((298 * C + 128) >> 8);
+    } else {
+      r = ((298 * C + 409 * E + 128) >> 8);
+      g = ((298 * C - 100 * D - 208 * E + 128) >> 8);
       b = ((298 * C + 516 * D + 128) >> 8);
+    }
 
     rgb[0] = (b & 0x8000)?0:(b & 0xff00)?0xff:b;
     rgb[1] = (g & 0x8000)?0:(g & 0xff00)?0xff:g;
@@ -154,28 +148,21 @@ void ColorConversion::GetRGB32FromYV12(uint8_t **y_array, uint8_t **u_array, uin
     rgb = rgb + 4;
 
     // pixel 2
-    y = ybuf[((line + px) << 1) + 1];
+    y = ybuf[(line + px + 1) << 1];
     // u = ubuf[py * width_2 + px];
     // v = vbuf[py * width_2 + px];
 
-    C = y - 16;
+    // C = y - 16;
     // D = u - 128;
     // E = v - 128;      
 
     if (y == 0) {
-      D = E = 0;
+      r = g = b = ((298 * C + 128) >> 8);
+    } else {
+      r = ((298 * C + 409 * E + 128) >> 8);
+      g = ((298 * C - 100 * D - 208 * E + 128) >> 8);
+      b = ((298 * C + 516 * D + 128) >> 8);
     }
-
-    /*
-    rgb[2] = CLAMP((298 * C + 409 * E + 128) >> 8, 0, 255);
-    rgb[1] = CLAMP((298 * C - 100 * D - 208 * E + 128) >> 8, 0, 255);
-    rgb[0] = CLAMP((298 * C + 516 * D + 128) >> 8, 0, 255);
-    rgb[3] = 0xff;
-    */
-    
-    r = CLAMP((298 * C + 409 * E + 128) >> 8, 0, 255);
-    g = CLAMP((298 * C - 100 * D - 208 * E + 128) >> 8, 0, 255);
-    b = CLAMP((298 * C + 516 * D + 128) >> 8, 0, 255);
 
     rgb[0] = (b & 0x8000)?0:(b & 0xff00)?0xff:b;
     rgb[1] = (g & 0x8000)?0:(g & 0xff00)?0xff:g;
