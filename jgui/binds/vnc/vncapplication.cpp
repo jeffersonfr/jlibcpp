@@ -402,6 +402,14 @@ static void InternalPaint()
   jgui::Graphics 
     *g = sg_back_buffer->GetGraphics();
 
+  if (Application::FrameRate(sg_jgui_window->GetFramesPerSecond()) == true) {
+    g->Flush();
+
+    sg_jgui_window->Repaint();
+
+    return;
+  }
+
   g->Reset();
   g->SetCompositeFlags(jgui::JCF_SRC_OVER);
 
@@ -429,8 +437,6 @@ static void InternalPaint()
   cairo_surface_destroy(cairo_surface);
 
 	sg_back_buffer->UnlockData();
-
-  Application::FrameRate(sg_jgui_window->GetFramesPerSecond());
 
   sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
 }

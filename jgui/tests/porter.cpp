@@ -81,7 +81,7 @@ class PorterTeste : public jgui::Window {
 			
 			jgui::Font *font = GetTheme().GetFont();
 
-			g->SetColor(jgui::jcolor_name_t::White);
+			g->SetColor(jgui::jcolorname::White);
 			g->SetFont(font);
 			g->DrawString(name, jgui::jpoint_t<int>{x+RECT_SIZE/2, y});
 
@@ -118,7 +118,7 @@ class PorterTeste : public jgui::Window {
 
 			jgui::Font *font = GetTheme().GetFont();
 
-			g->SetColor(jgui::jcolor_name_t::White);
+			g->SetColor(jgui::jcolorname::White);
 			g->SetFont(font);
 			g->DrawString("Press 1 to use DrawImage() and 2 to use SetRGBArray()", jgui::jpoint_t<int>{insets.left, insets.top});
 

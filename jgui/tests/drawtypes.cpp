@@ -92,9 +92,9 @@ class Main : public jgui::Window {
 				  y = count/items;
 
 				g->DrawImage(image, {x*(bs+gap)+gap, y*(bs+gap)+16, bs, bs});
-				g->SetColor(jgui::jcolor_name_t::Black);
+				g->SetColor(jgui::jcolorname::Black);
 				g->FillRectangle({x*(bs+gap)+gap, y*(bs+gap)+16, 36, 24});
-				g->SetColor(jgui::jcolor_name_t::White);
+				g->SetColor(jgui::jcolorname::White);
 				g->DrawString(i->first, jgui::jpoint_t<int>{x*(bs+gap)+gap, y*(bs+gap)+16});
 
 				count = count + 1;

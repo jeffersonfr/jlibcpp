@@ -21,7 +21,6 @@
 #include "jgui/jwindow.h"
 
 #include <iostream>
-#include <mutex>
 
 #define VMAX 100
 
@@ -41,8 +40,6 @@ struct particle_t {
 class Main : public jgui::Window {
 
 	private:
-    std::mutex
-      _mutex;
 		struct point_t 
       *_objects;
 		struct particle_t 
@@ -110,8 +107,6 @@ class Main : public jgui::Window {
 		{
       SetVisible(false);
 
-      _mutex.unlock();
-
 			_active = false;
 			
       delete [] _objects;
@@ -129,181 +124,183 @@ class Main : public jgui::Window {
 			return k;
 		}
 
-		virtual void ShowApp()
+		void UpdateParticles()
 		{
+			static int scrumble = 0;
+			static int j = 0;
+
       jgui::jsize_t
         size = GetSize();
-			int 
-        scrumble = 0;
 
-			// for (int j=0; j<1000; j++) {
-			for (int j=0; _active != false and IsHidden() == false; j++) {
-				double 
-          r = 10,
-					// vmax = 100,
-					// vmin = -vmax,
-					xmax = size.width,
-					xmin = 0;
-				int 
-          signal = 1;
+      double 
+        r = 10,
+          // vmax = 100,
+          // vmin = -vmax,
+          xmax = size.width,
+          xmin = 0;
+      int 
+        signal = 1;
 
-				if (j > 100) {
-					_active = false;
-				}
+      if (j > 100) {
+        _active = false;
+      }
 
-				for (int i=0; i<_size_particles; i++) {
-					struct particle_t 
-            *p = &_particles[i];
-					double 
-            k,
-						c1 = 2.05,
-						c2 = 2.05,
-						// w = 200,
-						wmax = 10,
-						wmin = 1,
-						r1,
-						r2,
-						x;
-						// kapa = 1,
-						// teta = c1+c2,
-						// c = 2;
+      for (int i=0; i<_size_particles; i++) {
+        struct particle_t 
+          *p = &_particles[i];
+        double 
+          k,
+          c1 = 2.05,
+          c2 = 2.05,
+          // w = 200,
+          wmax = 10,
+          wmin = 1,
+          r1,
+          r2,
+          x;
+        // kapa = 1,
+        // teta = c1+c2,
+        // c = 2;
 
-					k = g(p);
+        k = g(p);
 
-					if (k < p->pi_value) {
-						p->pi.x = p->xi.x;
-						p->pi.y = p->xi.y;
-						p->pi_value = k;
-					}
+        if (k < p->pi_value) {
+          p->pi.x = p->xi.x;
+          p->pi.y = p->xi.y;
+          p->pi_value = k;
+        }
 
-					if (k < _gbest.pi_value) {
-						_gbest.xi.x = p->xi.x;
-						_gbest.xi.y = p->xi.y;
-						_gbest.pi_value = k;
-						
-						std::cout << "Gi Value:: " << k << std::endl;
-					} else {
-							scrumble++;
+        if (k < _gbest.pi_value) {
+          _gbest.xi.x = p->xi.x;
+          _gbest.xi.y = p->xi.y;
+          _gbest.pi_value = k;
 
-						if (scrumble > 50000) {
-							scrumble = 0;
-							j = 0;
-							
-							for (int i=0; i<_size_particles; i++) {
-								_particles[i].pi.x = _particles[i].xi.x = rand()%(size.width-64)+64;
-								_particles[i].pi.y = _particles[i].xi.y = rand()%(size.height-64)+64;
+          std::cout << "Gi Value:: " << k << std::endl;
+        } else {
+          scrumble++;
 
-								double k = 0;
+          if (scrumble > 50000) {
+            scrumble = 0;
+            j = 0;
 
-								for (int j=0; j<_size_objects; j++) {
-									k = k + ((double)(pow(_particles[i].xi.x - _objects[j].x, 2) + pow(_particles[i].xi.y - _objects[j].y, 2)));
-								}
+            for (int i=0; i<_size_particles; i++) {
+              _particles[i].pi.x = _particles[i].xi.x = rand()%(size.width-64)+64;
+              _particles[i].pi.y = _particles[i].xi.y = rand()%(size.height-64)+64;
 
-								_particles[i].pi_value = k;
+              double k = 0;
 
-								_particles[i].v.x = VMAX;
-								_particles[i].v.y = VMAX;
-								
-								_particles[i].vi.x = 0;
-								_particles[i].vi.y = 0;
-							}
-						
-							double k = 0;
+              for (int j=0; j<_size_objects; j++) {
+                k = k + ((double)(pow(_particles[i].xi.x - _objects[j].x, 2) + pow(_particles[i].xi.y - _objects[j].y, 2)));
+              }
 
-							for (int j=0; j<_size_objects; j++) {
-								k = k + ((double)(pow(_particles[0].xi.x - _objects[j].x, 2) + pow(_particles[0].xi.y - _objects[j].y, 2)));
-							}
+              _particles[i].pi_value = k;
 
-							_gbest.xi.x = _particles[0].pi.x;
-							_gbest.xi.y = _particles[0].pi.y;
-							_gbest.pi_value = k;
-						}
-					}
+              _particles[i].v.x = VMAX;
+              _particles[i].v.y = VMAX;
 
-					x = 0.73; // (2*kapa)/(double)abs((int)(2-teta-sqrt(-c*c+4*teta)));
+              _particles[i].vi.x = 0;
+              _particles[i].vi.y = 0;
+            }
 
-					double vix,
-								 viy;
+            double k = 0;
 
-					r1 = rand()%(int)r;
-					r2 = rand()%(int)r;
-					// p->vi.x = (int)(w*p->vi.x + c1*r1*(pow(p->pi.x-p->xi.x, 1)) + c2*r2*(pow(_gbest.xi.x-p->xi.x, 1)));
-					vix = (int)(x*((wmax-j*((wmax-wmin)/wmax))*p->vi.x + c1*r1*(p->pi.x-p->xi.x) + signal*c2*r2*(_gbest.xi.x-p->xi.x)));
-					
-					r1 = rand()%(int)r;
-					r2 = rand()%(int)r;
+            for (int j=0; j<_size_objects; j++) {
+              k = k + ((double)(pow(_particles[0].xi.x - _objects[j].x, 2) + pow(_particles[0].xi.y - _objects[j].y, 2)));
+            }
 
-					// p->vi.y = (int)(w*p->vi.y + c1*r1*(pow(p->pi.y-p->xi.y, 1)) + c2*r2*(pow(_gbest.xi.y-p->xi.y, 1)));
-					viy = (int)(x*((wmax-j*((wmax-wmin)/wmax))*p->vi.y + c1*r1*(p->pi.y-p->xi.y) + signal*c2*r2*(_gbest.xi.y-p->xi.y)));
+            _gbest.xi.x = _particles[0].pi.x;
+            _gbest.xi.y = _particles[0].pi.y;
+            _gbest.pi_value = k;
+          }
+        }
 
-					if (vix > p->v.x) {
-						vix = p->v.x;
-					}
+        x = 0.73; // (2*kapa)/(double)abs((int)(2-teta-sqrt(-c*c+4*teta)));
 
-					if (vix < -p->v.x) {
-						vix = -p->v.x;
-					}
+        double vix,
+               viy;
 
-					if (viy > p->v.y) {
-						viy = p->v.y;
-					}
+        r1 = rand()%(int)r;
+        r2 = rand()%(int)r;
+        // p->vi.x = (int)(w*p->vi.x + c1*r1*(pow(p->pi.x-p->xi.x, 1)) + c2*r2*(pow(_gbest.xi.x-p->xi.x, 1)));
+        vix = (int)(x*((wmax-j*((wmax-wmin)/wmax))*p->vi.x + c1*r1*(p->pi.x-p->xi.x) + signal*c2*r2*(_gbest.xi.x-p->xi.x)));
 
-					if (viy < -p->v.y) {
-						viy = -p->v.y;
-					}
+        r1 = rand()%(int)r;
+        r2 = rand()%(int)r;
 
-					if ((vix*p->vi.x) <= 0) {
-						p->v.x = 0.9*p->v.x;
-					} else {
-						p->v.x = 1.5*p->v.x;
-					}
+        // p->vi.y = (int)(w*p->vi.y + c1*r1*(pow(p->pi.y-p->xi.y, 1)) + c2*r2*(pow(_gbest.xi.y-p->xi.y, 1)));
+        viy = (int)(x*((wmax-j*((wmax-wmin)/wmax))*p->vi.y + c1*r1*(p->pi.y-p->xi.y) + signal*c2*r2*(_gbest.xi.y-p->xi.y)));
 
-					if ((viy*p->vi.y) <= 0) {
-						p->v.y = 0.9*p->v.y;
-					} else {
-						p->v.y = 1.5*p->v.y;
-					}
+        if (vix > p->v.x) {
+          vix = p->v.x;
+        }
 
-					p->vi.x = vix;
-					p->vi.y = viy;
+        if (vix < -p->v.x) {
+          vix = -p->v.x;
+        }
 
-					p->xi.x = (int)(p->xi.x + p->vi.x);
-					p->xi.y = (int)(p->xi.y + p->vi.y);
+        if (viy > p->v.y) {
+          viy = p->v.y;
+        }
 
-					if (p->xi.x > xmax) {
-						p->xi.x = xmax;
-						p->vi.x = 0;
-						p->vi.y = 0;
-					}
+        if (viy < -p->v.y) {
+          viy = -p->v.y;
+        }
 
-					if (p->xi.x < xmin) {
-						p->xi.x = xmin;
-						p->vi.x = 0;
-						p->vi.y = 0;
-					}
+        if ((vix*p->vi.x) <= 0) {
+          p->v.x = 0.9*p->v.x;
+        } else {
+          p->v.x = 1.5*p->v.x;
+        }
 
-					if (p->xi.y > xmax) {
-						p->xi.y = xmax;
-						p->vi.x = 0;
-						p->vi.y = 0;
-					}
+        if ((viy*p->vi.y) <= 0) {
+          p->v.y = 0.9*p->v.y;
+        } else {
+          p->v.y = 1.5*p->v.y;
+        }
 
-					if (p->xi.y < xmin) {
-						p->xi.y = xmin;
-						p->vi.x = 0;
-						p->vi.y = 0;
-					}
-				}
+        p->vi.x = vix;
+        p->vi.y = viy;
 
-				Repaint();
+        p->xi.x = (int)(p->xi.x + p->vi.x);
+        p->xi.y = (int)(p->xi.y + p->vi.y);
 
-        _mutex.lock();
-			}
+        if (p->xi.x > xmax) {
+          p->xi.x = xmax;
+          p->vi.x = 0;
+          p->vi.y = 0;
+        }
+
+        if (p->xi.x < xmin) {
+          p->xi.x = xmin;
+          p->vi.x = 0;
+          p->vi.y = 0;
+        }
+
+        if (p->xi.y > xmax) {
+          p->xi.y = xmax;
+          p->vi.x = 0;
+          p->vi.y = 0;
+        }
+
+        if (p->xi.y < xmin) {
+          p->xi.y = xmin;
+          p->vi.x = 0;
+          p->vi.y = 0;
+        }
+      }
+
+      j++;
 		}
 
 		virtual void Paint(jgui::Graphics *g)
 		{
 			jgui::Window::Paint(g);
+
+      if (_active == false) {
+        return;
+      }
+
+      UpdateParticles();
 
 			g->SetColor({0x80, 0x80, 0x80, 0xff});
 			for (int i=0; i<_size_objects; i++) {
@@ -318,7 +315,7 @@ class Main : public jgui::Window {
 			g->SetColor({0xff, 0x00, 0x00, 0xff});
 			g->FillRectangle({_gbest.xi.x, _gbest.xi.y, 4, 4});
 
-      _mutex.unlock();
+      Repaint();
 		}
 
 };

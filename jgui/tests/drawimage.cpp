@@ -671,7 +671,7 @@ class Picture : public jgui::Component {
 
 			if (font != nullptr) {
 
-				g->SetColor(jgui::jcolor_name_t::White);
+				g->SetColor(jgui::jcolorname::White);
 				g->SetFont(font);
 				g->DrawString(_title, jgui::jpoint_t<int>{0, 0});
       }

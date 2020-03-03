@@ -274,8 +274,6 @@ static void InternalPaint()
     
     dw->update();
 
-    Application::FrameRate(sg_jgui_window->GetFramesPerSecond());
-
     sg_paint_condition.wait_for(lock, std::chrono::milliseconds(1));
   }
 }
@@ -454,6 +452,14 @@ static void paint_callback(const nana::paint::graphics& graph)
 
   jgui::Graphics 
     *g = sg_back_buffer->GetGraphics();
+
+  if (Application::FrameRate(sg_jgui_window->GetFramesPerSecond()) == true) {
+    g->Flush();
+
+    sg_jgui_window->Repaint();
+
+    return;
+  }
 
   g->Reset();
   g->SetCompositeFlags(jgui::JCF_SRC_OVER);

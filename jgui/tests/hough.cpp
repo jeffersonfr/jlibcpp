@@ -296,7 +296,7 @@ class Test : public jgui::Window {
 			g->DrawImage(_image, {0, 0, size.width, size.height});
 			g->DrawImage(_hough, {size.width, 0, size.width, size.height});
 
-			g->SetColor(jgui::jcolor_name_t::Red);
+			g->SetColor(jgui::jcolorname::Red);
 			g->SetClip({0, 0, size.width, size.height});
 
 			for (std::vector<jgui::jline_t<int>>::iterator i=lines.begin(); i!=lines.end(); i++) {

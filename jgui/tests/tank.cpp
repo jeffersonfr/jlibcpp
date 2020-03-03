@@ -21,12 +21,9 @@
 #include "jgui/jwindow.h"
 #include "jgui/jbufferedimage.h"
 
-#include <mutex>
-
 class Main : public jgui::Window {
 
 	private:
-    std::mutex _mutex;
 		jgui::Image *_image;
 		jgui::Image *_tiles;
 		double _tx;
@@ -86,8 +83,6 @@ class Main : public jgui::Window {
 
 			_running = false;
 
-      _mutex.unlock();
-
 			delete _image;
 			delete _tiles;
 		}
@@ -97,6 +92,35 @@ class Main : public jgui::Window {
 			jgui::Window::Paint(g);
 
 			KeyPressed();
+
+      jgui::jsize_t
+        size = GetSize();
+
+      _tx = _tx + _step*cos(_angle); // +M_PI_2);
+      _ty = _ty - _step*sin(_angle); // +M_PI_2);
+
+      if (_tx < _tw/2) {
+        _tx = _tw/2;
+      }
+
+      if (_tx > (size.width - _tw/2)) {
+        _tx = (size.width - _tw/2);
+      }
+
+      if (_ty < _th/2) {
+        _ty = _th/2;
+      }
+
+      if (_ty > (size.height - _th/2)) {
+        _ty = (size.height - _th/2);
+      }
+
+      _bullet_x = _bullet_x + 12*cos(_bullet_angle);
+      _bullet_y = _bullet_y - 12*sin(_bullet_angle);
+
+      if (_bullet_x < 0 || _bullet_x > size.width || _bullet_y < 0 || _bullet_y > size.height) {
+        _has_bullet = false;
+      }
 
       g->SetBlittingFlags(jgui::JBF_NEAREST);
 
@@ -120,45 +144,7 @@ class Main : public jgui::Window {
 
 			delete image;
 
-      _mutex.unlock();
-		}
-
-		virtual void ShowApp() 
-		{
-			jgui::jsize_t
-				size = GetSize();
-
-			while (_running && IsHidden() == false) {
-				_tx = _tx + _step*cos(_angle); // +M_PI_2);
-				_ty = _ty - _step*sin(_angle); // +M_PI_2);
-
-				if (_tx < _tw/2) {
-					_tx = _tw/2;
-				}
-
-				if (_tx > (size.width - _tw/2)) {
-					_tx = (size.width - _tw/2);
-				}
-
-				if (_ty < _th/2) {
-					_ty = _th/2;
-				}
-
-				if (_ty > (size.height - _th/2)) {
-					_ty = (size.height - _th/2);
-				}
-
-				_bullet_x = _bullet_x + 12*cos(_bullet_angle);
-				_bullet_y = _bullet_y - 12*sin(_bullet_angle);
-
-				if (_bullet_x < 0 || _bullet_x > size.width || _bullet_y < 0 || _bullet_y > size.height) {
-					_has_bullet = false;
-				}
-
-				Repaint();
-
-        _mutex.lock();
-			}
+      Repaint();
 		}
 
 		virtual void KeyPressed()

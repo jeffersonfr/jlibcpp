@@ -513,9 +513,6 @@ class Widgets : public jgui::Window, public jevent::ActionListener, public jeven
     _mutex.unlock();
 	}
 
-  virtual void ShowApp()
-  {
-  }
 };
 
 int main(int argc, char **argv)

@@ -47,7 +47,16 @@ class Main : public jgui::Window {
 			_angle = angle;
 		}
 
-		virtual void Paint(jgui::Graphics *g)
+    void UpdateRotation()
+    {
+      static double j = 0.0;
+
+      SetAngle(j);
+
+      j = fmod(j + 2*M_PI/30.0f, 2*M_PI);
+    }
+
+    virtual void Paint(jgui::Graphics *g)
 		{
 			// |-----------------------------------------------------------------------|
 			// |       Translate -     |       Translate 0     |       Translate +     |
@@ -72,6 +81,8 @@ class Main : public jgui::Window {
 			// |-----------------------------------------------------------------------|
 
 			jgui::Window::Paint(g);
+
+      UpdateRotation();
 
       jgui::jsize_t
         size = GetSize();
@@ -147,19 +158,9 @@ class Main : public jgui::Window {
 
 				g->Translate({-j*gapx, -j*gapy});
 			}
+      
+      Repaint();
 		}
-
-    virtual void ShowApp()
-    {
-      double j = 0.0;
-
-      do {
-        SetAngle(j);
-        Repaint();
-
-        j = fmod(j + 0.1, 2*M_PI);
-      } while (IsHidden() == false);
-    }
 
 };
 

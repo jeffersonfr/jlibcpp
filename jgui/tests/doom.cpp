@@ -63,6 +63,9 @@ class Doom : public jgui::Window {
 			jgui::IndexedImage image(
 				palette, 37, (uint8_t *)buffer, {SCREEN_WIDTH, SCREEN_HEIGHT});
 
+      g->SetCompositeFlags(jgui::JCF_SRC);
+      g->SetBlittingFlags(jgui::JBF_NEAREST);
+
 			g->DrawImage(&image, {0, 0, size.width, size.height});
 
       Repaint();

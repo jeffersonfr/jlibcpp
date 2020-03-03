@@ -37,7 +37,7 @@ class ScreenLayer : public jgui::Container {
 		ScreenLayer():
 			jgui::Container({0, 0, 1920, 1080})
 		{
-      _theme.SetIntegerParam("component.bg", uint32_t(jgui::jcolor_name_t::Black));
+      _theme.SetIntegerParam("component.bg", uint32_t(jgui::jcolorname::Black));
 
       SetTheme(_theme);
 			
@@ -240,7 +240,6 @@ class LayersManager : public jgui::Window {
 		ScreenLayer *_background_layer;
 		ScreenLayer *_video_layer;
 		ScreenLayer *_graphic_layer;
-    std::mutex _mutex;
     std::condition_variable _condition;
 
 	private:
@@ -275,17 +274,6 @@ class LayersManager : public jgui::Window {
 			_graphic_layer->Paint(g);
     }
 
-		virtual void ShowApp()
-		{
-      do {
-        std::unique_lock<std::mutex> lock(_mutex);
-        
-        _condition.wait(lock);
-
-        jgui::Window::Repaint();
-      } while (IsHidden() == false);
-		}
-
 	public:
 		virtual ~LayersManager()
 		{
@@ -313,11 +301,6 @@ class LayersManager : public jgui::Window {
 			return dynamic_cast<GraphicLayer *>(_graphic_layer);
 		}
 
-		virtual void Repaint(jgui::Component *c = nullptr)
-		{
-			_condition.notify_one();
-		}
-		
 };
 
 class Scene : public jgui::Container {

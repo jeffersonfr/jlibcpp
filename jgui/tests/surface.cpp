@@ -23,7 +23,6 @@
 #include "jmath/jmath.h"
 
 #include <iostream>
-#include <mutex>
 
 #define GRID_A 40
 #define GRID_B 30
@@ -33,11 +32,6 @@
 class Surface : public jgui::Window {
 
 	private:
-    jgui::Image 
-      *_buffer;
-    std::mutex
-      _mutex_sync,
-      _mutex_draw;
     float 
       nodesize,
       relax,
@@ -63,8 +57,6 @@ class Surface : public jgui::Window {
 		Surface():
 			jgui::Window({720, 480})
 		{
-      _buffer = new jgui::BufferedImage(jgui::JPF_RGB32, {800, 600});
-    
       nodesize = 2.0f;
       relax = 1.0f;
       fade = 0.99f;
@@ -93,8 +85,6 @@ class Surface : public jgui::Window {
 
 		virtual ~Surface()
 		{
-      _mutex_sync.unlock();
-      _mutex_sync.unlock();
 		}
 
     virtual bool MouseMoved(jevent::MouseEvent *event) 
@@ -164,68 +154,43 @@ class Surface : public jgui::Window {
       oldmousey = my;
     }
 
-		virtual void ShowApp() 
-		{
-      jgui::Graphics
-        *g = _buffer->GetGraphics();
-
-			do {
-        _mutex_draw.lock();
-
-        g->Clear();
-
-        Update();
-
-        int a, b;
-
-        for (a=0; a<GRID_A; a++) {
-          for (b=0; b<GRID_B; b++) {
-            g->SetColor({55, 55, (int)(55 + 200*point_vel[a][b]/vel), 0xff});
-            g->DrawCircle({(int)point_worka[a][b], (int)point_workb[a][b]}, nodesize);
-          }
-        }
-
-        for (a=0; a<GRID_A - 1; a++) {
-          for (b=0; b<GRID_B - 1; b++) {
-            g->SetColor({55, 55, (int)(55 + 200*point_vel[a][b]/vel), 0xff});
-            g->DrawLine({(int)point_worka[a][b], (int)point_workb[a][b]}, {(int)point_worka[a + 1][b], (int)point_workb[a + 1][b]});
-            g->DrawLine({(int)point_worka[a][b], (int)point_workb[a][b]}, {(int)point_worka[a][b + 1], (int)point_workb[a][b + 1]});
-          }
-        }
-
-        for (a=0; a<GRID_A - 1; a++) {
-          g->SetColor({55, 55, (int)(55 + 200*point_vel[a][b]/vel), 0xff});
-          g->DrawLine({(int)point_worka[a][b], (int)point_workb[a][b]}, {(int)point_worka[a + 1][b], (int)point_workb[a + 1][b]});
-        }
-
-        for (b=0; b<GRID_B - 1; b++) {
-          g->SetColor({55, 55, (int)(55 + 200*point_vel[a][b]/vel), 0xff});
-          g->DrawLine({(int)point_worka[a][b], (int)point_workb[a][b]}, {(int)point_worka[a][b + 1], (int)point_workb[a][b + 1]});
-        }
-        
-        _mutex_draw.unlock();
-        
-        _mutex_sync.lock();
-
-        Repaint();
-			} while (IsHidden() == false);
-
-      delete _buffer;
-      _buffer = nullptr;
-		}
-
 		void Paint(jgui::Graphics *g) 
 		{
       jgui::jsize_t
         size = GetSize();
 
-      _mutex_draw.lock();
+      g->Clear();
 
-      g->DrawImage(_buffer, {0, 0, size.width, size.height});
+      Update();
 
-      _mutex_draw.unlock();
-      
-      _mutex_sync.unlock();
+      int a, b;
+
+      for (a=0; a<GRID_A; a++) {
+        for (b=0; b<GRID_B; b++) {
+          g->SetColor({55, 55, (int)(55 + 200*point_vel[a][b]/vel), 0xff});
+          g->DrawCircle({(int)point_worka[a][b], (int)point_workb[a][b]}, nodesize);
+        }
+      }
+
+      for (a=0; a<GRID_A - 1; a++) {
+        for (b=0; b<GRID_B - 1; b++) {
+          g->SetColor({55, 55, (int)(55 + 200*point_vel[a][b]/vel), 0xff});
+          g->DrawLine({(int)point_worka[a][b], (int)point_workb[a][b]}, {(int)point_worka[a + 1][b], (int)point_workb[a + 1][b]});
+          g->DrawLine({(int)point_worka[a][b], (int)point_workb[a][b]}, {(int)point_worka[a][b + 1], (int)point_workb[a][b + 1]});
+        }
+      }
+
+      for (a=0; a<GRID_A - 1; a++) {
+        g->SetColor({55, 55, (int)(55 + 200*point_vel[a][b]/vel), 0xff});
+        g->DrawLine({(int)point_worka[a][b], (int)point_workb[a][b]}, {(int)point_worka[a + 1][b], (int)point_workb[a + 1][b]});
+      }
+
+      for (b=0; b<GRID_B - 1; b++) {
+        g->SetColor({55, 55, (int)(55 + 200*point_vel[a][b]/vel), 0xff});
+        g->DrawLine({(int)point_worka[a][b], (int)point_workb[a][b]}, {(int)point_worka[a][b + 1], (int)point_workb[a][b + 1]});
+      }
+
+      Repaint();
     }
 
 };

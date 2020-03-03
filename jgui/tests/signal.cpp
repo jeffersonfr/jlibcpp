@@ -311,8 +311,6 @@ class SignalMetter : public jgui::Component {
 class Plotter : public jgui::Window {
 
 	private:
-    std::mutex
-      _mutex;
 		SignalMetter 
       *_signal;
 		int 
@@ -338,13 +336,13 @@ class Plotter : public jgui::Window {
 		{
 			_counter = 0;
 
-      _mutex.unlock();
-
       delete _signal;
 		}
 
-		virtual void ShowApp()
-		{
+    virtual void Paint(jgui::Graphics *g)
+    {
+      jgui::Window::Paint(g);
+
 			// char receive[4096];
 
       static float index = 0.1;
@@ -352,31 +350,20 @@ class Plotter : public jgui::Window {
 			try {
         jnetwork::DatagramSocket s(1234);
 
-				do {
-					// r = s.Receive(receive, 4096);
+        // r = s.Receive(receive, 4096);
 
-          PerlinNoise noise;
+        PerlinNoise noise;
 
-					_signal->Plot(100 + (int)(noise.noise(index)*100));
+        _signal->Plot(100 + (int)(noise.noise(index)*100));
 
-          index = index + 0.2;
+        index = index + 0.2;
 
-          Repaint();
-
-          _mutex.lock();
-				} while (IsHidden() == false && _counter-- >= 0);
+        Repaint();
 
 				s.Close();
 			} catch (...) {
 				std::cout << "error dump_raw" << std::endl;
 			}
-		}
-
-    virtual void Paint(jgui::Graphics *g)
-    {
-      jgui::Window::Paint(g);
-
-      _mutex.unlock();
     }
 
 };

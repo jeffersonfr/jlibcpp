@@ -32,7 +32,7 @@
 
 namespace jgui {
 
-enum class jcolor_name_t : uint32_t {
+enum class jcolorname : uint32_t {
   AliceBlue = 0xfff0f8ff,
   AntiqueWhite = 0xfffaebd7,
   Aqua = 0xff00ffff,
@@ -198,307 +198,307 @@ struct jcolor_t {
 
   jcolor_t(std::string name)
   {
-    jcolor_name_t color = jcolor_name_t::Black;
+    jcolorname color = jcolorname::Black;
 
     name = jcommon::StringUtils::ToLower(name);
 
     if (name[0] >= 'a' && name[0] <= 'j') {
       if (name == jcommon::StringUtils::ToLower("AliceBlue")) {
-        color = jcolor_name_t::AliceBlue;
+        color = jcolorname::AliceBlue;
       } else if (name == jcommon::StringUtils::ToLower("AntiqueWhite")) {
-        color = jcolor_name_t::AntiqueWhite;
+        color = jcolorname::AntiqueWhite;
       } else if (name == jcommon::StringUtils::ToLower("Aqua")) {
-        color = jcolor_name_t::Aqua;
+        color = jcolorname::Aqua;
       } else if (name == jcommon::StringUtils::ToLower("Aquamarine")) {
-        color = jcolor_name_t::Aquamarine;
+        color = jcolorname::Aquamarine;
       } else if (name == jcommon::StringUtils::ToLower("Azure")) {
-        color = jcolor_name_t::Azure;
+        color = jcolorname::Azure;
       } else if (name == jcommon::StringUtils::ToLower("Beige")) {
-        color = jcolor_name_t::Beige;
+        color = jcolorname::Beige;
       } else if (name == jcommon::StringUtils::ToLower("Bisque")) {
-        color = jcolor_name_t::Bisque;
+        color = jcolorname::Bisque;
       } else if (name == jcommon::StringUtils::ToLower("Black")) {
-        color = jcolor_name_t::Black;
+        color = jcolorname::Black;
       } else if (name == jcommon::StringUtils::ToLower("BlanchedAlmond")) {
-        color = jcolor_name_t::BlanchedAlmond;
+        color = jcolorname::BlanchedAlmond;
       } else if (name == jcommon::StringUtils::ToLower("Blue")) {
-        color = jcolor_name_t::Blue;
+        color = jcolorname::Blue;
       } else if (name == jcommon::StringUtils::ToLower("BlueViolet")) {
-        color = jcolor_name_t::BlueViolet;
+        color = jcolorname::BlueViolet;
       } else if (name == jcommon::StringUtils::ToLower("Brown")) {
-        color = jcolor_name_t::Brown;
+        color = jcolorname::Brown;
       } else if (name == jcommon::StringUtils::ToLower("BurlyWood")) {
-        color = jcolor_name_t::BurlyWood;
+        color = jcolorname::BurlyWood;
       } else if (name == jcommon::StringUtils::ToLower("CadetBlue")) {
-        color = jcolor_name_t::CadetBlue;
+        color = jcolorname::CadetBlue;
       } else if (name == jcommon::StringUtils::ToLower("Chartreuse")) {
-        color = jcolor_name_t::Chartreuse;
+        color = jcolorname::Chartreuse;
       } else if (name == jcommon::StringUtils::ToLower("Chocolate")) {
-        color = jcolor_name_t::Chocolate;
+        color = jcolorname::Chocolate;
       } else if (name == jcommon::StringUtils::ToLower("Coral")) {
-        color = jcolor_name_t::Coral;
+        color = jcolorname::Coral;
       } else if (name == jcommon::StringUtils::ToLower("CornflowerBlue")) {
-        color = jcolor_name_t::CornflowerBlue;
+        color = jcolorname::CornflowerBlue;
       } else if (name == jcommon::StringUtils::ToLower("Cornsilk")) {
-        color = jcolor_name_t::Cornsilk;
+        color = jcolorname::Cornsilk;
       } else if (name == jcommon::StringUtils::ToLower("Crimson")) {
-        color = jcolor_name_t::Crimson;
+        color = jcolorname::Crimson;
       } else if (name == jcommon::StringUtils::ToLower("Cyan")) {
-        color = jcolor_name_t::Cyan;
+        color = jcolorname::Cyan;
       } else if (name == jcommon::StringUtils::ToLower("DarkBlue")) {
-        color = jcolor_name_t::DarkBlue;
+        color = jcolorname::DarkBlue;
       } else if (name == jcommon::StringUtils::ToLower("DarkCyan")) {
-        color = jcolor_name_t::DarkCyan;
+        color = jcolorname::DarkCyan;
       } else if (name == jcommon::StringUtils::ToLower("DarkGoldenRod")) {
-        color = jcolor_name_t::DarkGoldenRod;
+        color = jcolorname::DarkGoldenRod;
       } else if (name == jcommon::StringUtils::ToLower("DarkGray")) {
-        color = jcolor_name_t::DarkGray;
+        color = jcolorname::DarkGray;
       } else if (name == jcommon::StringUtils::ToLower("DarkGrey")) {
-        color = jcolor_name_t::DarkGrey;
+        color = jcolorname::DarkGrey;
       } else if (name == jcommon::StringUtils::ToLower("DarkGreen")) {
-        color = jcolor_name_t::DarkGreen;
+        color = jcolorname::DarkGreen;
       } else if (name == jcommon::StringUtils::ToLower("DarkKhaki")) {
-        color = jcolor_name_t::DarkKhaki;
+        color = jcolorname::DarkKhaki;
       } else if (name == jcommon::StringUtils::ToLower("DarkMagenta")) {
-        color = jcolor_name_t::DarkMagenta;
+        color = jcolorname::DarkMagenta;
       } else if (name == jcommon::StringUtils::ToLower("DarkOliveGreen")) {
-        color = jcolor_name_t::DarkOliveGreen;
+        color = jcolorname::DarkOliveGreen;
       } else if (name == jcommon::StringUtils::ToLower("DarkOrange")) {
-        color = jcolor_name_t::DarkOrange;
+        color = jcolorname::DarkOrange;
       } else if (name == jcommon::StringUtils::ToLower("DarkOrchid")) {
-        color = jcolor_name_t::DarkOrchid;
+        color = jcolorname::DarkOrchid;
       } else if (name == jcommon::StringUtils::ToLower("DarkRed")) {
-        color = jcolor_name_t::DarkRed;
+        color = jcolorname::DarkRed;
       } else if (name == jcommon::StringUtils::ToLower("DarkSalmon")) {
-        color = jcolor_name_t::DarkSalmon;
+        color = jcolorname::DarkSalmon;
       } else if (name == jcommon::StringUtils::ToLower("DarkSeaGreen")) {
-        color = jcolor_name_t::DarkSeaGreen;
+        color = jcolorname::DarkSeaGreen;
       } else if (name == jcommon::StringUtils::ToLower("DarkSlateBlue")) {
-        color = jcolor_name_t::DarkSlateBlue;
+        color = jcolorname::DarkSlateBlue;
       } else if (name == jcommon::StringUtils::ToLower("DarkSlateGray")) {
-        color = jcolor_name_t::DarkSlateGray;
+        color = jcolorname::DarkSlateGray;
       } else if (name == jcommon::StringUtils::ToLower("DarkSlateGrey")) {
-        color = jcolor_name_t::DarkSlateGrey;
+        color = jcolorname::DarkSlateGrey;
       } else if (name == jcommon::StringUtils::ToLower("DarkTurquoise")) {
-        color = jcolor_name_t::DarkTurquoise;
+        color = jcolorname::DarkTurquoise;
       } else if (name == jcommon::StringUtils::ToLower("DarkViolet")) {
-        color = jcolor_name_t::DarkViolet;
+        color = jcolorname::DarkViolet;
       } else if (name == jcommon::StringUtils::ToLower("DeepPink")) {
-        color = jcolor_name_t::DeepPink;
+        color = jcolorname::DeepPink;
       } else if (name == jcommon::StringUtils::ToLower("Deepskyblue")) {
-        color = jcolor_name_t::Deepskyblue;
+        color = jcolorname::Deepskyblue;
       } else if (name == jcommon::StringUtils::ToLower("DimGray")) {
-        color = jcolor_name_t::DimGray;
+        color = jcolorname::DimGray;
       } else if (name == jcommon::StringUtils::ToLower("DimGrey")) {
-        color = jcolor_name_t::DimGrey;
+        color = jcolorname::DimGrey;
       } else if (name == jcommon::StringUtils::ToLower("DodgerBlue")) {
-        color = jcolor_name_t::DodgerBlue;
+        color = jcolorname::DodgerBlue;
       } else if (name == jcommon::StringUtils::ToLower("FireBrick")) {
-        color = jcolor_name_t::FireBrick;
+        color = jcolorname::FireBrick;
       } else if (name == jcommon::StringUtils::ToLower("FloralWhite")) {
-        color = jcolor_name_t::FloralWhite;
+        color = jcolorname::FloralWhite;
       } else if (name == jcommon::StringUtils::ToLower("ForestGreen")) {
-        color = jcolor_name_t::ForestGreen;
+        color = jcolorname::ForestGreen;
       } else if (name == jcommon::StringUtils::ToLower("Fuchsia")) {
-        color = jcolor_name_t::Fuchsia;
+        color = jcolorname::Fuchsia;
       } else if (name == jcommon::StringUtils::ToLower("Gainsboro")) {
-        color = jcolor_name_t::Gainsboro;
+        color = jcolorname::Gainsboro;
       } else if (name == jcommon::StringUtils::ToLower("GhostWhite")) {
-        color = jcolor_name_t::GhostWhite;
+        color = jcolorname::GhostWhite;
       } else if (name == jcommon::StringUtils::ToLower("Gold")) {
-        color = jcolor_name_t::Gold;
+        color = jcolorname::Gold;
       } else if (name == jcommon::StringUtils::ToLower("GoldenRod")) {
-        color = jcolor_name_t::GoldenRod;
+        color = jcolorname::GoldenRod;
       } else if (name == jcommon::StringUtils::ToLower("Gray")) {
-        color = jcolor_name_t::Gray;
+        color = jcolorname::Gray;
       } else if (name == jcommon::StringUtils::ToLower("Grey")) {
-        color = jcolor_name_t::Grey;
+        color = jcolorname::Grey;
       } else if (name == jcommon::StringUtils::ToLower("Green")) {
-        color = jcolor_name_t::Green;
+        color = jcolorname::Green;
       } else if (name == jcommon::StringUtils::ToLower("GreenYellow")) {
-        color = jcolor_name_t::GreenYellow;
+        color = jcolorname::GreenYellow;
       } else if (name == jcommon::StringUtils::ToLower("HoneyDew")) {
-        color = jcolor_name_t::HoneyDew;
+        color = jcolorname::HoneyDew;
       } else if (name == jcommon::StringUtils::ToLower("HotPink")) {
-        color = jcolor_name_t::HotPink;
+        color = jcolorname::HotPink;
       } else if (name == jcommon::StringUtils::ToLower("IndianRed")) {
-        color = jcolor_name_t::IndianRed;
+        color = jcolorname::IndianRed;
       } else if (name == jcommon::StringUtils::ToLower("Indigo")) {
-        color = jcolor_name_t::Indigo;
+        color = jcolorname::Indigo;
       } else if (name == jcommon::StringUtils::ToLower("Ivory")) {
-        color = jcolor_name_t::Ivory;
+        color = jcolorname::Ivory;
       } else if (name == jcommon::StringUtils::ToLower("Khaki")) {
-        color = jcolor_name_t::Khaki;
+        color = jcolorname::Khaki;
       } else if (name == jcommon::StringUtils::ToLower("Lavender")) {
-        color = jcolor_name_t::Lavender;
+        color = jcolorname::Lavender;
       } else if (name == jcommon::StringUtils::ToLower("kavenderBlush")) {
-        color = jcolor_name_t::kavenderBlush;
+        color = jcolorname::kavenderBlush;
       } else if (name == jcommon::StringUtils::ToLower("LawnGreen")) {
-        color = jcolor_name_t::LawnGreen;
+        color = jcolorname::LawnGreen;
       } else if (name == jcommon::StringUtils::ToLower("LemonChiffon")) {
-        color = jcolor_name_t::LemonChiffon;
+        color = jcolorname::LemonChiffon;
       } else if (name == jcommon::StringUtils::ToLower("LightBlue")) {
-        color = jcolor_name_t::LightBlue;
+        color = jcolorname::LightBlue;
       } else if (name == jcommon::StringUtils::ToLower("LightCoral")) {
-        color = jcolor_name_t::LightCoral;
+        color = jcolorname::LightCoral;
       } else if (name == jcommon::StringUtils::ToLower("LightCyan")) {
-        color = jcolor_name_t::LightCyan;
+        color = jcolorname::LightCyan;
       } else if (name == jcommon::StringUtils::ToLower("LightGoldenRodYellow")) {
-        color = jcolor_name_t::LightGoldenRodYellow;
+        color = jcolorname::LightGoldenRodYellow;
       } else if (name == jcommon::StringUtils::ToLower("LightGray")) {
-        color = jcolor_name_t::LightGray;
+        color = jcolorname::LightGray;
       } else if (name == jcommon::StringUtils::ToLower("LightGrey")) {
-        color = jcolor_name_t::LightGrey;
+        color = jcolorname::LightGrey;
       } else if (name == jcommon::StringUtils::ToLower("LightGreen")) {
-        color = jcolor_name_t::LightGreen;
+        color = jcolorname::LightGreen;
       } else if (name == jcommon::StringUtils::ToLower("LightPink")) {
-        color = jcolor_name_t::LightPink;
+        color = jcolorname::LightPink;
       } else if (name == jcommon::StringUtils::ToLower("LightSalmon")) {
-        color = jcolor_name_t::LightSalmon;
+        color = jcolorname::LightSalmon;
       } else if (name == jcommon::StringUtils::ToLower("LightSeaGreen")) {
-        color = jcolor_name_t::LightSeaGreen;
+        color = jcolorname::LightSeaGreen;
       } else if (name == jcommon::StringUtils::ToLower("LightSkyBlue")) {
-        color = jcolor_name_t::LightSkyBlue;
+        color = jcolorname::LightSkyBlue;
       } else if (name == jcommon::StringUtils::ToLower("LightSlateGray")) {
-        color = jcolor_name_t::LightSlateGray;
+        color = jcolorname::LightSlateGray;
       } else if (name == jcommon::StringUtils::ToLower("LightSlateGrey")) {
-        color = jcolor_name_t::LightSlateGrey;
+        color = jcolorname::LightSlateGrey;
       } else if (name == jcommon::StringUtils::ToLower("LightSteelBlue")) {
-        color = jcolor_name_t::LightSteelBlue;
+        color = jcolorname::LightSteelBlue;
       } else if (name == jcommon::StringUtils::ToLower("LightYellow")) {
-        color = jcolor_name_t::LightYellow;
+        color = jcolorname::LightYellow;
       } else if (name == jcommon::StringUtils::ToLower("Lime")) {
-        color = jcolor_name_t::Lime;
+        color = jcolorname::Lime;
       } else if (name == jcommon::StringUtils::ToLower("LimeGreen")) {
-        color = jcolor_name_t::LimeGreen;
+        color = jcolorname::LimeGreen;
       } else if (name == jcommon::StringUtils::ToLower("Linen")) {
-        color = jcolor_name_t::Linen;
+        color = jcolorname::Linen;
       } else if (name == jcommon::StringUtils::ToLower("Magenta")) {
-        color = jcolor_name_t::Magenta;
+        color = jcolorname::Magenta;
       } else if (name == jcommon::StringUtils::ToLower("Maroon")) {
-        color = jcolor_name_t::Maroon;
+        color = jcolorname::Maroon;
       } else if (name == jcommon::StringUtils::ToLower("MediumAquaMarine")) {
-        color = jcolor_name_t::MediumAquaMarine;
+        color = jcolorname::MediumAquaMarine;
       } else if (name == jcommon::StringUtils::ToLower("MediumBlue")) {
-        color = jcolor_name_t::MediumBlue;
+        color = jcolorname::MediumBlue;
       } else if (name == jcommon::StringUtils::ToLower("MediumOrchid")) {
-        color = jcolor_name_t::MediumOrchid;
+        color = jcolorname::MediumOrchid;
       } else if (name == jcommon::StringUtils::ToLower("MediumPurple")) {
-        color = jcolor_name_t::MediumPurple;
+        color = jcolorname::MediumPurple;
       } else if (name == jcommon::StringUtils::ToLower("MediumSeaGreen")) {
-        color = jcolor_name_t::MediumSeaGreen;
+        color = jcolorname::MediumSeaGreen;
       } else if (name == jcommon::StringUtils::ToLower("MediumSlateBlue")) {
-        color = jcolor_name_t::MediumSlateBlue;
+        color = jcolorname::MediumSlateBlue;
       } else if (name == jcommon::StringUtils::ToLower("MediumSpringGreen")) {
-        color = jcolor_name_t::MediumSpringGreen;
+        color = jcolorname::MediumSpringGreen;
       } else if (name == jcommon::StringUtils::ToLower("MediumTurquoise")) {
-        color = jcolor_name_t::MediumTurquoise;
+        color = jcolorname::MediumTurquoise;
       } else if (name == jcommon::StringUtils::ToLower("MediumVioletRed")) {
-        color = jcolor_name_t::MediumVioletRed;
+        color = jcolorname::MediumVioletRed;
       } else if (name == jcommon::StringUtils::ToLower("MidnightBlue")) {
-        color = jcolor_name_t::MidnightBlue;
+        color = jcolorname::MidnightBlue;
       } else if (name == jcommon::StringUtils::ToLower("MintCream")) {
-        color = jcolor_name_t::MintCream;
+        color = jcolorname::MintCream;
       } else if (name == jcommon::StringUtils::ToLower("MistyRose")) {
-        color = jcolor_name_t::MistyRose;
+        color = jcolorname::MistyRose;
       } else if (name == jcommon::StringUtils::ToLower("Moccasin")) {
-        color = jcolor_name_t::Moccasin;
+        color = jcolorname::Moccasin;
       } else if (name == jcommon::StringUtils::ToLower("NavajoWhite")) {
-        color = jcolor_name_t::NavajoWhite;
+        color = jcolorname::NavajoWhite;
       } else if (name == jcommon::StringUtils::ToLower("Navy")) {
-        color = jcolor_name_t::Navy;
+        color = jcolorname::Navy;
       } else if (name == jcommon::StringUtils::ToLower("OldLace")) {
-        color = jcolor_name_t::OldLace;
+        color = jcolorname::OldLace;
       } else if (name == jcommon::StringUtils::ToLower("Olive")) {
-        color = jcolor_name_t::Olive;
+        color = jcolorname::Olive;
       } else if (name == jcommon::StringUtils::ToLower("OliveDrab")) {
-        color = jcolor_name_t::OliveDrab;
+        color = jcolorname::OliveDrab;
       } else if (name == jcommon::StringUtils::ToLower("Orange")) {
-        color = jcolor_name_t::Orange;
+        color = jcolorname::Orange;
       } else if (name == jcommon::StringUtils::ToLower("OrangeRed")) {
-        color = jcolor_name_t::OrangeRed;
+        color = jcolorname::OrangeRed;
       } else if (name == jcommon::StringUtils::ToLower("Orchid")) {
-        color = jcolor_name_t::Orchid;
+        color = jcolorname::Orchid;
       } else if (name == jcommon::StringUtils::ToLower("PaleGoldenRod")) {
-        color = jcolor_name_t::PaleGoldenRod;
+        color = jcolorname::PaleGoldenRod;
       } else if (name == jcommon::StringUtils::ToLower("PaleGreen")) {
-        color = jcolor_name_t::PaleGreen;
+        color = jcolorname::PaleGreen;
       } else if (name == jcommon::StringUtils::ToLower("PaleTurquoise")) {
-        color = jcolor_name_t::PaleTurquoise;
+        color = jcolorname::PaleTurquoise;
       } else if (name == jcommon::StringUtils::ToLower("PaleVioletRed")) {
-        color = jcolor_name_t::PaleVioletRed;
+        color = jcolorname::PaleVioletRed;
       } else if (name == jcommon::StringUtils::ToLower("PapayaWhip")) {
-        color = jcolor_name_t::PapayaWhip;
+        color = jcolorname::PapayaWhip;
       } else if (name == jcommon::StringUtils::ToLower("PeachPuff")) {
-        color = jcolor_name_t::PeachPuff;
+        color = jcolorname::PeachPuff;
       } else if (name == jcommon::StringUtils::ToLower("Peru")) {
-        color = jcolor_name_t::Peru;
+        color = jcolorname::Peru;
       } else if (name == jcommon::StringUtils::ToLower("Pink")) {
-        color = jcolor_name_t::Pink;
+        color = jcolorname::Pink;
       } else if (name == jcommon::StringUtils::ToLower("PowderBlue")) {
-        color = jcolor_name_t::PowderBlue;
+        color = jcolorname::PowderBlue;
       } else if (name == jcommon::StringUtils::ToLower("Plum")) {
-        color = jcolor_name_t::Plum;
+        color = jcolorname::Plum;
       } else if (name == jcommon::StringUtils::ToLower("Purple")) {
-        color = jcolor_name_t::Purple;
+        color = jcolorname::Purple;
       } else if (name == jcommon::StringUtils::ToLower("Red")) {
-        color = jcolor_name_t::Red;
+        color = jcolorname::Red;
       } else if (name == jcommon::StringUtils::ToLower("RosyBrown")) {
-        color = jcolor_name_t::RosyBrown;
+        color = jcolorname::RosyBrown;
       } else if (name == jcommon::StringUtils::ToLower("RoyalBlue")) {
-        color = jcolor_name_t::RoyalBlue;
+        color = jcolorname::RoyalBlue;
       } else if (name == jcommon::StringUtils::ToLower("SaddlebBown")) {
-        color = jcolor_name_t::SaddlebBown;
+        color = jcolorname::SaddlebBown;
       } else if (name == jcommon::StringUtils::ToLower("Salmon")) {
-        color = jcolor_name_t::Salmon;
+        color = jcolorname::Salmon;
       } else if (name == jcommon::StringUtils::ToLower("SandyBrown")) {
-        color = jcolor_name_t::SandyBrown;
+        color = jcolorname::SandyBrown;
       } else if (name == jcommon::StringUtils::ToLower("SeaGreen")) {
-        color = jcolor_name_t::SeaGreen;
+        color = jcolorname::SeaGreen;
       } else if (name == jcommon::StringUtils::ToLower("SeaShell")) {
-        color = jcolor_name_t::SeaShell;
+        color = jcolorname::SeaShell;
       } else if (name == jcommon::StringUtils::ToLower("Sienna")) {
-        color = jcolor_name_t::Sienna;
+        color = jcolorname::Sienna;
       } else if (name == jcommon::StringUtils::ToLower("Silver")) {
-        color = jcolor_name_t::Silver;
+        color = jcolorname::Silver;
       } else if (name == jcommon::StringUtils::ToLower("Skyblue")) {
-        color = jcolor_name_t::Skyblue;
+        color = jcolorname::Skyblue;
       } else if (name == jcommon::StringUtils::ToLower("StateBlue")) {
-        color = jcolor_name_t::StateBlue;
+        color = jcolorname::StateBlue;
       } else if (name == jcommon::StringUtils::ToLower("StateGray")) {
-        color = jcolor_name_t::StateGray;
+        color = jcolorname::StateGray;
       } else if (name == jcommon::StringUtils::ToLower("StateGrey")) {
-        color = jcolor_name_t::StateGrey;
+        color = jcolorname::StateGrey;
       } else if (name == jcommon::StringUtils::ToLower("Snow")) {
-        color = jcolor_name_t::Snow;
+        color = jcolorname::Snow;
       } else if (name == jcommon::StringUtils::ToLower("SpringGreen")) {
-        color = jcolor_name_t::SpringGreen;
+        color = jcolorname::SpringGreen;
       } else if (name == jcommon::StringUtils::ToLower("SteelBlue")) {
-        color = jcolor_name_t::SteelBlue;
+        color = jcolorname::SteelBlue;
       } else if (name == jcommon::StringUtils::ToLower("Tan")) {
-        color = jcolor_name_t::Tan;
+        color = jcolorname::Tan;
       } else if (name == jcommon::StringUtils::ToLower("Teal")) {
-        color = jcolor_name_t::Teal;
+        color = jcolorname::Teal;
       } else if (name == jcommon::StringUtils::ToLower("Thistle")) {
-        color = jcolor_name_t::Thistle;
+        color = jcolorname::Thistle;
       } else if (name == jcommon::StringUtils::ToLower("Tomato")) {
-        color = jcolor_name_t::Tomato;
+        color = jcolorname::Tomato;
       } else if (name == jcommon::StringUtils::ToLower("Turquoise")) {
-        color = jcolor_name_t::Turquoise;
+        color = jcolorname::Turquoise;
       } else if (name == jcommon::StringUtils::ToLower("Violet")) {
-        color = jcolor_name_t::Violet;
+        color = jcolorname::Violet;
       } else if (name == jcommon::StringUtils::ToLower("Wheat")) {
-        color = jcolor_name_t::Wheat;
+        color = jcolorname::Wheat;
       } else if (name == jcommon::StringUtils::ToLower("White")) {
-        color = jcolor_name_t::White;
+        color = jcolorname::White;
       } else if (name == jcommon::StringUtils::ToLower("WhiteSmoke")) {
-        color = jcolor_name_t::WhiteSmoke;
+        color = jcolorname::WhiteSmoke;
       } else if (name == jcommon::StringUtils::ToLower("Yellow")) {
-        color = jcolor_name_t::Yellow;
+        color = jcolorname::Yellow;
       } else if (name == jcommon::StringUtils::ToLower("Yellowgreen")) {
-        color = jcolor_name_t::Yellowgreen;
+        color = jcolorname::Yellowgreen;
       } else if (name == jcommon::StringUtils::ToLower("Transparent")) {
-        color = jcolor_name_t::Transparent;
+        color = jcolorname::Transparent;
       }
     }
 
@@ -516,7 +516,7 @@ struct jcolor_t {
     alpha = a/T(255.0);
   }
 
-  jcolor_t(jcolor_name_t color):
+  jcolor_t(jcolorname color):
     jcolor_t((uint32_t)color)
   {
   }

@@ -430,6 +430,14 @@ static void OnDraw()
   jgui::Graphics 
     *g = sg_back_buffer->GetGraphics();
 
+  if (Application::FrameRate(sg_jgui_window->GetFramesPerSecond()) == true) {
+    g->Flush();
+
+    sg_jgui_window->Repaint();
+
+    return;
+  }
+
   g->Reset();
   g->SetCompositeFlags(jgui::JCF_SRC_OVER);
 
@@ -473,8 +481,6 @@ static void OnDraw()
   sg_back_buffer->UnlockData();
 
   sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
-
-  Application::FrameRate(sg_jgui_window->GetFramesPerSecond());
 }
 
 void OnShape(int w, int h)

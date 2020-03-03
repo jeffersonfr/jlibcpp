@@ -104,17 +104,12 @@ class Dummy : public jgui::Window {
     virtual void Paint(jgui::Graphics *g) 
     {
       static jgui::Image *tiles = new jgui::BufferedImage("images/mario.png");
+      static bool onGround = false;
 
       jgui::Window::Paint(g);
 
       jgui::jpoint_t
         old_player_position = _player_position;
-
-      if (_keys[jevent::JKS_SPACE]) {
-        if (_v == 0.0) {
-          _v = INITIAL_VELOCITY;
-        }
-      }
 
       if (_keys[jevent::JKS_CURSOR_LEFT]) {
         _player_position.x -= PLAYER_STEP;
@@ -123,12 +118,12 @@ class Dummy : public jgui::Window {
           _player_position.x = 0;
         }
  
-        // collision
+        // colision
         jgui::jpoint_t<int>
           index = _player_position/BLOCK_DIVISOR;
 
         if (scene[index.y][index.x - 1] != '.') {
-          _player_position = index*BLOCK_DIVISOR;
+          // _player_position = index*BLOCK_DIVISOR;
         }
       }
 
@@ -139,11 +134,18 @@ class Dummy : public jgui::Window {
           _player_position.x = (int)(scene[0].size()*BLOCK_SIZE.width - BLOCK_SIZE.width);
         }
 
+        // colision
         jgui::jpoint_t<int>
           index = _player_position/BLOCK_DIVISOR;
 
-        if (scene[index.y][index.x + 1] != '.') {
-          _player_position = index*BLOCK_DIVISOR;
+        if (scene[index.y + 0][index.x + 1] != '.' or scene[index.y + 1][index.x + 1] != '.') {
+          // _player_position.x = index.x*BLOCK_DIVISOR.x;
+        }
+      }
+
+      if (_keys[jevent::JKS_SPACE]) {
+        if (onGround == true) {
+          _v = INITIAL_VELOCITY;
         }
       }
 
@@ -159,8 +161,25 @@ class Dummy : public jgui::Window {
       }
 
       if (_player_position.y > (int)(scene.size()*BLOCK_SIZE.height - BLOCK_SIZE.height)) {
-        _v = 0.0;
+        _v = 0.0f;
         _player_position.y = (int)(scene.size()*BLOCK_SIZE.height - BLOCK_SIZE.height);
+      }
+
+      // colision top/bottom
+      jgui::jpoint_t<int>
+        index = _player_position/BLOCK_DIVISOR;
+
+      onGround = false;
+
+      if (scene[index.y + 0][index.x + 0] != '.' or scene[index.y + 0][index.x + 1] != '.') {
+        _v = 0.0f;
+        _player_position.y = (index.y + 1)*BLOCK_DIVISOR.y;
+      }
+
+      if (scene[index.y + 1][index.x + 0] != '.' or scene[index.y + 1][index.x + 1] != '.') {
+        onGround = true;
+        _v = 0.0f;
+        _player_position.y = index.y*BLOCK_DIVISOR.y;
       }
 
       jgui::jpoint_t<int> offset = {
@@ -214,7 +233,7 @@ class Dummy : public jgui::Window {
         }
       }
 
-			g->SetColor(jgui::jcolor_name_t::Green);
+			g->SetColor(jgui::jcolorname::Green);
 			g->FillRectangle(jgui::jrect_t<int>{_player_position - offset, BLOCK_SIZE});
 
       Repaint();

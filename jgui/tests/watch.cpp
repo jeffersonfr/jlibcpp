@@ -101,7 +101,7 @@ class WatchTeste : public jgui::Window {
 
 			jgui::Font *font = GetTheme().GetFont();
 
-			g->SetColor(jgui::jcolor_name_t::White);
+			g->SetColor(jgui::jcolorname::White);
 			g->SetFont(font);
 			g->DrawString(tmp, jgui::jpoint_t<int>{insets.left, insets.top});
 	
@@ -152,7 +152,7 @@ class WatchTeste : public jgui::Window {
       o << std::setw(2) << std::setfill('0') << lt->tm_mday;
 
       g->SetFont(GetTheme().GetFont());
-      g->SetColor(jgui::jcolor_name_t::White);
+      g->SetColor(jgui::jcolorname::White);
       g->DrawRectangle({92, 92, 34, 34});
       g->DrawString(o.str(), jgui::jrect_t<int>{92, 92, 34, 34});
 

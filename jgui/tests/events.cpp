@@ -521,9 +521,9 @@ class Test : public UserWindow, public UserEventListener {
 			jgui::Window::Paint(g);
 
 			if (_color == 0) {
-				g->SetColor(jgui::jcolor_name_t::Red);
+				g->SetColor(jgui::jcolorname::Red);
 			} else if (_color == 1) {
-				g->SetColor(jgui::jcolor_name_t::Blue);
+				g->SetColor(jgui::jcolorname::Blue);
 			}
 
 			g->FillCircle(_ball, _raio);

@@ -19,7 +19,6 @@
  ***************************************************************************/
 #include "jgui/japplication.h"
 #include "jgui/jwindow.h"
-#include "jgui/jbufferedimage.h"
 #include "jmath/jmath.h"
 
 #include <iostream>
@@ -32,10 +31,6 @@
 class Function : public jgui::Window {
 
 	private:
-    std::mutex 
-      _mutex;
-    jgui::Image 
-      *_buffer;
     float 
       cx,
       cy,
@@ -61,19 +56,17 @@ class Function : public jgui::Window {
 		{
       SetFramesPerSecond(60);
 
-      _buffer = new jgui::BufferedImage(jgui::JPF_RGB32, {960, 720});
-    
       jgui::jsize_t<int>
-        size = _buffer->GetSize();
+        size = GetSize();
 
-      cx = (int)(size.width/2);
-      cy = (int)(size.height/2);
+      cx = (int)(size.width);
+      cy = (int)(size.height);
 
       fx = cx - 30;
       fy = cy - 114;
 
       Rho = 45; // view elevation
-      Scale = 1020; // scaling factor
+      Scale = 500; // scaling factor
 
       Theta = 1.0;
 
@@ -85,8 +78,8 @@ class Function : public jgui::Window {
       snp = sin(Phi);
       csp = cos(Phi);
 
-      tx = 450;
-      ty = 485; // x & y translates
+      tx = size.width/2;
+      ty = size.height/2; // x & y translates
 
       incremented = 3.1;
       dr = -1;
@@ -95,66 +88,46 @@ class Function : public jgui::Window {
 
 		virtual ~Function()
 		{
-      _mutex.unlock();
-
-      delete _buffer;
-      _buffer = nullptr;
 		}
-
-		virtual void ShowApp() 
-		{
-      jgui::Graphics
-        *g = _buffer->GetGraphics();
-      jgui::jsize_t<int>
-        size = _buffer->GetSize();
-
-			do {
-        g->Clear();
-
-        for (float x=-15; x<15; x+=0.125) {
-          float x2 = x * x;
-        
-          for (float y=-15; y<15; y+=0.125) {
-            float xy2 = (x2 + y*y)/20.0;
-            float z = incremented * cos(xy2);
-            float xe = -x * snt + y * cst;
-            float ye = -x * cst * csp - y * snt * csp + z * snp;
-            float ze = -x * snp * cst - y * snt * snp - z * csp + Rho;
-            float sx = Scale * xe / ze;
-            float sy = Scale * ye / ze;
-            float ix = (int)(sx + tx);
-            float iy = size.height - (int)(sy + ty);
-            
-            g->SetRGB(0xff808080, {(int)ix, (int)iy});
-          }
-        }
-
-        Repaint();
-
-        _mutex.lock();
-
-        incremented = incremented + increment * dr;
-
-        if (incremented > 5) {
-          incremented = 5;
-          dr = dr * -1;
-        }
-
-        if (incremented < -5) {
-          incremented = -5;
-          dr = dr * -1;
-        }
-      } while (IsHidden() == false);
-    }
 
 		void Paint(jgui::Graphics *g) 
 		{
       jgui::jsize_t<int>
         size = GetSize();
 
-      g->DrawImage(_buffer, {0, 0, size.width, size.height});
-      
-      _mutex.unlock();
+      g->Clear();
+
+      for (float x=-15; x<15; x+=0.125) {
+        float x2 = x * x;
+
+        for (float y=-15; y<15; y+=0.125) {
+          float xy2 = (x2 + y*y)/20.0;
+          float z = incremented * cos(xy2);
+          float xe = -x * snt + y * cst;
+          float ye = -x * cst * csp - y * snt * csp + z * snp;
+          float ze = -x * snp * cst - y * snt * snp - z * csp + Rho;
+          float sx = Scale * xe / ze;
+          float sy = Scale * ye / ze;
+          float ix = (int)(sx + tx);
+          float iy = size.height - (int)(sy + ty);
+
+          g->SetRGB(0xff808080, {(int)ix, (int)iy});
+        }
+      }
+
+      incremented = incremented + increment * dr;
+
+      if (incremented > 5) {
+        incremented = 5;
+        dr = dr * -1;
+      }
+
+      if (incremented < -5) {
+        incremented = -5;
+        dr = dr * -1;
+      }
+
+      Repaint();
     }
 
 };

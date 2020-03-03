@@ -29,6 +29,9 @@
 
 #include <math.h>
 
+// generic buffer (8k)
+uint32_t buffer[8192*4320];
+
 // the texture map
 int texmap[16*16*16*3];
  
@@ -187,8 +190,6 @@ class Minecraft : public jgui::Window {
         ox = 32.5 + now * 64.0,
         oy = 32.5,
         oz = 32.5;
-      uint32_t 
-        buffer[size.width*size.height];
 
       // for each column
 #pragma omp parallel for

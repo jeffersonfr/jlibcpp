@@ -432,6 +432,14 @@ static gboolean OnDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
   jgui::Graphics 
     *g = sg_back_buffer->GetGraphics();
 
+  if (Application::FrameRate(sg_jgui_window->GetFramesPerSecond()) == true) {
+    g->Flush();
+
+    sg_jgui_window->Repaint();
+
+    return;
+  }
+
   /* CHANGE:: use this cairo surface instead
 	int 
     w = gtk_widget_get_allocated_width(widget),
@@ -454,8 +462,6 @@ static gboolean OnDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
   cairo_paint(cr);
 
   sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
-
-  Application::FrameRate(sg_jgui_window->GetFramesPerSecond());
 
   return TRUE;
 }

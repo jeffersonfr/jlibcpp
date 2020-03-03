@@ -69,7 +69,7 @@ class Game2048 : public jgui::Window {
 
 			jgui::Font *font = GetTheme().GetFont();
 
-			g->SetColor(jgui::jcolor_name_t::White);
+			g->SetColor(jgui::jcolorname::White);
 			g->SetFont(font);
 
 			jgui::jsize_t<int>
@@ -95,7 +95,7 @@ class Game2048 : public jgui::Window {
 			int bw = (size.width - t.left - t.right - 4*gap)/4;
 			int bh = (size.height - t.top - t.bottom - 4*gap - 16)/4;
 
-			g->SetColor(jgui::jcolor_name_t::Gray);
+			g->SetColor(jgui::jcolorname::Gray);
 
 			for (int i=0; i<4; i++) {
 				for (int j=0; j<4; j++) {

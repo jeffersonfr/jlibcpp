@@ -20,6 +20,7 @@
 #include "jgui/japplication.h"
 #include "jgui/jwindow.h"
 #include "jgui/jbufferedimage.h"
+#include "jgui/jcolor.h"
 #include "jmedia/jplayermanager.h"
 #include "jmedia/jvolumecontrol.h"
 #include "jevent/jplayerlistener.h"
@@ -182,7 +183,7 @@ class Ray : public jgui::Window, public jevent::PlayerListener {
 
 	public:
 		Ray():
-			jgui::Window(720, 480)
+			jgui::Window({720, 480})
 		{
 			_speed = 4;
 			_angle = 0;
@@ -386,7 +387,7 @@ class Ray : public jgui::Window, public jevent::PlayerListener {
 			jgui::jsize_t<int> size = _map->GetSize();
 
 			g->Clear();
-			g->SetColor(jgui::Color::White);
+			g->SetColor(jgui::jcolorname::White);
 
 			int bw = size.width/MAP_X;
 			int bh = size.height/MAP_Y;
@@ -430,7 +431,7 @@ class Ray : public jgui::Window, public jevent::PlayerListener {
 			delete rotate;
 		}
 
-		jgui::Color GetLuminosity(uint32_t color, float distance)
+		jgui::jcolor_t<float> GetLuminosity(uint32_t color, float distance)
 		{
 			int r = (color >> 0x10) & 0xff;
 			int g = (color >> 0x08) & 0xff;
@@ -440,7 +441,7 @@ class Ray : public jgui::Window, public jevent::PlayerListener {
 			g = g - ((g * distance + _warp) / (15.0 + _lum));
 			b = b - ((b * distance + _warp) / (15.0 + _lum));
 
-			return jgui::Color(r, g, b);
+			return jgui::jcolor_t<float>(r, g, b);
 		}
 
 		virtual void PaintScene(jgui::Graphics *graphics)
@@ -585,31 +586,9 @@ class Ray : public jgui::Window, public jevent::PlayerListener {
 			// jgui::Window::Paint(g);
 
 			PaintScene(g);
+
+      Repaint();
 		}
-
-    virtual void ShowApp()
-    {
-      // INFO:: 15 frames per second
-      uint64_t ref_time = 1000000000LL/15LL;
-
-      do {
-        struct timespec t1, t2;
-
-        clock_gettime(CLOCK_REALTIME, &t1);
-
-        Repaint();
-
-        clock_gettime(CLOCK_REALTIME, &t2);
-
-        uint64_t diff = (t2.tv_sec - t1.tv_sec) * 1000000000LL + (t2.tv_nsec - t1.tv_nsec);
-
-        if (diff < ref_time) {
-          diff = ref_time - diff;
-
-          std::this_thread::sleep_for(std::chrono::microseconds((diff/1000)));
-        }
-      } while (IsHidden() == false);
-    }
 
 };
 

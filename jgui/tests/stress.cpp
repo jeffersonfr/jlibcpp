@@ -48,7 +48,7 @@ class GraphicPanel : public jgui::Window {
     jgui::jsize_t 
       t = _buffer->GetSize();
 
-		g->SetColor(jgui::jcolor_name_t::Black);
+		g->SetColor(jgui::jcolorname::Black);
 		g->FillRectangle({0, 0, t.width, t.height});
 	}
 

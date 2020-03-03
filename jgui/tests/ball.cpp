@@ -339,7 +339,7 @@ class BallDrop : public jgui::Window {
 			//  Draw density curve
 			scale = (double)size.width/numracks;
 
-			g->SetColor(jgui::jcolor_name_t::White);
+			g->SetColor(jgui::jcolorname::White);
 
 			oy = 0;
 

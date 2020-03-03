@@ -77,29 +77,7 @@ class Application : public jcommon::Object {
      * \brief
      *
      */
-    static void FrameRate(int fps)
-    {
-      static auto begin = std::chrono::steady_clock::now();
-
-      static int latest_fps = -1;
-      static int index = 0;
-
-      if (fps != latest_fps) {
-        begin = std::chrono::steady_clock::now();
-        latest_fps = fps;
-        index = 0;
-      }
-
-      std::chrono::time_point<std::chrono::steady_clock> timestamp = begin + std::chrono::milliseconds(index++*(1000/fps));
-      std::chrono::time_point<std::chrono::steady_clock> current = std::chrono::steady_clock::now();
-      std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - current);
-
-      if (diff.count() < 0) {
-        return;
-      }
-
-      std::this_thread::sleep_for(diff);
-    }
+    static bool FrameRate(int fps);
 
 };
 

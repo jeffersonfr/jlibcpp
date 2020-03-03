@@ -107,10 +107,6 @@ class Dialogs : public jgui::Window, public jevent::ActionListener {
     }
 	}
 
-  virtual void ShowApp()
-  {
-  }
-
 };
 
 int main(int argc, char **argv)
