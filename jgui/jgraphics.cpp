@@ -942,6 +942,10 @@ void Graphics::DrawChord(jpoint_t<int> point, jsize_t<int> size, float arc0, flo
 
 void Graphics::FillArc(jpoint_t<int> point, jsize_t<int> size, float arc0, float arc1)
 {
+  if (size.width <= 0 or size.height <= 0) {
+    return;
+  }
+
   struct jpoint_t<int> t = Translate();
 
   arc0 = M_2PI - arc0;
@@ -959,6 +963,10 @@ void Graphics::FillArc(jpoint_t<int> point, jsize_t<int> size, float arc0, float
 
 void Graphics::DrawArc(jpoint_t<int> point, jsize_t<int> size, float arc0, float arc1)
 {
+  if (size.width <= 0 or size.height <= 0) {
+    return;
+  }
+
   struct jpoint_t<int> t = Translate();
 
   int xc = point.x + t.x;

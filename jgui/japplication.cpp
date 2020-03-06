@@ -25,7 +25,30 @@ namespace jgui {
 
 bool Application::FrameRate(int fps)
 {
-  static auto begin = std::chrono::steady_clock::now();
+  static std::chrono::steady_clock::time_point last_time = std::chrono::steady_clock::now();
+  static int last_fps = fps;
+
+  if (fps != last_fps) {
+    last_time = std::chrono::steady_clock::now();
+    last_fps = fps;
+  }
+
+  std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+  std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_time);
+  std::chrono::milliseconds step = std::chrono::milliseconds(1000/fps);
+
+  last_time = now;
+
+  if (diff > step) {
+    return true;
+  }
+
+  std::this_thread::sleep_for(std::chrono::milliseconds(step - diff));
+
+  return false;
+
+  /*
+  static std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
   static int latest_fps = -1;
   static int index = 0;
@@ -36,7 +59,7 @@ bool Application::FrameRate(int fps)
     index = 0;
   }
 
-  std::chrono::time_point<std::chrono::steady_clock> timestamp = begin + std::chrono::milliseconds(index++*(1000/fps));
+  std::chrono::time_point<std::chrono::steady_clock> timestamp = begin + std::chrono::milliseconds(++index*1000/fps);
   std::chrono::time_point<std::chrono::steady_clock> current = std::chrono::steady_clock::now();
   std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - current);
 
@@ -55,6 +78,7 @@ bool Application::FrameRate(int fps)
   std::this_thread::sleep_for(diff);
 
   return false;
+  */
 }
 
 }

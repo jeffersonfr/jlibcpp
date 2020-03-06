@@ -264,6 +264,50 @@ void Raster::FillTriangle(const jgui::jpoint_t<int> &v1, const jgui::jpoint_t<in
   }
 }
 
+/*
+static bool InsideTriangle(const jgui::jpoint_t<int> &v1, const jgui::jpoint_t<int> &v2, const jgui::jpoint_t<int> &v3, const jgui::jpoint_t<int> &p)
+{
+    int dX = p.x - v3.x;
+    int dY = p.y - v3.y;
+    int dX21 = v3.x - v2.x;
+    int dY12 = v2.y - v3.y;
+    int D = dY12*(v1.x - v3.x) + dX21*(v1.y - v3.y);
+    int s = dY12*dX + dX21*dY;
+    int t = (v3.y - v1.y)*dX + (v1.x - v3.x)*dY;
+
+    if (D < 0) {
+      return s <= 0 and t <= 0 and (s + t) >= D;
+    }
+
+    return s >= 0 and t >= 0 and (s + t) <= D;
+}
+
+void Raster::FillTriangle(const jgui::jpoint_t<int> &v1, const jgui::jpoint_t<int> &v2, const jgui::jpoint_t<int> &v3) 
+{
+  int
+    x0 = std::min(std::min(v1.x, v2.x), v3.x),
+    y0 = std::min(std::min(v1.y, v2.y), v3.y),
+    x1 = std::max(std::max(v1.x, v2.x), v3.x),
+    y1 = std::max(std::max(v1.y, v2.y), v3.y);
+
+  for (jgui::jpoint_t<int> p={0, y0}; p.y<y1; p.y++) {
+    for (p.x=x0; p.x<x1; p.x++) {
+      if (InsideTriangle(p, v1, v2, v3) == true) {
+        break;
+      }
+    }
+    
+    for (; p.x<x1; p.x++) {
+      if (InsideTriangle(v1, v2, v3, p) == false) {
+        break;
+      }
+
+      SetPixel(p);
+    }
+  }
+}
+*/
+
 void Raster::DrawRectangle(const jgui::jrect_t<int> &rect)
 {
   jgui::jpoint_t<int>

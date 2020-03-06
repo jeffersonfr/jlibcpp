@@ -138,12 +138,12 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
     
     template<typename U> jpoint_t<typename std::common_type<T, U>::type> operator*(const U &param) const
     {
-      return {(x*param), (y*param)};
+      return {(x * param), (y * param)};
     }
     
     template<typename U> jpoint_t<typename std::common_type<T, U>::type> operator/(const U &param) const
     {
-      return {(x/param), (y/param)};
+      return {(x / param), (y / param)};
     }
 
     template<typename U> jpoint_t<T> & operator+=(const U &param)
@@ -158,12 +158,12 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
     
     template<typename U> jpoint_t<T> & operator*=(const U &param)
     {
-      return (*this = *this*param);
+      return (*this = *this * param);
     }
     
     template<typename U> jpoint_t<T> & operator/=(const U &param)
     {
-      return (*this = *this/param);
+      return (*this = *this / param);
     }
     
     template<typename U> jpoint_t<T> & operator=(const jpoint_t<U> &param)
@@ -888,6 +888,16 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       return {(width + param.width), (height + param.height)};
     }
     
+    template<typename U> jsize_t<typename std::common_type<T, U>::type> operator*(const jsize_t<U> &param) const
+    {
+      return {(width * param.width), (height * param.height)};
+    }
+    
+    template<typename U> jsize_t<typename std::common_type<T, U>::type> operator/(const jsize_t<U> &param) const
+    {
+      return {(width / param.width), (height / param.height)};
+    }
+    
     template<typename U> jsize_t<typename std::common_type<T, U>::type> operator-(const jsize_t<U> &param) const
     {
       return {(width - param.width), (height - param.height)};
@@ -901,6 +911,16 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
     template<typename U> jsize_t<T> & operator-=(const jsize_t<U> &param)
     {
       return (*this = *this - param);
+    }
+    
+    template<typename U> jsize_t<T> & operator*=(const jsize_t<U> &param)
+    {
+      return (*this = *this * param);
+    }
+    
+    template<typename U> jsize_t<T> & operator/=(const jsize_t<U> &param)
+    {
+      return (*this = *this / param);
     }
     
     T Area() const

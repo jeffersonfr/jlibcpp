@@ -54,8 +54,13 @@ class Grid : public jgui::Window {
     jmath::jmatrix_t<3, 1, float>
       _rotate {+1.2f, +0.0f, +2.4f},
       _camera {+0.0f, +0.0f, +1.0f};
+    jgui::jpoint_t<int> 
+      _pointer;
 		float
 			_scale = 100.0f;
+    bool 
+      _drag = false;
+
 
   private:
     void UpdateValues()
@@ -83,7 +88,7 @@ class Grid : public jgui::Window {
 		Grid():
 			jgui::Window({720, 480})
 		{
-      SetFramesPerSecond(120);
+      SetFramesPerSecond(60);
 
       float step = 2*M_PI/sizeT;
 
@@ -143,16 +148,13 @@ class Grid : public jgui::Window {
 
     jgui::jpoint_t<float> Project(jmath::jmatrix_t<3, 1, float> p) 
 		{
-      p = _transformation*(p - _camera);
-  
       jgui::jsize_t<int>
         size = GetSize();
 
+      p = _transformation*(p - _camera);
+  
       return jgui::jpoint_t<float>{p(0, 0)/_camera(2, 0), -p(1, 0)/_camera(2, 0)}*_scale + jgui::jpoint_t<int>{size.width/2, size.height/2};
 		}
-
-    jgui::jpoint_t<int> _pointer;
-    bool _drag = false;
 
 		bool MousePressed(jevent::MouseEvent *event)
 		{
