@@ -20,10 +20,13 @@
 #ifndef J_GEOMETRY_H
 #define J_GEOMETRY_H
 
+#include "jmath/jvector.h"
+
 #include <algorithm>
 #include <cmath>
 #include <optional>
 #include <type_traits>
+#include <iostream>
 
 #include <stdio.h>
 
@@ -103,6 +106,16 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
       };
     }
 
+    template<typename U> operator jmath::jvector_t<2, U>()
+    {
+      return {
+        .data = {
+          (U)x,
+          (U)y
+        }
+      };
+    }
+
     bool operator==(const jpoint_t<T> &param) const
     {
       return (x == param.x and y == param.y);
@@ -122,6 +135,14 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
     {
       x = (T)param;
       y = (T)param;
+
+      return *this;
+    }
+
+    template<typename U> jpoint_t<T> & operator=(const jmath::jvector_t<2, U> &param)
+    {
+      x = (T)param[0];
+      y = (T)param[1];
 
       return *this;
     }
@@ -313,6 +334,211 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
     friend std::istream & operator>>(std::istream& is, jpoint_t<T> &param) 
     {
       is >> param.x >> param.y;
+
+      return is;
+    }
+
+  };
+
+/**
+ * \brief
+ *
+ */
+template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
+  struct jsize_t {
+    T width;
+    T height;
+    
+    template<typename U> operator jsize_t<U>()
+    {
+      return {
+        .width = (U)width,
+        .height = (U)height
+      };
+    }
+
+    template<typename U> operator jpoint_t<U>()
+    {
+      return {
+        .x = (U)width,
+        .y = (U)height
+      };
+    }
+
+    template<typename U> operator jmath::jvector_t<2, U>()
+    {
+      return {
+        .data = {
+          (U)width,
+          (U)height
+        }
+      };
+    }
+
+    jsize_t<T> operator-() const
+    {
+      return {-width, -height};
+    }
+    
+    bool operator==(const jsize_t<T> &param) const
+    {
+      return (width == param.width and height == param.height);
+    }
+
+    bool operator!=(const jsize_t<T> &param) const
+    {
+      return (width != param.width or height != param.height);
+    }
+
+    template<typename U> jsize_t<T> & operator=(const U &param)
+    {
+      width = (T)param;
+      height = (T)param;
+
+      return *this;
+    }
+
+    template<typename U> jsize_t<T> & operator=(const jmath::jvector_t<2, U> &param)
+    {
+      width = (T)param[0];
+      height = (T)param[1];
+
+      return *this;
+    }
+
+    template<typename U> jsize_t<typename std::common_type<T, U>::type> operator+(const U &param) const
+    {
+      return {width + param, height + param};
+    }
+    
+    template<typename U> jsize_t<typename std::common_type<T, U>::type> operator-(const U &param) const
+    {
+      return {width - param, height - param};
+    }
+    
+    template<typename U> jsize_t<typename std::common_type<T, U>::type> operator*(const U &param) const
+    {
+      return {width*param, height*param};
+    }
+    
+    template<typename U> jsize_t<typename std::common_type<T, U>::type> operator/(const U &param) const
+    {
+      return {width/param, height/param};
+    }
+
+    template<typename U> jsize_t<T> & operator+=(const U &param)
+    {
+      return (*this = *this + param);
+    }
+
+    template<typename U> jsize_t<T> & operator-=(const U &param)
+    {
+      return (*this = *this - param);
+    }
+
+    template<typename U> jsize_t<T> & operator*=(const U &param)
+    {
+      return (*this = *this*param);
+    }
+
+    template<typename U> jsize_t<T> & operator/=(const U &param)
+    {
+      return (*this = *this/param);
+    }
+
+    template<typename U> jsize_t<T> & operator=(const jsize_t<U> &param)
+    {
+      width = (T)param.width;
+      height = (T)param.height;
+
+      return *this;
+    }
+
+    template<typename U> jsize_t<typename std::common_type<T, U>::type> operator+(const jsize_t<U> &param) const
+    {
+      return {(width + param.width), (height + param.height)};
+    }
+    
+    template<typename U> jsize_t<typename std::common_type<T, U>::type> operator*(const jsize_t<U> &param) const
+    {
+      return {(width * param.width), (height * param.height)};
+    }
+    
+    template<typename U> jsize_t<typename std::common_type<T, U>::type> operator/(const jsize_t<U> &param) const
+    {
+      return {(width / param.width), (height / param.height)};
+    }
+    
+    template<typename U> jsize_t<typename std::common_type<T, U>::type> operator-(const jsize_t<U> &param) const
+    {
+      return {(width - param.width), (height - param.height)};
+    }
+    
+    template<typename U> jsize_t<T> & operator+=(const jsize_t<U> &param)
+    {
+      return (*this = *this + param);
+    }
+    
+    template<typename U> jsize_t<T> & operator-=(const jsize_t<U> &param)
+    {
+      return (*this = *this - param);
+    }
+    
+    template<typename U> jsize_t<T> & operator*=(const jsize_t<U> &param)
+    {
+      return (*this = *this * param);
+    }
+    
+    template<typename U> jsize_t<T> & operator/=(const jsize_t<U> &param)
+    {
+      return (*this = *this / param);
+    }
+    
+    T Area() const
+    {
+      return width*height;
+    }
+
+    T Min() const
+    {
+      return std::min<T>(width, height);
+    }
+
+    T Max() const
+    {
+      return std::max<T>(width, height);
+    }
+
+    template<typename U> friend jsize_t<typename std::common_type<T, U>::type> operator+(const U &param, const jsize_t<T> &thiz)
+    {
+      return {param + thiz.width, param + thiz.height};
+    }
+    
+    template<typename U> friend jsize_t<typename std::common_type<T, U>::type> operator-(const U &param, const jsize_t<T> &thiz)
+    {
+      return {param - thiz.width, param - thiz.height};
+    }
+    
+    template<typename U> friend jsize_t<typename std::common_type<T, U>::type> operator*(const U &param, const jsize_t<T> &thiz)
+    {
+      return {param*thiz.width, param*thiz.height};
+    }
+    
+    template<typename U> friend jsize_t<typename std::common_type<T, U>::type> operator/(const U &param, const jsize_t<T> &thiz)
+    {
+      return {param/thiz.width, param/thiz.height};
+    }
+    
+    friend std::ostream & operator<<(std::ostream& out, const jsize_t<T> &param)
+    {
+      out << param.width << ", " << param.height;
+
+      return out;
+    }
+
+    friend std::istream & operator>>(std::istream& is, jsize_t<T> &param) 
+    {
+      is >> param.width >> param.height;
 
       return is;
     }
@@ -789,185 +1015,6 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
     friend std::istream & operator>>(std::istream& is, jcircle_t<T> &param) 
     {
       is >> param.center.x >> param.center.y >> param.radius;
-
-      return is;
-    }
-
-  };
-
-/**
- * \brief
- *
- */
-template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
-  struct jsize_t {
-    T width;
-    T height;
-    
-    template<typename U> operator jsize_t<U>()
-    {
-      return {
-        .width = (U)width,
-        .height = (U)height
-      };
-    }
-
-    jsize_t<T> operator-() const
-    {
-      return {-width, -height};
-    }
-    
-    bool operator==(const jsize_t<T> &param) const
-    {
-      return (width == param.width and height == param.height);
-    }
-
-    bool operator!=(const jsize_t<T> &param) const
-    {
-      return (width != param.width or height != param.height);
-    }
-
-    template<typename U> jsize_t<T> & operator=(const U &param)
-    {
-      width = (T)param;
-      height = (T)param;
-
-      return *this;
-    }
-
-    template<typename U> jsize_t<typename std::common_type<T, U>::type> operator+(const U &param) const
-    {
-      return {width + param, height + param};
-    }
-    
-    template<typename U> jsize_t<typename std::common_type<T, U>::type> operator-(const U &param) const
-    {
-      return {width - param, height - param};
-    }
-    
-    template<typename U> jsize_t<typename std::common_type<T, U>::type> operator*(const U &param) const
-    {
-      return {width*param, height*param};
-    }
-    
-    template<typename U> jsize_t<typename std::common_type<T, U>::type> operator/(const U &param) const
-    {
-      return {width/param, height/param};
-    }
-
-    template<typename U> jsize_t<T> & operator+=(const U &param)
-    {
-      return (*this = *this + param);
-    }
-
-    template<typename U> jsize_t<T> & operator-=(const U &param)
-    {
-      return (*this = *this - param);
-    }
-
-    template<typename U> jsize_t<T> & operator*=(const U &param)
-    {
-      return (*this = *this*param);
-    }
-
-    template<typename U> jsize_t<T> & operator/=(const U &param)
-    {
-      return (*this = *this/param);
-    }
-
-    template<typename U> jsize_t<T> & operator=(const jsize_t<U> &param)
-    {
-      width = (T)param.width;
-      height = (T)param.height;
-
-      return *this;
-    }
-
-    template<typename U> jsize_t<typename std::common_type<T, U>::type> operator+(const jsize_t<U> &param) const
-    {
-      return {(width + param.width), (height + param.height)};
-    }
-    
-    template<typename U> jsize_t<typename std::common_type<T, U>::type> operator*(const jsize_t<U> &param) const
-    {
-      return {(width * param.width), (height * param.height)};
-    }
-    
-    template<typename U> jsize_t<typename std::common_type<T, U>::type> operator/(const jsize_t<U> &param) const
-    {
-      return {(width / param.width), (height / param.height)};
-    }
-    
-    template<typename U> jsize_t<typename std::common_type<T, U>::type> operator-(const jsize_t<U> &param) const
-    {
-      return {(width - param.width), (height - param.height)};
-    }
-    
-    template<typename U> jsize_t<T> & operator+=(const jsize_t<U> &param)
-    {
-      return (*this = *this + param);
-    }
-    
-    template<typename U> jsize_t<T> & operator-=(const jsize_t<U> &param)
-    {
-      return (*this = *this - param);
-    }
-    
-    template<typename U> jsize_t<T> & operator*=(const jsize_t<U> &param)
-    {
-      return (*this = *this * param);
-    }
-    
-    template<typename U> jsize_t<T> & operator/=(const jsize_t<U> &param)
-    {
-      return (*this = *this / param);
-    }
-    
-    T Area() const
-    {
-      return width*height;
-    }
-
-    T Min() const
-    {
-      return std::min<T>(width, height);
-    }
-
-    T Max() const
-    {
-      return std::max<T>(width, height);
-    }
-
-    template<typename U> friend jsize_t<typename std::common_type<T, U>::type> operator+(const U &param, const jsize_t<T> &thiz)
-    {
-      return {param + thiz.width, param + thiz.height};
-    }
-    
-    template<typename U> friend jsize_t<typename std::common_type<T, U>::type> operator-(const U &param, const jsize_t<T> &thiz)
-    {
-      return {param - thiz.width, param - thiz.height};
-    }
-    
-    template<typename U> friend jsize_t<typename std::common_type<T, U>::type> operator*(const U &param, const jsize_t<T> &thiz)
-    {
-      return {param*thiz.width, param*thiz.height};
-    }
-    
-    template<typename U> friend jsize_t<typename std::common_type<T, U>::type> operator/(const U &param, const jsize_t<T> &thiz)
-    {
-      return {param/thiz.width, param/thiz.height};
-    }
-    
-    friend std::ostream & operator<<(std::ostream& out, const jsize_t<T> &param)
-    {
-      out << param.width << ", " << param.height;
-
-      return out;
-    }
-
-    friend std::istream & operator>>(std::istream& is, jsize_t<T> &param) 
-    {
-      is >> param.width >> param.height;
 
       return is;
     }

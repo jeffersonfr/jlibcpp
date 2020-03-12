@@ -68,7 +68,7 @@ DEFINES = \
   -D_FILE_OFFSET_BITS=64 \
   -D_LARGEFILE_SOURCE \
   -std=c++17 \
-
+	#-Wfatal-errors \ # in case of errors, shows just the first line of error
 ifeq ($(ENABLE_DEBUG),yes)
   
 DEFINES += \

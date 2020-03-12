@@ -1,12 +1,17 @@
 #include "jgui/japplication.h"
 #include "jgui/jwindow.h"
+#include "jgui/jbufferedimage.h"
 
 class Dummy : public jgui::Window {
 
+  jgui::Image
+    *buffer;
+
   public:
     Dummy():
-      jgui::Window({100, 100})
+      jgui::Window({256, 256})
     {
+      buffer = new jgui::BufferedImage(jgui::JPF_RGB32, {256, 256});
     }
 
     virtual ~Dummy()
@@ -17,8 +22,30 @@ class Dummy : public jgui::Window {
     {
       jgui::Window::Paint(g);
 
-			g->SetColor(jgui::jcolorname::Red);
-			g->FillRectangle({0, 0, GetSize()});
+      static float angle = 0.0f;
+
+      buffer->GetGraphics()->SetColor(jgui::jcolorname::Green);
+      buffer->GetGraphics()->FillArc({128, 128}, {128, 128}, angle, angle + 0.2f);
+
+      for (int i=0; i<256*256; i++) {
+        jgui::jpoint_t<int>
+          point {i%256, i/256};
+        jgui::jcolor_t<float>
+          color = buffer->GetGraphics()->GetRGB(point);
+
+        color.green = color.green*0.90f;
+
+        buffer->GetGraphics()->SetRGB(color, point);
+      }
+
+      buffer->GetGraphics()->SetColor(jgui::jcolorname::Green);
+      buffer->GetGraphics()->DrawCircle({128, 128}, 128);
+
+      g->DrawImage(buffer, jgui::jpoint_t<int>{0, 0});
+
+      angle = angle + 0.06f;
+
+      Repaint();
     }
 
 };
