@@ -25,111 +25,97 @@ class GraphicsTeste : public jgui::Window {
 	private:
 		std::vector<jgui::jpoint_t<int>> 
       points;
-		int 
-      cx,
-			cy;
-		int 
-      wblocks,
-			hblocks;
+    jgui::jpoint_t<int>
+      last = {-1, -1};
+    jgui::jsize_t<int>
+      blocks;
+    bool
+      pressed = false;
 
 	public:
 		GraphicsTeste():
 			jgui::Window({720, 480})
 		{
-			jgui::jsize_t
-				size = GetSize();
-
-			cx = size.width/2;
-			cy = size.height/2;
-
-			wblocks = 64;
-			hblocks = 64;
+      blocks = {720/32, 480/32};
 		}
 
 		virtual ~GraphicsTeste()
 		{
 		}
 
-		virtual bool MousePressed(jevent::MouseEvent *event)
-		{
-      jgui::jpoint_t<int>
-        elocation = event->GetLocation();
-      jgui::jsize_t<int>
-        size = GetSize();
-      int
-        wsize = size.width/(double)wblocks,
-        hsize = size.height/(double)hblocks;
-			std::vector<jgui::jpoint_t<int>>::iterator 
-        i = points.begin();
-			int 
-        x = elocation.x/wsize,
-				y = elocation.y/hsize;
+    void DrawPoint(jevent::MouseEvent *event)
+    {
+      if (pressed == false) {
+        return;
+      }
 
-			for (; i!=points.end(); i++) {
-				if ((*i).x == x && (*i).y == y) {
-					break;
-				}
-			}
+      jgui::jpoint_t<int>
+        point = event->GetLocation()/jgui::jpoint_t<int>(blocks);
+
+      if (last == point) {
+        return;
+      }
+
+      last = point;
+
+      decltype(points)::iterator 
+        i = std::find_if(points.begin(), points.end(), [=](const jgui::jpoint_t<int> &param){
+          return param == point;
+          });
 
 			if (i == points.end()) {
-				points.push_back({x, y});
+				points.push_back(point);
 			} else {
 				points.erase(i);
 			}
 
       Repaint();
+    }
+
+		virtual bool MousePressed(jevent::MouseEvent *event)
+		{
+      pressed = true;
+
+      DrawPoint(event);
+
+			return true;
+		}
+
+		virtual bool MouseReleased(jevent::MouseEvent *event)
+		{
+      pressed = false;
+      last = {-1, -1};
 
 			return true;
 		}
 
 		virtual bool MouseMoved(jevent::MouseEvent *event)
 		{
-      jgui::jpoint_t<int>
-        elocation = event->GetLocation();
-      jgui::jsize_t<int>
-        size = GetSize();
-      int
-        wsize = size.width/(double)wblocks,
-        hsize = size.height/(double)hblocks;
-
-      cx = elocation.x/wsize;
-      cy = elocation.y/hsize;
-
-      Repaint();
+      DrawPoint(event);
 
       return true;
     }
 
 		virtual void Paint(jgui::Graphics *g)
 		{
+      jgui::Window::Paint(g);
+
 			jgui::jsize_t
 				size = GetSize();
-      int
-        wsize = size.width/(double)wblocks,
-        hsize = size.height/(double)hblocks;
 
-			g->Clear();
-			g->SetColor({0x20, 0x20, 0x80, 0xff});
-			
-			for (int i=0; i<wblocks; i++) {
-				g->DrawLine({i*wsize, 0}, {i*wsize, size.height});
-			}
-			
-			for (int i=0; i<hblocks; i++) {
-				g->DrawLine({0, i*hsize}, {size.width, i*hsize});
-			}
-	
-			g->SetColor({0x80, 0x00, 0x00, 0xff});
-			for (std::vector<jgui::jpoint_t<int>>::iterator i=points.begin(); i!=points.end(); i++) {
-				g->FillRectangle({(*i).x*wsize, (*i).y*hsize, wsize, hsize});
-			}
+      g->SetColor(jgui::jcolorname::Blue);
 
-			g->SetColor({0x60, 0x60, 0x80, 0xa0});
-			g->FillRectangle({cx*wsize, cy*hsize, wsize, hsize});
+      for (int j=0; j<size.height; j+=blocks.height) {
+        g->DrawLine({0, j}, {size.width, j});
+      }
 
-			g->SetColor({0xff, 0xff, 0xff, 0xff});
-			g->FillRectangle({cx*wsize + wsize/2, 0, 1, size.height});
-			g->FillRectangle({0, cy*hsize + hsize/2, size.width, 1});
+      for (int i=0; i<size.width; i+=blocks.width) {
+        g->DrawLine({i, 0}, {i, size.height});
+      }
+
+      for (auto &point : points) {
+        g->FillRectangle({point*jgui::jpoint_t<int>(blocks), blocks});
+      }
 		}
 
 };

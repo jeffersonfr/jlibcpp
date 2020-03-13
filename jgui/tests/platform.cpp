@@ -179,9 +179,10 @@ class Entity : public Component {
       UNKNOWN,
       TILE,
       FIELD,
-      PROJECTILE,
       ENEMY,
+      ENEMY_PROJECTILE,
       PLAYER,
+      PLAYER_PROJECTILE,
       UI,
       __LAST__
     };
@@ -332,12 +333,14 @@ class Entity : public Component {
         type = "tile";
       } else if (param.Type() == Entity::entity_t::FIELD) {
         type = "field";
-      } else if (param.Type() == Entity::entity_t::PROJECTILE) {
-        type = "projectile";
       } else if (param.Type() == Entity::entity_t::ENEMY) {
         type = "enemy";
+      } else if (param.Type() == Entity::entity_t::ENEMY_PROJECTILE) {
+        type = "enemy projectile";
       } else if (param.Type() == Entity::entity_t::PLAYER) {
         type = "player";
+      } else if (param.Type() == Entity::entity_t::PLAYER_PROJECTILE) {
+        type = "player projectile";
       } else if (param.Type() == Entity::entity_t::UI) {
         type = "ui";
       }
@@ -907,7 +910,8 @@ class EntityManager : public Component {
         entities = ListEntitiesByComponent<CollisionComponent>();
 
       for (auto thisEntity : entities) {
-        CollisionComponent *thisComponent = thisEntity->GetComponent<CollisionComponent>();
+        CollisionComponent 
+          *thisComponent = thisEntity->GetComponent<CollisionComponent>();
 
         if (thisEntity->valid == false) {
           continue;
@@ -922,7 +926,8 @@ class EntityManager : public Component {
             continue;
           }
 
-          CollisionComponent *thatComponent = thatEntity->GetComponent<CollisionComponent>();
+          CollisionComponent 
+            *thatComponent = thatEntity->GetComponent<CollisionComponent>();
 
           if (thisComponent->bounds.Intersects(thatComponent->bounds)) {
             Entity::entity_t
@@ -933,6 +938,59 @@ class EntityManager : public Component {
               return CollisionComponent::collision_t::PLAYER_ENEMY;
             } else if (thisId == Entity::entity_t::ENEMY and thatId == Entity::entity_t::ENEMY) {
               return CollisionComponent::collision_t::ENEMY_ENEMY;
+            } else if (thisId == Entity::entity_t::PLAYER_PROJECTILE and thatId == Entity::entity_t::ENEMY) {
+              thisEntity->valid = false;
+              thatEntity->valid = false;
+
+              std::vector<jgui::Image *>
+                crops = AssetsManager::Instance().LoadImageMap("assets/images/explosion.png", {
+                    {0*32, 0*32, 32, 32},
+                    {1*32, 0*32, 32, 32},
+                    {2*32, 0*32, 32, 32},
+                    {3*32, 0*32, 32, 32},
+                    {4*32, 0*32, 32, 32},
+
+                    {0*32, 1*32, 32, 32},
+                    {1*32, 1*32, 32, 32},
+                    {2*32, 1*32, 32, 32},
+                    {3*32, 1*32, 32, 32},
+                    {4*32, 1*32, 32, 32},
+
+                    {0*32, 2*32, 32, 32},
+                    {1*32, 2*32, 32, 32},
+                    {2*32, 2*32, 32, 32},
+                    {3*32, 2*32, 32, 32},
+                    {4*32, 2*32, 32, 32},
+                    });
+
+              Entity 
+                &entity = Create(Entity::entity_t::ENEMY_PROJECTILE); // INFO:: avoid damage the enemy with another PLAYER_PROJECTILE
+
+              entity.Create<StaticComponent>(
+                  thatComponent->bounds.point, 2);
+              entity.Create<AnimatedSpriteComponent>(std::map<std::string, AnimatedSpriteComponent::Animation>{
+                  {
+                  std::string("explosion"), AnimatedSpriteComponent::Animation({
+                      crops[0],
+                      crops[1],
+                      crops[2],
+                      crops[3],
+                      crops[4],
+
+                      crops[5],
+                      crops[6],
+                      crops[7],
+                      crops[8],
+                      crops[9],
+
+                      crops[10],
+                      crops[11],
+                      crops[12],
+                      crops[13],
+                      crops[14],
+                      }, false, 8)
+                  }
+              })->CurrentAnimation("explosion");
             }
           }
         }
@@ -1270,7 +1328,7 @@ class KeyboardComponent : public Component {
           _counter = 0.0f;
 
           Entity 
-            &entity = _entityManager.Create(Entity::entity_t::PROJECTILE);
+            &entity = _entityManager.Create(Entity::entity_t::PLAYER_PROJECTILE);
           jgui::Image
             *image = AssetsManager::Instance().LoadImage("assets/images/bullet-enemy.png");
           jgui::jsize_t<int>
@@ -1299,65 +1357,6 @@ class KeyboardComponent : public Component {
           entity.Create<SpriteComponent>(
               image);
           entity.Create<CollisionComponent>();
-
-
-
-
-
-
-
-
-          {
-          std::vector<jgui::Image *>
-            crops = AssetsManager::Instance().LoadImageMap("assets/images/explosion.png", {
-              {0*32, 0*32, 32, 32},
-              {1*32, 0*32, 32, 32},
-              {2*32, 0*32, 32, 32},
-              {3*32, 0*32, 32, 32},
-              {4*32, 0*32, 32, 32},
-
-              {0*32, 1*32, 32, 32},
-              {1*32, 1*32, 32, 32},
-              {2*32, 1*32, 32, 32},
-              {3*32, 1*32, 32, 32},
-              {4*32, 1*32, 32, 32},
-
-              {0*32, 2*32, 32, 32},
-              {1*32, 2*32, 32, 32},
-              {2*32, 2*32, 32, 32},
-              {3*32, 2*32, 32, 32},
-              {4*32, 2*32, 32, 32},
-            });
-
-          Entity 
-            &entity = _entityManager.Create(Entity::entity_t::PROJECTILE);
-
-          entity.Create<StaticComponent>(
-            transform->pos, 2);
-					entity.Create<AnimatedSpriteComponent>(std::map<std::string, AnimatedSpriteComponent::Animation>{
-						{
-							std::string("explosion"), AnimatedSpriteComponent::Animation({
-                  crops[0],
-                  crops[1],
-                  crops[2],
-                  crops[3],
-                  crops[4],
-
-                  crops[5],
-                  crops[6],
-                  crops[7],
-                  crops[8],
-                  crops[9],
-
-                  crops[10],
-                  crops[11],
-                  crops[12],
-                  crops[13],
-                  crops[14],
-              }, false, 8)
-						}
-					})->CurrentAnimation("explosion");
-          }
         }
       }
 
@@ -1503,7 +1502,7 @@ class Game : public jgui::Window {
 
       _entityManager.Initialize();
       
-      SetFramesPerSecond(30);
+      SetFramesPerSecond(60);
     }
 
     virtual ~Game()
@@ -1627,7 +1626,7 @@ class Game : public jgui::Window {
 
           entity.Create<TimeoutComponent>(1.0f, [&](){
               Entity 
-                &projectile = _entityManager.Create(Entity::entity_t::PROJECTILE);
+                &projectile = _entityManager.Create(Entity::entity_t::ENEMY_PROJECTILE);
                 
               jgui::jrect_t<float>
                 rect = entity.GetComponent<SpriteComponent>()->dst;
