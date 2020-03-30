@@ -1898,11 +1898,13 @@ bool Graphics::DrawImage(Image *img, jpoint_t<int> point)
     cairo_restore(_cairo_context);
   } else {
     jsize_t<int> size = img->GetSize();
-    uint32_t rgb[size.width*size.height];
+    uint32_t *rgb = new uint32_t[size.width*size.height];
 
     img->GetRGBArray(rgb, {0, 0, size.width, size.height});
   
     SetRGBArray(rgb, {point, size});
+
+    delete [] rgb;
   }
 
   return true;
@@ -1942,13 +1944,15 @@ bool Graphics::DrawImage(Image *img, jrect_t<int> dst)
       return false;
     }
 
-    uint32_t rgb[dst.size.width*dst.size.height];
+    uint32_t *rgb = new uint32_t[dst.size.width*dst.size.height];
 
     scl->GetRGBArray(rgb, {0, 0, dst.size.width, dst.size.height});
   
     SetRGBArray(rgb, dst);
   
     delete scl;
+
+    delete [] rgb;
   }
 
   return true;
@@ -2005,13 +2009,15 @@ bool Graphics::DrawImage(Image *img, jrect_t<int> src, jrect_t<int> dst)
 
     delete aux;
 
-    uint32_t rgb[dst.size.width*dst.size.height];
+    uint32_t *rgb = new uint32_t[dst.size.width*dst.size.height];
 
     scl->GetRGBArray(rgb, {0, 0, dst.size.width, dst.size.height});
   
     SetRGBArray(rgb, dst);
   
     delete scl;
+
+    delete [] rgb;
   }
 
   return true;

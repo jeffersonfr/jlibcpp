@@ -222,6 +222,50 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
       return v;
     }
 
+    template<typename U> jvector_t<N, typename std::common_type<T, U>::type> operator%(const U &param) const
+    {
+      jvector_t<N, typename std::common_type<T, U>::type> v;
+
+      for (size_t i=0; i<N; i++) {
+        v.data[i] = (data[i]%param);
+      }
+
+      return v;
+    }
+
+    template<typename U> jvector_t<N, typename std::common_type<T, U>::type> operator|(const U &param) const
+    {
+      jvector_t<N, typename std::common_type<T, U>::type> v;
+
+      for (size_t i=0; i<N; i++) {
+        v.data[i] = (data[i] | param);
+      }
+
+      return v;
+    }
+
+    template<typename U> jvector_t<N, typename std::common_type<T, U>::type> operator&(const U &param) const
+    {
+      jvector_t<N, typename std::common_type<T, U>::type> v;
+
+      for (size_t i=0; i<N; i++) {
+        v.data[i] = (data[i] & param);
+      }
+
+      return v;
+    }
+
+    template<typename U> jvector_t<N, typename std::common_type<T, U>::type> operator^(const U &param) const
+    {
+      jvector_t<N, typename std::common_type<T, U>::type> v;
+
+      for (size_t i=0; i<N; i++) {
+        v.data[i] = (data[i] ^ param);
+      }
+
+      return v;
+    }
+
     template<typename U> jvector_t<N, T> & operator=(const jvector_t<N, U> &param)
     {
       for (size_t i=0; i<N; i++) {
@@ -275,6 +319,50 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
       return v;
     }
     
+    template<typename U> jvector_t<N, typename std::common_type<T, U>::type> operator%(const jvector_t<N, U> &param) const
+    {
+      jvector_t<N, typename std::common_type<T, U>::type> v;
+
+      for (size_t i=0; i<N; i++) {
+        v.data[i] = (data[i]%param.data[i]);
+      }
+
+      return v;
+    }
+    
+    template<typename U> jvector_t<N, typename std::common_type<T, U>::type> operator|(const jvector_t<N, U> &param) const
+    {
+      jvector_t<N, typename std::common_type<T, U>::type> v;
+
+      for (size_t i=0; i<N; i++) {
+        v.data[i] = (data[i] | param.data[i]);
+      }
+
+      return v;
+    }
+    
+    template<typename U> jvector_t<N, typename std::common_type<T, U>::type> operator&(const jvector_t<N, U> &param) const
+    {
+      jvector_t<N, typename std::common_type<T, U>::type> v;
+
+      for (size_t i=0; i<N; i++) {
+        v.data[i] = (data[i]&param.data[i]);
+      }
+
+      return v;
+    }
+    
+    template<typename U> jvector_t<N, typename std::common_type<T, U>::type> operator^(const jvector_t<N, U> &param) const
+    {
+      jvector_t<N, typename std::common_type<T, U>::type> v;
+
+      for (size_t i=0; i<N; i++) {
+        v.data[i] = (data[i]^param.data[i]);
+      }
+
+      return v;
+    }
+    
     template<typename U> jvector_t<N, T> & operator+=(const jvector_t<N, U> &param)
     {
       return (*this = *this + param);
@@ -293,6 +381,26 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
     template<typename U> jvector_t<N, T> & operator/=(const jvector_t<N, U> &param)
     {
       return (*this = *this/param);
+    }
+    
+    template<typename U> jvector_t<N, T> & operator%=(const jvector_t<N, U> &param)
+    {
+      return (*this = *this%param);
+    }
+    
+    template<typename U> jvector_t<N, T> & operator|=(const jvector_t<N, U> &param)
+    {
+      return (*this = *this | param);
+    }
+    
+    template<typename U> jvector_t<N, T> & operator&=(const jvector_t<N, U> &param)
+    {
+      return (*this = *this & param);
+    }
+    
+    template<typename U> jvector_t<N, T> & operator^=(const jvector_t<N, U> &param)
+    {
+      return (*this = *this ^ param);
     }
     
     template<typename U> typename std::common_type<T, U>::type Scalar(const jvector_t<N, U> &param) const
@@ -711,6 +819,50 @@ template<size_t N, typename T = float, typename = typename std::enable_if<std::i
 
       for (size_t i=0; i<N; i++) {
         v.data[i] = (param/thiz.data[i]);
+      }
+
+      return v;
+    }
+    
+    template<typename U> friend jvector_t<N, typename std::common_type<T, U>::type> operator%(const U &param, const jvector_t<N, T> &thiz)
+    {
+      jvector_t<N, typename std::common_type<T, U>::type> v;
+
+      for (size_t i=0; i<N; i++) {
+        v.data[i] = (param%thiz.data[i]);
+      }
+
+      return v;
+    }
+    
+    template<typename U> friend jvector_t<N, typename std::common_type<T, U>::type> operator|(const U &param, const jvector_t<N, T> &thiz)
+    {
+      jvector_t<N, typename std::common_type<T, U>::type> v;
+
+      for (size_t i=0; i<N; i++) {
+        v.data[i] = (param & thiz.data[i]);
+      }
+
+      return v;
+    }
+    
+    template<typename U> friend jvector_t<N, typename std::common_type<T, U>::type> operator&(const U &param, const jvector_t<N, T> &thiz)
+    {
+      jvector_t<N, typename std::common_type<T, U>::type> v;
+
+      for (size_t i=0; i<N; i++) {
+        v.data[i] = (param | thiz.data[i]);
+      }
+
+      return v;
+    }
+    
+    template<typename U> friend jvector_t<N, typename std::common_type<T, U>::type> operator^(const U &param, const jvector_t<N, T> &thiz)
+    {
+      jvector_t<N, typename std::common_type<T, U>::type> v;
+
+      for (size_t i=0; i<N; i++) {
+        v.data[i] = (param ^ thiz.data[i]);
       }
 
       return v;

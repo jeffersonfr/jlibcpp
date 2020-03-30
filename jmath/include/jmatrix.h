@@ -340,6 +340,58 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return m;
     }
  
+    template<typename U> jmatrix_t<R, C, typename std::common_type<T, U>::type> operator%(const U &param) const
+    {
+      jmatrix_t<R, C, typename std::common_type<T, U>::type> m;
+
+      for (size_t j=0; j<R; j++) {
+        for (size_t i=0; i<C; i++) {
+          m.data[j][i] = (data[j][i]%param);
+        }
+      }
+
+      return m;
+    }
+ 
+    template<typename U> jmatrix_t<R, C, typename std::common_type<T, U>::type> operator|(const U &param) const
+    {
+      jmatrix_t<R, C, typename std::common_type<T, U>::type> m;
+
+      for (size_t j=0; j<R; j++) {
+        for (size_t i=0; i<C; i++) {
+          m.data[j][i] = (data[j][i]|param);
+        }
+      }
+
+      return m;
+    }
+ 
+    template<typename U> jmatrix_t<R, C, typename std::common_type<T, U>::type> operator&(const U &param) const
+    {
+      jmatrix_t<R, C, typename std::common_type<T, U>::type> m;
+
+      for (size_t j=0; j<R; j++) {
+        for (size_t i=0; i<C; i++) {
+          m.data[j][i] = (data[j][i]&param);
+        }
+      }
+
+      return m;
+    }
+ 
+    template<typename U> jmatrix_t<R, C, typename std::common_type<T, U>::type> operator^(const U &param) const
+    {
+      jmatrix_t<R, C, typename std::common_type<T, U>::type> m;
+
+      for (size_t j=0; j<R; j++) {
+        for (size_t i=0; i<C; i++) {
+          m.data[j][i] = (data[j][i]^param);
+        }
+      }
+
+      return m;
+    }
+ 
     template<typename U> jmatrix_t<R, C, T> & operator=(const jmatrix_t<R, C, U> &param)
     {
       for (size_t j=0; j<R; j++) {
@@ -390,6 +442,58 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       return m;
     }
     
+    template<typename U> jmatrix_t<R, C, typename std::common_type<T, U>::type> operator%(const jmatrix_t<R, C, U> &param) const
+    {
+      jmatrix_t<R, C, typename std::common_type<T, U>::type> m;
+
+      for (size_t j=0; j<R; j++) {
+        for (size_t i=0; i<C; i++) {
+          m.data[j][i] = (data[j][i]%param.data[j][i]);
+        }
+      }
+
+      return m;
+    }
+    
+    template<typename U> jmatrix_t<R, C, typename std::common_type<T, U>::type> operator|(const jmatrix_t<R, C, U> &param) const
+    {
+      jmatrix_t<R, C, typename std::common_type<T, U>::type> m;
+
+      for (size_t j=0; j<R; j++) {
+        for (size_t i=0; i<C; i++) {
+          m.data[j][i] = (data[j][i]|param.data[j][i]);
+        }
+      }
+
+      return m;
+    }
+    
+    template<typename U> jmatrix_t<R, C, typename std::common_type<T, U>::type> operator&(const jmatrix_t<R, C, U> &param) const
+    {
+      jmatrix_t<R, C, typename std::common_type<T, U>::type> m;
+
+      for (size_t j=0; j<R; j++) {
+        for (size_t i=0; i<C; i++) {
+          m.data[j][i] = (data[j][i]&param.data[j][i]);
+        }
+      }
+
+      return m;
+    }
+    
+    template<typename U> jmatrix_t<R, C, typename std::common_type<T, U>::type> operator^(const jmatrix_t<R, C, U> &param) const
+    {
+      jmatrix_t<R, C, typename std::common_type<T, U>::type> m;
+
+      for (size_t j=0; j<R; j++) {
+        for (size_t i=0; i<C; i++) {
+          m.data[j][i] = (data[j][i]^param.data[j][i]);
+        }
+      }
+
+      return m;
+    }
+    
     template<typename U> jmatrix_t<R, C, typename std::common_type<T, U>::type> operator/(const jmatrix_t<R, C, U> &param) const
     {
 			return *this*param.Inverse();
@@ -413,6 +517,26 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
     template<typename U> jmatrix_t<R, C, T> & operator/=(const jmatrix_t<R, C, U> &param)
     {
       return (*this = *this/param);
+    }
+    
+    template<typename U> jmatrix_t<R, C, T> & operator%=(const jmatrix_t<R, C, U> &param)
+    {
+      return (*this = *this%param);
+    }
+    
+    template<typename U> jmatrix_t<R, C, T> & operator|=(const jmatrix_t<R, C, U> &param)
+    {
+      return (*this = *this | param);
+    }
+    
+    template<typename U> jmatrix_t<R, C, T> & operator&=(const jmatrix_t<R, C, U> &param)
+    {
+      return (*this = *this & param);
+    }
+    
+    template<typename U> jmatrix_t<R, C, T> & operator^=(const jmatrix_t<R, C, U> &param)
+    {
+      return (*this = *this ^ param);
     }
     
     constexpr size_t Size() noexcept
@@ -1156,6 +1280,58 @@ template<size_t R, size_t C, typename T = float, typename = typename std::enable
       for (size_t j=0; j<R; j++) {
         for (size_t i=0; i<C; i++) {
           m.data[j][i] = (param/thiz.data[j][i]);
+        }
+      }
+
+      return m;
+    }
+    
+    template<typename U> friend jmatrix_t<R, C, typename std::common_type<T, U>::type> operator%(const U &param, const jmatrix_t<R, C, T> &thiz)
+    {
+      jmatrix_t<R, C, typename std::common_type<T, U>::type> m;
+
+      for (size_t j=0; j<R; j++) {
+        for (size_t i=0; i<C; i++) {
+          m.data[j][i] = (param%thiz.data[j][i]);
+        }
+      }
+
+      return m;
+    }
+    
+    template<typename U> friend jmatrix_t<R, C, typename std::common_type<T, U>::type> operator|(const U &param, const jmatrix_t<R, C, T> &thiz)
+    {
+      jmatrix_t<R, C, typename std::common_type<T, U>::type> m;
+
+      for (size_t j=0; j<R; j++) {
+        for (size_t i=0; i<C; i++) {
+          m.data[j][i] = (param | thiz.data[j][i]);
+        }
+      }
+
+      return m;
+    }
+    
+    template<typename U> friend jmatrix_t<R, C, typename std::common_type<T, U>::type> operator&(const U &param, const jmatrix_t<R, C, T> &thiz)
+    {
+      jmatrix_t<R, C, typename std::common_type<T, U>::type> m;
+
+      for (size_t j=0; j<R; j++) {
+        for (size_t i=0; i<C; i++) {
+          m.data[j][i] = (param & thiz.data[j][i]);
+        }
+      }
+
+      return m;
+    }
+    
+    template<typename U> friend jmatrix_t<R, C, typename std::common_type<T, U>::type> operator^(const U &param, const jmatrix_t<R, C, T> &thiz)
+    {
+      jmatrix_t<R, C, typename std::common_type<T, U>::type> m;
+
+      for (size_t j=0; j<R; j++) {
+        for (size_t i=0; i<C; i++) {
+          m.data[j][i] = (param ^ thiz.data[j][i]);
         }
       }
 

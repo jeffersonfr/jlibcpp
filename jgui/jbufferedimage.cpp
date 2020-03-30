@@ -424,11 +424,11 @@ BufferedImage::BufferedImage(jio::InputStream *stream):
     throw jexception::NullPointerException("Cannot request avaiable data from the stream");
   }
 
-  uint8_t buffer[size];
+  uint8_t *buffer = new uint8_t[size];
   int r, count = 0;
 
   do {
-    r = stream->Read((char *)(buffer+count), 4096);
+    r = stream->Read((char *)(buffer + count), 4096);
 
     if (r <= 0) {
       break;
@@ -563,6 +563,8 @@ BufferedImage::BufferedImage(jio::InputStream *stream):
   _size.height = cairo_image_surface_get_height(_cairo_surface);
 
   _graphics = new Graphics(_cairo_surface);
+
+  delete [] buffer;
 }
 
 BufferedImage::~BufferedImage()
@@ -714,14 +716,17 @@ Image * BufferedImage::Rotate(double radians, bool resize)
       *image = new BufferedImage(surface);
 
     if (GetGraphics()->GetAntialias() == JAM_NONE) {
-      uint32_t src[_size.width*_size.height];
-      uint32_t dst[iw*ih];
+      uint32_t *src = new uint32_t[_size.width*_size.height];
+      uint32_t *dst = new uint32_t[iw*ih];
 
       GetRGBArray(src, {0, 0, _size.width, _size.height});
 
       NearesNeighborRotate(src, _size.width, _size.height, dst, iw, ih, radians, true);
 
       image->GetGraphics()->SetRGBArray(dst, {0, 0, iw, ih});
+
+      delete [] dst;
+      delete [] src;
     } else {
       cairo_t *dst_context = cairo_create(image->GetGraphics()->GetCairoSurface());
 
@@ -757,14 +762,17 @@ Image * BufferedImage::Rotate(double radians, bool resize)
     *image = new BufferedImage(surface);
   
   if (GetGraphics()->GetAntialias() == JAM_NONE) {
-    uint32_t src[_size.width*_size.height];
-    uint32_t dst[iw*ih];
+    uint32_t *src = new uint32_t[_size.width*_size.height];
+    uint32_t *dst = new uint32_t[iw*ih];
 
     GetRGBArray(src, {0, 0, _size.width, _size.height});
 
     NearesNeighborRotate(src, _size.width, _size.height, dst, iw, ih, radians, false);
 
     image->GetGraphics()->SetRGBArray(dst, {0, 0, iw, ih});
+
+    delete [] dst;
+    delete [] src;
   } else {
     cairo_t *dst_context = cairo_create(image->GetGraphics()->GetCairoSurface());
 
@@ -826,8 +834,8 @@ Image * BufferedImage::Scale(jsize_t<int> size)
   if (GetGraphics()->GetAntialias() == JAM_NONE) {
     jinterpolation_method_t method = GetInterpolationMethod();
 
-    uint32_t src[_size.width*_size.height];
-    uint32_t dst[size.width*size.height];
+    uint32_t *src = new uint32_t[_size.width*_size.height];
+    uint32_t *dst = new uint32_t[size.width*size.height];
 
     GetRGBArray(src, {0, 0, _size.width, _size.height});
 
@@ -840,6 +848,9 @@ Image * BufferedImage::Scale(jsize_t<int> size)
     }
 
     image->GetGraphics()->SetRGBArray(dst, {0, 0, size.width, size.height});
+
+    delete [] dst;
+    delete [] src;
   } else {
     cairo_t *context = cairo_create(image->GetGraphics()->GetCairoSurface());
 
