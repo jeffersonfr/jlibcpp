@@ -621,6 +621,12 @@ class Graphics : public virtual jcommon::Object {
      * \brief
      *
      */
+    virtual void SetRawRGB(uint32_t rgb, jpoint_t<int> point);
+    
+    /**
+     * \brief
+     *
+     */
     virtual void SetRGB(uint32_t rgb, jpoint_t<int> point);
     
     /**

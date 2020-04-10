@@ -1495,6 +1495,27 @@ void Graphics::GetRGBArray(uint32_t *rgb, jrect_t<int> rect)
   }
 }
 
+void Graphics::SetRawRGB(uint32_t rgb, jpoint_t<int> point) 
+{
+  struct jpoint_t<int> t = Translate();
+
+  point = point + t;
+
+  int sw = cairo_image_surface_get_width(_cairo_surface);
+  int sh = cairo_image_surface_get_height(_cairo_surface);
+  
+  if (point.x < 0 or point.y < 0 or point.x > sw or point.y > sh) {
+    return;
+  }
+
+  uint8_t *data = cairo_image_surface_get_data(_cairo_surface);
+  int stride = cairo_image_surface_get_stride(_cairo_surface);
+
+  *(uint32_t *)(data + point.y * stride + point.x * stride / sw) = rgb;
+  
+  cairo_surface_mark_dirty(_cairo_surface);
+}
+
 void Graphics::SetRGB(uint32_t rgb, jpoint_t<int> point) 
 {
   try {

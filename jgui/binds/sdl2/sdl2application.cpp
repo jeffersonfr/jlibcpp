@@ -61,7 +61,7 @@ static Window *sg_jgui_window = nullptr;
 /** \brief */
 static jcursor_style_t sg_jgui_cursor = JCS_DEFAULT;
 
-static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(SDL_Keysym symbol)
+static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(SDL_Keysym symbol, bool capital)
 {
 	switch (symbol.sym) {
 		case SDLK_RETURN:
@@ -206,58 +206,58 @@ static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(SDL_Keysym symbol)
 			return jevent::JKS_UNDERSCORE;
 		case SDLK_BACKQUOTE:
 			return jevent::JKS_GRAVE_ACCENT;
-		case SDLK_a:       
-			return jevent::JKS_a;
-		case SDLK_b:
-			return jevent::JKS_b;
-		case SDLK_c:
-			return jevent::JKS_c;
-		case SDLK_d:
-			return jevent::JKS_d;
-		case SDLK_e:
-			return jevent::JKS_e;
-		case SDLK_f:
-			return jevent::JKS_f;
-		case SDLK_g:
-			return jevent::JKS_g;
-		case SDLK_h:
-			return jevent::JKS_h;
-		case SDLK_i:
-			return jevent::JKS_i;
-		case SDLK_j:
-			return jevent::JKS_j;
-		case SDLK_k:
-			return jevent::JKS_k;
-		case SDLK_l:
-			return jevent::JKS_l;
-		case SDLK_m:
-			return jevent::JKS_m;
-		case SDLK_n:
-			return jevent::JKS_n;
-		case SDLK_o:
-			return jevent::JKS_o;
-		case SDLK_p:
-			return jevent::JKS_p;
-		case SDLK_q:
-			return jevent::JKS_q;
-		case SDLK_r:
-			return jevent::JKS_r;
-		case SDLK_s:
-			return jevent::JKS_s;
-		case SDLK_t:
-			return jevent::JKS_t;
-		case SDLK_u:
-			return jevent::JKS_u;
-		case SDLK_v:
-			return jevent::JKS_v;
-		case SDLK_w:
-			return jevent::JKS_w;
-		case SDLK_x:
-			return jevent::JKS_x;
-		case SDLK_y:
-			return jevent::JKS_y;
-		case SDLK_z:
-			return jevent::JKS_z;
+    case SDLK_a:
+			return (capital == true)?jevent::JKS_A:jevent::JKS_a;
+    case SDLK_b:
+			return (capital == true)?jevent::JKS_B:jevent::JKS_b;
+    case SDLK_c:
+			return (capital == true)?jevent::JKS_C:jevent::JKS_c;
+    case SDLK_d:
+			return (capital == true)?jevent::JKS_D:jevent::JKS_d;
+    case SDLK_e:
+			return (capital == true)?jevent::JKS_E:jevent::JKS_e;
+    case SDLK_f:
+			return (capital == true)?jevent::JKS_F:jevent::JKS_f;
+    case SDLK_g:
+			return (capital == true)?jevent::JKS_G:jevent::JKS_g;
+    case SDLK_h:
+			return (capital == true)?jevent::JKS_H:jevent::JKS_h;
+    case SDLK_i:
+			return (capital == true)?jevent::JKS_I:jevent::JKS_i;
+    case SDLK_j:
+			return (capital == true)?jevent::JKS_J:jevent::JKS_j;
+    case SDLK_k:
+			return (capital == true)?jevent::JKS_K:jevent::JKS_k;
+    case SDLK_l:
+			return (capital == true)?jevent::JKS_L:jevent::JKS_l;
+    case SDLK_m:
+			return (capital == true)?jevent::JKS_M:jevent::JKS_m;
+    case SDLK_n:
+			return (capital == true)?jevent::JKS_N:jevent::JKS_n;
+    case SDLK_o:
+			return (capital == true)?jevent::JKS_O:jevent::JKS_o;
+    case SDLK_p:
+			return (capital == true)?jevent::JKS_P:jevent::JKS_p;
+    case SDLK_q:
+			return (capital == true)?jevent::JKS_Q:jevent::JKS_q;
+    case SDLK_r:
+			return (capital == true)?jevent::JKS_R:jevent::JKS_r;
+    case SDLK_s:
+			return (capital == true)?jevent::JKS_S:jevent::JKS_s;
+    case SDLK_t:
+			return (capital == true)?jevent::JKS_T:jevent::JKS_t;
+    case SDLK_u:
+			return (capital == true)?jevent::JKS_U:jevent::JKS_u;
+    case SDLK_v:
+			return (capital == true)?jevent::JKS_V:jevent::JKS_v;
+    case SDLK_w:
+			return (capital == true)?jevent::JKS_W:jevent::JKS_w;
+    case SDLK_x:
+			return (capital == true)?jevent::JKS_X:jevent::JKS_x;
+    case SDLK_y:
+			return (capital == true)?jevent::JKS_Y:jevent::JKS_y;
+    case SDLK_z:
+			return (capital == true)?jevent::JKS_Z:jevent::JKS_z;
 		// case SDLK_CURLY_BRACKET_LEFT:
 		//	return jevent::JKS_CURLY_BRACKET_LEFT;
 		// case SDLK_VERTICAL_BAR:  
@@ -496,8 +496,12 @@ void Application::Loop()
           mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_ALT);
         } else if ((event.key.keysym.mod & KMOD_RALT) != 0) {
           mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_ALT);
-        // } else if ((event.key.keysym.mod & ) != 0) {
-        //	mod = (jevent::jkeyevent_modifiers_t)(mod | JKM_ALTGR);
+        } else if ((event.key.keysym.mod & KMOD_LGUI) != 0) {
+          mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_SUPER);
+        } else if ((event.key.keysym.mod & KMOD_RGUI) != 0) {
+          mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_SUPER);
+        } else if ((event.key.keysym.mod & KMOD_MODE) != 0) {
+        	mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_ALTGR);
         // } else if ((event.key.keysym.mod & KMOD_LMETA) != 0) {
         //	mod = (jevent::jkeyevent_modifiers_t)(mod | JKM_META);
         // } else if ((event.key.keysym.mod & KMOD_RMETA) != 0) {
@@ -520,7 +524,10 @@ void Application::Loop()
           // TODO:: ungrab pointer events
         }
 
-        jevent::jkeyevent_symbol_t symbol = TranslateToNativeKeySymbol(event.key.keysym);
+        int shift = (int)(event.key.keysym.mod & KMOD_SHIFT);
+        int capslock = (int)(event.key.keysym.mod & KMOD_CAPS);
+
+        jevent::jkeyevent_symbol_t symbol = TranslateToNativeKeySymbol(event.key.keysym, shift != capslock);
 
         sg_jgui_window->GetEventManager()->PostEvent(new jevent::KeyEvent(sg_jgui_window, type, mod, jevent::KeyEvent::GetCodeFromSymbol(symbol), symbol));
       } else if (event.type == SDL_MOUSEMOTION || event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP || event.type == SDL_MOUSEWHEEL) {

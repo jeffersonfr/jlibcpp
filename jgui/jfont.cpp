@@ -26,7 +26,8 @@
 
 namespace jgui {
 
-static FT_Library _ft_library;
+static FT_Library sg_ft_library;
+static int sg_ft_library_reference = 0;
 
 #define DEFAULT_FONT_NAME "default"
 
@@ -50,18 +51,20 @@ Font Font::SIZE48(DEFAULT_FONT_NAME, (jfont_attributes_t)(JFA_NORMAL), 48);
 
 int InternalCreateFont(std::string name, cairo_font_face_t **font)
 {
-  static bool init = false;
-
-  if (init == false) {
-    init = true;
-
-    FT_Init_FreeType(&_ft_library);
+  if (sg_ft_library_reference++ == 0) {
+    FT_Init_FreeType(&sg_ft_library);
   }
 
   FT_Face ft_face;
 
-  if (FT_New_Face(_ft_library, name.c_str(), 0, &ft_face) != 0) {
+  if (FT_New_Face(sg_ft_library, name.c_str(), 0, &ft_face) != 0) {
     (*font) = nullptr;
+
+    sg_ft_library_reference--;
+
+    if (sg_ft_library_reference == 0) {
+      FT_Done_FreeType(sg_ft_library);
+    }
 
     return -1;
   }
@@ -181,6 +184,13 @@ Font::~Font()
     cairo_font_face_destroy(_font);
     cairo_font_options_destroy(_options);
     // FT_Done_Face (ft_face);
+  }
+    
+  sg_ft_library_reference--;
+
+  if (sg_ft_library_reference == 0) {
+    printf("aaaaaaaaaaaaa");
+    FT_Done_FreeType(sg_ft_library);
   }
 }
 

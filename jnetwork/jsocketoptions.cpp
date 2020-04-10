@@ -387,5 +387,23 @@ void SocketOptions::SetIPv6Only(bool b_)
   }
 }
 
+void SocketOptions::SetDontFragment(bool b_)
+{
+  int b = (b_ == true)?1:0;
+
+  if (setsockopt(_fd, IPPROTO_IP, IPV6_DONTFRAG, &b, sizeof(b)) < 0) {
+    throw jexception::ConnectionException("Dont fragment error");
+  }
+}
+
+void SocketOptions::SetMTUDiscover(bool b_)
+{
+  int b = (b_ == true)?1:0;
+
+  if (setsockopt(_fd, IPPROTO_IP, IP_MTU_DISCOVER, &b, sizeof(b)) < 0) {
+    throw jexception::ConnectionException("MTU discover error");
+  }
+}
+
 }
 

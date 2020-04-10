@@ -315,6 +315,18 @@ class SocketOptions : public virtual jcommon::Object {
      */
     void SetIPv6Only(bool opt);
 
+    /**
+     * \brief
+     *
+     */
+    void SetDontFragment(bool b_);
+
+    /**
+     * \brief
+     *
+     */
+    void SetMTUDiscover(bool b_);
+
 };
 
 }

@@ -22,9 +22,7 @@
 #include "jgui/jnulllayout.h"
 #include "jexception/jnullpointerexception.h"
 
-#ifdef JGUI_UI
 #include "binds/include/nativewindow.h"
-#endif
 
 #include <algorithm>
 
@@ -48,9 +46,7 @@ Window::Window(jgui::jsize_t<int> size, jgui::jpoint_t<int> point):
 {
   jcommon::Object::SetClassName("jgui::Window");
 
-#ifdef JGUI_UI
   _instance = new NativeWindow(point.x, point.y, size.width, size.height);
-#endif
   
   _instance->SetParent(this);
 

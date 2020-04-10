@@ -16,6 +16,8 @@ class Dummy : public jgui::Window {
 
     virtual ~Dummy()
     {
+      delete buffer;
+      buffer = nullptr;
     }
 
     virtual void Paint(jgui::Graphics *g) 

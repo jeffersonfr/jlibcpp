@@ -424,7 +424,7 @@ BufferedImage::BufferedImage(jio::InputStream *stream):
     throw jexception::NullPointerException("Cannot request avaiable data from the stream");
   }
 
-  uint8_t *buffer = new uint8_t[size];
+  uint8_t *buffer = new uint8_t[size*2];
   int r, count = 0;
 
   do {
@@ -542,6 +542,8 @@ BufferedImage::BufferedImage(jio::InputStream *stream):
   }
 
   if (surface == nullptr) {
+    delete [] buffer;
+
     throw jexception::RuntimeException("Cannot open this image type");
   }
 
