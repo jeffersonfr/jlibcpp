@@ -502,6 +502,8 @@ void Application::Loop()
           mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_SUPER);
         } else if ((event.key.keysym.mod & KMOD_MODE) != 0) {
         	mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_ALTGR);
+        } else if ((event.key.keysym.mod & KMOD_CAPS) != 0) {
+        	mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_CAPS_LOCK);
         // } else if ((event.key.keysym.mod & KMOD_LMETA) != 0) {
         //	mod = (jevent::jkeyevent_modifiers_t)(mod | JKM_META);
         // } else if ((event.key.keysym.mod & KMOD_RMETA) != 0) {
@@ -524,8 +526,8 @@ void Application::Loop()
           // TODO:: ungrab pointer events
         }
 
-        int shift = (int)(event.key.keysym.mod & KMOD_SHIFT);
-        int capslock = (int)(event.key.keysym.mod & KMOD_CAPS);
+        bool shift = (bool)(event.key.keysym.mod & KMOD_SHIFT);
+        bool capslock = (bool)(event.key.keysym.mod & KMOD_CAPS);
 
         jevent::jkeyevent_symbol_t symbol = TranslateToNativeKeySymbol(event.key.keysym, shift != capslock);
 
