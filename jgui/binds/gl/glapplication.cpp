@@ -145,58 +145,6 @@ static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(int symbol)
 			return jevent::JKS_QUESTION_MARK;
 		case '@':
 			return jevent::JKS_AT;
-		case 'A':
-			return jevent::JKS_A;
-		case 'B':
-			return jevent::JKS_B;
-		case 'C':
-			return jevent::JKS_C;
-		case 'D':
-			return jevent::JKS_D;
-		case 'E':
-			return jevent::JKS_E;
-		case 'F':
-			return jevent::JKS_F;
-		case 'G':
-			return jevent::JKS_G;
-		case 'H':
-			return jevent::JKS_H;
-		case 'I':
-			return jevent::JKS_I;
-		case 'J':
-			return jevent::JKS_J;
-		case 'K':
-			return jevent::JKS_K;
-		case 'L':
-			return jevent::JKS_L;
-		case 'M':
-			return jevent::JKS_M;
-		case 'N':
-			return jevent::JKS_N;
-		case 'O':
-			return jevent::JKS_O;
-		case 'P':
-			return jevent::JKS_P;
-		case 'Q':
-			return jevent::JKS_Q;
-		case 'R':
-			return jevent::JKS_R;
-		case 'S':
-			return jevent::JKS_S;
-		case 'T':
-			return jevent::JKS_T;
-		case 'U':
-			return jevent::JKS_U;
-		case 'V':
-			return jevent::JKS_V;
-		case 'W':
-			return jevent::JKS_W;
-		case 'X':
-			return jevent::JKS_X;
-		case 'Y':
-			return jevent::JKS_Y;
-		case 'Z':
-			return jevent::JKS_Z;
 		case '[':
 			return jevent::JKS_SQUARE_BRACKET_LEFT;
 		case '\\':   

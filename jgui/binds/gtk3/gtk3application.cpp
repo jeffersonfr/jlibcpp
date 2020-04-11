@@ -173,58 +173,6 @@ static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(guint symbol)
 			return jevent::JKS_QUESTION_MARK;
 		case GDK_at:
 			return jevent::JKS_AT;
-		case GDK_A:
-			return jevent::JKS_A;
-		case GDK_B:
-			return jevent::JKS_B;
-		case GDK_C:
-			return jevent::JKS_C;
-		case GDK_D:
-			return jevent::JKS_D;
-		case GDK_E:
-			return jevent::JKS_E;
-		case GDK_F:
-			return jevent::JKS_F;
-		case GDK_G:
-			return jevent::JKS_G;
-		case GDK_H:
-			return jevent::JKS_H;
-		case GDK_I:
-			return jevent::JKS_I;
-		case GDK_J:
-			return jevent::JKS_J;
-		case GDK_K:
-			return jevent::JKS_K;
-		case GDK_L:
-			return jevent::JKS_L;
-		case GDK_M:
-			return jevent::JKS_M;
-		case GDK_N:
-			return jevent::JKS_N;
-		case GDK_O:
-			return jevent::JKS_O;
-		case GDK_P:
-			return jevent::JKS_P;
-		case GDK_Q:
-			return jevent::JKS_Q;
-		case GDK_R:
-			return jevent::JKS_R;
-		case GDK_S:
-			return jevent::JKS_S;
-		case GDK_T:
-			return jevent::JKS_T;
-		case GDK_U:
-			return jevent::JKS_U;
-		case GDK_V:
-			return jevent::JKS_V;
-		case GDK_W:
-			return jevent::JKS_W;
-		case GDK_X:
-			return jevent::JKS_X;
-		case GDK_Y:
-			return jevent::JKS_Y;
-		case GDK_Z:
-			return jevent::JKS_Z;
 		case GDK_bracketleft:
 			return jevent::JKS_SQUARE_BRACKET_LEFT;
 		case GDK_backslash:

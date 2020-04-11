@@ -88,7 +88,7 @@ static jcursor_style_t sg_jgui_cursor;
 /** \brief */
 static Window *sg_jgui_window = nullptr;
 
-static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(xcb_keycode_t symbol, bool capital)
+static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(xcb_keycode_t symbol)
 {
 	switch (symbol) {
     case 0x32:
@@ -111,30 +111,30 @@ static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(xcb_keycode_t symbo
 		case 0x2f:
 			return jevent::JKS_SEMICOLON;
 		case 0x3d:
-			return (capital == true)?jevent::JKS_QUESTION_MARK:jevent::JKS_SLASH;
+			return jevent::JKS_SLASH;
 		case 0x6a:
 			return jevent::JKS_SLASH;
 		case 0x15:
-			return (capital == true)?jevent::JKS_EQUALS_SIGN:jevent::JKS_PLUS_SIGN;
+			return jevent::JKS_PLUS_SIGN;
 		case 0x14:
-			return (capital == true)?jevent::JKS_UNDERSCORE:jevent::JKS_MINUS_SIGN;
+			return jevent::JKS_MINUS_SIGN;
 		case 0x52:
 			return jevent::JKS_MINUS_SIGN;
 		case 0x22:
-			return (capital == true)?jevent::JKS_CURLY_BRACKET_LEFT:jevent::JKS_SQUARE_BRACKET_LEFT;
+			return jevent::JKS_SQUARE_BRACKET_LEFT;
 		case 0x23:
-			return (capital == true)?jevent::JKS_CURLY_BRACKET_RIGHT:jevent::JKS_SQUARE_BRACKET_RIGHT;
+			return jevent::JKS_SQUARE_BRACKET_RIGHT;
 		case 0x3b:
-			return (capital == true)?jevent::JKS_LESS_THAN_SIGN:jevent::JKS_COMMA;
+			return jevent::JKS_COMMA;
 		case 0x3c:
 		case 0x5b:
-			return (capital == true)?jevent::JKS_GREATER_THAN_SIGN:jevent::JKS_PERIOD;
+			return jevent::JKS_PERIOD;
 		case 0x30:
-			return (capital == true)?jevent::JKS_QUOTATION:jevent::JKS_APOSTROPHE;
+			return jevent::JKS_APOSTROPHE;
 		case 0x33:
-			return (capital == true)?jevent::JKS_BACKSLASH:jevent::JKS_VERTICAL_BAR;
+			return jevent::JKS_VERTICAL_BAR;
 		case 0x31:
-			return (capital == true)?jevent::JKS_TILDE:jevent::JKS_GRAVE_ACCENT;
+			return jevent::JKS_GRAVE_ACCENT;
 		case 0x41:
 			return jevent::JKS_SPACE;
 		case 0x24:
@@ -196,86 +196,86 @@ static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(xcb_keycode_t symbo
 			return jevent::JKS_CURSOR_DOWN;
 		case 0x13:
 		case 0x54:
-			return (capital == true)?jevent::JKS_PARENTHESIS_RIGHT:jevent::JKS_0;
+			return jevent::JKS_0;
 		case 0x0a:
 		// case 0x57:
-			return (capital == true)?jevent::JKS_EXCLAMATION_MARK:jevent::JKS_1;
+			return jevent::JKS_1;
 		case 0x0b:
 		// case 0x58:
-			return (capital == true)?jevent::JKS_AT:jevent::JKS_2;
+			return jevent::JKS_2;
 		case 0x0c:
 		// case 0x59:
-			return (capital == true)?jevent::JKS_NUMBER_SIGN:jevent::JKS_3;
+			return jevent::JKS_3;
 		case 0x0d:
 		// case 0x53:
-			return (capital == true)?jevent::JKS_DOLLAR_SIGN:jevent::JKS_4;
+			return jevent::JKS_4;
 		case 0x0e:
 		// case 0x54:
-			return (capital == true)?jevent::JKS_PERCENT_SIGN:jevent::JKS_5;
+			return jevent::JKS_5;
 		case 0x0f:
 		// case 0x55:
-			return (capital == true)?jevent::JKS_CIRCUMFLEX_ACCENT:jevent::JKS_6;
+			return jevent::JKS_6;
 		case 0x10:
 		// case 0x4f:
-			return (capital == true)?jevent::JKS_AMPERSAND:jevent::JKS_7;
+			return jevent::JKS_7;
 		case 0x11:
 		// case 0x50:
-			return (capital == true)?jevent::JKS_STAR:jevent::JKS_8;
+			return jevent::JKS_8;
 		case 0x12:
 		// case 0x51:
-			return (capital == true)?jevent::JKS_PARENTHESIS_LEFT:jevent::JKS_9;
+			return jevent::JKS_9;
 		case 0x26:
-			return (capital == true)?jevent::JKS_A:jevent::JKS_a;
+			return jevent::JKS_a;
 		case 0x38:
-			return (capital == true)?jevent::JKS_B:jevent::JKS_b;
+			return jevent::JKS_b;
 		case 0x36:
-			return (capital == true)?jevent::JKS_C:jevent::JKS_c;
+			return jevent::JKS_c;
 		case 0x28:
-			return (capital == true)?jevent::JKS_D:jevent::JKS_d;
+			return jevent::JKS_d;
 		case 0x1a:
-			return (capital == true)?jevent::JKS_E:jevent::JKS_e;
+			return jevent::JKS_e;
 		case 0x29:
-			return (capital == true)?jevent::JKS_F:jevent::JKS_f;
+			return jevent::JKS_f;
 		case 0x2a:
-			return (capital == true)?jevent::JKS_G:jevent::JKS_g;
+			return jevent::JKS_g;
 		case 0x2b:
-			return (capital == true)?jevent::JKS_H:jevent::JKS_h;
+			return jevent::JKS_h;
 		case 0x1f:
-			return (capital == true)?jevent::JKS_I:jevent::JKS_i;
+			return jevent::JKS_i;
 		case 0x2c:
-			return (capital == true)?jevent::JKS_J:jevent::JKS_j;
+			return jevent::JKS_j;
 		case 0x2d:
-			return (capital == true)?jevent::JKS_K:jevent::JKS_k;
+			return jevent::JKS_k;
 		case 0x2e:
-			return (capital == true)?jevent::JKS_L:jevent::JKS_l;
+			return jevent::JKS_l;
 		case 0x3a:
-			return (capital == true)?jevent::JKS_M:jevent::JKS_m;
+			return jevent::JKS_m;
 		case 0x39:
-			return (capital == true)?jevent::JKS_N:jevent::JKS_n;
+			return jevent::JKS_n;
 		case 0x20:
-			return (capital == true)?jevent::JKS_O:jevent::JKS_o;
+			return jevent::JKS_o;
 		case 0x21:
-			return (capital == true)?jevent::JKS_P:jevent::JKS_p;
+			return jevent::JKS_p;
 		case 0x18:
-			return (capital == true)?jevent::JKS_Q:jevent::JKS_q;
+			return jevent::JKS_q;
 		case 0x1b:
-			return (capital == true)?jevent::JKS_R:jevent::JKS_r;
+			return jevent::JKS_r;
 		case 0x27:
-			return (capital == true)?jevent::JKS_S:jevent::JKS_s;
+			return jevent::JKS_s;
 		case 0x1c:
-			return (capital == true)?jevent::JKS_T:jevent::JKS_t;
+			return jevent::JKS_t;
 		case 0x1e:
-			return (capital == true)?jevent::JKS_U:jevent::JKS_u;
+			return jevent::JKS_u;
 		case 0x37:
-			return (capital == true)?jevent::JKS_V:jevent::JKS_v;
+			return jevent::JKS_v;
 		case 0x35:
-			return (capital == true)?jevent::JKS_W:jevent::JKS_w;
+			return jevent::JKS_w;
 		case 0x19:
-			return (capital == true)?jevent::JKS_X:jevent::JKS_x;
+			return jevent::JKS_x;
 		case 0x1d:
-			return (capital == true)?jevent::JKS_Y:jevent::JKS_y;
+			return jevent::JKS_y;
 		case 0x34:
-			return (capital == true)?jevent::JKS_Z:jevent::JKS_z;
+			return jevent::JKS_z;
 		// case XK_Print:
 		//	return jevent::JKS_PRINT;
 		case 0x7f:
@@ -486,18 +486,11 @@ void Application::Loop()
 
         if (id == XCB_KEY_PRESS) {
           type = jevent::JKT_PRESSED;
-
-          // TODO:: grab pointer events
         } else if (id == XCB_KEY_RELEASE) {
           type = jevent::JKT_RELEASED;
-
-          // TODO:: ungrab pointer events
         }
 
-        int shift = (e->state & XCB_MOD_MASK_SHIFT) != 0;
-        int capslock = (e->state & XCB_MOD_MASK_LOCK) != 0;
-
-        jevent::jkeyevent_symbol_t symbol = TranslateToNativeKeySymbol(e->detail, (shift != 0 && capslock == 0) || (shift == 0 && capslock != 0));
+        jevent::jkeyevent_symbol_t symbol = TranslateToNativeKeySymbol(e->detail);
 
         sg_jgui_window->GetEventManager()->PostEvent(new jevent::KeyEvent(sg_jgui_window, type, mod, jevent::KeyEvent::GetCodeFromSymbol(symbol), symbol));
       } else if (id == XCB_BUTTON_PRESS || id == XCB_BUTTON_RELEASE || id == XCB_MOTION_NOTIFY) {

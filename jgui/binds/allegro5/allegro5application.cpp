@@ -72,7 +72,7 @@ static jcursor_style_t sg_jgui_cursor = JCS_DEFAULT;
 /** \brief */
 static jgui::Image *sg_jgui_icon = nullptr;
 
-static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(int symbol, bool capital)
+static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(int symbol)
 {
 	switch (symbol) {
 		case ALLEGRO_KEY_ENTER:
@@ -152,57 +152,57 @@ static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(int symbol, bool ca
 		case ALLEGRO_KEY_AT:
 			return jevent::JKS_AT;
 		case ALLEGRO_KEY_A:
-			return (capital == true)?jevent::JKS_A:jevent::JKS_a;
+			return jevent::JKS_a;
 		case ALLEGRO_KEY_B:
-			return (capital == true)?jevent::JKS_B:jevent::JKS_b;
+			return jevent::JKS_b;
 		case ALLEGRO_KEY_C:
-			return (capital == true)?jevent::JKS_C:jevent::JKS_c;
+			return jevent::JKS_c;
 		case ALLEGRO_KEY_D:
-			return (capital == true)?jevent::JKS_D:jevent::JKS_d;
+			return jevent::JKS_d;
 		case ALLEGRO_KEY_E:
-			return (capital == true)?jevent::JKS_E:jevent::JKS_e;
+			return jevent::JKS_e;
 		case ALLEGRO_KEY_F:
-			return (capital == true)?jevent::JKS_F:jevent::JKS_f;
+			return jevent::JKS_f;
 		case ALLEGRO_KEY_G:
-			return (capital == true)?jevent::JKS_G:jevent::JKS_g;
+			return jevent::JKS_g;
 		case ALLEGRO_KEY_H:
-			return (capital == true)?jevent::JKS_H:jevent::JKS_h;
+			return jevent::JKS_h;
 		case ALLEGRO_KEY_I:
-			return (capital == true)?jevent::JKS_I:jevent::JKS_i;
+			return jevent::JKS_i;
 		case ALLEGRO_KEY_J:
-			return (capital == true)?jevent::JKS_J:jevent::JKS_j;
+			return jevent::JKS_j;
 		case ALLEGRO_KEY_K:
-			return (capital == true)?jevent::JKS_K:jevent::JKS_k;
+			return jevent::JKS_k;
 		case ALLEGRO_KEY_L:
-			return (capital == true)?jevent::JKS_L:jevent::JKS_l;
+			return jevent::JKS_l;
 		case ALLEGRO_KEY_M:
-			return (capital == true)?jevent::JKS_M:jevent::JKS_m;
+			return jevent::JKS_m;
 		case ALLEGRO_KEY_N:
-			return (capital == true)?jevent::JKS_N:jevent::JKS_n;
+			return jevent::JKS_n;
 		case ALLEGRO_KEY_O:
-			return (capital == true)?jevent::JKS_O:jevent::JKS_o;
+			return jevent::JKS_o;
 		case ALLEGRO_KEY_P:
-			return (capital == true)?jevent::JKS_P:jevent::JKS_p;
+			return jevent::JKS_p;
 		case ALLEGRO_KEY_Q:
-			return (capital == true)?jevent::JKS_Q:jevent::JKS_q;
+			return jevent::JKS_q;
 		case ALLEGRO_KEY_R:
-			return (capital == true)?jevent::JKS_R:jevent::JKS_r;
+			return jevent::JKS_r;
 		case ALLEGRO_KEY_S:
-			return (capital == true)?jevent::JKS_S:jevent::JKS_s;
+			return jevent::JKS_s;
 		case ALLEGRO_KEY_T:
-			return (capital == true)?jevent::JKS_T:jevent::JKS_t;
+			return jevent::JKS_t;
 		case ALLEGRO_KEY_U:
-			return (capital == true)?jevent::JKS_U:jevent::JKS_u;
+			return jevent::JKS_u;
 		case ALLEGRO_KEY_V:
-			return (capital == true)?jevent::JKS_V:jevent::JKS_v;
+			return jevent::JKS_v;
 		case ALLEGRO_KEY_W:
-			return (capital == true)?jevent::JKS_W:jevent::JKS_w;
+			return jevent::JKS_w;
 		case ALLEGRO_KEY_X:
-			return (capital == true)?jevent::JKS_X:jevent::JKS_x;
+			return jevent::JKS_x;
 		case ALLEGRO_KEY_Y:
-			return (capital == true)?jevent::JKS_Y:jevent::JKS_y;
+			return jevent::JKS_y;
 		case ALLEGRO_KEY_Z:
-			return (capital == true)?jevent::JKS_Z:jevent::JKS_z;
+			return jevent::JKS_z;
 		case ALLEGRO_KEY_OPENBRACE:
 			return jevent::JKS_SQUARE_BRACKET_LEFT;
 		case ALLEGRO_KEY_BACKSLASH:   
@@ -508,7 +508,9 @@ void Application::Loop()
         } else if (sg_key_modifiers[ALLEGRO_KEY_LWIN] == true) {
           mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_META);
         } else if (sg_key_modifiers[ALLEGRO_KEY_RWIN] == true) {
-          // mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_RMETA);
+          mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_META);
+        } else if (sg_key_modifiers[ALLEGRO_KEY_CAPSLOCK] == true) {
+          mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_CAPS_LOCK);
         }
 
         type = jevent::JKT_UNKNOWN;
@@ -519,10 +521,7 @@ void Application::Loop()
           type = jevent::JKT_RELEASED;
         }
 
-        int shift = sg_key_modifiers[ALLEGRO_KEY_LSHIFT] | sg_key_modifiers[ALLEGRO_KEY_RSHIFT];
-        int capslock = sg_key_modifiers[ALLEGRO_KEY_CAPSLOCK];
-
-        jevent::jkeyevent_symbol_t symbol = TranslateToNativeKeySymbol(event.keyboard.keycode, (shift != 0 && capslock == 0) || (shift == 0 && capslock != 0));
+        jevent::jkeyevent_symbol_t symbol = TranslateToNativeKeySymbol(event.keyboard.keycode);
 
         sg_jgui_window->GetEventManager()->PostEvent(new jevent::KeyEvent(sg_jgui_window, type, mod, jevent::KeyEvent::GetCodeFromSymbol(symbol), symbol));
       } else if (event.type == ALLEGRO_EVENT_MOUSE_AXES || event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN || event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP || event.type == ALLEGRO_EVENT_MOUSE_WARPED) {

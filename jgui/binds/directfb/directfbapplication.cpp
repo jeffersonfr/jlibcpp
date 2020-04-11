@@ -154,58 +154,6 @@ jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(DFBInputDeviceKeySymbol sy
 			return jevent::JKS_QUESTION_MARK;
 		case DIKS_AT:      
 			return jevent::JKS_AT;
-		case DIKS_CAPITAL_A:
-			return jevent::JKS_A;
-		case DIKS_CAPITAL_B:
-			return jevent::JKS_B;
-		case DIKS_CAPITAL_C:
-			return jevent::JKS_C;
-		case DIKS_CAPITAL_D:
-			return jevent::JKS_D;
-		case DIKS_CAPITAL_E:
-			return jevent::JKS_E;
-		case DIKS_CAPITAL_F:
-			return jevent::JKS_F;
-		case DIKS_CAPITAL_G:
-			return jevent::JKS_G;
-		case DIKS_CAPITAL_H:
-			return jevent::JKS_H;
-		case DIKS_CAPITAL_I:
-			return jevent::JKS_I;
-		case DIKS_CAPITAL_J:
-			return jevent::JKS_J;
-		case DIKS_CAPITAL_K:
-			return jevent::JKS_K;
-		case DIKS_CAPITAL_L:
-			return jevent::JKS_L;
-		case DIKS_CAPITAL_M:
-			return jevent::JKS_M;
-		case DIKS_CAPITAL_N:
-			return jevent::JKS_N;
-		case DIKS_CAPITAL_O:
-			return jevent::JKS_O;
-		case DIKS_CAPITAL_P:
-			return jevent::JKS_P;
-		case DIKS_CAPITAL_Q:
-			return jevent::JKS_Q;
-		case DIKS_CAPITAL_R:
-			return jevent::JKS_R;
-		case DIKS_CAPITAL_S:
-			return jevent::JKS_S;
-		case DIKS_CAPITAL_T:
-			return jevent::JKS_T;
-		case DIKS_CAPITAL_U:
-			return jevent::JKS_U;
-		case DIKS_CAPITAL_V:
-			return jevent::JKS_V;
-		case DIKS_CAPITAL_W:
-			return jevent::JKS_W;
-		case DIKS_CAPITAL_X:
-			return jevent::JKS_X;
-		case DIKS_CAPITAL_Y:
-			return jevent::JKS_Y;
-		case DIKS_CAPITAL_Z:
-			return jevent::JKS_Z;
 		case DIKS_SQUARE_BRACKET_LEFT:
 			return jevent::JKS_SQUARE_BRACKET_LEFT;
 		case DIKS_BACKSLASH:   

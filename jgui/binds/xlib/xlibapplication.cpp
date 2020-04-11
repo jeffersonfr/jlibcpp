@@ -242,58 +242,6 @@ static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(KeySym symbol)
 		case XK_KP_9:
 		case XK_9:
 			return jevent::JKS_9;
-		case XK_A:
-			return jevent::JKS_A;
-		case XK_B:
-			return jevent::JKS_B;
-		case XK_C:
-			return jevent::JKS_C;
-		case XK_D:
-			return jevent::JKS_D;
-		case XK_E:
-			return jevent::JKS_E;
-		case XK_F:
-			return jevent::JKS_F;
-		case XK_G:
-			return jevent::JKS_G;
-		case XK_H:
-			return jevent::JKS_H;
-		case XK_I:
-			return jevent::JKS_I;
-		case XK_J:
-			return jevent::JKS_J;
-		case XK_K:
-			return jevent::JKS_K;
-		case XK_L:
-			return jevent::JKS_L;
-		case XK_M:
-			return jevent::JKS_M;
-		case XK_N:
-			return jevent::JKS_N;
-		case XK_O:
-			return jevent::JKS_O;
-		case XK_P:
-			return jevent::JKS_P;
-		case XK_Q:
-			return jevent::JKS_Q;
-		case XK_R:
-			return jevent::JKS_R;
-		case XK_S:
-			return jevent::JKS_S;
-		case XK_T:
-			return jevent::JKS_T;
-		case XK_U:
-			return jevent::JKS_U;
-		case XK_V:
-			return jevent::JKS_V;
-		case XK_X:
-			return jevent::JKS_X;
-		case XK_W:
-			return jevent::JKS_W;
-		case XK_Y:
-			return jevent::JKS_Y;
-		case XK_Z:
-			return jevent::JKS_Z;
 		case XK_a:
 			return jevent::JKS_a;
 		case XK_b:
@@ -637,12 +585,8 @@ void Application::Loop()
 
         if (event.type == KeyPress) {
           type = jevent::JKT_PRESSED;
-
-          // TODO:: grab pointer events
         } else if (event.type == KeyRelease) {
           type = jevent::JKT_RELEASED;
-
-          // TODO:: ungrab pointer events
         }
 
         static XComposeStatus keyboard;

@@ -209,58 +209,6 @@ static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(rfbKeySym symbol)
 		case XK_KP_9:
 		case XK_9:
 			return jevent::JKS_9;
-		case XK_A:
-			return jevent::JKS_A;
-		case XK_B:
-			return jevent::JKS_B;
-		case XK_C:
-			return jevent::JKS_C;
-		case XK_D:
-			return jevent::JKS_D;
-		case XK_E:
-			return jevent::JKS_E;
-		case XK_F:
-			return jevent::JKS_F;
-		case XK_G:
-			return jevent::JKS_G;
-		case XK_H:
-			return jevent::JKS_H;
-		case XK_I:
-			return jevent::JKS_I;
-		case XK_J:
-			return jevent::JKS_J;
-		case XK_K:
-			return jevent::JKS_K;
-		case XK_L:
-			return jevent::JKS_L;
-		case XK_M:
-			return jevent::JKS_M;
-		case XK_N:
-			return jevent::JKS_N;
-		case XK_O:
-			return jevent::JKS_O;
-		case XK_P:
-			return jevent::JKS_P;
-		case XK_Q:
-			return jevent::JKS_Q;
-		case XK_R:
-			return jevent::JKS_R;
-		case XK_S:
-			return jevent::JKS_S;
-		case XK_T:
-			return jevent::JKS_T;
-		case XK_U:
-			return jevent::JKS_U;
-		case XK_V:
-			return jevent::JKS_V;
-		case XK_X:
-			return jevent::JKS_X;
-		case XK_W:
-			return jevent::JKS_W;
-		case XK_Y:
-			return jevent::JKS_Y;
-		case XK_Z:
-			return jevent::JKS_Z;
 		case XK_a:
 			return jevent::JKS_a;
 		case XK_b:
@@ -542,42 +490,40 @@ static void ProcessKeyEvents(rfbBool down, rfbKeySym k, rfbClientPtr cl)
 
   mod = (jevent::jkeyevent_modifiers_t)(0);
 
-  /*
-  if ((event.key.keysym.mod & KMOD_LSHIFT) != 0) {
+  if (k.isPressed(XK_Shift_L) == true) {
     mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_SHIFT);
-  } else if ((event.key.keysym.mod & KMOD_RSHIFT) != 0) {
+  } else if (k.isPressed(XK_Shift_R) == true) {
     mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_SHIFT);
-  } else if ((event.key.keysym.mod & KMOD_LCTRL) != 0) {
+  } else if (k.isPressed(XK_Control_L) == true) {
     mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_CONTROL);
-  } else if ((event.key.keysym.mod & KMOD_RCTRL) != 0) {
+  } else if (k.isPressed(XK_Control_R) == true) {
     mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_CONTROL);
-  } else if ((event.key.keysym.mod & KMOD_LALT) != 0) {
+  } else if (k.isPressed(XK_Alt_L) == true) {
     mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_ALT);
-  } else if ((event.key.keysym.mod & KMOD_RALT) != 0) {
+  } else if (k.isPressed(XK_Alt_R) == true) {
     mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_ALT);
-    // } else if ((event.key.keysym.mod & ) != 0) {
-    //	mod = (jevent::jkeyevent_modifiers_t)(mod | JKM_ALTGR);
-    // } else if ((event.key.keysym.mod & KMOD_LMETA) != 0) {
-    //	mod = (jevent::jkeyevent_modifiers_t)(mod | JKM_META);
-    // } else if ((event.key.keysym.mod & KMOD_RMETA) != 0) {
-    //	mod = (jevent::jkeyevent_modifiers_t)(mod | JKM_META);
-    // } else if ((event.key.keysym.mod & ) != 0) {
-    //	mod = (jevent::jkeyevent_modifiers_t)(mod | JKM_SUPER);
-    // } else if ((event.key.keysym.mod & ) != 0) {
-    //	mod = (jevent::jkeyevent_modifiers_t)(mod | JKM_HYPER);
+  } else if (k.isPressed(XK_Caps_Lock) == true) {
+    mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_CAPS_LOCK);
+  } else if (k.isPressed(XK_Meta_L) == true) {
+    mod = (jevent::jkeyevent_modifiers_t)(mod | JKM_META);
+  } else if (k.isPressed(XK_Meta_R) == true) {
+    mod = (jevent::jkeyevent_modifiers_t)(mod | JKM_META);
+  } else if (k.isPressed(XK_Super_L) == true) {
+    mod = (jevent::jkeyevent_modifiers_t)(mod | JKM_SUPER);
+  } else if (k.isPressed(XK_Super_R) == true) {
+    mod = (jevent::jkeyevent_modifiers_t)(mod | JKM_SUPER);
+  } else if (k.isPressed(XK_Hyper_L) == true) {
+    mod = (jevent::jkeyevent_modifiers_t)(mod | JKM_HYPER);
+  } else if (k.isPressed(XK_Hyper_R) == true) {
+    mod = (jevent::jkeyevent_modifiers_t)(mod | JKM_HYPER);
   }
-  */
 
   type = jevent::JKT_UNKNOWN;
 
   if (down) {
     type = jevent::JKT_PRESSED;
-
-    // TODO:: grab pointer events
   } else {
     type = jevent::JKT_RELEASED;
-
-    // TODO:: ungrab pointer events
   }
 
   jevent::jkeyevent_symbol_t symbol = TranslateToNativeKeySymbol(k);

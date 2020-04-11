@@ -70,7 +70,7 @@ static jgui::Image *sg_jgui_icon = nullptr;
 /** \brief */
 static Window *sg_jgui_window = nullptr;
 
-static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(int symbol, bool capital)
+static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(int symbol)
 {
 	switch (symbol) {
 		case 16777220:
@@ -150,57 +150,57 @@ static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(int symbol, bool ca
 		// case ALLEGRO_KEY_AT:
 		//	return jevent::JKS_AT;
 		case 65:
-			return (capital == true)?jevent::JKS_A:jevent::JKS_a;
+			return jevent::JKS_a;
 		case 66:
-			return (capital == true)?jevent::JKS_B:jevent::JKS_b;
+			return jevent::JKS_b;
 		case 67:
-			return (capital == true)?jevent::JKS_C:jevent::JKS_c;
+			return jevent::JKS_c;
 		case 68:
-			return (capital == true)?jevent::JKS_D:jevent::JKS_d;
+			return jevent::JKS_d;
 		case 69:
-			return (capital == true)?jevent::JKS_E:jevent::JKS_e;
+			return jevent::JKS_e;
 		case 70:
-			return (capital == true)?jevent::JKS_F:jevent::JKS_f;
+			return jevent::JKS_f;
 		case 71:
-			return (capital == true)?jevent::JKS_G:jevent::JKS_g;
+			return jevent::JKS_g;
 		case 72:
-			return (capital == true)?jevent::JKS_H:jevent::JKS_h;
+			return jevent::JKS_h;
 		case 73:
-			return (capital == true)?jevent::JKS_I:jevent::JKS_i;
+			return jevent::JKS_i;
 		case 74:
-			return (capital == true)?jevent::JKS_J:jevent::JKS_j;
+			return jevent::JKS_j;
 		case 75:
-			return (capital == true)?jevent::JKS_K:jevent::JKS_k;
+			return jevent::JKS_k;
 		case 76:
-			return (capital == true)?jevent::JKS_L:jevent::JKS_l;
+			return jevent::JKS_l;
 		case 77:
-			return (capital == true)?jevent::JKS_M:jevent::JKS_m;
+			return jevent::JKS_m;
 		case 78:
-			return (capital == true)?jevent::JKS_N:jevent::JKS_n;
+			return jevent::JKS_n;
 		case 79:
-			return (capital == true)?jevent::JKS_O:jevent::JKS_o;
+			return jevent::JKS_o;
 		case 80:
-			return (capital == true)?jevent::JKS_P:jevent::JKS_p;
+			return jevent::JKS_p;
 		case 81:
-			return (capital == true)?jevent::JKS_Q:jevent::JKS_q;
+			return jevent::JKS_q;
 		case 82:
-			return (capital == true)?jevent::JKS_R:jevent::JKS_r;
+			return jevent::JKS_r;
 		case 83:
-			return (capital == true)?jevent::JKS_S:jevent::JKS_s;
+			return jevent::JKS_s;
 		case 84:
-			return (capital == true)?jevent::JKS_T:jevent::JKS_t;
+			return jevent::JKS_t;
 		case 85:
-			return (capital == true)?jevent::JKS_U:jevent::JKS_u;
+			return jevent::JKS_u;
 		case 86:
-			return (capital == true)?jevent::JKS_V:jevent::JKS_v;
+			return jevent::JKS_v;
 		case 87:
-			return (capital == true)?jevent::JKS_W:jevent::JKS_w;
+			return jevent::JKS_w;
 		case 88:
-			return (capital == true)?jevent::JKS_X:jevent::JKS_x;
+			return jevent::JKS_x;
 		case 89:
-			return (capital == true)?jevent::JKS_Y:jevent::JKS_y;
+			return jevent::JKS_y;
 		case 90:
-			return (capital == true)?jevent::JKS_Z:jevent::JKS_z;
+			return jevent::JKS_z;
 		case 91:
 			return jevent::JKS_SQUARE_BRACKET_LEFT;
 		case 92:   
@@ -373,10 +373,7 @@ class QTWindowRender : public QDialog {
           type = jevent::JKT_RELEASED;
         }
 
-        int shift = e->modifiers() & Qt::ShiftModifier;
-        int capslock = false;
-
-        jevent::jkeyevent_symbol_t symbol = TranslateToNativeKeySymbol(e->key(), (shift != 0 && capslock == 0) || (shift == 0 && capslock != 0));
+        jevent::jkeyevent_symbol_t symbol = TranslateToNativeKeySymbol(e->key());
 
         sg_jgui_window->GetEventManager()->PostEvent(new jevent::KeyEvent(sg_jgui_window, type, mod, jevent::KeyEvent::GetCodeFromSymbol(symbol), symbol));
       } else if (
