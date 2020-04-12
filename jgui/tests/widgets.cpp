@@ -40,11 +40,67 @@
 #include <iostream>
 #include <mutex>
 
+class ImageAnimation : public jgui::Animation {
+
+  private:
+    std::vector<jgui::Image *>
+      _images;
+    int 
+      _index = 0;
+
+  public:
+    ImageAnimation(jgui::jrect_t<int> bounds):
+      jgui::Animation(std::chrono::milliseconds(0), std::chrono::milliseconds(2000))
+    {
+      SetBounds(bounds);
+
+			_images.push_back(new jgui::BufferedImage("images/tux-alien.png"));
+			_images.push_back(new jgui::BufferedImage("images/tux-bart.png"));
+			_images.push_back(new jgui::BufferedImage("images/tux-batman.png"));
+			_images.push_back(new jgui::BufferedImage("images/tux-freddy.png"));
+			_images.push_back(new jgui::BufferedImage("images/tux-homer.png"));
+			_images.push_back(new jgui::BufferedImage("images/tux-indiana.png"));
+			_images.push_back(new jgui::BufferedImage("images/tux-ipod.png"));
+			_images.push_back(new jgui::BufferedImage("images/tux-jamaican.png"));
+			_images.push_back(new jgui::BufferedImage("images/tux-jason.png"));
+			_images.push_back(new jgui::BufferedImage("images/tux-kenny.png"));
+			_images.push_back(new jgui::BufferedImage("images/tux-mario.png"));
+			_images.push_back(new jgui::BufferedImage("images/tux-neo.png"));
+			_images.push_back(new jgui::BufferedImage("images/tux-potter.png"));
+			_images.push_back(new jgui::BufferedImage("images/tux-raider.png"));
+			_images.push_back(new jgui::BufferedImage("images/tux-rambo.png"));
+			_images.push_back(new jgui::BufferedImage("images/tux-rapper.png"));
+			_images.push_back(new jgui::BufferedImage("images/tux-shrek.png"));
+			_images.push_back(new jgui::BufferedImage("images/tux-spiderman.png"));
+			_images.push_back(new jgui::BufferedImage("images/tux-turtle.png"));
+			_images.push_back(new jgui::BufferedImage("images/tux-wolverine.png"));
+			_images.push_back(new jgui::BufferedImage("images/tux-zombie.png"));
+    }
+
+    virtual ~ImageAnimation()
+    {
+      for (auto image : _images) {
+        delete image;
+      }
+    }
+
+    virtual void Update(std::chrono::milliseconds tick)
+    {
+      _index = (_index + 1) % _images.size();
+    }
+
+    virtual void Render(jgui::Graphics *g)
+    {
+      g->DrawImage(_images[_index], {0, 0, GetSize()});
+    }
+
+};
+
 class Widgets : public jgui::Window, public jevent::ActionListener, public jevent::SelectListener, public jevent::ToggleListener {
 
 	private:
     std::mutex _mutex;
-		jgui::Animation 
+		ImageAnimation 
 			*_animation;
 		jgui::Marquee 
 			*_marquee;
@@ -115,33 +171,8 @@ class Widgets : public jgui::Window, public jevent::ActionListener, public jeven
 		_theme4.SetIntegerParam("item.bg", 0xe0f08035);
 
 		{
-			_animation = new jgui::Animation({insets.left, insets.top, 96, 96});
+			_animation = new ImageAnimation({insets.left, insets.top, 96, 96});
 
-			_animation->SetInterval(2000);
-
-      // TODO:: remove all images in destructor
-			_animation->AddImage(new jgui::BufferedImage("images/tux-alien.png"));
-			_animation->AddImage(new jgui::BufferedImage("images/tux-bart.png"));
-			_animation->AddImage(new jgui::BufferedImage("images/tux-batman.png"));
-			_animation->AddImage(new jgui::BufferedImage("images/tux-freddy.png"));
-			_animation->AddImage(new jgui::BufferedImage("images/tux-homer.png"));
-			_animation->AddImage(new jgui::BufferedImage("images/tux-indiana.png"));
-			_animation->AddImage(new jgui::BufferedImage("images/tux-ipod.png"));
-			_animation->AddImage(new jgui::BufferedImage("images/tux-jamaican.png"));
-			_animation->AddImage(new jgui::BufferedImage("images/tux-jason.png"));
-			_animation->AddImage(new jgui::BufferedImage("images/tux-kenny.png"));
-			_animation->AddImage(new jgui::BufferedImage("images/tux-mario.png"));
-			_animation->AddImage(new jgui::BufferedImage("images/tux-neo.png"));
-			_animation->AddImage(new jgui::BufferedImage("images/tux-potter.png"));
-			_animation->AddImage(new jgui::BufferedImage("images/tux-raider.png"));
-			_animation->AddImage(new jgui::BufferedImage("images/tux-rambo.png"));
-			_animation->AddImage(new jgui::BufferedImage("images/tux-rapper.png"));
-			_animation->AddImage(new jgui::BufferedImage("images/tux-shrek.png"));
-			_animation->AddImage(new jgui::BufferedImage("images/tux-spiderman.png"));
-			_animation->AddImage(new jgui::BufferedImage("images/tux-turtle.png"));
-			_animation->AddImage(new jgui::BufferedImage("images/tux-wolverine.png"));
-			_animation->AddImage(new jgui::BufferedImage("images/tux-zombie.png"));
-    
       _animation->Start();
 		}
 
@@ -202,12 +233,10 @@ class Widgets : public jgui::Window, public jevent::ActionListener, public jeven
 		}
 
 		{
-			_marquee = new jgui::Marquee("Marquee Test");
+			_marquee = new jgui::Marquee("Marquee Test", std::chrono::milliseconds(100));
       
       _marquee->SetBounds({insets.left + 196 + 16, insets.top, size.width - 2*(196 + 16) - insets.left - insets.right, 48});
 
-			_marquee->SetType(jgui::JMM_LOOP);
-    
       _marquee->Start();
 		}
 
@@ -407,16 +436,6 @@ class Widgets : public jgui::Window, public jevent::ActionListener, public jeven
 		_group->Remove(_radio2);
 		_group->Remove(_radio3);
 
-		std::vector<jgui::Image *> images = _animation->GetImages();
-
-    _animation->RemoveAll();
-
-    for (int i=0; i<(int)images.size(); i++) {
-      jgui::Image *image = images[i];
-
-      delete image;
-    }
-		
     delete _animation;
 
 		delete _group;
@@ -489,9 +508,9 @@ class Widgets : public jgui::Window, public jevent::ActionListener, public jeven
     _mutex.lock();
 
 		if (_spin->GetCurrentIndex() == 0) {
-			_marquee->SetType(jgui::JMM_LOOP);
+			// _marquee->SetType(jgui::JMM_LOOP);
 		} else if (_spin->GetCurrentIndex() == 1) {
-			_marquee->SetType(jgui::JMM_BOUNCE);
+			// _marquee->SetType(jgui::JMM_BOUNCE);
 		}
 
     _mutex.unlock();

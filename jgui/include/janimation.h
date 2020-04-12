@@ -23,9 +23,7 @@
 #include "jgui/jcomponent.h"
 #include "jgui/jimage.h"
 
-#include <mutex>
 #include <vector>
-#include <thread>
 
 namespace jgui {
 
@@ -38,25 +36,31 @@ class Animation : public Component {
 
   private:
     /** \brief */
-    std::vector<Image *> _images;
+    std::chrono::steady_clock::time_point _timestamp;
     /** \brief */
-    std::mutex _animation_mutex;
+    std::chrono::milliseconds _start;
     /** \brief */
-    std::thread _thread;
+    std::chrono::milliseconds _interval;
     /** \brief */
-    int _index;
-    /** \brief */
-    int _interval;
+    bool _loop;
     /** \brief */
     bool _running;
 
-  public:
+  private:
     /**
      * \brief
      *
      */
-    Animation(jgui::jrect_t<int> bounds = {0, 0, 0, 0});
+    virtual void Paint(Graphics *g);
+
+  protected:
+    /**
+     * \brief
+     *
+     */
+    Animation(std::chrono::milliseconds start, std::chrono::milliseconds interval, bool loop = true);
     
+  public:
     /**
      * \brief
      *
@@ -67,31 +71,25 @@ class Animation : public Component {
      * \brief
      *
      */
-    virtual void SetInterval(int i);
-    
+    virtual void SetLoop(bool param);
+
     /**
      * \brief
      *
      */
-    virtual void AddImage(jgui::Image *image);
-    
+    virtual bool IsLoop();
+
     /**
      * \brief
      *
      */
-    virtual void RemoveImage(jgui::Image *image);
-    
+    virtual void SetInterval(std::chrono::milliseconds interval);
+
     /**
      * \brief
      *
      */
-    virtual void RemoveAll();
-    
-    /**
-     * \brief
-     *
-     */
-    virtual const std::vector<jgui::Image *> & GetImages();
+    virtual std::chrono::milliseconds GetInterval();
     
     /**
      * \brief
@@ -109,14 +107,14 @@ class Animation : public Component {
      * \brief
      *
      */
-    virtual void Paint(Graphics *g);
-    
+    virtual void Update(std::chrono::milliseconds tick);
+
     /**
      * \brief
      *
      */
-    virtual void Run();
-
+    virtual void Render(Graphics *g);
+    
 };
 
 }

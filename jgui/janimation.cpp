@@ -23,15 +23,16 @@
 
 namespace jgui {
 
-Animation::Animation(jgui::jrect_t<int> bounds):
-   Component(bounds)
+Animation::Animation(std::chrono::milliseconds start, std::chrono::milliseconds interval, bool loop):
+  Component()
 {
   SetClassName("jgui::Animation");
 
-  _index = 0;
+  _timestamp = std::chrono::steady_clock::now();
+  _start = start;
+  _interval = interval;
+  _loop = loop;
   _running = false;
-
-  SetInterval(500);
 }
 
 Animation::~Animation()
@@ -39,104 +40,66 @@ Animation::~Animation()
   Stop();
 }
 
-void Animation::Start()
+void Animation::Paint(Graphics *g)
 {
-   std::lock_guard<std::mutex> guard(_animation_mutex);
+  std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+  std::chrono::milliseconds elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - _timestamp);
 
-  if (_running == true) {
-    return;
+  if (_start >= std::chrono::milliseconds(0) and elapsed > _start) {
+    _start = std::chrono::milliseconds(-1);
+    _timestamp = now;
+
+    Update(_start);
+  } else {
+    if (elapsed > _interval) {
+      _timestamp = now;
+
+      Update(_interval);
+    }
   }
 
-  _running = true;
+  Render(g);
+  Repaint();
+}
 
-  _thread = std::thread(&Animation::Run, this);
+void Animation::SetLoop(bool param)
+{
+  _loop = param;
+}
+
+bool Animation::IsLoop()
+{
+  return _loop;
+}
+
+void Animation::SetInterval(std::chrono::milliseconds interval)
+{
+  _interval = interval;
+}
+
+std::chrono::milliseconds Animation::GetInterval()
+{
+  return _interval;
+}
+
+void Animation::Start()
+{
+  _timestamp = std::chrono::steady_clock::now();
+
+  _running = true;
 }
 
 void Animation::Stop()
 {
-   std::lock_guard<std::mutex> guard(_animation_mutex);
-
-  if (_running == false) {
-    return;
-  }
-
   _running = false;
-
-  try {
-    _thread.join();
-  } catch (...) {
-  }
 }
 
-void Animation::SetInterval(int i)
+void Animation::Update(std::chrono::milliseconds tick)
 {
-  _interval = i;
 }
 
-void Animation::AddImage(jgui::Image *image)
+void Animation::Render(Graphics *g)
 {
-   std::lock_guard<std::mutex> guard(_animation_mutex);
-
-  _images.push_back(image);
-}
-
-void Animation::RemoveImage(jgui::Image *image)
-{
-   std::lock_guard<std::mutex> guard(_animation_mutex);
-
-  _images.erase(std::remove(_images.begin(), _images.end(), image), _images.end());
-}
-
-void Animation::RemoveAll()
-{
-   std::lock_guard<std::mutex> guard(_animation_mutex);
-
-  _images.clear();
-}
-
-const std::vector<jgui::Image *> & Animation::GetImages()
-{
-  return _images;
-}
-
-void Animation::Paint(Graphics *g)
-{
-  // JDEBUG(JINFO, "paint\n");
-
-  Component::Paint(g);
-
-  jgui::jsize_t
-    size = GetSize();
-  jgui::Border
-    border = GetTheme().GetBorder();
-  int 
-    w = size.width - GetHorizontalPadding(),
-    h = size.height - GetVerticalPadding();
-
-  if (_images.size() != 0) {
-    Image *image = _images[_index];
-
-    g->DrawImage(image, {GetPadding().left, GetPadding().top, w, h});
-  }
-}
-
-void Animation::Run()
-{
-  while (_running == true) {
-    Repaint();
-
-    if (_running == false) {
-      return;
-    }
-
-    _index++;
-
-    if (_index >= (int)_images.size()) {
-      _index = 0;
-    }
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(_interval));
-  }
 }
 
 }

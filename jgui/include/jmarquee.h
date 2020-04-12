@@ -20,55 +20,29 @@
 #ifndef J_MARQUEE_H
 #define J_MARQUEE_H
 
-#include "jgui/jcomponent.h"
-
-#include <thread>
-#include <mutex>
+#include "jgui/janimation.h"
 
 namespace jgui {
 
 /**
  * \brief
  *
- */
-enum jmarquee_mode_t {
-  JMM_LOOP,
-  JMM_BOUNCE
-};
-
-/**
- * \brief
- *
  * \author Jeff Ferr
  */
-class Marquee : public Component {
+class Marquee : public Animation {
 
   private:
     /** \brief */
-    std::thread _thread;
-    /** \brief */
-    std::mutex _marquee_mutex;
-    /** \brief */
     std::string _text;
     /** \brief */
-    jmarquee_mode_t _type;
-    /** \brief */
     int _position;
-    /** \brief */
-    int _interval;
-    /** \brief */
-    int _index;
-    /** \brief */
-    int _step;
-    /** \brief */
-    bool _running;
 
   public:
     /**
      * \brief
      *
      */
-    Marquee(std::string text);
+    Marquee(std::string text, std::chrono::milliseconds interval);
     
     /**
      * \brief
@@ -76,24 +50,6 @@ class Marquee : public Component {
      */
     virtual ~Marquee();
 
-    /**
-     * \brief
-     *
-     */
-    virtual void SetType(jmarquee_mode_t type);
-    
-    /**
-     * \brief
-     *
-     */
-    virtual void SetStep(int i);
-    
-    /**
-     * \brief
-     *
-     */
-    virtual void SetInterval(int i);
-    
     /**
      * \brief
      *
@@ -110,26 +66,14 @@ class Marquee : public Component {
      * \brief
      *
      */
-    virtual void Start();
-
-    /**
-     * \brief
-     *
-     */
-    virtual void Stop();
-
-    /**
-     * \brief
-     *
-     */
-    virtual void Paint(Graphics *g);
+    virtual void Update(std::chrono::milliseconds tick);
     
     /**
      * \brief
      *
      */
-    virtual void Run();
-
+    virtual void Render(Graphics *g);
+    
 };
 
 }
