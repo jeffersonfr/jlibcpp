@@ -259,11 +259,13 @@ void DemuxManager::ProcessPSI(const char *data, const int length)
 
     int chunk = section_length - current.size();
 
-    if (chunk > length) {
-      chunk = length;
-    }
+    if (chunk > 0) {
+      if (chunk > length) {
+        chunk = length;
+      }
 
-    current.append(ptr, chunk);
+      current.append(ptr, chunk);
+    }
   }
 
   timeline[pid] = current;

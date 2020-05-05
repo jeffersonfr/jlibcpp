@@ -3116,10 +3116,26 @@ class PSIParser : public jevent::DemuxListener {
         int location_tag = TS_G8(ptr + 0);
 
         printf("\t\t:: location tag:[0x%02x]\n", location_tag);
+      } else if (descriptor_tag == 0x09) { // conditional access descriptora
+        int conditional_access_method_identifier = TS_G16(ptr + 0);
+        int conditional_access_pid = TS_GM16(ptr + 2, 3, 13);
+
+        printf("\t\t:: method identifier:[0x%04x], access pid:[0x%04x]\n", 
+            conditional_access_method_identifier, conditional_access_pid);
+
+        DumpBytes("Private Data", ptr + 4, descriptor_length - 4);
       } else if (descriptor_tag == 0x0a) { // iso 639 language descriptor
         std::string language = std::string(ptr + 0, 3);
 
         printf("\t\t:: language:[%s]\n", language.c_str());
+      } else if (descriptor_tag == 0x0d) { // copyright descriptor
+        int copyright_id = TS_G32(ptr + 0);
+
+        printf("\t\t:: copyright:[0x%08x]\n", 
+            copyright_id);
+
+        DumpBytes("Copyright additional info", ptr + 4, descriptor_length - 4);
+      // } else if (descriptor_tag == 0x13) { // carousel id descriptor
       } else if (descriptor_tag == 0x14) { // association tag descriptor
         const char *end = ptr + descriptor_length;
 
@@ -3188,6 +3204,8 @@ class PSIParser : public jevent::DemuxListener {
         if (private_length > 0) {
           DumpBytes("Private Data", ptr, private_length);
         }
+      // } else if (descriptor_tag == 0x28) { // avc video descriptor
+      // } else if (descriptor_tag == 0x2a) { // avc timing and hrd descriptor 
       } else if (descriptor_tag == 0x40) { // network name descriptor
         std::string name(ptr, descriptor_length);
 
@@ -3208,6 +3226,8 @@ class PSIParser : public jevent::DemuxListener {
 
           services_loop_count = services_loop_count + 3;
         }
+      // } else if (descriptor_tag == 0x42) { // stuffing descriptor
+      // } else if (descriptor_tag == 0x47) { // bouquet name descriptor
       } else if (descriptor_tag == 0x48) { // service descriptor [ABNTNBR 15603-2 2009]
         int service_type = TS_G8(ptr + 0); // 0x01: HD, 0xXX: LD
         int service_provider_name_length = TS_G8(ptr + 1);
@@ -3239,6 +3259,9 @@ class PSIParser : public jevent::DemuxListener {
         std::string country(ptr + 1, 3);
         
         printf("\t\t:: country availability flag:[%d], country:[%s]\n", country_availability_flag, country.c_str());
+      // } else if (descriptor_tag == 0x4a) { // linkage descriptor
+      // } else if (descriptor_tag == 0x4b) { // nvod reference descriptor
+      // } else if (descriptor_tag == 0x4c) { // time shifted service descriptor
       } else if (descriptor_tag == 0x4d) { // short event descriptor
         std::string language = std::string(ptr, 3);
 
@@ -3284,6 +3307,7 @@ class PSIParser : public jevent::DemuxListener {
 
           printf("\t\t:: item description:[%s], item:[%s]\n", item_description.c_str(), item.c_str());
         }
+      // } else if (descriptor_tag == 0x4f) { // time shifted event descriptor 
       } else if (descriptor_tag == 0x50) { // component descriptor 
         const char *end = ptr + descriptor_length;
 
@@ -3302,10 +3326,12 @@ class PSIParser : public jevent::DemuxListener {
         if (private_length > 0) {
           DumpBytes("Text Char", ptr, private_length);
         }
+      // } else if (descriptor_tag == 0x51) { // mosaic descriptor
       } else if (descriptor_tag == 0x52) { // stream identifier descriptor
         int component_tag = TS_G8(ptr + 0);
 
         printf("\t\t:: component tag:[0x%02x]\n", component_tag);
+      // } else if (descriptor_tag == 0x53) { // ca identifier descriptor
       } else if (descriptor_tag == 0x54) { // content descriptor
         int content_nibble = TS_G8(ptr + 0);
 
@@ -3359,6 +3385,7 @@ class PSIParser : public jevent::DemuxListener {
 
           printf("\t\t:: country:[%s], subtitle type:[0x%02x/%s], composition page id:[%d], ancillary page id:[%d]\n", country.c_str(), subtitling_type, GetComponentDescription(0x03, subtitling_type).c_str(), composition_page_id, ancillary_page_id);
         }
+      // } else if (descriptor_tag == 0x63) { // partial transport stream descriptor
       } else if (descriptor_tag == 0x7c) { // aac descriptor
         const char *end = ptr + descriptor_length;
 
@@ -3416,6 +3443,10 @@ class PSIParser : public jevent::DemuxListener {
             DumpBytes("Compressed String Bytes", ptr, number_bytes);
           }
         }
+      // } else if (descriptor_tag == 0xc0) { // hierarchical transmission descriptor
+      // } else if (descriptor_tag == 0xc1) { // digital copy control descriptor
+      // } else if (descriptor_tag == 0xc2) { // network identifier descriptor
+      // } else if (descriptor_tag == 0xc3) { // partial transport stream time descriptor
       } else if (descriptor_tag == 0xc4) { // audio component descriptor
         // int reserved = TS_GM8(ptr + 0, 0, 4);
         int stream_content = TS_GM8(ptr + 0, 4, 4);
@@ -3431,24 +3462,8 @@ class PSIParser : public jevent::DemuxListener {
         std::string language = std::string(ptr + 6, 3);
 
         printf("\t\t:: stream content:[0x%01x], content type:[0x%01x], component tag::[0x%01x], stream type::[0x%01x], group tag::[0x%01x], multilanguage::[0x%01x], component flag::[0x%01x], quality flag::[0x%01x], sampling rate::[0x%01x], language::[%s]\n", stream_content, content_type, component_tag, stream_type, group_tag, multilanguage_flag, component_flag, quality_indicator, sampling_rate, language.c_str());
-      } else if (descriptor_tag == 0xc8) { // video decode control descriptor
-        int still_picture_flag = TS_GM8(ptr + 0, 0, 1);
-        int sequence_end_code_flag = TS_GM8(ptr + 0, 1, 1);
-        int video_encode_format = TS_GM8(ptr + 0, 2, 4);
-        
-        std::string video_encode = "unknown";
-
-        if (video_encode_format == 0x001) {
-          video_encode = "1080i";
-        } else if (video_encode_format == 0x010) {
-          video_encode = "720i";
-        } else if (video_encode_format == 0x011) {
-          video_encode = "480p";
-        } else if (video_encode_format == 0x100) {
-          video_encode = "480i";
-        }
-
-        printf("\t\t:: still picture flag:[0x%01x], sequence end code flag:[0x%01x], video encode format::[0x%02x/%s]\n", still_picture_flag, sequence_end_code_flag, video_encode_format, video_encode.c_str());
+      // } else if (descriptor_tag == 0xc5) { // hyperlink descriptor
+      // } else if (descriptor_tag == 0xc6) { // target area descriptor
       } else if (descriptor_tag == 0xc7) { // data content descriptor [ABNTNBR 15608-3/15610-1]
         int data_component_id = TS_G16(ptr + 0);
         int entry_component = TS_G8(ptr + 2);
@@ -3492,6 +3507,24 @@ class PSIParser : public jevent::DemuxListener {
         std::string text(ptr + 4, text_length);
 
         printf("\t\t:: language code:[%s], text:[%s]\n", language_code.c_str(), text.c_str());
+      } else if (descriptor_tag == 0xc8) { // video decode control descriptor
+        int still_picture_flag = TS_GM8(ptr + 0, 0, 1);
+        int sequence_end_code_flag = TS_GM8(ptr + 0, 1, 1);
+        int video_encode_format = TS_GM8(ptr + 0, 2, 4);
+        
+        std::string video_encode = "unknown";
+
+        if (video_encode_format == 0x001) {
+          video_encode = "1080i";
+        } else if (video_encode_format == 0x010) {
+          video_encode = "720i";
+        } else if (video_encode_format == 0x011) {
+          video_encode = "480p";
+        } else if (video_encode_format == 0x100) {
+          video_encode = "480i";
+        }
+
+        printf("\t\t:: still picture flag:[0x%01x], sequence end code flag:[0x%01x], video encode format::[0x%02x/%s]\n", still_picture_flag, sequence_end_code_flag, video_encode_format, video_encode.c_str());
       } else if (descriptor_tag == 0xc9) { // downlod content descriptor [ABNTNBR 15608-3/15610-1]
         int reboot = TS_GM8(ptr + 0, 0, 1);
         int add_on = TS_GM8(ptr + 0, 1, 1);
@@ -3630,6 +3663,7 @@ class PSIParser : public jevent::DemuxListener {
           DumpBytes("Private Data", ptr, private_length);
         }
         */
+      // } else if (descriptor_tag == 0xce) { // extended broadcast descriptor
       } else if (descriptor_tag == 0xcf) { // logo transmission descriptor [ABNTNBR 15608-3 2008]
         int logo_transmission_type = TS_G8(ptr + 0);
 
@@ -3652,6 +3686,13 @@ class PSIParser : public jevent::DemuxListener {
         } else {
           DumpBytes("reserved", ptr + 1, descriptor_length - 1);
         }
+      // } else if (descriptor_tag == 0xd0) { // basic local event descriptor
+      // } else if (descriptor_tag == 0xd1) { // reference descriptor
+      // } else if (descriptor_tag == 0xd2) { // node relation descriptor
+      // } else if (descriptor_tag == 0xd3) { // short node information descriptor
+      // } else if (descriptor_tag == 0xd4) { // stc reference descriptor
+      // } else if (descriptor_tag == 0xd5) { // series descriptor
+      // } else if (descriptor_tag == 0xd6) { // event group descriptor
       } else if (descriptor_tag == 0xd7) { // si parameter descriptor [ABNTNBR 15603-1 2008]
         int parameter_version = TS_G8(ptr + 0);
         int update_time = TS_G16(ptr + 1);
@@ -3667,12 +3708,40 @@ class PSIParser : public jevent::DemuxListener {
           int table_description_length = TS_G8(ptr + 1);
           std::string table_description_byte(ptr + 2, table_description_length);
 
-          printf("\t\t:: table id:[0x%02x], table description byte:[%s]\n", table_id, table_description_byte.c_str());
+          printf("\t\t\t:: table id:[0x%02x], table description byte:[%s]\n", table_id, table_description_byte.c_str());
 
           ptr = ptr + 1 + 1 + table_description_length;
 
           length = length - 1 - 1 - table_description_length;
         }
+      // } else if (descriptor_tag == 0xd8) { // broadcaster name descriptor
+      // } else if (descriptor_tag == 0xd9) { // component group descriptor
+      // } else if (descriptor_tag == 0xda) { // si prime ts descriptor
+      // } else if (descriptor_tag == 0xdb) { // board information descriptor
+      } else if (descriptor_tag == 0xdc) { // ldt linkage descriptor [ABNTNBR 15603-1 2008]
+        int original_service_id = TS_G16(ptr + 0);
+        int transport_stream_id = TS_G16(ptr + 2);
+        int original_network_id = TS_G16(ptr + 4);
+
+        ptr = ptr + 6;
+
+        printf("\t\t:: original service id:[0x%04x], transport stream id:[0x%04x], original network id:[0x%04x]\n", 
+            original_service_id, transport_stream_id, original_network_id);
+
+        for (int i=0; i<descriptor_length - 6; i+=4) {
+          int description_id = TS_G16(ptr + 0);
+          int description_type = TS_GM8(ptr + 2, 4, 4);
+
+          printf("\t\t\t:: description id:[0x%04x], description type:[0x%02x]\n", 
+              description_id, description_type);
+
+          ptr = ptr + 4;
+        }
+      // } else if (descriptor_tag == 0xdd) { // connected transmission descriptor
+      // } else if (descriptor_tag == 0xde) { // content availability descriptor
+      // } else if (descriptor_tag == 0xe0) { // service group descriptor
+      // } else if (descriptor_tag == 0xf7) { // carousel compatible composite descriptor
+      // } else if (descriptor_tag == 0xf8) { // conditional playback descriptor
       } else if (descriptor_tag == 0xfa) { // terrestrial delivery system descriptor
         int area_code = TS_GM16(ptr, 0, 12);
         int guard_interval = TS_GM16(ptr, 12, 2);

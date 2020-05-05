@@ -282,6 +282,7 @@ void SocketOptions::SetHeaderInclude(bool b_)
 
 std::chrono::microseconds SocketOptions::GetTimeStamp()
 {
+  /*
   struct timespec t;
 
   if (ioctl(_fd, SIOCGSTAMP, &t) < 0) {
@@ -289,6 +290,9 @@ std::chrono::microseconds SocketOptions::GetTimeStamp()
   }
 
   return std::chrono::microseconds(t.tv_sec*1000000LL + t.tv_nsec/1000LL);
+  */
+
+  return std::chrono::microseconds(0);
 }
 
 int SocketOptions::GetMaximunTransferUnit()
