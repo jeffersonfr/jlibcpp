@@ -361,30 +361,30 @@ static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(xcb_keycode_t symbo
 		case 0x2f:
 			return jevent::JKS_SEMICOLON;
 		case 0x3d:
-			return (capital == true)?jevent::JKS_QUESTION_MARK;
+			return jevent::JKS_QUESTION_MARK;
 		case 0x6a:
 			return jevent::JKS_SLASH;
 		case 0x15:
-			return (capital == true)?jevent::JKS_EQUALS_SIGN;
+			return jevent::JKS_EQUALS_SIGN;
 		case 0x14:
-			return (capital == true)?jevent::JKS_UNDERSCORE;
+			return jevent::JKS_UNDERSCORE;
 		case 0x52:
 			return jevent::JKS_MINUS_SIGN;
 		case 0x22:
-			return (capital == true)?jevent::JKS_CURLY_BRACKET_LEFT;
+			return jevent::JKS_CURLY_BRACKET_LEFT;
 		case 0x23:
-			return (capital == true)?jevent::JKS_CURLY_BRACKET_RIGHT;
+			return jevent::JKS_CURLY_BRACKET_RIGHT;
 		case 0x3b:
-			return (capital == true)?jevent::JKS_LESS_THAN_SIGN;
+			return jevent::JKS_LESS_THAN_SIGN;
 		case 0x3c:
 		case 0x5b:
-			return (capital == true)?jevent::JKS_GREATER_THAN_SIGN;
+			return jevent::JKS_GREATER_THAN_SIGN;
 		case 0x30:
-			return (capital == true)?jevent::JKS_QUOTATION;
+			return jevent::JKS_QUOTATION;
 		case 0x33:
-			return (capital == true)?jevent::JKS_BACKSLASH;
+			return jevent::JKS_BACKSLASH;
 		case 0x31:
-			return (capital == true)?jevent::JKS_TILDE;
+			return jevent::JKS_TILDE;
 		case 0x41:
 			return jevent::JKS_SPACE;
 		case 0x24:
@@ -446,86 +446,86 @@ static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(xcb_keycode_t symbo
 			return jevent::JKS_CURSOR_DOWN;
 		case 0x13:
 		case 0x54:
-			return (capital == true)?jevent::JKS_PARENTHESIS_RIGHT;
+			return jevent::JKS_PARENTHESIS_RIGHT;
 		case 0x0a:
 		// case 0x57:
-			return (capital == true)?jevent::JKS_EXCLAMATION_MARK;
+			return jevent::JKS_EXCLAMATION_MARK;
 		case 0x0b:
 		// case 0x58:
-			return (capital == true)?jevent::JKS_AT;
+			return jevent::JKS_AT;
 		case 0x0c:
 		// case 0x59:
-			return (capital == true)?jevent::JKS_NUMBER_SIGN;
+			return jevent::JKS_NUMBER_SIGN;
 		case 0x0d:
 		// case 0x53:
-			return (capital == true)?jevent::JKS_DOLLAR_SIGN;
+			return jevent::JKS_DOLLAR_SIGN;
 		case 0x0e:
 		// case 0x54:
-			return (capital == true)?jevent::JKS_PERCENT_SIGN;
+			return jevent::JKS_PERCENT_SIGN;
 		case 0x0f:
 		// case 0x55:
-			return (capital == true)?jevent::JKS_CIRCUMFLEX_ACCENT;
+			return jevent::JKS_CIRCUMFLEX_ACCENT;
 		case 0x10:
 		// case 0x4f:
-			return (capital == true)?jevent::JKS_AMPERSAND;
+			return jevent::JKS_AMPERSAND;
 		case 0x11:
 		// case 0x50:
-			return (capital == true)?jevent::JKS_STAR;
+			return jevent::JKS_STAR;
 		case 0x12:
 		// case 0x51:
-			return (capital == true)?jevent::JKS_PARENTHESIS_LEFT;
+			return jevent::JKS_PARENTHESIS_LEFT;
 		case 0x26:
-			return (capital == true)?jevent::JKS_A;
+			return jevent::JKS_a;
 		case 0x38:
-			return (capital == true)?jevent::JKS_B;
+			return jevent::JKS_b;
 		case 0x36:
-			return (capital == true)?jevent::JKS_C;
+			return jevent::JKS_c;
 		case 0x28:
-			return (capital == true)?jevent::JKS_D;
+			return jevent::JKS_d;
 		case 0x1a:
-			return (capital == true)?jevent::JKS_E;
+			return jevent::JKS_e;
 		case 0x29:
-			return (capital == true)?jevent::JKS_F;
+			return jevent::JKS_f;
 		case 0x2a:
-			return (capital == true)?jevent::JKS_G;
+			return jevent::JKS_g;
 		case 0x2b:
-			return (capital == true)?jevent::JKS_H;
+			return jevent::JKS_h;
 		case 0x1f:
-			return (capital == true)?jevent::JKS_I;
+			return jevent::JKS_i;
 		case 0x2c:
-			return (capital == true)?jevent::JKS_J;
+			return jevent::JKS_j;
 		case 0x2d:
-			return (capital == true)?jevent::JKS_K;
+			return jevent::JKS_k;
 		case 0x2e:
-			return (capital == true)?jevent::JKS_L;
+			return jevent::JKS_l;
 		case 0x3a:
-			return (capital == true)?jevent::JKS_M;
+			return jevent::JKS_m;
 		case 0x39:
-			return (capital == true)?jevent::JKS_N;
+			return jevent::JKS_n;
 		case 0x20:
-			return (capital == true)?jevent::JKS_O;
+			return jevent::JKS_o;
 		case 0x21:
-			return (capital == true)?jevent::JKS_P;
+			return jevent::JKS_p;
 		case 0x18:
-			return (capital == true)?jevent::JKS_Q;
+			return jevent::JKS_q;
 		case 0x1b:
-			return (capital == true)?jevent::JKS_R;
+			return jevent::JKS_r;
 		case 0x27:
-			return (capital == true)?jevent::JKS_S;
+			return jevent::JKS_s;
 		case 0x1c:
-			return (capital == true)?jevent::JKS_T;
+			return jevent::JKS_t;
 		case 0x1e:
-			return (capital == true)?jevent::JKS_U;
+			return jevent::JKS_u;
 		case 0x37:
-			return (capital == true)?jevent::JKS_V;
+			return jevent::JKS_v;
 		case 0x35:
-			return (capital == true)?jevent::JKS_W;
+			return jevent::JKS_w;
 		case 0x19:
-			return (capital == true)?jevent::JKS_X;
+			return jevent::JKS_x;
 		case 0x1d:
-			return (capital == true)?jevent::JKS_Y;
+			return jevent::JKS_y;
 		case 0x34:
-			return (capital == true)?jevent::JKS_Z;
+			return jevent::JKS_z;
 		// case XK_Print:
 		//	return jevent::JKS_PRINT;
 		case 0x7f:

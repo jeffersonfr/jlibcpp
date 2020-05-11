@@ -710,7 +710,6 @@ void Application::Loop()
   std::lock_guard<std::mutex> lock(sg_loop_mutex);
 
   struct input_event ev;
-  bool shift = false;
   int mouse_x = 0, mouse_y = 0;
   uint32_t last_mouse_state = 0x00;
   

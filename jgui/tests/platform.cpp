@@ -6,6 +6,7 @@
 #include <memory>
 #include <typeinfo>
 #include <cctype>
+#include <functional>
 
 #include <cxxabi.h>
 
