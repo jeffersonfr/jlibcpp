@@ -286,6 +286,12 @@ class SocketOptions : public virtual jcommon::Object {
     void SetMulticastLoop(bool opt);
 
     /**
+     * \brief
+     *
+     */
+    void SetMulticastEnabled(std::string local_address);
+
+    /**
      * \brief -1 enabled nomal multicast forwarding
      *
      */

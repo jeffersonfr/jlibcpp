@@ -34,6 +34,19 @@
 
 namespace jmath {
 
+/* // -fconcepts -std=c++20
+template<typename T>
+  concept ComplexConcept = requires { 
+    std::complex<T>{}; 
+  };  
+
+template<typename T>
+  concept VectorConcept = ComplexConcept<T> || std::is_arithmetic<T>::value;
+
+template<size_t N, VectorConcept T = float> 
+  struct jvector_t {
+*/
+
 template<class T> 
   struct is_complex : std::false_type {
   };

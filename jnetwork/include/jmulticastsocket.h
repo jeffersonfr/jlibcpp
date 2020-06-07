@@ -45,13 +45,11 @@ class MulticastSocket : public jnetwork::Connection {
 
   private:
     /** \brief Local socket */
-    struct sockaddr_in _sock_s, _sock_r;
+    struct sockaddr_in _sock;
     /** \brief Input stream */
     SocketInputStream *_is;
     /** \brief Output stream */
     SocketOutputStream *_os;
-    /** \brief Socket handler. */
-    int _fds, _fdr;
     /** \brief */
     int64_t _sent_bytes;
     /** \brief */
@@ -69,13 +67,13 @@ class MulticastSocket : public jnetwork::Connection {
      * \brief Bind socket
      *
      */
-    void BindSocket(InetAddress *addr, int local_port);
+    void BindSocket();
 
     /**
      * \brief Connect socket
      *
      */
-    void ConnectSocket(InetAddress *addr, int port);
+    void ConnectSocket(int port);
 
     /**
      * \brief
@@ -88,7 +86,7 @@ class MulticastSocket : public jnetwork::Connection {
      * \brief 
      *
      */
-    MulticastSocket(std::string addr, int port, int rbuf = SOCK_RD_BUFFER_SIZE, int wbuf = SOCK_WR_BUFFER_SIZE);
+    MulticastSocket(int port_, int rbuf = SOCK_RD_BUFFER_SIZE, int wbuf = SOCK_WR_BUFFER_SIZE);
 
     /**
      * \brief Destrutor virtual.
@@ -136,25 +134,13 @@ class MulticastSocket : public jnetwork::Connection {
      * \brief
      *
      */
-    void Join(std::string group);
-
-    /**
-     * \brief
-     *
-     */
-    void Join(InetAddress *group);
+    void Join(std::string local, std::string group);
 
     /**
      * \brief
      *
      */
     void Leave(std::string group);
-
-    /**
-     * \brief
-     *
-     */
-    void Leave(InetAddress *group);
 
     /**
      * \brief

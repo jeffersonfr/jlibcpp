@@ -19,9 +19,9 @@
  ***************************************************************************/
 #include "jnetwork/jmulticastsocket6.h"
 #include "jnetwork/jinetaddress6.h"
-#include "jexception/jconnectionexception.h"
 #include "jexception/jconnectiontimeoutexception.h"
 #include "jexception/jioexception.h"
+#include "jexception/jconnectionexception.h"
 
 #include <poll.h>
 #include <unistd.h>
@@ -29,7 +29,7 @@
 
 namespace jnetwork {
 
-MulticastSocket6::MulticastSocket6(std::string host_, int port_, int rbuf_, int wbuf_):
+MulticastSocket6::MulticastSocket6(int port_, int rbuf_, int wbuf_):
   jnetwork::Connection(JCT_MCAST)
 {
   jcommon::Object::SetClassName("jnetwork::MulticastSocket6");
@@ -41,9 +41,8 @@ MulticastSocket6::MulticastSocket6(std::string host_, int port_, int rbuf_, int 
   _receive_bytes = 0;
 
   CreateSocket();
-  ConnectSocket(InetAddress6::GetByName(host_), port_);
-  BindSocket(InetAddress6::GetByName(host_), port_);
-  Join(InetAddress6::GetByName(host_));
+  ConnectSocket(port_);
+  BindSocket();
   InitStream(rbuf_, wbuf_);
 }
 
@@ -67,54 +66,36 @@ MulticastSocket6::~MulticastSocket6()
 
 void MulticastSocket6::CreateSocket()
 {
-  if ((_fds = ::socket(PF_INET6, SOCK_DGRAM, IPPROTO_IPV6)) < 0) { // IPPROTO_MTP
-    throw jexception::ConnectionException("Socket create::sender exception");
-  }
-
-  if ((_fdr = ::socket(PF_INET6, SOCK_DGRAM, IPPROTO_IPV6)) < 0) { // IPPROTO_MTP
-    throw jexception::ConnectionException("Socket create::receiver exception");
+  if ((_fd = ::socket(PF_INET6, SOCK_DGRAM, 0)) < 0) { // IPPROTO_MTP
+    throw jexception::ConnectionException("Multicast socket create exception");
   }
 
   _is_closed = false;
 }
 
-void MulticastSocket6::ConnectSocket(InetAddress *addr_, int port_)
+void MulticastSocket6::ConnectSocket(int port_)
 {
   // Receive
-  memset(&_sock_r, 0, sizeof(_sock_r));
+  memset(&_sock, 0, sizeof(_sock));
 
-  _sock_r.sin6_family = AF_INET6;
-  _sock_r.sin6_port = htons(port_);
-  _sock_r.sin6_flowinfo = 0;
-  _sock_r.sin6_scope_id = 0;
-
-  if (addr_ == nullptr) {
-    _sock_r.sin6_addr = in6addr_any;
-  } else {
-    inet_pton(AF_INET6, addr_->GetHostAddress().c_str(), &(_sock_r.sin6_addr));
-  }
-
-  // Send
-  memset(&_sock_s, 0, sizeof(_sock_s));
-
-  _sock_s.sin6_family = AF_INET6;
-  _sock_s.sin6_port = htons(port_);
-  _sock_s.sin6_flowinfo = 0;
-  _sock_s.sin6_scope_id = 0;
-  _sock_s.sin6_addr = in6addr_any;
+  _sock.sin6_family = AF_INET6;
+  _sock.sin6_port = htons(port_);
+  _sock.sin6_flowinfo = 0;
+  _sock.sin6_scope_id = 0;
+  _sock.sin6_addr = in6addr_any;
 }
 
-void MulticastSocket6::BindSocket(InetAddress *addr_, int local_port_)
+void MulticastSocket6::BindSocket()
 {
-  if (bind(_fdr, (struct sockaddr *)&_sock_r, sizeof(_sock_r)) < 0) {
+  if (bind(_fd, (struct sockaddr *)&_sock, sizeof(_sock)) < 0) {
     throw jexception::ConnectionException("Binding error");
   }
 }
 
 void MulticastSocket6::InitStream(int rbuf_, int wbuf_)
 {
-  _is = new SocketInputStream((Connection *)this, (struct sockaddr *)&_sock_r, rbuf_);
-  _os = new SocketOutputStream((Connection *)this, (struct sockaddr *)&_sock_s, wbuf_);
+  _is = new SocketInputStream((Connection *)this, (struct sockaddr *)&_sock, rbuf_);
+  _os = new SocketOutputStream((Connection *)this, (struct sockaddr *)&_sock, wbuf_);
 }
 
 /** End */
@@ -137,7 +118,7 @@ int MulticastSocket6::Receive(char *data_, int size_, std::chrono::milliseconds 
   
   struct pollfd ufds[1];
 
-  ufds[0].fd = _fdr;
+  ufds[0].fd = _fd;
   ufds[0].events = POLLIN | POLLRDBAND;
 
   int rv = poll(ufds, 1, timeout_.count());
@@ -163,13 +144,13 @@ int MulticastSocket6::Receive(char *data_, int size_, bool block_)
 
   int n,
       flags = 0,
-      length = sizeof(_sock_r);
+      length = sizeof(_sock);
 
   if (block_ == false) {
     flags = MSG_DONTWAIT;
   }
 
-  n = ::recvfrom(_fdr, data_, size_, flags, (struct sockaddr *)&_sock_r, (socklen_t *)&length);
+  n = ::recvfrom(_fd, data_, size_, flags, (struct sockaddr *)&_sock, (socklen_t *)&length);
   
   if (n < 0) {
     if (errno == EAGAIN || errno == EWOULDBLOCK) {
@@ -219,7 +200,7 @@ int MulticastSocket6::Send(const char *data, int size, std::chrono::milliseconds
 
   struct pollfd ufds[1];
 
-  ufds[0].fd = _fds;
+  ufds[0].fd = _fd;
   ufds[0].events = POLLOUT | POLLWRBAND;
 
   int rv = poll(ufds, 1, timeout_.count());
@@ -251,7 +232,7 @@ int MulticastSocket6::Send(const char *data, int size, bool block_)
     flags = MSG_NOSIGNAL | MSG_DONTWAIT;
   }
 
-  int n = ::sendto(_fds, data, size, flags, (struct sockaddr *)&_sock_s, sizeof(_sock_s));
+  int n = ::sendto(_fd, data, size, flags, (struct sockaddr *)&_sock, sizeof(_sock));
 
   if (n < 0) {
     if (errno == EAGAIN || errno == EWOULDBLOCK) {
@@ -283,7 +264,7 @@ int MulticastSocket6::Send(const char *data, int size, bool block_)
   return n;
 }
 
-void MulticastSocket6::Join(std::string group_)
+void MulticastSocket6::Join(std::string local, std::string group)
 {
   if (_is_closed == true) {
     throw jexception::ConnectionException("Connection closed exception");
@@ -291,32 +272,14 @@ void MulticastSocket6::Join(std::string group_)
   
   struct ip_mreq imr;
 
-  imr.imr_multiaddr.s_addr = inet_addr(group_.c_str());
-  imr.imr_interface.s_addr = htonl(INADDR_ANY);
+  imr.imr_multiaddr.s_addr = inet_addr(group.c_str());
+  imr.imr_interface.s_addr = inet_addr(local.c_str());
 
-  if (setsockopt(_fdr, IPPROTO_IPV6, IPV6_JOIN_GROUP, &imr, sizeof(imr)) < 0) {
-    throw jexception::ConnectionException("MulticastSocket join exception");
+  if (setsockopt(_fd, IPPROTO_IPV6, IPV6_JOIN_GROUP, &imr, sizeof(imr)) < 0) {
+    throw jexception::ConnectionException("MulticastSocket6 join exception");
   }
 
-  _groups.push_back(group_);
-}
-
-void MulticastSocket6::Join(InetAddress *group_)
-{
-  if (_is_closed == true) {
-    throw jexception::ConnectionException("Connection closed exception");
-  }
-  
-  struct ip_mreq imr;
-
-  imr.imr_multiaddr.s_addr = inet_addr(group_->GetHostAddress().c_str());
-  imr.imr_interface.s_addr = htonl(INADDR_ANY);
-
-  if (setsockopt(_fdr, IPPROTO_IPV6, IPV6_JOIN_GROUP, &imr, sizeof(imr)) < 0) {
-    throw jexception::ConnectionException("MulticastSocket join exception");
-  }
-
-  _groups.push_back(group_->GetHostAddress());
+  _groups.push_back(group);
 }
 
 void MulticastSocket6::Leave(std::string group_)
@@ -332,38 +295,15 @@ void MulticastSocket6::Leave(std::string group_)
       imr.imr_multiaddr.s_addr = inet_addr(group_.c_str());
       imr.imr_interface.s_addr = htonl(INADDR_ANY);
 
-      if (setsockopt(_fdr, IPPROTO_IPV6, IPV6_LEAVE_GROUP, &imr, sizeof(imr)) < 0) {
-        throw jexception::ConnectionException("MulticastSocket leave exception");
+      if (setsockopt(_fd, IPPROTO_IPV6, IPV6_LEAVE_GROUP, &imr, sizeof(imr)) < 0) {
+        throw jexception::ConnectionException("MulticastSocket6 leave exception");
       }
 
-      // _groups.remove(*i);
+      i = _groups.erase(i);
 
-      break;
-    }
-  }
-}
-
-void MulticastSocket6::Leave(InetAddress *group_)
-{
-  if (_is_closed == true) {
-    throw jexception::ConnectionException("Connection closed exception");
-  }
-  
-  struct ip_mreq imr;
-  std::string s = group_->GetHostAddress();
-
-  for (std::vector<std::string>::iterator i=_groups.begin(); i!=_groups.end(); i++) {
-    if (s == (*i)) {
-      imr.imr_multiaddr.s_addr = inet_addr(s.c_str());
-      imr.imr_interface.s_addr = htonl(INADDR_ANY);
-
-      if (setsockopt(_fdr, IPPROTO_IPV6, IPV6_LEAVE_GROUP, &imr, sizeof(imr)) < 0) {
-        throw jexception::ConnectionException("MulticastSocket leave exception");
+      if (i == _groups.end()) {
+        break;
       }
-
-      // std::remove(i);
-
-      break;
     }
   }
 }
@@ -381,11 +321,11 @@ void MulticastSocket6::Close()
 
   bool flag = false;
 
-  if (close(_fdr) != 0) {
+  if (close(_fd) != 0) {
     flag = true;
   }
   
-  if (close(_fds) != 0) {
+  if (close(_fd) != 0) {
     flag = true;
   }
   
@@ -398,7 +338,7 @@ void MulticastSocket6::Close()
 
 int MulticastSocket6::GetLocalPort()
 {
-  return ntohs(_sock_r.sin6_port);
+  return ntohs(_sock.sin6_port);
 }
 
 int64_t MulticastSocket6::GetSentBytes()
@@ -413,19 +353,19 @@ int64_t MulticastSocket6::GetReadedBytes()
 
 void MulticastSocket6::SetMulticastTTL(char ttl_)
 {
-  if (setsockopt(_fds, IPPROTO_IPV6, IP_MULTICAST_TTL, &ttl_, sizeof(char))) {
+  if (setsockopt(_fd, IPPROTO_IPV6, IP_MULTICAST_TTL, &ttl_, sizeof(char))) {
     throw jexception::ConnectionException("Seting multicast ttl error");
   }
 }
 
 SocketOptions * MulticastSocket6::GetReadSocketOptions()
 {
-  return new SocketOptions(_fdr, JCT_MCAST);
+  return new SocketOptions(_fd, JCT_MCAST);
 }
 
 SocketOptions * MulticastSocket6::GetWriteSocketOptions()
 {
-  return new SocketOptions(_fds, JCT_MCAST);
+  return new SocketOptions(_fd, JCT_MCAST);
 }
 
 }

@@ -57,8 +57,6 @@ class Font : public virtual jcommon::Object {
     /** \brief */
     cairo_font_face_t *_font;
     /** \brief */
-    cairo_surface_t *_surface_ref;
-    /** \brief */
     cairo_t *_context_ref;
     /** \brief */
     cairo_scaled_font_t *_scaled_font;

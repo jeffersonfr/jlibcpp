@@ -164,7 +164,7 @@ uint64_t DataStream::GetBits(size_t n)
       n = 0;
     } else {
       size_t 
-        d = 8 - (_data_index_lo + _data_index%8);
+        d = 8 - (_data_index_lo + _data_index)%8;
 
       bits = (bits << d) | TS_GM8(ptr + start, (_data_index_lo + _data_index)%8, d);
 
@@ -211,7 +211,7 @@ std::vector<uint8_t> DataStream::GetBitsAsArray(size_t n)
       n = 0;
     } else {
       size_t 
-        d = 8 - (_data_index_lo + _data_index%8);
+        d = 8 - (_data_index_lo + _data_index)%8;
 
       bits.push_back(TS_GM8(ptr + start, (_data_index_lo + _data_index)%8, d));
 

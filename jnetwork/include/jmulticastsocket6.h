@@ -20,7 +20,7 @@
 #ifndef J_MULTICASTSOCKET6_H
 #define J_MULTICASTSOCKET6_H
 
-#include "jnetwork/jinetaddress6.h"
+#include "jnetwork/jinetaddress.h"
 #include "jnetwork/jsocketoptions.h"
 #include "jnetwork/jsocketinputstream.h"
 #include "jnetwork/jsocketoutputstream.h"
@@ -44,22 +44,18 @@ namespace jnetwork {
 class MulticastSocket6 : public jnetwork::Connection {
 
   private:
-    /** \brief */
-    std::vector<std::string> _groups;
+    /** \brief Local socket */
+    struct sockaddr_in6 _sock;
     /** \brief Input stream */
     SocketInputStream *_is;
     /** \brief Output stream */
     SocketOutputStream *_os;
-    /** \brief Socket handler. */
-    int _fds, _fdr;
     /** \brief */
     int64_t _sent_bytes;
     /** \brief */
     int64_t _receive_bytes;
-    /** \brief Local socket */
-    struct sockaddr_in6 _sock_s;
-    /** \brief Local socket */
-    struct sockaddr_in6 _sock_r;
+    /** \brief */
+    std::vector<std::string> _groups;
 
     /**
      * \brief Create a new socket
@@ -71,13 +67,13 @@ class MulticastSocket6 : public jnetwork::Connection {
      * \brief Bind socket
      *
      */
-    void BindSocket(InetAddress *addr, int local_port);
+    void BindSocket();
 
     /**
      * \brief Connect socket
      *
      */
-    void ConnectSocket(InetAddress *addr, int port);
+    void ConnectSocket(int port);
 
     /**
      * \brief
@@ -90,7 +86,7 @@ class MulticastSocket6 : public jnetwork::Connection {
      * \brief 
      *
      */
-    MulticastSocket6(std::string addr, int port, int rbuf = SOCK_RD_BUFFER_SIZE, int wbuf = SOCK_WR_BUFFER_SIZE);
+    MulticastSocket6(int port_, int rbuf = SOCK_RD_BUFFER_SIZE, int wbuf = SOCK_WR_BUFFER_SIZE);
 
     /**
      * \brief Destrutor virtual.
@@ -138,25 +134,13 @@ class MulticastSocket6 : public jnetwork::Connection {
      * \brief
      *
      */
-    void Join(std::string group);
-
-    /**
-     * \brief
-     *
-     */
-    void Join(InetAddress *group);
+    void Join(std::string local, std::string group);
 
     /**
      * \brief
      *
      */
     void Leave(std::string group);
-
-    /**
-     * \brief
-     *
-     */
-    void Leave(InetAddress *group);
 
     /**
      * \brief
@@ -199,7 +183,7 @@ class MulticastSocket6 : public jnetwork::Connection {
      *
      */
     SocketOptions * GetReadSocketOptions();
-    
+
     /**
      * \brief
      *

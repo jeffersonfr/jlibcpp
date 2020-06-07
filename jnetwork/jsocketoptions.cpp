@@ -21,9 +21,13 @@
 #include "jexception/jconnectionexception.h"
 
 #include <sys/ioctl.h>
+#include <sys/socket.h>
 #include <linux/tcp.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 #include <fcntl.h>
+#include <string.h>
 
 namespace jnetwork {
 
@@ -332,6 +336,19 @@ void SocketOptions::SetMulticastLoop(bool b_)
 
   if (setsockopt(_fd, IPPROTO_IP, IP_MULTICAST_LOOP, &b, sizeof(b)) < 0) {
     throw jexception::ConnectionException("Set multicast loop error");
+  }
+}
+
+void SocketOptions::SetMulticastEnabled(std::string local_address)
+{
+  struct in_addr local;
+
+  memset(&local, 0, sizeof(local));
+
+  local.s_addr = inet_addr(local_address.c_str());
+
+  if(setsockopt(_fd, IPPROTO_IP, IP_MULTICAST_IF, (char *)&local, sizeof(local)) < 0) {
+    throw jexception::ConnectionException("Set multicast enabled error");
   }
 }
 

@@ -29,7 +29,7 @@
 
 namespace jnetwork {
 
-MulticastSocket::MulticastSocket(std::string host_, int port_, int rbuf_, int wbuf_):
+MulticastSocket::MulticastSocket(int port_, int rbuf_, int wbuf_):
   jnetwork::Connection(JCT_MCAST)
 {
   jcommon::Object::SetClassName("jnetwork::MulticastSocket");
@@ -41,9 +41,8 @@ MulticastSocket::MulticastSocket(std::string host_, int port_, int rbuf_, int wb
   _receive_bytes = 0;
 
   CreateSocket();
-  ConnectSocket(InetAddress4::GetByName(host_), port_);
-  BindSocket(InetAddress4::GetByName(host_), port_);
-  Join(InetAddress4::GetByName(host_));
+  ConnectSocket(port_);
+  BindSocket();
   InitStream(rbuf_, wbuf_);
 }
 
@@ -67,54 +66,34 @@ MulticastSocket::~MulticastSocket()
 
 void MulticastSocket::CreateSocket()
 {
-  if ((_fds = ::socket(PF_INET, SOCK_DGRAM, IPPROTO_IP)) < 0) { // IPPROTO_MTP
-    throw jexception::ConnectionException("Socket create::sender exception");
-  }
-
-  if ((_fdr = ::socket(PF_INET, SOCK_DGRAM, IPPROTO_IP)) < 0) { // IPPROTO_MTP
-    throw jexception::ConnectionException("Socket create::receiver exception");
+  if ((_fd = ::socket(PF_INET, SOCK_DGRAM, 0)) < 0) { // IPPROTO_MTP
+    throw jexception::ConnectionException("Multicast socket create exception");
   }
 
   _is_closed = false;
 }
 
-void MulticastSocket::BindSocket(InetAddress *addr_, int local_port_)
+void MulticastSocket::ConnectSocket(int port_)
 {
-  if (bind(_fdr, (struct sockaddr *)&_sock_r, sizeof(_sock_r)) < 0) {
+  // Receive
+  memset(&_sock, 0, sizeof(_sock));
+
+  _sock.sin_family = AF_INET;
+  _sock.sin_port = htons(port_);
+  _sock.sin_addr.s_addr = INADDR_ANY;
+}
+
+void MulticastSocket::BindSocket()
+{
+  if (bind(_fd, (struct sockaddr *)&_sock, sizeof(_sock)) < 0) {
     throw jexception::ConnectionException("Binding error");
   }
 }
 
-void MulticastSocket::ConnectSocket(InetAddress *local_addr_, int port_)
-{
-  // Receive
-  memset(&_sock_r, 0, sizeof(_sock_r));
-
-  _sock_r.sin_family = AF_INET;
-  _sock_r.sin_port = htons(port_);
-
-#ifdef SOLARIS
-  _sock_r.sin_addr.s_addr = htonl(INADDR_ANY);
-#else
-  if (local_addr_ == nullptr) {
-    _sock_r.sin_addr.s_addr = htonl(INADDR_ANY);
-  } else {
-    _sock_r.sin_addr.s_addr = inet_addr(local_addr_->GetHostAddress().c_str());
-  }
-#endif
-
-  // Send
-  memset(&_sock_s, 0, sizeof(_sock_s));
-
-  _sock_s.sin_family = AF_INET;
-  _sock_s.sin_port = htons(port_);
-  _sock_s.sin_addr.s_addr = htonl(INADDR_ANY);
-}
-
 void MulticastSocket::InitStream(int rbuf_, int wbuf_)
 {
-  _is = new SocketInputStream((Connection *)this, (struct sockaddr *)&_sock_r, rbuf_);
-  _os = new SocketOutputStream((Connection *)this, (struct sockaddr *)&_sock_s, wbuf_);
+  _is = new SocketInputStream((Connection *)this, (struct sockaddr *)&_sock, rbuf_);
+  _os = new SocketOutputStream((Connection *)this, (struct sockaddr *)&_sock, wbuf_);
 }
 
 /** End */
@@ -137,7 +116,7 @@ int MulticastSocket::Receive(char *data_, int size_, std::chrono::milliseconds t
   
   struct pollfd ufds[1];
 
-  ufds[0].fd = _fdr;
+  ufds[0].fd = _fd;
   ufds[0].events = POLLIN | POLLRDBAND;
 
   int rv = poll(ufds, 1, timeout_.count());
@@ -163,13 +142,13 @@ int MulticastSocket::Receive(char *data_, int size_, bool block_)
 
   int n,
       flags = 0,
-      length = sizeof(_sock_r);
+      length = sizeof(_sock);
 
   if (block_ == false) {
     flags = MSG_DONTWAIT;
   }
 
-  n = ::recvfrom(_fdr, data_, size_, flags, (struct sockaddr *)&_sock_r, (socklen_t *)&length);
+  n = ::recvfrom(_fd, data_, size_, flags, (struct sockaddr *)&_sock, (socklen_t *)&length);
   
   if (n < 0) {
     if (errno == EAGAIN || errno == EWOULDBLOCK) {
@@ -219,7 +198,7 @@ int MulticastSocket::Send(const char *data, int size, std::chrono::milliseconds 
 
   struct pollfd ufds[1];
 
-  ufds[0].fd = _fds;
+  ufds[0].fd = _fd;
   ufds[0].events = POLLOUT | POLLWRBAND;
 
   int rv = poll(ufds, 1, timeout_.count());
@@ -251,7 +230,7 @@ int MulticastSocket::Send(const char *data, int size, bool block_)
     flags = MSG_NOSIGNAL | MSG_DONTWAIT;
   }
 
-  int n = ::sendto(_fds, data, size, flags, (struct sockaddr *)&_sock_s, sizeof(_sock_s));
+  int n = ::sendto(_fd, data, size, flags, (struct sockaddr *)&_sock, sizeof(_sock));
 
   if (n < 0) {
     if (errno == EAGAIN || errno == EWOULDBLOCK) {
@@ -283,7 +262,7 @@ int MulticastSocket::Send(const char *data, int size, bool block_)
   return n;
 }
 
-void MulticastSocket::Join(std::string group_)
+void MulticastSocket::Join(std::string local, std::string group)
 {
   if (_is_closed == true) {
     throw jexception::ConnectionException("Connection closed exception");
@@ -291,32 +270,14 @@ void MulticastSocket::Join(std::string group_)
   
   struct ip_mreq imr;
 
-  imr.imr_multiaddr.s_addr = inet_addr(group_.c_str());
-  imr.imr_interface.s_addr = htonl(INADDR_ANY);
+  imr.imr_multiaddr.s_addr = inet_addr(group.c_str());
+  imr.imr_interface.s_addr = inet_addr(local.c_str());
 
-  if (setsockopt(_fdr, IPPROTO_IP, IP_ADD_MEMBERSHIP, &imr, sizeof(imr)) < 0) {
+  if (setsockopt(_fd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &imr, sizeof(imr)) < 0) {
     throw jexception::ConnectionException("MulticastSocket join exception");
   }
 
-  _groups.push_back(group_);
-}
-
-void MulticastSocket::Join(InetAddress *group_)
-{
-  if (_is_closed == true) {
-    throw jexception::ConnectionException("Connection closed exception");
-  }
-  
-  struct ip_mreq imr;
-
-  imr.imr_multiaddr.s_addr = inet_addr(group_->GetHostAddress().c_str());
-  imr.imr_interface.s_addr = htonl(INADDR_ANY);
-
-  if (setsockopt(_fdr, IPPROTO_IP, IP_ADD_MEMBERSHIP, &imr, sizeof(imr)) < 0) {
-    throw jexception::ConnectionException("MulticastSocket join exception");
-  }
-
-  _groups.push_back(group_->GetHostAddress());
+  _groups.push_back(group);
 }
 
 void MulticastSocket::Leave(std::string group_)
@@ -332,38 +293,15 @@ void MulticastSocket::Leave(std::string group_)
       imr.imr_multiaddr.s_addr = inet_addr(group_.c_str());
       imr.imr_interface.s_addr = htonl(INADDR_ANY);
 
-      if (setsockopt(_fdr, IPPROTO_IP, IP_DROP_MEMBERSHIP, &imr, sizeof(imr)) < 0) {
+      if (setsockopt(_fd, IPPROTO_IP, IP_DROP_MEMBERSHIP, &imr, sizeof(imr)) < 0) {
         throw jexception::ConnectionException("MulticastSocket leave exception");
       }
 
-      // _groups.remove(*i);
+      i = _groups.erase(i);
 
-      break;
-    }
-  }
-}
-
-void MulticastSocket::Leave(InetAddress *group_)
-{
-  if (_is_closed == true) {
-    throw jexception::ConnectionException("Connection closed exception");
-  }
-  
-  struct ip_mreq imr;
-  std::string s = group_->GetHostAddress();
-
-  for (std::vector<std::string>::iterator i=_groups.begin(); i!=_groups.end(); i++) {
-    if (s == (*i)) {
-      imr.imr_multiaddr.s_addr = inet_addr(s.c_str());
-      imr.imr_interface.s_addr = htonl(INADDR_ANY);
-
-      if (setsockopt(_fdr, IPPROTO_IP, IP_DROP_MEMBERSHIP, &imr, sizeof(imr)) < 0) {
-        throw jexception::ConnectionException("MulticastSocket leave exception");
+      if (i == _groups.end()) {
+        break;
       }
-
-      // std::remove(i);
-
-      break;
     }
   }
 }
@@ -381,11 +319,11 @@ void MulticastSocket::Close()
 
   bool flag = false;
 
-  if (close(_fdr) != 0) {
+  if (close(_fd) != 0) {
     flag = true;
   }
   
-  if (close(_fds) != 0) {
+  if (close(_fd) != 0) {
     flag = true;
   }
   
@@ -398,7 +336,7 @@ void MulticastSocket::Close()
 
 int MulticastSocket::GetLocalPort()
 {
-  return ntohs(_sock_r.sin_port);
+  return ntohs(_sock.sin_port);
 }
 
 int64_t MulticastSocket::GetSentBytes()
@@ -413,19 +351,19 @@ int64_t MulticastSocket::GetReadedBytes()
 
 void MulticastSocket::SetMulticastTTL(char ttl_)
 {
-  if (setsockopt(_fds, IPPROTO_IP, IP_MULTICAST_TTL, &ttl_, sizeof(char))) {
+  if (setsockopt(_fd, IPPROTO_IP, IP_MULTICAST_TTL, &ttl_, sizeof(char))) {
     throw jexception::ConnectionException("Seting multicast ttl error");
   }
 }
 
 SocketOptions * MulticastSocket::GetReadSocketOptions()
 {
-  return new SocketOptions(_fdr, JCT_MCAST);
+  return new SocketOptions(_fd, JCT_MCAST);
 }
 
 SocketOptions * MulticastSocket::GetWriteSocketOptions()
 {
-  return new SocketOptions(_fds, JCT_MCAST);
+  return new SocketOptions(_fd, JCT_MCAST);
 }
 
 }

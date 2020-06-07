@@ -26,8 +26,8 @@
 
 namespace jgui {
 
-static FT_Library sg_ft_library;
-static int sg_ft_library_reference = 0;
+static FT_Library sg_freetype;
+static int sg_freetype_refcounter = 0;
 
 #define DEFAULT_FONT_NAME "default"
 
@@ -51,20 +51,10 @@ Font Font::SIZE48(DEFAULT_FONT_NAME, (jfont_attributes_t)(JFA_NORMAL), 48);
 
 int InternalCreateFont(std::string name, cairo_font_face_t **font)
 {
-  if (sg_ft_library_reference++ == 0) {
-    FT_Init_FreeType(&sg_ft_library);
-  }
-
   FT_Face ft_face;
 
-  if (FT_New_Face(sg_ft_library, name.c_str(), 0, &ft_face) != 0) {
+  if (FT_New_Face(sg_freetype, name.c_str(), 0, &ft_face) != 0) {
     (*font) = nullptr;
-
-    sg_ft_library_reference--;
-
-    if (sg_ft_library_reference == 0) {
-      FT_Done_FreeType(sg_ft_library);
-    }
 
     return -1;
   }
@@ -72,6 +62,8 @@ int InternalCreateFont(std::string name, cairo_font_face_t **font)
   FT_Select_Charmap(ft_face, ft_encoding_unicode);
 
   (*font) = cairo_ft_font_face_create_for_ft_face(ft_face, FT_LOAD_NO_AUTOHINT);
+
+  // FT_Done_Face(ft_face);
 
   return 0;
 }
@@ -91,20 +83,33 @@ Font::Font(std::string name, jfont_attributes_t attributes, int size, const jmat
   _font = nullptr;
   _is_builtin = false;
 
+  if (sg_freetype_refcounter == 0) {
+    FT_Init_FreeType(&sg_freetype);
+  }
+
   if (file == nullptr) {
     _is_builtin = true;
   } else {
+    delete file;
+
     InternalCreateFont(name, &_font);
   
     if (_font == nullptr) {
+      if (sg_freetype_refcounter == 0) {
+        FT_Done_FreeType(sg_freetype);
+      }
+
       throw jexception::NullPointerException("Cannot load a native font");
     }
   }
 
-  delete file;
+  sg_freetype_refcounter = sg_freetype_refcounter + 1;
 
-  _surface_ref = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 0, 0);
-  _context_ref = cairo_create(_surface_ref);
+  cairo_surface_t *surface_ref = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 0, 0);
+
+  _context_ref = cairo_create(surface_ref);
+
+  cairo_surface_destroy(surface_ref);
 
   // INFO:: DEFAULT, NONE, GRAY, SUBPIXEL, FAST, GOOD, BEST
   _options = cairo_font_options_create();
@@ -166,7 +171,6 @@ Font::Font(std::string name, jfont_attributes_t attributes, int size, const jmat
 
   _scaled_font = cairo_scaled_font_create(font_face, &fm, &tm, _options);
 
-  cairo_surface_destroy(_surface_ref);
   cairo_destroy(_context_ref);
 
   // INFO:: intializing the first 256 characters withs
@@ -179,18 +183,16 @@ Font::Font(std::string name, jfont_attributes_t attributes, int size, const jmat
 
 Font::~Font()
 {
+  cairo_scaled_font_destroy(_scaled_font);
+  cairo_font_options_destroy(_options);
+  
   if (_font != nullptr) {
-    cairo_scaled_font_destroy(_scaled_font);
     cairo_font_face_destroy(_font);
-    cairo_font_options_destroy(_options);
-    // FT_Done_Face (ft_face);
+
   }
     
-  sg_ft_library_reference--;
-
-  if (sg_ft_library_reference == 0) {
-    printf("aaaaaaaaaaaaa");
-    FT_Done_FreeType(sg_ft_library);
+  if (--sg_freetype_refcounter == 0) {
+    FT_Done_FreeType(sg_freetype);
   }
 }
 
