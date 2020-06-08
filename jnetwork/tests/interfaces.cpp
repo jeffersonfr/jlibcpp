@@ -26,16 +26,17 @@ int main(int argc, char **argv)
 {
 	InitializeSocketLibrary();
 
-	std::vector<jnetwork::NetworkInterface *> interfaces = jnetwork::NetworkInterface::GetNetworkInterfaces();
+	std::vector<jnetwork::jnetworkinterface_info_t> 
+    ifs = jnetwork::NetworkInterface::GetInterfaces();
 
-	for (std::vector<jnetwork::NetworkInterface *>::iterator i=interfaces.begin(); i!=interfaces.end(); i++) {
-		std::cout << (*i)->What() << std::endl;
+	for (auto &ifa : ifs) {
+		std::cout << ifa.name << std::endl;
 
-		std::vector<jnetwork::NetworkInterface *> subinterfaces = (*i)->GetSubInterfaces();
-		
-		for (std::vector<jnetwork::NetworkInterface *>::iterator j=subinterfaces.begin(); j!=subinterfaces.end(); j++) {
-			std::cout << (*j)->What() << std::endl;
-		}
+    for (auto &addr : ifa.addresses) {
+      std::cout << "\taddr: " << addr.addr << std::endl;
+      std::cout << "\tmask: " << addr.mask << std::endl;
+      std::cout << "\tbroadaddr: " << addr.broadaddr << std::endl;
+    }
 	}
 
 	ReleaseSocketLibrary();
