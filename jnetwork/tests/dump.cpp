@@ -59,7 +59,7 @@ void dump_raw()
 	try {
     jnetwork::DatagramSocket s(4001);
 
-		jnetwork::SocketOptions *opt = s.GetSocketOptions();
+		const jnetwork::SocketOptions *opt = s.GetSocketOptions();
 
 		opt->SetSendTimeout(std::chrono::seconds(2));
 		opt->SetReceiveTimeout(std::chrono::seconds(2));

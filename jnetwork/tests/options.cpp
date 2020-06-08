@@ -41,7 +41,7 @@ int main()
 	try {
     jnetwork::DatagramSocket s("127.0.0.1", 1234);
 
-    jnetwork::SocketOptions *o = s.GetSocketOptions(); 
+    const jnetwork::SocketOptions *o = s.GetSocketOptions(); 
 	
 		o->SetReceiveTimeout(std::chrono::seconds(10));
 		o->SetSendMaximumBuffer(10240);

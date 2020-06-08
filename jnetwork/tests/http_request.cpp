@@ -72,7 +72,7 @@ class HTTPRequest {
 				c = new jnetwork::Socket(_host, _port, _timeout);
 
 				{
-          jnetwork::SocketOptions *o = c->GetSocketOptions(); 
+          const jnetwork::SocketOptions *o = c->GetSocketOptions(); 
 
 					o->SetSendTimeout(_timeout);
 					o->SetReceiveTimeout(_timeout);

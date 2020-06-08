@@ -365,7 +365,7 @@ void sayerror(char *msg, jnetwork::Socket *sockIn, jnetwork::Socket *sockOut)
 {
 	sockIn->Send(msg, strlen(msg));
 	
-	jnetwork::SocketOptions *o = sockIn->GetSocketOptions();
+	const jnetwork::SocketOptions *o = sockIn->GetSocketOptions();
 
 	o->SetLinger(1, 4);
 	o->SetLinger(1, 1);
@@ -381,7 +381,7 @@ int process_request(jnetwork::Socket *sockIn)
 	int ldata, lreq, port, req_len, req_method;
 	jnetwork::Socket *sockOut = nullptr;
 	
-	jnetwork::SocketOptions *o = sockIn->GetSocketOptions();
+	const jnetwork::SocketOptions *o = sockIn->GetSocketOptions();
 
 	o->SetReuseAddress(true);
 	o->SetKeepAlive(true);

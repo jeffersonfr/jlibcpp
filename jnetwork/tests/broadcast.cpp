@@ -36,7 +36,7 @@ int main(int argc, char **argv)
 
   jnetwork::DatagramSocket s(std::string(argv[1]), atoi(argv[2]));
 
-  jnetwork::SocketOptions *opt = s.GetSocketOptions();
+  const jnetwork::SocketOptions *opt = s.GetSocketOptions();
 
   opt->SetBroadcast(true);
 

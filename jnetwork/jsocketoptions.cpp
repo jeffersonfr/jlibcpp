@@ -44,7 +44,7 @@ SocketOptions::~SocketOptions()
 {
 }
 
-void SocketOptions::SetKeepAlive(bool b_)
+void SocketOptions::SetKeepAlive(bool b_) const
 {
   int b = (b_ == true)?1:0;
 
@@ -53,7 +53,7 @@ void SocketOptions::SetKeepAlive(bool b_)
   }
 }
 
-void SocketOptions::SetNoDelay(bool b_)
+void SocketOptions::SetNoDelay(bool b_) const
 {
   int b = (b_ == true)?1:0;
 
@@ -63,7 +63,7 @@ void SocketOptions::SetNoDelay(bool b_)
   }
 }
 
-void SocketOptions::SetOutOfBandInLine(bool b_)
+void SocketOptions::SetOutOfBandInLine(bool b_) const
 {
   int b = (b_ == true)?1:0;
 
@@ -72,7 +72,7 @@ void SocketOptions::SetOutOfBandInLine(bool b_)
   }
 }
 
-void SocketOptions::SetSendTimeout(std::chrono::milliseconds timeout_)
+void SocketOptions::SetSendTimeout(std::chrono::milliseconds timeout_) const
 {
   struct timespec t;
 
@@ -84,7 +84,7 @@ void SocketOptions::SetSendTimeout(std::chrono::milliseconds timeout_)
   }
 }
 
-void SocketOptions::SetReceiveTimeout(std::chrono::milliseconds timeout_)
+void SocketOptions::SetReceiveTimeout(std::chrono::milliseconds timeout_) const
 {
   struct timespec t;
     
@@ -96,7 +96,7 @@ void SocketOptions::SetReceiveTimeout(std::chrono::milliseconds timeout_)
   }
 }
 
-void SocketOptions::SetPassCredentials(bool b_)
+void SocketOptions::SetPassCredentials(bool b_) const
 {
   int b = (b_ == true)?1:0;
 
@@ -105,7 +105,7 @@ void SocketOptions::SetPassCredentials(bool b_)
   }
 }
 
-void SocketOptions::GetPeerCredentials(void *v_)
+void SocketOptions::GetPeerCredentials(void *v_) const
 {
   /*
   if (getsockopt(_fd, SOL_SOCKET, SO_PEERCRED, &v_, sizeof(v_)) < 0) {
@@ -114,14 +114,14 @@ void SocketOptions::GetPeerCredentials(void *v_)
   */
 }
 
-void SocketOptions::BindToDevice(std::string dev_)
+void SocketOptions::BindToDevice(std::string dev_) const
 {
   if (setsockopt(_fd, SOL_SOCKET, SO_BINDTODEVICE, dev_.c_str(), dev_.size()+1) < 0) {
     throw jexception::ConnectionException("Bind to device error");
   }
 }
 
-void SocketOptions::SetReuseAddress(bool b_)
+void SocketOptions::SetReuseAddress(bool b_) const
 {
   int b = (b_ == true)?1:0;
 
@@ -130,7 +130,7 @@ void SocketOptions::SetReuseAddress(bool b_)
   }
 }
 
-void SocketOptions::SetReusePort(bool b_)
+void SocketOptions::SetReusePort(bool b_) const
 {
   #ifndef SO_REUSEPORT
     #define SO_REUSEPORT 15
@@ -143,12 +143,12 @@ void SocketOptions::SetReusePort(bool b_)
   }
 }
 
-jconnection_type_t SocketOptions::GetType()
+jconnection_type_t SocketOptions::GetType() const
 {
   return _type;
 }
 
-bool SocketOptions::GetSocketAcceptConnection()
+bool SocketOptions::GetSocketAcceptConnection() const
 {
   socklen_t length = sizeof(bool);
   bool b;
@@ -160,7 +160,7 @@ bool SocketOptions::GetSocketAcceptConnection()
   return b;
 }
 
-void SocketOptions::SetRoute(bool b_)
+void SocketOptions::SetRoute(bool b_) const
 {
   int b = (b_ == true)?1:0;
   
@@ -169,7 +169,7 @@ void SocketOptions::SetRoute(bool b_)
   }
 }
 
-void SocketOptions::SetBroadcast(bool b_)
+void SocketOptions::SetBroadcast(bool b_) const
 {
   int b = (b_ == true)?1:0;
 
@@ -178,7 +178,7 @@ void SocketOptions::SetBroadcast(bool b_)
   }
 }
 
-void SocketOptions::SetSendMaximumBuffer(int length_)
+void SocketOptions::SetSendMaximumBuffer(int length_) const
 {
   length_ /= 2;
 
@@ -187,7 +187,7 @@ void SocketOptions::SetSendMaximumBuffer(int length_)
   }
 }
 
-void SocketOptions::SetReceiveMaximumBuffer(int length_)
+void SocketOptions::SetReceiveMaximumBuffer(int length_) const
 {
   length_ /= 2;
   
@@ -196,7 +196,7 @@ void SocketOptions::SetReceiveMaximumBuffer(int length_)
   }
 }
 
-int SocketOptions::GetSendMaximumBuffer()
+int SocketOptions::GetSendMaximumBuffer() const
 {
   int l = 0,
     length = sizeof(int);
@@ -208,7 +208,7 @@ int SocketOptions::GetSendMaximumBuffer()
   return l;
 }
 
-int SocketOptions::GetReceiveMaximumBuffer()
+int SocketOptions::GetReceiveMaximumBuffer() const
 {
   int l = 0,
     length = sizeof(int);
@@ -220,7 +220,7 @@ int SocketOptions::GetReceiveMaximumBuffer()
   return l;
 }
 
-void SocketOptions::SetLinger(bool on, int linger_)
+void SocketOptions::SetLinger(bool on, int linger_) const
 {
   struct linger l;
 
@@ -232,14 +232,14 @@ void SocketOptions::SetLinger(bool on, int linger_)
   }
 }
 
-void SocketOptions::SetPriority(int p_)
+void SocketOptions::SetPriority(int p_) const
 {
   if (setsockopt(_fd, SOL_SOCKET, SO_PRIORITY, &p_, sizeof(int)) < 0) {
     throw jexception::ConnectionException("Set priority error");
   }
 }
 
-void SocketOptions::ClearPendingSocketError()
+void SocketOptions::ClearPendingSocketError() const
 {
   bool b = true;
   
@@ -248,7 +248,7 @@ void SocketOptions::ClearPendingSocketError()
   }
 }
 
-void SocketOptions::SetBlocking(bool b_)
+void SocketOptions::SetBlocking(bool b_) const
 {
   if (b_ == true) {
     if (fcntl(_fd, F_SETFL, O_SYNC) < 0) {
@@ -261,21 +261,21 @@ void SocketOptions::SetBlocking(bool b_)
   }
 }
 
-void SocketOptions::SetTypeOfService(int t_)
+void SocketOptions::SetTypeOfService(int t_) const
 {
   if (setsockopt(_fd, IPPROTO_IP, IP_TOS, (char *)&t_, sizeof(int)) < 0) {
     throw jexception::ConnectionException("Set type of service error");
   }
 }
 
-void SocketOptions::SetTimeToLive(int t_)
+void SocketOptions::SetTimeToLive(int t_) const
 {
   if (setsockopt(_fd, IPPROTO_IP, IP_TTL, (char *)&t_, sizeof(int)) < 0) {
     throw jexception::ConnectionException("Set time to live error");
   }
 }
 
-void SocketOptions::SetHeaderInclude(bool b_)
+void SocketOptions::SetHeaderInclude(bool b_) const
 {
   int b = (b_ == true)?1:0;
 
@@ -284,7 +284,7 @@ void SocketOptions::SetHeaderInclude(bool b_)
   }
 }
 
-std::chrono::microseconds SocketOptions::GetTimeStamp()
+std::chrono::microseconds SocketOptions::GetTimeStamp() const
 {
   /*
   struct timespec t;
@@ -299,7 +299,7 @@ std::chrono::microseconds SocketOptions::GetTimeStamp()
   return std::chrono::microseconds(0);
 }
 
-int SocketOptions::GetMaximunTransferUnit()
+int SocketOptions::GetMaximunTransferUnit() const
 {
   /*
   socklen_t length = 4;
@@ -317,7 +317,7 @@ int SocketOptions::GetMaximunTransferUnit()
   return 1500;
 }
 
-void SocketOptions::SetIOAsync(bool b_)
+void SocketOptions::SetIOAsync(bool b_) const
 {
   int b = (b_ == true)?1:0;
 
@@ -326,7 +326,7 @@ void SocketOptions::SetIOAsync(bool b_)
   }
 }
 
-void SocketOptions::SetRSVP(int t_)
+void SocketOptions::SetRSVP(int t_) const
 {
   if (_type != JCT_MCAST) {
     return;
@@ -339,7 +339,7 @@ void SocketOptions::SetRSVP(int t_)
   */
 }
 
-void SocketOptions::SetShutdown(socket_shutdown_t opt_)
+void SocketOptions::SetShutdown(socket_shutdown_t opt_) const
 {
   if (_type != JCT_MCAST) {
     if (shutdown(_fd, opt_) < 0) {
@@ -354,14 +354,14 @@ void SocketOptions::SetShutdown(socket_shutdown_t opt_)
   }
 }
 
-void SocketOptions::SetIPv6UnicastHops(int opt_)
+void SocketOptions::SetIPv6UnicastHops(int opt_) const
 {
   if (setsockopt(_fd, IPPROTO_IPV6, IPV6_UNICAST_HOPS, &opt_, sizeof(int)) < 0) {
     throw jexception::ConnectionException("Set ipv6 socket hops error");
   }
 }
 
-int SocketOptions::GetIPv6UnicastHops()
+int SocketOptions::GetIPv6UnicastHops() const
 {
   socklen_t length = sizeof(int);
   int opt;
@@ -373,7 +373,7 @@ int SocketOptions::GetIPv6UnicastHops()
   return opt;
 }
 
-void SocketOptions::SetIPv6Only(bool b_)
+void SocketOptions::SetIPv6Only(bool b_) const
 {
   int b = (b_ == true)?1:0;
 
@@ -382,7 +382,7 @@ void SocketOptions::SetIPv6Only(bool b_)
   }
 }
 
-void SocketOptions::SetDontFragment(bool b_)
+void SocketOptions::SetDontFragment(bool b_) const
 {
   int b = (b_ == true)?1:0;
 
@@ -391,7 +391,7 @@ void SocketOptions::SetDontFragment(bool b_)
   }
 }
 
-void SocketOptions::SetMTUDiscover(bool b_)
+void SocketOptions::SetMTUDiscover(bool b_) const
 {
   int b = (b_ == true)?1:0;
 

@@ -93,40 +93,40 @@ class SocketOptions : public virtual jcommon::Object {
      * \brief Enable sending of keep-alive messages on connection-oriented sockets.
      *
      */
-    void SetKeepAlive(bool b);
+    void SetKeepAlive(bool b) const;
 
     /**
      * \brief If this option is enabled, out-of-band data is directly placed into the receive data stream.
      * Otherwise out-of-band data is only passed when the MSG_OOB flag is set during receiving.
      *
      */
-    void SetOutOfBandInLine(bool b);
+    void SetOutOfBandInLine(bool b) const;
 
     /**
      * \brief Specify the sending or receiving timeouts until reporting an error.
      * They are  fixed  to  a  protocol specific  setting  in  Linux and cannot be read or written.
      *
      */
-    void SetSendTimeout(std::chrono::milliseconds timeout);
+    void SetSendTimeout(std::chrono::milliseconds timeout) const;
 
     /**
      * \brief Specify the sending or receiving timeouts until reporting an error.  
      * They are  fixed  to  a  protocol specific  setting  in  Linux and cannot be read or written.
      *
      */
-    void SetReceiveTimeout(std::chrono::milliseconds timeout);
+    void SetReceiveTimeout(std::chrono::milliseconds timeout) const;
 
     /**
      * \brief Enable or disable the receiving of the SCM_CREDENTIALS control  message.
      *
      */
-    void SetPassCredentials(bool opt);
+    void SetPassCredentials(bool opt) const;
 
     /**
      * \brief Return  the  credentials  of  the  foreign process connected to this socket.
      * 
      */
-    void GetPeerCredentials(void *opt);
+    void GetPeerCredentials(void *opt) const ;
 
     /**
      * \brief Bind this socket to a particular device like "eth0", as specified in the passed
@@ -134,7 +134,7 @@ class SocketOptions : public virtual jcommon::Object {
      * the socket device binding is removed.
      *
      */
-    void BindToDevice(std::string dev);
+    void BindToDevice(std::string dev) const;
 
     /**
      * \brief Indicates that the rules used in validating addresses supplied in a bind call
@@ -144,33 +144,33 @@ class SocketOptions : public virtual jcommon::Object {
      * to bind to this port for any local address.
      *
      */
-    void SetReuseAddress(bool opt);
+    void SetReuseAddress(bool opt) const;
 
     /**
      * \brief 
      *
      */
-    void SetReusePort(bool opt);
+    void SetReusePort(bool opt) const;
 
 
     /**
      * \brief Gets the socket type
      *
      */
-    virtual jconnection_type_t GetType();
+    virtual jconnection_type_t GetType() const;
 
     /**
      * \brief Returns a value indicating whether or not this socket has been marked to accept 
      * connections with listen.
      *
      */
-    bool GetSocketAcceptConnection();
+    bool GetSocketAcceptConnection() const;
 
     /**
      * \brief Don't  send via a gateway, only send to directly connected hosts.
      * 
      */
-    void SetRoute(bool opt);
+    void SetRoute(bool opt) const;
 
     /**
      * \brief Set or get the broadcast flag. When enabled, datagram sockets receive packets
@@ -178,37 +178,37 @@ class SocketOptions : public virtual jcommon::Object {
      * address. This option has no effect on stream-oriented sockets.
      *
      */
-    void SetBroadcast(bool opt);
+    void SetBroadcast(bool opt) const;
 
     /**
      * \brief
      *
      */
-    void SetNoDelay(bool b);
+    void SetNoDelay(bool b) const;
 
     /**
      * \brief Sets or gets the maximum socket send buffer in bytes
      *
      */
-    void SetSendMaximumBuffer(int length);
+    void SetSendMaximumBuffer(int length) const;
 
     /**
      * \brief Sets or gets the maximum socket receive buffer in bytes.
      *
      */
-    void SetReceiveMaximumBuffer(int length);
+    void SetReceiveMaximumBuffer(int length) const;
 
     /**
      * \brief Sets or gets the maximum socket send buffer in bytes.
      *
      */
-    int GetSendMaximumBuffer();
+    int GetSendMaximumBuffer() const;
 
     /**
      * \brief Sets or gets the maximum socket receive buffer in bytes.
      *
      */
-    int GetReceiveMaximumBuffer();
+    int GetReceiveMaximumBuffer() const;
 
     /**
      * \brief When enabled, a close() or shutdown() will not return until all queued messages 
@@ -217,7 +217,7 @@ class SocketOptions : public virtual jcommon::Object {
      * When the socket is closed as part  of  exit(), it always lingers in the background.
      *
      */
-    void SetLinger(bool on, int linger);
+    void SetLinger(bool on, int linger) const;
 
     /**
      * \brief Set the protocol-defined priority for all packets to be sent on this socket. 
@@ -226,50 +226,50 @@ class SocketOptions : public virtual jcommon::Object {
      * queueing discipline.
      *
      */
-    void SetPriority(int opt);
+    void SetPriority(int opt) const;
 
     /**
      * \brief Get and clear the pending socket error. 
      *
      */
-    void ClearPendingSocketError();
+    void ClearPendingSocketError() const;
 
     /**
      * \brief /usr/include/linux/ip.h
      *
      */
-    void SetTypeOfService(int type);
+    void SetTypeOfService(int type) const;
 
     /**
      * \brief Throw signal EAGAIN set timeoutexception exception.
      *
      */
-    void SetBlocking(bool opt);
+    void SetBlocking(bool opt) const;
 
     /**
      * \brief Set TTL
      *
      */
-    void SetTimeToLive(int opt);
+    void SetTimeToLive(int opt) const;
 
     /**
      * \brief Header is included ?
      * 
      */
-    void SetHeaderInclude(bool opt);
+    void SetHeaderInclude(bool opt) const;
 
     /**
      * \brief Return the receive timestamp of the last packet passed to the user. 
      * This is useful for accurate round trip time measurements.
      *
      */
-    std::chrono::microseconds GetTimeStamp();
+    std::chrono::microseconds GetTimeStamp() const;
 
     /**
      * \brief Get MTU.
      *
      */
-    int GetMaximunTransferUnit();
+    int GetMaximunTransferUnit() const;
 
     /**
      * \brief Change the O_ASYNC flag to enable or disable asynchronous IO mode of the socket. 
@@ -277,49 +277,49 @@ class SocketOptions : public virtual jcommon::Object {
      * when a new I/O event occurs.
      *
      */
-    void SetIOAsync(bool opt);
+    void SetIOAsync(bool opt) const;
 
     /**
      * \brief -1 enabled nomal multicast forwarding
      *
      */
-    void SetRSVP(int opt);
+    void SetRSVP(int opt) const;
 
     /**
      * \brief
      *
      */
-    void SetShutdown(socket_shutdown_t opt);
+    void SetShutdown(socket_shutdown_t opt) const;
     
     /**
      * \brief
      *
      */
-    void SetIPv6UnicastHops(int opt);
+    void SetIPv6UnicastHops(int opt) const;
 
     /**
      * \brief
      *
      */
-    int GetIPv6UnicastHops();
+    int GetIPv6UnicastHops() const;
 
     /**
      * \brief
      *
      */
-    void SetIPv6Only(bool opt);
+    void SetIPv6Only(bool opt) const;
 
     /**
      * \brief
      *
      */
-    void SetDontFragment(bool b_);
+    void SetDontFragment(bool b_) const;
 
     /**
      * \brief
      *
      */
-    void SetMTUDiscover(bool b_);
+    void SetMTUDiscover(bool b_) const;
 
 };
 
