@@ -44,6 +44,7 @@ RawSocket::RawSocket(std::string device_, bool promisc_, std::chrono::millisecon
   _os = nullptr;
   _is_closed = true;
   _timeout = timeout_;
+  _options = nullptr;
 
   CreateSocket();
   BindSocket();
@@ -60,6 +61,11 @@ RawSocket::~RawSocket()
   try {
     Close();
   } catch (...) {
+  }
+
+  if (_options != nullptr) {
+    delete _options;
+    _options = nullptr;
   }
 }
 
@@ -101,6 +107,8 @@ void RawSocket::CreateSocket()
   if (_index_device < 0) {
     throw jexception::ConnectionException("Network interface do not exists");
   }
+  
+  _options = new SocketOptions(_fd, JCT_RAW);
 }
 
 void RawSocket::BindSocket()
@@ -317,9 +325,9 @@ int64_t RawSocket::GetReadedBytes()
   return _receive_bytes + _is->GetReadedBytes();
 }
 
-SocketOptions * RawSocket::GetSocketOptions()
+const SocketOptions * RawSocket::GetSocketOptions()
 {
-  return new SocketOptions(_fd, JCT_RAW);
+  return _options;
 }
 
 unsigned short RawSocket::Checksum(unsigned short *addr, int len)

@@ -40,8 +40,6 @@ int main(int argc, char **argv)
 
   opt->SetBroadcast(true);
 
-  delete opt;
-
   printf("Send:: %d\n", s.Send("jeff", 4));
   printf("Receive:: %d\n", s.Receive(buf, 1500));
 

@@ -39,6 +39,7 @@ MulticastSocket::MulticastSocket(int port_, int rbuf_, int wbuf_):
   _is_closed = true;
   _sent_bytes = 0;
   _receive_bytes = 0;
+  _options = nullptr;
 
   CreateSocket();
   ConnectSocket(port_);
@@ -60,6 +61,11 @@ MulticastSocket::~MulticastSocket()
   if (_os != nullptr) {
     delete _os;
   }
+
+  if (_options != nullptr) {
+    delete _options;
+    _options = nullptr;
+  }
 }
 
 /** Private */
@@ -69,6 +75,8 @@ void MulticastSocket::CreateSocket()
   if ((_fd = ::socket(PF_INET, SOCK_DGRAM, 0)) < 0) { // IPPROTO_MTP
     throw jexception::ConnectionException("Multicast socket create exception");
   }
+
+  _options = new SocketOptions(_fd, JCT_MCAST);
 
   _is_closed = false;
 }
@@ -356,14 +364,35 @@ void MulticastSocket::SetMulticastTTL(char ttl_)
   }
 }
 
-SocketOptions * MulticastSocket::GetReadSocketOptions()
+const SocketOptions * MulticastSocket::GetSocketOptions()
 {
-  return new SocketOptions(_fd, JCT_MCAST);
+  return _options;
 }
 
-SocketOptions * MulticastSocket::GetWriteSocketOptions()
+void MulticastSocket::SetMulticastLoop(bool enabled)
 {
-  return new SocketOptions(_fd, JCT_MCAST);
+  if (_type != JCT_MCAST) {
+    return;
+  }
+  
+  int b = (enabled == true)?1:0;
+
+  if (setsockopt(_fd, IPPROTO_IP, IP_MULTICAST_LOOP, &b, sizeof(b)) < 0) {
+    throw jexception::ConnectionException("Set multicast loop error");
+  }
+}
+
+void MulticastSocket::SetMulticastEnabled(std::string local_address)
+{
+  struct in_addr local;
+
+  memset(&local, 0, sizeof(local));
+
+  local.s_addr = inet_addr(local_address.c_str());
+
+  if(setsockopt(_fd, IPPROTO_IP, IP_MULTICAST_IF, (char *)&local, sizeof(local)) < 0) {
+    throw jexception::ConnectionException("Set multicast enabled error");
+  }
 }
 
 }

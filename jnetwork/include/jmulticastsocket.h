@@ -51,6 +51,8 @@ class MulticastSocket : public jnetwork::Connection {
     /** \brief Output stream */
     SocketOutputStream *_os;
     /** \brief */
+    SocketOptions *_options;
+    /** \brief */
     int64_t _sent_bytes;
     /** \brief */
     int64_t _receive_bytes;
@@ -182,13 +184,19 @@ class MulticastSocket : public jnetwork::Connection {
      * \brief
      *
      */
-    SocketOptions * GetReadSocketOptions();
+    const SocketOptions * GetSocketOptions();
 
     /**
      * \brief
      *
      */
-    SocketOptions * GetWriteSocketOptions();
+    void SetMulticastLoop(bool enabled);
+
+    /**
+     * \brief
+     *
+     */
+    void SetMulticastEnabled(std::string local_address);
 
 };
 

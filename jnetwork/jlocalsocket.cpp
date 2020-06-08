@@ -42,6 +42,7 @@ LocalSocket::LocalSocket(std::string file, std::chrono::milliseconds timeout_, i
   _sent_bytes = 0;
   _receive_bytes = 0;
   _timeout = timeout_;
+  _options = nullptr;
 
   CreateSocket();
   ConnectSocket();
@@ -66,6 +67,11 @@ LocalSocket::~LocalSocket()
     delete _os;
     _os = nullptr;
   }
+
+  if (_options != nullptr) {
+    delete _options;
+    _options = nullptr;
+  }
 }
 
 /** Private */
@@ -77,6 +83,7 @@ LocalSocket::LocalSocket(int fd_, std::string file_, std::chrono::milliseconds t
 
   _fd = fd_;
   _file = file_;
+  _options = nullptr;
 
   InitStreams(rbuf_, wbuf_);
 
@@ -90,6 +97,8 @@ void LocalSocket::CreateSocket()
   if (_fd < 0) {
     throw jexception::ConnectionException("Socket handling error");
   }
+  
+  _options = new SocketOptions(_fd, JCT_TCP);
 }
 
 void LocalSocket::ConnectSocket()
@@ -364,9 +373,9 @@ int64_t LocalSocket::GetReadedBytes()
   return _receive_bytes + _is->GetReadedBytes();
 }
 
-SocketOptions * LocalSocket::GetSocketOptions()
+const SocketOptions * LocalSocket::GetSocketOptions()
 {
-  return new SocketOptions(_fd, JCT_TCP);
+  return _options;
 }
 
 }

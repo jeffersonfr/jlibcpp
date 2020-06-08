@@ -49,6 +49,7 @@ SSLSocket6::SSLSocket6(SSLContext *ctx, InetAddress *addr_, int port_, std::chro
   _sent_bytes = 0;
   _receive_bytes = 0;
   _timeout = timeout_;
+  _options = nullptr;
 
   _ctx = ctx;
   _ssl = nullptr;
@@ -73,6 +74,7 @@ SSLSocket6::SSLSocket6(SSLContext *ctx, InetAddress *addr_, int port_, InetAddre
   _sent_bytes = 0;
   _receive_bytes = 0;
   _timeout = timeout_;
+  _options = nullptr;
 
   _is_closed = false;
 
@@ -98,6 +100,7 @@ SSLSocket6::SSLSocket6(SSLContext *ctx, std::string host_, int port_, std::chron
   _sent_bytes = 0;
   _receive_bytes = 0;
   _timeout = timeout_;
+  _options = nullptr;
 
   InetAddress *address = InetAddress6::GetByName(host_);
 
@@ -125,6 +128,7 @@ SSLSocket6::SSLSocket6(SSLContext *ctx, std::string host_, int port_, InetAddres
   _receive_bytes = 0;
   _timeout = timeout_;
   _is_closed = false;
+  _options = nullptr;
 
   _ctx = ctx;
   _ssl = nullptr;
@@ -156,6 +160,11 @@ SSLSocket6::~SSLSocket6()
     delete _address;
     _address = nullptr;
   }
+
+  if (_options != nullptr) {
+    delete _options;
+    _options = nullptr;
+  }
 }
 
 /** Private */
@@ -181,6 +190,7 @@ SSLSocket6::SSLSocket6(SSLContext *ctx, int fd_, SSL *ssl, sockaddr_in6 server_,
   _ssl = ssl;
 
   _address = InetAddress6::GetByName(std::string(inet_ntop(AF_INET6, &(_lsock.sin6_addr), straddr, sizeof(straddr))));
+  _options = new SocketOptions(_fd, JCT_TCP);
 
   InitStreams(rbuf_, wbuf_);
 
@@ -193,6 +203,8 @@ void SSLSocket6::CreateSocket()
     throw jexception::ConnectionException("Socket handling error");
   }
   
+  _options = new SocketOptions(_fd, JCT_TCP);
+
   _is_closed = false;
 }
 
@@ -534,9 +546,9 @@ int64_t SSLSocket6::GetReadedBytes()
   return _receive_bytes + _is->GetReadedBytes();
 }
 
-SocketOptions * SSLSocket6::GetSocketOptions()
+const SocketOptions * SSLSocket6::GetSocketOptions()
 {
-  return new SocketOptions(_fd, JCT_TCP);
+  return _options;
 }
 
 std::string SSLSocket6::What()

@@ -42,6 +42,7 @@ Socket::Socket(InetAddress *addr_, int port_, std::chrono::milliseconds timeout_
   _sent_bytes = 0;
   _receive_bytes = 0;
   _timeout = timeout_;
+  _options = nullptr;
 
   CreateSocket();
   ConnectSocket(addr_, port_);
@@ -60,6 +61,7 @@ Socket::Socket(InetAddress *addr_, int port_, InetAddress *local_addr_, int loca
   _sent_bytes = 0;
   _receive_bytes = 0;
   _timeout = timeout_;
+  _options = nullptr;
 
   CreateSocket();
   BindSocket(local_addr_, local_port_);
@@ -79,6 +81,7 @@ Socket::Socket(std::string host_, int port_, std::chrono::milliseconds timeout_,
   _sent_bytes = 0;
   _receive_bytes = 0;
   _timeout = timeout_;
+  _options = nullptr;
 
   _address = InetAddress4::GetByName(host_);
 
@@ -99,6 +102,7 @@ Socket::Socket(std::string host_, int port_, InetAddress *local_addr_, int local
   _sent_bytes = 0;
   _receive_bytes = 0;
   _timeout = timeout_;
+  _options = nullptr;
 
   _address = InetAddress4::GetByName(host_);
 
@@ -129,6 +133,11 @@ Socket::~Socket()
     delete _address;
     _address = nullptr;
   }
+
+  if (_options != nullptr) {
+    delete _options;
+    _options = nullptr;
+  }
 }
 
 /** Private */
@@ -142,11 +151,12 @@ Socket::Socket(int fd_, struct sockaddr_in server_, std::chrono::milliseconds ti
 
   _fd = fd_;
   _is_closed = false;
-
   _lsock.sin_family = AF_INET;
   _server_sock = server_;
+  _options = nullptr;
 
   _address = InetAddress4::GetByName((std::string)inet_ntoa(server_.sin_addr));
+  _options = new SocketOptions(_fd, JCT_TCP);
 
   InitStreams(rbuf_, wbuf_);
 }
@@ -156,6 +166,8 @@ void Socket::CreateSocket()
   if ((_fd = ::socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
     throw jexception::ConnectionException("Socket handling error");
   }
+
+  _options = new SocketOptions(_fd, JCT_TCP);
 
   _is_closed = false;
 }
@@ -464,9 +476,9 @@ int64_t Socket::GetReadedBytes()
   return _receive_bytes + _is->GetReadedBytes();
 }
 
-SocketOptions * Socket::GetSocketOptions()
+const SocketOptions * Socket::GetSocketOptions()
 {
-  return new SocketOptions(_fd, JCT_TCP);
+  return _options;
 }
 
 std::string Socket::What()

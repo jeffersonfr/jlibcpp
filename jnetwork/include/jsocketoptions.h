@@ -31,10 +31,10 @@ class Socket;
 class Socket6;
 class DatagramSocket;
 class DatagramSocket6;
-class SSLSocket;
-class SSLSocket6;
 class MulticastSocket;
 class MulticastSocket6;
+class SSLSocket;
+class SSLSocket6;
 class LocalSocket;
 class LocalDatagramSocket;
 
@@ -59,10 +59,10 @@ class SocketOptions : public virtual jcommon::Object {
   friend class Socket6;
   friend class DatagramSocket;
   friend class DatagramSocket6;
-  friend class SSLSocket;
-  friend class SSLSocket6;
   friend class MulticastSocket;
   friend class MulticastSocket6;
+  friend class SSLSocket;
+  friend class SSLSocket6;
   friend class RawSocket;
   friend class SocketPipe;
   friend class PromiscSocket;
@@ -278,18 +278,6 @@ class SocketOptions : public virtual jcommon::Object {
      *
      */
     void SetIOAsync(bool opt);
-
-    /**
-     * \brief
-     *
-     */
-    void SetMulticastLoop(bool opt);
-
-    /**
-     * \brief
-     *
-     */
-    void SetMulticastEnabled(std::string local_address);
 
     /**
      * \brief -1 enabled nomal multicast forwarding

@@ -42,6 +42,7 @@ DatagramSocket::DatagramSocket(std::string host_, int port_, bool stream_, std::
   _os = nullptr;
   _is_closed = true;
   _timeout = timeout_;
+  _options = nullptr;
 
   _address = InetAddress4::GetByName(host_);
 
@@ -64,6 +65,7 @@ DatagramSocket::DatagramSocket(int port_, bool stream_, std::chrono::millisecond
   _is_closed = true;
   _stream = stream_;
   _timeout = timeout_;
+  _options = nullptr;
 
   _address = InetAddress4::GetByName("127.0.0.1");
 
@@ -88,6 +90,7 @@ DatagramSocket::DatagramSocket(InetAddress *addr_, int port_, bool stream_, std:
   _timeout = timeout_;
   _sent_bytes = 0;
   _receive_bytes = 0;
+  _options = nullptr;
 
   CreateSocket();
   BindSocket(_address, port_);
@@ -101,16 +104,21 @@ DatagramSocket::~DatagramSocket()
   } catch (...) {
   }
 
-  if ((void *)_address != nullptr) {
+  if (_address != nullptr) {
     delete _address;
   }
 
-  if ((void *)_is != nullptr) {
+  if (_is != nullptr) {
     delete _is;
   }
 
-  if ((void *)_os != nullptr) {
+  if (_os != nullptr) {
     delete _os;
+  }
+
+  if (_options != nullptr) {
+    delete _options;
+    _options = nullptr;
   }
 }
 
@@ -122,13 +130,13 @@ void DatagramSocket::CreateSocket()
     throw jexception::ConnectionException("Socket handling error");
   }
 
+  _options = new SocketOptions(_fd, JCT_UDP);
+
   _is_closed = false;
 }
 
 void DatagramSocket::BindSocket(InetAddress *local_addr_, int local_port_)
 {
-  int opt = 1;
-
   memset(&_lsock, 0, sizeof(_lsock));
    
   _lsock.sin_family = AF_INET;
@@ -148,7 +156,11 @@ void DatagramSocket::BindSocket(InetAddress *local_addr_, int local_port_)
     _lsock.sin_port = htons(-1);
   }
 
+  /*
+  int opt = 1;
+
   setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, (void *)&opt, sizeof(opt));
+  */
 
   if (::bind(_fd, (struct sockaddr *)&_lsock, sizeof(_lsock)) < 0) {
     Close();
@@ -464,9 +476,9 @@ int64_t DatagramSocket::GetReadedBytes()
   return _receive_bytes + _is->GetReadedBytes();
 }
 
-SocketOptions * DatagramSocket::GetSocketOptions()
+const SocketOptions * DatagramSocket::GetSocketOptions()
 {
-  return new SocketOptions(_fd, JCT_UDP);
+  return _options;
 }
 
 std::string DatagramSocket::What()

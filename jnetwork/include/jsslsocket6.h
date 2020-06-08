@@ -90,6 +90,8 @@ class SSLSocket6 : public jnetwork::Connection {
     SSLSocketOutputStream *_os;
     /** \brief */
     InetAddress *_address;
+    /** \brief */
+    SocketOptions *_options;
     /** \brief Bytes sent. */
     int64_t _sent_bytes;
     /** \brief Bytes received. */
@@ -248,7 +250,7 @@ class SSLSocket6 : public jnetwork::Connection {
      * \brief Get the socket options.
      *
      */
-    virtual SocketOptions * GetSocketOptions();
+    const SocketOptions * GetSocketOptions();
 
     /**
      *  Get information about peer certificate. Should be called after connect() or accept() when 
@@ -258,7 +260,7 @@ class SSLSocket6 : public jnetwork::Connection {
      *  struct evp_pkey_st *SSL_get_privatekey(SSL *ssl);
      *
      */
-    virtual bool GetPeerCertInfo(peer_cert_info_t *info);
+    bool GetPeerCertInfo(peer_cert_info_t *info);
 
     /**
      *  Get peer certificate in PEM (ASCII) format. Should be called after connect() or accept() 
@@ -266,19 +268,19 @@ class SSLSocket6 : public jnetwork::Connection {
      *
      *  Returns the length of pem or -1 on errors
      */
-    virtual bool GetPeerCertPEM(std::string *pem);
+    bool GetPeerCertPEM(std::string *pem);
 
     /**
      * \brief 
      *
      */
-    virtual X509 * GetPeerCert();
+    X509 * GetPeerCert();
 
     /**
      * \brief
      *
      */
-    virtual std::string What();
+    std::string What();
 
 };
 

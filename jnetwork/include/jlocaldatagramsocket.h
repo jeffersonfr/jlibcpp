@@ -47,6 +47,8 @@ class LocalDatagramSocket : public jnetwork::Connection {
     /** \brief Output stream. */
     SocketOutputStream *_os;
     /** \brief */
+    SocketOptions *_options;
+    /** \brief */
     std::string _server_file;
     /** \brief */
     std::string _client_file;
@@ -170,7 +172,7 @@ class LocalDatagramSocket : public jnetwork::Connection {
      * \brief Get a object SocketOptions.
      *
      */
-    SocketOptions * GetSocketOptions();
+    const SocketOptions * GetSocketOptions();
 
 };
 

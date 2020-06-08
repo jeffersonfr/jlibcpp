@@ -46,6 +46,8 @@ class LocalSocket : public jnetwork::Connection {
     /** \brief */
     SocketOutputStream *_os;
     /** \brief */
+    SocketOptions *_options;
+    /** \brief */
     std::string _file;
     /** \brief Bytes sent. */
     int64_t _sent_bytes;
@@ -160,7 +162,7 @@ class LocalSocket : public jnetwork::Connection {
      * \brief Get the socket options.
      *
      */
-    SocketOptions * GetSocketOptions();
+    const SocketOptions * GetSocketOptions();
 
 };
 

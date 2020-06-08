@@ -132,6 +132,8 @@ class RawSocket : public jnetwork::Connection {
     SocketInputStream *_is;
     /** \brief Output stream. */
     SocketOutputStream *_os;
+    /** \brief */
+    SocketOptions *_options;
     /** \brief Bytes sent. */
     int64_t _sent_bytes;
     /** \brief Bytes received. */
@@ -254,7 +256,7 @@ class RawSocket : public jnetwork::Connection {
      * \brief Get a object SocketOptions.
      *
      */
-    SocketOptions * GetSocketOptions();
+    const SocketOptions * GetSocketOptions();
 
     /**
      * \brief

@@ -42,6 +42,7 @@ Socket6::Socket6(InetAddress *addr_, int port_, std::chrono::milliseconds timeou
   _sent_bytes = 0;
   _receive_bytes = 0;
   _timeout = timeout_;
+  _options = nullptr;
 
   CreateSocket();
   ConnectSocket(addr_, port_);
@@ -62,6 +63,7 @@ Socket6::Socket6(InetAddress *addr_, int port_, InetAddress *local_addr_, int lo
   _sent_bytes = 0;
   _receive_bytes = 0;
   _timeout = timeout_;
+  _options = nullptr;
 
   CreateSocket();
   BindSocket(local_addr_, local_port_);
@@ -83,6 +85,7 @@ Socket6::Socket6(std::string host_, int port_, std::chrono::milliseconds timeout
   _sent_bytes = 0;
   _receive_bytes = 0;
   _timeout = timeout_;
+  _options = nullptr;
 
   _address = InetAddress6::GetByName(host_);
 
@@ -105,6 +108,7 @@ Socket6::Socket6(std::string host_, int port_, InetAddress *local_addr_, int loc
   _sent_bytes = 0;
   _receive_bytes = 0;
   _timeout = timeout_;
+  _options = nullptr;
 
   _address = InetAddress6::GetByName(host_);
 
@@ -137,6 +141,11 @@ Socket6::~Socket6()
     delete _address;
     _address = nullptr;
   }
+
+  if (_options != nullptr) {
+    delete _options;
+    _options = nullptr;
+  }
 }
 
 /** Private */
@@ -153,11 +162,13 @@ Socket6::Socket6(int fd_, struct sockaddr_in6 server_, std::chrono::milliseconds
   _lsock.sin6_scope_id = 0;
   _lsock.sin6_addr = in6addr_any;
   _lsock.sin6_port = htons(0);
+  _options = nullptr;
   
   _fd = fd_;
   _server_sock = server_;
 
   _address = InetAddress6::GetByName(std::string(inet_ntop(AF_INET6, &(_lsock.sin6_addr), straddr, sizeof(straddr))));
+  _options = new SocketOptions(_fd, JCT_TCP);
 
   InitStreams(rbuf_, wbuf_);
 
@@ -169,6 +180,8 @@ void Socket6::CreateSocket()
   if ((_fd = ::socket(PF_INET6, SOCK_STREAM, IPPROTO_TCP)) < 0) {
     throw jexception::ConnectionException("Socket handling error");
   }
+
+  _options = new SocketOptions(_fd, JCT_TCP);
 
   _is_closed = false;
 }
@@ -480,9 +493,9 @@ int64_t Socket6::GetReadedBytes()
   return _receive_bytes + _is->GetReadedBytes();
 }
 
-SocketOptions * Socket6::GetSocketOptions()
+const SocketOptions * Socket6::GetSocketOptions()
 {
-  return new SocketOptions(_fd, JCT_TCP);
+  return _options;
 }
 
 std::string Socket6::What()

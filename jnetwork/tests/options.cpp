@@ -52,8 +52,6 @@ int main()
 		std::cout << "Receive Maximun Buffer :: " << o->GetReceiveMaximumBuffer() << " bytes" << std::endl;
 		std::cout << "Waiting for receive ..." << std::endl;
 
-		delete o;
-
 		size = s.Receive(receive, 1024);
 
 		std::cout << "Receive OK" << std::endl;

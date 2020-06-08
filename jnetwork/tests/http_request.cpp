@@ -76,8 +76,6 @@ class HTTPRequest {
 
 					o->SetSendTimeout(_timeout);
 					o->SetReceiveTimeout(_timeout);
-
-					delete o;
 				}
 
 				_resource_data = new char[4098];

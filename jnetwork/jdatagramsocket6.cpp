@@ -44,6 +44,7 @@ DatagramSocket6::DatagramSocket6(std::string host_, int port_, bool stream_, std
   _os = nullptr;
   _is_closed = true;
   _timeout = timeout_;
+  _options = nullptr;
   
   _address = InetAddress6::GetByName(host_);
 
@@ -68,6 +69,7 @@ DatagramSocket6::DatagramSocket6(int port_, bool stream_, std::chrono::milliseco
   _timeout = timeout_;
   _sent_bytes = 0;
   _receive_bytes = 0;
+  _options = nullptr;
 
   _address = InetAddress6::GetByName("127.0.0.1");
 
@@ -89,6 +91,7 @@ DatagramSocket6::DatagramSocket6(InetAddress *addr_, int port_, bool stream_, st
   _timeout = timeout_;
   _sent_bytes = 0;
   _receive_bytes = 0;
+  _options = nullptr;
 
   CreateSocket();
   BindSocket(_address, port_);
@@ -102,16 +105,21 @@ DatagramSocket6::~DatagramSocket6()
   } catch (...) {
   }
 
-  if ((void *)_address != nullptr) {
+  if (_address != nullptr) {
     delete _address;
   }
 
-  if ((void *)_is != nullptr) {
+  if (_is != nullptr) {
     delete _is;
   }
 
-  if ((void *)_os != nullptr) {
+  if (_os != nullptr) {
     delete _os;
+  }
+
+  if (_options != nullptr) {
+    delete _options;
+    _options = nullptr;
   }
 }
 
@@ -123,13 +131,13 @@ void DatagramSocket6::CreateSocket()
     throw jexception::ConnectionException("Socket handling error");
   }
 
+  _options = new SocketOptions(_fd, JCT_UDP);
+
   _is_closed = false;
 }
 
 void DatagramSocket6::BindSocket(InetAddress *local_addr_, int local_port_)
 {
-  int opt = 1;
-
   memset(&_lsock, 0, sizeof(_lsock));
    
   _lsock.sin6_family = AF_INET6;
@@ -151,7 +159,11 @@ void DatagramSocket6::BindSocket(InetAddress *local_addr_, int local_port_)
     _lsock.sin6_port = htons(-1);
   }
 
+  /*
+  int opt = 1;
+
   setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, (void *)&opt, sizeof(opt));
+  */
 
   if (::bind(_fd, (struct sockaddr *)&_lsock, sizeof(_lsock)) < 0) {
     Close();
@@ -461,9 +473,9 @@ int64_t DatagramSocket6::GetReadedBytes()
   return _receive_bytes + _is->GetReadedBytes();
 }
 
-SocketOptions * DatagramSocket6::GetSocketOptions()
+const SocketOptions * DatagramSocket6::GetSocketOptions()
 {
-  return new SocketOptions(_fd, JCT_UDP);
+  return _options;
 }
 
 std::string DatagramSocket6::What()

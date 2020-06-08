@@ -49,6 +49,8 @@ class Socket6 : public jnetwork::Connection {
     SocketOutputStream *_os;
     /** \brief */
     InetAddress *_address;
+    /** \brief */
+    SocketOptions *_options;
     /** \brief Bytes sent. */
     int64_t _sent_bytes;
     /** \brief Bytes received. */
@@ -202,7 +204,7 @@ class Socket6 : public jnetwork::Connection {
      * \brief Get the socket options.
      *
      */
-    SocketOptions * GetSocketOptions();
+    const SocketOptions * GetSocketOptions();
 
     /**
      * \brief

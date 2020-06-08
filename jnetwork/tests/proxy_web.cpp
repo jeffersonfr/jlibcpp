@@ -368,14 +368,7 @@ void sayerror(char *msg, jnetwork::Socket *sockIn, jnetwork::Socket *sockOut)
 	jnetwork::SocketOptions *o = sockIn->GetSocketOptions();
 
 	o->SetLinger(1, 4);
-
-	delete o;
-
-	o = sockOut->GetSocketOptions();
-
 	o->SetLinger(1, 1);
-
-	delete o;
 
 	sockOut->Close();
 	sockIn->Close();
@@ -392,8 +385,6 @@ int process_request(jnetwork::Socket *sockIn)
 
 	o->SetReuseAddress(true);
 	o->SetKeepAlive(true);
-
-	delete o;
 
 	// here, we'll analyze the request and get rid of "http://adr:port". The address and port willbe duplicated and used to open the connection
 	if (sockIn->Receive(data, LDATA) <= 0) {

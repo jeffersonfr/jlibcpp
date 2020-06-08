@@ -39,6 +39,7 @@ MulticastSocket6::MulticastSocket6(int port_, int rbuf_, int wbuf_):
   _is_closed = true;
   _sent_bytes = 0;
   _receive_bytes = 0;
+  _options = nullptr;
 
   CreateSocket();
   ConnectSocket(port_);
@@ -55,10 +56,17 @@ MulticastSocket6::~MulticastSocket6()
 
   if (_is != nullptr) {
     delete _is;
+    _is = nullptr;
   }
 
   if (_os != nullptr) {
     delete _os;
+    _os = nullptr;
+  }
+
+  if (_options != nullptr) {
+    delete _options;
+    _options = nullptr;
   }
 }
 
@@ -69,6 +77,8 @@ void MulticastSocket6::CreateSocket()
   if ((_fd = ::socket(PF_INET6, SOCK_DGRAM, 0)) < 0) { // IPPROTO_MTP
     throw jexception::ConnectionException("Multicast socket create exception");
   }
+
+  _options = new SocketOptions(_fd, JCT_MCAST);
 
   _is_closed = false;
 }
@@ -358,14 +368,35 @@ void MulticastSocket6::SetMulticastTTL(char ttl_)
   }
 }
 
-SocketOptions * MulticastSocket6::GetReadSocketOptions()
+const SocketOptions * MulticastSocket6::GetSocketOptions()
 {
-  return new SocketOptions(_fd, JCT_MCAST);
+  return _options;
 }
 
-SocketOptions * MulticastSocket6::GetWriteSocketOptions()
+void MulticastSocket6::SetMulticastLoop(bool enabled)
 {
-  return new SocketOptions(_fd, JCT_MCAST);
+  if (_type != JCT_MCAST) {
+    return;
+  }
+  
+  int b = (enabled == true)?1:0;
+
+  if (setsockopt(_fd, IPPROTO_IPV6, IP_MULTICAST_LOOP, &b, sizeof(b)) < 0) {
+    throw jexception::ConnectionException("Set multicast loop error");
+  }
+}
+
+void MulticastSocket6::SetMulticastEnabled(std::string local_address)
+{
+  struct in_addr local;
+
+  memset(&local, 0, sizeof(local));
+
+  local.s_addr = inet_addr(local_address.c_str());
+
+  if(setsockopt(_fd, IPPROTO_IPV6, IP_MULTICAST_IF, (char *)&local, sizeof(local)) < 0) {
+    throw jexception::ConnectionException("Set multicast enabled error");
+  }
 }
 
 }

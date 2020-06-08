@@ -65,8 +65,6 @@ void dump_raw()
 		opt->SetReceiveTimeout(std::chrono::seconds(2));
 		opt->SetReceiveMaximumBuffer(0x0200000);
 
-		delete opt;
-
 		do {
 			r = s.Receive(receive, 1500);
 

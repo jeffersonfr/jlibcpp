@@ -40,6 +40,7 @@ LocalDatagramSocket::LocalDatagramSocket(std::string server, std::chrono::millis
   _os = nullptr;
   _is_closed = true;
   _timeout = timeout_;
+  _options = nullptr;
 
   CreateSocket();
   BindSocket();
@@ -60,6 +61,7 @@ LocalDatagramSocket::LocalDatagramSocket(std::string client, std::string server,
   _os = nullptr;
   _is_closed = true;
   _timeout = timeout_;
+  _options = nullptr;
 
   CreateSocket();
   ConnectSocket();
@@ -76,12 +78,17 @@ LocalDatagramSocket::~LocalDatagramSocket()
   } catch (...) {
   }
 
-  if ((void *)_is != nullptr) {
+  if (_is != nullptr) {
     delete _is;
   }
 
-  if ((void *)_os != nullptr) {
+  if (_os != nullptr) {
     delete _os;
+  }
+
+  if (_options != nullptr) {
+    delete _options;
+    _options = nullptr;
   }
 }
 
@@ -92,6 +99,8 @@ void LocalDatagramSocket::CreateSocket()
   if ((_fd = ::socket(AF_UNIX, SOCK_DGRAM, PF_UNSPEC)) < 0) {
     throw jexception::ConnectionException("Socket handling error");
   }
+
+  _options = new SocketOptions(_fd, JCT_UDP);
 
   _is_closed = false;
 }
@@ -356,9 +365,9 @@ int64_t LocalDatagramSocket::GetReadedBytes()
   return _receive_bytes + _is->GetReadedBytes();
 }
 
-SocketOptions * LocalDatagramSocket::GetSocketOptions()
+const SocketOptions * LocalDatagramSocket::GetSocketOptions()
 {
-  return new SocketOptions(_fd, JCT_UDP);
+  return _options;
 }
 
 }
