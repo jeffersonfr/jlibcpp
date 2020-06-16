@@ -23,8 +23,9 @@
 
 namespace jmath {
 
-Base64::Base64()
+Base64::Base64(std::string chars)
 {
+  _chars = chars;
 }
 
 Base64::~Base64()
@@ -43,14 +44,14 @@ std::string Base64::Encode(const std::string &in)
     valb += 8;
 
     while (valb >= 0) {
-      out.push_back("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"[(val >> valb) & 0x3F]);
+      out.push_back(_chars[(val >> valb) & 0x3F]);
 
       valb -= 6;
     }
   }
 
   if (valb > -6) {
-    out.push_back("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"[((val << 8) >> (valb + 8)) & 0x3F]);
+    out.push_back(_chars[((val << 8) >> (valb + 8)) & 0x3F]);
   }
 
   while (out.size()%4) {
@@ -66,7 +67,7 @@ std::string Base64::Decode(const std::string &in)
   std::vector<int> T(256, -1);
 
   for (int i=0; i<64; i++) {
-    T["ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"[i]] = i; 
+    T[_chars[i]] = i; 
   }
 
   int 

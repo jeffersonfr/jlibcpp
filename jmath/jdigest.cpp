@@ -22,163 +22,87 @@
 
 namespace jmath {
 
-Digest::Digest(std::string method):
+Digest::Digest():
   jcommon::Object()
 {
   jcommon::Object::SetClassName("jcommon::Digest");
-
-  _method = method;
-  
-  // TODO:: MD2, SHA224, SHA384, MDC2
-  if (_method == "md4") {
-    _digest_length = MD4_DIGEST_LENGTH;
-
-    MD4_Init(&_md4_ctx);
-  } else if (_method == "md5") {
-    _digest_length = MD5_DIGEST_LENGTH;
-
-    MD5_Init(&_md5_ctx);
-  } else if (_method == "sha1") {
-    _digest_length = SHA_DIGEST_LENGTH;
-
-    SHA1_Init(&_sha1_ctx);
-  } else if (_method == "sha256") {
-    _digest_length = SHA256_DIGEST_LENGTH;
-
-    SHA256_Init(&_sha256_ctx);
-  } else if (_method == "sha512") {
-    _digest_length = SHA512_DIGEST_LENGTH;
-
-    SHA512_Init(&_sha512_ctx);
-  } else if (_method == "ripemd160") {
-    _digest_length = RIPEMD160_DIGEST_LENGTH;
-
-    RIPEMD160_Init(&_ripemd160_ctx);
-  } else {
-    throw jexception::InvalidArgumentException("Cannot process the digest method");
-  } 
 }
 
 Digest::~Digest()
 {
 }
 
-std::string Digest::GetMethod()
+std::string Digest::Hash(std::string method, std::string data)
 {
-  return _method;
-}
+  if (method == "md4") {
+    uint8_t
+      tmp[MD4_DIGEST_LENGTH];
+    MD4_CTX
+      ctx;
 
-jcommon::Object * Digest::Clone()
-{
-  Digest *clone = new Digest(_method);
+    MD4_Init(&ctx);
+    MD4_Update(&ctx, data.c_str(), data.size());
+    MD4_Final(tmp, &ctx);
 
-  // TODO:: MD2, SHA224, SHA384, MDC2
-  if (_method == "md4") {
-    clone->_md4_ctx = _md4_ctx;
-  } else if (_method == "md5") {
-    clone->_md5_ctx = _md5_ctx;
-  } else if (_method == "sha1") {
-    clone->_sha1_ctx = _sha1_ctx;
-  } else if (_method == "sha256") {
-    clone->_sha256_ctx = _sha256_ctx;
-  } else if (_method == "sha512") {
-    clone->_sha512_ctx = _sha512_ctx;
-  } else if (_method == "ripemd160") {
-    clone->_ripemd160_ctx = _ripemd160_ctx;
-  } 
+    return std::string((const char *)tmp, MD4_DIGEST_LENGTH);
+  } else if (method == "md5") {
+    uint8_t
+      tmp[MD5_DIGEST_LENGTH];
+    MD5_CTX
+      ctx;
+
+    MD5_Init(&ctx);
+    MD5_Update(&ctx, data.c_str(), data.size());
+    MD5_Final(tmp, &ctx);
+
+    return std::string((const char *)tmp, MD5_DIGEST_LENGTH);
+  } else if (method == "sha1") {
+    uint8_t
+      tmp[SHA_DIGEST_LENGTH];
+    SHA_CTX
+      ctx;
+
+    SHA1_Init(&ctx);
+    SHA1_Update(&ctx, data.c_str(), data.size());
+    SHA1_Final(tmp, &ctx);
+
+    return std::string((const char *)tmp, SHA_DIGEST_LENGTH);
+  } else if (method == "sha256") {
+    uint8_t
+      tmp[SHA256_DIGEST_LENGTH];
+    SHA256_CTX
+      ctx;
+
+    SHA256_Init(&ctx);
+    SHA256_Update(&ctx, data.c_str(), data.size());
+    SHA256_Final(tmp, &ctx);
+
+    return std::string((const char *)tmp, SHA256_DIGEST_LENGTH);
+  } else if (method == "sha512") {
+    uint8_t
+      tmp[SHA512_DIGEST_LENGTH];
+    SHA512_CTX
+      ctx;
+
+    SHA512_Init(&ctx);
+    SHA512_Update(&ctx, data.c_str(), data.size());
+    SHA512_Final(tmp, &ctx);
+
+    return std::string((const char *)tmp, SHA512_DIGEST_LENGTH);
+  } else if (method == "ripemd160") {
+    uint8_t
+      tmp[RIPEMD160_DIGEST_LENGTH];
+    RIPEMD160_CTX
+      ctx;
+
+    RIPEMD160_Init(&ctx);
+    RIPEMD160_Update(&ctx, data.c_str(), data.size());
+    RIPEMD160_Final(tmp, &ctx);
     
-  clone->_digest_length = _digest_length;
-
-  return clone;
-}
-
-void Digest::Reset()
-{
-  // TODO:: MD2, SHA224, SHA384, MDC2
-  if (_method == "md4") {
-    MD4_Init(&_md4_ctx);
-  } else if (_method == "md5") {
-    MD5_Init(&_md5_ctx);
-  } else if (_method == "sha1") {
-    SHA1_Init(&_sha1_ctx);
-  } else if (_method == "sha256") {
-    SHA256_Init(&_sha256_ctx);
-  } else if (_method == "sha512") {
-    SHA512_Init(&_sha512_ctx);
-  } else if (_method == "ripemd160") {
-    RIPEMD160_Init(&_ripemd160_ctx);
+    return std::string((const char *)tmp, RIPEMD160_DIGEST_LENGTH);
+  } else {
+    throw jexception::InvalidArgumentException("Unknown method");
   } 
-}
-
-void Digest::Update(const char *data, int length)
-{
-  // TODO:: MD2, SHA224, SHA384, MDC2
-  if (_method == "md4") {
-    MD4_Update(&_md4_ctx, data, length);
-  } else if (_method == "md5") {
-    MD5_Update(&_md5_ctx, data, length);
-  } else if (_method == "sha1") {
-    SHA1_Update(&_sha1_ctx, data, length);
-  } else if (_method == "sha256") {
-    SHA256_Update(&_sha256_ctx, data, length);
-  } else if (_method == "sha512") {
-    SHA512_Update(&_sha512_ctx, data, length);
-  } else if (_method == "ripemd160") {
-    RIPEMD160_Update(&_ripemd160_ctx, data, length);
-  } 
-}
-
-std::string Digest::GetResult(bool hex)
-{
-  uint8_t buffer[_digest_length];
-
-  // TODO:: MD2, SHA224, SHA384, MDC2
-  if (_method == "md4") {
-    MD4_CTX ctx = _md4_ctx;
-    MD4_Final(buffer, &_md4_ctx);
-    _md4_ctx = ctx;
-  } else if (_method == "md5") {
-    MD5_CTX ctx = _md5_ctx;
-    MD5_Final(buffer, &_md5_ctx);
-    _md5_ctx = ctx;
-  } else if (_method == "sha1") {
-    SHA_CTX ctx = _sha1_ctx;
-    SHA1_Final(buffer, &_sha1_ctx);
-    _sha1_ctx = ctx;
-  } else if (_method == "sha256") {
-    SHA256_CTX ctx = _sha256_ctx;
-    SHA256_Final(buffer, &_sha256_ctx);
-    _sha256_ctx = ctx;
-  } else if (_method == "sha512") {
-    SHA512_CTX ctx = _sha512_ctx;
-    SHA512_Final(buffer, &_sha512_ctx);
-    _sha512_ctx = ctx;
-  } else if (_method == "ripemd160") {
-    RIPEMD160_CTX ctx = _ripemd160_ctx;
-    RIPEMD160_Final(buffer, &_ripemd160_ctx);
-    _ripemd160_ctx = ctx;
-  } 
-
-  if (hex == true) {
-    char tmp[2*_digest_length];
-    char digit[] = "0123456789abcdef";
-    char *h;
-    int i;
-
-    for (h=tmp,i=0; i<_digest_length; i++) {
-      *h++ = digit[(buffer[i] >> 4) & 0x0f];
-      *h++ = digit[(buffer[i] >> 0) & 0x0f];
-    }
-
-    return std::string((const char *)tmp, 2*_digest_length);
-  }
-
-  return std::string((const char *)buffer, _digest_length);
-}
-
-std::string Digest::What()
-{
-  return _method;
 }
 
 }

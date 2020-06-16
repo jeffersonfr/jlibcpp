@@ -43,38 +43,13 @@ namespace jmath {
 class Digest : public virtual jcommon::Object {
 
   private:
-    /** \brief */
-    // MD2_CTX _md2_ctx;
-    /** \brief */
-    MD4_CTX _md4_ctx;
-    /** \brief */
-    MD5_CTX _md5_ctx;
-    /** \brief */
-    SHA_CTX _sha1_ctx;
-    /** \brief */
-    // SHA224_CTX _sha224_ctx;
-    /** \brief */
-    SHA256_CTX _sha256_ctx;
-    /** \brief */
-    // SHA384_CTX _sha384_ctx;
-    /** \brief */
-    SHA512_CTX _sha512_ctx;
-    /** \brief */
-    RIPEMD160_CTX _ripemd160_ctx;
-    /** \brief */
-    // MDC2_CTX _mdc2_ctx;
-    /** \brief */
-    std::string _method;
-    /** \brief */
-    int _digest_length;
-
-  public:
     /*
      * \brief
      *
      */
-    Digest(std::string method);
-    
+    Digest();
+
+  public:
     /*
      * \brief
      *
@@ -85,37 +60,8 @@ class Digest : public virtual jcommon::Object {
      * \brief
      *
      */
-    virtual std::string GetMethod();
+    static std::string Hash(std::string method, std::string data);
 
-    /*
-     * \brief
-     *
-     */
-    virtual jcommon::Object * Clone();
-
-    /*
-     * \brief
-     *
-     */
-    virtual void Reset();
-
-    /*
-     * \brief
-     *
-     */
-    virtual void Update(const char *data, int length);
-
-    /*
-     * \brief
-     *
-     */
-    virtual std::string GetResult(bool hex = true);
-
-    /*
-     * \brief
-     *
-     */
-    virtual std::string What();
 };
 
 }

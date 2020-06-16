@@ -272,6 +272,7 @@ OBJS_jthread += \
   jsemaphore.o\
   jspinlock.o\
   jthreadlib.o\
+  jthreadpool.o\
 
 ifneq ($(ENABLE_GRAPHICS),none)
 

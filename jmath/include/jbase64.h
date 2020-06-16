@@ -34,13 +34,14 @@ namespace jmath {
 class Base64 : public virtual jcommon::Object {
 
   private:
+    std::string _chars;
 
   public:
     /**
      * \brief
      *
      */
-    Base64();
+    Base64(std::string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/");
 
     /**
      * \brief
@@ -52,13 +53,13 @@ class Base64 : public virtual jcommon::Object {
      * \brief
      *
      */
-    static std::string Encode(const std::string &in);
+    std::string Encode(const std::string &in);
 
     /**
      * \brief
      *
      */
-    static std::string Decode(const std::string &in);
+    std::string Decode(const std::string &in);
 };
 
 }
