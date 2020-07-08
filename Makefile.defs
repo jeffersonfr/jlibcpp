@@ -54,11 +54,12 @@ ENABLE_DEBUG ?= yes
 # {no, yes}
 ENABLE_SANITIZE ?= no
 
-# {allegro5, directfb, dispmanx, egl, fb, gl, gtk3, openvg, qt5, sdl2, sfml2, vdpau, vnc, xcb, xlib, caca, flaschen, nanax, drm}
-ENABLE_GRAPHICS ?= sdl2
+# {allegro5, directfb, dispmanx, egl, fb, gl, gtk3, openvg, qt5, sdl2, sfml2, vdpau, vnc, xcb, xlib, caca, flaschen, nanax, drm, wayland}
+ENABLE_GRAPHICS ?= wayland
 
 # {bmp, gif, ico, jpg, pcx, png, ppm, tga, xbm, xpm, heif, webp, jp2000, svg, tif, bpg, mjpeg, flif}
-ENABLE_IMAGE ?= bmp, gif, ico, jpg, pcx, png, ppm, tga, xbm, xpm, heif, webp, jp2000, svg, tif, mjpeg, flif
+ENABLE_IMAGE ?= bmp, gif, ico, jpg, pcx, png, ppm, tga, xbm, xpm, heif, webp, svg, tif, mjpeg
+#ENABLE_IMAGE ?= bmp, gif, ico, jpg, pcx, png, ppm, tga, xbm, xpm, heif, webp, jp2000, svg, tif, mjpeg, flif
 
 # {gif, ilist, v4l2, alsa, mixer, libvlc, libav, libxine, gstreamer}
 ENABLE_VIDEO ?= gif, ilist, v4l2, alsa, mixer, libvlc, libav, libxine, gstreamer
@@ -67,13 +68,12 @@ DEFINES = \
   -D_REENTRANT \
   -D_FILE_OFFSET_BITS=64 \
   -D_LARGEFILE_SOURCE \
-  -std=c++17 \
+  -std=c++20 \
 	#-Wfatal-errors \ # in case of errors, shows just the first line of error
 ifeq ($(ENABLE_DEBUG),yes)
   
 DEFINES += \
-  -g \
-  -ggdb \
+  -g -ggdb \
   -DJDEBUG_ENABLED \
 
 endif
