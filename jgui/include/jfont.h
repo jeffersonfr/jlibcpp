@@ -55,6 +55,10 @@ class Font : public virtual jcommon::Object {
 
   private:
     /** \brief */
+    FT_Face _face;
+    /** \brief */
+    cairo_font_face_t *_cairo_face;
+    /** \brief */
     cairo_font_face_t *_font;
     /** \brief */
     cairo_t *_context_ref;

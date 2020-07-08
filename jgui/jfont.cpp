@@ -49,25 +49,6 @@ Font Font::SIZE40(DEFAULT_FONT_NAME, (jfont_attributes_t)(JFA_NORMAL), 40);
 Font Font::SIZE44(DEFAULT_FONT_NAME, (jfont_attributes_t)(JFA_NORMAL), 44);
 Font Font::SIZE48(DEFAULT_FONT_NAME, (jfont_attributes_t)(JFA_NORMAL), 48);
 
-int InternalCreateFont(std::string name, cairo_font_face_t **font)
-{
-  FT_Face ft_face;
-
-  if (FT_New_Face(sg_freetype, name.c_str(), 0, &ft_face) != 0) {
-    (*font) = nullptr;
-
-    return -1;
-  }
-
-  FT_Select_Charmap(ft_face, ft_encoding_unicode);
-
-  (*font) = cairo_ft_font_face_create_for_ft_face(ft_face, FT_LOAD_NO_AUTOHINT);
-
-  // FT_Done_Face(ft_face);
-
-  return 0;
-}
-
 Font::Font(std::string name, jfont_attributes_t attributes, int size, const jmath::jmatrix_t<3, 2, float> &m):
   jcommon::Object()
 {
@@ -77,6 +58,7 @@ Font::Font(std::string name, jfont_attributes_t attributes, int size, const jmat
   _size = size;
   _attributes = attributes;
   _encoding = JFE_UTF8;
+  _cairo_face = nullptr;
 
   jio::File *file = jio::File::OpenFile(name);
 
@@ -92,15 +74,17 @@ Font::Font(std::string name, jfont_attributes_t attributes, int size, const jmat
   } else {
     delete file;
 
-    InternalCreateFont(name, &_font);
-  
-    if (_font == nullptr) {
+    if (FT_New_Face(sg_freetype, name.c_str(), 0, &_face) != 0) {
       if (sg_freetype_refcounter == 0) {
         FT_Done_FreeType(sg_freetype);
       }
 
       throw jexception::NullPointerException("Cannot load a native font");
     }
+
+    FT_Select_Charmap(_face, ft_encoding_unicode);
+
+    _font = cairo_ft_font_face_create_for_ft_face(_face, FT_LOAD_NO_AUTOHINT);
   }
 
   sg_freetype_refcounter = sg_freetype_refcounter + 1;
@@ -142,7 +126,10 @@ Font::Font(std::string name, jfont_attributes_t attributes, int size, const jmat
       slant = CAIRO_FONT_SLANT_ITALIC;
     }
 
-    cairo_select_font_face(_context_ref, _name.c_str(), slant, weight);
+    cairo_font_face_t 
+      *_cairo_face = cairo_toy_font_face_create(_name.c_str(), slant, weight);
+
+    cairo_set_font_face(_context_ref, _cairo_face);
   }
 
   cairo_font_extents_t t;
@@ -183,14 +170,19 @@ Font::Font(std::string name, jfont_attributes_t attributes, int size, const jmat
 
 Font::~Font()
 {
+  if (_cairo_face != nullptr) {
+    cairo_font_face_destroy(_cairo_face);
+  }
+
   cairo_scaled_font_destroy(_scaled_font);
   cairo_font_options_destroy(_options);
   
   if (_font != nullptr) {
     cairo_font_face_destroy(_font);
-
   }
-    
+  
+  FT_Done_Face(_face);
+
   if (--sg_freetype_refcounter == 0) {
     FT_Done_FreeType(sg_freetype);
   }

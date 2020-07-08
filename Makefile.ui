@@ -508,3 +508,24 @@ ifeq ($(ENABLE_GRAPHICS), drm)
 
 endif
 
+ifeq ($(ENABLE_GRAPHICS), wayland)
+	CCFLAGS 	+= \
+
+	LDFLAGS		+= \
+     -lwayland-client \
+     -lxkbcommon \
+
+	DEFINES		+= \
+     -DJGUI_UI \
+		 -DWAYLAND_UI \
+
+	REQUIRES	+= \
+
+	OBJS_gfx	+= \
+		 waylandapplication.o\
+
+  OBJS_jgui	+= \
+     $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+
+endif
+
