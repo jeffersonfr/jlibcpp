@@ -46,12 +46,16 @@ struct jfont_extends_t {
   jgui::jsize_t<float> size;
 };
 
+class Raster;
+
 /**
  * \brief
  *
  * \author Jeff Ferr
  */
 class Font : public virtual jcommon::Object {
+
+  friend class Raster;
 
   private:
     /** \brief */

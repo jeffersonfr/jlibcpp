@@ -66,6 +66,9 @@ class RasterTest : public jgui::Window {
       raster.DrawPolygon({300, 300}, hourglass);
       raster.DrawArc({500, 200}, {50, 50}, M_PI/4, 3*M_PI/2);
       
+      jgui::Font font("/usr/jlibcpp/fonts/default.ttf", jgui::JFA_NORMAL, 10);
+      
+      raster.SetFont(&font);
       raster.SetColor(0xfff0f0f0);
       raster.DrawString("Hello, world !", {300, 100});
     }

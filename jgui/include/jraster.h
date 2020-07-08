@@ -31,6 +31,7 @@ namespace jgui {
 class Raster : public jcommon::Object {
 
 	private:
+    jgui::Font *_font;
     jgui::jrect_t<int> _clip;
     jgui::jsize_t<int> _size;
     uint32_t *_buffer;
@@ -204,18 +205,6 @@ class Raster : public jcommon::Object {
      * \brief
      *
      */
-    virtual void DrawGlyph(int glyph, int xp, int yp);
-
-    /**
-     * \brief
-     *
-     */
-    virtual void DrawString(std::string text, const jgui::jpoint_t<int> &v1);
-
-    /**
-     * \brief
-     *
-     */
     virtual void DrawImage(jgui::Image *image, const jgui::jpoint_t<int> &v1);
 
     /**
@@ -229,6 +218,24 @@ class Raster : public jcommon::Object {
      *
      */
     virtual float GetBlendEnabled();
+
+    /**
+     * \brief
+     *
+     */
+    virtual void SetFont(jgui::Font *font);
+
+    /**
+     * \brief
+     *
+     */
+    virtual void DrawGlyph(int glyph, const jgui::jpoint_t<int> &v1);
+
+    /**
+     * \brief
+     *
+     */
+    virtual void DrawString(std::string text, const jgui::jpoint_t<int> &v1);
 
 };
 
