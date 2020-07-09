@@ -667,8 +667,8 @@ void Application::Quit()
   sg_loop_mutex.unlock();
 }
 
-NativeWindow::NativeWindow(int x, int y, int width, int height):
-	jgui::Window(dynamic_cast<Window *>(this))
+NativeWindow::NativeWindow(jgui::Window *parent, jgui::jrect_t<int> bounds):
+	jgui::Window(nullptr)
 {
 	jcommon::Object::SetClassName("jgui::NativeWindow");
 
@@ -681,6 +681,7 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 	sg_window = 0;
 	sg_mouse_x = 0;
 	sg_mouse_y = 0;
+  sg_jgui_window = parent;
 
 	XSetWindowAttributes attr;
 
@@ -693,10 +694,10 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 	sg_window = XCreateWindow(
 			sg_display, 
 			XRootWindow(sg_display, screen), 
-			x, 
-			y, 
-			width, 
-			height, 
+			bounds.point.x, 
+			bounds.point.y, 
+			bounds.size.width, 
+			bounds.size.height, 
 			0, 
 			DefaultDepth(sg_display, screen), 
 			InputOutput, 
@@ -775,12 +776,7 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 			sg_display, sg_window, ExposureMask | EnterNotify | LeaveNotify | KeyPress | KeyRelease | ButtonPress | ButtonRelease | MotionNotify | PointerMotionMask | StructureNotifyMask | SubstructureNotifyMask
 	);
 
-  sg_visible_bounds = {
-    x,
-    y,
-    width,
-    height
-  };
+  sg_visible_bounds = bounds;
 
   XMapRaised(sg_display, sg_window);
 	XMapWindow(sg_display, sg_window);
@@ -847,19 +843,6 @@ void NativeWindow::ToggleFullScreen()
 
     sg_fullscreen = false;
   }
-}
-
-void NativeWindow::SetParent(jgui::Container *c)
-{
-  jgui::Window *parent = dynamic_cast<jgui::Window *>(c);
-
-  if (parent == nullptr) {
-    throw jexception::IllegalArgumentException("Used only by native engine");
-  }
-
-  sg_jgui_window = parent;
-
-  sg_jgui_window->SetParent(nullptr);
 }
 
 void NativeWindow::SetTitle(std::string title)

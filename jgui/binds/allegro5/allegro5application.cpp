@@ -579,8 +579,8 @@ void Application::Quit()
   sg_loop_mutex.unlock();
 }
 
-NativeWindow::NativeWindow(int x, int y, int width, int height):
-	jgui::Window(dynamic_cast<Window *>(this))
+NativeWindow::NativeWindow(jgui::Window *parent, jgui::jrect_t<int> bounds):
+	jgui::Window(nullptr)
 {
 	jcommon::Object::SetClassName("jgui::NativeWindow");
 
@@ -593,24 +593,25 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 	sg_surface = nullptr;
 	sg_mouse_x = 0;
 	sg_mouse_y = 0;
+  sg_jgui_window = parent;
 
   // al_set_new_displaysg_repaint_rate(60);
 	al_set_new_bitmap_flags(ALLEGRO_MEMORY_BITMAP | ALLEGRO_NO_PREMULTIPLIED_ALPHA);
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ARGB_8888);
 	al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
 
-	al_set_new_window_position(x, y);
+	al_set_new_window_position(bounds.point.x, bounds.point.y);
 	al_set_new_display_option(ALLEGRO_UPDATE_DISPLAY_REGION, 1, ALLEGRO_SUGGEST); // ALLEGRO_REQUIRE;
 	al_set_new_display_option(ALLEGRO_VSYNC, 1, ALLEGRO_SUGGEST); // ALLEGRO_REQUIRE;
 	al_set_new_display_flags(ALLEGRO_RESIZABLE);
 
-	sg_display = al_create_display(width, height);
+	sg_display = al_create_display(bounds.size.width, bounds.size.height);
 
 	if (sg_display == nullptr) {
 		throw jexception::RuntimeException("Cannot create a window");
 	}
 
-	sg_surface = al_create_bitmap(width, height);
+	sg_surface = al_create_bitmap(bounds.size.width, bounds.size.height);
 	
 	if (sg_surface == nullptr) {
 	  al_destroy_display(sg_display);
@@ -655,19 +656,6 @@ void NativeWindow::ToggleFullScreen()
 	}
 
 	sg_repaint = true;
-}
-
-void NativeWindow::SetParent(jgui::Container *c)
-{
-  jgui::Window *parent = dynamic_cast<jgui::Window *>(c);
-
-  if (parent == nullptr) {
-    throw jexception::IllegalArgumentException("Used only by native engine");
-  }
-
-  sg_jgui_window = parent;
-
-  sg_jgui_window->SetParent(nullptr);
 }
 
 void NativeWindow::SetTitle(std::string title)

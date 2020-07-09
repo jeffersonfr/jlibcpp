@@ -507,11 +507,7 @@ class QTWindowRender : public QDialog {
         *g = sg_back_buffer->GetGraphics();
 
       if (Application::FrameRate(sg_jgui_window->GetFramesPerSecond()) == true) {
-        g->Flush();
-
-        sg_jgui_window->Repaint();
-
-        return;
+        // do nothing ...
       }
 
       g->Reset();
@@ -593,8 +589,8 @@ void Application::Quit()
   sg_loop_mutex.unlock();
 }
 
-NativeWindow::NativeWindow(int x, int y, int width, int height):
-	jgui::Window(dynamic_cast<Window *>(this))
+NativeWindow::NativeWindow(jgui::Window *parent, jgui::jrect_t<int> bounds):
+	jgui::Window(nullptr)
 {
 	jcommon::Object::SetClassName("jgui::NativeWindow");
 
@@ -602,13 +598,15 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 		throw jexception::RuntimeException("Cannot create more than one window");
   }
 
+  sg_jgui_window = parent;
+
   sg_jgui_icon = new BufferedImage(_DATA_PREFIX"/images/small-gnu.png");
 
   sg_handler = new QTWindowRender();
 
   sg_handler->setVisible(true);
   sg_handler->setMouseTracking(true);
-  sg_handler->setGeometry(x, y, width, height);
+  sg_handler->setGeometry(bounds.point.x, bounds.point.y, bounds.size.width, bounds.size.height);
 
   sg_visible = true;
 }
@@ -659,19 +657,6 @@ void NativeWindow::ToggleFullScreen()
         sg_handler->showNormal();
     }
 	}
-}
-
-void NativeWindow::SetParent(jgui::Container *c)
-{
-  jgui::Window *parent = dynamic_cast<jgui::Window *>(c);
-
-  if (parent == nullptr) {
-    throw jexception::IllegalArgumentException("Used only by native engine");
-  }
-
-  sg_jgui_window = parent;
-
-  sg_jgui_window->SetParent(nullptr);
 }
 
 void NativeWindow::SetTitle(std::string title)

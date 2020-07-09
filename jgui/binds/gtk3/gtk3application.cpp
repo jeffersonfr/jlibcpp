@@ -381,11 +381,7 @@ static gboolean OnDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
     *g = sg_back_buffer->GetGraphics();
 
   if (Application::FrameRate(sg_jgui_window->GetFramesPerSecond()) == true) {
-    g->Flush();
-
-    sg_jgui_window->Repaint();
-
-    return;
+    // do nothing ...
   }
 
   /* CHANGE:: use this cairo surface instead
@@ -604,8 +600,8 @@ void Application::Quit()
   sg_loop_mutex.unlock();
 }
 
-NativeWindow::NativeWindow(int x, int y, int width, int height):
-	jgui::Window(dynamic_cast<Window *>(this))
+NativeWindow::NativeWindow(jgui::Window *parent, jgui::jrect_t<int> bounds):
+	jgui::Window(nullptr)
 {
 	jcommon::Object::SetClassName("jgui::NativeWindow");
 
@@ -614,13 +610,8 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
   }
 
 	sg_window = nullptr;
-
-  sg_visible_bounds = {
-    x,
-    y,
-    width,
-    height
-  };
+  sg_jgui_window = parent;
+  sg_visible_bounds = bounds;
 
   sg_jgui_icon = new BufferedImage(_DATA_PREFIX"/images/small-gnu.png");
 
@@ -674,19 +665,6 @@ void NativeWindow::ToggleFullScreen()
 	}
 
   gtk_widget_queue_draw(sg_widget);
-}
-
-void NativeWindow::SetParent(jgui::Container *c)
-{
-  jgui::Window *parent = dynamic_cast<jgui::Window *>(c);
-
-  if (parent == nullptr) {
-    throw jexception::IllegalArgumentException("Used only by native engine");
-  }
-
-  sg_jgui_window = parent;
-
-  sg_jgui_window->SetParent(nullptr);
 }
 
 void NativeWindow::SetTitle(std::string title)

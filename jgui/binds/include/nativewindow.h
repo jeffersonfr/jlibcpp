@@ -39,19 +39,13 @@ class NativeWindow : public jgui::Window {
 		 * \brief
 		 *
 		 */
-		NativeWindow(int x, int y, int width, int height);
+		NativeWindow(jgui::Window *parent, jgui::jrect_t<int> bounds);
 		
 		/**
 		 * \brief
 		 *
 		 */
 		virtual ~NativeWindow();
-
-		/**
-		 * \brief
-		 *
-		 */
-    virtual void SetParent(jgui::Container *c);
 
 		/**
 		 * \brief

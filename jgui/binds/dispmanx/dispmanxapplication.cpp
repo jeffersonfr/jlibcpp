@@ -698,17 +698,17 @@ void Application::Quit()
   sg_loop_mutex.unlock();
 }
 
-NativeWindow::NativeWindow(int x, int y, int width, int height):
-	jgui::Window(dynamic_cast<Window *>(this))
+NativeWindow::NativeWindow(jgui::Window *parent, jgui::jrect_t<int> bounds):
+	jgui::Window(nullptr)
 {
 	jcommon::Object::SetClassName("jgui::NativeWindow");
 
-  /*
-	if (_window != nullptr) {
+	if (sg_window != nullptr) {
 		throw jexception::RuntimeException("Cannot create more than one window");
   }
-  */
   
+  sg_jgui_window = parent;
+
   SetCursor(sgsg_jgui_cursors[JCS_DEFAULT].cursor, sgsg_jgui_cursors[JCS_DEFAULT].hot_x, sgsg_jgui_cursors[JCS_DEFAULT].hot_y);
 }
 
@@ -727,21 +727,6 @@ void NativeWindow::Repaint(Component *cmp)
 
 void NativeWindow::ToggleFullScreen()
 {
-}
-
-void NativeWindow::SetParent(jgui::Container *c)
-{
-  jgui::Window *parent = dynamic_cast<jgui::Window *>(c);
-
-  if (parent == nullptr) {
-    throw jexception::IllegalArgumentException("Used only by native engine");
-  }
-
-  // TODO:: sg_jgui_window precisa ser a window que contem ela
-  // TODO:: pegar os windows por evento ou algo assim
-  sg_jgui_window = parent;
-
-  sg_jgui_window->SetParent(nullptr);
 }
 
 void NativeWindow::SetTitle(std::string title)

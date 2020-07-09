@@ -52,6 +52,8 @@ static bool sg_quitting = false;
 /** \brief */
 static jgui::jsize_t<int> sg_screen = {0, 0};
 /** \brief */
+static jgui::jrect_t<int> sg_previous_bounds;
+/** \brief */
 static std::mutex sg_loop_mutex;
 /** \brief */
 static jgui::Image *sg_jgui_icon = nullptr;
@@ -730,7 +732,9 @@ static void repeat_timer_handler()
   struct input* input = get_input();
   uint64_t exp;
 
-  read(input->repeat_timer_fd, &exp, sizeof(exp));
+  if (read(input->repeat_timer_fd, &exp, sizeof(exp)) == 0LL) {
+    ;
+  }
 
   uint32_t keycode = input->repeat_keycode;
   char ch = input->repeat_char;
@@ -1479,8 +1483,8 @@ bool Application::IsVerticalSyncEnabled()
   return true;
 }
 
-NativeWindow::NativeWindow(int x, int y, int width, int height):
-	jgui::Window(dynamic_cast<Window *>(this))
+NativeWindow::NativeWindow(jgui::Window *parent, jgui::jrect_t<int> bounds):
+	jgui::Window(nullptr)
 {
 	jcommon::Object::SetClassName("jgui::NativeWindow");
 
@@ -1492,13 +1496,13 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 
 	sg_mouse_x = 0;
 	sg_mouse_y = 0;
+  sg_jgui_window = parent;
 
-  sg_surface = CreateShmScreenSurface(0, 0, 0, width, height, 4); 
+  sg_previous_bounds = bounds;
 
-  // printf("wayland display:%p: %d, %d\n", surface, w, h);
+  sg_surface = CreateShmScreenSurface(0, 0, 0, bounds.size.width, bounds.size.height, 4); 
 
   RemapShmScreenSurface(sg_surface, sg_surface->width, sg_surface->height);
-  // new_surface_event(SURFACE_MAP, (ShmSurface*)sg_surface, 0, 0); // INFO:: need start the thread before
 }
 
 NativeWindow::~NativeWindow()
@@ -1521,21 +1525,6 @@ void NativeWindow::Repaint(Component *cmp)
 
 void NativeWindow::ToggleFullScreen()
 {
-}
-
-void NativeWindow::SetParent(jgui::Container *c)
-{
-  jgui::Window *parent = dynamic_cast<jgui::Window *>(c);
-
-  if (parent == nullptr) {
-    throw jexception::IllegalArgumentException("Used only by native engine");
-  }
-
-  // TODO:: sg_jgui_window precisa ser a window que contem ela
-  // TODO:: pegar os windows por evento ou algo assim
-  sg_jgui_window = parent;
-
-  sg_jgui_window->SetParent(nullptr);
 }
 
 void NativeWindow::SetTitle(std::string title)
@@ -1567,7 +1556,6 @@ bool NativeWindow::IsUndecorated()
 
 void NativeWindow::SetBounds(int x, int y, int width, int height)
 {
-  // TODO:: move to
   ResizeShmScreenSurface(sg_surface, width, height);
 }
 

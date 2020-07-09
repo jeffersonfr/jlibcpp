@@ -676,12 +676,12 @@ void Application::Quit()
   sg_loop_mutex.unlock();
 }
 
-NativeWindow::NativeWindow(int x, int y, int width, int height):
-	jgui::Window(dynamic_cast<Window *>(this))
+NativeWindow::NativeWindow(jgui::Window *parent, jgui::jrect_t<int> bounds):
+	jgui::Window(nullptr)
 {
 	jcommon::Object::SetClassName("jgui::NativeWindow");
 
-	if (sg_window != 0) {
+	if (sg_jgui_window != nullptr) {
 		throw jexception::RuntimeException("Cannot create more than one window");
   }
 
@@ -690,6 +690,7 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 	sg_window = 0;
 	sg_mouse_x = 0;
 	sg_mouse_y = 0;
+  sg_jgui_window = parent;
 
 	XSetWindowAttributes attr;
 
@@ -704,10 +705,10 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 	sg_window = XCreateWindow(
 			sg_display, 
 			XRootWindow(sg_display, screen), 
-			x, 
-			y, 
-			width, 
-			height, 
+			bounds.point.x, 
+			bounds.point.y, 
+			bounds.size.width, 
+			bounds.size.height, 
 			0, 
 			DefaultDepth(sg_display, screen), 
 			InputOutput, 
@@ -787,10 +788,10 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 	);
 
   sg_visible_bounds = {
-    x,
-    y,
-    width,
-    height
+    bounds.point.x,
+    bounds.point.y,
+    bounds.size.width,
+    bounds.size.height
   };
 
   XMapRaised(sg_display, sg_window);
@@ -834,7 +835,7 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 		throw jexception::RuntimeException("Unable to create a presentation queue");
   }
 
-  status = OutputSurfaceCreate(sg_vdp_device, VDP_RGBA_FORMAT_B8G8R8A8, width, height, &sg_vdp_surface);
+  status = OutputSurfaceCreate(sg_vdp_device, VDP_RGBA_FORMAT_B8G8R8A8, bounds.size.width, bounds.size.height, &sg_vdp_surface);
 
   if (status) {
     XUnlockDisplay(sg_display);
@@ -913,19 +914,6 @@ void NativeWindow::ToggleFullScreen()
 
     sg_fullscreen = false;
   }
-}
-
-void NativeWindow::SetParent(jgui::Container *c)
-{
-  jgui::Window *parent = dynamic_cast<jgui::Window *>(c);
-
-  if (parent == nullptr) {
-    throw jexception::IllegalArgumentException("Used only by native engine");
-  }
-
-  sg_jgui_window = parent;
-
-  sg_jgui_window->SetParent(nullptr);
 }
 
 void NativeWindow::SetTitle(std::string title)

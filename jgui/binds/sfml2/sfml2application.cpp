@@ -557,8 +557,8 @@ void Application::Quit()
   sg_loop_mutex.unlock();
 }
 
-NativeWindow::NativeWindow(int x, int y, int width, int height):
-	jgui::Window(dynamic_cast<Window *>(this))
+NativeWindow::NativeWindow(jgui::Window *parent, jgui::jrect_t<int> bounds):
+	jgui::Window(nullptr)
 {
 	jcommon::Object::SetClassName("jgui::NativeWindow");
 
@@ -571,16 +571,18 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 	sg_window = nullptr;
 	sg_mouse_x = 0;
 	sg_mouse_y = 0;
+  sg_jgui_window = parent;
 
 	int flags = (int)(sf::Style::Titlebar | sf::Style::Resize | sf::Style::Close);
 
   // TODO:: set location too
-	sg_window = new sf::RenderWindow(sf::VideoMode(width, height), sg_title.c_str(), flags);
+	sg_window = new sf::RenderWindow(sf::VideoMode(bounds.size.width, bounds.size.height), sg_title.c_str(), flags);
 
 	if (sg_window == nullptr) {
 		throw jexception::RuntimeException("Cannot create a window");
 	}
 
+	sg_window->setPosition(sf::Vector2i(bounds.point.x, bounds.point.y));
 	sg_window->requestFocus();
 	sg_window->setVerticalSyncEnabled(true);
 	sg_window->setFramerateLimit(120);
@@ -655,21 +657,6 @@ void NativeWindow::ToggleFullScreen()
 
   delete old;
   old = nullptr;
-}
-
-void NativeWindow::SetParent(jgui::Container *c)
-{
-  jgui::Window *parent = dynamic_cast<jgui::Window *>(c);
-
-  if (parent == nullptr) {
-    throw jexception::IllegalArgumentException("Used only by native engine");
-  }
-
-  // TODO:: sg_jgui_window precisa ser a window que contem ela
-  // TODO:: pegar os windows por evento ou algo assim
-  sg_jgui_window = parent;
-
-  sg_jgui_window->SetParent(nullptr);
 }
 
 void NativeWindow::SetTitle(std::string title)

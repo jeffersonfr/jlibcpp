@@ -667,8 +667,8 @@ void OnEntry(int state)
   }
 }
 
-NativeWindow::NativeWindow(int x, int y, int width, int height):
-	jgui::Window(dynamic_cast<Window *>(this))
+NativeWindow::NativeWindow(jgui::Window *parent, jgui::jrect_t<int> bounds):
+	jgui::Window(nullptr)
 {
 	jcommon::Object::SetClassName("jgui::NativeWindow");
 
@@ -681,9 +681,10 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
   sg_window = 0;
 	sg_mouse_x = 0;
 	sg_mouse_y = 0;
+  sg_jgui_window = parent;
 
-  glutInitWindowSize(width, height);
-  glutInitWindowPosition(x, y);
+  glutInitWindowSize(bounds.size.width, bounds.size.height);
+  glutInitWindowPosition(bounds.point.x, bounds.point.y);
   
   sg_window = glutCreateWindow(nullptr);
 
@@ -708,8 +709,6 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
   glutVisibilityFunc(OnVisibility);
   glutEntryFunc(OnEntry);
   glutIdleFunc(nullptr);
-
-  sg_jgui_window = this;
 }
 
 NativeWindow::~NativeWindow()
@@ -736,19 +735,6 @@ void NativeWindow::ToggleFullScreen()
     
     sg_fullscreen = false;
   }
-}
-
-void NativeWindow::SetParent(jgui::Container *c)
-{
-  jgui::Window *parent = dynamic_cast<jgui::Window *>(c);
-
-  if (parent == nullptr) {
-    throw jexception::IllegalArgumentException("Used only by native engine");
-  }
-
-  sg_jgui_window = parent;
-
-  sg_jgui_window->SetParent(nullptr);
 }
 
 void NativeWindow::SetTitle(std::string title)

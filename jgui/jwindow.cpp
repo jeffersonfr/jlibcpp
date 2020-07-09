@@ -46,14 +46,11 @@ Window::Window(jgui::jsize_t<int> size, jgui::jpoint_t<int> point):
 {
   jcommon::Object::SetClassName("jgui::Window");
 
-  _instance = new NativeWindow(point.x, point.y, size.width, size.height);
-  
-  _instance->SetParent(this);
-
   _focus_owner = nullptr;
   _fps = 30;
 
   _event_manager = new EventManager(this);
+  _instance = new NativeWindow(this, jgui::jrect_t<int>{point, size});
 
   GetTheme().GetBorder().SetStyle(JBS_RAISED_GRADIENT);
   GetTheme().SetFont("primary", &jgui::Font::BIG);

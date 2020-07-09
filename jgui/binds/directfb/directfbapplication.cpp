@@ -603,8 +603,8 @@ void Application::Quit()
   sg_loop_mutex.unlock();
 }
 
-NativeWindow::NativeWindow(int x, int y, int width, int height):
-	jgui::Window(dynamic_cast<Window *>(this))
+NativeWindow::NativeWindow(jgui::Window *parent, jgui::jrect_t<int> bounds):
+	jgui::Window(nullptr)
 {
 	jcommon::Object::SetClassName("jgui::NativeWindow");
 
@@ -617,6 +617,7 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 	sg_window = nullptr;
 	sg_mouse_x = 0;
 	sg_mouse_y = 0;
+  sg_jgui_window = parent;
 
 	DFBWindowDescription desc;
 
@@ -626,10 +627,10 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 	desc.surface_caps = (DFBSurfaceCapabilities)(DSCAPS_DOUBLE);
 	desc.options = (DFBWindowOptions) (DWOP_ALPHACHANNEL | DWOP_SCALE);
 	desc.stacking = DWSC_UPPER;
-	desc.posx   = x;
-	desc.posy   = y;
-	desc.width  = width;
-	desc.height = height;
+	desc.posx   = bounds.point.x;
+	desc.posy   = bounds.point.y;
+	desc.width  = bounds.size.width;
+	desc.height = bounds.size.height;
 
 	IDirectFBDisplayLayer *layer = nullptr;
 	
@@ -720,21 +721,6 @@ void NativeWindow::Repaint(Component *cmp)
 void NativeWindow::ToggleFullScreen()
 {
   // TODO::
-}
-
-void NativeWindow::SetParent(jgui::Container *c)
-{
-  jgui::Window *parent = dynamic_cast<jgui::Window *>(c);
-
-  if (parent == nullptr) {
-    throw jexception::IllegalArgumentException("Used only by native engine");
-  }
-
-  // TODO:: sg_jgui_window precisa ser a window que contem ela
-  // TODO:: pegar os windows por evento ou algo assim
-  sg_jgui_window = parent;
-
-  sg_jgui_window->SetParent(nullptr);
 }
 
 void NativeWindow::SetTitle(std::string title)
