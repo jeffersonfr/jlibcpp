@@ -366,7 +366,7 @@ static void InternalPaint()
 
   g->Flush();
 
-	int size = dw*dh;
+	int size = bounds.size.width*bounds.size.height;
 	uint8_t *src = sg_back_buffer->LockData();
 	uint8_t *dst = (uint8_t *)sg_server->frameBuffer;
 
@@ -380,9 +380,7 @@ static void InternalPaint()
 		dst = dst + SCREEN_BPP;
 	}
 
-  rfbMarkRectAsModified(sg_server, 0, 0, dw, dh);
-
-  cairo_surface_destroy(cairo_surface);
+  rfbMarkRectAsModified(sg_server, 0, 0, bounds.size.width, bounds.size.height);
 
 	sg_back_buffer->UnlockData();
 
@@ -481,41 +479,47 @@ void Application::Quit()
 
 static void ProcessKeyEvents(rfbBool down, rfbKeySym k, rfbClientPtr cl)
 {
+  static jevent::jkeyevent_modifiers_t mod = jevent::JKM_NONE;
+
   if (sg_jgui_window == nullptr) {
     return;
   }
 
   jevent::jkeyevent_type_t type;
-  jevent::jkeyevent_modifiers_t mod;
 
-  mod = (jevent::jkeyevent_modifiers_t)(0);
+#define UPDATE_MODIFIERS(flag) \
+    if (down == true) { \
+      mod = (jevent::jkeyevent_modifiers_t)(mod | flag); \
+    } else { \
+      mod = (jevent::jkeyevent_modifiers_t)(mod & ~flag); \
+    } \
 
-  if (k.isPressed(XK_Shift_L) == true) {
-    mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_SHIFT);
-  } else if (k.isPressed(XK_Shift_R) == true) {
-    mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_SHIFT);
-  } else if (k.isPressed(XK_Control_L) == true) {
-    mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_CONTROL);
-  } else if (k.isPressed(XK_Control_R) == true) {
-    mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_CONTROL);
-  } else if (k.isPressed(XK_Alt_L) == true) {
-    mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_ALT);
-  } else if (k.isPressed(XK_Alt_R) == true) {
-    mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_ALT);
-  } else if (k.isPressed(XK_Caps_Lock) == true) {
-    mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_CAPS_LOCK);
-  } else if (k.isPressed(XK_Meta_L) == true) {
-    mod = (jevent::jkeyevent_modifiers_t)(mod | JKM_META);
-  } else if (k.isPressed(XK_Meta_R) == true) {
-    mod = (jevent::jkeyevent_modifiers_t)(mod | JKM_META);
-  } else if (k.isPressed(XK_Super_L) == true) {
-    mod = (jevent::jkeyevent_modifiers_t)(mod | JKM_SUPER);
-  } else if (k.isPressed(XK_Super_R) == true) {
-    mod = (jevent::jkeyevent_modifiers_t)(mod | JKM_SUPER);
-  } else if (k.isPressed(XK_Hyper_L) == true) {
-    mod = (jevent::jkeyevent_modifiers_t)(mod | JKM_HYPER);
-  } else if (k.isPressed(XK_Hyper_R) == true) {
-    mod = (jevent::jkeyevent_modifiers_t)(mod | JKM_HYPER);
+  if (k == XK_Shift_L) {
+    UPDATE_MODIFIERS(jevent::JKM_SHIFT);
+  } else if (k == XK_Shift_R) {
+    UPDATE_MODIFIERS(jevent::JKM_SHIFT);
+  } else if (k == XK_Control_L) {
+    UPDATE_MODIFIERS(jevent::JKM_CONTROL);
+  } else if (k == XK_Control_R) {
+    UPDATE_MODIFIERS(jevent::JKM_CONTROL);
+  } else if (k == XK_Alt_L) {
+    UPDATE_MODIFIERS(jevent::JKM_ALT);
+  } else if (k == XK_Alt_R) {
+    UPDATE_MODIFIERS(jevent::JKM_ALT);
+  } else if (k == XK_Caps_Lock) {
+    UPDATE_MODIFIERS(jevent::JKM_CAPS_LOCK);
+  } else if (k == XK_Meta_L) {
+    UPDATE_MODIFIERS(jevent::JKM_META);
+  } else if (k == XK_Meta_R) {
+    UPDATE_MODIFIERS(jevent::JKM_META);
+  } else if (k == XK_Super_L) {
+    UPDATE_MODIFIERS(jevent::JKM_SUPER);
+  } else if (k == XK_Super_R) {
+    UPDATE_MODIFIERS(jevent::JKM_SUPER);
+  } else if (k == XK_Hyper_L) {
+    UPDATE_MODIFIERS(jevent::JKM_HYPER);
+  } else if (k == XK_Hyper_R) {
+    UPDATE_MODIFIERS(jevent::JKM_HYPER);
   }
 
   type = jevent::JKT_UNKNOWN;
@@ -602,7 +606,7 @@ NativeWindow::NativeWindow(jgui::Window *parent, jgui::jrect_t<int> bounds):
   }
 
   sg_server->desktopName = "jgui-sg_server";
-  sg_server->frameBuffer= (char *)malloc(width*height*SCREEN_BPP);
+  sg_server->frameBuffer= (char *)malloc(bounds.size.width*bounds.size.height*SCREEN_BPP);
   sg_server->alwaysShared = true;
   sg_server->colourMap.is16 = false;
   sg_server->serverFormat.trueColour = false;
@@ -676,8 +680,6 @@ jgui::jrect_t<int> NativeWindow::GetBounds()
       .height = sg_screen.height
     }
   };
-
-	return t;
 }
 		
 void NativeWindow::SetResizable(bool resizable)

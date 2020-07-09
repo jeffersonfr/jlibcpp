@@ -317,8 +317,8 @@ static void InternalPaint()
 
   uint8_t *data = (uint8_t *)scale->LockData();
 
-  for (int j=0; j<dh; j++) {
-    for (int i=0; i<dw; i++) {
+  for (int j=0; j<bounds.size.height; j++) {
+    for (int i=0; i<bounds.size.width; i++) {
       sg_canvas->SetPixel(i, j, ::Color(data[2], data[1], data[0]));
 
       data = data + 4;
@@ -343,7 +343,7 @@ void Application::Loop()
   std::lock_guard<std::mutex> lock(sg_loop_mutex);
 
   struct input_event ev;
-  bool shift = false;
+  // bool shift = false;
   int mouse_x = 0, mouse_y = 0;
   uint32_t last_mouse_state = 0x00;
   

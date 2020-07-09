@@ -459,11 +459,10 @@ ifeq ($(ENABLE_GRAPHICS), nanax)
   CCFLAGS += \
     -I/opt/nana/include \
 
-  # add the following line to nana/CMakeFile.txt ...
-  # set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -fPIC")
+  # add '-fpic' to /opt/nana/build/makefile and 'make clean all'
 
   LDFLAGS += \
-    -L/opt/nana/build/cmake \
+    -L/opt/nana/build/bin \
     -lnana \
     -lX11 \
     -lpthread \

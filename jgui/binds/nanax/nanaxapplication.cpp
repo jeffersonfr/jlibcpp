@@ -28,7 +28,6 @@
 #include <mutex>
 #include <atomic>
 
-#include <nana/gui/wvl.hpp>
 #include <nana/gui.hpp>
 #include <nana/gui/screen.hpp>
 #include <nana/paint/pixel_buffer.hpp>
@@ -454,11 +453,7 @@ static void paint_callback(const nana::paint::graphics& graph)
     *g = sg_back_buffer->GetGraphics();
 
   if (Application::FrameRate(sg_jgui_window->GetFramesPerSecond()) == true) {
-    g->Flush();
-
-    sg_jgui_window->Repaint();
-
-    return;
+    // do nothing ...
   }
 
   g->Reset();
