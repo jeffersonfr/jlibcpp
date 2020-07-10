@@ -331,6 +331,7 @@ OBJS_jgui += \
   jtheme.o\
   jtreelistview.o\
   jwindow.o\
+  jwindowadapter.o\
   jyesnodialog.o\
 
 OBJS_jmedia += \

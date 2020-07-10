@@ -604,7 +604,7 @@ bool Application::IsVerticalSyncEnabled()
 }
 
 NativeWindow::NativeWindow(jgui::Window *parent, jgui::jrect_t<int> bounds):
-	jgui::Window(nullptr)
+	jgui::WindowAdapter()
 {
 	jcommon::Object::SetClassName("jgui::NativeWindow");
 

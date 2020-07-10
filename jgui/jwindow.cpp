@@ -30,17 +30,6 @@
 
 namespace jgui {
 
-Window::Window(Window *window):
-  Container()
-{
-  jcommon::Object::SetClassName("jgui::Window");
-
-  _fps = 30;
-  _focus_owner = nullptr;
-  _event_manager = nullptr;
-  _instance = nullptr;
-}
-
 Window::Window(jgui::jsize_t<int> size, jgui::jpoint_t<int> point):
   Container({point, size})
 {

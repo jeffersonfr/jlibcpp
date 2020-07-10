@@ -581,7 +581,7 @@ static void ProcessMouseEvents(int buttonMask, int x, int y, rfbClientPtr cl)
 }
 
 NativeWindow::NativeWindow(jgui::Window *parent, jgui::jrect_t<int> bounds):
-	jgui::Window(nullptr)
+	jgui::WindowAdapter()
 {
 	jcommon::Object::SetClassName("jgui::NativeWindow");
 

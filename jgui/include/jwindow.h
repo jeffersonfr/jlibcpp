@@ -63,6 +63,7 @@ enum jcursor_style_t {
   JCS_WAIT
 };
 
+class WindowAdapter;
 class Graphics;
 
 /**
@@ -107,7 +108,7 @@ class Window : public jgui::Container {
     /** \brief */
     std::mutex _window_listener_mutex;
     /** \brief */
-    Window *_instance;
+    WindowAdapter *_instance;
     /** \brief */
     EventManager *_event_manager;
     /** \brief */
@@ -116,12 +117,6 @@ class Window : public jgui::Container {
     int _fps;
 
   public:
-    /**
-     * \brief
-     *
-     */
-    Window(Window *window);
-    
     /**
      * \brief
      *

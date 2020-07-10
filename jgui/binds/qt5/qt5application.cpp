@@ -507,14 +507,14 @@ class QTWindowRender : public QDialog {
         *g = sg_back_buffer->GetGraphics();
 
       if (Application::FrameRate(sg_jgui_window->GetFramesPerSecond()) == true) {
-        // do nothing ...
+        sg_jgui_window->Repaint();
+      } else {
+        g->Reset();
+        g->SetCompositeFlags(jgui::JCF_SRC_OVER);
+
+        sg_jgui_window->DoLayout();
+        sg_jgui_window->Paint(g);
       }
-
-      g->Reset();
-      g->SetCompositeFlags(jgui::JCF_SRC_OVER);
-
-      sg_jgui_window->DoLayout();
-      sg_jgui_window->Paint(g);
 
       g->Flush();
 
@@ -590,7 +590,7 @@ void Application::Quit()
 }
 
 NativeWindow::NativeWindow(jgui::Window *parent, jgui::jrect_t<int> bounds):
-	jgui::Window(nullptr)
+	jgui::WindowAdapter()
 {
 	jcommon::Object::SetClassName("jgui::NativeWindow");
 

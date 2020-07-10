@@ -21,7 +21,7 @@
 #define J_NATIVEWINDOW_H
 
 #include "jgui/japplication.h"
-#include "jgui/jwindow.h"
+#include "jgui/jwindowadapter.h"
 
 namespace jgui {
 
@@ -30,7 +30,7 @@ namespace jgui {
  *
  * \author Jeff Ferr
  */
-class NativeWindow : public jgui::Window {
+class NativeWindow : public jgui::WindowAdapter {
 
 	private:
 

@@ -381,22 +381,24 @@ static gboolean OnDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
     *g = sg_back_buffer->GetGraphics();
 
   if (Application::FrameRate(sg_jgui_window->GetFramesPerSecond()) == true) {
-    // do nothing ...
+    sg_jgui_window->Repaint();
+  } else {
+    /* CHANGE:: use this cairo surface instead
+  	int 
+      w = gtk_widget_get_allocated_width(widget),
+  	  h = gtk_widget_get_allocated_height(widget);
+
+    cairo_surface_t *surface = gdk_window_create_similar_surface(gtk_widget_getsg_window(widget), CAIRO_CONTENT_COLOR, w, h);
+    */
+
+    g->Reset();
+    g->SetCompositeFlags(jgui::JCF_SRC_OVER);
+
+	  sg_jgui_window->DoLayout();
+    sg_jgui_window->Paint(g);
   }
 
-  /* CHANGE:: use this cairo surface instead
-	int 
-    w = gtk_widget_get_allocated_width(widget),
-	  h = gtk_widget_get_allocated_height(widget);
-
-  cairo_surface_t *surface = gdk_window_create_similar_surface(gtk_widget_getsg_window(widget), CAIRO_CONTENT_COLOR, w, h);
-  */
-
-  g->Reset();
-  g->SetCompositeFlags(jgui::JCF_SRC_OVER);
-
-	sg_jgui_window->DoLayout();
-  sg_jgui_window->Paint(g);
+  g->Flush();
 
   cairo_surface_t *cairo_surface = g->GetCairoSurface();
 
@@ -601,7 +603,7 @@ void Application::Quit()
 }
 
 NativeWindow::NativeWindow(jgui::Window *parent, jgui::jrect_t<int> bounds):
-	jgui::Window(nullptr)
+	jgui::WindowAdapter()
 {
 	jcommon::Object::SetClassName("jgui::NativeWindow");
 
