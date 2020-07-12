@@ -181,7 +181,9 @@ Font::~Font()
     cairo_font_face_destroy(_font);
   }
   
-  FT_Done_Face(_face);
+  if (_is_builtin == false) {
+    FT_Done_Face(_face);
+  }
 
   if (--sg_freetype_refcounter == 0) {
     FT_Done_FreeType(sg_freetype);

@@ -45,6 +45,8 @@ static SDL_Window *sg_window = nullptr;
 /** \brief */
 static SDL_Renderer *sg_renderer = nullptr;
 /** \brief */
+jevent::jmouseevent_button_t sg_button_state = jevent::JMB_NONE;
+/** \brief */
 static int sg_mouse_x = 0;
 /** \brief */
 static int sg_mouse_y = 0;
@@ -547,18 +549,22 @@ void Application::Loop()
         if (event.type == SDL_MOUSEMOTION) {
           type = jevent::JMT_MOVED;
         } else if (event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP) {
-          if (event.type == SDL_MOUSEBUTTONDOWN) {
-            type = jevent::JMT_PRESSED;
-          } else if (event.type == SDL_MOUSEBUTTONUP) {
-            type = jevent::JMT_RELEASED;
-          }
-
           if (event.button.button == SDL_BUTTON_LEFT) {
             button = jevent::JMB_BUTTON1;
           } else if (event.button.button == SDL_BUTTON_MIDDLE) {
             button = jevent::JMB_BUTTON2;
           } else if (event.button.button == SDL_BUTTON_RIGHT) {
             button = jevent::JMB_BUTTON3;
+          }
+          
+          if (event.type == SDL_MOUSEBUTTONDOWN) {
+            sg_button_state = (jevent::jmouseevent_button_t)(sg_button_state | button);
+
+            type = jevent::JMT_PRESSED;
+          } else if (event.type == SDL_MOUSEBUTTONUP) {
+            sg_button_state = (jevent::jmouseevent_button_t)(sg_button_state & ~button);
+
+            type = jevent::JMT_RELEASED;
           }
         } else if (event.type == SDL_MOUSEWHEEL) {
           type = jevent::JMT_ROTATED;
