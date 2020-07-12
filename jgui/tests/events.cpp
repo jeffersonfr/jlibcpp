@@ -479,7 +479,7 @@ class Test : public UserWindow, public UserEventListener {
 
 		virtual void OnMouseMove(UserEvent *event)
 		{
-			jgui::jsize_t
+			jgui::jsize_t<int>
 				size = GetSize();
 			int 
         cx = event->GetX(),
