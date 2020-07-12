@@ -34,13 +34,13 @@ namespace jgui {
 /** \brief */
 static struct display _display;
 /** \brief */
-ShmSurface *sg_surface = nullptr;
+static ShmSurface *sg_surface = nullptr;
 /** \brief */
 static struct input _input;
 /** \brief */
 static bool _input_inited;
 /** \brief */
-jgui::Image *sg_back_buffer = nullptr;
+static jgui::Image *sg_back_buffer = nullptr;
 /** \brief */
 static std::atomic<bool> sg_repaint;
 /** \brief */

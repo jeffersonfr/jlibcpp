@@ -30,6 +30,7 @@ EventManager::EventManager(jgui::Window *window):
   _click_delay = 200; // milliseconds
   _alive = true;
   _window = window;
+  _autograb = false;
 
   _thread = std::thread(&EventManager::ProcessEvents, this);
 }
@@ -65,6 +66,16 @@ void EventManager::SetClickDelay(size_t ms)
 size_t EventManager::GetClickDelay()
 {
   return _click_delay;
+}
+
+void EventManager::SetAutoGrab(bool grab)
+{
+  _autograb = grab;
+}
+
+bool EventManager::IsAutoGrab()
+{
+  return _autograb;
 }
 
 void EventManager::PostEvent(jevent::EventObject *event)

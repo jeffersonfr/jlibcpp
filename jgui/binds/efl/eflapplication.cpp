@@ -36,31 +36,33 @@
 namespace jgui {
 
 /** \brief */
-Evas_Object *sg_window = nullptr;
+static Ecore_Evas *ee = nullptr;
 /** \brief */
-Evas_Object *sg_surface = nullptr;
+static Evas_Object *sg_window = nullptr;
 /** \brief */
-Evas_Coord sg_mouse_x = 0;
+static Evas_Object *sg_surface = nullptr;
 /** \brief */
-Evas_Coord sg_mouse_y = 0;
+static Evas_Coord sg_mouse_x = 0;
 /** \brief */
-Eina_Bool _mouse_down = false;
+static Evas_Coord sg_mouse_y = 0;
 /** \brief */
-jgui::jrect_t<int> sg_bounds = {0, 0, 0, 0};
+// static Eina_Bool _mouse_down = false;
 /** \brief */
-bool sg_visible = false;
+static jgui::jrect_t<int> sg_bounds = {0, 0, 0, 0};
 /** \brief */
-double _mouse_wheel_x = 0.0;
+static bool sg_visible = false;
 /** \brief */
-double _mouse_wheel_y = 0.0;
+// static double _mouse_wheel_x = 0.0;
 /** \brief */
-double _mouse_wheel_scale = 1.0;
+// static double _mouse_wheel_y = 0.0;
 /** \brief */
-Ecore_Timer *_mouse_wheel_timer = nullptr;
+// static double _mouse_wheel_scale = 1.0;
 /** \brief */
-jgui::Image *sg_back_buffer = nullptr;
+// static Ecore_Timer *_mouse_wheel_timer = nullptr;
 /** \brief */
-jevent::jmouseevent_button_t sg_button_state = jevent::JMB_NONE;
+static jgui::Image *sg_back_buffer = nullptr;
+/** \brief */
+static jevent::jmouseevent_button_t sg_button_state = jevent::JMB_NONE;
 /** \brief */
 static bool sg_repaint = false;
 /** \brief */
@@ -362,8 +364,7 @@ void Application::Init(int argc, char **argv)
     throw jexception::RuntimeException("Unable to init ecore evas");
   }
 
-  static Ecore_Evas 
-    *ee = ecore_evas_new(NULL, 0, 0, 0, 0, NULL);
+  ee = ecore_evas_new(NULL, 0, 0, 0, 0, NULL);
 
   if (!ee) {
     throw jexception::RuntimeException("Unable to create a ecore evas object");
@@ -372,7 +373,6 @@ void Application::Init(int argc, char **argv)
   int w, h;
   
   ecore_evas_screen_geometry_get(ee, nullptr, nullptr, &w, &h);
-  ecore_evas_free(ee);
 
   _elm_startup_time = ecore_time_unix_get();
   
@@ -463,24 +463,6 @@ static void render_layout(Evas_Object *content, bool paint)
   }
 }
 
-void fractally_render_refresh(Evas_Object *content)
-{
-  Evas_Coord ww, wh;
-  unsigned int *data, *pixel;
-  int x, y;
-
-  evas_object_geometry_get(content, NULL, NULL, &ww, &wh);
-  data = (unsigned int*)evas_object_image_data_get(sg_surface, EINA_TRUE);
-  pixel = data;
-
-  for (y = 0; y < wh; y++)
-    for (x = 0; x < ww; x++) {
-      *pixel++ = random()%0xffffffff;
-    }
-  evas_object_image_data_set(sg_surface, data);
-  evas_object_image_data_update_add(sg_surface, 0, 0, ww, wh);
-}
-
 static Eina_Bool InternalPaintTick(void *data)
 {
   if (sg_quitting == true) {
@@ -520,6 +502,8 @@ void Application::Quit()
 
   sg_loop_mutex.lock();
   sg_loop_mutex.unlock();
+  
+  ecore_evas_free(ee);
 }
 
 static void mousedown_callback(void *data EINA_UNUSED, Evas *evas, Evas_Object *o EINA_UNUSED, void *einfo)

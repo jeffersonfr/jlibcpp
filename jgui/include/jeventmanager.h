@@ -48,6 +48,10 @@ class EventManager : public jcommon::Object {
     /** \brief */
     std::vector<jevent::EventObject *> _events;
     /** \brief */
+    std::map<jevent::jkeyevent_symbol_t, bool> _key_button_map;
+    /** \brief */
+    std::map<jevent::jmouseevent_button_t, bool> _mouse_button_map;
+    /** \brief */
     std::thread _thread;
     /** \brief */
     std::mutex _mutex;
@@ -60,9 +64,7 @@ class EventManager : public jcommon::Object {
     /** \brief */
     bool _alive;
     /** \brief */
-    std::map<jevent::jkeyevent_symbol_t, bool> _key_button_map;
-    /** \brief */
-    std::map<jevent::jmouseevent_button_t, bool> _mouse_button_map;
+    bool _autograb;
 
   protected:
     /**
@@ -107,6 +109,18 @@ class EventManager : public jcommon::Object {
      *
      */
     virtual size_t GetClickDelay();
+    
+    /**
+     * \brief
+     *
+     */
+    virtual void SetAutoGrab(bool grab);
+    
+    /**
+     * \brief
+     *
+     */
+    virtual bool IsAutoGrab();
     
     /**
      * \brief
