@@ -1349,6 +1349,8 @@ void Application::Loop()
     
     if (event != NULL) {
       if (event->kind == MOUSE_EVENT)  {
+        static jevent::jmouseevent_button_t buttons = jevent::JMB_NONE;
+
         jevent::jmouseevent_button_t button = jevent::JMB_NONE;
         jevent::jmouseevent_type_t type = jevent::JMT_UNKNOWN;
         int mouse_z = 0;
@@ -1370,18 +1372,20 @@ void Application::Loop()
         } else if (event->e.m.action == MOUSE_MOVE or event->e.m.action == MOUSE_DRAG) {
           type = jevent::JMT_MOVED;
         } else if (event->e.m.action == MOUSE_BUTTON_PRESS or event->e.m.action == MOUSE_BUTTON_RELEASE) {
-          if (event->e.m.action == MOUSE_BUTTON_PRESS) {
-            type = jevent::JMT_PRESSED;
-          } else if (event->e.m.action == MOUSE_BUTTON_RELEASE) {
-            type = jevent::JMT_RELEASED;
-          }
-
           if (event->e.m.button == BTN_LEFT) {
             button = jevent::JMB_BUTTON1;
           } else if (event->e.m.button == BTN_MIDDLE) {
             button = jevent::JMB_BUTTON2;
           } else if (event->e.m.button == BTN_RIGHT) {
             button = jevent::JMB_BUTTON3;
+          }
+
+          if (event->e.m.action == MOUSE_BUTTON_PRESS) {
+            type = jevent::JMT_PRESSED;
+            buttons = (jevent::jmouseevent_button_t)(buttons | button);
+          } else if (event->e.m.action == MOUSE_BUTTON_RELEASE) {
+            type = jevent::JMT_RELEASED;
+            buttons = (jevent::jmouseevent_button_t)(buttons & ~button);
           }
         } else if (event->e.m.action == MOUSE_CLICK) {
           // action = "click";
@@ -1390,7 +1394,13 @@ void Application::Loop()
           mouse_z = (int)event->e.m.click_count;
         }
 
-        sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, jevent::JMB_NONE, {sg_mouse_x, sg_mouse_y}, mouse_z));
+        if (sg_jgui_window->GetEventManager()->IsAutoGrab() == true && buttons != jevent::JMB_NONE) {
+          // grab input
+        } else {
+          // release input
+        }
+
+        sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, buttons, {sg_mouse_x, sg_mouse_y}, mouse_z));
       } else if (event->kind == KEY_EVENT)  {
         jevent::jkeyevent_type_t type;
         jevent::jkeyevent_modifiers_t mod;

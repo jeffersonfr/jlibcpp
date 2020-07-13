@@ -950,6 +950,18 @@ bool Container::MouseReleased(jevent::MouseEvent *event)
 
   jgui::jpoint_t
     elocation = event->GetLocation();
+  jgui::jpoint_t 
+    slocation = GetScrollLocation();
+  Component 
+    *focus = GetFocusOwner();
+
+  if (focus != nullptr) {
+    jevent::MouseEvent
+      evt(event->GetSource(), event->GetType(), event->GetButton(), event->GetButtons(), elocation - focus->GetLocation(), event->GetClicks());
+
+    return focus->MouseReleased(&evt);
+  }
+
   int 
     dx,
     dy;
@@ -957,8 +969,6 @@ bool Container::MouseReleased(jevent::MouseEvent *event)
   Component *c = GetTargetComponent(this, elocation.x, elocation.y, &dx, &dy);
 
   if (c != nullptr && c != this) {
-    jgui::jpoint_t 
-      slocation = GetScrollLocation();
     jevent::MouseEvent 
       evt(event->GetSource(), event->GetType(), event->GetButton(), event->GetButtons(), {dx + slocation.x, dy + slocation.y}, event->GetClicks());
 
@@ -983,6 +993,18 @@ bool Container::MouseMoved(jevent::MouseEvent *event)
 
   jgui::jpoint_t
     elocation = event->GetLocation();
+  jgui::jpoint_t 
+    slocation = GetScrollLocation();
+  Component 
+    *focus = GetFocusOwner();
+
+  if (focus != nullptr) {
+    jevent::MouseEvent 
+      evt(event->GetSource(), event->GetType(), event->GetButton(), event->GetButtons(), elocation - focus->GetLocation(), event->GetClicks());
+
+    return focus->MouseMoved(&evt);
+  }
+
   int 
     dx,
     dy;
@@ -990,8 +1012,6 @@ bool Container::MouseMoved(jevent::MouseEvent *event)
   Component *c = GetTargetComponent(this, elocation.x, elocation.y, &dx, &dy);
 
   if (c != nullptr && c != this) {
-    jgui::jpoint_t 
-      slocation = GetScrollLocation();
     jevent::MouseEvent 
       evt(event->GetSource(), event->GetType(), event->GetButton(), event->GetButtons(), {dx + slocation.x, dy + slocation.y}, event->GetClicks());
 
@@ -1016,6 +1036,16 @@ bool Container::MouseWheel(jevent::MouseEvent *event)
 
   jgui::jpoint_t
     elocation = event->GetLocation();
+  Component 
+    *focus = GetFocusOwner();
+
+  if (focus != nullptr) {
+    jevent::MouseEvent
+      evt(event->GetSource(), event->GetType(), event->GetButton(), event->GetButtons(), elocation - focus->GetLocation(), event->GetClicks());
+
+    return focus->MouseWheel(&evt);
+  }
+
   int
     dx,
     dy;

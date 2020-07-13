@@ -488,6 +488,8 @@ void Application::Loop()
           event.type == sf::Event::MouseButtonReleased ||
           event.type == sf::Event::MouseWheelMoved ||
           event.type == sf::Event::MouseWheelScrolled) {
+        static jevent::jmouseevent_button_t buttons = jevent::JMB_NONE;
+
         jevent::jmouseevent_button_t button = jevent::JMB_NONE;
         jevent::jmouseevent_type_t type = jevent::JMT_UNKNOWN;
         int mouse_z = 0;
@@ -498,12 +500,6 @@ void Application::Loop()
           sg_mouse_x = event.mouseMove.x;
           sg_mouse_y = event.mouseMove.y;
         } else if (event.type == sf::Event::MouseButtonPressed || event.type == sf::Event::MouseButtonReleased) {
-          if (event.type == sf::Event::MouseButtonPressed) {
-            type = jevent::JMT_PRESSED;
-          } else if (event.type == sf::Event::MouseButtonReleased) {
-            type = jevent::JMT_RELEASED;
-          }
-
           sg_mouse_x = event.mouseButton.x;
           sg_mouse_y = event.mouseButton.y;
 
@@ -513,6 +509,14 @@ void Application::Loop()
             button = jevent::JMB_BUTTON2;
           } else if (event.mouseButton.button == sf::Mouse::Right) {
             button = jevent::JMB_BUTTON3;
+          }
+          
+          if (event.type == sf::Event::MouseButtonPressed) {
+            type = jevent::JMT_PRESSED;
+            buttons = (jevent::jmouseevent_button_t)(buttons | button);
+          } else if (event.type == sf::Event::MouseButtonReleased) {
+            type = jevent::JMT_RELEASED;
+            buttons = (jevent::jmouseevent_button_t)(buttons & ~button);
           }
         } else if (event.type == sf::Event::MouseWheelMoved || event.type == sf::Event::MouseWheelScrolled) {
           type = jevent::JMT_ROTATED;
@@ -528,7 +532,13 @@ void Application::Loop()
           }
         }
 
-        sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, jevent::JMB_NONE, {sg_mouse_x, sg_mouse_y}, mouse_z));
+        if (sg_jgui_window->GetEventManager()->IsAutoGrab() == true && buttons != jevent::JMB_NONE) {
+          sg_window->setMouseCursorGrabbed(true);
+        } else {
+          sg_window->setMouseCursorGrabbed(false);
+        }
+
+        sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, buttons, {sg_mouse_x, sg_mouse_y}, mouse_z));
       } else if (event.type == sf::Event::Closed) {
         sg_window->close();
 

@@ -508,9 +508,6 @@ void Application::Quit()
 
 static void mousedown_callback(void *data EINA_UNUSED, Evas *evas, Evas_Object *o EINA_UNUSED, void *einfo)
 {
-  // grabbing
-  // evas_object_pointer_mode_set(sg_window, EVAS_OBJECT_POINTER_MODE_AUTOGRAB); // EVAS_OBJECT_POINTER_MODE_NOGRAB
-
   Evas_Event_Mouse_Down *ev = (Evas_Event_Mouse_Down*)einfo;
   // const Evas_Modifier *mods = evas_key_modifier_get(evas);
 
@@ -536,6 +533,10 @@ static void mousedown_callback(void *data EINA_UNUSED, Evas *evas, Evas_Object *
 
   sg_button_state = (jevent::jmouseevent_button_t)(sg_button_state | button);
 
+  if (sg_jgui_window->GetEventManager()->IsAutoGrab() == true && sg_button_state != jevent::JMB_NONE) {
+    evas_object_pointer_mode_set(sg_window, EVAS_OBJECT_POINTER_MODE_AUTOGRAB); // EVAS_OBJECT_POINTER_MODE_NOGRAB
+  }
+
   sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, sg_button_state, {sg_mouse_x, sg_mouse_y}, mouse_z));
 }
 
@@ -559,6 +560,10 @@ static void mouseup_callback(void *data EINA_UNUSED, Evas *evas, Evas_Object *o 
   mouse_z = 1;
 
   sg_button_state = (jevent::jmouseevent_button_t)(sg_button_state & ~button);
+
+  if (sg_jgui_window->GetEventManager()->IsAutoGrab() == true && sg_button_state != jevent::JMB_NONE) {
+    evas_object_pointer_mode_set(sg_window, EVAS_OBJECT_POINTER_MODE_NOGRAB);
+  }
 
   sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, sg_button_state, {sg_mouse_x, sg_mouse_y}, mouse_z));
 }

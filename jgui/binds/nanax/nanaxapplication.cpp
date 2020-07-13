@@ -350,6 +350,8 @@ static void focus_callback(const nana::arg_mouse &arg)
 
 static void mouse_input_callback(const nana::arg_mouse &arg)
 {
+  static jevent::jmouseevent_button_t buttons = jevent::JMB_NONE;
+
   int mouse_z = 0;
   jevent::jmouseevent_button_t button = jevent::JMB_NONE;
   jevent::jmouseevent_type_t type = jevent::JMT_UNKNOWN;
@@ -360,12 +362,6 @@ static void mouse_input_callback(const nana::arg_mouse &arg)
   if (arg.evt_code == nana::event_code::mouse_move) {
     type = jevent::JMT_MOVED;
   } else {
-    if (arg.evt_code == nana::event_code::mouse_down or arg.evt_code == nana::event_code::dbl_click) {
-      type = jevent::JMT_PRESSED;
-    } else if (arg.evt_code == nana::event_code::mouse_up) {
-      type = jevent::JMT_RELEASED;
-    }
-
     if (arg.button == nana::mouse::left_button) {
       button = jevent::JMB_BUTTON1;
     } else if (arg.button == nana::mouse::middle_button) {
@@ -374,6 +370,14 @@ static void mouse_input_callback(const nana::arg_mouse &arg)
       button = jevent::JMB_BUTTON3;
     }
   
+    if (arg.evt_code == nana::event_code::mouse_down or arg.evt_code == nana::event_code::dbl_click) {
+      type = jevent::JMT_PRESSED;
+      buttons = (jevent::jmouseevent_button_t)(buttons | button);
+    } else if (arg.evt_code == nana::event_code::mouse_up) {
+      type = jevent::JMT_RELEASED;
+      buttons = (jevent::jmouseevent_button_t)(buttons & ~button);
+    }
+
     mouse_z = 1;
   
     if (arg.evt_code == nana::event_code::dbl_click) {
@@ -381,7 +385,13 @@ static void mouse_input_callback(const nana::arg_mouse &arg)
     }
   }
 
-  sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, jevent::JMB_NONE, {sg_mouse_x, sg_mouse_y}, mouse_z));
+  if (sg_jgui_window->GetEventManager()->IsAutoGrab() == true && buttons != jevent::JMB_NONE) {
+    fm->set_capture(true);
+  } else {
+    fm->release_capture();
+  }
+
+  sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, buttons, {sg_mouse_x, sg_mouse_y}, mouse_z));
 }
 
 static void mouse_wheel_input_callback(const nana::arg_wheel &arg)

@@ -402,20 +402,14 @@ class QTWindowRender : public QDialog {
             info.c_str(), e->button(), e->buttons(), e->globalX(), e->globalY(), e->x(), e->y()); 
         */
 
+        static jevent::jmouseevent_button_t buttons = jevent::JMB_NONE;
+
         jevent::jmouseevent_button_t button = jevent::JMB_NONE;
         jevent::jmouseevent_type_t type = jevent::JMT_MOVED;
 
         int mouse_x = e->x();
         int mouse_y = e->y();
         int mouse_z = 0;
-
-        if (event->type() == QEvent::MouseButtonDblClick) {
-          type = jevent::JMT_PRESSED;
-        } else if (event->type() == QEvent::MouseButtonPress) {
-          type = jevent::JMT_PRESSED;
-        } else if (event->type() == QEvent::MouseButtonRelease) {
-          type = jevent::JMT_RELEASED;
-        }
 
         if (e->button() == Qt::LeftButton) {
           button = jevent::JMB_BUTTON1;
@@ -425,7 +419,24 @@ class QTWindowRender : public QDialog {
           button = jevent::JMB_BUTTON3;
         }
 
-        sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, jevent::JMB_NONE, {mouse_x, mouse_y}, mouse_z));
+        if (event->type() == QEvent::MouseButtonDblClick) {
+          type = jevent::JMT_PRESSED;
+          buttons = (jevent::jmouseevent_button_t)(buttons | button);
+        } else if (event->type() == QEvent::MouseButtonPress) {
+          type = jevent::JMT_PRESSED;
+          buttons = (jevent::jmouseevent_button_t)(buttons & ~button);
+        } else if (event->type() == QEvent::MouseButtonRelease) {
+          type = jevent::JMT_RELEASED;
+          buttons = (jevent::jmouseevent_button_t)(buttons & ~button);
+        }
+
+        if (sg_jgui_window->GetEventManager()->IsAutoGrab() == true && buttons != jevent::JMB_NONE) {
+          sg_handler->grabMouse();
+        } else {
+          sg_handler->releaseMouse();
+        }
+
+        sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, buttons, {mouse_x, mouse_y}, mouse_z));
       } else if (event->type() == QEvent::Wheel) {
         QWheelEvent *e = dynamic_cast<QWheelEvent *>(event);
 

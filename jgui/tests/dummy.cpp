@@ -4,50 +4,51 @@
 
 class Dummy : public jgui::Window {
 
-  jgui::Image
-    *buffer;
+  private:
+    jgui::jpoint_t<int>
+      _pointer {0, 0};
+    jgui::jpoint_t<int>
+      _pos;
+    jgui::jsize_t<int>
+      _size;
 
   public:
     Dummy():
-      jgui::Window({256, 256})
+      jgui::Window({720, 480})
     {
-      buffer = new jgui::BufferedImage(jgui::JPF_RGB32, {256, 256});
     }
 
     virtual ~Dummy()
     {
-      delete buffer;
-      buffer = nullptr;
+    }
+
+		virtual bool MouseMoved(jevent::MouseEvent *event) override
+    {
+      _pointer = event->GetLocation();
+
+      Repaint();
+
+      return true;
     }
 
     virtual void Paint(jgui::Graphics *g) 
     {
       jgui::Window::Paint(g);
 
-      static float angle = 0.0f;
+      jgui::jrect_t<int>
+        rect {720/2 - 64, 480/2 - 64, 128, 128},
+        user {_pointer,  64, 64};
 
-      buffer->GetGraphics()->SetColor(jgui::jcolorname::Green);
-      buffer->GetGraphics()->FillArc({128, 128}, {128, 128}, angle, angle + 0.2f);
+      g->SetColor(jgui::jcolorname::White);
+      g->DrawRectangle(user);
 
-      for (int i=0; i<256*256; i++) {
-        jgui::jpoint_t<int>
-          point {i%256, i/256};
-        jgui::jcolor_t<float>
-          color = buffer->GetGraphics()->GetRGB(point);
+      g->SetColor(jgui::jcolorname::White);
 
-        color.green = color.green*0.90f;
-
-        buffer->GetGraphics()->SetRGB(color, point);
+      if (rect.Intersects(user) == true) {
+        g->SetColor(jgui::jcolorname::Red);
       }
 
-      buffer->GetGraphics()->SetColor(jgui::jcolorname::Green);
-      buffer->GetGraphics()->DrawCircle({128, 128}, 128);
-
-      g->DrawImage(buffer, jgui::jpoint_t<int>{0, 0});
-
-      angle = angle + 0.06f;
-
-      Repaint();
+      g->DrawRectangle(rect);
     }
 
 };

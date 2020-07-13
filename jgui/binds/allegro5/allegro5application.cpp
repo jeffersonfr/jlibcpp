@@ -525,6 +525,8 @@ void Application::Loop()
 
         sg_jgui_window->GetEventManager()->PostEvent(new jevent::KeyEvent(sg_jgui_window, type, mod, jevent::KeyEvent::GetCodeFromSymbol(symbol), symbol));
       } else if (event.type == ALLEGRO_EVENT_MOUSE_AXES || event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN || event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP || event.type == ALLEGRO_EVENT_MOUSE_WARPED) {
+        static jevent::jmouseevent_button_t buttons = jevent::JMB_NONE;
+
         jevent::jmouseevent_button_t button = jevent::JMB_NONE;
         jevent::jmouseevent_type_t type = jevent::JMT_UNKNOWN;
         int mouse_z = 0;
@@ -538,12 +540,6 @@ void Application::Loop()
         if (event.type == ALLEGRO_EVENT_MOUSE_AXES) {
           type = jevent::JMT_MOVED;
         } else if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN || event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
-          if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
-            type = jevent::JMT_PRESSED;
-          } else if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
-            type = jevent::JMT_RELEASED;
-          }
-
           if (event.mouse.button == 1) {
             button = jevent::JMB_BUTTON1;
           } else if (event.mouse.button == 2) {
@@ -551,12 +547,26 @@ void Application::Loop()
           } else if (event.mouse.button == 3) {
             button = jevent::JMB_BUTTON3;
           }
+
+          if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
+            type = jevent::JMT_PRESSED;
+            buttons = (jevent::jmouseevent_button_t)(buttons | button);
+          } else if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
+            type = jevent::JMT_RELEASED;
+            buttons = (jevent::jmouseevent_button_t)(buttons & ~button);
+          }
         } else if (event.type == ALLEGRO_EVENT_MOUSE_WARPED) {
           type = jevent::JMT_ROTATED;
           mouse_z = event.mouse.dz;
         }
 
-        sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, jevent::JMB_NONE, {sg_mouse_x, sg_mouse_y}, mouse_z));
+        if (sg_jgui_window->GetEventManager()->IsAutoGrab() == true && buttons != jevent::JMB_NONE) {
+          al_grab_mouse(sg_display);
+        } else {
+          al_ungrab_mouse();
+        }
+
+        sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, buttons, {sg_mouse_x, sg_mouse_y}, mouse_z));
       }
     }
   }

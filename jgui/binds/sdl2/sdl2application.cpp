@@ -559,11 +559,9 @@ void Application::Loop()
           
           if (event.type == SDL_MOUSEBUTTONDOWN) {
             sg_button_state = (jevent::jmouseevent_button_t)(sg_button_state | button);
-
             type = jevent::JMT_PRESSED;
           } else if (event.type == SDL_MOUSEBUTTONUP) {
             sg_button_state = (jevent::jmouseevent_button_t)(sg_button_state & ~button);
-
             type = jevent::JMT_RELEASED;
           }
         } else if (event.type == SDL_MOUSEWHEEL) {
@@ -571,7 +569,13 @@ void Application::Loop()
           mouse_z = event.wheel.y;
         }
 
-        sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, jevent::JMB_NONE, {sg_mouse_x, sg_mouse_y}, mouse_z));
+        if (sg_jgui_window->GetEventManager()->IsAutoGrab() == true && sg_button_state != jevent::JMB_NONE) {
+          SDL_CaptureMouse(SDL_TRUE);
+        } else {
+          SDL_CaptureMouse(SDL_FALSE);
+        }
+        
+        sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, sg_button_state, {sg_mouse_x, sg_mouse_y}, mouse_z));
       } else if(event.type == SDL_QUIT) {
         SDL_HideWindow(sg_window);
 

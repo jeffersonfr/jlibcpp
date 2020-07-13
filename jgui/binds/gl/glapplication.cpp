@@ -475,6 +475,8 @@ void OnMousePress(int button_id, int state, int x, int y)
     sg_mouse_button_state[button] = false;
   }
 
+  // TODO:: mouse grab
+  
   sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, jevent::JMB_NONE, {sg_mouse_x, sg_mouse_y}, mouse_z));
 }
 
@@ -492,6 +494,8 @@ void OnMouseMove(int x, int y)
 
   type = jevent::JMT_MOVED;
 
+  // TODO:: mouse grab
+  
   sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, jevent::JMB_NONE, {sg_mouse_x, sg_mouse_y}, mouse_z));
 }
 

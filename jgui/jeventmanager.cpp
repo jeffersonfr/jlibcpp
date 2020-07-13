@@ -30,7 +30,7 @@ EventManager::EventManager(jgui::Window *window):
   _click_delay = 200; // milliseconds
   _alive = true;
   _window = window;
-  _autograb = false;
+  _autograb = true;
 
   _thread = std::thread(&EventManager::ProcessEvents, this);
 }

@@ -480,18 +480,10 @@ void Application::Loop()
       event_buffer->Reset(event_buffer);
 
       if (event.type == DWET_ENTER) {
-        // SDL_CaptureMouse(true);
-        // void SDL_SetWindowGrab(SDL_Window* window, SDL_bool grabbed);
-        // SDL_GrabMode SDL_WM_GrabInput(SDL_GrabMode mode); // <SDL_GRAB_ON, SDL_GRAB_OFF>
-
         // SetCursor(GetCursor());
 
         sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_ENTERED));
       } else if (event.type == DWET_LEAVE) {
-        // SDL_CaptureMouse(false);
-        // void SDL_SetWindowGrab(SDL_Window* window, SDL_bool grabbed);
-        // SDL_GrabMode SDL_WM_GrabInput(SDL_GrabMode mode); // <SDL_GRAB_ON, SDL_GRAB_OFF>
-
         // SetCursor(JCS_DEFAULT);
 
         sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_LEAVED));
@@ -547,12 +539,8 @@ void Application::Loop()
         } else if (event.type == DWET_BUTTONDOWN || event.type == DWET_BUTTONUP) {
           if (event.type == DWET_BUTTONDOWN) {
             type = jevent::JMT_PRESSED;
-
-            sg_window->GrabPointer(sg_window);
           } else if (event.type == DWET_BUTTONUP) {
             type = jevent::JMT_RELEASED;
-
-            sg_window->UngrabPointer(sg_window);
           }
 
           if (event.button == DIBI_LEFT) {
@@ -574,6 +562,12 @@ void Application::Loop()
 
         if ((event.buttons & DIBI_MIDDLE) != 0) {
           buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON3);
+        }
+
+        if (sg_jgui_window->GetEventManager()->IsAutoGrab() == true && buttons != jevent::JMB_NONE) {
+          sg_window->GrabPointer(sg_window);
+        } else {
+          sg_window->UngrabPointer(sg_window);
         }
 
         sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, buttons, {sg_mouse_x, sg_mouse_y}, mouse_z));

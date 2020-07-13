@@ -510,18 +510,10 @@ void Application::Loop()
       } else if (event.type == ExposureMask) {
         InternalPaint();
       } else if (event.type == EnterNotify) {
-        // SDL_CaptureMouse(true);
-        // void SDL_SetWindowGrab(SDL_Window* window, SDL_bool grabbed);
-        // SDL_GrabMode SDL_WM_GrabInput(SDL_GrabMode mode); // <SDL_GRAB_ON, SDL_GRAB_OFF>
-
         // SetCursor(GetCursor());
 
         sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_ENTERED));
       } else if (event.type == LeaveNotify) {
-        // SDL_CaptureMouse(false);
-        // void SDL_SetWindowGrab(SDL_Window* window, SDL_bool grabbed);
-        // SDL_GrabMode SDL_WM_GrabInput(SDL_GrabMode mode); // <SDL_GRAB_ON, SDL_GRAB_OFF>
-
         // SetCursor(JCS_DEFAULT);
 
         sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_LEAVED));
@@ -600,6 +592,8 @@ void Application::Loop()
 
         sg_jgui_window->GetEventManager()->PostEvent(new jevent::KeyEvent(sg_jgui_window, type, mod, jevent::KeyEvent::GetCodeFromSymbol(symbol), symbol));
       } else if (event.type == ButtonPress || event.type == ButtonRelease || event.type == MotionNotify) {
+        static jevent::jmouseevent_button_t buttons = jevent::JMB_NONE;
+
         jevent::jmouseevent_button_t button = jevent::JMB_NONE;
         jevent::jmouseevent_type_t type = jevent::JMT_UNKNOWN;
         int mouse_z = 0;
@@ -610,12 +604,6 @@ void Application::Loop()
           sg_mouse_x = event.xmotion.x;
           sg_mouse_y = event.xmotion.y;
         } else if (event.type == ButtonPress || event.type == ButtonRelease) {
-          if (event.type == ButtonPress) {
-            type = jevent::JMT_PRESSED;
-          } else if (event.type == ButtonRelease) {
-            type = jevent::JMT_RELEASED;
-          }
-
           sg_mouse_x = event.xbutton.x;
           sg_mouse_y = event.xbutton.y;
 
@@ -642,9 +630,30 @@ void Application::Loop()
             button = jevent::JMB_WHEEL;
             mouse_z = 1;
           }
+          
+          if (event.type == ButtonPress) {
+            buttons = (jevent::jmouseevent_button_t)(buttons | button);
+            type = jevent::JMT_PRESSED;
+          } else if (event.type == ButtonRelease) {
+            buttons = (jevent::jmouseevent_button_t)(buttons & ~button);
+            type = jevent::JMT_RELEASED;
+          }
         }
 
-        sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, jevent::JMB_NONE, {sg_mouse_x, sg_mouse_y}, mouse_z));
+        /*
+        int 
+          screen = DefaultScreen(sg_display);
+
+        if (sg_jgui_window->GetEventManager()->IsAutoGrab() == true && buttons != jevent::JMB_NONE) {
+          Cursor  cursor = XCreateFontCursor(sg_display, XC_arrow);
+          
+          XGrabPointer(sg_display, XRootWindow(sg_display, screen), False, ButtonPressMask | ButtonReleaseMask | ButtonMotionMask, GrabModeSync, GrabModeAsync, XRootWindow(sg_display, screen), cursor, CurrentTime);
+        } else {
+          XUngrabPointer(sg_display, CurrentTime);
+        }
+        */
+
+        sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, buttons, {sg_mouse_x, sg_mouse_y}, mouse_z));
       }
     }
 

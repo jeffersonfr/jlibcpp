@@ -467,6 +467,8 @@ static gboolean OnMouseMoveEvent(GtkWidget *widget, GdkEventMotion *event, gpoin
 
 static gboolean OnMousePressEvent(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
 {
+  static jevent::jmouseevent_button_t buttons = jevent::JMB_NONE;
+
   jevent::jmouseevent_button_t button = jevent::JMB_NONE;
 	jevent::jmouseevent_type_t type = jevent::JMT_UNKNOWN;
 
@@ -474,12 +476,6 @@ static gboolean OnMousePressEvent(GtkWidget *widget, GdkEventButton *event, gpoi
 	int mouse_y = event->y; // event->y_root;
 	int mouse_z = 0;
 	
-	if (event->type == GDK_BUTTON_PRESS || event->type == GDK_2BUTTON_PRESS || event->type == GDK_3BUTTON_PRESS) {
-		type = jevent::JMT_PRESSED;
-	} else { // if (event->type == GDK_BUTTON_RELEASE) {
-		type = jevent::JMT_RELEASED;
-	}
-
 	if (event->button == 1) {
 		button = jevent::JMB_BUTTON1;
 	} else if (event->button == 2) {
@@ -488,7 +484,21 @@ static gboolean OnMousePressEvent(GtkWidget *widget, GdkEventButton *event, gpoi
 		button = jevent::JMB_BUTTON2;
 	}
 
-  sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, jevent::JMB_NONE, {mouse_x, mouse_y}, mouse_z));
+	if (event->type == GDK_BUTTON_PRESS || event->type == GDK_2BUTTON_PRESS || event->type == GDK_3BUTTON_PRESS) {
+		type = jevent::JMT_PRESSED;
+    buttons = (jevent::jmouseevent_button_t)(buttons | button);
+  } else { // if (event->type == GDK_BUTTON_RELEASE) {
+		type = jevent::JMT_RELEASED;
+    buttons = (jevent::jmouseevent_button_t)(buttons & ~button);
+  }
+
+  if (sg_jgui_window->GetEventManager()->IsAutoGrab() == true && buttons != jevent::JMB_NONE) {
+    gtk_grab_add(sg_window);
+  } else {
+    gtk_grab_remove(sg_window);
+  }
+  
+  sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, buttons, {mouse_x, mouse_y}, mouse_z));
 
   return TRUE;
 }
