@@ -228,10 +228,14 @@ class MixerAudioMixerControlImpl : public AudioMixerControl {
 
           i++;
         } else {
-          i = mixer->_audios.erase(i);
+          i = mixer->_audios.erase(i) - 1;
 
           delete audio;
           audio = nullptr;
+        }
+
+        if (i == mixer->_audios.end()) {
+          break;
         }
       }
     }

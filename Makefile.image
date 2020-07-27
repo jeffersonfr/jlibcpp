@@ -281,3 +281,17 @@ ifeq ($(findstring mjpeg, $(ENABLE_IMAGE)), mjpeg)
 
 endif
 
+ifeq ($(findstring avif, $(ENABLE_IMAGE)), avif)
+
+  CCFLAGS += \
+
+  LDFLAGS += \
+
+  DEFINES += \
+    -DAVIF_IMAGE \
+
+  OBJS_jgui += \
+    providers/imageprovider_avif.o \
+
+endif
+

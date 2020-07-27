@@ -292,7 +292,7 @@ void TextComponent::Delete()
       if (_text[_caret_position] == -61) {
         _text = _text.erase(_caret_position, 2);
       } else if (_text[_caret_position] == -89) {
-        _text = _text.erase(_caret_position-1, 2);
+        _text = _text.erase(_caret_position - 1, 2);
       } else {
         _text = _text.erase(_caret_position, 1);
       }

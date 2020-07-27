@@ -428,6 +428,7 @@ static void InternalPaint(Evas_Object *content)
   
   uint32_t *src = (uint32_t *)sg_back_buffer->LockData();
 
+  /*
   Evas_Coord ww, wh;
   uint32_t *dst, *pixel;
 
@@ -440,9 +441,12 @@ static void InternalPaint(Evas_Object *content)
       *pixel++ = *src++;
     }
   }
+  */
 
-  evas_object_image_data_set(sg_surface, dst);
-  evas_object_image_data_update_add(sg_surface, 0, 0, ww, wh);
+  evas_object_image_data_set(sg_surface, src);
+  evas_object_image_data_update_add(sg_surface, 0, 0, bounds.size.width, bounds.size.height);
+
+  sg_back_buffer->UnlockData();
 
   sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
 }
@@ -709,6 +713,8 @@ NativeWindow::NativeWindow(jgui::Window *parent, jgui::jrect_t<int> bounds):
   evas_object_hide(content);
 
   sg_surface = evas_object_image_add(evas_object_evas_get(content));
+
+  evas_object_image_content_hint_set(sg_surface, EVAS_IMAGE_CONTENT_HINT_DYNAMIC);
 
   evas_object_image_alpha_set(sg_surface, EINA_FALSE);
   evas_object_image_source_set(sg_surface, content);

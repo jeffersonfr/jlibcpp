@@ -309,7 +309,7 @@ void MulticastSocket6::Leave(std::string group_)
         throw jexception::ConnectionException("MulticastSocket6 leave exception");
       }
 
-      i = _groups.erase(i);
+      i = _groups.erase(i) - 1;
 
       if (i == _groups.end()) {
         break;

@@ -707,7 +707,7 @@ void Container::Remove(jgui::Component *c)
     if (c == (*i)) {
       c->SetParent(nullptr);
 
-      i = _components.erase(i);
+      i = _components.erase(i) - 1;
 
       if (i == _components.end()) {
         break;
@@ -1072,7 +1072,7 @@ void Container::RaiseComponentToTop(Component *c)
 
   for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
     if (c == (*i)) {
-      i = _components.erase(i);
+      i = _components.erase(i) - 1;
 
       if (i == _components.end()) {
         break;
@@ -1095,7 +1095,7 @@ void Container::LowerComponentToBottom(Component *c)
 
   for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
     if (c == (*i)) {
-      i = _components.erase(i);
+      i = _components.erase(i) - 1;
 
       if (i == _components.end()) {
         break;
