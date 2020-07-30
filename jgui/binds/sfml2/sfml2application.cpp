@@ -360,7 +360,7 @@ static void InternalPaint()
     *g = sg_back_buffer->GetGraphics();
 
   g->Reset();
-  g->SetCompositeFlags(jgui::JCF_SRC_OVER);
+  g->SetCompositeFlags(jgui::JCF_SRC);
 
 	sg_jgui_window->DoLayout();
   sg_jgui_window->Paint(g);

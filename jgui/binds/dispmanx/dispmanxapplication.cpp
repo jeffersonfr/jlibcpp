@@ -173,7 +173,7 @@ bool layer_init(layer_t *bg)
     VC_RECT_T dst_rect;
     uint32_t vc_image_ptr;
 
-    if (image_init(&bg->image, VC_IMAGE_RGBA32, SW, SH) == false) {
+    if (image_init(&bg->image, VC_IMAGE_XRGB8888, SW, SH) == false) { // RGBA32
 	    return false;
     }
 
@@ -486,13 +486,13 @@ static void InternalPaint()
   }
 
   g->Reset();
-  g->SetCompositeFlags(jgui::JCF_SRC_OVER);
+  g->SetCompositeFlags(jgui::JCF_SRC);
 
 	sg_jgui_window->DoLayout();
   sg_jgui_window->Paint(g);
     
   if (sg_cursor_enabled == true) {
-    g->DrawImage(sg_cursor_params.cursor, jgui::jpoint_t<int>{sg_mouse_x, sg_mouse_y});
+    // g->DrawImage(sg_cursor_params.cursor, jgui::jpoint_t<int>{sg_mouse_x, sg_mouse_y});
   }
 
   g->Flush();
@@ -508,17 +508,6 @@ static void InternalPaint()
   sg_layer.update = vc_dispmanx_update_start(0);
 
   if (sg_layer.update != 0) {
-    int size = bounds.size.width*bounds.size.height;
-    uint8_t *src = (uint8_t *)data;
-
-    for (int i=0; i<size; i++) {
-      uint8_t p = src[2];
-
-      src[2] = src[0];
-      src[0] = p;
-
-      src = src + 4;
-    }
 
     if (vc_dispmanx_resource_write_data(
           sg_layer.resource, sg_layer.image.type, sg_layer.image.pitch, data, &dst_rect) == 0) {

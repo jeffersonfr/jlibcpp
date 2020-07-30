@@ -466,7 +466,7 @@ static void paint_callback(const nana::paint::graphics& graph)
     sg_jgui_window->Repaint();
   } else {
     g->Reset();
-    g->SetCompositeFlags(jgui::JCF_SRC_OVER);
+    g->SetCompositeFlags(jgui::JCF_SRC);
 
     sg_jgui_window->DoLayout();
     sg_jgui_window->Paint(g);

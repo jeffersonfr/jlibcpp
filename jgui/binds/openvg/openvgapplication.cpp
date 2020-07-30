@@ -422,7 +422,7 @@ static void InternalPaint()
   }
 
   g->Reset();
-  g->SetCompositeFlags(jgui::JCF_SRC_OVER);
+  g->SetCompositeFlags(jgui::JCF_SRC);
 
 	sg_jgui_window->DoLayout();
   sg_jgui_window->Paint(g);
@@ -433,34 +433,18 @@ static void InternalPaint()
 
   g->Flush();
 
-  uint32_t *data = (uint32_t *)sg_back_buffer->LockData();
-
   vgLoadIdentity();
   vgSeti(VG_MATRIX_MODE, VG_MATRIX_IMAGE_USER_TO_SURFACE);
-  vgScale(1.0f, 1.0f);
+  vgScale(1.0f, -1.0f);
+  vgTranslate(1.0f, -bounds.size.height);
 
-  // INFO:: invert the y-axis
-  uint32_t 
-	  *r1 = (uint32_t *)data,
-	  *r2 = (uint32_t *)data + (bounds.size.height - 1)*bounds.size.width;
-
-  for (int i=0; i<bounds.size.height/2; i++) {
-	  for (int j=0; j<bounds.size.width; j++) {
-		  uint32_t p = r1[j];
-
-		  r1[j] = r2[j];
-		  r2[j] = p; 
-	  }    
-
-	  r1 = r1 + bounds.size.width;
-	  r2 = r2 - bounds.size.width;
-  }
+  uint32_t *data = (uint32_t *)sg_back_buffer->LockData();
 
   VGImage img = vgCreateImage(VG_sARGB_8888, bounds.size.width, bounds.size.height, VG_IMAGE_QUALITY_BETTER);
   vgImageSubData(img, data, bounds.size.width*4, VG_sARGB_8888, 0, 0, bounds.size.width, bounds.size.height);
   vgDrawImage(img);
   vgDestroyImage(img);
-  
+
   if (g->IsVerticalSyncEnabled() == false) {
     vgFlush();
   } else {
