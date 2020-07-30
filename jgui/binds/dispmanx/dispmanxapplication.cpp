@@ -49,8 +49,8 @@ extern "C" {
 #define ALIGN_TO_16(x)  ((x + 15) & ~15)
 #endif
 
-#define SW 480*2
-#define SH 270*2
+#define SW 1280
+#define SH 720
 
 namespace jgui {
 
@@ -106,7 +106,7 @@ static Window *sg_jgui_window = nullptr;
 /** \brief */
 static jcursor_style_t sg_jgui_cursor = JCS_DEFAULT;
 /** \brief */
-static struct cursor_params_t sg_jgui_cursor;
+static struct cursor_params_t sg_cursor_params;
 
 bool image_init(image_t *image, VC_IMAGE_TYPE_T type, int32_t width, int32_t height)
 {
@@ -419,7 +419,7 @@ void Application::Init(int argc, char **argv)
 	t.hot_x = hotx;																												\
 	t.hot_y = hoty;																												\
 																																				\
-	t.cursor->GetGraphics()->DrawImage(cursors, {ix*w, iy*h, w, h}, {0, 0});	\
+	t.cursor->GetGraphics()->DrawImage(cursors, {ix*w, iy*h, w, h}, jgui::jpoint_t<int>{0, 0});	\
 																																				\
 	sgsg_jgui_cursors[type] = t;																										\
 
@@ -492,7 +492,7 @@ static void InternalPaint()
   sg_jgui_window->Paint(g);
     
   if (sg_cursor_enabled == true) {
-    g->DrawImage(sg_jgui_cursor.cursor, sg_mouse_x, sg_mouse_y);
+    g->DrawImage(sg_cursor_params.cursor, jgui::jpoint_t<int>{sg_mouse_x, sg_mouse_y});
   }
 
   g->Flush();
@@ -509,7 +509,7 @@ static void InternalPaint()
 
   if (sg_layer.update != 0) {
     int size = bounds.size.width*bounds.size.height;
-    uint8_t *src = data;
+    uint8_t *src = (uint8_t *)data;
 
     for (int i=0; i<size; i++) {
       uint8_t p = src[2];
@@ -547,7 +547,6 @@ void Application::Loop()
   uint32_t lastsg_mouse_state = 0x00;
   int mouse_x = 0;
   int mouse_y = 0;
-  bool shift = false;
   
   int 
     fdk = open("/dev/input/by-path/platform-3f980000.usb-usb-0:1.4:1.0-event-kbd", O_RDONLY);
@@ -671,7 +670,7 @@ void Application::Loop()
 
       lastsg_mouse_state = buttonMask;
 
-      sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, jevent::JMB_NONE, {sg_mouse_x + sg_jgui_cursor.hot_x, sg_mouse_y + sg_jgui_cursor.hot_y}, mouse_z));
+      sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, jevent::JMB_NONE, {sg_mouse_x + sg_cursor_params.hot_x, sg_mouse_y + sg_cursor_params.hot_y}, mouse_z));
     }
   }
 
@@ -703,7 +702,7 @@ NativeWindow::NativeWindow(jgui::Window *parent, jgui::jrect_t<int> bounds):
 {
 	jcommon::Object::SetClassName("jgui::NativeWindow");
 
-	if (sg_window != nullptr) {
+	if (sg_jgui_window != nullptr) {
 		throw jexception::RuntimeException("Cannot create more than one window");
   }
   
@@ -833,15 +832,15 @@ void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 		return;
 	}
 
-  if (sg_jgui_cursor.cursor != nullptr) {
-    delete sg_jgui_cursor.cursor;
-    sg_jgui_cursor.cursor = nullptr;
+  if (sg_cursor_params.cursor != nullptr) {
+    delete sg_cursor_params.cursor;
+    sg_cursor_params.cursor = nullptr;
   }
 
-  sg_jgui_cursor.cursor = dynamic_cast<jgui::Image *>(shape->Clone());
+  sg_cursor_params.cursor = dynamic_cast<jgui::Image *>(shape->Clone());
 
-  sg_jgui_cursor.hot_x = hotx;
-  sg_jgui_cursor.hot_y = hoty;
+  sg_cursor_params.hot_x = hotx;
+  sg_cursor_params.hot_y = hoty;
 }
 
 void NativeWindow::SetRotation(jwindow_rotation_t t)

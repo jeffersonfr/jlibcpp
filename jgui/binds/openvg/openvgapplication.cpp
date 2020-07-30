@@ -310,7 +310,7 @@ void Application::Init(int argc, char **argv)
 	t.hot_x = hotx;																												\
 	t.hot_y = hoty;																												\
 																																				\
-	t.cursor->GetGraphics()->DrawImage(cursors, {ix*w, iy*h, w, h}, {0, 0});	\
+	t.cursor->GetGraphics()->DrawImage(cursors, {ix*w, iy*h, w, h}, jgui::jpoint_t<int>{0, 0});	\
 																																				\
 	sg_cursors[type] = t;																										\
 
@@ -428,7 +428,7 @@ static void InternalPaint()
   sg_jgui_window->Paint(g);
 
   if (sg_cursor_enabled == true) {
-    g->DrawImage(sg_cursor_params.cursor, sg_mouse_x, sg_mouse_y);
+    g->DrawImage(sg_cursor_params.cursor, jgui::jpoint_t<int>{sg_mouse_x, sg_mouse_y});
   }
 
   g->Flush();
@@ -457,7 +457,7 @@ static void InternalPaint()
   }
 
   VGImage img = vgCreateImage(VG_sARGB_8888, bounds.size.width, bounds.size.height, VG_IMAGE_QUALITY_BETTER);
-  vgImageSubData(img, data, stride, VG_sARGB_8888, 0, 0, bounds.size.width, bounds.size.height);
+  vgImageSubData(img, data, bounds.size.width*4, VG_sARGB_8888, 0, 0, bounds.size.width, bounds.size.height);
   vgDrawImage(img);
   vgDestroyImage(img);
   
@@ -483,7 +483,6 @@ void Application::Loop()
   std::lock_guard<std::mutex> lock(sg_loop_mutex);
 
   struct input_event ev;
-  bool shift = false;
   int mouse_x = 0, mouse_y = 0;
   uint32_t lastsg_mouse_state = 0x00;
 
@@ -616,7 +615,8 @@ void Application::Loop()
   }
 
   sg_jgui_window->SetVisible(false);
-  sg_jgui_window->GrabEvents();
+  // TODO:: what for ??
+  // sg_jgui_window->GrabEvents();
 }
 
 jsize_t<int> Application::GetScreenSize()

@@ -17,7 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-//#define RASPBERRY_PI
+#define RASPBERRY_PI
 
 #include "binds/include/nativewindow.h"
 
@@ -629,7 +629,7 @@ void Application::Init(int argc, char **argv)
 	t.hot_x = hotx;																												\
 	t.hot_y = hoty;																												\
 																																				\
-	t.cursor->GetGraphics()->DrawImage(cursors, {ix*w, iy*h, w, h}, {0, 0});	\
+	t.cursor->GetGraphics()->DrawImage(cursors, {ix*w, iy*h, w, h}, jgui::jpoint_t<int>{0, 0});	\
 																																				\
 	sg_jgui_cursors[type] = t;																										\
 
@@ -711,7 +711,7 @@ static void InternalPaint()
 #ifdef RASPBERRY_PI
 
   if (sg_cursor_enabled == true) {
-    g->DrawImage(sg_cursor_params_cursor.cursor, sg_mouse_x, sg_mouse_y);
+    g->DrawImage(sg_cursor_params_cursor.cursor, jgui::jpoint_t<int>{sg_mouse_x, sg_mouse_y});
   }
 
 #endif
@@ -825,7 +825,6 @@ void Application::Loop()
 #ifdef RASPBERRY_PI
 
   struct input_event ev;
-  bool shift = false;
   int mouse_x = 0, mouse_y = 0;
   uint32_t lastsg_mouse_state = 0x00;
 
@@ -973,7 +972,7 @@ void Application::Loop()
 
       lastsg_mouse_state = buttonMask;
 
-      sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, jevent::JMB_NONE, {sg_mouse_x + sg_cursor_params_cursor.hot_x, sg_mouse_y + sg_cursor_params_cursor.hot_y}. mouse_z));
+      sg_jgui_window->GetEventManager()->PostEvent(new jevent::MouseEvent(sg_jgui_window, type, button, jevent::JMB_NONE, {sg_mouse_x + sg_cursor_params_cursor.hot_x, sg_mouse_y + sg_cursor_params_cursor.hot_y}, mouse_z));
     }
 
 #else
@@ -1356,8 +1355,8 @@ jgui::jrect_t<int> NativeWindow::GetBounds()
 
 #ifdef RASPBERRY_PI
 
-	t.width = sg_screen.width;
-	t.height = sg_screen.height;
+	t.size.width = sg_screen.width;
+	t.size.height = sg_screen.height;
 
 #else
 

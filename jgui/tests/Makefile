@@ -1,5 +1,6 @@
 include ../../Makefile.defs
 
+CC=c++
 DEBUG  		= -g -ggdb 
 
 CCFLAGS		= \

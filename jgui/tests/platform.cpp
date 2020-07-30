@@ -896,7 +896,7 @@ class EntityManager : public Component {
         if (entity->valid == false) {
           delete entity;
 
-          i = _entities.erase(i);
+          i = _entities.erase(i) - 1;
 
           if (i == _entities.end()) {
             break;

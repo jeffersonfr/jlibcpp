@@ -1,5 +1,9 @@
 [Installing jlibcpp]
 
+:Dependencies
+
+$ sudo apt-get install libssl-dev libcairo2-dev uuid-dev libjpeg-dev libasound2-dev
+
 :Makefile defines
 
 ENABLE_DEBUG = <no, yes>
