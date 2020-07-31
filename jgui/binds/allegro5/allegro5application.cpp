@@ -34,8 +34,6 @@
 namespace jgui {
 
 /** \brief */
-jgui::Image *sg_back_buffer = nullptr;
-/** \brief */
 static std::atomic<bool> sg_repaint;
 /** \brief */
 static std::map<int, int> sg_key_modifiers;
@@ -347,24 +345,20 @@ static void InternalPaint()
   jrect_t<int> 
     bounds = sg_jgui_window->GetBounds();
 
-  if (sg_back_buffer != nullptr) {
-    jgui::jsize_t<int>
-      size = sg_back_buffer->GetSize();
+  ALLEGRO_LOCKED_REGION 
+    *lock = al_lock_bitmap(sg_surface, ALLEGRO_PIXEL_FORMAT_ARGB_8888, ALLEGRO_LOCK_WRITEONLY);
+  cairo_surface_t
+    *surface = cairo_image_surface_create_for_data(
+        (uint8_t *)lock->data, CAIRO_FORMAT_RGB24, bounds.size.width, bounds.size.height, cairo_format_stride_for_width(CAIRO_FORMAT_RGB24, bounds.size.width));
 
-    if (size.width != bounds.size.width or size.height != bounds.size.height) {
-      delete sg_back_buffer;
-      sg_back_buffer = nullptr;
-    }
-  }
-
-  if (sg_back_buffer == nullptr) {
-    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, bounds.size);
-  }
-
+  jgui::BufferedImage
+    buffer(surface);
   jgui::Graphics 
-    *g = sg_back_buffer->GetGraphics();
+    *g = buffer.GetGraphics();
 
   if (Application::FrameRate(sg_jgui_window->GetFramesPerSecond()) == true) {
+	  al_unlock_bitmap(sg_surface);
+
     g->Flush();
 
     sg_jgui_window->Repaint();
@@ -380,35 +374,14 @@ static void InternalPaint()
 
   g->Flush();
 
-	ALLEGRO_LOCKED_REGION 
-    *lock = al_lock_bitmap(sg_surface, ALLEGRO_PIXEL_FORMAT_ARGB_8888, ALLEGRO_LOCK_WRITEONLY);
-	int 
-    size = bounds.size.width*bounds.size.height;
-	uint8_t 
-    *src = sg_back_buffer->LockData(),
-	  *dst = (uint8_t *)lock->data;
-
-  for (int i=0; i<size; i++) {
-    dst[3] = src[3];
-    dst[2] = src[2];
-    dst[1] = src[1];
-    dst[0] = src[0];
-
-    src = src + 4;
-    dst = dst + 4;
-  }
-
 	al_unlock_bitmap(sg_surface);
-	
-	al_clear_to_color(al_map_rgb(0, 0, 0));
+  al_clear_to_color(al_map_rgb(0, 0, 0));
 	al_draw_bitmap(sg_surface, 0, 0, 0);
 	al_flip_display();
   
   if (g->IsVerticalSyncEnabled() == true) {
     al_wait_for_vsync();
   }
-
-  sg_back_buffer->UnlockData();
 
   sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
 }
@@ -637,9 +610,6 @@ NativeWindow::~NativeWindow()
 
 	al_destroy_display(sg_display);
   sg_display = nullptr;
-  
-  delete sg_back_buffer;
-  sg_back_buffer = nullptr;
 }
 
 void NativeWindow::Repaint(Component *cmp)

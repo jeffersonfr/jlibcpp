@@ -83,8 +83,6 @@ struct modeset_buf;
 struct modeset_dev;
 
 /** \brief */
-jgui::Image *sg_back_buffer = nullptr;
-/** \brief */
 static std::atomic<bool> sg_repaint;
 /** \brief */
 static int sg_handler = -1;
@@ -642,22 +640,19 @@ static void InternalPaint()
   jrect_t<int> 
     bounds = sg_jgui_window->GetBounds();
 
-  if (sg_back_buffer != nullptr) {
-    jgui::jsize_t<int>
-      size = sg_back_buffer->GetSize();
+  struct modeset_dev
+    *dev = sg_modeset_list; // INFO:: first monitor
+  struct modeset_buf
+    *buf = &dev->bufs[dev->front_buf ^ 1];
 
-    if (size.width != bounds.size.width or size.height != bounds.size.height) {
-      delete sg_back_buffer;
-      sg_back_buffer = nullptr;
-    }
-  }
-
-  if (sg_back_buffer == nullptr) {
-    sg_back_buffer = new jgui::BufferedImage(jgui::JPF_RGB32, bounds.size);
-  }
-
+  cairo_surface_t
+    *surface = cairo_image_surface_create_for_data(
+        (uint8_t *)buf->map, CAIRO_FORMAT_RGB24, bounds.size.width, bounds.size.height, cairo_format_stride_for_width(CAIRO_FORMAT_RGB24, bounds.size.width));
+  
+  jgui::BufferedImage
+    buffer(surface);
   jgui::Graphics 
-    *g = sg_back_buffer->GetGraphics();
+    *g = buffer.GetGraphics();
 
   if (Application::FrameRate(sg_jgui_window->GetFramesPerSecond()) == true) {
     g->Flush();
@@ -679,22 +674,7 @@ static void InternalPaint()
   
   g->Flush();
   
-  uint32_t *data = (uint32_t *)sg_back_buffer->LockData();
-
-  struct modeset_dev *dev = sg_modeset_list; // INFO:: first monitor
-  struct modeset_buf *buf = &dev->bufs[dev->front_buf ^ 1];
-  uint32_t *src = (uint32_t *)data;
-  uint32_t *dst = (uint32_t *)buf->map;
-
-  for (int j = 0; j < bounds.size.height; j++) {
-    for (int i = 0; i < bounds.size.width; i++) {
-      *dst++ = *src++;
-    }
-  }
-
   dev->front_buf ^= 1;
-
-  sg_back_buffer->UnlockData();
 
   sg_pending = true;
 
@@ -889,9 +869,6 @@ NativeWindow::~NativeWindow()
 
   modeset_cleanup();
   close(sg_handler);
-  
-  delete sg_back_buffer;
-  sg_back_buffer = nullptr;
 }
 
 void NativeWindow::Repaint(Component *cmp)

@@ -44,8 +44,6 @@ static std::atomic<bool> sg_repaint;
 /** \brief */
 static int sg_window = 0;
 /** \brief */
-static jgui::jrect_t<int> sg_bounds = {0, 0, 0, 0};
-/** \brief */
 static int sg_mouse_x = 0;
 /** \brief */
 static int sg_mouse_y = 0;
@@ -401,6 +399,8 @@ static void OnDraw()
   glTexSubImage2D(
       GL_TEXTURE_2D, 0 ,0, 0, bounds.size.width, bounds.size.height, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)data);
 
+  sg_back_buffer->UnlockData();
+
   glBegin( GL_QUADS );
   glTexCoord2d(0.0, 0.0); glVertex2d(0.0, 0.0);
   glTexCoord2d(1.0, 0.0); glVertex2d(bounds.size.width, 0.0);
@@ -416,8 +416,6 @@ static void OnDraw()
     glFinish();
   }
   
-  sg_back_buffer->UnlockData();
-
   sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
 }
 
@@ -432,13 +430,6 @@ void OnShape(int w, int h)
   gluOrtho2D(0.0f, (GLdouble)w, (GLdouble)h, 0.0f);
   glMatrixMode(GL_MODELVIEW);
   glViewport(0, 0, w, h);
-
-  sg_bounds = {
-    glutGet(GLUT_WINDOW_X),
-    glutGet(GLUT_WINDOW_Y),
-    glutGet(GLUT_WINDOW_WIDTH),
-    glutGet(GLUT_WINDOW_HEIGHT)
-  };
 }
 
 std::map<jevent::jmouseevent_button_t, bool> sg_mouse_button_state;
@@ -788,18 +779,16 @@ void NativeWindow::SetBounds(int x, int y, int width, int height)
 {
   glutPositionWindow(x, y);
   glutReshapeWindow(width, height);
-  
-  sg_bounds = {
+}
+
+jgui::jrect_t<int> NativeWindow::GetBounds()
+{
+  return {
     glutGet(GLUT_WINDOW_X),
     glutGet(GLUT_WINDOW_Y),
     glutGet(GLUT_WINDOW_WIDTH),
     glutGet(GLUT_WINDOW_HEIGHT)
   };
-}
-
-jgui::jrect_t<int> NativeWindow::GetBounds()
-{
-  return sg_bounds;
 }
 		
 void NativeWindow::SetVisible(bool visible)
