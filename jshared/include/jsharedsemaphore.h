@@ -24,6 +24,7 @@
 #include "jcommon/jobject.h"
 
 #include <iostream>
+#include <thread>
 
 #include <sys/socket.h>
 #include <sys/ipc.h>
@@ -40,88 +41,13 @@ namespace jshared {
  */
 class SharedSemaphore : public virtual jcommon::Object {
 
-  class SharedSemaphoreOp {
-
-    private:
-      /** \brief */
-      int _id;
-      /** \brief */
-      int _index;
-      /** \brief */
-      bool _is_blocking;
-
-    public:
-      /**
-       * \brief
-       *
-       */
-      SharedSemaphoreOp(int id, int index);
-
-      /**
-       * \brief
-       *
-       */
-      virtual ~SharedSemaphoreOp();
-
-      /**
-       * \brief
-       *
-       */
-      virtual void SetBlocking(bool b);
-
-      /**
-       * \brief
-       *
-       */
-      virtual bool IsBlocking();
-
-      /**
-       * \brief
-       *
-       */
-      virtual int GetLocked();
-
-      /**
-       * \brief
-       *
-       */
-      virtual int GetUnlocked();
-
-      /**
-       * \brief
-       *
-       */
-      virtual void Wait();
-
-      /**
-       * \brief Wait milliseconds.
-       *
-       */
-      virtual void Wait(int ms);
-
-      /**
-       * \brief
-       *
-       */
-      virtual void Notify(int n);
-
-      /**
-       * \brief
-       *
-       */
-      virtual void NotifyAll();
-
-  };
-
   private:
     /** \brief */
     key_t _key;
     /** \brief */
     int _id;
     /** \brief */
-    int _nsem;
-    /** \brief */
-    bool _is_blocking;
+    bool _blocking;
 
   public:
     /**
@@ -129,13 +55,13 @@ class SharedSemaphore : public virtual jcommon::Object {
      * only one process.
      *
      */
-    SharedSemaphore(key_t key_);
+    SharedSemaphore(int key);
 
     /**
      * \brief Create a new semaphore.
      *
      */
-    SharedSemaphore(key_t key_, int nsem_, int value_ = 1, jshared_permissions_t = JSP_URWX);
+    SharedSemaphore(int key, short value = 1, jshared_permissions_t = JSP_URWX);
 
     /**
      * \brief Destrutor virtual.
@@ -147,13 +73,37 @@ class SharedSemaphore : public virtual jcommon::Object {
      * \brief
      *
      */
-    virtual SharedSemaphoreOp At(int index);
+    virtual void Wait();
+
+    /**
+     * \brief Wait milliseconds.
+     *
+     */
+    virtual void Wait(std::chrono::milliseconds ms);
 
     /**
      * \brief
      *
      */
-    virtual void SetBlocking(bool b);
+    virtual void Notify(short count = 1);
+
+    /**
+     * \brief
+     *
+     */
+    virtual void NotifyAll();
+
+    /**
+     * \brief
+     *
+     */
+    virtual void Release();
+
+    /**
+     * \brief
+     *
+     */
+    virtual void SetBlocking(bool block);
 
     /**
      * \brief
@@ -165,31 +115,7 @@ class SharedSemaphore : public virtual jcommon::Object {
      * \brief
      *
      */
-    virtual void Wait(int *array, int array_size);
-
-    /**
-     * \brief Wait milliseconds.
-     *
-     */
-    virtual void Wait(int *array, int array_size, int ms);
-
-    /**
-     * \brief
-     *
-     */
-    virtual void Notify(int *array, int array_size, int n);
-
-    /**
-     * \brief
-     *
-     */
-    virtual void NotifyAll(int *array, int array_size);
-
-    /**
-     * \brief
-     *
-     */
-    virtual void Release();
+    virtual int GetValue();
 
 };
 

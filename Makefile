@@ -182,8 +182,8 @@ OBJS_jshared += \
   jprocessoutputstream.o\
   jschedule.o\
   jsharedlib.o\
-  jsharedmutex.o\
   jsharedqueue.o\
+  jsharedmemory.o\
   jsharedsemaphore.o\
   jindexedbuffer.o\
 

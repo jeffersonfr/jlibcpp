@@ -29,7 +29,7 @@
 
 namespace jshared {
 
-MemoryMap::MemoryMap(jio::File *file, int length, bool shared, jio::jfile_permissions_t perms):
+MemoryMap::MemoryMap(jio::File *file, bool shared, jio::jfile_permissions_t perms):
   jcommon::Object()
 {
   if (file == nullptr) {
@@ -39,7 +39,6 @@ MemoryMap::MemoryMap(jio::File *file, int length, bool shared, jio::jfile_permis
   jcommon::Object::SetClassName("jshared::MemoryMap");
 
   _file = file;
-  _length = length;
 
   int flags = PROT_NONE;
 
@@ -56,9 +55,9 @@ MemoryMap::MemoryMap(jio::File *file, int length, bool shared, jio::jfile_permis
   }
 
   if (shared == false) {
-    _address = (uint8_t *)mmap(nullptr, length, flags, MAP_PRIVATE, _file->GetDescriptor(), 0);
+    _address = (uint8_t *)mmap(nullptr, file->GetSize(), flags, MAP_PRIVATE, _file->GetDescriptor(), 0);
   } else {
-    _address = (uint8_t *)mmap(nullptr, length, flags, MAP_SHARED, _file->GetDescriptor(), 0);
+    _address = (uint8_t *)mmap(nullptr, file->GetSize(), flags, MAP_SHARED, _file->GetDescriptor(), 0);
   }
 
   if (_address == MAP_FAILED) {
@@ -68,7 +67,7 @@ MemoryMap::MemoryMap(jio::File *file, int length, bool shared, jio::jfile_permis
 
 MemoryMap::~MemoryMap()
 {
-  munmap(_address, _length);
+  munmap(_address, _file->GetSize());
 
   _file->Close();
 
@@ -84,11 +83,6 @@ jio::File * MemoryMap::GetFile()
 uint8_t * MemoryMap::GetAddress()
 {
   return _address;
-}
-
-int64_t MemoryMap::GetLength()
-{
-  return _length;
 }
 
 void MemoryMap::SetPermission(jio::jfile_permissions_t perms)
@@ -107,8 +101,36 @@ void MemoryMap::SetPermission(jio::jfile_permissions_t perms)
     flags = flags | PROT_EXEC;
   }
 
-  if (mprotect(_address, _length, flags) < 0) {
+  if (mprotect(_address, _file->GetSize(), flags) < 0) {
     throw jexception::MemoryException("Set permission failed");
+  }
+}
+
+void MemoryMap::Lock()
+{
+  if (mlock(GetAddress(), (size_t)GetLength()) < 0) {
+    throw jexception::MemoryException("Lock memory error");
+  }
+}
+
+void MemoryMap::Unlock()
+{
+  if (munlock(GetAddress(), (size_t)GetLength()) < 0) {
+    throw jexception::MemoryException("Unlock memory error");
+  }
+}
+
+void MemoryMap::LockAll()
+{
+  if (mlockall(MCL_CURRENT | MCL_FUTURE) < 0) {
+    throw jexception::MemoryException("Lock error");
+  }
+}
+
+void MemoryMap::UnlockAll()
+{
+  if (munlockall() < 0) {
+    throw jexception::MemoryException("Unlock error");
   }
 }
 

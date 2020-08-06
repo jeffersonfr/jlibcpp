@@ -36,15 +36,13 @@ class MemoryMap : public virtual jcommon::Object {
       jio::File *_file;
       /** \brief */
       uint8_t *_address;
-      /** \brief */
-      int64_t _length;
 
     public:
       /**
        * \brief Constructor.
        *
        */
-      MemoryMap(jio::File *file, int length, bool shared = true, 
+      MemoryMap(jio::File *file, bool shared = true, 
           jio::jfile_permissions_t perms = (jio::jfile_permissions_t)(jio::JFP_USR_READ | jio::JFP_USR_WRITE));
 
       /**
@@ -76,6 +74,30 @@ class MemoryMap : public virtual jcommon::Object {
        *
        */
       virtual void SetPermission(jio::jfile_permissions_t perms);
+
+      /**
+       * \brief
+       *
+       */
+      void Lock();
+
+      /**
+       * \brief
+       *
+       */
+      void Unlock();
+
+      /**
+       * \brief
+       *
+       */
+      void LockAll();
+
+      /**
+       * \brief
+       *
+       */
+      void UnlockAll();
 
 };
 
