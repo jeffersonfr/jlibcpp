@@ -108,14 +108,14 @@ void MemoryMap::SetPermission(jio::jfile_permissions_t perms)
 
 void MemoryMap::Lock()
 {
-  if (mlock(GetAddress(), (size_t)GetLength()) < 0) {
+  if (mlock(GetAddress(), (size_t)GetFile()->GetSize()) < 0) {
     throw jexception::MemoryException("Lock memory error");
   }
 }
 
 void MemoryMap::Unlock()
 {
-  if (munlock(GetAddress(), (size_t)GetLength()) < 0) {
+  if (munlock(GetAddress(), (size_t)GetFile()->GetSize()) < 0) {
     throw jexception::MemoryException("Unlock memory error");
   }
 }

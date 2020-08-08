@@ -67,12 +67,6 @@ class MemoryMap : public virtual jcommon::Object {
        * \brief
        *
        */
-      virtual int64_t GetLength();
-
-      /**
-       * \brief
-       *
-       */
       virtual void SetPermission(jio::jfile_permissions_t perms);
 
       /**
