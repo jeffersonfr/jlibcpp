@@ -654,14 +654,6 @@ static void InternalPaint()
   jgui::Graphics 
     *g = buffer.GetGraphics();
 
-  if (Application::FrameRate(sg_jgui_window->GetFramesPerSecond()) == true) {
-    g->Flush();
-
-    sg_jgui_window->Repaint();
-
-    return;
-  }
-
   g->Reset();
   g->SetCompositeFlags(jgui::JCF_SRC);
 
@@ -674,6 +666,10 @@ static void InternalPaint()
   
   g->Flush();
   
+  if (Application::FrameRate(sg_jgui_window->GetFramesPerSecond()) == true) {
+    return;
+  }
+
   dev->front_buf ^= 1;
 
   sg_pending = true;

@@ -412,6 +412,10 @@ static void InternalPaint()
 
   g->Flush();
 
+  if (Application::FrameRate(sg_jgui_window->GetFramesPerSecond()) == true) {
+    return;
+  }
+
   uint32_t *data = (uint32_t *)sg_back_buffer->LockData();
 
 	int 
@@ -452,14 +456,6 @@ static void InternalPaint()
     
   sg_back_buffer->UnlockData();
   
-  if (Application::FrameRate(sg_jgui_window->GetFramesPerSecond()) == true) {
-    g->Flush();
-
-    sg_jgui_window->Repaint();
-
-    return;
-  }
-
   sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_PAINTED));
 }
 

@@ -386,7 +386,7 @@ void Application::Init(int argc, char **argv)
 
 static void InternalPaint()
 {
-	if (sg_jgui_window == nullptr || sg_jgui_window->IsVisible() == false) {
+	if (sg_jgui_window == nullptr || sg_surface == nullptr || sg_jgui_window->IsVisible() == false) {
 		return;
 	}
 
@@ -410,14 +410,6 @@ static void InternalPaint()
   jgui::Graphics 
     *g = sg_back_buffer->GetGraphics();
 
-  if (Application::FrameRate(sg_jgui_window->GetFramesPerSecond()) == true) {
-    g->Flush();
-
-    sg_jgui_window->Repaint();
-
-    return;
-  }
-
   g->Reset();
   g->SetCompositeFlags(jgui::JCF_SRC);
 
@@ -426,9 +418,9 @@ static void InternalPaint()
 
   g->Flush();
 
-	if (sg_surface == nullptr) {
-		return;
-	}
+  if (Application::FrameRate(sg_jgui_window->GetFramesPerSecond()) == true) {
+    return;
+  }
 
   uint32_t *data = (uint32_t *)sg_back_buffer->LockData();
 

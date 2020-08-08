@@ -356,16 +356,6 @@ static void InternalPaint()
   jgui::Graphics 
     *g = buffer.GetGraphics();
 
-  if (Application::FrameRate(sg_jgui_window->GetFramesPerSecond()) == true) {
-	  al_unlock_bitmap(sg_surface);
-
-    g->Flush();
-
-    sg_jgui_window->Repaint();
-
-    return;
-  }
-
   g->Reset();
   g->SetCompositeFlags(jgui::JCF_SRC);
 
@@ -375,6 +365,11 @@ static void InternalPaint()
   g->Flush();
 
 	al_unlock_bitmap(sg_surface);
+
+  if (Application::FrameRate(sg_jgui_window->GetFramesPerSecond()) == true) {
+    return;
+  }
+
   al_clear_to_color(al_map_rgb(0, 0, 0));
 	al_draw_bitmap(sg_surface, 0, 0, 0);
 	al_flip_display();

@@ -23,62 +23,32 @@
 
 namespace jgui {
 
-bool Application::FrameRate(int fps)
+bool Application::FrameRate(size_t fps)
 {
-  static std::chrono::steady_clock::time_point last_time = std::chrono::steady_clock::now();
-  static int last_fps = fps;
+  static std::chrono::steady_clock::time_point 
+    last_time = std::chrono::steady_clock::now();
+  static size_t
+    last_fps = fps,
+    frames = 0;
 
   if (fps != last_fps) {
     last_time = std::chrono::steady_clock::now();
     last_fps = fps;
+    frames = 0;
   }
 
-  std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-  std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_time);
-  std::chrono::milliseconds step = std::chrono::milliseconds(1000/fps);
+  static std::chrono::steady_clock::time_point 
+    current = std::chrono::steady_clock::now();
+  static std::chrono::steady_clock::time_point 
+    calculate = last_time + std::chrono::microseconds(++frames*1000000LL/fps);
 
-  last_time = now;
-
-  if (diff > step) {
+  if (calculate < current) {
     return true;
   }
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(step - diff));
+  std::this_thread::sleep_for(calculate - current);
 
   return false;
-
-  /*
-  static std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-
-  static int latest_fps = -1;
-  static int index = 0;
-
-  if (fps != latest_fps) {
-    begin = std::chrono::steady_clock::now();
-    latest_fps = fps;
-    index = 0;
-  }
-
-  std::chrono::time_point<std::chrono::steady_clock> timestamp = begin + std::chrono::milliseconds(++index*1000/fps);
-  std::chrono::time_point<std::chrono::steady_clock> current = std::chrono::steady_clock::now();
-  std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - current);
-
-  if (diff.count() < 0) {
-    std::chrono::milliseconds step(1000/fps);
-
-    step = 2*step;
-
-    if (step < -diff) {
-      return true; // skip frame
-    }
-
-    return false;
-  }
-
-  std::this_thread::sleep_for(diff);
-
-  return false;
-  */
 }
 
 }

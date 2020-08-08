@@ -297,14 +297,6 @@ static void InternalPaint()
   jgui::Graphics 
     *g = sg_back_buffer->GetGraphics();
 
-  if (Application::FrameRate(sg_jgui_window->GetFramesPerSecond()) == true) {
-    g->Flush();
-
-    sg_jgui_window->Repaint();
-
-    return;
-  }
-
   g->Reset();
   g->SetCompositeFlags(jgui::JCF_SRC);
 
@@ -312,6 +304,10 @@ static void InternalPaint()
   sg_jgui_window->Paint(g);
 
   g->Flush();
+
+  if (Application::FrameRate(sg_jgui_window->GetFramesPerSecond()) == true) {
+    return;
+  }
 
   jgui::Image *scale = sg_back_buffer->Scale({FLASCHEN_DISPLAY_WIDTH, FLASCHEN_DISPLAY_HEIGHT});
 

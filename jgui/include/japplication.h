@@ -77,7 +77,7 @@ class Application : public jcommon::Object {
      * \brief
      *
      */
-    static bool FrameRate(int fps);
+    static bool FrameRate(size_t fps);
 
 };
 

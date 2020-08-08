@@ -477,14 +477,6 @@ static void InternalPaint()
   jgui::Graphics 
     *g = sg_back_buffer->GetGraphics();
 
-  if (Application::FrameRate(sg_jgui_window->GetFramesPerSecond()) == true) {
-    g->Flush();
-
-    sg_jgui_window->Repaint();
-
-    return;
-  }
-
   g->Reset();
   g->SetCompositeFlags(jgui::JCF_SRC);
 
@@ -496,6 +488,10 @@ static void InternalPaint()
   }
 
   g->Flush();
+
+  if (Application::FrameRate(sg_jgui_window->GetFramesPerSecond()) == true) {
+    return;
+  }
 
   uint32_t *data = (uint32_t *)sg_back_buffer->LockData();
 

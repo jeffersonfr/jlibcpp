@@ -413,14 +413,6 @@ static void InternalPaint()
   jgui::Graphics 
     *g = sg_back_buffer->GetGraphics();
 
-  if (Application::FrameRate(sg_jgui_window->GetFramesPerSecond()) == true) {
-    g->Flush();
-
-    sg_jgui_window->Repaint();
-
-    return;
-  }
-
   g->Reset();
   g->SetCompositeFlags(jgui::JCF_SRC);
 
@@ -432,6 +424,10 @@ static void InternalPaint()
   }
 
   g->Flush();
+
+  if (Application::FrameRate(sg_jgui_window->GetFramesPerSecond()) == true) {
+    return;
+  }
 
   vgLoadIdentity();
   vgSeti(VG_MATRIX_MODE, VG_MATRIX_IMAGE_USER_TO_SURFACE);

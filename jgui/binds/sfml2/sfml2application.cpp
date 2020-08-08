@@ -367,6 +367,10 @@ static void InternalPaint()
 
   g->Flush();
 
+  if (Application::FrameRate(sg_jgui_window->GetFramesPerSecond()) == true) {
+    return;
+  }
+
   uint8_t *data = sg_back_buffer->LockData();
 
 	sf::Texture texture;
@@ -595,7 +599,7 @@ NativeWindow::NativeWindow(jgui::Window *parent, jgui::jrect_t<int> bounds):
 	sg_window->setPosition(sf::Vector2i(bounds.point.x, bounds.point.y));
 	sg_window->requestFocus();
 	sg_window->setVerticalSyncEnabled(true);
-	sg_window->setFramerateLimit(120);
+	sg_window->setFramerateLimit(12000); // CHANGE:: is correct ?
 	sg_window->setActive(false);
 }
 
