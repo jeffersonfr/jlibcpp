@@ -441,7 +441,7 @@ static void InternalPaint()
   VdpTime 
     this_time = 0;
   uint32_t
-    period = 30000000;
+    period = 1000000;
 
   PresentationQueueBlockUntilSurfaceIdle(sg_vdp_queue, sg_vdp_surface, &sg_vdp_time);
   OutputSurfacePutBitsNative(sg_vdp_surface, (void const *const *)src, pitches, nullptr);
@@ -449,7 +449,7 @@ static void InternalPaint()
   if (!sg_vdp_time) {
     PresentationQueueGetTime(sg_vdp_queue, &sg_vdp_time);
     
-    sg_vdp_time += 30000000;
+    sg_vdp_time += 1000000;
   } else {
     sg_vdp_time += period;
   }

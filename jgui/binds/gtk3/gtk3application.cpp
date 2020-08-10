@@ -402,7 +402,7 @@ static gboolean OnDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
 
   cairo_surface_t *cairo_surface = g->GetCairoSurface();
 
-  cairo_surface_flush(cairo_surface);
+  // cairo_surface_flush(cairo_surface);
   cairo_set_source_surface(cr, cairo_surface, 0, 0);
 	cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
   cairo_paint(cr);
