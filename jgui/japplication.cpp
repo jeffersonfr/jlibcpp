@@ -25,28 +25,26 @@ namespace jgui {
 
 bool Application::FrameRate(size_t fps)
 {
-  static std::chrono::steady_clock::time_point 
-    last_time = std::chrono::steady_clock::now();
-  static size_t
-    last_fps = fps,
-    frames = 0;
+  static auto
+    start_time = std::chrono::steady_clock::now();
+  static int
+    current_frame_number = 0;
 
-  if (fps != last_fps) {
-    last_time = std::chrono::steady_clock::now();
-    last_fps = fps;
-    frames = 0;
-  }
+  auto
+    current_time = std::chrono::steady_clock::now();
+  auto
+    frame_time = start_time + current_frame_number++*std::chrono::microseconds{1000000/fps};
 
-  static std::chrono::steady_clock::time_point 
-    current = std::chrono::steady_clock::now();
-  static std::chrono::steady_clock::time_point 
-    calculate = last_time + std::chrono::microseconds(++frames*1000000LL/fps);
+  std::this_thread::sleep_until(frame_time);
 
-  if (calculate < current) {
+  if (current_time > frame_time) {
+    if ((current_time - frame_time) > std::chrono::seconds(1)) {
+      start_time = current_time;
+      current_frame_number = 0;
+    }
+
     return true;
   }
-
-  std::this_thread::sleep_for(calculate - current);
 
   return false;
 }

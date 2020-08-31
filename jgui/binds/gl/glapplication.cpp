@@ -626,6 +626,8 @@ void OnTimer(int value)
   if (sg_quitting == false) {
     glutTimerFunc(1, OnTimer, value);
   }
+
+  std::this_thread::yield();
 }
 
 void OnVisibility(int state)

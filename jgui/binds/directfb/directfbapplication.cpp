@@ -479,6 +479,8 @@ void Application::Loop()
         // SetCursor(JCS_DEFAULT);
 
         sg_jgui_window->DispatchWindowEvent(new jevent::WindowEvent(sg_jgui_window, jevent::JWET_LEAVED));
+      } else if (event.type == DWET_CLOSE || event.type == DWET_DESTROYED) {
+        sg_quitting = true;
       } else if (event.type == DWET_KEYDOWN || event.type == DWET_KEYUP) {
         jevent::jkeyevent_type_t type;
         jevent::jkeyevent_modifiers_t mod;
