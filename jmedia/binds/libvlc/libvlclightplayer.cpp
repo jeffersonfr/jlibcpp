@@ -550,6 +550,7 @@ LibVLCLightPlayer::LibVLCLightPlayer(jnetwork::URL url):
 	_engine = libvlc_new(vlc_argc, vlc_argv);
 
 	media = libvlc_media_new_path(_engine, _file.c_str());
+	// media = libvlc_media_new_location(_engine, _file.c_str()); // to medias over internet
 
   libvlc_media_add_option(media, ":network-caching=1000"); // 1000ms
   libvlc_media_add_option(media, ":avcodec-hw=vdpau_decoder"); // vlc --list | grep "video decoder"
