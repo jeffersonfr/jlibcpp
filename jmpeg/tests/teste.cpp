@@ -3883,7 +3883,7 @@ class PSIParser : public jevent::DemuxListener {
       int length = event->GetLength();
 
       if (demux->GetType() == jmpeg::JDT_RAW) {
-        printf("Raw Packet:: pid:[0x%04x], length:[%d]\n", pid, length);
+        printf("Raw Packet:: pid:[0x%04x], length:[%d], continuity counter:[%d]\n", pid, length, TS_GM8(ptr + 3, 4, 4));
       } else if (demux->GetType() == jmpeg::JDT_PES) {
         printf("PES Section:: pid:[0x%04x], length:[%d]\n", pid, length);
       } else {

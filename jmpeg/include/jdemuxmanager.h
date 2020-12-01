@@ -26,6 +26,7 @@
 #include <map>
 #include <thread>
 #include <mutex>
+#include <functional>
 
 namespace jmpeg {
 
@@ -90,6 +91,12 @@ class DemuxManager : public jcommon::Object {
      *
      */
     virtual void RemoveDemux(Demux *demux);
+
+    /**
+     * \brief
+     *
+     */
+    virtual void DispatchIfCompleted(int pid, const std::string &section, std::function<bool(Demux *)> predicate);
 
     /**
      * \brief
