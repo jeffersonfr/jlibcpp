@@ -1164,7 +1164,14 @@ template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::v
 
     template<typename U> jrect_t<typename std::common_type<T, U>::type> operator+(const jrect_t<U> &param) const
     {
-      return {point + param.point, size + param.size};
+      int
+        x0 = std::min(point.x, param.point.x),
+        y0 = std::min(point.y, param.point.y);
+      int
+        w0 = std::max(point.x + size.width, param.point.x + param.size.width),
+        h0 = std::max(point.y + size.height, param.point.y + param.size.height);
+
+      return {{x0, y0}, {w0, h0}};
     }
     
     template<typename U> jrect_t<typename std::common_type<T, U>::type> operator-(const jrect_t<U> &param) const
