@@ -2601,24 +2601,15 @@ class SIFacade {
     std::mutex
       _time_mutex;
 
-  private:
+  public:
     SIFacade()
     {
       _data = std::make_shared<SIData>();
       _subtitle = std::make_shared<SISubtitle>();
     }
 
-  public:
     virtual ~SIFacade()
     {
-    }
-
-    static SIFacade * GetInstance()
-    {
-      static SIFacade 
-        *instance = new SIFacade();
-
-      return instance;
     }
 
     void Service(std::shared_ptr<SIService> &param)
@@ -2753,11 +2744,12 @@ class SIFacade {
     
 };
 
-class PSIParser : public jevent::DemuxListener {
+class TransportStreamDump : public jevent::DemuxListener {
 
   private:
     std::map<int, SIService::stream_type_t> _stream_types;
     std::vector<jmpeg::Demux *> _demuxes;
+    SIFacade _si_facade;
 
   private:
     void StopDemux(std::string id)
@@ -2780,7 +2772,7 @@ class PSIParser : public jevent::DemuxListener {
     }
 
   public:
-    PSIParser()
+    TransportStreamDump()
     {
       _stream_types[0x00] = SIService::stream_type_t::RESERVED;
       _stream_types[0x01] = SIService::stream_type_t::VIDEO;
@@ -2815,7 +2807,7 @@ class PSIParser : public jevent::DemuxListener {
       StartPSIDemux("pat", TS_PAT_PID, TS_PAT_TABLE_ID, TS_PAT_TIMEOUT);
     }
 
-    virtual ~PSIParser()
+    virtual ~TransportStreamDump()
     {
       for (std::vector<jmpeg::Demux *>::iterator i=_demuxes.begin(); i!=_demuxes.end(); i++) {
         jmpeg::Demux *demux = (*i);
@@ -2825,6 +2817,11 @@ class PSIParser : public jevent::DemuxListener {
       }
 
       _demuxes.clear();
+    }
+
+    SIFacade & GetSystemFacade()
+    {
+      return _si_facade;
     }
 
     void StartRawDemux(std::string id, int pid, int timeout)
@@ -4070,7 +4067,7 @@ class PSIParser : public jevent::DemuxListener {
       int vpid = -1;
       int program_info_length = TS_GM16(ptr + 10, 4, 12);
 
-      std::shared_ptr<SIService> param = SIFacade::GetInstance()->Service(program_number);
+      std::shared_ptr<SIService> param = _si_facade.Service(program_number);
 
       if (param == nullptr) {
         param = std::make_shared<SIService>();
@@ -4156,7 +4153,7 @@ class PSIParser : public jevent::DemuxListener {
         services_count = services_count + 5 + descriptors_length;
       }
 
-      SIFacade::GetInstance()->Service(param);
+      _si_facade.Service(param);
 
       if (pcr_pid == 0x1fff) { // pmt pcr unsed
         pcr_pid = vpid; // first video pid
@@ -4225,7 +4222,7 @@ class PSIParser : public jevent::DemuxListener {
           descriptors_count = descriptors_count + descriptor_length + 2;  
         }
 
-        SIFacade::GetInstance()->Network(param);
+        _si_facade.Network(param);
 
         transport_stream_loop_count = transport_stream_loop_count + 6 + descriptors_length;
       }
@@ -4261,7 +4258,7 @@ class PSIParser : public jevent::DemuxListener {
 
         ptr = ptr + 5;
 
-        std::shared_ptr<SIService> param = SIFacade::GetInstance()->Service(service_id);
+        std::shared_ptr<SIService> param = _si_facade.Service(service_id);
 
         if (param == nullptr) {
           return;
@@ -4282,7 +4279,7 @@ class PSIParser : public jevent::DemuxListener {
         }
 
         if (param != nullptr) {
-          SIFacade::GetInstance()->Service(param);
+          _si_facade.Service(param);
         }
 
         services_count = services_count + 6 + descriptors_length;
@@ -4438,7 +4435,7 @@ class PSIParser : public jevent::DemuxListener {
         descriptors_count = descriptors_count + descriptor_length + 2;  
       }
       
-      SIFacade::GetInstance()->Time(param);
+      _si_facade.Time(param);
     }
 
     virtual void ProcessRST(jevent::DemuxEvent *event)
@@ -4564,7 +4561,7 @@ class PSIParser : public jevent::DemuxListener {
           ptr = ptr + descriptor_length + 2;
         }
 
-        SIFacade::GetInstance()->Event(param);
+        _si_facade.Event(param);
 
         events_count = events_count + 12 + descriptors_length;
       }
@@ -5224,7 +5221,7 @@ class PSIParser : public jevent::DemuxListener {
           // 6-STD-B24v5_1-1p3-E1:: pg. 113
           DumpBytes("data unit byte", ptr, data_unit_size);
 
-          std::shared_ptr<SISubtitle> param = SIFacade::GetInstance()->Subtitle();
+          std::shared_ptr<SISubtitle> param = _si_facade.Subtitle();
 
           param->Unit(ptr, data_unit_size);
 
@@ -5371,7 +5368,7 @@ class PSIParser : public jevent::DemuxListener {
         printf("DSMCC:DownloadInfoIndication<DII>: download id:[0x%08x], block size:[%d], window size:[%d], number of modules:[%d]\n", download_id, block_size, window_size, number_of_modules);
 
         // INFO:: creating SIData
-        std::shared_ptr<SIData> param = SIFacade::GetInstance()->Data();
+        std::shared_ptr<SIData> param = _si_facade.Data();
 
         if (param->DownloadID() != (uint32_t)-1 and param->DownloadID() != download_id) {
           // TODO:: SIData->Reset() ???
@@ -5572,7 +5569,7 @@ class PSIParser : public jevent::DemuxListener {
         ptr = ptr + 6;
 
         // INFO:: request SIData
-        std::shared_ptr<SIData> param = SIFacade::GetInstance()->Data();
+        std::shared_ptr<SIData> param = _si_facade.Data();
 
         if (param == nullptr) { // INFO:: we need to find DII message first
           return;
@@ -5582,7 +5579,7 @@ class PSIParser : public jevent::DemuxListener {
           // return;
         }
         
-        SIFacade::GetInstance()->Data()->ModuleBlock(download_id, module_id, module_version, block_number, std::make_shared<std::string>(ptr, message_length - adaptation_length - 6));
+        _si_facade.Data()->ModuleBlock(download_id, module_id, module_version, block_number, std::make_shared<std::string>(ptr, message_length - adaptation_length - 6));
       } else if (message_id == 0x1004) { // DownloadDataRequest (DDR)
         int module_id = TS_G16(ptr + 0);
         int block_number = TS_G16(ptr + 2);
@@ -6302,8 +6299,8 @@ int main(int argc, char **argv)
   manager->SetInputStream(stream);
   manager->RegisterStreamListener(&waiter);
 
-  PSIParser 
-    test;
+  TransportStreamDump 
+    dump;
 
   for (int i=4; i<argc; i++) {
     jcommon::StringTokenizer token(argv[i], ":");
@@ -6335,16 +6332,16 @@ int main(int argc, char **argv)
         id1 == "pcr" or
         id1 == "sdtt" or
         id1 == "eit") {
-        test.StartPSIDemux(id1, mapper.GetIntegerParam(id1), -1, 3600000);
+        dump.StartPSIDemux(id1, mapper.GetIntegerParam(id1), -1, 3600000);
     } else if (
         id1 == "ait" or
         id1 == "dsmcc-data" or
         id1 == "dsmcc-descriptors" or
         id1 == "libras-data") {
-        test.StartPrivateDemux(id1, mapper.GetIntegerParam(id1), -1, 3600000);
+        dump.StartPrivateDemux(id1, mapper.GetIntegerParam(id1), -1, 3600000);
     } else if (
         id1 == "closed-caption") {
-        test.StartPESDemux(id1, mapper.GetIntegerParam(id1), 3600000);
+        dump.StartPESDemux(id1, mapper.GetIntegerParam(id1), 3600000);
     }
   }
 
@@ -6361,40 +6358,40 @@ int main(int argc, char **argv)
 
   // INFO:: dumping methods
   auto 
-    data = SIFacade::GetInstance()->Data();
+    data = dump.GetSystemFacade().Data();
 
   data->Parse();
   data->Print();
   data->Save("/tmp/data", true);
 
   auto 
-    subtitle = SIFacade::GetInstance()->Subtitle();
+    subtitle = dump.GetSystemFacade().Subtitle();
 
   subtitle->Print();
 
   auto 
-    networks = SIFacade::GetInstance()->Networks();
+    networks = dump.GetSystemFacade().Networks();
 
   for (auto i : networks) {
     i->Print();
   }
 
   auto 
-    services = SIFacade::GetInstance()->Services();
+    services = dump.GetSystemFacade().Services();
 
   for (auto i : services) {
     i->Print();
   }
 
   auto 
-    events = SIFacade::GetInstance()->Events();
+    events = dump.GetSystemFacade().Events();
 
   for (auto i : events) {
     i->Print();
   }
 
   auto 
-    time = SIFacade::GetInstance()->Time();
+    time = dump.GetSystemFacade().Time();
 
   time.Print();
 
@@ -6407,10 +6404,10 @@ int main(int argc, char **argv)
     count = count + i->second;
   }
 
-  printf("\n\nPID Report\n");
+  printf("\n  PID  | Packets | Percentual\n");
 
   for (std::map<int, int>::iterator i=pid_report.begin(); i!=pid_report.end(); i++) {
-    printf("pid:[0x%04x], count:[%d]:[%02.04f%%]\n", i->first, i->second, 100.0*i->second/(double)count);
+    printf(" 0x%04x|%9d|    %02.04f%%\n", i->first, i->second, 100.0*i->second/(double)count);
   }
 
   return 0;

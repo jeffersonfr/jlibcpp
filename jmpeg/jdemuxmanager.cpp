@@ -142,22 +142,9 @@ void DemuxManager::ProcessRaw(const char *data, const int length)
   int 
     pid = TS_GM16(data + 1, 3, 13);
 
-  // INFO:: process only raw packets
-  for (std::vector<Demux *>::iterator i=_demuxes.begin(); i!=_demuxes.end(); i++) {
-    Demux *demux = (*i);
-
-    if (demux->GetType() != JDT_RAW) {
-      continue;
-    }
-
-    if (demux->GetPID() < 0 || demux->GetPID() == pid) {
-      if (demux->Parse(data, length) == true) {
-        demux->UpdateTimePoint();
-
-        demux->DispatchDemuxEvent(new jevent::DemuxEvent(demux, jevent::JDET_DATA_ARRIVED, data, length, pid));
-      }
-    }
-  }
+  DispatchIfCompleted(pid, std::string(data, length), [](Demux *demux) {
+    return demux->GetType() == JDT_RAW;
+  });
 }
 
 void DemuxManager::ProcessPSI(const char *data, const int length)
@@ -434,11 +421,7 @@ void DemuxManager::Run()
        ProcessPES(data, TS_PACKET_LENGTH);
      } else {
        if (i->second.next_continuity_counter == continuity_counter) {
-         counter[pid] = packet_list {
-           .next_continuity_counter = (continuity_counter + 1)%16,
-           .chunks = {
-           }
-         };
+         counter[pid].next_continuity_counter = (continuity_counter + 1)%16;
 
          ProcessPSI(data, TS_PACKET_LENGTH);
          ProcessPES(data, TS_PACKET_LENGTH);
