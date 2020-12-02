@@ -84,7 +84,7 @@ bool PrivateDemux::Parse(const char *data, int data_length)
   if (section_syntax_indicator != 0) {
     uint32_t 
       // crc = *(uint32_t *)(data+(data_length-4)),
-      sum = jmath::CRC::Calculate32((const uint8_t *)data, data_length);
+      sum = jmath::CRC::Calculate32((const uint8_t *)data, section_length);
 
     _is_crc_failed = false;
 

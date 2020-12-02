@@ -17,46 +17,46 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jmpeg/jprogramserviceinformation.h"
+#include "jmpeg/jpsisection.h"
 #include "jexception/jinvalidargumentexception.h"
 
 #include <algorithm>
 
 namespace jmpeg {
 
-ProgramServiceInformation::ProgramServiceInformation(std::shared_ptr<std::string> data):
+PSISection::PSISection(std::shared_ptr<std::string> data):
   jcommon::Object()
 {
-  jcommon::Object::SetClassName("jmpeg::ProgramServiceInformation");
+  jcommon::Object::SetClassName("jmpeg::PSISection");
 
   _data = data;
 }
 
-ProgramServiceInformation::~ProgramServiceInformation()
+PSISection::~PSISection()
 {
 }
 
-std::shared_ptr<std::string> ProgramServiceInformation::GetData()
+std::shared_ptr<std::string> PSISection::GetData()
 {
   return _data;
 }
 
-int ProgramServiceInformation::GetTableIdentifier()
+int PSISection::GetTableIdentifier()
 {
   return TS_G8(_data->c_str() + 0);
 }
 
-int ProgramServiceInformation::GetSectionSyntaxIndicator()
+int PSISection::GetSectionSyntaxIndicator()
 {
   return TS_GM8(_data->c_str() + 1, 0, 1);
 }
 
-int ProgramServiceInformation::GetSectionLength()
+int PSISection::GetSectionLength()
 {
   return TS_GM16(_data->c_str() + 1, 4, 12);
 }
 
-std::shared_ptr<std::string> ProgramServiceInformation::GetPayload()
+std::shared_ptr<std::string> PSISection::GetPayload()
 {
   return std::make_shared<std::string>(_data->c_str() + 3, GetSectionLength() - 4); // CRC32
 }

@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_PROGRAMSERVICEINFORMATION_H
-#define J_PROGRAMSERVICEINFORMATION_H
+#ifndef J_PSISECTION_H
+#define J_PSISECTION_H
 
 #include "jmpeg/jmpeglib.h"
 #include "jcommon/jobject.h"
@@ -27,7 +27,7 @@
 
 namespace jmpeg {
 
-class ProgramServiceInformation : public jcommon::Object {
+class PSISection : public jcommon::Object {
 
   protected:
     /** \brief */
@@ -38,13 +38,13 @@ class ProgramServiceInformation : public jcommon::Object {
      * \brief
      *
      */
-    ProgramServiceInformation(std::shared_ptr<std::string> data);
+    PSISection(std::shared_ptr<std::string> data);
 
     /**
      * \brief
      *
      */
-    virtual ~ProgramServiceInformation();
+    virtual ~PSISection();
  
     /**
      * \brief
